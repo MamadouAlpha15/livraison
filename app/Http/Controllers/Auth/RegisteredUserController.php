@@ -12,50 +12,51 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Models\DeliveryCompany;
+
 
 class RegisteredUserController extends Controller
 {
     /**
-     * Display the registration view.
+     * Affiche la page d'inscription
      */
     public function create(Request $request): View
     {
-        // ✅ On garde l'ID de la boutique (si présent) pour l’envoyer à la vue
+        // On garde l’ID de la boutique (si présent) pour un éventuel lien de suivi
         $shopId = $request->get('shop_id');
         return view('auth.register', compact('shopId'));
     }
 
     /**
-     * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
+     * Gère la création du compte
      */
     public function store(Request $request): RedirectResponse
     {
+        // Validation des champs
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'in:client,admin,vendeur,livreur'], // 👈 choix du rôle
+            'role' => ['required', 'in:client,admin,company,livreur'], // ✅ ajout de company ici
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string', 'max:255'],
-            'shop_id' => ['nullable', 'exists:shops,id'], // 👈 sécurisation de l’ID boutique
+            'shop_id' => ['nullable', 'exists:shops,id'],
         ]);
 
+        // Création du compte utilisateur
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'phone' => $request->role === 'client' ? $request->phone : null,
+            'phone' => in_array($request->role, ['client', 'livreur']) ? $request->phone : null,
             'address' => $request->role === 'client' ? $request->address : null,
-            'role' => $request->role, // 👈 rôle choisi
+            'role' => $request->role,
         ]);
 
         event(new Registered($user));
-
         Auth::login($user);
 
-        // ✅ Si l’utilisateur venait pour suivre une boutique, on l’ajoute direct
+        // Si le client s'inscrit depuis une boutique à suivre
         if ($request->filled('shop_id') && $user->role === 'client') {
             $shop = Shop::find($request->shop_id);
             if ($shop) {
@@ -63,12 +64,16 @@ class RegisteredUserController extends Controller
             }
         }
 
-        // ✅ Redirection selon rôle
-        if ($user->role === 'admin') {
-            return redirect()->route('boutique.dashboard');
+        // Redirections selon le rôle
+        switch ($user->role) {
+            case 'admin':
+                return redirect()->route('boutique.dashboard');
+            case 'company':
+                return redirect()->route('company.dashboard'); // ✅ redirection spécifique entreprise
+            case 'livreur':
+                return redirect()->route('livreur.dashboard');
+            default:
+                return redirect()->route('client.dashboard');
         }
-       
-
-        return redirect()->route('client.dashboard');
     }
 }

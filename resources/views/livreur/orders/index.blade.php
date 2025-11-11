@@ -71,31 +71,48 @@
               {{ number_format($order->total, 0, ',', ' ') }} GNF
             </td>
 
+            {{-- ---------------- STATUS BADGE ---------------- --}}
             <td>
-              @switch($order->status)
-                @case('confirmed')
-                  <span class="badge text-bg-warning">📦 Confirmée</span>
-                  @break
-                @case('delivering')
-                  <span class="badge text-bg-primary">🚚 En livraison</span>
-                  @break
-                @case('delivered')
-                  <span class="badge text-bg-success">✅ Livrée</span>
-                  @break
-              @endswitch
+              @php
+                // Normaliser le statut pour comparaisons (tout en minuscules)
+                $s = strtolower($order->status ?? '');
+              @endphp
+
+              {{-- On accepte les versions FR et EN pour compatibilité --}}
+              @if(in_array($s, ['confirmed', 'confirmée', 'confirmée', 'confirmée', 'confirmé'])) 
+                <span class="badge text-bg-warning">📦 Confirmée</span>
+
+              @elseif(in_array($s, ['delivering', 'en_livraison', 'en-livraison']))
+                <span class="badge text-bg-primary">🚚 En livraison</span>
+
+              @elseif(in_array($s, ['delivered', 'livrée', 'livree']))
+                <span class="badge text-bg-success">✅ Livrée</span>
+
+              @elseif(in_array($s, ['cancelled','annulée','annulee','annulé']))
+                <span class="badge text-bg-secondary">⚠️ Annulée</span>
+
+              @else
+                {{-- Valeur inconnue — affiche brute pour debug --}}
+                <span class="badge bg-light text-dark"># {{ $order->status }}</span>
+              @endif
             </td>
 
+            {{-- ---------------- ACTIONS ---------------- --}}
             <td>
-              @if($order->status == 'confirmed')
+              {{-- Commencer si commande confirmée (anglais ou français) --}}
+              @if(in_array($s, ['confirmed', 'confirmée', 'confirmé']))
                 <form action="{{ route('livreur.orders.start', $order) }}" method="POST" class="d-inline">
                   @csrf @method('PUT')
                   <button type="submit" class="btn btn-sm btn-info">🚚 Commencer</button>
                 </form>
-              @elseif($order->status == 'delivering')
+
+              {{-- Terminer si en cours de livraison --}}
+              @elseif(in_array($s, ['delivering', 'en_livraison', 'en-livraison']))
                 <form action="{{ route('livreur.orders.complete', $order) }}" method="POST" class="d-inline">
                   @csrf @method('PUT')
                   <button type="submit" class="btn btn-sm btn-success">✅ Terminer</button>
                 </form>
+
               @else
                 <span class="text-muted">—</span>
               @endif
@@ -115,6 +132,8 @@
 {{-- ============================ MOBILE (< md) ============================ --}}
 <div class="d-md-none">
   @forelse($orders as $order)
+    @php $s = strtolower($order->status ?? ''); @endphp
+
     <div class="card mb-3 shadow-sm">
       <div class="card-body">
         {{-- En-tête --}}
@@ -127,17 +146,15 @@
             </div>
           </div>
           <div>
-            @switch($order->status)
-              @case('confirmed')
-                <span class="badge text-bg-warning">📦</span>
-                @break
-              @case('delivering')
-                <span class="badge text-bg-primary">🚚</span>
-                @break
-              @case('delivered')
-                <span class="badge text-bg-success">✅</span>
-                @break
-            @endswitch
+            @if(in_array($s, ['confirmed', 'confirmée', 'confirmé']))
+              <span class="badge text-bg-warning">📦</span>
+            @elseif(in_array($s, ['delivering', 'en_livraison', 'en-livraison']))
+              <span class="badge text-bg-primary">🚚</span>
+            @elseif(in_array($s, ['delivered', 'livrée', 'livree']))
+              <span class="badge text-bg-success">✅</span>
+            @else
+              <span class="badge bg-light text-dark">#</span>
+            @endif
           </div>
         </div>
 
@@ -164,12 +181,12 @@
 
         {{-- Actions --}}
         <div class="d-flex gap-2">
-          @if($order->status == 'confirmed')
+          @if(in_array($s, ['confirmed', 'confirmée', 'confirmé']))
             <form action="{{ route('livreur.orders.start', $order) }}" method="POST" class="flex-fill">
               @csrf @method('PUT')
               <button type="submit" class="btn btn-info btn-sm w-100">🚚 Commencer</button>
             </form>
-          @elseif($order->status == 'delivering')
+          @elseif(in_array($s, ['delivering', 'en_livraison', 'en-livraison']))
             <form action="{{ route('livreur.orders.complete', $order) }}" method="POST" class="flex-fill">
               @csrf @method('PUT')
               <button type="submit" class="btn btn-success btn-sm w-100">✅ Terminer</button>
@@ -187,3 +204,67 @@
   {{ $orders->links() }}
 </div>
 @endsection
+
+@push('scripts')
+<script>
+const gpsWatchers = {};
+
+function startTracking(orderId) {
+  if (!('geolocation' in navigator)) {
+    return alert("Géolocalisation non supportée.");
+  }
+  if (gpsWatchers[orderId]) return; // déjà actif
+
+  // HTTPS recommandé en prod
+  if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+    alert("Le suivi GPS nécessite HTTPS en production.");
+  }
+
+  const opts = { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 };
+  const watchId = navigator.geolocation.watchPosition(async pos => {
+    try {
+      await fetch(`{{ url('/orders') }}/${orderId}/position`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+      });
+    } catch(e) {
+      console.warn('Erreur envoi position:', e);
+    }
+  }, err => {
+    console.warn('GPS error:', err);
+    alert("Permission ou signal GPS indisponible.");
+    stopTracking(orderId);
+  }, opts);
+
+  gpsWatchers[orderId] = watchId;
+}
+
+function stopTracking(orderId) {
+  const id = gpsWatchers[orderId];
+  if (id) {
+    navigator.geolocation.clearWatch(id);
+    delete gpsWatchers[orderId];
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  @if(session('autostart_gps_order_id'))
+    startTracking({{ session('autostart_gps_order_id') }});
+  @endif
+
+  // lancer pour toutes les commandes en livraison (FR/EN)
+  @foreach($orders as $o)
+    @php $s = strtolower($o->status ?? '') @endphp
+    @if(in_array($s, ['delivering','en_livraison','en-livraison']))
+      startTracking({{ $o->id }});
+    @endif
+  @endforeach
+});
+</script>
+@endpush

@@ -6,37 +6,55 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Notifications\OrderStatusNotification;
 
 class OrderController extends Controller
 {
     public function index()
     {
-        // Récupère uniquement les commandes confirmées (prêtes à être livrées)
-        $orders = Order::where('status', 'confirmed')
-            ->with(['client','shop','livreur'])
+        $shopId = Auth::user()->currentShopId();
+        if (!$shopId) {
+            return redirect()->route('employe.dashboard')
+                ->with('error','Aucune boutique rattachée à votre compte.');
+        }
+
+        // ✅ Uniquement les commandes de MA boutique (tu peux garder confirmed si tu veux)
+        $orders = Order::with(['client','shop','livreur','items.product'])
+            ->inShop($shopId)
             ->latest()
             ->paginate(10);
 
-        // Récupère tous les livreurs (users avec rôle livreur)
-        $livreurs = User::where('role', 'livreur')->get();
+        // ✅ Uniquement MES livreurs
+        $livreurs = User::livreurs()->inShop($shopId)->orderBy('name')->get();
 
         return view('employe.orders.index', compact('orders','livreurs'));
     }
 
     public function assign(Request $request, Order $order)
     {
-        $request->validate([
-            'livreur_id' => 'required|exists:users,id'
+        $shopId = Auth::user()->currentShopId();
+        abort_unless($shopId && $order->shop_id === $shopId, 403, 'Commande hors de votre boutique.');
+
+        $data = $request->validate([
+            'livreur_id' => ['required','exists:users,id'],
         ]);
 
-        $order->livreur_id = $request->livreur_id;
-        $order->status = 'confirmed'; // reste confirmé jusqu'à ce que le livreur commence
-        $order->save(); // Sauvegarde la mise à jour de l'ordre
-        $order->livreur->notify(new OrderStatusNotification($order, 'Une nouvelle commande vous a été assignée.')); // Notifie le livreur
+        // ✅ Le livreur choisi doit appartenir à MA boutique
+        $livreur = User::livreurs()->inShop($shopId)->findOrFail($data['livreur_id']);
 
+        $order->livreur_id = $livreur->id;
+        if ($order->status === 'en_attente') {
+            $order->status = 'confirmée';
+        }
+        
+        $order->save();
 
-        return redirect()->route('employe.orders.index')
-            ->with('success', 'Commande assignée au livreur avec succès.');
+        // (optionnel) notifier le livreur
+        if (method_exists($livreur, 'notify')) {
+            $livreur->notify(new OrderStatusNotification($order, 'Une nouvelle commande vous a été assignée.'));
+        }
+
+        return back()->with('success','Commande assignée au livreur.');
     }
 }

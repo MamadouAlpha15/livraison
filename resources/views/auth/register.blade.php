@@ -24,6 +24,8 @@
             <select id="role" name="role" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" required>
                 <option value="client" {{ old('role') === 'client' ? 'selected' : '' }}>Client</option>
                 <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Admin de boutique</option>
+                <option value="company" {{ old('role') === 'company' ? 'selected' : '' }}>Entreprise de livraison</option>
+                <option value="livreur" {{ old('role') === 'livreur' ? 'selected' : '' }}>Livreur</option>
             </select>
             <x-input-error :messages="$errors->get('role')" class="mt-2" />
         </div>
@@ -76,7 +78,7 @@
         </div>
     </form>
 
-    <!-- Script -->
+    <!-- Script d’affichage conditionnel -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const roleSelect = document.getElementById("role");
@@ -84,7 +86,8 @@
             const addressField = document.getElementById("addressField");
 
             function toggleFields() {
-                if (roleSelect.value === "admin") {
+                // Si c'est un admin ou une entreprise, on masque téléphone et adresse
+                if (roleSelect.value === "admin" || roleSelect.value === "company") {
                     phoneField.style.display = "none";
                     addressField.style.display = "none";
                 } else {

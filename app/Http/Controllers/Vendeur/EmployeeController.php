@@ -12,7 +12,11 @@ class EmployeeController extends Controller
 {
     public function index()
     {
-        $shopId = Auth::user()->shop_id;
+        $user   = Auth::user();
+        $shop   = $user->shop ?: $user->assignedShop;
+        $shopId = $shop?->id;
+
+        abort_unless($shopId, 403, 'Aucune boutique rattachée.');
 
         $employees = User::where('shop_id', $shopId)
             ->whereIn('role_in_shop', ['vendeur','livreur','employe'])
@@ -29,6 +33,12 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
+        $user   = Auth::user();
+        $shop   = $user->shop ?: $user->assignedShop;
+        $shopId = $shop?->id;
+
+        abort_unless($shopId, 403, 'Aucune boutique rattachée.');
+
         $request->validate([
             'name'         => 'required|string|max:255',
             'email'        => 'required|email|unique:users,email',
@@ -36,7 +46,6 @@ class EmployeeController extends Controller
             'role_in_shop' => 'required|in:vendeur,livreur,employe',
         ]);
 
-        // ✅ rôle global cohérent avec le rôle dans la boutique
         $globalRole = match ($request->role_in_shop) {
             'vendeur' => 'vendeur',
             'livreur' => 'livreur',
@@ -47,26 +56,26 @@ class EmployeeController extends Controller
             'name'         => $request->name,
             'email'        => $request->email,
             'password'     => Hash::make($request->password),
-            'role'         => $globalRole,                 // 👈 correction ici
-            'shop_id'      => Auth::user()->shop_id,       // lie le nouvel user à la boutique de l’admin
+            'role'         => $globalRole,      // rôle global
+            'shop_id'      => $shopId,          // <= rattache bien à MA boutique
             'role_in_shop' => $request->role_in_shop,
         ]);
 
-        return redirect()
-            ->route('boutique.employees.index')
+        return redirect()->route('boutique.employees.index')
             ->with('success','Utilisateur ajouté avec succès.');
     }
 
     public function destroy(User $employee)
     {
-        if ($employee->shop_id !== Auth::user()->shop_id) {
-            abort(403, "Action non autorisée.");
-        }
+        $user   = Auth::user();
+        $shop   = $user->shop ?: $user->assignedShop;
+        $shopId = $shop?->id;
+
+        abort_unless($shopId && $employee->shop_id === $shopId, 403, 'Action non autorisée.');
 
         $employee->delete();
 
-        return redirect()
-            ->route('boutique.employees.index')
+        return redirect()->route('boutique.employees.index')
             ->with('success','Utilisateur supprimé avec succès.');
     }
 }

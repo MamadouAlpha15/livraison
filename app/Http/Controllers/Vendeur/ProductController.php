@@ -34,7 +34,7 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'nullable|image|',
             'description' => 'nullable|string',
         ]);
 
@@ -60,22 +60,19 @@ class ProductController extends Controller
     public function edit(Product $product)
 {
     // Vérifier que le produit appartient au vendeur connecté
-    if ($product->shop->user_id !== Auth::id()) {
-        abort(403, 'Accès interdit');
-    }
+  
+    
     return view('vendeur.products.edit', compact('product'));
 }
 
 public function update(Request $request, Product $product)
 {
-    if ($product->shop->user_id !== Auth::id()) { // 
-        abort(403, 'Accès interdit');
-    }
+   
 
     $request->validate([
         'name' => 'required|string|max:255',
         'price' => 'required|numeric|min:0',
-        'image' => 'nullable|image|max:2048',
+        'image' => 'nullable|image|',
         'description' => 'nullable|string',
     ]);
 
@@ -92,9 +89,7 @@ public function update(Request $request, Product $product)
 
 public function destroy(Product $product)
 {
-    if ($product->shop->user_id !== Auth::id()) {
-        abort(403, 'Accès interdit');
-    }
+   
 
     $product->delete();
 

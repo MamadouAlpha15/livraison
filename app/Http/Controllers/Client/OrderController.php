@@ -62,8 +62,13 @@ public function create()
         $request->validate([
             'shop_id'    => 'required|exists:shops,id',
             'total'      => 'required|numeric|min:1',
-            'ordonnance' => 'nullable|file|mimes:pdf,jpg,png|max:2048'
+            'ordonnance' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            'image'      => 'nullable|image|',
         ]);
+
+        if($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('order_images', 'public');
+        }
 
         // Upload ordonnance si envoyée
         $ordonnancePath = null;
@@ -72,20 +77,21 @@ public function create()
         }
 
         // Création de la commande
-        $order = Order::create([
-            'user_id'    => Auth::id(),
-            'shop_id'    => $request->shop_id,
-            'total'      => $request->total,
-            'status'     => 'pending',
-            'ordonnance' => $ordonnancePath
-        ]);
+$order = Order::create([
+    'user_id'    => Auth::id(),
+    'shop_id'    => $request->shop_id,
+    'total'      => $request->total,
+    'status'     => Order::STATUS_EN_ATTENTE, // <-- français
+    'ordonnance' => $ordonnancePath,
+    'image'      => $imagePath ?? null,
+]);
 
         // Paiement cash
         Payment::create([
             'order_id' => $order->id,
             'method'   => 'cash',
             'amount'   => $request->total,
-            'status'   => 'pending',
+            'status'   => 'en_attente', // <-- français
         ]);
 
         return redirect()->route('client.orders.index')
@@ -121,7 +127,7 @@ public function create()
             'user_id'    => Auth::id(),
             'shop_id'    => $product->shop->id,
             'total'      => $total,
-            'status'     => 'pending',
+            'status'     => 'en_attente',
         ]);
 
         // Item associé

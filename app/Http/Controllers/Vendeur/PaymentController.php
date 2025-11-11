@@ -19,8 +19,8 @@ class PaymentController extends Controller
 
         $payments = Payment::whereHas('order', function($query) use ($shop) {
             $query->where('shop_id', $shop->id)
-                  ->where('status', 'delivered'); // uniquement commandes livrées
-        })->where('status', 'paid') // uniquement paiements confirmés
+                  ->where('status', 'livrée'); // uniquement commandes livrées
+        })->where('status', 'payé') // uniquement paiements confirmés
           ->latest()
           ->paginate(10);
 

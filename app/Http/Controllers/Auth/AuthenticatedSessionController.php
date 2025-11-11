@@ -38,8 +38,8 @@ class AuthenticatedSessionController extends Controller
            return redirect()->route('boutique.dashboard');
         }
 
-        if($user->role === 'employe'){
-           return redirect()->route('employe.dashboard');
+      if($user->role === 'company'){
+           return redirect()->route('company.dashboard');
         }
 
         if($user->role === 'livreur'){

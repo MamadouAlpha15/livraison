@@ -13,5 +13,9 @@ class Payment extends Model
         return $this->belongsTo(Order::class); // Un paiement appartient à une commande
     }
 
-    
+    //Statuts (constantes)
+    public const STATUS_EN_ATTENTE = 'en_attente';
+    public const STATUS_PAYE       = 'payé'; // ou 'paye' si tu préfères sans accent
+
+   
 }

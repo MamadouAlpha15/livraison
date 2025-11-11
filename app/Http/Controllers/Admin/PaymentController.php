@@ -1,5 +1,6 @@
 <?php
 
+// app/Http/Controllers/Admin/PaymentController.php
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -9,8 +10,10 @@ class PaymentController extends Controller
 {
     public function index()
     {
-        // Récupère tous les paiements avec leurs commandes et clients
-        $payments = Payment::with(['order.client', 'order.shop'])
+        $shopId = $this->currentShopId();
+
+        $payments = Payment::with(['order.client','order.shop'])  // en francais : charge avec les relations order et client et shop
+            ->when($shopId, fn($q) => $q->where('shop_id', $shopId)) // filtre par shop_id si $shopId est defini
             ->latest()
             ->paginate(15);
 
