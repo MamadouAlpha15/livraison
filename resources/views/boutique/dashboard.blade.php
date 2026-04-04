@@ -44,18 +44,13 @@
             @endif
         </div>
 
-       
-
-                <div class="d-none d-md-block">
-                    <a href="{{ route('products.create') }}" class="btn btn-success shadow-sm">+ Produit</a>
-                </div>
-            </div>
+        <div class="d-none d-md-block">
+            <a href="{{ route('products.create') }}" class="btn btn-success shadow-sm">+ Produit</a>
         </div>
     </div>
 
-    {{-- Grid des cartes fonctionnelles (toujours garder les boutons) --}}
+    {{-- Grid des cartes fonctionnelles --}}
     <div class="row g-4">
-        {{-- Card component (réutilisable) --}}
         @php
             $cards = [
                 ['emoji'=>'🏬','title'=>'Ma Boutique','desc'=>'Créer / modifier les informations.','route'=>route('boutique.shops.index'),'class'=>'primary'],
@@ -84,7 +79,6 @@
                         <h5 class="mt-3 mb-3 fw-bold">{{ $c['title'] }}</h5>
 
                         <div class="mt-auto">
-                            {{-- Bouton style selon type (conserve les routes originales) --}}
                             @php
                                 $btnClass = 'btn btn-primary w-100';
                                 if(str_contains($c['class'],'success')) $btnClass = 'btn btn-success w-100';
@@ -100,59 +94,52 @@
             </div>
         @endforeach
 
-       {{-- Livreurs disponibles (amélioré) --}}
-<div class="col-12 col-sm-6 col-lg-4">
-    <div class="card h-100 shadow-sm border-0">
-        <div class="card-body">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-                <div class="fs-4">🟢 <span class="fw-bold">Livreurs disponibles</span></div>
-                <small class="text-muted">En ligne</small>
+        {{-- Carte Livreurs disponibles --}}
+        @if($livreursDisponibles->isNotEmpty())
+            <div class="col-12 col-sm-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0 hover-lift">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div class="fs-4">🟢 <span class="fw-bold">Livreurs disponibles</span></div>
+                            <small class="text-muted">En ligne</small>
+                        </div>
+                        <ul class="list-unstyled small mb-0" style="max-height:160px; overflow:auto;">
+                            @foreach($livreursDisponibles as $livreur)
+                                <li class="d-flex justify-content-between align-items-center py-1">
+                                    <div>
+                                        <strong>{{ $livreur->name }}</strong>
+                                        <div class="small text-muted">{{ $livreur->phone ?? '' }}</div>
+                                    </div>
+                                    <span class="badge bg-success">En ligne</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
             </div>
+        @else
+            {{-- Carte Contact Entreprise de Livraison --}}
+            <div class="col-12 col-sm-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0 hover-lift">
+                    <div class="card-body d-flex flex-column">
+                        <div class="display-6 text-center mb-2">🚚</div>
+                        <h5 class="fw-bold text-center">Pas de livreur disponible</h5>
+                        <p class="small text-muted text-center mb-3">Contactez une entreprise de livraison pour déléguer vos commandes.</p>
 
-            @if($livreursDisponibles->isEmpty())
-                {{-- Alerte + menu déroulant vers entreprises de livraison --}}
-                <div class="alert alert-warning small">
-                    <strong>Vous n’avez pas de livreur</strong><br>
-                    <span class="text-muted">Contactez une entreprise de livraison pour déléguer la livraison.</span>
+                        <select id="selectDeliveryCompany" class="form-select mb-3">
+                            <option value="">— Sélectionnez une entreprise —</option>
+                            @foreach($deliveryCompanies as $company)
+                                @if($company->phone)
+                                    <option value="{{ $company->phone }}" data-name="{{ $company->name }}">{{ $company->name }} — {{ number_format($company->commission_percent ?? 0, 2) }}%</option>
+                                @endif
+                            @endforeach
+                        </select>
+
+                        <button id="btnContactCompany" class="btn btn-primary w-100" disabled>Contacter</button>
+                    </div>
                 </div>
-
-                <div class="mb-3">
-                    <label for="selectDeliveryCompany" class="form-label small fw-semibold">Choisir une entreprise de livraison</label>
-                    <select id="selectDeliveryCompany" class="form-select">
-                        <option value="">— Sélectionnez une entreprise —</option>
-                        @foreach($deliveryCompanies as $company)
-                            <option value="{{ $company->id }}" data-name="{{ $company->name }}">
-                                {{ $company->name }} — {{ number_format($company->commission_percent ?? 0, 2) }}% 
-                                @if($company->phone) · {{ $company->phone }} @endif
-                            </option>
-                        @endforeach
-                    </select>
-                    <div class="form-text small text-muted">Après sélection, vous serez redirigé vers le chat pour négocier le tarif.</div>
-                </div>
-
-                <div class="d-flex gap-2">
-                    <button id="btnContactCompany" class="btn btn-primary" disabled>Contacter</button>
-                    <button id="btnResetCompany" class="btn btn-outline-secondary" disabled>Annuler</button>
-                </div>
-
-            @else
-                <ul class="list-unstyled small mb-3" style="max-height:160px; overflow:auto;">
-                    @foreach($livreursDisponibles as $livreur)
-                        <li class="d-flex justify-content-between align-items-center py-1">
-                            <div>
-                                <strong>{{ $livreur->name }}</strong>
-                                <div class="small text-muted">{{ $livreur->phone ?? '' }}</div>
-                            </div>
-                            <span class="badge bg-success">En ligne</span>
-                        </li>
-                    @endforeach
-                </ul>
-            @endif
-        </div>
-    </div>
-</div>
-
-       
+            </div>
+        @endif
 
     </div>
 
@@ -165,7 +152,6 @@
 
 </div>
 
-{{-- Styles additionnels pour l'effet premium (peut être extrait dans un fichier CSS) --}}
 @section('styles')
 <style>
 .hover-lift{ transition: transform .15s ease, box-shadow .15s ease; border-radius: .8rem; }
@@ -175,47 +161,25 @@
 @endsection
 
 @endsection
+
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const select = document.getElementById('selectDeliveryCompany');
     const btnContact = document.getElementById('btnContactCompany');
-    const btnReset = document.getElementById('btnResetCompany');
 
     if (!select) return;
 
-    // enable / disable buttons selon selection
     select.addEventListener('change', () => {
-        const val = select.value;
-        btnContact.disabled = !val;
-        btnReset.disabled = !val;
+        btnContact.disabled = !select.value;
     });
 
-    // action Contacter -> redirection vers le chat de l'entreprise
     btnContact.addEventListener('click', () => {
-        const id = select.value;
-        const name = select.selectedOptions[0]?.dataset?.name || '';
-        if (!id) return;
-
-        // message initial (URL-encode)
-        const initMessage = encodeURIComponent('Écrivez-nous pour en savoir plus');
-
-        // Construire l'URL de chat :
-        // route attend /company/{company}/chat/{shop?}
-        // Ici on redirige vers /company/{id}/chat?init=...
-        const chatUrl = `${window.location.origin}/company/${id}/chat?init=${initMessage}`;
-
-        // confirmation rapide (optionnelle)
-        if (confirm(`Contacter "${name}" maintenant ?`)) {
-            window.location.href = chatUrl;
-        }
-    });
-
-    // reset selection
-    btnReset.addEventListener('click', () => {
-        select.value = '';
-        btnContact.disabled = true;
-        btnReset.disabled = true;
+        const phone = select.value;
+        if(!phone) return;
+        // ouvre WhatsApp directement vers le numéro sélectionné
+        const url = `https://wa.me/${phone.replace(/\D/g,'')}`;
+        window.open(url, '_blank');
     });
 });
 </script>

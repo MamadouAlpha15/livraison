@@ -200,10 +200,7 @@
                                 <div>
                                     <h5 class="mb-1">{{ $c->name }}</h5>
                                     <div class="small text-muted">{{ Str::limit($c->description, 80) }}</div>
-                                    <div class="mt-2">
-                                        <a href="{{ route('delivery.companies.show', $c) }}" class="btn btn-sm btn-outline-primary">Contacter</a>
-                                        <a href="{{ route('company.chat.show', $c, ['shop' => null]) }}" class="btn btn-sm btn-primary">Chat</a>
-                                    </div>
+                                  
                                 </div>
                             </div>
                         </div>

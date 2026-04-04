@@ -69,7 +69,12 @@ Route::middleware(['auth'])->group(function () {
     // Companies (public listing + contact)
     Route::get('/delivery-companies', [DeliveryCompanyController::class, 'index'])->name('delivery.companies.index');
     Route::get('/delivery-companies/{company}', [DeliveryCompanyController::class, 'show'])->name('delivery.companies.show');
-
+    // Route pour afficher le chat entre une boutique et une entreprise de livraison
+    Route::get('/company/{company}/chat', [DeliveryChatController::class, 'show'])->name('company.chat.show');
+    // envoyer un message (POST)
+    Route::post('/company/{company}/chat/send', [DeliveryChatController::class, 'send'])->name('company.chat.send');
+    // récupérer messages (JSON) - param optional `after` timestamp for incremental
+    Route::get('/company/{company}/chat/messages', [DeliveryChatController::class, 'messages'])->name('company.chat.messages');
     // Company owner area (manage drivers) - middleware role:company_owner or role checks inside
     Route::middleware(['role:admin,company'])->prefix('company')->group(function () {
         Route::get('/', [DeliveryCompanyController::class, 'dashboard'])->name('company.dashboard');
@@ -84,10 +89,6 @@ Route::middleware(['auth'])->group(function () {
     })->name('company.waiting');
     });
 
-    // Chat between shop (seller) and delivery company
-    Route::get('/company/{company}/chat/{shop?}', [DeliveryChatController::class, 'show'])->name('company.chat.show');
-    Route::post('/company/{company}/chat/send', [DeliveryChatController::class, 'send'])->name('company.chat.send');
-    Route::get('/company/{company}/chat/messages', [DeliveryChatController::class, 'messages'])->name('company.chat.messages');
 });
 
     

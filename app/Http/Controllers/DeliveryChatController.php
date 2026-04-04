@@ -1,92 +1,177 @@
 <?php
 
-// app/Http/Controllers/DeliveryChatController.php
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\DeliveryCompany;
 use App\Models\DeliveryMessage;
 use App\Models\Shop;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class DeliveryChatController extends Controller
 {
     /**
-     * Affiche l'UI de chat pour un shop (vendeur) vers une entreprise
-     * $company est route-model-bound
-     * $shopId optionnel : si pas fourni, on essaye de retrouver le shop depuis l'utilisateur connecté
+     * Affiche la page de chat (blade). `init` : message initial.
      */
-    public function show(Request $request, DeliveryCompany $company, $shopId = null)
+    public function show(DeliveryCompany $company, Request $request)
     {
-        $shop = null;
-        if ($shopId) {
-            $shop = Shop::find($shopId);
-        } else {
-            // si l'utilisateur est connecté et possède un shop -> on prend le premier
-            $user = $request->user();
-            if ($user) {
-                $shop = Shop::where('user_id', $user->id)->first();
+        // accès seulement si entreprise approuvée (ou propriétaire)
+        if (!$company->approved && $company->user_id !== $request->user()->id) {
+            abort(403, 'Entreprise non disponible.');
+        }
+
+        $user = $request->user();
+
+        // déterminer shopId du vendeur connecté (si vendeur)
+        $shopId = $request->query('shop') ?? $request->query('shop_id') ?? null;
+        if (! $shopId) {
+            if (isset($user->shop_id) && $user->shop_id) $shopId = $user->shop_id;
+            elseif (method_exists($user, 'shop')) {
+                $rel = $user->shop()->first();
+                $shopId = $rel ? $rel->id : null;
             }
         }
 
-        // passe company et shop à la vue
-        return view('company.chat', compact('company','shop'));
+        // sécurité : si pas shopId et pas propriétaire => interdit
+        if (!$shopId && $company->user_id !== $user->id && $user->role !== 'admin') {
+            abort(403, 'Accès réservé aux vendeurs ou à l’entreprise.');
+        }
+
+        $init = $request->query('init', '');
+
+        // charger quelques messages pour rendu initial (optionnel)
+        $messages = DeliveryMessage::where('delivery_company_id', $company->id)
+            ->when($shopId, fn($q) => $q->where('shop_id', $shopId))
+            ->orderBy('created_at')
+            ->get();
+
+        return view('company.chat', [
+            'company' => $company,
+            'shopId' => $shopId,
+            'init' => $init,
+            'messages' => $messages,
+        ]);
     }
 
     /**
-     * Envoie un message : du vendeur (shop) vers l'entreprise (ou inverse selon l'UI)
+     * Envoie d'un message (AJAX). Body: { message:, shop_id || shop: }
      */
-    public function send(Request $request, DeliveryCompany $company)
+    public function send(DeliveryCompany $company, Request $request)
     {
-        $request->validate([
-            'shop_id' => 'nullable|exists:shops,id',
+        $user = $request->user();
+
+        $data = $request->all();
+        // accepter shop ou shop_id dans payload
+        $shopId = $data['shop_id'] ?? $data['shop'] ?? null;
+
+        $validator = Validator::make($data, [
             'message' => 'required|string|max:2000',
+            'shop_id'  => 'nullable|integer|exists:shops,id',
+            'shop'     => 'nullable|integer|exists:shops,id',
         ]);
 
-        // shop_id si le vendeur envoie
-        $shopId = $request->input('shop_id') ?? null;
+        if ($validator->fails()) {
+            return response()->json(['ok' => false, 'errors' => $validator->errors()], 422);
+        }
 
-        // on va tenter de déterminer l'owner de l'entreprise (destinataire)
-        // Hypothèse : delivery_companies a user_id qui est le propriétaire / compte associé
-        $ownerUserId = $company->user_id ?? null;
+        // autorisation : company owner OR shop owner (vendeur) OR admin
+        $isCompanyOwner = $company->user_id === $user->id;
+        $isAdmin = in_array($user->role, ['admin','superadmin']);
+        $isShopOwner = false;
+        if ($shopId) {
+            // vérifier si l'utilisateur est lié à la boutique
+            if (isset($user->shop_id) && $user->shop_id == $shopId) $isShopOwner = true;
+            elseif (method_exists($user,'shop') && optional($user->shop()->first())->id == $shopId) $isShopOwner = true;
+            // role vendeur could also be accepted if linked differently
+        }
 
-        // Crée le message
+        if (!($isCompanyOwner || $isShopOwner || $isAdmin)) {
+            return response()->json(['ok' => false, 'error' => 'Non autorisé'], 403);
+        }
+
+        $senderRole = $isCompanyOwner ? 'company' : ($isShopOwner ? 'shop' : ($isAdmin ? 'admin' : 'user'));
+
         $msg = DeliveryMessage::create([
             'delivery_company_id' => $company->id,
             'shop_id' => $shopId,
-            'from_user_id' => $request->user() ? $request->user()->id : null,
-            'to_user_id' => $ownerUserId, // facultatif mais pratique
-            'message' => $request->input('message'),
+            'sender_id' => $user->id,
+            'sender_role' => $senderRole,
+            'message' => $data['message'],
         ]);
 
-        // Optionnel : tu peux ici déclencher une notification, envoyer email, broadcast etc.
-        // event(new \App\Events\DeliveryMessageSent($msg));
-
-        // renvoie l'objet fraîchement créé
-        return response()->json(['ok' => true, 'message' => $msg]);
+        // répondre avec la forme que le front attend (body + from_type + sender_name)
+        return response()->json([
+            'ok' => true,
+            'message' => [
+                'id' => $msg->id,
+                'body' => $msg->message,
+                'from_type' => $msg->sender_role,
+                'sender_name' => $msg->sender ? $msg->sender->name ?? null : ($msg->shop?->name ?? $company->name),
+                'created_at' => $msg->created_at->toDateTimeString(),
+            ],
+            'last' => $msg->created_at->toDateTimeString(),
+        ]);
     }
 
     /**
-     * Récupère les messages (polling).
-     * Query params:
-     *  - shop_id (optionnel) : si fourni, filtre sur ce shop (utile pour multi-shop)
-     *  - after_id (optionnel) : prend seulement les messages id > after_id
+     * Récupère les messages JSON. Query params : shop || shop_id, after (ISO)
      */
-    public function messages(Request $request, DeliveryCompany $company)
+    public function messages(DeliveryCompany $company, Request $request)
     {
-        $shopId = $request->query('shop_id', null);
-        $lastId = (int) $request->query('after_id', 0);
+        $user = $request->user();
 
-        $query = $company->messages()->when($shopId, function($q) use ($shopId) {
-            return $q->where('shop_id', $shopId);
-        });
+        // accepter shop ou shop_id
+        $shopId = $request->query('shop') ?? $request->query('shop_id') ?? null;
+        if (! $shopId && isset($user->shop_id)) $shopId = $user->shop_id;
 
-        if ($lastId) {
-            $query->where('id', '>', $lastId);
+        // autorisation : propriétaire company OR shop owner OR admin
+        $isCompanyOwner = $company->user_id === $user->id;
+        $isAdmin = in_array($user->role, ['admin','superadmin']);
+        $isShopOwner = false;
+        if ($shopId) {
+            if (isset($user->shop_id) && $user->shop_id == $shopId) $isShopOwner = true;
+            elseif (method_exists($user,'shop') && optional($user->shop()->first())->id == $shopId) $isShopOwner = true;
         }
 
-        $msgs = $query->orderBy('created_at', 'asc')->limit(200)->get();
+        if (!($isCompanyOwner || $isShopOwner || $isAdmin)) {
+            return response()->json(['ok' => false, 'error' => 'Non autorisé'], 403);
+        }
 
-        return response()->json(['messages' => $msgs]);
+        $query = DeliveryMessage::where('delivery_company_id', $company->id)
+            ->when($shopId, fn($q) => $q->where('shop_id', $shopId));
+
+        if ($after = $request->query('after')) {
+            $query->where('created_at', '>', $after);
+        }
+
+        $messages = $query->orderBy('created_at')->get();
+
+        // Optionnel : si c'est la company qui lit, marquer shop->company messages comme lus
+        if ($isCompanyOwner || $isAdmin) {
+            DeliveryMessage::where('delivery_company_id', $company->id)
+                ->when($shopId, fn($q) => $q->where('shop_id', $shopId))
+                ->where('sender_role', 'shop')
+                ->whereNull('read_at')
+                ->update(['read_at' => now()]);
+        }
+
+        $payload = $messages->map(function ($m) use ($company) {
+            return [
+                'id' => $m->id,
+                'body' => $m->message,
+                'from_type' => $m->sender_role,
+                'sender_name' => $m->sender ? $m->sender->name ?? null : ($m->shop?->name ?? $company->name),
+                'created_at' => $m->created_at->toDateTimeString(),
+            ];
+        });
+
+        $last = $messages->last()?->created_at?->toDateTimeString() ?? null;
+
+        return response()->json([
+            'ok' => true,
+            'messages' => $payload,
+            'last' => $last,
+        ]);
     }
 }
-       

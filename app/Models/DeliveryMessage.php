@@ -6,25 +6,34 @@ use Illuminate\Database\Eloquent\Model;
 
 class DeliveryMessage extends Model
 {
-    protected $fillable = ['delivery_company_id','shop_id','from_user_id','to_user_id','message','read'];
+    protected $fillable = [
+        'delivery_company_id',
+        'shop_id',
+        'sender_id',
+        'sender_role',
+        'message',
+        'read_at',
+    ];
 
+    protected $casts = [
+        'read_at' => 'datetime',
+    ];
+
+    // Lien vers l'entreprise
     public function company()
     {
         return $this->belongsTo(DeliveryCompany::class, 'delivery_company_id');
     }
 
+    // Lien vers la boutique
     public function shop()
     {
-        return $this->belongsTo(\App\Models\Shop::class); // un message peut être lié à une boutique
+        return $this->belongsTo(\App\Models\Shop::class, 'shop_id');
     }
 
-    public function fromUser()
+    // Auteur (user) éventuellement
+    public function sender()
     {
-        return $this->belongsTo(\App\Models\User::class, 'from_user_id'); // un message provient d'un utilisateur
-    }
-
-    public function toUser()
-    {
-        return $this->belongsTo(\App\Models\User::class, 'to_user_id'); // un message est envoyé à un utilisateur
+        return $this->belongsTo(\App\Models\User::class, 'sender_id');
     }
 }

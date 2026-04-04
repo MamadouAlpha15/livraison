@@ -2,99 +2,203 @@
 
 @section('content')
 <div class="container py-4">
-  <h4>Chat avec {{ $company->name }}</h4>
-
-  <div id="chat-box" style="height:400px; overflow:auto; border:1px solid #eee; padding:12px; border-radius:8px; background:#fafafa;">
-    {{-- messages will be appended here by JS --}}
-  </div>
-
-  <form id="chat-form" class="mt-3">
-    @csrf
-    <input type="hidden" name="shop_id" value="{{ $shop->id ?? '' }}">
-    <div class="input-group">
-      <input id="chat-input" name="message" class="form-control" placeholder="Écrire un message..." autocomplete="off">
-      <button class="btn btn-primary" id="chat-send" type="submit">Envoyer</button>
+    <div class="d-flex mb-3 align-items-center justify-content-between">
+        <div>
+            <h4 class="mb-0">Discussion — {{ $company->name }}</h4>
+            <div class="small text-muted">Négociez tarifs et conditions de livraison.</div>
+        </div>
+        <div>
+            <a href="{{ route('delivery.companies.index') }}" class="btn btn-outline-secondary btn-sm">Retour</a>
+        </div>
     </div>
-  </form>
+
+    <div class="row">
+        <div class="col-12 col-lg-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-body p-0">
+                    {{-- Chat window --}}
+                    <div id="chatWindow" style="height:420px; overflow:auto; padding:1rem; background:#f9fafb;">
+                        {{-- messages server-rendered (initial) --}}
+                        @foreach($messages as $m)
+                            @php
+                                $isMine = auth()->id() === $m->sender_id;
+                            @endphp
+                            <div class="d-flex mb-2 {{ $isMine ? 'justify-content-end' : '' }}">
+                                <div style="max-width:80%;">
+                                    <div class="p-2 rounded {{ $isMine ? 'bg-primary text-white' : 'bg-white border' }}">
+                                        <div class="small">{!! nl2br(e($m->message)) !!}</div>
+                                    </div>
+                                    <div class="small text-muted mt-1 {{ $isMine ? 'text-end' : '' }}">
+                                        {{ $m->created_at->format('d/m/Y H:i') }}
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <div class="border-top p-3">
+                        <form id="chatForm" onsubmit="return false;">
+                            @csrf
+                            <input type="hidden" id="shopId" value="{{ $shopId }}">
+                            <div class="mb-2">
+                                <textarea id="messageInput" class="form-control" rows="3" placeholder="Écrivez votre message...">{{ $init ?? '' }}</textarea>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button id="sendBtn" class="btn btn-primary">Envoyer</button>
+                                <button id="clearBtn" class="btn btn-outline-secondary">Effacer</button>
+                                <div class="ms-auto small text-muted align-self-center">Conversation privée entre vous et {{ $company->name }}</div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3 text-center small text-muted">
+                Messages synchronisés toutes les <strong id="pollIntervalLabel">2s</strong>. Restez sur la page pour recevoir en temps réel.
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
-const companyId = @json($company->id);
-const shopId = @json($shop->id ?? null);
-let lastId = 0;
-const authId = @json(auth()->id());
+(function(){
+    const chatWindow = document.getElementById('chatWindow');
+    const input = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const shopId = document.getElementById('shopId')?.value || '';
+    const companyId = '{{ $company->id }}';
+    let lastFetchAt = null;
+    let pollingInterval = 2000; // ms
+    const messagesEndpoint = (after=null) => {
+        let url = `/company/${companyId}/chat/messages?shop_id=${encodeURIComponent(shopId)}`;
+        if (after) url += `&after=${encodeURIComponent(after)}`;
+        return url;
+    };
+    const sendEndpoint = `/company/${companyId}/chat/send`;
 
-// fonction pour échapper HTML basique
-function escapeHtml(unsafe) {
-  return (unsafe + '').replace(/[&<>"'`=\/]/g, function (s) {
-    return ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;',
-      "'": '&#39;', '/': '&#x2F;', '`': '&#96;', '=': '&#x3D;'
-    })[s];
-  });
-}
-
-function appendMessage(msg) {
-  const box = document.getElementById('chat-box');
-  const fromMe = msg.from_user_id === authId;
-  const avatarLabel = fromMe ? 'Vous' : '{{ addslashes($company->name) }}';
-  const wrapper = document.createElement('div');
-  wrapper.className = 'mb-2';
-  const sentAt = new Date(msg.created_at).toLocaleString();
-  wrapper.innerHTML = `
-    <div class="${fromMe ? 'text-end' : 'text-start'}"><small class="text-muted">${escapeHtml(avatarLabel)}</small></div>
-    <div style="display:inline-block; padding:8px; border-radius:8px; background:${fromMe ? '#d1e7dd' : '#f1f3f5'}; max-width:75%;">${escapeHtml(msg.message)}</div>
-    <div class="small text-muted">${escapeHtml(sentAt)}</div>
-  `;
-  box.appendChild(wrapper);
-  box.scrollTop = box.scrollHeight;
-  lastId = Math.max(lastId, msg.id || 0);
-}
-
-async function fetchMessages() {
-  try {
-    const url = `{{ url('/company') }}/${companyId}/chat/messages?shop_id=${shopId ?? ''}&after_id=${lastId}`;
-    const res = await fetch(url, { credentials: 'same-origin' });
-    if (!res.ok) return;
-    const json = await res.json();
-    if (json.messages && json.messages.length) {
-      json.messages.forEach(m => appendMessage(m));
+    // utility: scroll bottom
+    function scrollBottom() {
+        chatWindow.scrollTop = chatWindow.scrollHeight + 200;
     }
-  } catch(err) {
-    console.error('fetchMessages error', err);
-  }
-}
 
-document.getElementById('chat-form').addEventListener('submit', async function(e){
-  e.preventDefault();
-  const input = document.getElementById('chat-input');
-  const msg = input.value.trim();
-  if (!msg) return;
-  const form = new FormData(this);
+    // render a single message (obj as from API)
+    function renderMessage(m) {
+        const mine = parseInt(m.sender_id) === {{ auth()->id() ?? 'null' }};
+        const wrapper = document.createElement('div');
+        wrapper.className = 'd-flex mb-2 ' + (mine ? 'justify-content-end' : '');
+        const inner = document.createElement('div');
+        inner.style.maxWidth = '80%';
 
-  try {
-    const res = await fetch(`{{ url('/company') }}/${companyId}/chat/send`, {
-      method: 'POST',
-      headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-      body: form,
-      credentials: 'same-origin'
+        const bubble = document.createElement('div');
+        bubble.className = 'p-2 rounded ' + (mine ? 'bg-primary text-white' : 'bg-white border');
+        bubble.innerHTML = (m.message || '').replace(/\n/g, '<br>');
+        inner.appendChild(bubble);
+
+        const meta = document.createElement('div');
+        meta.className = 'small text-muted mt-1 ' + (mine ? 'text-end' : '');
+        meta.textContent = new Date(m.created_at).toLocaleString();
+        inner.appendChild(meta);
+
+        wrapper.appendChild(inner);
+        chatWindow.appendChild(wrapper);
+    }
+
+    // fetch new messages
+    async function fetchMessages() {
+        try {
+            const url = lastFetchAt ? messagesEndpoint(lastFetchAt) : messagesEndpoint();
+            const res = await fetch(url, { credentials: 'same-origin' });
+            if (!res.ok) return;
+            const data = await res.json();
+            if (!data.ok) return;
+            if (data.messages && data.messages.length > 0) {
+                data.messages.forEach(m => {
+                    renderMessage(m);
+                    lastFetchAt = m.created_at;
+                });
+                scrollBottom();
+            }
+        } catch (err) {
+            console.error('fetchMessages error', err);
+        }
+    }
+
+    // initial set lastFetchAt from last message in DOM (if any)
+    (function initLastAtFromDom(){
+        // try to find last message time from server-rendered block
+        const metas = chatWindow.querySelectorAll('.small.text-muted.mt-1');
+        if (metas.length) {
+            const text = metas[metas.length - 1].textContent.trim();
+            // best-effort parse - fallback to now
+            lastFetchAt = new Date().toISOString();
+        } else {
+            lastFetchAt = null;
+        }
+    })();
+
+    // send message
+    async function sendMessage() {
+        const txt = input.value.trim();
+        if (!txt) return;
+        sendBtn.disabled = true;
+        try {
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const payload = { message: txt, shop_id: shopId };
+            const res = await fetch(sendEndpoint, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok || !data.ok) {
+                alert(data?.error || 'Erreur lors de l\'envoi');
+            } else {
+                // afficher immédiatement
+                renderMessage({
+                    id: data.message.id,
+                    sender_id: data.message.sender_id,
+                    sender_role: data.message.sender_role,
+                    message: data.message.message,
+                    created_at: data.message.created_at
+                });
+                input.value = '';
+                scrollBottom();
+                lastFetchAt = data.message.created_at;
+            }
+        } catch (err) {
+            console.error('sendMessage error', err);
+            alert('Erreur réseau.');
+        } finally {
+            sendBtn.disabled = false;
+        }
+    }
+
+    // events
+    sendBtn.addEventListener('click', sendMessage);
+    clearBtn.addEventListener('click', () => { input.value = ''; input.focus(); });
+
+    // Enter to send (shift+enter for newline)
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
     });
-    const json = await res.json();
-    if (json.ok) {
-      appendMessage(json.message);
-      input.value = '';
-    } else {
-      console.warn('send error', json);
-    }
-  } catch(err){
-    console.error('send exception', err);
-  }
-});
 
-// start polling
-fetchMessages();
-setInterval(fetchMessages, 2500);
+    // Polling
+    setInterval(fetchMessages, pollingInterval);
+
+    // scroll to bottom initially
+    scrollBottom();
+
+})();
 </script>
-@endsection
+@endpush
