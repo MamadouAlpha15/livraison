@@ -8,7 +8,7 @@
             <div class="small text-muted">Négociez tarifs et conditions de livraison.</div>
         </div>
         <div>
-            <a href="{{ route('delivery.companies.index') }}" class="btn btn-outline-secondary btn-sm">Retour</a>
+         
         </div>
     </div>
 

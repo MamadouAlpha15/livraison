@@ -128,7 +128,7 @@ Route::middleware(['auth', 'role:admin'])
         Route::resource('employees', \App\Http\Controllers\Vendeur\EmployeeController::class)->except(['show']);
         Route::get('orders', [EmployeOrderController::class, 'index'])->name('orders.index'); // Liste des commandes confirmées
         Route::put('orders/{order}/assign', [EmployeOrderController::class, 'assign'])->name('orders.assign'); // Assignation des commandes aux livreurs
-        Route::get('payments', [AdminPaymentController::class, 'index'])->name('payments.index'); // Gestion des paiements
+        Route::get('payments', [\App\Http\Controllers\Vendeur\PaymentController::class, 'index'])->name('payments.index'); // Gestion des paiements
           Route::get('commissions', [VendeurCommissionController::class, 'index'])->name('commissions.index');
         Route::post('commissions/pay', [VendeurCommissionController::class, 'pay'])->name('commissions.pay');
 
@@ -141,6 +141,8 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('export/orders/pdf', [ExportController::class, 'exportOrdersPdf'])->name('export.orders.pdf');
         Route::get('export/payments/pdf', [ExportController::class, 'exportPaymentsPdf'])->name('export.payments.pdf');
         Route::get('export/stats/pdf', [ExportController::class, 'exportStatsPdf'])->name('export.stats.pdf');
+
+       
     });
     
 

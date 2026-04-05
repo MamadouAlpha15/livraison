@@ -177,17 +177,21 @@ public function update(Request $request, \App\Models\Shop $shop)
             ->orderBy('name')
             ->get();
 
+  
         // 3) On envoie TOUT ce que la Blade consomme
         return view('boutique.dashboard', [
             'shop' => $shop,
             'livreursDisponibles' => $livreursDisponibles,
             'deliveryCompanies' => $deliveryCompanies,
+            
         ]);
     }
 
     // 4) Sinon → accès refusé
     abort(403, 'Accès réservé aux administrateurs de boutique.');
 }
+
+
 
 
 

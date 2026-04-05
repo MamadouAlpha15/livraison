@@ -87,5 +87,11 @@ protected $casts = [
         ];
 
         $this->attributes['status'] = $map[$value] ?? $value;
+
     }
+
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
 }
