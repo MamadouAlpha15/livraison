@@ -142,7 +142,14 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('export/payments/pdf', [ExportController::class, 'exportPaymentsPdf'])->name('export.payments.pdf');
         Route::get('export/stats/pdf', [ExportController::class, 'exportStatsPdf'])->name('export.stats.pdf');
 
-       
+        // ROUTE POUR CLIENT BOUTIQUE 
+        Route::get('clients',        [\App\Http\Controllers\Boutique\ClientController::class, 'index'])->name('clients.index');
+Route::get('clients/{user}', [\App\Http\Controllers\Boutique\ClientController::class, 'show'])->name('clients.show');
+
+       // Route pour periode 
+
+       Route::get('period-stats', \App\Http\Controllers\Boutique\PeriodStatsController::class)
+    ->name('period.stats');
     });
     
 

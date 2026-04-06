@@ -600,6 +600,444 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     .tb-actions .btn:not(.btn-primary) { display: none; }
     .flash { margin: 10px 16px 0; }
     .comm-banner { margin-bottom: 16px; }
+    .kanban-grid { grid-template-columns: repeat(2,1fr); }
+    .quick-grid  { grid-template-columns: repeat(2,1fr); }
+    .quick-btn   { border-right: none; border-bottom: 1px solid var(--border); }
+    .quick-btn:last-child { border-bottom: none; }
+    .today-grid  { grid-template-columns: 1fr; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   ÉTAPE 1 — NOUVEAUX COMPOSANTS CSS
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── REVENUS AUJOURD'HUI ─────────────────────────────────────────
+   Bandeau hero en haut du contenu : chiffre du jour bien visible
+   avec comparaison hier. Design sobre mais impact fort.
+   ────────────────────────────────────────────────────────────── */
+.today-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+.today-card {
+    background: linear-gradient(135deg, #0d1f18 0%, #1a3328 100%);
+    border: 1px solid rgba(16,185,129,.2);
+    border-radius: var(--r);
+    padding: 20px 22px;
+    display: flex; align-items: center; gap: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.12);
+    position: relative; overflow: hidden;
+}
+/* Décoration de fond */
+.today-card::after {
+    content: '';
+    position: absolute; right: -20px; top: -20px;
+    width: 100px; height: 100px;
+    background: rgba(16,185,129,.06);
+    border-radius: 50%;
+}
+.today-icon {
+    width: 48px; height: 48px;
+    background: rgba(16,185,129,.15);
+    border: 1px solid rgba(16,185,129,.25);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+}
+.today-lbl  { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+.today-val  { font-size: 26px; font-weight: 700; color: #fff; font-family: var(--mono); letter-spacing: -1px; line-height: 1; }
+.today-unit { font-size: 10px; color: rgba(255,255,255,.35); margin-top: 3px; }
+.today-delta {
+    font-size: 11px; font-weight: 700;
+    margin-top: 6px; display: inline-flex; align-items: center; gap: 3px;
+    padding: 2px 8px; border-radius: 20px;
+}
+.today-delta.up   { background: rgba(16,185,129,.2); color: #34d399; }
+.today-delta.down { background: rgba(239,68,68,.2);  color: #fca5a5; }
+.today-delta.flat { background: rgba(255,255,255,.08); color: rgba(255,255,255,.4); }
+
+/* ── ALERTES INTELLIGENTES ────────────────────────────────────────
+   Zone d'alertes dynamiques : n'apparaît que s'il y a des alertes.
+   Chaque alerte a une couleur selon sa gravité.
+   ────────────────────────────────────────────────────────────── */
+.alerts-zone { margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
+
+.alert-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px;
+    border-radius: var(--r-sm);
+    border: 1px solid;
+    font-size: 12.5px; font-weight: 500;
+    animation: slideIn .3s ease;
+}
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.alert-item.danger  { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
+.alert-item.warning { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
+.alert-item.success { background: #ecfdf5; border-color: #6ee7b7; color: #065f46; }
+.alert-item.info    { background: #eff6ff; border-color: #93c5fd; color: #1e40af; }
+
+.alert-ico  { font-size: 16px; flex-shrink: 0; }
+.alert-msg  { flex: 1; line-height: 1.4; }
+.alert-cta  {
+    font-size: 11px; font-weight: 700;
+    padding: 4px 10px; border-radius: 6px;
+    border: 1px solid currentColor;
+    text-decoration: none; color: inherit;
+    white-space: nowrap; flex-shrink: 0;
+    opacity: .75; transition: opacity .15s;
+}
+.alert-cta:hover { opacity: 1; }
+
+/* ── KANBAN STATUTS ───────────────────────────────────────────────
+   5 colonnes représentant le flux de vie d'une commande.
+   Le propriétaire voit instantanément où en est son business.
+   ────────────────────────────────────────────────────────────── */
+.kanban-section { margin-bottom: 22px; }
+.kanban-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+}
+.kanban-col {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--k-color);
+    border-radius: var(--r);
+    padding: 14px 14px 12px;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow .2s, transform .2s;
+    cursor: default;
+}
+.kanban-col:hover {
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+}
+.kanban-ico   { font-size: 20px; margin-bottom: 8px; }
+.kanban-count {
+    font-size: 28px; font-weight: 700;
+    font-family: var(--mono); color: var(--k-color);
+    line-height: 1; letter-spacing: -1px;
+}
+.kanban-lbl {
+    font-size: 10.5px; font-weight: 600;
+    color: var(--muted); margin-top: 4px;
+    text-transform: uppercase; letter-spacing: .4px;
+}
+/* Indicateur visuel si count > 0 */
+.kanban-col.has-items { background: var(--k-bg); }
+
+/* ── ACTIONS RAPIDES ──────────────────────────────────────────────
+   Grille de boutons d'action directe : les tâches les plus courantes
+   accessibles en 1 clic sans naviguer dans les menus.
+   ────────────────────────────────────────────────────────────── */
+/* ── ACTIONS RAPIDES — carte conteneur + boutons inline ────────────
+   Tous les boutons sont regroupés dans une seule card propre.
+   Design horizontal : icône colorée + texte sur la même ligne.
+   ────────────────────────────────────────────────────────────── */
+.quick-section { margin-bottom: 22px; }
+
+/* La card qui contient tous les boutons */
+.quick-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+/* Header de la card */
+.quick-card-hd {
+    padding: 13px 18px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+}
+.quick-card-title {
+    font-size: 13px; font-weight: 700; color: var(--text);
+    display: flex; align-items: center; gap: 8px;
+}
+.quick-card-title .title-ico {
+    width: 24px; height: 24px;
+    background: var(--brand-mlt);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+}
+
+/* Grille de boutons à l'intérieur de la card */
+.quick-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+}
+
+/* Séparateur vertical entre boutons */
+.quick-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 9px;
+    padding: 20px 14px 18px;
+    text-decoration: none;
+    border-right: 1px solid var(--border);
+    transition: background .15s, transform .15s;
+    position: relative;
+    cursor: pointer;
+}
+/* Dernier bouton sans bordure droite */
+.quick-btn:last-child { border-right: none; }
+
+/* Hover : fond coloré léger + indicateur en haut */
+.quick-btn:hover { background: var(--q-bg, var(--brand-mlt)); }
+.quick-btn::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--q-color, var(--brand));
+    opacity: 0;
+    transition: opacity .15s;
+}
+.quick-btn:hover::before { opacity: 1; }
+
+/* Icône dans un cercle coloré */
+.quick-btn-ico {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    background: var(--q-bg, var(--brand-mlt));
+    border: 1px solid var(--q-border, var(--brand-lt));
+    transition: transform .15s;
+    flex-shrink: 0;
+}
+.quick-btn:hover .quick-btn-ico {
+    transform: scale(1.08);
+}
+
+.quick-btn-lbl {
+    font-size: 12.5px; font-weight: 700;
+    color: var(--text); line-height: 1.2;
+    text-align: center;
+}
+.quick-btn-sub {
+    font-size: 10.5px; color: var(--muted);
+    line-height: 1.3; text-align: center;
+}
+
+@media (max-width: 860px) {
+    .kanban-grid { grid-template-columns: repeat(3,1fr); }
+    .quick-grid  { grid-template-columns: repeat(2,1fr); }
+    .quick-btn   { border-right: none; border-bottom: 1px solid var(--border); }
+    .quick-btn:last-child { border-bottom: none; }
+    .today-grid  { grid-template-columns: 1fr; }
+    .e2-grid     { grid-template-columns: 1fr; }
+}
+
+/* ================================================================
+   ETAPE 2 — CSS : Top clients, Produits a risque, Graphique 6 mois
+   ================================================================ */
+
+/* Grille 2 colonnes pour blocs A et B cote a cote */
+.e2-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+/* TOP CLIENTS */
+.client-list { display: flex; flex-direction: column; }
+.client-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 18px;
+    border-bottom: 1px solid #f3f6f4;
+    transition: background .12s;
+}
+.client-row:last-child { border-bottom: none; }
+.client-row:hover { background: var(--bg); }
+.client-av {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.client-info { flex: 1; min-width: 0; }
+.client-name {
+    font-size: 12.5px; font-weight: 600; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.client-meta { font-size: 10.5px; color: var(--muted); margin-top: 1px; }
+.client-bar-wrap { width: 60px; flex-shrink: 0; }
+.client-bar-track {
+    height: 5px; background: #eef1f0;
+    border-radius: 3px; overflow: hidden; margin-bottom: 3px;
+}
+.client-bar-fill {
+    height: 100%; border-radius: 3px; background: var(--brand);
+    transition: width 1s cubic-bezier(.23,1,.32,1);
+}
+.client-amount {
+    font-family: var(--mono); font-size: 10px;
+    font-weight: 600; color: var(--text);
+    text-align: right; white-space: nowrap;
+}
+.client-rank {
+    width: 20px; flex-shrink: 0;
+    font-size: 11px; font-weight: 700;
+    color: var(--muted); text-align: center;
+}
+.client-rank.top { color: #f59e0b; font-size: 14px; }
+
+/* PRODUITS A RISQUE */
+.risk-list { display: flex; flex-direction: column; }
+.risk-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 18px;
+    border-bottom: 1px solid #f3f6f4;
+    transition: background .12s;
+}
+.risk-row:last-child { border-bottom: none; }
+.risk-row:hover { background: var(--bg); }
+.risk-img {
+    width: 38px; height: 38px; border-radius: var(--r-sm);
+    object-fit: cover; flex-shrink: 0;
+    border: 1px solid var(--border);
+}
+.risk-img-placeholder {
+    width: 38px; height: 38px; border-radius: var(--r-sm);
+    background: #f3f6f4; border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+}
+.risk-info { flex: 1; min-width: 0; }
+.risk-name {
+    font-size: 12.5px; font-weight: 600; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.risk-meta { font-size: 10.5px; color: var(--muted); margin-top: 1px; }
+.risk-badge {
+    font-size: 10px; font-weight: 700;
+    padding: 3px 8px; border-radius: 20px;
+    background: #fef2f2; color: #991b1b;
+    border: 1px solid #fca5a5;
+    white-space: nowrap; flex-shrink: 0;
+}
+.risk-empty {
+    padding: 20px 18px; text-align: center;
+    font-size: 13px; color: var(--muted);
+}
+.risk-empty .ico { font-size: 28px; display: block; margin-bottom: 6px; }
+
+/* ── SELECTEUR DE PERIODE ──────────────────────────────────────
+   Card avec boutons de periodes rapides + résumé des stats
+   pour la période sélectionnée. Mise à jour via AJAX (fetch).
+   ─────────────────────────────────────────────────────────── */
+.period-card { margin-bottom: 22px; }
+
+/* Grille de boutons de période */
+.period-btns {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+}
+.period-btn {
+    padding: 6px 14px; border-radius: 20px;
+    font-size: 12px; font-weight: 600; font-family: var(--font);
+    border: 1px solid var(--border-dk);
+    background: var(--bg); color: var(--text-2);
+    cursor: pointer; transition: all .15s;
+    white-space: nowrap;
+}
+.period-btn:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-mlt); }
+.period-btn.active {
+    background: var(--brand); color: #fff;
+    border-color: var(--brand-dk);
+    box-shadow: 0 2px 8px rgba(16,185,129,.25);
+}
+
+/* Zone stats de la période */
+.period-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+}
+.period-stat {
+    padding: 16px 18px;
+    border-right: 1px solid var(--border);
+    text-align: center;
+}
+.period-stat:last-child { border-right: none; }
+.period-stat-lbl { font-size: 10.5px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .3px; margin-bottom: 5px; }
+.period-stat-val { font-size: 20px; font-weight: 700; font-family: var(--mono); color: var(--text); letter-spacing: -.5px; }
+.period-stat-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+/* Zone graphique barres journalières */
+.period-chart {
+    padding: 16px 18px 14px;
+    border-top: 1px solid var(--border);
+}
+.period-bars {
+    display: flex; align-items: flex-end; gap: 3px;
+    height: 70px; margin-bottom: 6px;
+}
+.period-bar-wrap { flex: 1; height: 100%; display: flex; align-items: flex-end; }
+.period-bar {
+    width: 100%; border-radius: 3px 3px 0 0;
+    background: var(--brand); opacity: .8;
+    transition: height .4s cubic-bezier(.23,1,.32,1), opacity .15s;
+    cursor: pointer; position: relative; min-height: 2px;
+}
+.period-bar:hover { opacity: 1; }
+.period-bar.empty { opacity: .15; background: #9ca3af; }
+.period-bar::after {
+    content: attr(data-tip);
+    position: absolute; bottom: calc(100% + 5px); left: 50%;
+    transform: translateX(-50%);
+    background: #0f1c18; color: #fff;
+    font-size: 10px; font-weight: 600; font-family: var(--mono);
+    padding: 3px 7px; border-radius: 4px;
+    white-space: nowrap; pointer-events: none;
+    opacity: 0; transition: opacity .15s; z-index: 10;
+}
+.period-bar:hover::after { opacity: 1; }
+.period-bar-labels {
+    display: flex; gap: 3px; overflow: hidden;
+}
+.period-bar-lbl {
+    flex: 1; text-align: center;
+    font-size: 9px; color: var(--muted); font-family: var(--mono);
+    white-space: nowrap; overflow: hidden; text-overflow: clip;
+}
+
+/* Loader */
+.period-loading {
+    display: none; align-items: center; justify-content: center;
+    padding: 32px; gap: 10px;
+    font-size: 13px; color: var(--muted); font-weight: 500;
+}
+.period-loading.show { display: flex; }
+.spin {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid var(--brand-lt);
+    border-top-color: var(--brand);
+    animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Label de la période active */
+.period-label {
+    font-size: 11px; color: var(--muted); font-weight: 500;
+    padding: 0 18px 10px;
+}
+.period-label strong { color: var(--text); }
+
+@media (max-width: 640px) {
+    .period-stats { grid-template-columns: repeat(2,1fr); }
+    .period-stat:nth-child(2) { border-right: none; }
+    .period-stat:nth-child(3) { border-top: 1px solid var(--border); }
 }
 </style>
 @endpush
@@ -624,7 +1062,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
     /* Taux livraison */
     $totalCmdMonth = $shop->orders()->whereMonth('created_at',$now->month)->count();
-   $livres = $shop->orders()->whereMonth('created_at',$now->month)->where('status','livrée')->count();
+    $livres        = $shop->orders()->whereMonth('created_at',$now->month)->where('status','livrée')->count();
     $tauxLiv       = $totalCmdMonth > 0 ? round(($livres / $totalCmdMonth) * 100, 1) : 0;
 
     /* Graph 7 jours */
@@ -644,24 +1082,211 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
     /* Statuts */
     $statusMap = [
-        'delivered'   => ['label'=>'Livré',       'cls'=>'p-success'],
+        'livrée'      => ['label'=>'Livré',        'cls'=>'p-success'],
         'pending'     => ['label'=>'En attente',   'cls'=>'p-warning'],
         'processing'  => ['label'=>'En traitement','cls'=>'p-info'],
-        'confirmed'   => ['label'=>'Confirmé',     'cls'=>'p-info'],
-        'livrée'      => ['label'=>'Livré', 'cls'=>'p-success'],
+        'confirmée'   => ['label'=>'Confirmé',     'cls'=>'p-info'],
+        'en_livraison'=> ['label'=>'En livraison', 'cls'=>'p-info'],
         'shipped'     => ['label'=>'Expédié',      'cls'=>'p-info'],
-        'cancelled'   => ['label'=>'Annulé',       'cls'=>'p-danger'],
+        'annulée'     => ['label'=>'Annulé',       'cls'=>'p-danger'],
     ];
 
     /* Pending badge */
-    $pendingCount = $shop->orders()->whereIn('status',['pending','processing'])->count();
+    $pendingCount = $shop->orders()->whereIn('status',['en attente','en_attente','pending','confirmée','processing'])->count();
 
     /* Avatar colors */
     $avColors = ['av-green','av-blue','av-amber','av-purple','av-teal','av-rose'];
 
-    /* Livraison logic */
+    /* ═══════════════════════════════════════════════════════════════
+     * ÉTAPE 1 — NOUVELLES DONNÉES : contrôle opérationnel quotidien
+     * ═══════════════════════════════════════════════════════════════ */
+
+    /* ── REVENUS AUJOURD'HUI ──────────────────────────────────────
+     * On compare aujourd'hui vs hier pour donner une tendance immédiate
+     * au propriétaire dès qu'il ouvre son dashboard le matin.
+     * ──────────────────────────────────────────────────────────── */
+    $caToday     = (float) $shop->orders()->whereDate('created_at', today())->sum('total');
+    $caYesterday = (float) $shop->orders()->whereDate('created_at', today()->subDay())->sum('total');
+    // Variation en % (si hier = 0, on met 0 pour éviter la division par zéro)
+    $caTodayDelta = $caYesterday > 0
+        ? round((($caToday - $caYesterday) / $caYesterday) * 100, 1)
+        : ($caToday > 0 ? 100 : 0);
+
+    /* ── ALERTES INTELLIGENTES ────────────────────────────────────
+     * On génère une liste d'alertes selon l'état de la boutique.
+     * Chaque alerte a : type (warning/danger/info), icône, message.
+     * Le propriétaire voit d'un coup ce qui nécessite son attention.
+     * ──────────────────────────────────────────────────────────── */
+    $alerts = collect();
+
+    // Alerte 1 : commandes en attente depuis plus de 2h → action urgente
+    $cmdEnRetard = $shop->orders()
+        ->whereIn('status', ['pending', 'en attente', 'en_attente'])
+        ->where('created_at', '<', now()->subHours(2))
+        ->count();
+    if ($cmdEnRetard > 0) {
+        $alerts->push([
+            'type' => 'danger',
+            'ico'  => '🚨',
+            'msg'  => "{$cmdEnRetard} commande(s) en attente depuis plus de 2h — à traiter urgemment",
+            'link' => route('boutique.orders.index'),
+            'cta'  => 'Voir les commandes',
+        ]);
+    }
+
+    // Alerte 2 : aucun livreur disponible alors qu'il y a des commandes à livrer
+    $cmdALivrer = $shop->orders()
+        ->whereIn('status', ['confirmée', 'confirmed', 'processing'])
+        ->count();
+    if ($cmdALivrer > 0 && $livreursDisponibles->isEmpty()) {
+        $alerts->push([
+            'type' => 'warning',
+            'ico'  => '⚠️',
+            'msg'  => "{$cmdALivrer} commande(s) prête(s) à livrer mais aucun livreur disponible",
+            'link' => route('delivery.companies.index'),
+            'cta'  => 'Trouver un livreur',
+        ]);
+    }
+
+    // Alerte 3 : boutique non approuvée → le propriétaire doit le savoir
+    if (!$shop->is_approved) {
+        $alerts->push([
+            'type' => 'warning',
+            'ico'  => '⏳',
+            'msg'  => "Votre boutique est en attente de validation par l'administrateur",
+            'link' => null,
+            'cta'  => null,
+        ]);
+    }
+
+    // Alerte 4 : bonne nouvelle → si CA aujourd'hui > hier, on encourage
+    if ($caTodayDelta >= 20 && $caToday > 0) {
+        $alerts->push([
+            'type' => 'success',
+            'ico'  => '🎉',
+            'msg'  => "Excellente journée ! Vos revenus d'aujourd'hui sont en hausse de {$caTodayDelta}% vs hier",
+            'link' => null,
+            'cta'  => null,
+        ]);
+    }
+
+    /* ── KANBAN STATUTS ───────────────────────────────────────────
+     * On compte le nombre de commandes dans chaque étape du flux.
+     * Permet au propriétaire de voir instantanément où en est
+     * son pipeline de commandes sans ouvrir la liste complète.
+     * ──────────────────────────────────────────────────────────── */
+    /* ── KANBAN : pipeline en temps réel ─────────────────────────────
+     * Logique des statuts utilisés par le livreur (LivreurOrderController) :
+     *   - Livreur clique "Commencer" → status = 'en_livraison'
+     *   - Livreur clique "Terminer"  → status = 'livrée'
+     *
+     * Les colonnes "En livraison" et "Terminées" reflètent ces deux états
+     * en temps réel : le chiffre monte/descend à chaque action du livreur.
+     * ─────────────────────────────────────────────────────────────── */
+    $kanban = [
+
+        // ── Étape 1 : EN ATTENTE ──────────────────────────────────
+        // Commandes reçues mais pas encore prises en charge.
+        // Statuts possibles (FR + EN pour compatibilité) :
+        [
+            'label'  => 'En attente',
+            'count'  => $shop->orders()
+                            ->whereIn('status', ['pending','en attente','en_attente'])
+                            ->count(),
+            'color'  => '#f59e0b',
+            'bg'     => '#fffbeb',
+            'ico'    => '📥',
+        ],
+
+        // ── Étape 2 : CONFIRMÉES ──────────────────────────────────
+        // Commandes validées par la boutique, en attente d'être
+        // assignées à un livreur.
+        [
+            'label'  => 'Confirmées',
+            'count'  => $shop->orders()
+                            ->whereIn('status', ['confirmed','confirmée','processing'])
+                            ->count(),
+            'color'  => '#3b82f6',
+            'bg'     => '#eff6ff',
+            'ico'    => '✅',
+        ],
+
+        // ── Étape 3 : EN LIVRAISON ────────────────────────────────
+        // Le livreur a cliqué "Commencer" → status = 'en_livraison'.
+        // Ce chiffre monte quand le livreur part en course.
+        // Il redescend quand il clique "Terminer".
+        [
+            'label'  => 'En livraison',
+            'count'  => $shop->orders()
+                            ->whereIn('status', ['en_livraison','delivering','shipped'])
+                            ->count(),
+            'color'  => '#8b5cf6',
+            'bg'     => '#f5f3ff',
+            'ico'    => '🚴',
+        ],
+
+        // ── Étape 4 : TERMINÉES (livrées) ─────────────────────────
+        // Le livreur a cliqué "Terminer" → status = 'livrée'.
+        // Ce chiffre monte chaque fois qu'une livraison est complétée.
+        // Filtre sur le mois courant pour rester pertinent.
+        [
+            'label'  => 'Terminées',
+            'count'  => $shop->orders()
+                            ->whereMonth('created_at', $now->month)
+                            ->where('status', 'livrée')
+                            ->count(),
+            'color'  => '#10b981',
+            'bg'     => '#ecfdf5',
+            'ico'    => '🎯',
+        ],
+
+        // ── Étape 5 : ANNULÉES ────────────────────────────────────
+        // Commandes annulées ce mois. Si ce chiffre monte,
+        // le propriétaire doit investiguer pourquoi.
+        [
+            'label'  => 'Annulées',
+            'count'  => $shop->orders()
+                            ->whereMonth('created_at', $now->month)
+                            ->whereIn('status', ['annulée','cancelled'])
+                            ->count(),
+            'color'  => '#ef4444',
+            'bg'     => '#fef2f2',
+            'ico'    => '❌',
+        ],
+
+    ];
+
+    /* ── LIVRAISON LOGIC (inchangé) ──────────────────────────────*/
     $hasLivreurs  = $livreursDisponibles->isNotEmpty();
     $hasCompanies = isset($deliveryCompanies) && $deliveryCompanies->isNotEmpty();
+
+    /* ═══════════════════════════════════════════════════════════════
+     * ÉTAPE 2 — ANALYSE BUSINESS : top clients, produits à risque,
+     *           évolution mensuelle sur 6 mois
+     * ═══════════════════════════════════════════════════════════════ */
+
+    /* ── PRODUITS À RISQUE ────────────────────────────────────────
+     * Produits du catalogue qui n'ont fait AUCUNE vente ce mois.
+     * Signal d'alerte : soit le produit est mal affiché, soit
+     * le prix est trop élevé, soit il ne correspond plus à la demande.
+     * On limite à 5 pour ne pas surcharger le dashboard.
+     * ──────────────────────────────────────────────────────────── */
+    $produitsRisque = $shop->products()
+        ->withCount([
+            // Compte uniquement les order_items liés à des commandes de ce mois
+            'orderItems as ventes_mois' => function ($q) use ($now) {
+                $q->whereHas('order', function ($o) use ($now) {
+                    $o->whereMonth('created_at', $now->month)
+                      ->whereYear('created_at', $now->year);
+                });
+            }
+        ])
+        ->having('ventes_mois', '=', 0)                        // seulement ceux avec 0 vente
+        ->orderBy('created_at', 'desc')                         // les plus récents d'abord
+        ->take(5)
+        ->get();
+
+    /* Graphique 6 mois remplacé par sélecteur de période dynamique (AJAX) */
 @endphp
 
 <div class="dash-wrap" id="dashWrap">
@@ -699,6 +1324,18 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             </a>
             <a href="{{ route('boutique.employees.index') }}" class="sb-item">
                 <span class="ico">👥</span> Équipe
+            </a>
+
+            {{-- Clients : lien vers la liste complète des clients de la boutique --}}
+            <a href="{{ route('boutique.clients.index') }}" class="sb-item">
+                <span class="ico">🙍</span> Clients
+                {{-- Badge avec le nombre total de clients distincts --}}
+                @php
+                    $totalClientsCount = $shop->orders()->distinct('user_id')->count('user_id');
+                @endphp
+                @if($totalClientsCount > 0)
+                    <span class="sb-badge">{{ $totalClientsCount }}</span>
+                @endif
             </a>
 
             <div class="sb-section">Livraison</div>
@@ -800,6 +1437,198 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 💡 <span>Taux de commission : <strong>{{ $shop->commission_rate_percent }}%</strong> — appliqué à chaque commande validée.</span>
             </div>
             @endif
+
+            {{-- ════════════════════════════════════════════════════════
+                 ÉTAPE 1 — BLOC A : REVENUS AUJOURD'HUI
+                 Deux cartes sombres mises en avant : revenus du jour
+                 et nombre de commandes du jour. Premier regard le matin.
+                 ════════════════════════════════════════════════════════ --}}
+            <div class="today-grid">
+
+                {{-- Carte : Revenus aujourd'hui --}}
+                <div class="today-card">
+                    <div class="today-icon">💵</div>
+                    <div>
+                        <div class="today-lbl">Revenus aujourd'hui</div>
+                        <div class="today-val">{{ number_format($caToday, 0, ',', ' ') }}</div>
+                        <div class="today-unit">GNF</div>
+                        {{-- Tendance vs hier --}}
+                        <div class="today-delta {{ $caTodayDelta > 0 ? 'up' : ($caTodayDelta < 0 ? 'down' : 'flat') }}">
+                            @if($caTodayDelta > 0) ↑ +{{ $caTodayDelta }}% vs hier
+                            @elseif($caTodayDelta < 0) ↓ {{ $caTodayDelta }}% vs hier
+                            @else — Même niveau qu'hier
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Carte : Commandes aujourd'hui --}}
+                <div class="today-card">
+                    <div class="today-icon">📦</div>
+                    <div>
+                        <div class="today-lbl">Commandes aujourd'hui</div>
+                        <div class="today-val">{{ $cmdToday }}</div>
+                        <div class="today-unit">commandes reçues</div>
+                        {{-- Tendance vs hier --}}
+                        <div class="today-delta {{ $cmdToday >= $cmdYest ? 'up' : 'down' }}">
+                            @if($cmdToday > $cmdYest) ↑ +{{ $cmdToday - $cmdYest }} vs hier
+                            @elseif($cmdToday < $cmdYest) ↓ {{ $cmdYest - $cmdToday }} de moins vs hier
+                            @else — Même niveau qu'hier
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            {{-- /ÉTAPE 1 — BLOC A --}}
+
+
+            {{-- ════════════════════════════════════════════════════════
+                 ÉTAPE 1 — BLOC B : ALERTES INTELLIGENTES
+                 N'apparaît QUE s'il y a des alertes à signaler.
+                 Le propriétaire voit immédiatement ce qui nécessite
+                 son attention sans chercher dans les menus.
+                 ════════════════════════════════════════════════════════ --}}
+            @if($alerts->isNotEmpty())
+            <div class="alerts-zone">
+                @foreach($alerts as $alert)
+                <div class="alert-item {{ $alert['type'] }}">
+                    <span class="alert-ico">{{ $alert['ico'] }}</span>
+                    <span class="alert-msg">{{ $alert['msg'] }}</span>
+                    {{-- Bouton d'action direct si une route est définie --}}
+                    @if($alert['link'])
+                    <a href="{{ $alert['link'] }}" class="alert-cta">
+                        {{ $alert['cta'] }} →
+                    </a>
+                    @endif
+                </div>
+                @endforeach
+            </div>
+            @endif
+            {{-- /ÉTAPE 1 — BLOC B --}}
+
+
+            {{-- ════════════════════════════════════════════════════════
+                 ÉTAPE 1 — BLOC C : KANBAN STATUTS COMMANDES
+                 5 colonnes = les 5 étapes de vie d'une commande.
+                 Permet au propriétaire de voir son pipeline en 1 coup
+                 d'œil : combien sont en attente, en cours, livrées.
+                 ════════════════════════════════════════════════════════ --}}
+            <div class="kanban-section">
+                <div class="card-hd" style="padding:0 0 12px;border:none;background:transparent">
+                    <span class="card-title" style="font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px">
+                        Pipeline commandes
+                    </span>
+                    <a href="{{ route('boutique.orders.index') }}" class="btn btn-ghost btn-sm">
+                        Gérer les commandes →
+                    </a>
+                </div>
+                <div class="kanban-grid">
+                    @foreach($kanban as $col)
+                    <div class="kanban-col {{ $col['count'] > 0 ? 'has-items' : '' }}"
+                         style="--k-color:{{ $col['color'] }};--k-bg:{{ $col['bg'] }}">
+
+                        {{-- Icône de l'étape --}}
+                        <div class="kanban-ico">{{ $col['ico'] }}</div>
+
+                        {{-- Chiffre principal coloré selon l'étape --}}
+                        <div class="kanban-count">{{ $col['count'] }}</div>
+
+                        {{-- Label de l'étape --}}
+                        <div class="kanban-lbl">{{ $col['label'] }}</div>
+
+                        {{-- Sous-texte contextuel :
+                             "En livraison" → indique que le livreur est en route
+                             "Terminées"    → précise que c'est ce mois --}}
+                        @if($col['label'] === 'En livraison' && $col['count'] > 0)
+                            <div style="font-size:9px;color:var(--muted);margin-top:3px;font-weight:600">
+                                🔴 En cours
+                            </div>
+                        @elseif($col['label'] === 'Terminées')
+                            <div style="font-size:9px;color:var(--muted);margin-top:3px">
+                                ce mois
+                            </div>
+                        @endif
+
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            {{-- /ÉTAPE 1 — BLOC C --}}
+
+
+            {{-- ════════════════════════════════════════════════════════
+                 ÉTAPE 1 — BLOC D : ACTIONS RAPIDES
+                 Les 4 actions les plus fréquentes en 1 clic.
+                 Évite au propriétaire de naviguer dans les menus
+                 pour les tâches quotidiennes.
+                 ════════════════════════════════════════════════════════ --}}
+            {{-- ════════════════════════════════════════════════════════
+                 ÉTAPE 1 — BLOC D : ACTIONS RAPIDES
+                 Tous les boutons sont regroupés dans une seule card.
+                 Design : icône colorée + label + sous-titre.
+                 Hover : fond coloré + barre de couleur en haut.
+                 ════════════════════════════════════════════════════════ --}}
+            <div class="quick-section">
+                <div class="quick-card">
+
+                    {{-- En-tête de la card --}}
+                    <div class="quick-card-hd">
+                        <div class="quick-card-title">
+                            <span class="title-ico">⚡</span>
+                            Actions rapides
+                        </div>
+                        <span style="font-size:11px;color:var(--muted)">Accès direct aux tâches courantes</span>
+                    </div>
+
+                    {{-- Grille des 4 boutons d'action --}}
+                    <div class="quick-grid">
+
+                        {{-- Action 1 : Commandes en attente
+                             Couleur ambre = urgence modérée --}}
+                        <a href="{{ route('boutique.orders.index') }}"
+                           class="quick-btn"
+                           style="--q-bg:#fffbeb;--q-border:#fde68a;--q-color:#f59e0b">
+                            <div class="quick-btn-ico">📋</div>
+                            <div class="quick-btn-lbl">Commandes</div>
+                            <div class="quick-btn-sub">Voir & gérer</div>
+                        </a>
+
+                        {{-- Action 2 : Ajouter un produit au catalogue
+                             Couleur verte = action positive --}}
+                        <a href="{{ route('products.create') }}"
+                           class="quick-btn"
+                           style="--q-bg:#ecfdf5;--q-border:#6ee7b7;--q-color:#10b981">
+                            <div class="quick-btn-ico">➕</div>
+                            <div class="quick-btn-lbl">Nouveau produit</div>
+                            <div class="quick-btn-sub">Ajouter au catalogue</div>
+                        </a>
+
+                        {{-- Action 3 : Gestion des livreurs
+                             Couleur violette = gestion équipe --}}
+                        <a href="{{ route('boutique.employees.index') }}"
+                           class="quick-btn"
+                           style="--q-bg:#f5f3ff;--q-border:#c4b5fd;--q-color:#8b5cf6">
+                            <div class="quick-btn-ico">🚴</div>
+                            <div class="quick-btn-lbl">Livreurs</div>
+                            <div class="quick-btn-sub">Gérer l'équipe</div>
+                        </a>
+
+                        {{-- Action 4 : Paiements et revenus
+                             Couleur bleue = finances --}}
+                        <a href="{{ route('boutique.payments.index') }}"
+                           class="quick-btn"
+                           style="--q-bg:#eff6ff;--q-border:#93c5fd;--q-color:#3b82f6">
+                            <div class="quick-btn-ico">💳</div>
+                            <div class="quick-btn-lbl">Paiements</div>
+                            <div class="quick-btn-sub">Revenus reçus</div>
+                        </a>
+
+                    </div>{{-- /quick-grid --}}
+                </div>{{-- /quick-card --}}
+            </div>
+            {{-- /ÉTAPE 1 — BLOC D --}}
+
 
             {{-- ── KPI Grid ── --}}
             <div class="kpi-grid">
@@ -1103,6 +1932,129 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             </div>
             @endif
 
+
+            {{-- ================================================================
+                 ETAPE 2 — PRODUITS A RISQUE (pleine largeur)
+                 Top clients déplacé dans la page /boutique/clients
+                 ================================================================ --}}
+            <div class="card" style="margin-bottom:22px">
+                <div class="card-hd">
+                    <span class="card-title">⚠️ Produits à risque — 0 vente ce mois</span>
+                    <a href="{{ route('products.index') }}" class="btn btn-ghost btn-sm">
+                        Gérer les produits →
+                    </a>
+                </div>
+
+                @if($produitsRisque->isEmpty())
+                    {{-- Bonne nouvelle : tous les produits se vendent --}}
+                    <div class="risk-empty">
+                        <span class="ico">🎉</span>
+                        Tous vos produits ont été vendus ce mois !
+                    </div>
+                @else
+                {{-- Grille horizontale : jusqu'à 5 produits côte à côte --}}
+                <div style="display:flex;flex-wrap:wrap;gap:0;padding:0">
+                    @foreach($produitsRisque as $product)
+                    <div class="risk-row" style="flex:1;min-width:180px;border-right:1px solid #f3f6f4;border-bottom:none">
+                        {{-- Image ou placeholder --}}
+                        @if(!empty($product->image))
+                            <img src="{{ asset('storage/'.$product->image) }}"
+                                 alt="{{ $product->name }}" class="risk-img">
+                        @else
+                            <div class="risk-img-placeholder">🏷️</div>
+                        @endif
+                        {{-- Nom et prix --}}
+                        <div class="risk-info">
+                            <div class="risk-name" title="{{ $product->name }}">
+                                {{ Str::limit($product->name, 20) }}
+                            </div>
+                            <div class="risk-meta">
+                                {{ $product->price ? number_format($product->price,0,',',' ').' GNF' : 'Prix non défini' }}
+                            </div>
+                        </div>
+                        <span class="risk-badge">0 vente</span>
+                    </div>
+                    @endforeach
+                </div>
+                @endif
+            </div>
+            {{-- /ETAPE 2 — PRODUITS A RISQUE --}}
+
+
+            {{-- ================================================================
+                 ETAPE 2 — BLOC C : SÉLECTEUR DE PÉRIODE
+                 Remplace le graphique 6 mois statique.
+                 L'utilisateur clique sur une période → les stats et le
+                 mini-graphique se mettent à jour via AJAX sans rechargement.
+                 Périodes : Hier · Aujourd'hui · 7j · 30j · Ce mois ·
+                            Mois dernier · Cette année · Année dernière
+                 ================================================================ --}}
+            <div class="card period-card" id="periodCard">
+                <div class="card-hd">
+                    <span class="card-title">📅 Analyse par période</span>
+                    {{-- Label de la période active --}}
+                    <span class="period-label" id="periodLabel">
+                        Période : <strong>Ce mois</strong>
+                    </span>
+                </div>
+
+                {{-- ── Boutons de sélection rapide ── --}}
+                <div class="period-btns">
+                    <button class="period-btn" data-period="yesterday">Hier</button>
+                    <button class="period-btn" data-period="today">Aujourd'hui</button>
+                    <button class="period-btn" data-period="7days">7 derniers jours</button>
+                    <button class="period-btn" data-period="30days">30 derniers jours</button>
+                    <button class="period-btn active" data-period="this_month">Ce mois</button>
+                    <button class="period-btn" data-period="last_month">Mois dernier</button>
+                    <button class="period-btn" data-period="this_year">Cette année</button>
+                    <button class="period-btn" data-period="last_year">Année dernière</button>
+                </div>
+
+                {{-- ── Loader (visible pendant le fetch) ── --}}
+                <div class="period-loading" id="periodLoading">
+                    <div class="spin"></div>
+                    Chargement…
+                </div>
+
+                {{-- ── Stats de la période (mises à jour dynamiquement) ── --}}
+                <div id="periodStatsWrap">
+                    <div class="period-stats">
+                        <div class="period-stat">
+                            <div class="period-stat-lbl">Chiffre d'affaires</div>
+                            <div class="period-stat-val" id="pCA">—</div>
+                            <div class="period-stat-sub">GNF</div>
+                        </div>
+                        <div class="period-stat">
+                            <div class="period-stat-lbl">Commandes</div>
+                            <div class="period-stat-val" id="pCMD">—</div>
+                            <div class="period-stat-sub">commandes</div>
+                        </div>
+                        <div class="period-stat">
+                            <div class="period-stat-lbl">Panier moyen</div>
+                            <div class="period-stat-val" id="pPANIER">—</div>
+                            <div class="period-stat-sub">GNF / cmd</div>
+                        </div>
+                        <div class="period-stat">
+                            <div class="period-stat-lbl">Taux livraison</div>
+                            <div class="period-stat-val" id="pTAUX">—</div>
+                            <div class="period-stat-sub">% livrées</div>
+                        </div>
+                    </div>
+
+                    {{-- ── Mini graphique barres ── --}}
+                    <div class="period-chart">
+                        <div class="period-bars" id="periodBars">
+                            {{-- Rempli dynamiquement par JS --}}
+                        </div>
+                        <div class="period-bar-labels" id="periodLabels">
+                            {{-- Rempli dynamiquement par JS --}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{-- /ETAPE 2 — BLOC C --}}
+
+
         </div>{{-- /content --}}
     </main>
 </div>{{-- /dash-wrap --}}
@@ -1144,12 +2096,133 @@ document.addEventListener('DOMContentLoaded', () => {
         }, i * 60);
     });
 
-    /* ── Sparkline animation ── */
+    /* ── Sparkline animation (top produits) ── */
     document.querySelectorAll('.sp-fill').forEach((el, i) => {
         setTimeout(() => {
             el.style.width = el.dataset.pct + '%';
         }, 100 + i * 90);
     });
+
+    /* ════════════════════════════════════════════════════════════
+       SÉLECTEUR DE PÉRIODE — Logique AJAX
+       ════════════════════════════════════════════════════════════
+       Au clic sur un bouton de période :
+         1. On marque le bouton comme actif
+         2. On affiche le loader
+         3. On fetch la route boutique.period.stats
+         4. On reçoit un JSON avec : ca, nb, panier, taux, points[]
+         5. On met à jour les 4 KPI + le mini-graphique
+       ════════════════════════════════════════════════════════════ */
+
+    /* Labels lisibles pour chaque période */
+    const periodLabels = {
+        yesterday  : 'Hier',
+        today      : "Aujourd'hui",
+        '7days'    : '7 derniers jours',
+        '30days'   : '30 derniers jours',
+        this_month : 'Ce mois',
+        last_month : 'Mois dernier',
+        this_year  : 'Cette année',
+        last_year  : 'Année dernière',
+    };
+
+    /* Formater un nombre en GNF lisible */
+    function fmt(n) {
+        if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace('.0','') + 'M';
+        if (n >= 1_000)     return Math.round(n / 1_000) + 'k';
+        return Math.round(n).toString();
+    }
+
+    /* Dessiner le mini-graphique barres */
+    function drawBars(points) {
+        const barsEl   = document.getElementById('periodBars');
+        const labelsEl = document.getElementById('periodLabels');
+        if (!barsEl || !labelsEl) return;
+
+        const max = Math.max(...points.map(p => p.ca), 1);
+
+        barsEl.innerHTML   = points.map(p => {
+            const h   = p.ca > 0 ? Math.max(Math.round((p.ca / max) * 100), 3) : 2;
+            const tip = fmt(p.ca) + ' GNF · ' + p.nb + ' cmd';
+            return `<div class="period-bar-wrap">
+                <div class="period-bar ${p.ca === 0 ? 'empty' : ''}"
+                     style="height:0%"
+                     data-h="${h}"
+                     data-tip="${tip}">
+                </div>
+            </div>`;
+        }).join('');
+
+        labelsEl.innerHTML = points.map(p =>
+            `<div class="period-bar-lbl">${p.label}</div>`
+        ).join('');
+
+        /* Animer les barres */
+        barsEl.querySelectorAll('.period-bar').forEach((bar, i) => {
+            setTimeout(() => {
+                bar.style.transition = 'height .4s cubic-bezier(.23,1,.32,1)';
+                bar.style.height = bar.dataset.h + '%';
+            }, i * 30);
+        });
+    }
+
+    /* Charger les données d'une période via AJAX */
+    async function loadPeriod(period) {
+        const loading    = document.getElementById('periodLoading');
+        const statsWrap  = document.getElementById('periodStatsWrap');
+        const labelEl    = document.getElementById('periodLabel');
+
+        /* Mettre à jour le label */
+        if (labelEl) {
+            labelEl.innerHTML = 'Période : <strong>' + (periodLabels[period] || period) + '</strong>';
+        }
+
+        /* Afficher loader, cacher stats */
+        loading.classList.add('show');
+        statsWrap.style.opacity = '.3';
+
+        try {
+            const res  = await fetch(`{{ route('boutique.period.stats') }}?period=${period}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                }
+            });
+
+            if (!res.ok) throw new Error('Erreur HTTP ' + res.status);
+            const data = await res.json();
+
+            /* Mettre à jour les 4 KPI */
+            document.getElementById('pCA').textContent     = fmt(data.ca);
+            document.getElementById('pCMD').textContent    = data.nb;
+            document.getElementById('pPANIER').textContent = fmt(data.panier);
+            document.getElementById('pTAUX').textContent   = data.taux + '%';
+
+            /* Dessiner le graphique */
+            drawBars(data.points);
+
+        } catch (err) {
+            console.error('Erreur chargement période:', err);
+            document.getElementById('pCA').textContent = '—';
+        } finally {
+            loading.classList.remove('show');
+            statsWrap.style.opacity = '1';
+        }
+    }
+
+    /* Gestion des clics sur les boutons */
+    document.querySelectorAll('.period-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            /* Retirer actif de tous, mettre sur celui cliqué */
+            document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            loadPeriod(btn.dataset.period);
+        });
+    });
+
+    /* Charger la période par défaut au démarrage */
+    loadPeriod('this_month');
 
 });
 </script>
