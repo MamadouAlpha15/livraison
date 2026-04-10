@@ -46,6 +46,7 @@ class ShopController extends Controller
                     'image'       => 'nullable|image',
                     'description' => 'nullable|string',
                     'commission_rate' => ['nullable','numeric','between:0,100'], // ✅ taux de commission entre 0 et 100
+                    'currency' => ['nullable','string','max:10'], // ✅ code devise (ex: GNF, USD, etc.)
                 ]);
                  // 🔁 Convertir 10 → 0.10, 15 → 0.15, etc.
     if (array_key_exists('commission_rate', $validated) && $validated['commission_rate'] !== null) {
@@ -110,6 +111,8 @@ public function update(Request $request, \App\Models\Shop $shop)
         // 🟢 ICI: on valide un pourcentage 0..100
         'commission_rate' => ['nullable','numeric','between:0,100'],
         'image'           => ['nullable','image','mimes:jpg,jpeg,png,webp'],
+        'currency'        => ['nullable','string','max:10'],
+        
     ]);
 
     // 🔁 Convertir 10 → 0.10, 15 → 0.15, etc.

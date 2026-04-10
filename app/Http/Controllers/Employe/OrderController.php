@@ -27,8 +27,10 @@ class OrderController extends Controller
 
         // ✅ Uniquement MES livreurs
         $livreurs = User::livreurs()->inShop($shopId)->orderBy('name')->get();
+        $shop   = Auth::user()->shop ?? Auth::user()->assignedShop;
+        $devise = $shop?->currency ?? 'GNF';
 
-        return view('employe.orders.index', compact('orders','livreurs'));
+        return view('employe.orders.index', compact('orders','livreurs','devise','shop'));
     }
 
     public function assign(Request $request, Order $order)
@@ -57,4 +59,21 @@ class OrderController extends Controller
 
         return back()->with('success','Commande assignée au livreur.');
     }
+
+    public function cancel(Order $order) {
+    $order->update(['status' => 'annulée']);
+    return back()->with('success', 'Commande #'.$order->id.' annulée.');
+}
+
+// Employe\OrderController.php
+public function restore(Order $order) {
+    if (!in_array($order->status, ['annulée', 'cancelled'])) {
+        return back()->with('warning', 'Cette commande ne peut pas être restaurée.');
+    }
+    $order->update([
+        'status'     => 'pending',
+        'livreur_id' => null,  // ← clé du fix : efface l'ancien livreur
+    ]);
+    return back()->with('success', 'Commande #'.$order->id.' restaurée — prête à réassigner.');
+}
 }

@@ -785,7 +785,7 @@ body {
             <div class="feature-card">
                 <div class="feature-ico">👥</div>
                 <h3 class="feature-title">Gestion d'équipe</h3>
-                <p class="feature-desc">Ajoutez des vendeurs, employés et livreurs. Chaque rôle a son propre espace de travail dédié.</p>
+                <p class="feature-desc">Ajoutez  vos livreurs. Chaque rôle a son propre espace de travail dédié.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-ico">💳</div>

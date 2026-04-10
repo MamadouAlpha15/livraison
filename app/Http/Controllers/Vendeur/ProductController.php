@@ -6,36 +6,121 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
+
 
 class ProductController extends Controller
 {
-    public function index()
+    /* ─────────────────────────────────────────────
+     | Catégories disponibles pour boutique / resto
+     ───────────────────────────────────────────── */
+    const CATEGORIES = [
+        // Boutique générale
+        'Vêtements & Mode',
+        'Chaussures & Accessoires',
+        'Électronique & Téléphones',
+        'Beauté & Cosmétiques',
+        'Maison & Décoration',
+        'Épicerie & Alimentation',
+        'Boissons',
+        'Jouets & Enfants',
+        'Sport & Loisirs',
+        'Bijoux & Montres',
+        // Restaurant / Food
+        'Entrées',
+        'Plats principaux',
+        'Grillades & Viandes',
+        'Poissons & Fruits de mer',
+        'Végétarien',
+        'Pizzas & Burgers',
+        'Sandwichs & Wraps',
+        'Salades',
+        'Desserts & Pâtisseries',
+        'Boissons chaudes',
+        'Jus & Smoothies',
+        'Formules & Menus',
+        'Autre',
+    ];
+
+    /* ─────────────────────────────────────────────
+     | INDEX
+     ───────────────────────────────────────────── */
+    public function index(Request $request)
     {
         $shop = Auth::user()->shop;
-        if (!$shop || !$shop->is_approved) { // Vérifie si la boutique existe et est approuvée
-            return redirect()->route('shop.index')->with('error', 'Votre boutique doit être validée avant d’ajouter des produits.');
+        if (!$shop || !$shop->is_approved) {
+            return redirect()->route('shop.index')
+                ->with('error', 'Votre boutique doit être validée avant d\'ajouter des produits.');
         }
- 
-        $products = $shop->products()->latest()->paginate(10); // Récupère les produits de la boutique
-        return view('vendeur.products.index', compact('products'));
+
+        $query = $shop->products()->latest();
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+        if ($request->filled('status') && \Illuminate\Support\Facades\Schema::hasColumn('products', 'is_active')) {
+            $query->where('is_active', $request->status === 'active');
+        }
+
+        $products      = $query->paginate(12)->withQueryString();
+        $categories    = self::CATEGORIES;
+        $devise        = $shop->currency ?? 'GNF';
+        $totalProducts = $shop->products()->count();
+
+        /* Colonnes optionnelles : évite le crash si la migration n'a pas encore tourné */
+        $hasIsActive    = \Illuminate\Support\Facades\Schema::hasColumn('products', 'is_active');
+        $hasStock       = \Illuminate\Support\Facades\Schema::hasColumn('products', 'stock');
+        $activeProducts = $hasIsActive ? $shop->products()->where('is_active', true)->count() : $totalProducts;
+        $outOfStock     = $hasStock    ? $shop->products()->where('stock', '<=', 0)->count()   : 0;
+
+        return view('vendeur.products.index', compact(
+            'products', 'categories', 'devise',
+            'totalProducts', 'activeProducts', 'outOfStock'
+        ));
     }
 
+    /* ─────────────────────────────────────────────
+     | CREATE
+     ───────────────────────────────────────────── */
     public function create()
     {
-        $shop = Auth::user()->shop; // Récupère la boutique de l'utilisateur connecté
+        $shop = Auth::user()->shop;
         if (!$shop || !$shop->is_approved) {
-            return redirect()->route('shop.index')->with('error', 'Votre boutique doit être validée avant d’ajouter des produits.');
+            return redirect()->route('shop.index')
+                ->with('error', 'Votre boutique doit être validée avant d\'ajouter des produits.');
         }
-        return view('vendeur.products.create');
+
+        $categories = self::CATEGORIES;
+        $devise     = $shop->currency ?? 'GNF';
+
+        return view('vendeur.products.create', compact('categories', 'devise'));
     }
 
+    /* ─────────────────────────────────────────────
+     | STORE
+     ───────────────────────────────────────────── */
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'image' => 'nullable|image|',
-            'description' => 'nullable|string',
+            'name'             => 'required|string|max:255',
+            'price'            => 'required|numeric|min:0',
+            'original_price'   => 'nullable|numeric|min:0',
+            'description'      => 'nullable|string|max:2000',
+            'category'         => 'nullable|string|max:100',
+            'stock'            => 'nullable|integer|min:0',
+            'unit'             => 'nullable|string|max:30',
+            'preparation_time' => 'nullable|integer|min:0',
+            'is_active'        => 'nullable|boolean',
+            'is_featured'      => 'nullable|boolean',
+            'is_available'     => 'nullable|boolean',
+            'allergens'        => 'nullable|string|max:500',
+            'tags'             => 'nullable|string|max:500',
+            'image'            => 'nullable|image|max:4096',
+            'images.*'         => 'nullable|image|max:4096',
         ]);
 
         $shop = Auth::user()->shop;
@@ -45,55 +130,157 @@ class ProductController extends Controller
             $imagePath = $request->file('image')->store('products', 'public');
         }
 
+        $gallery = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $img) {
+                $gallery[] = $img->store('products/gallery', 'public');
+            }
+        }
+
         Product::create([
-            'shop_id' => $shop->id,
-            'name' => $request->name,
-            'description' => $request->description,
-            'price' => $request->price,
-            'image' => $imagePath,
+            'shop_id'          => $shop->id,
+            'name'             => $request->name,
+            'description'      => $request->description,
+            'price'            => $request->price,
+            'original_price'   => $request->original_price,
+            'category'         => $request->category,
+            'stock'            => $request->stock ?? 0,
+            'unit'             => $request->unit ?? 'pièce',
+            'preparation_time' => $request->preparation_time,
+            'is_active'        => $request->boolean('is_active', true),
+            'is_featured'      => $request->boolean('is_featured', false),
+            'is_available'     => $request->boolean('is_available', true),
+            'allergens'        => $request->allergens,
+            'tags'             => $request->tags,
+            'image'            => $imagePath,
+            'gallery'          => !empty($gallery) ? json_encode($gallery) : null,
         ]);
 
-        return redirect()->route('products.index')->with('success', 'Produit ajouté avec succès.');
+        return redirect()->route('products.index')
+            ->with('success', 'Produit "' . $request->name . '" ajouté avec succès !');
     }
 
-
+    /* ─────────────────────────────────────────────
+     | EDIT
+     ───────────────────────────────────────────── */
     public function edit(Product $product)
-{
-    // Vérifier que le produit appartient au vendeur connecté
-  
-    
-    return view('vendeur.products.edit', compact('product'));
-}
+    {
+        $shop = Auth::user()->shop;
+        abort_if(!$shop || $product->shop_id !== $shop->id, 403);
 
-public function update(Request $request, Product $product)
-{
-   
+        $categories = self::CATEGORIES;
+        $devise     = $shop->currency ?? 'GNF';
 
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'price' => 'required|numeric|min:0',
-        'image' => 'nullable|image|',
-        'description' => 'nullable|string',
-    ]);
-
-    $data = $request->only(['name','price','description']); // Récupère les données sauf l'image
-
-    if ($request->hasFile('image')) {
-        $data['image'] = $request->file('image')->store('products', 'public');
+        return view('vendeur.products.edit', compact('product', 'categories', 'devise'));
     }
 
-    $product->update($data);
+    /* ─────────────────────────────────────────────
+     | UPDATE
+     ───────────────────────────────────────────── */
+    public function update(Request $request, Product $product)
+    {
+        $shop = Auth::user()->shop;
+        abort_if(!$shop || $product->shop_id !== $shop->id, 403);
 
-    return redirect()->route('products.index')->with('success', 'Produit mis à jour avec succès.');
-}
+        $request->validate([
+            'name'             => 'required|string|max:255',
+            'price'            => 'required|numeric|min:0',
+            'original_price'   => 'nullable|numeric|min:0',
+            'description'      => 'nullable|string|max:2000',
+            'category'         => 'nullable|string|max:100',
+            'stock'            => 'nullable|integer|min:0',
+            'unit'             => 'nullable|string|max:30',
+            'preparation_time' => 'nullable|integer|min:0',
+            'is_active'        => 'nullable|boolean',
+            'is_featured'      => 'nullable|boolean',
+            'is_available'     => 'nullable|boolean',
+            'allergens'        => 'nullable|string|max:500',
+            'tags'             => 'nullable|string|max:500',
+            'image'            => 'nullable|image|max:4096',
+            'images.*'         => 'nullable|image|max:4096',
+        ]);
 
-public function destroy(Product $product)
-{
-   
+        $data = $request->only([
+            'name', 'description', 'price', 'original_price',
+            'category', 'stock', 'unit', 'preparation_time',
+            'allergens', 'tags',
+        ]);
 
-    $product->delete();
+        $data['is_active']    = $request->boolean('is_active', $product->is_active);
+        $data['is_featured']  = $request->boolean('is_featured', false);
+        $data['is_available'] = $request->boolean('is_available', true);
 
-    return redirect()->route('products.index')->with('success', 'Produit supprimé avec succès.');
-}
+        if ($request->hasFile('image')) {
+            if ($product->image) Storage::disk('public')->delete($product->image);
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
 
+        if ($request->hasFile('images')) {
+            $existing = $product->gallery ? json_decode($product->gallery, true) : [];
+            foreach ($request->file('images') as $img) {
+                $existing[] = $img->store('products/gallery', 'public');
+            }
+            $data['gallery'] = json_encode($existing);
+        }
+
+        $product->update($data);
+
+        return redirect()->route('products.index')
+            ->with('success', 'Produit "' . $product->name . '" mis à jour avec succès !');
+    }
+
+    /* ─────────────────────────────────────────────
+     | TOGGLE actif / inactif (AJAX)
+     ───────────────────────────────────────────── */
+    public function toggleActive(Product $product)
+    {
+        $shop = Auth::user()->shop;
+        abort_if(!$shop || $product->shop_id !== $shop->id, 403);
+
+        $product->update(['is_active' => !$product->is_active]);
+
+        return response()->json([
+            'active'  => $product->is_active,
+            'message' => $product->is_active ? 'Produit activé' : 'Produit désactivé',
+        ]);
+    }
+
+    /* ─────────────────────────────────────────────
+     | DUPLICATE
+     ───────────────────────────────────────────── */
+    public function duplicate(Product $product)
+    {
+        $shop = Auth::user()->shop;
+        abort_if(!$shop || $product->shop_id !== $shop->id, 403);
+
+        $new = $product->replicate();
+        $new->name      = $product->name . ' (copie)';
+        $new->is_active = false;
+        $new->save();
+
+        return redirect()->route('products.edit', $new)
+            ->with('success', 'Produit dupliqué. Modifiez et activez-le.');
+    }
+
+    /* ─────────────────────────────────────────────
+     | DESTROY
+     ───────────────────────────────────────────── */
+    public function destroy(Product $product)
+    {
+        $shop = Auth::user()->shop;
+        abort_if(!$shop || $product->shop_id !== $shop->id, 403);
+
+        if ($product->image) Storage::disk('public')->delete($product->image);
+        if ($product->gallery) {
+            foreach (json_decode($product->gallery, true) as $img) {
+                Storage::disk('public')->delete($img);
+            }
+        }
+
+        $name = $product->name;
+        $product->delete();
+
+        return redirect()->route('products.index')
+            ->with('success', 'Produit "' . $name . '" supprimé avec succès.');
+    }
 }

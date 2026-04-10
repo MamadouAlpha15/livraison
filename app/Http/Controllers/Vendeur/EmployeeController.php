@@ -78,4 +78,6 @@ class EmployeeController extends Controller
         return redirect()->route('boutique.employees.index')
             ->with('success','Utilisateur supprimé avec succès.');
     }
+
+    
 }

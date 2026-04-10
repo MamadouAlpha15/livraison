@@ -17,10 +17,9 @@ class User extends Authenticatable
         'role',          // ex: superadmin|admin|employe|vendeur|livreur|client
         'phone',
         'address',
-        'shop_id',       // FK vers la boutique principale de l’utilisateur
+        'shop_id',       // FK vers la boutique principale de l'utilisateur
         'role_in_shop',  // ex: admin|vendeur|livreur (rôle dans la boutique)
-        'is_available', // pour les livreurs
-        
+        'is_available',  // pour les livreurs
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -43,10 +42,25 @@ class User extends Authenticatable
         return $this->belongsTo(Shop::class, 'shop_id');
     }
 
-    // Commandes passées par l'utilisateur (en tant que client)
+    // Alias — boutique assignée (pour employés/livreurs qui n'ont pas créé la boutique)
+    // Identique à shop() mais nommé explicitement pour la lisibilité
+    public function assignedShop()
+    {
+        return $this->belongsTo(Shop::class, 'shop_id');
+    }
+
+    // Commandes passées par l'utilisateur (en tant que CLIENT — filtre sur user_id)
     public function orders()
     {
         return $this->hasMany(Order::class, 'user_id');
+    }
+
+    // ✅ Commandes assignées à cet utilisateur EN TANT QUE LIVREUR
+    // Filtre sur livreur_id — c'est ce qu'on utilise pour compter les livraisons
+    // Exemple : $lv->ordersAsLivreur()->where('status','livrée')->count()
+    public function ordersAsLivreur()
+    {
+        return $this->hasMany(Order::class, 'livreur_id');
     }
 
     // Abonnements multi-boutiques (si tu as un pivot shop_user)
@@ -55,9 +69,16 @@ class User extends Authenticatable
         return $this->belongsToMany(Shop::class, 'shop_user')->withTimestamps();
     }
 
+    // Commissions de livraison (en tant que livreur)
+    public function courierCommissions()
+    {
+        return $this->hasMany(\App\Models\CourierCommission::class, 'livreur_id');
+    }
+
     /* =========================
      | Helper: boutique courante
      |=========================*/
+
     /**
      * Retourne l'ID de la boutique courante.
      * 1) Priorité à la session 'current_shop_id' si définie
@@ -92,7 +113,7 @@ class User extends Authenticatable
         });
     }
 
-    // Filtrer uniquement les vendeurs (si besoin ailleurs)
+    // Filtrer uniquement les vendeurs
     public function scopeVendeurs($q)
     {
         return $q->where(function ($qq) {
@@ -101,25 +122,21 @@ class User extends Authenticatable
         });
     }
 
+    // Livreurs disponibles (en ligne)
     public function scopeAvailableLivreurs($q)
-{
-    return $q->where(function($qq){
-        $qq->where('role', 'livreur')
-           ->orWhere('role_in_shop', 'livreur');
-    })->where('is_available', true);
-}
-// app/Models/User.php
+    {
+        return $q->where(function ($qq) {
+            $qq->where('role', 'livreur')
+               ->orWhere('role_in_shop', 'livreur');
+        })->where('is_available', true);
+    }
 
-public function scopeLivreursForShop($query, $shopId)
-{
-    return $query->where('role', 'livreur')
-                 ->where('shop_id', $shopId); // ou ->whereHas('assignedShop', fn($q) => $q->where('shops.id', $shopId))
-}
-
-public function courierCommissions()
-{
-    return $this->hasMany(\App\Models\CourierCommission::class, 'livreur_id'); // 
-}
-
-
+    // Livreurs d'une boutique spécifique
+    public function scopeLivreursForShop($query, $shopId)
+    {
+        return $query->where(function ($qq) {
+            $qq->where('role', 'livreur')
+               ->orWhere('role_in_shop', 'livreur');
+        })->where('shop_id', $shopId);
+    }
 }

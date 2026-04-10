@@ -8,24 +8,49 @@ use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
+    /**
+     * ── INDEX : Liste des paiements de la boutique ─────────────────
+     *
+     * Affiche uniquement les paiements confirmés ('payé') liés aux
+     * commandes livrées ('livrée') de la boutique du vendeur connecté.
+     *
+     * Injecte $shop et $devise pour afficher la bonne devise partout.
+     */
     public function index()
     {
-        // Récupérer les paiements des commandes liées à la boutique du vendeur connecté
         $shop = Auth::user()->shop;
 
         if (!$shop) {
-            return redirect()->route('vendeur.dashboard')->with('error', 'Vous devez avoir une boutique pour consulter vos revenus.');
+            return redirect()->route('vendeur.dashboard')
+                ->with('error', 'Vous devez avoir une boutique pour consulter vos revenus.');
         }
 
-        $payments = Payment::whereHas('order', function($query) use ($shop) {
-            $query->where('shop_id', $shop->id)
-                  ->where('status', 'livrée'); // uniquement commandes livrées
-        })->where('status', 'payé') // uniquement paiements confirmés
-          ->latest()
-          ->paginate(10);
+        /* ── Devise de la boutique ── */
+        $devise = $shop->currency ?? 'GNF';
 
-        $totalRevenue = $payments->sum('amount');
+        /* ── Paiements filtrés ── */
+        $payments = Payment::with('order.user')
+            ->whereHas('order', function ($query) use ($shop) {
+                $query->where('shop_id', $shop->id)
+                      ->where('status', 'livrée');
+            })
+            ->where('status', 'payé')
+            ->latest()
+            ->paginate(10);
 
-        return view('vendeur.payments.index', compact('payments', 'totalRevenue'));
+        /* ── Total de la page entière (pas juste la page courante) ── */
+        $totalRevenue = Payment::whereHas('order', function ($query) use ($shop) {
+                $query->where('shop_id', $shop->id)
+                      ->where('status', 'livrée');
+            })
+            ->where('status', 'payé')
+            ->sum('amount');
+
+        return view('vendeur.payments.index', compact(
+            'payments',
+            'totalRevenue',
+            'shop',
+            'devise'
+        ));
     }
 }

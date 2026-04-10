@@ -24,41 +24,141 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 
-/* ── Variables identiques au dashboard ── */
 :root {
-    --brand:     #10b981;
-    --brand-dk:  #059669;
-    --brand-lt:  #d1fae5;
-    --brand-mlt: #ecfdf5;
-    --bg:        #f6f8f7;
-    --surface:   #ffffff;
-    --border:    #e8eceb;
-    --border-dk: #d4d9d7;
-    --text:      #0f1c18;
-    --text-2:    #4b5c56;
-    --muted:     #8a9e98;
-    --font:      'Plus Jakarta Sans', sans-serif;
-    --mono:      'JetBrains Mono', monospace;
-    --r:         14px;
-    --r-sm:      9px;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
-    --shadow:    0 4px 16px rgba(0,0,0,.07);
+    --brand:      #10b981; --brand-dk:  #059669;
+    --brand-lt:   #d1fae5; --brand-mlt: #ecfdf5;
+    --sb-bg:      #0d1f18; --sb-border: rgba(255,255,255,.06);
+    --sb-act:     rgba(16,185,129,.14);
+    --sb-hov:     rgba(255,255,255,.04);
+    --sb-txt:     rgba(255,255,255,.55);
+    --sb-txt-act: #fff;
+    --bg:         #f6f8f7; --surface:   #ffffff;
+    --border:     #e8eceb; --border-dk: #d4d9d7;
+    --text:       #0f1c18; --text-2:    #4b5c56; --muted: #8a9e98;
+    --font:       'Plus Jakarta Sans', sans-serif;
+    --mono:       'JetBrains Mono', monospace;
+    --r:          14px; --r-sm: 9px;
+    --shadow-sm:  0 1px 3px rgba(0,0,0,.06);
+    --shadow:     0 4px 16px rgba(0,0,0,.07);
+    --sb-w:       230px;
+    --top-h:      56px;
 }
+html { font-family: var(--font); }
+body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smoothing: antialiased; }
 
-html, body { font-family: var(--font); background: var(--bg); color: var(--text); margin: 0; -webkit-font-smoothing: antialiased; }
+/* ══ LAYOUT ══ */
+.dash-wrap { display: flex; min-height: 100vh; }
+.dash-wrap .main { margin-left: var(--sb-w); flex: 1; min-width: 0; }
 
-/* ── Layout page ── */
-.page-wrap { max-width: 1100px; margin: 0 auto; padding: 28px 24px 60px; }
+/* ══ SIDEBAR ══ */
+.sidebar {
+    background: var(--sb-bg);
+    display: flex; flex-direction: column;
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: var(--sb-w);
+    overflow-y: scroll;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(16,185,129,.4) rgba(255,255,255,.05);
+    z-index: 40;
+    border-right: 1px solid rgba(0,0,0,.2);
+}
+.sidebar::-webkit-scrollbar       { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,.04); }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(16,185,129,.4); border-radius: 4px; }
+.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(16,185,129,.7); }
 
-/* ── Back link ── */
-.back-link {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 12.5px; font-weight: 600; color: var(--muted);
-    text-decoration: none; margin-bottom: 22px;
-    padding: 6px 10px 6px 6px; border-radius: var(--r-sm);
+.sb-brand { padding: 18px 16px 14px; border-bottom: 1px solid var(--sb-border); flex-shrink: 0; position: relative; }
+.sb-close {
+    display: none; position: absolute; top: 14px; right: 12px;
+    width: 30px; height: 30px; border-radius: 8px;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.10);
+    color: rgba(255,255,255,.6); font-size: 18px; cursor: pointer;
+    align-items: center; justify-content: center; transition: background .15s, color .15s;
+}
+.sb-close:hover { background: rgba(239,68,68,.18); border-color: rgba(239,68,68,.3); color: #fca5a5; }
+@media (max-width: 900px) { .sb-close { display: flex; } }
+
+.sb-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; }
+.sb-logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--brand), #059669);
+    border-radius: 9px; display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(16,185,129,.35);
+}
+.sb-shop-name { font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 148px; }
+.sb-status { display: flex; align-items: center; gap: 6px; margin-top: 9px; font-size: 10.5px; color: var(--sb-txt); font-weight: 500; }
+.pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--brand); flex-shrink: 0; animation: blink 2.2s ease-in-out infinite; box-shadow: 0 0 5px var(--brand); }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+.sb-nav { padding: 10px 10px 32px; flex: 1; display: flex; flex-direction: column; gap: 1px; overflow: visible; }
+.sb-section { font-size: 9.5px; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,255,255,.2); padding: 12px 8px 4px; font-weight: 600; }
+.sb-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 10px; border-radius: var(--r-sm);
+    font-size: 13px; font-weight: 500;
+    color: var(--sb-txt); text-decoration: none;
+    transition: background .15s, color .15s; position: relative;
+}
+.sb-item:hover { background: var(--sb-hov); color: rgba(255,255,255,.8); }
+.sb-item.active { background: var(--sb-act); color: var(--sb-txt-act); }
+.sb-item.active::before {
+    content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+    width: 3px; height: 18px; background: var(--brand); border-radius: 0 3px 3px 0;
+}
+.sb-item .ico { font-size: 14px; width: 20px; text-align: center; flex-shrink: 0; }
+.sb-badge { margin-left: auto; background: var(--brand); color: #fff; font-size: 10px; font-weight: 700; border-radius: 20px; padding: 1px 7px; font-family: var(--mono); min-width: 20px; text-align: center; }
+.sb-badge.warn { background: #f59e0b; }
+
+.sb-group { display: flex; flex-direction: column; }
+.sb-group-toggle {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 10px; border-radius: var(--r-sm);
+    font-size: 13px; font-weight: 500; color: var(--sb-txt); cursor: pointer;
     transition: background .15s, color .15s;
+    user-select: none; border: none; background: none;
+    width: 100%; text-align: left; font-family: var(--font);
 }
-.back-link:hover { background: var(--surface); color: var(--brand); }
+.sb-group-toggle:hover { background: var(--sb-hov); color: rgba(255,255,255,.8); }
+.sb-group-toggle.open  { color: rgba(255,255,255,.9); background: rgba(255,255,255,.03); }
+.sb-group-toggle .ico  { font-size: 14px; width: 20px; text-align: center; flex-shrink: 0; }
+.sb-group-toggle .sb-arrow { margin-left: auto; font-size: 10px; color: rgba(255,255,255,.25); transition: transform .2s; flex-shrink: 0; }
+.sb-group-toggle.open .sb-arrow { transform: rotate(90deg); color: rgba(255,255,255,.5); }
+.sb-sub { display: none; flex-direction: column; gap: 1px; margin-left: 12px; padding-left: 14px; border-left: 1px solid rgba(255,255,255,.07); margin-top: 2px; margin-bottom: 4px; overflow: visible; }
+.sb-sub.open { display: flex; }
+.sb-sub .sb-item { font-size: 12.5px; padding: 6px 10px; color: rgba(255,255,255,.45); }
+.sb-sub .sb-item:hover { color: rgba(255,255,255,.75); }
+.sb-sub .sb-item.active { color: var(--sb-txt-act); background: var(--sb-act); }
+
+.sb-scroll-hint { position: sticky; bottom: 72px; width: 100%; height: 40px; background: linear-gradient(to bottom, transparent, rgba(13,31,24,.9)); pointer-events: none; z-index: 2; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; transition: opacity .3s; margin-top: -40px; align-self: flex-end; }
+.sb-scroll-hint.hidden { opacity: 0; }
+.sb-scroll-hint-arrow { display: flex; flex-direction: column; align-items: center; gap: 2px; animation: bounceDown 1.5s ease-in-out infinite; }
+.sb-scroll-hint-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(16,185,129,.6); }
+.sb-scroll-hint-dot:nth-child(2) { opacity: .5; margin-top: -2px; }
+.sb-scroll-hint-dot:nth-child(3) { opacity: .25; margin-top: -2px; }
+@keyframes bounceDown { 0%,100%{transform:translateY(0)} 50%{transform:translateY(4px)} }
+
+.sb-footer { padding: 12px 10px; border-top: 1px solid var(--sb-border); flex-shrink: 0; display: flex; flex-direction: column; gap: 6px; position: sticky; bottom: 0; background: var(--sb-bg); z-index: 1; }
+.sb-user { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--r-sm); text-decoration: none; transition: background .15s; }
+.sb-user:hover { background: var(--sb-hov); }
+.sb-av { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), #16a34a); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(16,185,129,.25); }
+.sb-uname { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.85); }
+.sb-urole { font-size: 10px; color: var(--sb-txt); margin-top: 1px; }
+.sb-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; border-radius: var(--r-sm); background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.15); color: rgba(252,165,165,.85); font-size: 12px; font-weight: 600; font-family: var(--font); cursor: pointer; text-decoration: none; transition: background .15s, color .15s, border-color .15s; text-align: left; }
+.sb-logout:hover { background: rgba(220,38,38,.18); border-color: rgba(220,38,38,.35); color: #fca5a5; }
+.sb-logout .ico { font-size: 13px; flex-shrink: 0; }
+
+.sb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 39; }
+
+/* ══ MAIN ══ */
+.main { display: flex; flex-direction: column; min-width: 0; }
+.topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 22px; height: var(--top-h); display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 30; box-shadow: var(--shadow-sm); }
+.btn-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 6px; color: var(--text); font-size: 20px; }
+.tb-info { flex: 1; min-width: 0; }
+.tb-title { font-size: 14px; font-weight: 700; color: var(--text); }
+.tb-sub   { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+/* ── Page intérieure ── */
+.page-wrap { padding: 22px 22px 60px; }
 
 /* ── Header de page ── */
 .page-hd {
@@ -266,27 +366,211 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
     font-size: 10px; color: var(--muted); text-align: center;
 }
 
-/* ── Responsive ── */
-@media (max-width: 760px) {
-    .page-wrap { padding: 16px; }
-    .tbl thead th:nth-child(3),
-    .tbl tbody td:nth-child(3) { display: none; }
-    .kpi-chip { min-width: 120px; }
-    .top-grid { grid-template-columns: repeat(3,1fr); }
+/* ══════════════════════════════════════════
+   CARTES MOBILES — remplacent la table
+   sur les petits écrans
+══════════════════════════════════════════ */
+.clients-table  { display: block; }   /* table visible par défaut */
+.clients-mobile { display: none; }    /* cartes cachées par défaut */
+
+.m-client-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 10px;
+    transition: box-shadow .2s;
 }
-@media (max-width: 480px) {
-    .top-grid { grid-template-columns: repeat(2,1fr); }
+.m-client-card:hover { box-shadow: var(--shadow); }
+
+.m-client-hd {
+    padding: 12px 14px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center;
+    justify-content: space-between; gap: 8px;
+}
+.m-client-info { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.m-client-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.m-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.m-lbl { font-size: 10.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .3px; }
+.m-val { font-size: 13px; font-weight: 600; color: var(--text); }
+.m-client-foot {
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: flex-end;
+}
+
+/* ══ RESPONSIVE ══ */
+
+/* Sidebar cachée sur mobile */
+@media (max-width: 900px) {
+    .dash-wrap .main { margin-left: 0; }
+    .sidebar { transform: translateX(-100%); transition: transform .25s cubic-bezier(.23,1,.32,1); }
+    .sidebar.open { transform: translateX(0); }
+    .sb-overlay.open { display: block; }
+    .btn-hamburger { display: flex; }
+    .page-wrap { padding: 16px; }
+    .kpi-chip { min-width: 100px; padding: 10px 12px; }
+    .kpi-chip-val { font-size: 18px; }
+    .top-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Tablette : basculer sur cartes à 700px */
+@media (max-width: 700px) {
+    .clients-table  { display: none; }
+    .clients-mobile { display: block; }
+    .top-grid { grid-template-columns: repeat(3, 1fr); }
+    .toolbar { gap: 8px; }
+}
+
+/* Mobile */
+@media (max-width: 520px) {
+    .page-wrap { padding: 12px 10px; }
+    .kpi-mini { gap: 8px; }
+    .kpi-chip { min-width: 0; padding: 9px 10px; flex: 1; }
+    .kpi-chip-val { font-size: 15px; }
+    .kpi-chip-lbl { font-size: 9.5px; }
+    .top-grid { grid-template-columns: repeat(2, 1fr); }
+    .top-item { padding: 14px 8px 12px; }
+    .top-av { width: 36px; height: 36px; font-size: 12px; }
+    .toolbar { flex-direction: column; align-items: stretch; }
+    .toolbar .sort-select { width: 100%; }
+    .search-box { min-width: 0; }
+    .page-title { font-size: 18px; }
+    .page-hd { margin-bottom: 16px; }
+}
+
+@media (max-width: 380px) {
+    .top-grid { grid-template-columns: repeat(2, 1fr); }
+    .kpi-mini { flex-direction: column; }
 }
 </style>
 @endpush
 
 @section('content')
-<div class="page-wrap">
 
-    {{-- ── Retour au dashboard ── --}}
-    <a href="{{ route('boutique.dashboard') }}" class="back-link">
-        ← Retour au dashboard
-    </a>
+@php
+    $parts    = explode(' ', auth()->user()->name);
+    $initials = strtoupper(substr($parts[0],0,1)) . strtoupper(substr($parts[1] ?? 'X',0,1));
+    $pendingCount = $shop->orders()->whereIn('status',['pending','en attente','en_attente','confirmée','processing'])->count();
+@endphp
+
+<div class="dash-wrap">
+
+{{-- ══════ SIDEBAR ══════ --}}
+<aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+        <a href="{{ route('boutique.dashboard') }}" class="sb-logo">
+            <div class="sb-logo-icon">🛍️</div>
+            <span class="sb-shop-name">{{ $shop->name }}</span>
+        </a>
+        <button class="sb-close" id="btnCloseSidebar" aria-label="Fermer">✕</button>
+        <div class="sb-status">
+            <span class="pulse"></span>
+            {{ $shop->is_approved ? 'Boutique active' : 'En attente' }}
+        </div>
+    </div>
+
+    <div class="sb-scroll-hint" id="sbScrollHint">
+        <div class="sb-scroll-hint-arrow">
+            <div class="sb-scroll-hint-dot"></div>
+            <div class="sb-scroll-hint-dot"></div>
+            <div class="sb-scroll-hint-dot"></div>
+        </div>
+    </div>
+
+    <nav class="sb-nav">
+        <a href="{{ route('boutique.dashboard') }}" class="sb-item" style="margin-bottom:4px">
+            <span class="ico">⊞</span> Tableau de bord
+        </a>
+
+        <div class="sb-section">Boutique</div>
+        <a href="{{ route('boutique.orders.index') }}" class="sb-item">
+            <span class="ico">📦</span> Commandes
+            @if($pendingCount > 0)<span class="sb-badge">{{ $pendingCount }}</span>@endif
+        </a>
+        <a href="{{ route('products.index') }}" class="sb-item">
+            <span class="ico">🏷️</span> Produits
+        </a>
+        <a href="{{ route('boutique.clients.index') }}" class="sb-item active">
+            <span class="ico">👥</span> Clients
+        </a>
+        <a href="{{ route('boutique.employees.index') }}" class="sb-item">
+            <span class="ico">🧑‍💼</span> Équipe
+        </a>
+
+        <div class="sb-section">Livraison</div>
+        <a href="{{ route('boutique.livreurs.index') }}" class="sb-item">
+            <span class="ico">🚴</span> Livreurs
+        </a>
+        <a href="{{ route('delivery.companies.index') }}" class="sb-item">
+            <span class="ico">🏢</span> Partenaires
+        </a>
+
+        <div class="sb-section">Finances</div>
+        <div class="sb-group">
+            <button class="sb-group-toggle" onclick="toggleGroup(this)" type="button">
+                <span class="ico">💰</span>
+                Finances & Rapports
+                <span class="sb-arrow">▶</span>
+            </button>
+            <div class="sb-sub">
+                <a href="{{ route('boutique.payments.index') }}" class="sb-item">
+                    <span class="ico">💳</span> Paiements
+                </a>
+                <a href="{{ route('boutique.commissions.index') }}" class="sb-item">
+                    <span class="ico">📊</span> Commissions
+                </a>
+                <a href="{{ route('boutique.reports.index') }}" class="sb-item">
+                    <span class="ico">📋</span> Rapports
+                </a>
+                @if(auth()->user()->role === 'admin')
+                <a href="{{ route('shop.edit', $shop) }}" class="sb-item">
+                    <span class="ico">⚙️</span> Paramètres
+                </a>
+                @endif
+            </div>
+        </div>
+
+        <div class="sb-section">Aide</div>
+        <a href="{{ route('support.index') }}" class="sb-item">
+            <span class="ico">🎧</span> Support
+        </a>
+    </nav>
+
+    <div class="sb-footer">
+        <a href="{{ route('profile.edit') }}" class="sb-user">
+            <div class="sb-av">{{ $initials }}</div>
+            <div style="flex:1;min-width:0">
+                <div class="sb-uname">{{ Str::limit(auth()->user()->name, 20) }}</div>
+                <div class="sb-urole">{{ auth()->user()->role === 'admin' ? 'Administrateur' : ucfirst(auth()->user()->role) }}</div>
+            </div>
+        </a>
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="sb-logout">
+                <span class="ico">⎋</span> Se déconnecter
+            </button>
+        </form>
+    </div>
+</aside>
+
+<div class="sb-overlay" id="sbOverlay"></div>
+
+{{-- ══════ MAIN ══════ --}}
+<main class="main">
+
+    <div class="topbar">
+        <button class="btn-hamburger" id="btnMenu" aria-label="Menu">☰</button>
+        <div class="tb-info">
+            <div class="tb-title">👥 Clients</div>
+            <div class="tb-sub">{{ $shop->name }} · {{ $totalClients }} client(s)</div>
+        </div>
+    </div>
+
+<div class="page-wrap">
 
     {{-- ── En-tête de page ── --}}
     <div class="page-hd">
@@ -319,7 +603,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
         <div class="kpi-chip" style="border-top:3px solid #3b82f6">
             <div class="kpi-chip-lbl">CA total généré</div>
             <div class="kpi-chip-val" style="color:#2563eb">{{ number_format($caTotal/1000, 0) }}k</div>
-            <div class="kpi-chip-sub">GNF cumulés</div>
+            <div class="kpi-chip-sub">{{ $shop->currency ?? 'GNF' }} cumulés</div>
         </div>
 
     </div>
@@ -432,7 +716,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                     <div class="top-bar-fill" data-pct="{{ $pct }}" style="width:0%;background:{{ $medalColors[$i] }}"></div>
                 </div>
                 {{-- Montant --}}
-                <div class="top-amount">{{ number_format($item->total_mois/1000,0) }}k GNF</div>
+                <div class="top-amount">{{ number_format($item->total_mois/1000,0) }}k {{ $shop->currency ?? 'GNF' }}</div>
                 <div class="top-cmds">{{ $item->nb_cmd_mois }} cmd</div>
             </a>
             @endforeach
@@ -445,7 +729,13 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
          Chaque ligne : avatar + nom + email + téléphone +
          montant total + nb commandes + dernière cmd + badge top + lien fiche
          ════════════════════════════════════════════════════════════ --}}
-    <div class="clients-card">
+    @php
+        $avCols    = ['av-green','av-blue','av-amber','av-purple','av-teal','av-rose'];
+        $medailles = ['🥇','🥈','🥉','4e','5e'];
+    @endphp
+
+    {{-- ════ TABLE DESKTOP (visible > 700px) ════ --}}
+    <div class="clients-card clients-table">
         @if($clients->isEmpty())
             <div style="padding:48px;text-align:center;font-size:14px;color:var(--muted)">
                 @if($search)
@@ -461,95 +751,134 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                     <th>Client</th>
                     <th>Montant total</th>
                     <th>Commandes</th>
-                    <th>Dernière commande</th>
+                    <th>Dernière cmd</th>
                     <th>Statut</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
-                @php
-                    /* Couleurs des avatars en rotation */
-                    $avCols = ['av-green','av-blue','av-amber','av-purple','av-teal','av-rose'];
-                @endphp
-
                 @foreach($clients as $i => $item)
                 @php
                     $client = $item->user;
                     if (!$client) continue;
-
-                    /* Initiales pour l'avatar */
                     $parts  = explode(' ', $client->name ?? 'C L');
                     $init   = strtoupper(substr($parts[0],0,1)) . strtoupper(substr($parts[1] ?? 'X',0,1));
                     $col    = $avCols[$i % count($avCols)];
-
-                    /* Top client ce mois ? */
                     $isTop  = in_array($client->id, $topClientIds);
                     $rang   = array_search($client->id, $topClientIds);
-                    $medailles = ['🥇','🥈','🥉','4e','5e'];
                 @endphp
-                <tr onclick="window.location='{{ route('boutique.clients.show', $client) }}'"
-                    style="cursor:pointer">
-
-                    {{-- Colonne 1 : Avatar + nom + contact --}}
+                <tr onclick="window.location='{{ route('boutique.clients.show', $client) }}'" style="cursor:pointer">
                     <td>
                         <div class="client-cell">
                             <div class="c-av {{ $col }}">{{ $init }}</div>
                             <div>
                                 <div class="c-name">{{ $client->name }}</div>
-                                @if($client->email)
-                                    <div class="c-email">{{ $client->email }}</div>
-                                @endif
-                                @if($client->phone)
-                                    <div class="c-phone">📞 {{ $client->phone }}</div>
-                                @endif
+                                @if($client->email)<div class="c-email">{{ $client->email }}</div>@endif
+                                @if($client->phone)<div class="c-phone">📞 {{ $client->phone }}</div>@endif
                             </div>
                         </div>
                     </td>
-
-                    {{-- Colonne 2 : Montant total dépensé --}}
                     <td>
                         <div class="c-amount">{{ number_format($item->total_depense, 0, ',', ' ') }}</div>
-                        <div class="c-amount-sub">GNF</div>
+                        <div class="c-amount-sub">{{ $shop->currency ?? 'GNF' }}</div>
                     </td>
-
-                    {{-- Colonne 3 : Nombre de commandes --}}
-                    <td>
-                        <span class="badge-cmd">{{ $item->nb_commandes }}</span>
-                    </td>
-
-                    {{-- Colonne 4 : Date dernière commande --}}
+                    <td><span class="badge-cmd">{{ $item->nb_commandes }}</span></td>
                     <td style="font-size:12px;color:var(--text-2)">
                         {{ \Carbon\Carbon::parse($item->derniere_cmd)->diffForHumans() }}
-                        <div style="font-size:10px;color:var(--muted)">
-                            {{ \Carbon\Carbon::parse($item->derniere_cmd)->format('d/m/Y') }}
-                        </div>
+                        <div style="font-size:10px;color:var(--muted)">{{ \Carbon\Carbon::parse($item->derniere_cmd)->format('d/m/Y') }}</div>
                     </td>
-
-                    {{-- Colonne 5 : Badge top client ou client régulier --}}
                     <td>
                         @if($isTop)
-                            <span class="badge-top">
-                                {{ $medailles[$rang] }} Top client
-                            </span>
+                            <span class="badge-top">{{ $medailles[$rang] }} Top client</span>
                         @else
                             <span style="font-size:11px;color:var(--muted)">Client régulier</span>
                         @endif
                     </td>
-
-                    {{-- Colonne 6 : Lien vers la fiche complète --}}
                     <td>
-                        <a href="{{ route('boutique.clients.show', $client) }}"
-                           class="btn-fiche"
-                           onclick="event.stopPropagation()">
+                        <a href="{{ route('boutique.clients.show', $client) }}" class="btn-fiche" onclick="event.stopPropagation()">
                             Voir fiche →
                         </a>
                     </td>
-
                 </tr>
                 @endforeach
             </tbody>
         </table>
         @endif
+    </div>
+
+    {{-- ════ CARTES MOBILES (visible < 700px) ════ --}}
+    <div class="clients-mobile">
+        @forelse($clients as $i => $item)
+        @php
+            $client = $item->user;
+            if (!$client) continue;
+            $parts  = explode(' ', $client->name ?? 'C L');
+            $init   = strtoupper(substr($parts[0],0,1)) . strtoupper(substr($parts[1] ?? 'X',0,1));
+            $col    = $avCols[$i % count($avCols)];
+            $isTop  = in_array($client->id, $topClientIds);
+            $rang   = array_search($client->id, $topClientIds);
+        @endphp
+        <div class="m-client-card">
+
+            {{-- Header : avatar + nom + badge top ── --}}
+            <div class="m-client-hd">
+                <div class="m-client-info">
+                    <div class="c-av {{ $col }}" style="width:38px;height:38px;font-size:12px;flex-shrink:0">{{ $init }}</div>
+                    <div style="flex:1;min-width:0">
+                        <div class="c-name" style="font-size:13.5px">{{ $client->name }}</div>
+                        @if($client->phone)
+                            <div class="c-phone" style="font-size:11px;color:var(--muted);margin-top:1px">📞 {{ $client->phone }}</div>
+                        @elseif($client->email)
+                            <div class="c-email" style="font-size:11px;color:var(--muted);margin-top:1px">{{ Str::limit($client->email, 28) }}</div>
+                        @endif
+                    </div>
+                </div>
+                @if($isTop)
+                    <span class="badge-top" style="flex-shrink:0">{{ $medailles[$rang] }} Top</span>
+                @endif
+            </div>
+
+            {{-- Corps : stats en lignes ── --}}
+            <div class="m-client-body">
+
+                <div class="m-row">
+                    <span class="m-lbl">💰 Montant total</span>
+                    <span class="m-val" style="font-family:var(--mono);color:var(--brand)">
+                        {{ number_format($item->total_depense, 0, ',', ' ') }}
+                        <span style="font-size:10px;color:var(--muted);font-weight:500">{{ $shop->currency ?? 'GNF' }}</span>
+                    </span>
+                </div>
+
+                <div class="m-row">
+                    <span class="m-lbl">📦 Commandes</span>
+                    <span class="badge-cmd">{{ $item->nb_commandes }}</span>
+                </div>
+
+                <div class="m-row">
+                    <span class="m-lbl">🕐 Dernière commande</span>
+                    <span style="font-size:12px;color:var(--text-2);font-weight:500">
+                        {{ \Carbon\Carbon::parse($item->derniere_cmd)->diffForHumans() }}
+                    </span>
+                </div>
+
+            </div>
+
+            {{-- Footer : lien fiche ── --}}
+            <div class="m-client-foot">
+                <a href="{{ route('boutique.clients.show', $client) }}" class="btn-fiche">
+                    Voir la fiche →
+                </a>
+            </div>
+        </div>
+        @empty
+        <div style="padding:40px 20px;text-align:center;font-size:14px;color:var(--muted)">
+            @if($search)
+                Aucun client trouvé pour « {{ $search }} »
+            @else
+                Aucun client pour le moment.
+            @endif
+        </div>
+        @endforelse
     </div>
 
     {{-- Pagination --}}
@@ -560,11 +889,58 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
     @endif
 
 </div>
+</div>{{-- /page-wrap --}}
+</main>
+</div>{{-- /dash-wrap --}}
+
 @endsection
 
 @push('scripts')
 <script>
+/* ══ SIDEBAR ══ */
+function toggleGroup(btn) {
+    const sub    = btn.nextElementSibling;
+    const isOpen = sub.classList.contains('open');
+    document.querySelectorAll('.sb-sub.open').forEach(s => {
+        s.classList.remove('open');
+        s.previousElementSibling?.classList.remove('open');
+    });
+    if (!isOpen) {
+        sub.classList.add('open');
+        btn.classList.add('open');
+        const sidebar = document.getElementById('sidebar');
+        setTimeout(() => {
+            const support = sidebar?.querySelector('a[href*="support"]');
+            if (support && sidebar) support.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 220);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    const sidebar    = document.getElementById('sidebar');
+    const overlay    = document.getElementById('sbOverlay');
+    const scrollHint = document.getElementById('sbScrollHint');
+
+    document.getElementById('btnMenu')?.addEventListener('click', () => {
+        sidebar.classList.add('open'); overlay.classList.add('open');
+    });
+    overlay?.addEventListener('click', () => {
+        sidebar.classList.remove('open'); overlay.classList.remove('open');
+    });
+    document.getElementById('btnCloseSidebar')?.addEventListener('click', () => {
+        sidebar.classList.remove('open'); overlay.classList.remove('open');
+    });
+
+    function updateScrollHint() {
+        if (!sidebar || !scrollHint) return;
+        const atBottom    = sidebar.scrollTop + sidebar.clientHeight >= sidebar.scrollHeight - 16;
+        const needsScroll = sidebar.scrollHeight > sidebar.clientHeight + 20;
+        scrollHint.classList.toggle('hidden', atBottom || !needsScroll);
+    }
+    sidebar?.addEventListener('scroll', updateScrollHint);
+    window.addEventListener('resize', updateScrollHint);
+    setTimeout(updateScrollHint, 300);
+
     /* Animation barres top clients */
     document.querySelectorAll('.top-bar-fill').forEach((el, i) => {
         setTimeout(() => { el.style.width = el.dataset.pct + '%'; }, 100 + i * 120);

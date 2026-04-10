@@ -75,21 +75,53 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     display: flex;
     flex-direction: column;
     position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
+    top: 0; left: 0; bottom: 0;
     width: var(--sb-w);
-    overflow-y: auto;
-    scrollbar-width: none;
+    /* overflow-y: scroll sur la sidebar ENTIÈRE — scrollbar verte toujours visible,
+       permet de scroller même quand le sous-menu Finance est ouvert */
+    overflow-y: scroll;
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: rgba(16,185,129,.4) rgba(255,255,255,.05);
     z-index: 40;
     border-right: 1px solid rgba(0,0,0,.2);
 }
-.sidebar::-webkit-scrollbar { display: none; }
+/* Chrome / Safari — scrollbar verte fine toujours visible */
+.sidebar::-webkit-scrollbar       { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,.04); }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(16,185,129,.4); border-radius: 4px; }
+.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(16,185,129,.7); }
 
 .sb-brand {
     padding: 18px 16px 14px;
     border-bottom: 1px solid var(--sb-border);
     flex-shrink: 0;
+    position: relative;
+}
+
+/* ── Bouton fermeture sidebar (mobile uniquement) ── */
+.sb-close {
+    display: none; /* masqué sur desktop */
+    position: absolute;
+    top: 14px; right: 12px;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.10);
+    color: rgba(255,255,255,.6);
+    font-size: 18px; line-height: 1;
+    cursor: pointer;
+    align-items: center; justify-content: center;
+    transition: background .15s, color .15s;
+    flex-shrink: 0;
+}
+.sb-close:hover {
+    background: rgba(239,68,68,.18);
+    border-color: rgba(239,68,68,.3);
+    color: #fca5a5;
+}
+
+@media (max-width: 900px) {
+    .sb-close { display: flex; } /* visible seulement sur mobile */
 }
 .sb-logo {
     display: flex;
@@ -125,15 +157,16 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
 
 .sb-nav {
-    padding: 10px 10px;
+    padding: 10px 10px 32px; /* padding-bottom large — Support toujours visible
+                                au-dessus du footer, même accordéon ouvert */
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 1px;
-    overflow-y: auto;
-    scrollbar-width: none;
+    /* PAS de scroll interne sur .sb-nav :
+       c'est .sidebar entière qui scrolle avec sa scrollbar verte */
+    overflow: visible;
 }
-.sb-nav::-webkit-scrollbar { display: none; }
 
 .sb-section {
     font-size: 9.5px; text-transform: uppercase;
@@ -175,13 +208,95 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 }
 .sb-badge.warn { background: #f59e0b; }
 
+/* ── Groupe accordéon sous-menu ── */
+.sb-group { display: flex; flex-direction: column; }
+
+.sb-group-toggle {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 10px; border-radius: var(--r-sm);
+    font-size: 13px; font-weight: 500;
+    color: var(--sb-txt); cursor: pointer;
+    transition: background .15s, color .15s;
+    user-select: none; border: none; background: none;
+    width: 100%; text-align: left; font-family: var(--font);
+}
+.sb-group-toggle:hover { background: var(--sb-hov); color: rgba(255,255,255,.8); }
+.sb-group-toggle.open  { color: rgba(255,255,255,.9); background: rgba(255,255,255,.03); }
+.sb-group-toggle .ico  { font-size: 14px; width: 20px; text-align: center; flex-shrink: 0; }
+.sb-group-toggle .sb-arrow {
+    margin-left: auto; font-size: 10px;
+    color: rgba(255,255,255,.25); transition: transform .2s; flex-shrink: 0;
+}
+.sb-group-toggle.open .sb-arrow { transform: rotate(90deg); color: rgba(255,255,255,.5); }
+
+/* Sous-items indentés */
+.sb-sub {
+    display: none; flex-direction: column; gap: 1px;
+    margin-left: 12px; padding-left: 14px;
+    border-left: 1px solid rgba(255,255,255,.07);
+    margin-top: 2px; margin-bottom: 4px;
+    overflow: visible; /* ne jamais couper les sous-items */
+}
+.sb-sub.open { display: flex; }
+.sb-sub .sb-item { font-size: 12.5px; padding: 6px 10px; color: rgba(255,255,255,.45); }
+.sb-sub .sb-item:hover { color: rgba(255,255,255,.75); }
+.sb-sub .sb-item.active { color: var(--sb-txt-act); background: var(--sb-act); }
+
 .sb-footer {
     padding: 12px 10px;
     border-top: 1px solid var(--sb-border);
-    flex-shrink: 0;
+    flex-shrink: 0; /* ne rétrécit pas */
     display: flex;
     flex-direction: column;
     gap: 6px;
+    /* Colle naturellement en bas du flux de scroll —
+       visible uniquement quand on arrive en bas de la sidebar */
+    position: sticky;
+    bottom: 0;
+    background: var(--sb-bg);
+    z-index: 1;
+}
+
+/* ── Indicateur de scroll sidebar ─────────────────────────────
+   Ombre en bas de la sidebar qui indique qu'il y a du contenu
+   en dessous. Disparaît quand on arrive tout en bas.
+   ─────────────────────────────────────────────────────────── */
+.sb-scroll-hint {
+    position: sticky; /* sticky dans le flux de la sidebar */
+    top: auto;
+    bottom: 72px; /* au-dessus du footer sticky */
+    width: 100%;
+    height: 40px;
+    background: linear-gradient(to bottom, transparent, rgba(13,31,24,.9));
+    pointer-events: none;
+    z-index: 2;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 6px;
+    transition: opacity .3s;
+    margin-top: -40px; /* overlap avec le contenu au-dessus */
+    align-self: flex-end;
+    /* Positionné via JS — visible uniquement si scroll nécessaire */
+}
+.sb-scroll-hint.hidden { opacity: 0; pointer-events: none; }
+.sb-scroll-hint-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    animation: bounceDown 1.5s ease-in-out infinite;
+}
+.sb-scroll-hint-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: rgba(16,185,129,.6);
+}
+.sb-scroll-hint-dot:nth-child(2) { opacity: .5; margin-top: -2px; }
+.sb-scroll-hint-dot:nth-child(3) { opacity: .25; margin-top: -2px; }
+@keyframes bounceDown {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(4px); }
 }
 .sb-user {
     display: flex; align-items: center; gap: 10px;
@@ -216,6 +331,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     color: #fca5a5;
 }
 .sb-logout .ico { font-size: 13px; flex-shrink: 0; }
+
 
 /* ════════════════════════════════════════════
    MAIN CONTENT
@@ -593,18 +709,34 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 }
 
 @media (max-width: 520px) {
-    .content { padding: 16px; }
-    .topbar  { padding: 0 16px; }
+    .content { padding: 14px; }
+    .topbar  { padding: 0 14px; }
     .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
     .kpi-val  { font-size: 20px; }
     .tb-actions .btn:not(.btn-primary) { display: none; }
-    .flash { margin: 10px 16px 0; }
-    .comm-banner { margin-bottom: 16px; }
+    .flash { margin: 10px 14px 0; }
+    .comm-banner { margin-bottom: 14px; font-size: 11.5px; }
     .kanban-grid { grid-template-columns: repeat(2,1fr); }
+    .kanban-count { font-size: 22px; }
     .quick-grid  { grid-template-columns: repeat(2,1fr); }
     .quick-btn   { border-right: none; border-bottom: 1px solid var(--border); }
     .quick-btn:last-child { border-bottom: none; }
+    .quick-btn-ico { width: 36px; height: 36px; font-size: 18px; }
+    .quick-btn-lbl { font-size: 11.5px; }
     .today-grid  { grid-template-columns: 1fr; }
+    .today-card  { padding: 16px; gap: 12px; }
+    .today-val   { font-size: 22px; }
+    .period-stats { grid-template-columns: repeat(2,1fr); }
+    .period-stat:nth-child(2) { border-right: none; }
+    .period-stat:nth-child(3) { border-top: 1px solid var(--border); }
+    .tb-title { font-size: 13px; }
+    .tb-sub   { display: none; }
+}
+
+@media (max-width: 380px) {
+    .kpi-grid { grid-template-columns: 1fr; }
+    .today-grid { grid-template-columns: 1fr; }
+    .kanban-grid { grid-template-columns: repeat(2,1fr); }
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -1047,30 +1179,64 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     $initials = strtoupper(substr($parts[0],0,1)) . strtoupper(substr($parts[1] ?? 'X', 0, 1));
     $now      = \Illuminate\Support\Carbon::now();
 
-    /* CA mensuel */
-    $caMonth  = (float) $shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->sum('total');
-    $caPrev   = (float) $shop->orders()->whereMonth('created_at',$now->copy()->subMonth()->month)->whereYear('created_at',$now->copy()->subMonth()->year)->sum('total') ?: 1;
+    /* ── REVENU NET = CA livrée - Commissions PAYÉES aux livreurs ────────────
+     * On soustrait les commissions déjà versées pour afficher le vrai revenu
+     * net de la boutique. Seules les commissions au statut 'payée' sont
+     * déduites — les commissions en attente ne sont pas encore sorties.
+     * ──────────────────────────────────────────────────────────────────────── */
+
+    /* Commissions payées CE MOIS — à soustraire du CA */
+    $commissionsPaieesMonth = (float) \App\Models\CourierCommission::where('shop_id', $shop->id)
+        ->where('status', 'payée')
+        ->whereMonth('created_at', $now->month)
+        ->whereYear('created_at', $now->year)
+        ->sum('amount');
+
+    /* CA brut ce mois (commandes livrées) */
+    $caGrossMonth = (float) $shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->where('status','livrée')->sum('total');
+    /* Revenu NET = CA brut - commissions payées */
+    $caMonth = $caGrossMonth - $commissionsPaieesMonth;
+
+    /* Mois précédent */
+    $commissionsPaieesPrev = (float) \App\Models\CourierCommission::where('shop_id', $shop->id)
+        ->where('status', 'payée')
+        ->whereMonth('created_at', $now->copy()->subMonth()->month)
+        ->whereYear('created_at', $now->copy()->subMonth()->year)
+        ->sum('amount');
+    $caGrossPrev  = (float) $shop->orders()->whereMonth('created_at',$now->copy()->subMonth()->month)->whereYear('created_at',$now->copy()->subMonth()->year)->where('status','livrée')->sum('total');
+    $caPrev       = ($caGrossPrev - $commissionsPaieesPrev) ?: 1;
+
     $caDelta  = round((($caMonth - $caPrev) / $caPrev) * 100, 1);
 
-    /* Commandes */
-    $cmdMonth = $shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->count();
-    $cmdToday = $shop->orders()->whereDate('created_at', today())->count();
-    $cmdYest  = $shop->orders()->whereDate('created_at', today()->subDay())->count();
+    /* Commandes reçues ce mois (toutes sauf annulées) — sert au KPI "Commandes" */
+    /* On exclut les annulées : une commande annulée ne compte pas dans les stats */
+    $cmdMonth = $shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->whereNotIn('status',['annulée','cancelled'])->count();
+    $cmdToday = $shop->orders()->whereDate('created_at', today())->whereNotIn('status',['annulée','cancelled'])->count();
+    $cmdYest  = $shop->orders()->whereDate('created_at', today()->subDay())->whereNotIn('status',['annulée','cancelled'])->count();
 
-    /* Panier moyen */
-    $panier   = $cmdMonth > 0 ? round($caMonth / $cmdMonth) : 0;
+    /* Panier moyen net — CA net / nb livraisons */
+    $cmdLivreesMonth = $shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->where('status','livrée')->count();
+    $panier   = $cmdLivreesMonth > 0 ? round($caMonth / $cmdLivreesMonth) : 0;
 
     /* Taux livraison */
-    $totalCmdMonth = $shop->orders()->whereMonth('created_at',$now->month)->count();
+    /* Taux livraison = livrées / commandes non annulées ce mois */
+    $totalCmdMonth = $shop->orders()->whereMonth('created_at',$now->month)->whereNotIn('status',['annulée','cancelled'])->count();
     $livres        = $shop->orders()->whereMonth('created_at',$now->month)->where('status','livrée')->count();
     $tauxLiv       = $totalCmdMonth > 0 ? round(($livres / $totalCmdMonth) * 100, 1) : 0;
 
-    /* Graph 7 jours */
-    $days7 = collect(range(6,0))->map(fn($i) => [
-        'label' => $now->copy()->subDays($i)->isoFormat('dd'),
-        'value' => (float) $shop->orders()->whereDate('created_at', $now->copy()->subDays($i)->toDateString())->sum('total'),
-        'today' => $i === 0,
-    ]);
+    /* Graph 7 jours — revenus NETS (livrée - commissions payées du jour) */
+    $days7 = collect(range(6,0))->map(function ($i) use ($shop, $now) {
+        $day        = $now->copy()->subDays($i)->toDateString();
+        $caJour     = (float) $shop->orders()->whereDate('created_at', $day)->where('status','livrée')->sum('total');
+        $commJour   = (float) \App\Models\CourierCommission::whereHas('order', function ($q) use ($shop, $day) {
+            $q->where('shop_id', $shop->id)->whereDate('created_at', $day);
+        })->where('status', 'payée')->sum('amount');
+        return [
+            'label' => $now->copy()->subDays($i)->isoFormat('dd'),
+            'value' => max(0, $caJour - $commJour),
+            'today' => $i === 0,
+        ];
+    });
     $max7 = $days7->max('value') ?: 1;
 
     /* Commandes récentes */
@@ -1097,16 +1263,32 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     /* Avatar colors */
     $avColors = ['av-green','av-blue','av-amber','av-purple','av-teal','av-rose'];
 
+    /* ── DEVISE DE LA BOUTIQUE ────────────────────────────────────
+     * On lit la devise choisie à la création de la boutique.
+     * Si aucune devise n'est définie, on tombe sur 'GNF' par défaut.
+     * Cette variable $devise est utilisée PARTOUT dans la vue pour
+     * afficher la bonne unité monétaire.
+     * ──────────────────────────────────────────────────────────── */
+    $devise = $shop->currency ?? 'GNF';
+
     /* ═══════════════════════════════════════════════════════════════
      * ÉTAPE 1 — NOUVELLES DONNÉES : contrôle opérationnel quotidien
      * ═══════════════════════════════════════════════════════════════ */
 
-    /* ── REVENUS AUJOURD'HUI ──────────────────────────────────────
-     * On compare aujourd'hui vs hier pour donner une tendance immédiate
-     * au propriétaire dès qu'il ouvre son dashboard le matin.
+    /* ── REVENUS AUJOURD'HUI / HIER — NET (livrée - commissions payées) ──────────
+     * On soustrait les commissions déjà payées pour afficher le vrai revenu net.
      * ──────────────────────────────────────────────────────────── */
-    $caToday     = (float) $shop->orders()->whereDate('created_at', today())->sum('total');
-    $caYesterday = (float) $shop->orders()->whereDate('created_at', today()->subDay())->sum('total');
+    $caGrossToday    = (float) $shop->orders()->whereDate('created_at', today())->where('status','livrée')->sum('total');
+    $commToday       = (float) \App\Models\CourierCommission::whereHas('order', function ($q) use ($shop) {
+        $q->where('shop_id', $shop->id)->whereDate('created_at', today());
+    })->where('status', 'payée')->sum('amount');
+    $caToday         = max(0, $caGrossToday - $commToday);
+
+    $caGrossYesterday = (float) $shop->orders()->whereDate('created_at', today()->subDay())->where('status','livrée')->sum('total');
+    $commYesterday    = (float) \App\Models\CourierCommission::whereHas('order', function ($q) use ($shop) {
+        $q->where('shop_id', $shop->id)->whereDate('created_at', today()->subDay());
+    })->where('status', 'payée')->sum('amount');
+    $caYesterday      = max(0, $caGrossYesterday - $commYesterday);
     // Variation en % (si hier = 0, on met 0 pour éviter la division par zéro)
     $caTodayDelta = $caYesterday > 0
         ? round((($caToday - $caYesterday) / $caYesterday) * 100, 1)
@@ -1298,6 +1480,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 <div class="sb-logo-icon">🛍️</div>
                 <span class="sb-shop-name">{{ $shop->name }}</span>
             </a>
+            {{-- Croix de fermeture — visible uniquement sur mobile --}}
+            <button class="sb-close" id="btnCloseSidebar" aria-label="Fermer le menu">✕</button>
             <div class="sb-status">
                 <span class="pulse"></span>
                 {{ $shop->is_approved ? 'Boutique active' : 'En attente de validation' }}
@@ -1306,13 +1490,26 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             </div>
         </div>
 
+        {{-- Indicateur scroll : 3 points verts animés qui indiquent
+             qu'il y a des éléments en dessous dans la sidebar --}}
+        <div class="sb-scroll-hint" id="sbScrollHint">
+            <div class="sb-scroll-hint-arrow">
+                <div class="sb-scroll-hint-dot"></div>
+                <div class="sb-scroll-hint-dot"></div>
+                <div class="sb-scroll-hint-dot"></div>
+            </div>
+        </div>
+
         <nav class="sb-nav">
 
-            <div class="sb-section">Principal</div>
-
-            <a href="{{ route('boutique.dashboard') }}" class="sb-item active">
+            {{-- ════════ DASHBOARD ════════ --}}
+            <a href="{{ route('boutique.dashboard') }}" class="sb-item active" style="margin-bottom:4px">
                 <span class="ico">⊞</span> Tableau de bord
             </a>
+
+            {{-- ════════ BOUTIQUE ════════ --}}
+            <div class="sb-section">Boutique</div>
+
             <a href="{{ route('boutique.orders.index') }}" class="sb-item">
                 <span class="ico">📦</span> Commandes
                 @if($pendingCount > 0)
@@ -1322,55 +1519,55 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <a href="{{ route('products.index') }}" class="sb-item">
                 <span class="ico">🏷️</span> Produits
             </a>
-            <a href="{{ route('boutique.employees.index') }}" class="sb-item">
-                <span class="ico">👥</span> Équipe
-            </a>
-
-            {{-- Clients : lien vers la liste complète des clients de la boutique --}}
             <a href="{{ route('boutique.clients.index') }}" class="sb-item">
-                <span class="ico">🙍</span> Clients
-                {{-- Badge avec le nombre total de clients distincts --}}
-                @php
-                    $totalClientsCount = $shop->orders()->distinct('user_id')->count('user_id');
-                @endphp
-                @if($totalClientsCount > 0)
-                    <span class="sb-badge">{{ $totalClientsCount }}</span>
-                @endif
+                <span class="ico">👥</span> Clients
+            </a>
+            <a href="{{ route('boutique.employees.index') }}" class="sb-item">
+                <span class="ico">🧑‍💼</span> Équipe
             </a>
 
+            {{-- ════════ LIVRAISON ════════ --}}
             <div class="sb-section">Livraison</div>
 
-            {{-- Livreurs = employés de la boutique avec rôle livreur --}}
-            <a href="{{ route('boutique.employees.index') }}" class="sb-item">
+            <a href="{{ route('boutique.livreurs.index') }}" class="sb-item">
                 <span class="ico">🚴</span> Livreurs
                 @if($livreursDisponibles->count() > 0)
                     <span class="sb-badge">{{ $livreursDisponibles->count() }}</span>
                 @endif
             </a>
-
-            {{-- Entreprises = sociétés de livraison externes à contacter --}}
             <a href="{{ route('delivery.companies.index') }}" class="sb-item">
-                <span class="ico">🏢</span> Entreprises partenaires
+                <span class="ico">🏢</span> Partenaires
             </a>
 
-            <div class="sb-section">Gestion</div>
+            {{-- ════════ FINANCES (accordéon) ════════ --}}
+            <div class="sb-section">Finances</div>
 
-            <a href="{{ route('boutique.payments.index') }}" class="sb-item">
-                <span class="ico">💳</span> Paiements
-            </a>
-            <a href="{{ route('boutique.commissions.index') }}" class="sb-item">
-                <span class="ico">📊</span> Commissions
-            </a>
-            <a href="{{ route('boutique.reports.index') }}" class="sb-item">
-                <span class="ico">📋</span> Rapports
-            </a>
-            @if(auth()->user()->role === 'admin')
-            <a href="{{ route('shop.edit', $shop) }}" class="sb-item">
-                <span class="ico">⚙️</span> Paramètres
-            </a>
-            @endif
+            <div class="sb-group">
+                <button class="sb-group-toggle" onclick="toggleGroup(this)" type="button">
+                    <span class="ico">💰</span>
+                    Finances & Rapports
+                    <span class="sb-arrow">▶</span>
+                </button>
+                <div class="sb-sub">
+                    <a href="{{ route('boutique.payments.index') }}" class="sb-item">
+                        <span class="ico">💳</span> Paiements
+                    </a>
+                    <a href="{{ route('boutique.commissions.index') }}" class="sb-item">
+                        <span class="ico">📊</span> Commissions
+                    </a>
+                    <a href="{{ route('boutique.reports.index') }}" class="sb-item">
+                        <span class="ico">📋</span> Rapports
+                    </a>
+                    @if(auth()->user()->role === 'admin')
+                    <a href="{{ route('shop.edit', $shop) }}" class="sb-item">
+                        <span class="ico">⚙️</span> Paramètres
+                    </a>
+                    @endif
+                </div>
+            </div>
 
-            <div class="sb-section">Support</div>
+            {{-- ════════ AIDE ════════ --}}
+            <div class="sb-section">Aide</div>
 
             <a href="{{ route('support.index') }}" class="sb-item">
                 <span class="ico">🎧</span> Support
@@ -1430,6 +1627,67 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
         {{-- Content --}}
         <div class="content">
+            {{-- ── KPI Grid — premier regard du matin ── --}}
+            <div class="kpi-grid" style="margin-bottom:22px">
+
+                <div class="kpi" style="--kpi-color:#10b981;--kpi-bg:#ecfdf5">
+                    <div class="kpi-icon">💰</div>
+                    <div class="kpi-lbl">Revenu net</div>
+                    <div class="kpi-val">{{ number_format($caMonth,0,',',' ') }}</div>
+                    <div class="kpi-unit">{{ $devise }} · {{ $now->translatedFormat('F Y') }}</div>
+                    <div class="kpi-delta {{ $caDelta >= 0 ? 'up':'down' }}">
+                        {{ $caDelta >= 0 ? '↑':'↓' }} {{ abs($caDelta) }}% vs mois précédent
+                    </div>
+                    {{-- Décomposition CA brut - commissions ── --}}
+                    @if($commissionsPaieesMonth > 0)
+                    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:3px">
+                        <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted)">
+                            <span>CA brut</span>
+                            <span style="font-family:var(--mono);color:var(--text-2)">{{ number_format($caGrossMonth,0,',',' ') }}</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted)">
+                            <span>Commissions</span>
+                            <span style="font-family:var(--mono);color:#dc2626">− {{ number_format($commissionsPaieesMonth,0,',',' ') }}</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:10.5px;font-weight:700;padding-top:3px;border-top:1px dashed var(--border)">
+                            <span style="color:var(--brand)">Net</span>
+                            <span style="font-family:var(--mono);color:var(--brand)">{{ number_format($caMonth,0,',',' ') }}</span>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+
+                <div class="kpi" style="--kpi-color:#3b82f6;--kpi-bg:#eff6ff">
+                    <div class="kpi-icon">📦</div>
+                    <div class="kpi-lbl">Commandes ce mois</div>
+                    <div class="kpi-val">{{ $cmdMonth }}</div>
+                    <div class="kpi-unit">commandes</div>
+                    <div class="kpi-delta {{ $cmdToday >= $cmdYest ? 'up':'down' }}">
+                        {{ $cmdToday >= $cmdYest ? '↑':'↓' }} {{ $cmdToday }} aujourd'hui
+                    </div>
+                </div>
+
+                <div class="kpi" style="--kpi-color:#f59e0b;--kpi-bg:#fffbeb">
+                    <div class="kpi-icon">🛒</div>
+                    <div class="kpi-lbl">Panier moyen</div>
+                    <div class="kpi-val">{{ number_format($panier,0,',',' ') }}</div>
+                    <div class="kpi-unit">{{ $devise }} / commande</div>
+                    <div class="kpi-delta {{ $caDelta >= 0 ? 'up':'down' }}">
+                        {{ $caDelta >= 0 ? '↑':'↓' }} {{ abs($caDelta) }}%
+                    </div>
+                </div>
+
+                <div class="kpi" style="--kpi-color:#8b5cf6;--kpi-bg:#f5f3ff">
+                    <div class="kpi-icon">🚴</div>
+                    <div class="kpi-lbl">Taux de livraison</div>
+                    <div class="kpi-val">{{ $tauxLiv }}%</div>
+                    <div class="kpi-unit">{{ $livres }} / {{ $totalCmdMonth }} livrées</div>
+                    <div class="kpi-delta {{ $tauxLiv >= 90 ? 'up':'down' }}">
+                        {{ $tauxLiv >= 90 ? '✓ Excellent':'⚠ À améliorer' }}
+                    </div>
+                </div>
+
+            </div>
 
             {{-- Commission banner --}}
             @if($shop->commission_rate)
@@ -1448,10 +1706,10 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 {{-- Carte : Revenus aujourd'hui --}}
                 <div class="today-card">
                     <div class="today-icon">💵</div>
-                    <div>
-                        <div class="today-lbl">Revenus aujourd'hui</div>
+                    <div style="flex:1;min-width:0">
+                        <div class="today-lbl">Revenu net aujourd'hui</div>
                         <div class="today-val">{{ number_format($caToday, 0, ',', ' ') }}</div>
-                        <div class="today-unit">GNF</div>
+                        <div class="today-unit">{{ $devise }}</div>
                         {{-- Tendance vs hier --}}
                         <div class="today-delta {{ $caTodayDelta > 0 ? 'up' : ($caTodayDelta < 0 ? 'down' : 'flat') }}">
                             @if($caTodayDelta > 0) ↑ +{{ $caTodayDelta }}% vs hier
@@ -1459,6 +1717,23 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                             @else — Même niveau qu'hier
                             @endif
                         </div>
+                        {{-- Décomposition CA brut - commissions aujourd'hui ── --}}
+                        @if($commToday > 0)
+                        <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.12);display:flex;flex-direction:column;gap:3px">
+                            <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.4)">
+                                <span>CA brut</span>
+                                <span style="font-family:var(--mono);color:rgba(255,255,255,.6)">{{ number_format($caGrossToday,0,',',' ') }}</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.4)">
+                                <span>Commissions</span>
+                                <span style="font-family:var(--mono);color:#fca5a5">− {{ number_format($commToday,0,',',' ') }}</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;padding-top:3px;border-top:1px dashed rgba(255,255,255,.1)">
+                                <span style="color:#34d399">Net</span>
+                                <span style="font-family:var(--mono);color:#34d399">{{ number_format($caToday,0,',',' ') }}</span>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </div>
 
@@ -1605,13 +1880,13 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                         </a>
 
                         {{-- Action 3 : Gestion des livreurs
-                             Couleur violette = gestion équipe --}}
-                        <a href="{{ route('boutique.employees.index') }}"
+                             Couleur violette = gestion livreurs --}}
+                        <a href="{{ route('boutique.livreurs.index') }}"
                            class="quick-btn"
                            style="--q-bg:#f5f3ff;--q-border:#c4b5fd;--q-color:#8b5cf6">
                             <div class="quick-btn-ico">🚴</div>
                             <div class="quick-btn-lbl">Livreurs</div>
-                            <div class="quick-btn-sub">Gérer l'équipe</div>
+                            <div class="quick-btn-sub">Voir en ligne</div>
                         </a>
 
                         {{-- Action 4 : Paiements et revenus
@@ -1630,56 +1905,12 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             {{-- /ÉTAPE 1 — BLOC D --}}
 
 
-            {{-- ── KPI Grid ── --}}
-            <div class="kpi-grid">
-
-                <div class="kpi" style="--kpi-color:#10b981;--kpi-bg:#ecfdf5">
-                    <div class="kpi-icon">💰</div>
-                    <div class="kpi-lbl">Chiffre d'affaires</div>
-                    <div class="kpi-val">{{ number_format($caMonth,0,',',' ') }}</div>
-                    <div class="kpi-unit">GNF · {{ $now->translatedFormat('F Y') }}</div>
-                    <div class="kpi-delta {{ $caDelta >= 0 ? 'up':'down' }}">
-                        {{ $caDelta >= 0 ? '↑':'↓' }} {{ abs($caDelta) }}% vs mois précédent
-                    </div>
-                </div>
-
-                <div class="kpi" style="--kpi-color:#3b82f6;--kpi-bg:#eff6ff">
-                    <div class="kpi-icon">📦</div>
-                    <div class="kpi-lbl">Commandes ce mois</div>
-                    <div class="kpi-val">{{ $cmdMonth }}</div>
-                    <div class="kpi-unit">commandes</div>
-                    <div class="kpi-delta {{ $cmdToday >= $cmdYest ? 'up':'down' }}">
-                        {{ $cmdToday >= $cmdYest ? '↑':'↓' }} {{ $cmdToday }} aujourd'hui
-                    </div>
-                </div>
-
-                <div class="kpi" style="--kpi-color:#f59e0b;--kpi-bg:#fffbeb">
-                    <div class="kpi-icon">🛒</div>
-                    <div class="kpi-lbl">Panier moyen</div>
-                    <div class="kpi-val">{{ number_format($panier,0,',',' ') }}</div>
-                    <div class="kpi-unit">GNF / commande</div>
-                    <div class="kpi-delta {{ $caDelta >= 0 ? 'up':'down' }}">
-                        {{ $caDelta >= 0 ? '↑':'↓' }} {{ abs($caDelta) }}%
-                    </div>
-                </div>
-
-                <div class="kpi" style="--kpi-color:#8b5cf6;--kpi-bg:#f5f3ff">
-                    <div class="kpi-icon">🚴</div>
-                    <div class="kpi-lbl">Taux de livraison</div>
-                    <div class="kpi-val">{{ $tauxLiv }}%</div>
-                    <div class="kpi-unit">{{ $livres }} / {{ $totalCmdMonth }} livrées</div>
-                    <div class="kpi-delta {{ $tauxLiv >= 90 ? 'up':'down' }}">
-                        {{ $tauxLiv >= 90 ? '✓ Excellent':'⚠ À améliorer' }}
-                    </div>
-                </div>
-
-            </div>
 
             {{-- ── Chart 7 jours ── --}}
             <div class="card chart-wrap">
                 <div class="card-hd">
                     <span class="card-title">Revenus — 7 derniers jours</span>
-                    <span style="font-size:11px;color:var(--muted);font-weight:500">GNF</span>
+                    <span style="font-size:11px;color:var(--muted);font-weight:500">{{ $devise }}</span>
                 </div>
                 <div class="chart-inner">
                     <div class="chart-bars" id="chartBars">
@@ -1689,7 +1920,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                             <div class="bar {{ $day['today'] ? '' : 'dim' }}"
                                  data-h="{{ $pct }}"
                                  style="height:0%"
-                                 title="{{ $day['label'] }} : {{ number_format($day['value'],0,',',' ') }} GNF">
+                                 title="{{ $day['label'] }} : {{ number_format($day['value'],0,',',' ') }} {{ $devise }}">
                             </div>
                         </div>
                         @endforeach
@@ -1738,7 +1969,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                                     <td><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span></td>
                                     <td class="oamt">
                                         {{ number_format($order->total,0,',',' ') }}
-                                        <span style="font-size:9px;color:var(--muted)"> GNF</span>
+                                        <span style="font-size:9px;color:var(--muted)"> {{ $devise }}</span>
                                     </td>
                                 </tr>
                                 @endforeach
@@ -1844,22 +2075,35 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                         {{-- Ni livreurs ni entreprises --}}
                         <div class="no-livreur-notice">
                             <div class="notice-icon">🚚</div>
-                            <div class="notice-title">Aucun livreur configuré</div>
+                            <div class="notice-title">Aucun livreur disponible</div>
                             <div class="notice-sub">
-                                Votre boutique n'a pas encore de livreurs.<br>
-                                Contactez une entreprise partenaire pour commencer.
+                                Votre boutique n'a pas encore de livreurs assignés.<br>
+                                Vous pouvez ajouter vos propres livreurs dans
+                                <strong>Équipe</strong>, ou contacter une entreprise
+                                de livraison partenaire.
                             </div>
-                            <a href="{{ route('delivery.companies.index') }}" class="btn btn-primary" style="margin-top:8px">
-                                Trouver une entreprise
-                            </a>
+                            <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;justify-content:center">
+                                <a href="{{ route('boutique.employees.index') }}" class="btn btn-sm">
+                                    👥 Ajouter un livreur
+                                </a>
+                                <a href="{{ route('delivery.companies.index') }}" class="btn btn-primary btn-sm">
+                                    🏢 Trouver une entreprise
+                                </a>
+                            </div>
                         </div>
 
                         @else
                         {{-- Pas de livreurs mais des entreprises disponibles --}}
-                        <div style="padding:12px 18px 6px;background:#fffbeb;border-bottom:1px solid #fde68a;display:flex;align-items:flex-start;gap:9px">
-                            <span style="font-size:16px;flex-shrink:0;margin-top:1px">⚠️</span>
-                            <div style="font-size:12px;color:#92400e;font-weight:500;line-height:1.5">
-                                Vous n'avez pas de livreurs. Sélectionnez une entreprise partenaire ci-dessous pour démarrer une discussion et organiser vos livraisons.
+                        <div style="padding:12px 18px;background:#fffbeb;border-bottom:1px solid #fde68a;display:flex;align-items:flex-start;gap:10px">
+                            <span style="font-size:18px;flex-shrink:0">⚠️</span>
+                            <div>
+                                <div style="font-size:12.5px;color:#92400e;font-weight:700;margin-bottom:3px">
+                                    Vous n'avez pas de livreurs
+                                </div>
+                                <div style="font-size:11.5px;color:#b45309;line-height:1.55">
+                                    Contactez une entreprise partenaire ci-dessous pour organiser vos livraisons.
+                                    Cliquez sur <strong>💬 Contacter</strong> pour ouvrir une discussion.
+                                </div>
                             </div>
                         </div>
                         <div class="co-list">
@@ -1969,7 +2213,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                                 {{ Str::limit($product->name, 20) }}
                             </div>
                             <div class="risk-meta">
-                                {{ $product->price ? number_format($product->price,0,',',' ').' GNF' : 'Prix non défini' }}
+                                {{ $product->price ? number_format($product->price,0,',',' ').' '.$devise : 'Prix non défini' }}
                             </div>
                         </div>
                         <span class="risk-badge">0 vente</span>
@@ -2022,7 +2266,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                         <div class="period-stat">
                             <div class="period-stat-lbl">Chiffre d'affaires</div>
                             <div class="period-stat-val" id="pCA">—</div>
-                            <div class="period-stat-sub">GNF</div>
+                            <div class="period-stat-sub">{{ $devise }}</div>
                         </div>
                         <div class="period-stat">
                             <div class="period-stat-lbl">Commandes</div>
@@ -2032,7 +2276,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                         <div class="period-stat">
                             <div class="period-stat-lbl">Panier moyen</div>
                             <div class="period-stat-val" id="pPANIER">—</div>
-                            <div class="period-stat-sub">GNF / cmd</div>
+                            <div class="period-stat-sub">{{ $devise }} / cmd</div>
                         </div>
                         <div class="period-stat">
                             <div class="period-stat-lbl">Taux livraison</div>
@@ -2061,18 +2305,87 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 @push('scripts')
 <script>
+/* ═══════════════════════════════════════════════════════════
+   ACCORDÉON SOUS-MENUS SIDEBAR
+   - Un seul groupe ouvert à la fois
+   - Scroll automatique vers Support après ouverture
+     pour que l'item ne soit jamais caché sous le footer
+   ═══════════════════════════════════════════════════════════ */
+function toggleGroup(btn) {
+    const sub    = btn.nextElementSibling;
+    const isOpen = sub.classList.contains('open');
+
+    /* Fermer tous les groupes */
+    document.querySelectorAll('.sb-sub.open').forEach(s => {
+        s.classList.remove('open');
+        s.previousElementSibling?.classList.remove('open');
+    });
+
+    if (!isOpen) {
+        sub.classList.add('open');
+        btn.classList.add('open');
+
+        /* Après l'animation (200ms), scroller la sidebar
+           pour que Support soit visible en bas */
+        const sidebar = document.getElementById('sidebar');
+        setTimeout(() => {
+            const support = sidebar?.querySelector('a[href*="support"]');
+            if (support && sidebar) {
+                support.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }, 220);
+    }
+
+    /* Mettre à jour l'indicateur de scroll */
+    setTimeout(() => {
+        const sidebar    = document.getElementById('sidebar');
+        const scrollHint = document.getElementById('sbScrollHint');
+        if (!sidebar || !scrollHint) return;
+        const atBottom    = sidebar.scrollTop + sidebar.clientHeight >= sidebar.scrollHeight - 16;
+        const needsScroll = sidebar.scrollHeight > sidebar.clientHeight + 20;
+        scrollHint.classList.toggle('hidden', atBottom || !needsScroll);
+    }, 300);
+}
+
+/* Auto-ouvrir le groupe si un sous-item est actif au chargement */
+document.querySelectorAll('.sb-sub .sb-item.active').forEach(item => {
+    const sub = item.closest('.sb-sub');
+    if (sub) {
+        sub.classList.add('open');
+        sub.previousElementSibling?.classList.add('open');
+    }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
 
     /* ── Sidebar mobile toggle ── */
     const sidebar    = document.getElementById('sidebar');
     const overlay    = document.getElementById('sbOverlay');
     const btnMenu    = document.getElementById('btnMenu');
+    const scrollHint = document.getElementById('sbScrollHint');
 
     function openSidebar()  { sidebar.classList.add('open');  overlay.classList.add('open'); }
     function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('open'); }
 
     btnMenu?.addEventListener('click', openSidebar);
     overlay?.addEventListener('click', closeSidebar);
+
+    /* Bouton ✕ dans la sidebar — ferme le menu sur mobile */
+    document.getElementById('btnCloseSidebar')?.addEventListener('click', closeSidebar);
+
+    /* ── Indicateur scroll sidebar ──────────────────────────────────
+     * Masque les 3 points verts quand on est en bas ou pas besoin de scroll.
+     * Le scroll se fait sur .sidebar entière (overflow-y: scroll).
+     * ─────────────────────────────────────────────────────────── */
+    function updateScrollHint() {
+        if (!sidebar || !scrollHint) return;
+        const atBottom    = sidebar.scrollTop + sidebar.clientHeight >= sidebar.scrollHeight - 16;
+        const needsScroll = sidebar.scrollHeight > sidebar.clientHeight + 20;
+        scrollHint.classList.toggle('hidden', atBottom || !needsScroll);
+    }
+    sidebar?.addEventListener('scroll', updateScrollHint);
+    window.addEventListener('resize', updateScrollHint);
+    setTimeout(updateScrollHint, 300);
 
     /* ── Tabs livraison ── */
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -2126,11 +2439,16 @@ document.addEventListener('DOMContentLoaded', () => {
         last_year  : 'Année dernière',
     };
 
-    /* Formater un nombre en GNF lisible */
+    /* Devise de la boutique (définie à la création) */
+    const DEVISE = '{{ $devise }}';
+
+    /* Formater un nombre — exact en dessous de 1M, abrégé au-dessus
+     * 389 500 → "389 500"  (pas "390k")
+     * 1 500 000 → "1,5M"
+     * Cohérent avec number_format PHP côté serveur */
     function fmt(n) {
-        if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace('.0','') + 'M';
-        if (n >= 1_000)     return Math.round(n / 1_000) + 'k';
-        return Math.round(n).toString();
+        if (n >= 1_000_000) return (n / 1_000_000).toFixed(2).replace(/\.?0+$/, '') + 'M';
+        return Math.round(n).toLocaleString('fr-FR');
     }
 
     /* Dessiner le mini-graphique barres */
@@ -2143,7 +2461,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         barsEl.innerHTML   = points.map(p => {
             const h   = p.ca > 0 ? Math.max(Math.round((p.ca / max) * 100), 3) : 2;
-            const tip = fmt(p.ca) + ' GNF · ' + p.nb + ' cmd';
+            const tip = fmt(p.ca) + ' ' + DEVISE + ' · ' + p.nb + ' cmd';
             return `<div class="period-bar-wrap">
                 <div class="period-bar ${p.ca === 0 ? 'empty' : ''}"
                      style="height:0%"

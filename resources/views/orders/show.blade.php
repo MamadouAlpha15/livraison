@@ -4,6 +4,7 @@
 @section('title', 'Détails de la commande')
 
 @section('content')
+
 <div class="container py-4">
 
     {{-- Titre + résumé de la commande --}}

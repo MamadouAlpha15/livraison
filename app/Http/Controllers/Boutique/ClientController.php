@@ -187,12 +187,16 @@ class ClientController extends Controller
 
         $isTop = in_array($user->id, $topClientIds);
 
+        $devise = $shop->currency ?? 'GNF';
+
         return view('boutique.clients.show', compact(
             'user',
             'commandes',
             'stats',
             'isTop',
-            'shop'
+            'shop',
+            'devise',
+            
         ));
     }
 }

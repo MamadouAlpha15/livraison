@@ -36,9 +36,11 @@ class CommissionController extends Controller
         $totalPaid = CourierCommission::where('shop_id', $shop->id)
             ->where('status', CourierCommission::STATUS_PAYEE)
             ->sum('amount');
+            $devise = $shop->currency ?? 'GNF';
+
 
         return view('boutique.commissions.index', compact(
-            'commissions', 'status', 'totalPending', 'totalPaid'
+            'commissions', 'status', 'totalPending', 'totalPaid', 'devise','shop'
         ));
     }
 
