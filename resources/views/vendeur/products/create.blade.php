@@ -324,15 +324,46 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                     <div class="field-row">
                         <div class="field">
                             <label class="field-lbl" for="category">Catégorie</label>
-                            <select name="category" id="category" class="field-select">
-                                <option value="">Sélectionner…</option>
-                                @foreach($categories as $cat)
-                                <option value="{{ $cat }}"
-                                    {{ old('category', $isEdit ? $product->category : '') === $cat ? 'selected' : '' }}>
-                                    {{ $cat }}
-                                </option>
-                                @endforeach
-                            </select>
+                            @php
+                                $currentCat = old('category', $isEdit ? $product->category : '');
+                                $isCustomCat = $currentCat && !in_array($currentCat, $categories);
+                            @endphp
+
+                            {{-- Champ réel envoyé au serveur --}}
+                            <input type="hidden" name="category" id="categoryHidden" value="{{ $currentCat }}">
+
+                            {{-- Sélecteur liste --}}
+                            <div style="display:flex;gap:8px;align-items:center" id="categorySelectWrap">
+                                <select id="categorySelect" class="field-select" style="flex:1"
+                                        onchange="onCategorySelect(this.value)">
+                                    <option value="">Sélectionner…</option>
+                                    @foreach($categories as $cat)
+                                    <option value="{{ $cat }}"
+                                        {{ (!$isCustomCat && $currentCat === $cat) ? 'selected' : '' }}>
+                                        {{ $cat }}
+                                    </option>
+                                    @endforeach
+                                    @if($isCustomCat)
+                                    <option value="{{ $currentCat }}" selected>{{ $currentCat }}</option>
+                                    @endif
+                                    <option value="__custom__">➕ Saisir une catégorie…</option>
+                                </select>
+                            </div>
+
+                            {{-- Champ texte libre (masqué par défaut) --}}
+                            <div id="categoryCustomWrap" style="display:{{ $isCustomCat ? 'flex' : 'none' }};gap:8px;align-items:center;margin-top:8px">
+                                <input type="text" id="categoryCustomInput"
+                                       class="field-input" style="flex:1"
+                                       value="{{ $isCustomCat ? $currentCat : '' }}"
+                                       placeholder="Ex : Produits locaux, Artisanat…"
+                                       oninput="onCustomCategoryInput(this.value)">
+                                <button type="button"
+                                        onclick="cancelCustomCategory()"
+                                        style="padding:9px 12px;border-radius:var(--r-sm);border:1.5px solid var(--border-dk);background:var(--surface);color:var(--muted);font-size:12px;cursor:pointer;white-space:nowrap;font-family:var(--font)">
+                                    ✕ Annuler
+                                </button>
+                            </div>
+                            <div class="field-hint">Catégorie introuvable ? Cliquez sur <strong>➕ Saisir une catégorie…</strong></div>
                         </div>
                         <div class="field">
                             <label class="field-lbl" for="tags">Mots-clés / Tags</label>
@@ -725,9 +756,43 @@ document.getElementById('description').addEventListener('input', e => {
     const txt = e.target.value.substring(0, 80) + (e.target.value.length > 80 ? '…' : '');
     document.getElementById('previewDesc').textContent = txt || 'Description du produit…';
 });
-document.getElementById('category').addEventListener('change', e => {
-    document.getElementById('previewCat').textContent = e.target.value;
-});
+/* ── Catégorie : liste + saisie libre ── */
+function onCategorySelect(val) {
+    const hidden      = document.getElementById('categoryHidden');
+    const customWrap  = document.getElementById('categoryCustomWrap');
+    const customInput = document.getElementById('categoryCustomInput');
+
+    if (val === '__custom__') {
+        /* Afficher le champ texte libre */
+        customWrap.style.display = 'flex';
+        customInput.focus();
+        hidden.value = '';
+        document.getElementById('previewCat').textContent = '';
+        /* Remettre le select sur "Sélectionner…" */
+        document.getElementById('categorySelect').value = '';
+    } else {
+        /* Catégorie normale choisie dans la liste */
+        customWrap.style.display = 'none';
+        customInput.value = '';
+        hidden.value = val;
+        document.getElementById('previewCat').textContent = val;
+    }
+}
+
+function onCustomCategoryInput(val) {
+    /* Synchroniser en temps réel vers le champ caché + preview */
+    document.getElementById('categoryHidden').value = val;
+    document.getElementById('previewCat').textContent = val;
+}
+
+function cancelCustomCategory() {
+    /* Revenir à la liste */
+    document.getElementById('categoryCustomWrap').style.display = 'none';
+    document.getElementById('categoryCustomInput').value = '';
+    document.getElementById('categoryHidden').value = '';
+    document.getElementById('categorySelect').value = '';
+    document.getElementById('previewCat').textContent = '';
+}
 document.getElementById('price').addEventListener('input', e => {
     document.getElementById('previewPrice').innerHTML =
         previewFmt(e.target.value) +

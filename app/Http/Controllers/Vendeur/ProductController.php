@@ -67,7 +67,23 @@ class ProductController extends Controller
         }
 
         $products      = $query->paginate(12)->withQueryString();
-        $categories    = self::CATEGORIES;
+
+        /* Catégories prédéfinies + catégories personnalisées saisies manuellement
+         * On récupère toutes les catégories utilisées dans les produits de la boutique
+         * puis on soustrait les prédéfinies pour isoler les personnalisées */
+        $predefinedCats  = self::CATEGORIES;
+        $usedCats        = $shop->products()
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->pluck('category')
+            ->toArray();
+        $customCats      = array_values(array_diff($usedCats, $predefinedCats));
+        sort($customCats);
+
+        /* $categories = prédéfinies + personnalisées (passées séparément à la vue) */
+        $categories = $predefinedCats;
+
         $devise        = $shop->currency ?? 'GNF';
         $totalProducts = $shop->products()->count();
 
@@ -78,7 +94,7 @@ class ProductController extends Controller
         $outOfStock     = $hasStock    ? $shop->products()->where('stock', '<=', 0)->count()   : 0;
 
         return view('vendeur.products.index', compact(
-            'products', 'categories', 'devise',
+            'products', 'categories', 'customCats', 'devise',
             'totalProducts', 'activeProducts', 'outOfStock'
         ));
     }

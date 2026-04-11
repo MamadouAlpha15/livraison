@@ -859,12 +859,29 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     class="filter-select"
                     onchange="document.getElementById('filterForm').submit()">
                 <option value="">Toutes les catégories</option>
+
+                {{-- Catégories prédéfinies ── --}}
+                <optgroup label="── Catégories standards ──">
                 @foreach($categories as $cat)
                 <option value="{{ $cat }}"
                     {{ request('category') === $cat ? 'selected' : '' }}>
                     {{ $cat }}
                 </option>
                 @endforeach
+                </optgroup>
+
+                {{-- Catégories personnalisées saisies manuellement ── --}}
+                @if(!empty($customCats))
+                <optgroup label="── Mes catégories ──">
+                    @foreach($customCats as $cat)
+                    <option value="{{ $cat }}"
+                        {{ request('category') === $cat ? 'selected' : '' }}>
+                        ✏️ {{ $cat }}
+                    </option>
+                    @endforeach
+                </optgroup>
+                @endif
+
             </select>
 
             {{-- Filtre statut — soumet automatiquement au changement --}}

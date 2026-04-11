@@ -41,4 +41,9 @@ public function getCommissionRatePercentAttribute()
     return $this->commission_rate !== null ? round($this->commission_rate * 100, 2) : null;
 }
 
+public function user()
+{
+    return $this->belongsTo(User::class);
+}
+
 }

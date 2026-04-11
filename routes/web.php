@@ -96,6 +96,9 @@ use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\Client\ShopSubscriptionController;
 use App\Http\Controllers\Admin\DashboardController;
 
+/*contrôleur pour les clients* message */
+ 
+use App\Http\Controllers\Client\ShopMessageController;
 
 /* ══════════════════════════════════════════════════════════════════════════
 |  2. ROUTES PUBLIQUES
@@ -399,6 +402,10 @@ Route::middleware(['auth', 'role:client'])
 
         /* Tableau de bord */
         Route::get('/dashboard', [ClientDashboard::class, 'index'])->name('dashboard');
+        
+            /* Message pour les clients */
+            Route::get('/products/{product}/messages',  [ShopMessageController::class, 'index'])->name('messages.index');
+             Route::post('/products/{product}/message',  [ShopMessageController::class, 'store'])->name('messages.store');
 
         /* Commandes classiques */
         Route::resource('orders', OrderController::class)->only(['index', 'store', 'create']);

@@ -312,6 +312,39 @@ textarea.field-input { resize: vertical; min-height: 90px; }
 /* Input hidden pour la devise */
 #currency_hidden { display: none; }
 
+/* ── Sélecteur pays (même style que devise) ── */
+.pays-wrap { position: relative; }
+.pays-dropdown {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-sm);
+    box-shadow: var(--shadow);
+    z-index: 100; overflow: hidden;
+    display: none; max-height: 280px;
+}
+.pays-dropdown.open { display: block; }
+.pays-search-input {
+    width: 100%; padding: 10px 14px;
+    border: none; border-bottom: 1px solid var(--border);
+    font-size: 13px; font-family: var(--font); outline: none;
+    color: var(--text); background: var(--bg);
+}
+.pays-list { overflow-y: auto; max-height: 220px; }
+.pays-list::-webkit-scrollbar { width: 4px; }
+.pays-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.pays-opt {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 14px; cursor: pointer;
+    transition: background .12s; font-size: 13px;
+    border-bottom: 1px solid #f8fafc;
+}
+.pays-opt:hover  { background: var(--brand-mlt); }
+.pays-opt.selected { background: var(--brand-mlt); }
+.pays-flag   { font-size: 18px; flex-shrink: 0; }
+.pays-name   { color: var(--text); font-size: 13px; font-weight: 500; flex: 1; }
+.pays-region { font-size: 11px; color: var(--muted); flex-shrink: 0; }
+
 /* ── Upload image ── */
 .upload-zone {
     border: 2px dashed var(--border);
@@ -677,14 +710,21 @@ input[type=range]::-webkit-slider-thumb {
                     </div>
                     <div class="field-group">
                         <label class="field-label" for="pays">Pays</label>
-                        <div class="field-wrap">
-                            <span class="field-icon">🌍</span>
-                            <select name="pays" id="pays" class="field-input">
-                                <option value="">Sélectionner…</option>
-                                @foreach(['Guinée','Sénégal','Mali','Côte d\'Ivoire','Burkina Faso','Niger','Cameroun','Maroc','Algérie','Tunisie','France','Belgique','Canada','Autre'] as $p)
-                                <option value="{{ $p }}" {{ old('pays', 'Guinée') === $p ? 'selected' : '' }}>{{ $p }}</option>
-                                @endforeach
-                            </select>
+                        <div class="pays-wrap" id="paysWrap">
+                            <div class="field-wrap">
+                                <span class="field-icon">🌍</span>
+                                <input type="text" class="field-input" id="paysDisplay"
+                                       placeholder="Sélectionner un pays…"
+                                       readonly style="cursor:pointer">
+                            </div>
+                            <input type="hidden" name="pays" id="pays_hidden" value="{{ old('pays', 'Guinée') }}">
+                            <div class="pays-dropdown" id="paysDropdown">
+                                <input type="text" class="pays-search-input"
+                                       id="paysSearch"
+                                       placeholder="🔍  Rechercher un pays…"
+                                       autocomplete="off">
+                                <div class="pays-list" id="paysList"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1079,6 +1119,202 @@ function updateRecap() {
     document.getElementById('recapCurrency').textContent   = document.getElementById('currency_hidden').value || 'GNF';
     document.getElementById('recapCommission').textContent = parseFloat(document.getElementById('commission_rate').value).toFixed(1) + '%';
 }
+
+/* ════════════════════════════════════════════════════════════════
+   PAYS — liste complète de tous les pays du monde
+════════════════════════════════════════════════════════════════ */
+const PAYS = [
+    // Afrique de l'Ouest (priorité — boutique en Guinée)
+    { name: 'Guinée',              flag: '🇬🇳', region: 'Afrique Ouest' },
+    { name: 'Sénégal',             flag: '🇸🇳', region: 'Afrique Ouest' },
+    { name: 'Mali',                flag: '🇲🇱', region: 'Afrique Ouest' },
+    { name: "Côte d'Ivoire",       flag: '🇨🇮', region: 'Afrique Ouest' },
+    { name: 'Burkina Faso',        flag: '🇧🇫', region: 'Afrique Ouest' },
+    { name: 'Niger',               flag: '🇳🇪', region: 'Afrique Ouest' },
+    { name: 'Togo',                flag: '🇹🇬', region: 'Afrique Ouest' },
+    { name: 'Bénin',               flag: '🇧🇯', region: 'Afrique Ouest' },
+    { name: 'Ghana',               flag: '🇬🇭', region: 'Afrique Ouest' },
+    { name: 'Nigeria',             flag: '🇳🇬', region: 'Afrique Ouest' },
+    { name: 'Sierra Leone',        flag: '🇸🇱', region: 'Afrique Ouest' },
+    { name: 'Liberia',             flag: '🇱🇷', region: 'Afrique Ouest' },
+    { name: 'Gambie',              flag: '🇬🇲', region: 'Afrique Ouest' },
+    { name: 'Guinée-Bissau',       flag: '🇬🇼', region: 'Afrique Ouest' },
+    { name: 'Guinée équatoriale',  flag: '🇬🇶', region: 'Afrique Centrale' },
+    { name: 'Cap-Vert',            flag: '🇨🇻', region: 'Afrique Ouest' },
+    { name: 'Mauritanie',          flag: '🇲🇷', region: 'Afrique Ouest' },
+    // Afrique Centrale
+    { name: 'Cameroun',            flag: '🇨🇲', region: 'Afrique Centrale' },
+    { name: 'Congo',               flag: '🇨🇬', region: 'Afrique Centrale' },
+    { name: 'RD Congo',            flag: '🇨🇩', region: 'Afrique Centrale' },
+    { name: 'Gabon',               flag: '🇬🇦', region: 'Afrique Centrale' },
+    { name: 'Centrafrique',        flag: '🇨🇫', region: 'Afrique Centrale' },
+    { name: 'Tchad',               flag: '🇹🇩', region: 'Afrique Centrale' },
+    { name: 'Rwanda',              flag: '🇷🇼', region: 'Afrique Centrale' },
+    { name: 'Burundi',             flag: '🇧🇮', region: 'Afrique Centrale' },
+    // Afrique du Nord
+    { name: 'Maroc',               flag: '🇲🇦', region: 'Afrique Nord' },
+    { name: 'Algérie',             flag: '🇩🇿', region: 'Afrique Nord' },
+    { name: 'Tunisie',             flag: '🇹🇳', region: 'Afrique Nord' },
+    { name: 'Égypte',              flag: '🇪🇬', region: 'Afrique Nord' },
+    { name: 'Libye',               flag: '🇱🇾', region: 'Afrique Nord' },
+    { name: 'Soudan',              flag: '🇸🇩', region: 'Afrique Nord' },
+    // Afrique de l'Est
+    { name: 'Éthiopie',            flag: '🇪🇹', region: 'Afrique Est' },
+    { name: 'Kenya',               flag: '🇰🇪', region: 'Afrique Est' },
+    { name: 'Tanzanie',            flag: '🇹🇿', region: 'Afrique Est' },
+    { name: 'Ouganda',             flag: '🇺🇬', region: 'Afrique Est' },
+    { name: 'Mozambique',          flag: '🇲🇿', region: 'Afrique Est' },
+    { name: 'Madagascar',          flag: '🇲🇬', region: 'Afrique Est' },
+    { name: 'Somalie',             flag: '🇸🇴', region: 'Afrique Est' },
+    { name: 'Djibouti',            flag: '🇩🇯', region: 'Afrique Est' },
+    { name: 'Érythrée',            flag: '🇪🇷', region: 'Afrique Est' },
+    { name: 'Comores',             flag: '🇰🇲', region: 'Afrique Est' },
+    { name: 'Maurice',             flag: '🇲🇺', region: 'Afrique Est' },
+    // Afrique Australe
+    { name: 'Afrique du Sud',      flag: '🇿🇦', region: 'Afrique Australe' },
+    { name: 'Zimbabwe',            flag: '🇿🇼', region: 'Afrique Australe' },
+    { name: 'Zambie',              flag: '🇿🇲', region: 'Afrique Australe' },
+    { name: 'Angola',              flag: '🇦🇴', region: 'Afrique Australe' },
+    { name: 'Namibie',             flag: '🇳🇦', region: 'Afrique Australe' },
+    { name: 'Botswana',            flag: '🇧🇼', region: 'Afrique Australe' },
+    { name: 'Malawi',              flag: '🇲🇼', region: 'Afrique Australe' },
+    { name: 'Lesotho',             flag: '🇱🇸', region: 'Afrique Australe' },
+    { name: 'Eswatini',            flag: '🇸🇿', region: 'Afrique Australe' },
+    // Europe
+    { name: 'France',              flag: '🇫🇷', region: 'Europe' },
+    { name: 'Belgique',            flag: '🇧🇪', region: 'Europe' },
+    { name: 'Suisse',              flag: '🇨🇭', region: 'Europe' },
+    { name: 'Luxembourg',          flag: '🇱🇺', region: 'Europe' },
+    { name: 'Allemagne',           flag: '🇩🇪', region: 'Europe' },
+    { name: 'Espagne',             flag: '🇪🇸', region: 'Europe' },
+    { name: 'Italie',              flag: '🇮🇹', region: 'Europe' },
+    { name: 'Portugal',            flag: '🇵🇹', region: 'Europe' },
+    { name: 'Pays-Bas',            flag: '🇳🇱', region: 'Europe' },
+    { name: 'Royaume-Uni',         flag: '🇬🇧', region: 'Europe' },
+    { name: 'Irlande',             flag: '🇮🇪', region: 'Europe' },
+    { name: 'Suède',               flag: '🇸🇪', region: 'Europe' },
+    { name: 'Norvège',             flag: '🇳🇴', region: 'Europe' },
+    { name: 'Danemark',            flag: '🇩🇰', region: 'Europe' },
+    { name: 'Finlande',            flag: '🇫🇮', region: 'Europe' },
+    { name: 'Pologne',             flag: '🇵🇱', region: 'Europe' },
+    { name: 'Russie',              flag: '🇷🇺', region: 'Europe' },
+    { name: 'Ukraine',             flag: '🇺🇦', region: 'Europe' },
+    { name: 'Roumanie',            flag: '🇷🇴', region: 'Europe' },
+    { name: 'Grèce',               flag: '🇬🇷', region: 'Europe' },
+    { name: 'Autriche',            flag: '🇦🇹', region: 'Europe' },
+    { name: 'Turquie',             flag: '🇹🇷', region: 'Europe / Asie' },
+    // Amérique du Nord
+    { name: 'Canada',              flag: '🇨🇦', region: 'Amérique Nord' },
+    { name: 'États-Unis',          flag: '🇺🇸', region: 'Amérique Nord' },
+    { name: 'Mexique',             flag: '🇲🇽', region: 'Amérique Nord' },
+    // Amérique Centrale & Caraïbes
+    { name: 'Haïti',               flag: '🇭🇹', region: 'Caraïbes' },
+    { name: 'Cuba',                flag: '🇨🇺', region: 'Caraïbes' },
+    { name: 'République Dominicaine', flag: '🇩🇴', region: 'Caraïbes' },
+    { name: 'Martinique',          flag: '🇲🇶', region: 'Caraïbes' },
+    { name: 'Guadeloupe',          flag: '🇬🇵', region: 'Caraïbes' },
+    { name: 'Jamaïque',            flag: '🇯🇲', region: 'Caraïbes' },
+    // Amérique du Sud
+    { name: 'Brésil',              flag: '🇧🇷', region: 'Amérique Sud' },
+    { name: 'Argentine',           flag: '🇦🇷', region: 'Amérique Sud' },
+    { name: 'Colombie',            flag: '🇨🇴', region: 'Amérique Sud' },
+    { name: 'Venezuela',           flag: '🇻🇪', region: 'Amérique Sud' },
+    { name: 'Pérou',               flag: '🇵🇪', region: 'Amérique Sud' },
+    { name: 'Chili',               flag: '🇨🇱', region: 'Amérique Sud' },
+    // Moyen-Orient
+    { name: 'Arabie Saoudite',     flag: '🇸🇦', region: 'Moyen-Orient' },
+    { name: 'Émirats Arabes Unis', flag: '🇦🇪', region: 'Moyen-Orient' },
+    { name: 'Qatar',               flag: '🇶🇦', region: 'Moyen-Orient' },
+    { name: 'Koweït',              flag: '🇰🇼', region: 'Moyen-Orient' },
+    { name: 'Bahreïn',             flag: '🇧🇭', region: 'Moyen-Orient' },
+    { name: 'Oman',                flag: '🇴🇲', region: 'Moyen-Orient' },
+    { name: 'Irak',                flag: '🇮🇶', region: 'Moyen-Orient' },
+    { name: 'Iran',                flag: '🇮🇷', region: 'Moyen-Orient' },
+    { name: 'Liban',               flag: '🇱🇧', region: 'Moyen-Orient' },
+    { name: 'Jordanie',            flag: '🇯🇴', region: 'Moyen-Orient' },
+    { name: 'Syrie',               flag: '🇸🇾', region: 'Moyen-Orient' },
+    { name: 'Yémen',               flag: '🇾🇪', region: 'Moyen-Orient' },
+    { name: 'Palestine',           flag: '🇵🇸', region: 'Moyen-Orient' },
+    { name: 'Israël',              flag: '🇮🇱', region: 'Moyen-Orient' },
+    // Asie
+    { name: 'Chine',               flag: '🇨🇳', region: 'Asie' },
+    { name: 'Japon',               flag: '🇯🇵', region: 'Asie' },
+    { name: 'Corée du Sud',        flag: '🇰🇷', region: 'Asie' },
+    { name: 'Inde',                flag: '🇮🇳', region: 'Asie' },
+    { name: 'Pakistan',            flag: '🇵🇰', region: 'Asie' },
+    { name: 'Bangladesh',          flag: '🇧🇩', region: 'Asie' },
+    { name: 'Indonésie',           flag: '🇮🇩', region: 'Asie' },
+    { name: 'Malaisie',            flag: '🇲🇾', region: 'Asie' },
+    { name: 'Thaïlande',           flag: '🇹🇭', region: 'Asie' },
+    { name: 'Vietnam',             flag: '🇻🇳', region: 'Asie' },
+    { name: 'Philippines',         flag: '🇵🇭', region: 'Asie' },
+    { name: 'Singapour',           flag: '🇸🇬', region: 'Asie' },
+    { name: 'Hong Kong',           flag: '🇭🇰', region: 'Asie' },
+    // Océanie
+    { name: 'Australie',           flag: '🇦🇺', region: 'Océanie' },
+    { name: 'Nouvelle-Zélande',    flag: '🇳🇿', region: 'Océanie' },
+];
+
+function renderPays(filter = '') {
+    const list = document.getElementById('paysList');
+    const q    = filter.toLowerCase();
+    const filtered = PAYS.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        p.region.toLowerCase().includes(q)
+    );
+    const current = document.getElementById('pays_hidden').value;
+
+    if (filtered.length === 0) {
+        list.innerHTML = '<div style="padding:12px 14px;font-size:12.5px;color:var(--muted);text-align:center">Aucun pays trouvé</div>';
+        return;
+    }
+
+    list.innerHTML = filtered.map(p => `
+        <div class="pays-opt ${p.name === current ? 'selected' : ''}"
+             data-name="${p.name}" data-flag="${p.flag}">
+            <span class="pays-flag">${p.flag}</span>
+            <span class="pays-name">${p.name}</span>
+            <span class="pays-region">${p.region}</span>
+        </div>
+    `).join('');
+
+    list.querySelectorAll('.pays-opt').forEach(opt => {
+        opt.addEventListener('click', () => selectPays(opt.dataset.name, opt.dataset.flag));
+    });
+}
+
+function selectPays(name, flag) {
+    document.getElementById('pays_hidden').value  = name;
+    document.getElementById('paysDisplay').value  = `${flag}  ${name}`;
+    document.getElementById('paysDropdown').classList.remove('open');
+    renderPays();
+}
+
+/* Ouvrir/fermer le dropdown pays */
+document.getElementById('paysDisplay').addEventListener('click', () => {
+    const dd = document.getElementById('paysDropdown');
+    dd.classList.toggle('open');
+    if (dd.classList.contains('open')) {
+        document.getElementById('paysSearch').focus();
+    }
+});
+
+/* Fermer si clic à l'extérieur */
+document.addEventListener('click', e => {
+    if (!document.getElementById('paysWrap').contains(e.target)) {
+        document.getElementById('paysDropdown').classList.remove('open');
+    }
+});
+
+/* Filtrage en temps réel */
+document.getElementById('paysSearch').addEventListener('input', e => {
+    renderPays(e.target.value);
+});
+
+/* Init : sélectionner Guinée par défaut */
+renderPays();
+const defaultPays = PAYS.find(p => p.name === 'Guinée');
+if (defaultPays) selectPays(defaultPays.name, defaultPays.flag);
 
 /* ════════════════════════════════════════════════════════════════
    SUBMIT — loader sur le bouton

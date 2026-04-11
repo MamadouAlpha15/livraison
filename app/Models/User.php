@@ -139,4 +139,6 @@ class User extends Authenticatable
                ->orWhere('role_in_shop', 'livreur');
         })->where('shop_id', $shopId);
     }
+
+    
 }
