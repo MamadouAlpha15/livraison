@@ -293,18 +293,18 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('export/payments/pdf',   [ExportController::class, 'exportPaymentsPdf']) ->name('export.payments.pdf');
         Route::get('export/stats/pdf',      [ExportController::class, 'exportStatsPdf'])    ->name('export.stats.pdf');
 
-        // ── Répondre à un client ──
-Route::post(
-    '/boutique/messages/reply/{client}/{product?}',
-    [BoutiqueMessageController::class, 'reply']
-)->name('messages.reply');
- 
-// ── Polling AJAX (nb messages non lus) ──
-Route::get(
-    '/boutique/messages/poll',
-    [BoutiqueMessageController::class, 'poll']
-)->name('messages.poll');
-        
+        // === MESSAGES CLIENTS ===
+Route::post('messages/reply/{client}/{product?}', 
+    [BoutiqueMessageController::class, 'reply'])
+    ->name('messages.reply');
+
+Route::get('messages/poll', 
+    [BoutiqueMessageController::class, 'poll'])
+    ->name('messages.poll');
+
+Route::post('messages/read', 
+    [BoutiqueMessageController::class, 'markAsRead'])
+    ->name('messages.read');
     });
 
 

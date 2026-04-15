@@ -81,4 +81,40 @@ class BoutiqueMessageController extends Controller
             'reload' => $hasNew,
         ]);
     }
+
+
+    /**
+ * Marquer les messages d'un client comme lus (quand on ouvre la discussion)
+ * POST /boutique/messages/read
+ */
+public function markAsRead(Request $request)
+{
+    $request->validate([
+        'client_id'  => ['required', 'exists:users,id'],
+        'product_id' => ['nullable', 'exists:products,id'],
+    ]);
+
+    $vendeur = Auth::user();
+    $shop    = $vendeur->shop ?? $vendeur->assignedShop;
+
+    abort_unless($shop, 403);
+
+    // Marquer comme lus tous les messages envoyés par ce client vers le vendeur
+    $query = ShopMessage::where('shop_id', $shop->id)
+        ->where('sender_id', $request->client_id)
+        ->where('receiver_id', $vendeur->id)
+        ->whereNull('read_at');
+
+    // Si on est dans une conversation liée à un produit
+    if ($request->filled('product_id')) {
+        $query->where('product_id', $request->product_id);
+    }
+
+    $updated = $query->update(['read_at' => now()]);
+
+    return response()->json([
+        'success' => true,
+        'marked'  => $updated
+    ]);
+}
 }

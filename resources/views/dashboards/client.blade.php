@@ -42,8 +42,8 @@
     --nav-h:      60px;
 }
 
-html { font-family: var(--font); scroll-behavior: smooth; }
-body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoothing: antialiased; }
+html { font-family: var(--font); scroll-behavior: smooth; overflow-x: hidden; }
+body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 
 /* ══ NAVBAR ══ */
 .nav {
@@ -176,15 +176,17 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .msg-overlay.open { display: block; }
 
 .msg-drawer {
-    position: fixed; top: 0; right: -420px; bottom: 0;
+    position: fixed; top: 0; right: 0; bottom: 0;
     width: 420px; max-width: 100vw;
     background: var(--surface);
     box-shadow: -4px 0 32px rgba(0,0,0,.15);
     z-index: 500;
     display: flex; flex-direction: column;
-    transition: right .28s cubic-bezier(.23,1,.32,1);
+    transform: translateX(100%);
+    transition: transform .28s cubic-bezier(.23,1,.32,1);
+    visibility: hidden;
 }
-.msg-drawer.open { right: 0; }
+.msg-drawer.open { transform: translateX(0); visibility: visible; }
 
 .msg-drawer-hd {
     padding: 16px 18px;
@@ -700,8 +702,6 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 @media (max-width: 400px) {
     .shops-grid { grid-template-columns: 1fr; }
 }
-
-
 </style>
 @endpush
 
@@ -1183,10 +1183,12 @@ function closeMsgDrawer() {
    MODAL DISCUSSION
 ══════════════════════════════════════════ */
 let _currentProductId = null;
+let _currentConvKey    = null;
 let _csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
 function openMsgModal(conv) {
     _currentProductId = conv.productId;
+    _currentConvKey    = conv.key;
 
     /* Header */
     const av = document.getElementById('mmAv');
@@ -1233,11 +1235,17 @@ function openMsgModal(conv) {
     document.getElementById('mmInput').value = '';
     document.getElementById('mmInput').style.height = '';
     document.getElementById('msgModalOverlay').classList.add('open');
+
+    /* Marquer les messages comme lus dès l'ouverture */
+    if (conv.productId) {
+        markMessagesRead(conv.productId, conv.key);
+    }
 }
 
 function closeMsgModal() {
     document.getElementById('msgModalOverlay').classList.remove('open');
     _currentProductId = null;
+    _currentConvKey    = null;
 }
 
 /* Fermer sur clic overlay */
@@ -1269,6 +1277,61 @@ function buildBubble(m) {
 function escHtml(s) {
     return String(s)
         .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ══════════════════════════════════════════
+   MARQUER MESSAGES LUS (AJAX)
+══════════════════════════════════════════ */
+async function markMessagesRead(productId, convKey) {
+    try {
+        /* Appel AJAX GET sur la route existante — elle marque les msgs lus */
+        await fetch(`/client/products/${productId}/messages`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept':           'application/json',
+                'X-CSRF-TOKEN':     _csrfToken,
+            }
+        });
+    } catch(e) {}
+
+    /* Mise à jour immédiate de l'UI sans attendre le serveur */
+
+    /* 1. Retirer le dot rouge sur l'item de conversation */
+    const convItem = document.querySelector(`[data-conv-key="${convKey}"]`);
+    if (convItem) {
+        convItem.classList.remove('has-unread');
+        const dot  = convItem.querySelector('.msg-conv-av-dot');
+        const cnt  = convItem.querySelector('.msg-conv-unread');
+        if (dot) dot.remove();
+        if (cnt) cnt.remove();
+    }
+
+    /* 2. Recalculer le badge total dans la navbar */
+    updateNavBadge();
+}
+
+function updateNavBadge() {
+    /* Compte les items qui ont encore des non-lus */
+    const remaining = document.querySelectorAll('.msg-conv-item.has-unread').length;
+    const badge = document.getElementById('navMsgBadge');
+    const drawerBadge = document.querySelector('.msg-drawer-badge');
+
+    if (remaining > 0) {
+        badge.textContent = remaining;
+        badge.classList.add('show');
+    } else {
+        badge.textContent = '';
+        badge.classList.remove('show');
+    }
+
+    if (drawerBadge) {
+        if (remaining > 0) {
+            drawerBadge.textContent = remaining + ' non lu' + (remaining > 1 ? 's' : '');
+            drawerBadge.style.display = '';
+        } else {
+            drawerBadge.style.display = 'none';
+        }
+    }
 }
 
 /* ══════════════════════════════════════════
@@ -1317,10 +1380,19 @@ async function sendMsg(e) {
             input.style.height = '';
 
             /* Mettre à jour la preview dans la liste des convs */
-            const convItem = document.querySelector(`[data-conv-key]`);
-            if (convItem) {
-                const preview = convItem.querySelector('.msg-conv-preview');
-                if (preview) preview.textContent = body;
+            if (_currentConvKey) {
+                const convItem = document.querySelector(`[data-conv-key="${_currentConvKey}"]`);
+                if (convItem) {
+                    const preview = convItem.querySelector('.msg-conv-preview');
+                    if (preview) preview.textContent = body;
+                    /* Retirer aussi les badges non-lus si présents */
+                    convItem.classList.remove('has-unread');
+                    const dot = convItem.querySelector('.msg-conv-av-dot');
+                    const cnt = convItem.querySelector('.msg-conv-unread');
+                    if (dot) dot.remove();
+                    if (cnt) cnt.remove();
+                    updateNavBadge();
+                }
             }
         } else {
             alert('Erreur lors de l\'envoi. Veuillez réessayer.');

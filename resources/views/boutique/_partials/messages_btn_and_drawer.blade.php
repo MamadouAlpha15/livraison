@@ -501,13 +501,36 @@ function closeMsgDrawer() {
 }
 
 /* ── Modal ── */
+f/* ── Modal ── */
+/* ── Modal ── */
+/* ── Modal ── */
 function openMsgModal(conv) {
-    // Remplir header
+    
+    // 1. Marquer comme lu sur le serveur
+    fetch('{{ route("boutique.messages.read") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            client_id: conv.clientId,
+            product_id: conv.productId || null
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            removeUnreadVisual(conv.clientId);   // Mise à jour immédiate du drawer
+        }
+    })
+    .catch(err => console.error('Erreur mark as read:', err));
+
+    // Affichage du modal (ton code reste le même)
     document.getElementById('mmAv').textContent   = conv.clientInit;
     document.getElementById('mmName').textContent = conv.clientName;
     document.getElementById('mmSub').textContent  = conv.messages.length + ' message' + (conv.messages.length > 1 ? 's' : '');
 
-    // Barre produit
     const prodBar = document.getElementById('mmProd');
     if (conv.productName) {
         prodBar.style.display = 'flex';
@@ -522,13 +545,11 @@ function openMsgModal(conv) {
         prodBar.style.display = 'none';
     }
 
-    // Thread
     const thread = document.getElementById('mmThread');
     thread.innerHTML = '';
     let lastDate = null;
 
     conv.messages.forEach(msg => {
-        // Séparateur de date
         if (msg.dateKey !== lastDate) {
             const sep = document.createElement('div');
             sep.className = 'msg-date-sep';
@@ -553,18 +574,51 @@ function openMsgModal(conv) {
         thread.appendChild(row);
     });
 
-    // Scroll bas
     setTimeout(() => { thread.scrollTop = thread.scrollHeight; }, 30);
 
-    // Formulaire
     document.getElementById('mmForm').action  = conv.replyUrl;
     document.getElementById('mmClientId').value  = conv.clientId;
     document.getElementById('mmProductId').value = conv.productId || '';
     document.getElementById('mmInput').value     = '';
     document.getElementById('mmInput').style.height = 'auto';
 
-    // Ouvrir
     document.getElementById('msgModalOverlay').classList.add('open');
+}
+
+/* Mise à jour visuelle immédiate sans refresh */
+function removeUnreadVisual(clientId) {
+    // 1. Supprimer le badge du drawer
+    const drawerBadge = document.querySelector('.msg-drawer-badge');
+    if (drawerBadge) {
+        drawerBadge.style.display = 'none';
+    }
+
+    // 2. Supprimer le badge du bouton topbar
+    const topbarBtn = document.querySelector('.msg-topbar-btn');
+    const topbarCount = document.querySelector('.msg-topbar-count');
+    if (topbarCount) topbarCount.remove();
+    topbarBtn.classList.remove('has-unread');
+
+    // 3. Supprimer le style "unread" de la conversation concernée
+    const convItems = document.querySelectorAll('.msg-conv-item');
+    convItems.forEach(item => {
+        const onclickText = item.getAttribute('onclick') || '';
+        
+        if (onclickText.includes(`clientId":${clientId}`) || 
+            onclickText.includes(`"clientId":${clientId}`) ||
+            onclickText.includes(`client_id":${clientId}`)) {
+            
+            item.classList.remove('unread');
+            
+            // Supprimer le point rouge
+            const dot = item.querySelector('.msg-unread-dot');
+            if (dot) dot.remove();
+            
+            // Supprimer le pill "NEW"
+            const pill = item.querySelector('.msg-new-pill');
+            if (pill) pill.remove();
+        }
+    });
 }
 function closeMsgModal() {
     document.getElementById('msgModalOverlay').classList.remove('open');
@@ -572,6 +626,8 @@ function closeMsgModal() {
 function escHtml(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+
 
 /* Clavier */
 document.addEventListener('keydown', e => {
