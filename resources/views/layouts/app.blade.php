@@ -36,7 +36,7 @@
 
         /* ── Navbar (masquée sur les pages avec sidebar) ── */
         .navbar {
-            background: linear-gradient(90deg, var(--brand1), var(--brand2));
+            background: linear-gradient(90deg, var(--brand1), var(--brand2));  /*couleurs de la navbar*/
             box-shadow: 0 8px 24px rgba(22,163,74,.20);
         }
         .navbar-brand { font-weight: 700; letter-spacing: .2px; }

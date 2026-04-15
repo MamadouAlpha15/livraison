@@ -677,7 +677,7 @@ body {
     {{-- Badge "plateforme active" --}}
     <div class="hero-badge">
         <span class="hero-badge-dot"></span>
-        Plateforme de gestion boutique & livraison
+        Plateforme de gestion boutique & livraisons
     </div>
 
     {{-- Titre principal --}}

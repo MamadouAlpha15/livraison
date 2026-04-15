@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use App\Models\User;            // ✅ on va lister les livreurs
 use Illuminate\Support\Carbon;  // ✅ si tu veux gérer le "en ligne" par last_seen
+use App\Models\ShopMessage; // en haut du fichier
 
 
 class ShopController extends Controller
@@ -179,15 +180,27 @@ public function update(Request $request, \App\Models\Shop $shop)
             ->where('active', true)
             ->orderBy('name')
             ->get();
-
+ 
+            // Récupérer tous les messages de la boutique
+        // groupés par (client_id - product_id)
+$clientMessages = ShopMessage::where('shop_id', $shop->id)
+    ->with(['sender', 'receiver', 'product'])
+    ->orderBy('created_at')
+    ->get()
+    ->groupBy(function ($m) {
+        $clientId = optional($m->sender)->role === 'client'
+            ? $m->sender_id : $m->receiver_id;
+        return $clientId . '-' . ($m->product_id ?? '0');
+    });
   
         // 3) On envoie TOUT ce que la Blade consomme
         return view('boutique.dashboard', [
             'shop' => $shop,
             'livreursDisponibles' => $livreursDisponibles,
             'deliveryCompanies' => $deliveryCompanies,
-            
+            'clientMessages'      => $clientMessages,           
         ]);
+
     }
 
     // 4) Sinon → accès refusé

@@ -458,7 +458,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     <div class="kpi-row">
         <div class="kpi-chip" style="--kc:#10b981">
             <div class="kpi-chip-lbl">CA total confirmé</div>
-            <div class="kpi-chip-val">{{ number_format($totalRevenue/1000, 0) }}k</div>
+            <div class="kpi-chip-val">{{ number_format($totalRevenue/1000, 1) }}k</div>
             <div class="kpi-chip-sub">{{ $devise }}</div>
         </div>
         <div class="kpi-chip" style="--kc:#3b82f6">

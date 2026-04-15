@@ -100,6 +100,9 @@ use App\Http\Controllers\Admin\DashboardController;
  
 use App\Http\Controllers\Client\ShopMessageController;
 
+use App\Http\Controllers\Boutique\BoutiqueMessageController;
+use App\Http\Controllers\Client\ProductController as ClientProductController;
+
 /* ══════════════════════════════════════════════════════════════════════════
 |  2. ROUTES PUBLIQUES
 |  Accessibles sans authentification
@@ -290,6 +293,17 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('export/payments/pdf',   [ExportController::class, 'exportPaymentsPdf']) ->name('export.payments.pdf');
         Route::get('export/stats/pdf',      [ExportController::class, 'exportStatsPdf'])    ->name('export.stats.pdf');
 
+        // ── Répondre à un client ──
+Route::post(
+    '/boutique/messages/reply/{client}/{product?}',
+    [BoutiqueMessageController::class, 'reply']
+)->name('messages.reply');
+ 
+// ── Polling AJAX (nb messages non lus) ──
+Route::get(
+    '/boutique/messages/poll',
+    [BoutiqueMessageController::class, 'poll']
+)->name('messages.poll');
         
     });
 
@@ -423,6 +437,9 @@ Route::middleware(['auth', 'role:client'])
 
         /* Voir les produits d'une boutique */
         Route::get('shops/{shop}', [\App\Http\Controllers\Client\ShopController::class, 'show'])->name('shops.show');
+
+        Route::get('/produit/{product}', [ClientProductController::class, 'show'])
+    ->name('products.show');
     });
 
 
