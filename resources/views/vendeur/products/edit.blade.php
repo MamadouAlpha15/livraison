@@ -161,6 +161,26 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 }
 .gallery-slot:hover { border-color: var(--brand); opacity: .7; }
 .gallery-slot img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+/* Slot avec image existante ou nouvelle */
+.gallery-slot.has-image {
+    opacity: 1;
+    border-style: solid;
+    border-color: var(--border-dk);
+    cursor: default;
+}
+.gallery-slot.has-image:hover { border-color: var(--brand); }
+/* Bouton ✕ sur chaque image de galerie */
+.gallery-slot-remove {
+    position: absolute; top: 5px; right: 5px; z-index: 10;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: rgba(0,0,0,.72); color: #fff;
+    border: 1.5px solid rgba(255,255,255,.3);
+    cursor: pointer; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1; padding: 0;
+    transition: background .15s;
+}
+.gallery-slot-remove:hover { background: var(--danger); border-color: var(--danger); }
 
 /* ── Toggles (checkbox stylisés) ── */
 .toggle-field { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f3f6f4; }
@@ -451,7 +471,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                 <div class="form-card-hd">
                     <div class="form-card-hd-ico">🖼️</div>
                     <span class="form-card-title">Photos du produit</span>
-                    <span class="form-card-sub">Max 4 Mo par image</span>
+                    <span class="form-card-sub">Max 20 Mo par image</span>
                 </div>
                 <div class="form-card-body">
 
@@ -475,7 +495,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                                      style="{{ ($isEdit && $product->image) ? 'display:none' : '' }}">
                                     <span class="upload-placeholder-ico">📷</span>
                                     <div class="upload-placeholder-txt">Photo principale</div>
-                                    <div class="upload-placeholder-hint">JPG · PNG · WEBP — Max 4 Mo</div>
+                                    <div class="upload-placeholder-hint">JPG · PNG · WEBP — Max 20 Mo</div>
                                 </div>
                                 <button type="button" class="img-remove {{ ($isEdit && $product->image) ? 'visible' : '' }}"
                                         id="mainRemoveBtn"
@@ -487,21 +507,36 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                         {{-- Galerie secondaire --}}
                         <div class="field">
                             <label class="field-lbl">Photos supplémentaires</label>
+                            @php $existingGallery = $isEdit && $product->gallery ? json_decode($product->gallery, true) : []; @endphp
                             <div class="upload-gallery-grid" id="galleryGrid">
-                                @php $existingGallery = $isEdit && $product->gallery ? json_decode($product->gallery, true) : []; @endphp
-                                @for($gi = 0; $gi < 6; $gi++)
-                                <div class="gallery-slot" onclick="document.getElementById('galleryInput').click()">
-                                    @if(isset($existingGallery[$gi]))
-                                    <img src="{{ asset('storage/'.$existingGallery[$gi]) }}" alt="">
-                                    @else
-                                    ➕
-                                    @endif
+
+                                {{-- ── Images existantes : affichées avec croix de suppression ── --}}
+                                @foreach($existingGallery as $galleryPath)
+                                <div class="gallery-slot has-image">
+                                    <img src="{{ asset('storage/'.$galleryPath) }}" alt="">
+                                    {{-- Input caché : les chemins listés ici seront CONSERVÉS --}}
+                                    <input type="hidden" name="gallery_keep[]" value="{{ $galleryPath }}">
+                                    <button type="button" class="gallery-slot-remove"
+                                            onclick="removeExistingGallerySlot(this)"
+                                            title="Supprimer cette photo">✕</button>
                                 </div>
-                                @endfor
+                                @endforeach
+
+                                {{-- ── Bouton ➕ pour ajouter de nouvelles photos ── --}}
+                                <div class="gallery-slot" id="galleryAddBtn"
+                                     onclick="document.getElementById('galleryInput').click()"
+                                     title="Ajouter une photo"
+                                     style="{{ count($existingGallery) >= 6 ? 'display:none' : '' }}">
+                                    ➕
+                                </div>
+
                             </div>
-                            <input type="file" name="images[]" id="galleryInput"
-                                   accept="image/*" multiple style="display:none">
-                            <div class="field-hint" style="margin-top:8px">Jusqu'à 6 photos supplémentaires.</div>
+
+                            {{-- Input picker caché — NE porte PAS name (les fichiers vont dans des inputs dynamiques) --}}
+                            <input type="file" id="galleryInput" accept="image/*" multiple style="display:none">
+                            <div class="field-hint" style="margin-top:8px">
+                                Cliquez ✕ pour supprimer · ➕ pour ajouter · max 6 photos.
+                            </div>
                         </div>
                     </div>
 
@@ -679,8 +714,8 @@ mainInput.addEventListener('change', function() {
     if (!file) return;
 
     /* Validation taille côté client */
-    if (file.size > 4 * 1024 * 1024) {
-        alert('Image trop lourde — maximum 4 Mo.');
+    if (file.size > 20 * 1024 * 1024) {
+        alert('Image trop lourde — maximum 20 Mo.');
         this.value = '';
         return;
     }
@@ -726,7 +761,7 @@ zone.addEventListener('drop', e => {
     zone.classList.remove('over');
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith('image/')) {
-        if (file.size > 4 * 1024 * 1024) { alert('Image trop lourde — maximum 4 Mo.'); return; }
+        if (file.size > 20 * 1024 * 1024) { alert('Image trop lourde — maximum 20 Mo.'); return; }
         const dt = new DataTransfer();
         dt.items.add(file);
         mainInput.files = dt.files;
@@ -734,18 +769,72 @@ zone.addEventListener('drop', e => {
     }
 });
 
-/* ── Galerie secondaire ── */
-document.getElementById('galleryInput').addEventListener('change', e => {
-    const slots = document.querySelectorAll('.gallery-slot');
-    let idx = 0;
-    /* compter les slots déjà occupés */
-    slots.forEach(s => { if (s.querySelector('img')) idx++; });
-    Array.from(e.target.files).forEach(file => {
-        if (idx >= slots.length) return;
-        const url = URL.createObjectURL(file);
-        slots[idx].innerHTML = `<img src="${url}" alt="">`;
-        idx++;
+/* ══════════════════════════════════════════════
+   GALERIE — images existantes + nouvelles
+   ══════════════════════════════════════════════ */
+
+/* Supprimer une image EXISTANTE (déjà enregistrée en BDD)
+   → retire le slot + son input hidden gallery_keep[]
+   → le contrôleur détectera l'absence et supprimera le fichier */
+function removeExistingGallerySlot(btn) {
+    btn.closest('.gallery-slot').remove();
+    updateGalleryAddBtn();
+}
+
+/* Supprimer une NOUVELLE image (pas encore enregistrée)
+   → retire le slot + son input file caché dynamique */
+function removeNewGallerySlot(btn) {
+    const slot = btn.closest('.gallery-slot');
+    if (slot._hiddenInput) slot._hiddenInput.remove();
+    slot.remove();
+    updateGalleryAddBtn();
+}
+
+/* Afficher/masquer le bouton ➕ selon le nombre total d'images */
+function updateGalleryAddBtn() {
+    const total  = document.querySelectorAll('#galleryGrid .gallery-slot.has-image').length;
+    const addBtn = document.getElementById('galleryAddBtn');
+    if (addBtn) addBtn.style.display = total >= 6 ? 'none' : '';
+}
+
+/* Quand l'utilisateur sélectionne de nouveaux fichiers via le picker */
+document.getElementById('galleryInput').addEventListener('change', function() {
+    Array.from(this.files).forEach(file => {
+        const total = document.querySelectorAll('#galleryGrid .gallery-slot.has-image').length;
+        if (total >= 6) { alert('Maximum 6 photos de galerie atteint.'); return; }
+        if (file.size > 20 * 1024 * 1024) {
+            alert(`"${file.name}" dépasse 20 Mo.`);
+            return;
+        }
+
+        /* Créer un <input type="file"> caché avec CE fichier précis
+           (sera soumis avec le formulaire sous name="images[]") */
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type     = 'file';
+        hiddenInput.name     = 'images[]';
+        hiddenInput.style.display = 'none';
+        hiddenInput.accept   = 'image/*';
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        hiddenInput.files = dt.files;
+        document.getElementById('productForm').appendChild(hiddenInput);
+
+        /* Créer le slot visuel avec l'aperçu + croix */
+        const url  = URL.createObjectURL(file);
+        const slot = document.createElement('div');
+        slot.className = 'gallery-slot has-image';
+        slot.innerHTML = `
+            <img src="${url}" alt="" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">
+            <button type="button" class="gallery-slot-remove"
+                    onclick="removeNewGallerySlot(this)" title="Annuler">✕</button>
+        `;
+        slot._hiddenInput = hiddenInput; /* lien entre slot et son input */
+
+        const addBtn = document.getElementById('galleryAddBtn');
+        addBtn.parentNode.insertBefore(slot, addBtn);
+        updateGalleryAddBtn();
     });
+    this.value = ''; /* reset picker pour pouvoir re-sélectionner le même fichier */
 });
 
 /* ── Preview live ── */
@@ -826,6 +915,13 @@ function updatePreviewMeta() {
 
 /* ── Submit loader ── */
 document.getElementById('productForm').addEventListener('submit', () => {
+    /* Le picker galleryInput n'a jamais de name et est toujours désactivé
+       (les fichiers sont dans des inputs dynamiques name="images[]").
+       L'input image principale est désactivé s'il est vide. */
+    document.getElementById('galleryInput').disabled = true;
+    const mainInput = document.getElementById('mainImageInput');
+    if (mainInput && !mainInput.files.length) mainInput.disabled = true;
+
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
     btn.innerHTML = '⏳ Enregistrement…';

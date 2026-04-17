@@ -156,7 +156,12 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     <div class="prod-gallery">
         <div class="prod-main-img-wrap" id="mainImgWrap">
             @if($product->image)
-                <img src="{{ asset('storage/'.$product->image) }}" class="prod-main-img" id="mainImg" alt="{{ $product->name }}">
+                <img src="{{ \App\Services\ImageOptimizer::url($product->image, 'medium') }}"
+                     srcset="{{ \App\Services\ImageOptimizer::url($product->image, 'medium') }} 800w,
+                             {{ \App\Services\ImageOptimizer::url($product->image, 'large') }} 1600w"
+                     sizes="(max-width:768px) 90vw, 500px"
+                     class="prod-main-img" id="mainImg" alt="{{ $product->name }}"
+                     fetchpriority="high" decoding="async" width="500" height="500">
             @else
                 <div class="prod-main-img-ph">🏷️</div>
             @endif

@@ -10,7 +10,7 @@ class Shop extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'name', 'type', 'description', 'address', 'phone', 'image',  'is_approved','email','status','commission_rate', 'currency'
+        'user_id', 'name', 'type', 'description', 'address', 'phone', 'image', 'is_approved', 'email', 'status', 'commission_rate', 'currency', 'country'
     ];
 
     public function owner() {

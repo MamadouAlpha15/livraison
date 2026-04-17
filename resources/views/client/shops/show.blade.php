@@ -451,7 +451,10 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 {{-- BANNIÈRE --}}
 <div class="shop-banner">
     <div class="shop-banner-logo">
-        @if($shop->image)<img src="{{ asset('storage/'.$shop->image) }}" alt="">@else 🛍️ @endif
+        @if($shop->image)
+            <img src="{{ \App\Services\ImageOptimizer::url($shop->image, 'thumb') }}"
+                 alt="{{ $shop->name }}" fetchpriority="high" decoding="async" width="80" height="80">
+        @else 🛍️ @endif
     </div>
     <div class="shop-banner-info">
         <div class="shop-banner-name">{{ $shop->name }}</div>
@@ -603,7 +606,11 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
                 <div class="amz-card-img" onclick='openModal(JSON.parse(this.closest(".amz-card").dataset.prod))'>
                     @if($product->image)
-                        <img src="{{ asset('storage/'.$product->image) }}" alt="{{ $product->name }}" loading="lazy">
+                        <img src="{{ \App\Services\ImageOptimizer::url($product->image, 'thumb') }}"
+                             srcset="{{ \App\Services\ImageOptimizer::url($product->image, 'thumb') }} 300w,
+                                     {{ \App\Services\ImageOptimizer::url($product->image, 'medium') }} 800w"
+                             sizes="(max-width:600px) 45vw, 200px"
+                             alt="{{ $product->name }}" loading="lazy" decoding="async" width="200" height="200">
                     @else
                         <div class="amz-card-img-ph">🏷️</div>
                     @endif

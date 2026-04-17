@@ -15,7 +15,7 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        /* ── Boutiques approuvées ── */
+        /* ── Boutiques approuvées — filtrées par pays du client ── */
         $type   = request('type');
         $query  = Shop::where('is_approved', true)
             ->withCount([
@@ -34,6 +34,11 @@ class DashboardController extends Controller
                 ) as reviews_count
             '))
             ->latest();
+
+        // Filtre par pays du client connecté
+        if ($user->country) {
+            $query->where('country', $user->country);
+        }
 
         // Filtre par type de boutique
         if ($type && $type !== 'Toutes') {

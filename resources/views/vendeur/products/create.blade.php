@@ -451,7 +451,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                 <div class="form-card-hd">
                     <div class="form-card-hd-ico">🖼️</div>
                     <span class="form-card-title">Photos du produit</span>
-                    <span class="form-card-sub">Max 4 Mo par image</span>
+                    <span class="form-card-sub">Max 20 Mo par image</span>
                 </div>
                 <div class="form-card-body">
 
@@ -475,7 +475,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                                      style="{{ ($isEdit && $product->image) ? 'display:none' : '' }}">
                                     <span class="upload-placeholder-ico">📷</span>
                                     <div class="upload-placeholder-txt">Photo principale</div>
-                                    <div class="upload-placeholder-hint">JPG · PNG · WEBP — Max 4 Mo</div>
+                                    <div class="upload-placeholder-hint">JPG · PNG · WEBP — Max 20 Mo</div>
                                 </div>
                                 <button type="button" class="img-remove {{ ($isEdit && $product->image) ? 'visible' : '' }}"
                                         id="mainRemoveBtn"
@@ -674,8 +674,8 @@ mainInput.addEventListener('change', function() {
     if (!file) return;
 
     /* Validation taille côté client */
-    if (file.size > 4 * 1024 * 1024) {
-        alert('Image trop lourde — maximum 4 Mo.');
+    if (file.size > 20 * 1024 * 1024) {
+        alert('Image trop lourde — maximum 20 Mo.');
         this.value = '';
         return;
     }
@@ -721,7 +721,7 @@ zone.addEventListener('drop', e => {
     zone.classList.remove('over');
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith('image/')) {
-        if (file.size > 4 * 1024 * 1024) { alert('Image trop lourde — maximum 4 Mo.'); return; }
+        if (file.size > 20 * 1024 * 1024) { alert('Image trop lourde — maximum 20 Mo.'); return; }
         const dt = new DataTransfer();
         dt.items.add(file);
         mainInput.files = dt.files;
@@ -826,6 +826,14 @@ function updatePreviewMeta() {
 
 /* ── Submit loader ── */
 document.getElementById('productForm').addEventListener('submit', () => {
+    /* Désactiver les inputs fichier vides avant envoi.
+       Quand disabled, PHP ne reçoit pas l'entrée vide qui déclencherait
+       "The images.0 failed to upload." même avec la règle nullable. */
+    const mainInput    = document.getElementById('mainImageInput');
+    const galleryInput = document.getElementById('galleryInput');
+    if (mainInput    && !mainInput.files.length)    mainInput.disabled    = true;
+    if (galleryInput && !galleryInput.files.length) galleryInput.disabled = true;
+
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
     btn.innerHTML = '⏳ Enregistrement…';

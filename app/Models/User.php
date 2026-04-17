@@ -17,6 +17,7 @@ class User extends Authenticatable
         'role',          // ex: superadmin|admin|employe|vendeur|livreur|client
         'phone',
         'address',
+        'country',       // code ISO 2 lettres ex: SN, CI, ML
         'shop_id',       // FK vers la boutique principale de l'utilisateur
         'role_in_shop',  // ex: admin|vendeur|livreur (rôle dans la boutique)
         'is_available',  // pour les livreurs

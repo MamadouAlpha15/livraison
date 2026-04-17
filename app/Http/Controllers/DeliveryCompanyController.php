@@ -6,6 +6,7 @@ use App\Models\DeliveryCompany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\Services\ImageOptimizer;
 
 class DeliveryCompanyController extends Controller
 {  // liste des entreprises de livraison
@@ -33,9 +34,9 @@ class DeliveryCompanyController extends Controller
             'image' => ['nullable','image','mimes:jpg,jpeg,png,webp','max:4096'],
         ]);
 
-        // stockage de l'image si presente
+        // Stockage image optimisée en WebP
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('delivery_companies', 'public');
+            $data['image'] = ImageOptimizer::store($request->file('image'), 'delivery_companies');
         }
 
         // lier la company à l'utilisateur connecté

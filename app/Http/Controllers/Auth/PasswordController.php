@@ -24,6 +24,12 @@ class PasswordController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
+        // Rediriger selon le rôle de l'utilisateur
+        $role = $request->user()->role;
+        if ($role === 'client') {
+            return redirect()->route('client.dashboard')->with('status', 'password-updated');
+        }
+
         return back()->with('status', 'password-updated');
     }
 }

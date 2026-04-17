@@ -34,23 +34,25 @@ class RegisteredUserController extends Controller
     {
         // Validation des champs
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'in:client,admin,company,livreur'], // ✅ ajout de company ici
-            'phone' => ['nullable', 'string', 'max:20'],
-            'address' => ['nullable', 'string', 'max:255'],
-            'shop_id' => ['nullable', 'exists:shops,id'],
+            'role'     => ['required', 'in:client,admin,company,livreur'],
+            'phone'    => ['nullable', 'string', 'max:20'],
+            'address'  => ['nullable', 'string', 'max:255'],
+            'country'  => ['required', 'string', 'size:2'],
+            'shop_id'  => ['nullable', 'exists:shops,id'],
         ]);
 
         // Création du compte utilisateur
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
+            'name'     => $request->name,
+            'email'    => $request->email,
             'password' => Hash::make($request->password),
-            'phone' => in_array($request->role, ['client', 'livreur']) ? $request->phone : null,
-            'address' => $request->role === 'client' ? $request->address : null,
-            'role' => $request->role,
+            'phone'    => in_array($request->role, ['client', 'livreur']) ? $request->phone : null,
+            'address'  => $request->role === 'client' ? $request->address : null,
+            'country'  => strtoupper($request->country),
+            'role'     => $request->role,
         ]);
 
         event(new Registered($user));

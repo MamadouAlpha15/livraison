@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Schema;
+use App\Services\ImageOptimizer;
 
 
 class ProductController extends Controller
@@ -135,21 +136,26 @@ class ProductController extends Controller
             'is_available'     => 'nullable|boolean',
             'allergens'        => 'nullable|string|max:500',
             'tags'             => 'nullable|string|max:500',
-            'image'            => 'nullable|image|max:4096',
-            'images.*'         => 'nullable|image|max:4096',
+            'image'            => 'nullable|image|max:20480',
+            'images'           => 'nullable|array',
+            'images.*'         => 'nullable|image|max:20480',
+            'gallery_keep'     => 'nullable|array',
+            'gallery_keep.*'   => 'nullable|string',
         ]);
 
         $shop = Auth::user()->shop;
 
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
+            $imagePath = ImageOptimizer::store($request->file('image'), 'products');
         }
 
         $gallery = [];
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $img) {
-                $gallery[] = $img->store('products/gallery', 'public');
+                if ($img && $img->isValid()) {
+                    $gallery[] = ImageOptimizer::store($img, 'products/gallery');
+                }
             }
         }
 
@@ -212,8 +218,9 @@ class ProductController extends Controller
             'is_available'     => 'nullable|boolean',
             'allergens'        => 'nullable|string|max:500',
             'tags'             => 'nullable|string|max:500',
-            'image'            => 'nullable|image|max:4096',
-            'images.*'         => 'nullable|image|max:4096',
+            'image'            => 'nullable|image|max:20480',
+            'images'           => 'nullable|array',
+            'images.*'         => 'nullable|image|max:20480',
         ]);
 
         $data = $request->only([
@@ -227,17 +234,32 @@ class ProductController extends Controller
         $data['is_available'] = $request->boolean('is_available', true);
 
         if ($request->hasFile('image')) {
-            if ($product->image) Storage::disk('public')->delete($product->image);
-            $data['image'] = $request->file('image')->store('products', 'public');
+            ImageOptimizer::delete($product->image);
+            $data['image'] = ImageOptimizer::store($request->file('image'), 'products');
         }
 
-        if ($request->hasFile('images')) {
-            $existing = $product->gallery ? json_decode($product->gallery, true) : [];
-            foreach ($request->file('images') as $img) {
-                $existing[] = $img->store('products/gallery', 'public');
+        // Galerie : gallery_keep[] = chemins à conserver, images[] = nouvelles photos
+        $keep    = $request->input('gallery_keep', []);
+        $current = $product->gallery ? json_decode($product->gallery, true) : [];
+
+        // Supprimer les fichiers qui ont été retirés (présents dans current mais absents de keep)
+        foreach ($current as $path) {
+            if (!in_array($path, $keep)) {
+                ImageOptimizer::delete($path);
             }
-            $data['gallery'] = json_encode($existing);
         }
+
+        // Nouvelles photos uploadées
+        $newGallery = array_values($keep);
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $img) {
+                if ($img && $img->isValid()) {
+                    $newGallery[] = ImageOptimizer::store($img, 'products/gallery');
+                }
+            }
+        }
+
+        $data['gallery'] = !empty($newGallery) ? json_encode(array_values($newGallery)) : null;
 
         $product->update($data);
 

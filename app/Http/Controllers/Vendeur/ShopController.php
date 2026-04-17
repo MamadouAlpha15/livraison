@@ -7,9 +7,10 @@ use App\Models\Shop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
-use App\Models\User;            // ✅ on va lister les livreurs
-use Illuminate\Support\Carbon;  // ✅ si tu veux gérer le "en ligne" par last_seen
-use App\Models\ShopMessage; // en haut du fichier
+use App\Models\User;
+use Illuminate\Support\Carbon;
+use App\Models\ShopMessage;
+use App\Services\ImageOptimizer;
 
 
 class ShopController extends Controller
@@ -55,14 +56,15 @@ class ShopController extends Controller
     }
             
 
-        // ✅ Upload image si présente
+        // Upload image optimisée (WebP, 3 tailles)
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('shops', 'public');
+            $validated['image'] = ImageOptimizer::store($request->file('image'), 'shops');
         }
 
         // ✅ Création de la boutique et lien avec le vendeur
         $shop = new Shop($validated);
-        $shop->user_id = Auth::id();
+        $shop->user_id  = Auth::id();
+        $shop->country  = Auth::user()->country; // hérite du pays du propriétaire
         $shop->save();
 
         // ✅ Mise à jour du vendeur → il devient admin de sa boutique
@@ -109,11 +111,10 @@ public function update(Request $request, \App\Models\Shop $shop)
         'address'         => ['nullable','string','max:255'],
         'phone'           => ['nullable','string','max:30'],
         'email'           => ['nullable','email'],
-        // 🟢 ICI: on valide un pourcentage 0..100
         'commission_rate' => ['nullable','numeric','between:0,100'],
         'image'           => ['nullable','image','mimes:jpg,jpeg,png,webp'],
         'currency'        => ['nullable','string','max:10'],
-        
+        'country'         => ['nullable','string','size:2'],
     ]);
 
     // 🔁 Convertir 10 → 0.10, 15 → 0.15, etc.
@@ -121,12 +122,10 @@ public function update(Request $request, \App\Models\Shop $shop)
         $data['commission_rate'] = number_format(((float)$data['commission_rate']) / 100, 4, '.', '');
     }
 
-    // Image (optionnel)
+    // Image (optionnel) — optimisée en WebP
     if ($request->hasFile('image')) {
-        if ($shop->image) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($shop->image);
-        }
-        $data['image'] = $request->file('image')->store('shops', 'public');
+        ImageOptimizer::delete($shop->image);
+        $data['image'] = ImageOptimizer::store($request->file('image'), 'shops');
     } else {
         $data['image'] = $shop->image;
     }

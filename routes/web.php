@@ -125,9 +125,19 @@ Route::get('/orders/{order}', [SuiviController::class, 'show'])
 |  Requiert : auth
 ══════════════════════════════════════════════════════════════════════════ */
 
+// Redirection intelligente selon le rôle — évite la page Breeze vide "You're logged in!"
 Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    $user = auth()->user();
+    return match($user->role ?? '') {
+        'superadmin' => redirect()->route('admin.dashboard'),
+        'admin'      => redirect()->route('boutique.dashboard'),
+        'company'    => redirect()->route('company.dashboard'),
+        'livreur'    => redirect()->route('livreur.dashboard'),
+        'vendeur'    => redirect()->route('vendeur.dashboard'),
+        'employe'    => redirect()->route('employe.dashboard'),
+        default      => redirect()->route('client.dashboard'),
+    };
+})->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
 

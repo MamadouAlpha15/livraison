@@ -714,19 +714,90 @@ input[type=range]::-webkit-slider-thumb {
                         </div>
                     </div>
                     <div class="field-group">
-                        <label class="field-label" for="pays">Pays</label>
+                        <label class="field-label" for="country">Pays de la boutique</label>
+                        @php
+                        $shopCountries = [
+                            'Afrique de l\'Ouest' => [
+                                'BJ'=>['🇧🇯','Bénin'],'BF'=>['🇧🇫','Burkina Faso'],'CV'=>['🇨🇻','Cap-Vert'],
+                                'CI'=>['🇨🇮',"Côte d'Ivoire"],'GM'=>['🇬🇲','Gambie'],'GH'=>['🇬🇭','Ghana'],
+                                'GN'=>['🇬🇳','Guinée'],'GW'=>['🇬🇼','Guinée-Bissau'],'LR'=>['🇱🇷','Libéria'],
+                                'ML'=>['🇲🇱','Mali'],'MR'=>['🇲🇷','Mauritanie'],'NE'=>['🇳🇪','Niger'],
+                                'NG'=>['🇳🇬','Nigéria'],'SN'=>['🇸🇳','Sénégal'],'SL'=>['🇸🇱','Sierra Leone'],
+                                'TG'=>['🇹🇬','Togo'],
+                            ],
+                            'Afrique Centrale' => [
+                                'CM'=>['🇨🇲','Cameroun'],'CF'=>['🇨🇫','Centrafrique'],'TD'=>['🇹🇩','Tchad'],
+                                'CG'=>['🇨🇬','Congo'],'CD'=>['🇨🇩','RD Congo'],'GA'=>['🇬🇦','Gabon'],
+                                'GQ'=>['🇬🇶','Guinée Équat.'],'RW'=>['🇷🇼','Rwanda'],'BI'=>['🇧🇮','Burundi'],
+                            ],
+                            'Afrique de l\'Est' => [
+                                'DJ'=>['🇩🇯','Djibouti'],'ET'=>['🇪🇹','Éthiopie'],'KE'=>['🇰🇪','Kenya'],
+                                'MG'=>['🇲🇬','Madagascar'],'MU'=>['🇲🇺','Maurice'],'MZ'=>['🇲🇿','Mozambique'],
+                                'SO'=>['🇸🇴','Somalie'],'SD'=>['🇸🇩','Soudan'],'TZ'=>['🇹🇿','Tanzanie'],
+                                'UG'=>['🇺🇬','Ouganda'],'ZM'=>['🇿🇲','Zambie'],'ZW'=>['🇿🇼','Zimbabwe'],
+                            ],
+                            'Afrique du Nord' => [
+                                'DZ'=>['🇩🇿','Algérie'],'EG'=>['🇪🇬','Égypte'],'LY'=>['🇱🇾','Libye'],
+                                'MA'=>['🇲🇦','Maroc'],'TN'=>['🇹🇳','Tunisie'],
+                            ],
+                            'Afrique Australe' => [
+                                'AO'=>['🇦🇴','Angola'],'BW'=>['🇧🇼','Botswana'],'NA'=>['🇳🇦','Namibie'],
+                                'ZA'=>['🇿🇦','Afrique du Sud'],'LS'=>['🇱🇸','Lesotho'],
+                            ],
+                            'Europe' => [
+                                'DE'=>['🇩🇪','Allemagne'],'AT'=>['🇦🇹','Autriche'],'BE'=>['🇧🇪','Belgique'],
+                                'DK'=>['🇩🇰','Danemark'],'ES'=>['🇪🇸','Espagne'],'FI'=>['🇫🇮','Finlande'],
+                                'FR'=>['🇫🇷','France'],'GR'=>['🇬🇷','Grèce'],'IE'=>['🇮🇪','Irlande'],
+                                'IT'=>['🇮🇹','Italie'],'LU'=>['🇱🇺','Luxembourg'],'NO'=>['🇳🇴','Norvège'],
+                                'NL'=>['🇳🇱','Pays-Bas'],'PL'=>['🇵🇱','Pologne'],'PT'=>['🇵🇹','Portugal'],
+                                'GB'=>['🇬🇧','Royaume-Uni'],'RU'=>['🇷🇺','Russie'],'SE'=>['🇸🇪','Suède'],
+                                'CH'=>['🇨🇭','Suisse'],'UA'=>['🇺🇦','Ukraine'],
+                            ],
+                            'Amériques' => [
+                                'AR'=>['🇦🇷','Argentine'],'BR'=>['🇧🇷','Brésil'],'CA'=>['🇨🇦','Canada'],
+                                'CL'=>['🇨🇱','Chili'],'CO'=>['🇨🇴','Colombie'],'US'=>['🇺🇸','États-Unis'],
+                                'MX'=>['🇲🇽','Mexique'],'PE'=>['🇵🇪','Pérou'],'VE'=>['🇻🇪','Venezuela'],
+                            ],
+                            'Asie & Moyen-Orient' => [
+                                'SA'=>['🇸🇦','Arabie Saoudite'],'AE'=>['🇦🇪','Émirats Arabes'],
+                                'CN'=>['🇨🇳','Chine'],'IN'=>['🇮🇳','Inde'],'ID'=>['🇮🇩','Indonésie'],
+                                'JP'=>['🇯🇵','Japon'],'KW'=>['🇰🇼','Koweït'],'LB'=>['🇱🇧','Liban'],
+                                'MY'=>['🇲🇾','Malaisie'],'PK'=>['🇵🇰','Pakistan'],'QA'=>['🇶🇦','Qatar'],
+                                'SG'=>['🇸🇬','Singapour'],'KR'=>['🇰🇷','Corée du Sud'],
+                                'TH'=>['🇹🇭','Thaïlande'],'TR'=>['🇹🇷','Turquie'],'VN'=>['🇻🇳','Viêt Nam'],
+                            ],
+                            'Océanie' => [
+                                'AU'=>['🇦🇺','Australie'],'NZ'=>['🇳🇿','Nouvelle-Zélande'],
+                            ],
+                        ];
+                        // Aplatir pour retrouver flag+name depuis le code ISO
+                        $flatCountries = [];
+                        foreach ($shopCountries as $grp) { $flatCountries += $grp; }
+                        $currentCountry = old('country', $shop->country ?? '');
+                        @endphp
                         <div class="field-wrap">
-                            <span class="field-icon">🌍</span>
-                            <select name="pays" id="pays" class="field-input">
-                                <option value="">Sélectionner…</option>
-                                @foreach(['Guinée','Sénégal','Mali','Côte d\'Ivoire','Burkina Faso','Niger','Cameroun','Maroc','Algérie','Tunisie','France','Belgique','Canada','Autre'] as $p)
-                                <option value="{{ $p }}"
-                                    {{ old('pays', $shop->pays ?? 'Guinée') === $p ? 'selected' : '' }}>
-                                    {{ $p }}
-                                </option>
+                            <span class="field-icon" id="shopCountryFlag">
+                                {{ $currentCountry && isset($flatCountries[$currentCountry]) ? $flatCountries[$currentCountry][0] : '🌍' }}
+                            </span>
+                            <select name="country" id="country" class="field-input"
+                                    onchange="onShopCountryChange(this)">
+                                <option value="">Sélectionner un pays…</option>
+                                @foreach($shopCountries as $region => $pays)
+                                    <optgroup label="{{ $region }}">
+                                        @foreach($pays as $code => [$flag, $name])
+                                        <option value="{{ $code }}"
+                                            {{ $currentCountry === $code ? 'selected' : '' }}>
+                                            {{ $flag }} {{ $name }}
+                                        </option>
+                                        @endforeach
+                                    </optgroup>
                                 @endforeach
                             </select>
                         </div>
+                        <div class="field-hint" style="color:#059669;font-weight:600">
+                            Les clients de ce pays verront votre boutique dans leur tableau de bord.
+                        </div>
+                        @error('country')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
                     </div>
                 </div>
 
@@ -853,6 +924,7 @@ input[type=range]::-webkit-slider-thumb {
                         <div><strong style="color:var(--text)">Type :</strong> <span id="recapType">{{ $shop->type ?? '—' }}</span></div>
                         <div><strong style="color:var(--text)">Email :</strong> <span id="recapEmail">{{ $shop->email }}</span></div>
                         <div><strong style="color:var(--text)">Téléphone :</strong> <span id="recapPhone">{{ $shop->phone ?? '—' }}</span></div>
+                        <div><strong style="color:var(--text)">Pays :</strong> <span id="recapCountry">{{ $currentCountry && isset($flatCountries[$currentCountry]) ? $flatCountries[$currentCountry][0].' '.$flatCountries[$currentCountry][1] : '—' }}</span></div>
                         <div><strong style="color:var(--text)">Devise :</strong> <span id="recapCurrency">{{ $shop->currency ?? 'GNF' }}</span></div>
                         <div><strong style="color:var(--text)">Commission :</strong> <span id="recapCommission">{{ number_format($shop->commission_rate_percent ?? 0, 1) }}%</span></div>
                     </div>
@@ -1108,6 +1180,23 @@ document.getElementById('phone').addEventListener('input', e => {
 });
 
 /* ════════════════════════════════════════════════════════════════
+   PAYS DE LA BOUTIQUE — mise à jour du drapeau + récap
+════════════════════════════════════════════════════════════════ */
+function onShopCountryChange(select) {
+    const opt  = select.options[select.selectedIndex];
+    const text = opt.text; // ex: "🇲🇦 Maroc"
+    /* Met à jour l'icône dans le field-wrap */
+    const flagSpan = document.getElementById('shopCountryFlag');
+    if (flagSpan) {
+        const parts = text.split(' ');
+        flagSpan.textContent = parts[0] || '🌍';
+    }
+    /* Récap étape 4 */
+    const recapEl = document.getElementById('recapCountry');
+    if (recapEl) recapEl.textContent = select.value ? text : '—';
+}
+
+/* ════════════════════════════════════════════════════════════════
    RÉCAPITULATIF étape 4
 ════════════════════════════════════════════════════════════════ */
 function updateRecap() {
@@ -1118,6 +1207,12 @@ function updateRecap() {
     document.getElementById('recapCurrency').textContent   = document.getElementById('currency_hidden').value || 'GNF';
     const v = parseFloat(document.getElementById('commission_rate').value);
     document.getElementById('recapCommission').textContent = v.toFixed(1) + '%';
+    /* Pays */
+    const countryEl = document.getElementById('country');
+    if (countryEl && document.getElementById('recapCountry')) {
+        const opt = countryEl.options[countryEl.selectedIndex];
+        document.getElementById('recapCountry').textContent = countryEl.value ? opt.text : '—';
+    }
 }
 
 /* ════════════════════════════════════════════════════════════════
