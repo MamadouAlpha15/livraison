@@ -304,17 +304,26 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('export/stats/pdf',      [ExportController::class, 'exportStatsPdf'])    ->name('export.stats.pdf');
 
         // === MESSAGES CLIENTS ===
-Route::post('messages/reply/{client}/{product?}', 
+Route::post('messages/reply/{client}/{product?}',
     [BoutiqueMessageController::class, 'reply'])
     ->name('messages.reply');
 
-Route::get('messages/poll', 
+Route::get('messages/poll',
     [BoutiqueMessageController::class, 'poll'])
     ->name('messages.poll');
 
-Route::post('messages/read', 
+Route::post('messages/read',
     [BoutiqueMessageController::class, 'markAsRead'])
     ->name('messages.read');
+
+// === NÉGOCIATION DE PRIX ===
+Route::post('messages/price-offer',
+    [BoutiqueMessageController::class, 'createPriceOffer'])
+    ->name('messages.price-offer');
+
+Route::post('messages/refuse-proposal/{message}',
+    [BoutiqueMessageController::class, 'refuseProposal'])
+    ->name('messages.refuse-proposal');
     });
 
 
@@ -432,7 +441,11 @@ Route::middleware(['auth', 'role:client'])
         
             /* Message pour les clients */
             Route::get('/products/{product}/messages',  [ShopMessageController::class, 'index'])->name('messages.index');
-             Route::post('/products/{product}/message',  [ShopMessageController::class, 'store'])->name('messages.store');
+            Route::post('/products/{product}/message',  [ShopMessageController::class, 'store'])->name('messages.store');
+
+            /* Négociation de prix */
+            Route::post('/messages/propose-price',            [ShopMessageController::class, 'proposePrice']) ->name('messages.propose');
+            Route::post('/messages/confirm-offer/{message}',  [ShopMessageController::class, 'confirmOffer']) ->name('messages.confirm');
 
         /* Commandes classiques */
         Route::resource('orders', OrderController::class)->only(['index', 'store', 'create']);
