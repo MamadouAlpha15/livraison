@@ -266,6 +266,16 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 .flash ul { margin: 0; padding-left: 16px; }
 .flash ul li { margin-top: 3px; font-size: 12.5px; }
 
+/* ── Spinner upload ── */
+@keyframes spin { to { transform: rotate(360deg); } }
+.upload-spin { display: inline-block; animation: spin .8s linear infinite; font-size: 28px; }
+.upload-uploading {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: var(--brand-mlt); gap: 8px; z-index: 2;
+}
+.upload-uploading-txt { font-size: 12px; font-weight: 700; color: var(--brand-dk); }
+
 /* ── Responsive ── */
 @media (max-width: 900px) {
     .product-form-wrap { grid-template-columns: 1fr; }
@@ -479,16 +489,19 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                         {{-- Image principale --}}
                         <div class="field">
                             <label class="field-lbl">Photo principale</label>
-                            {{-- Input caché — déclenché par clic sur la zone ── --}}
-                            <input type="file" name="image" id="mainImageInput"
+                            {{-- Picker caché — déclenché par clic, upload AJAX immédiat ── --}}
+                            <input type="file" id="mainImageInput"
                                    class="upload-main-input" accept="image/*">
+                            {{-- Chemin stocké après upload AJAX (c'est ce qui est soumis avec le form) --}}
+                            <input type="hidden" id="mainImageUploaded" name="image_uploaded"
+                                   value="{{ $isEdit && $product->image ? $product->image : '' }}">
 
                             {{-- Zone cliquable ── --}}
                             <div class="upload-main" id="mainUploadZone"
                                  onclick="document.getElementById('mainImageInput').click()">
                                 <img id="mainPreview"
                                      class="upload-main-preview {{ ($isEdit && $product->image) ? 'visible' : '' }}"
-                                     src="{{ $isEdit && $product->image ? asset('storage/'.$product->image) : '' }}"
+                                     src="{{ $isEdit && $product->image ? \App\Services\ImageOptimizer::url($product->image, 'medium') : '' }}"
                                      alt="Aperçu">
                                 <div class="upload-main-overlay">📷 Changer l'image</div>
                                 <div class="upload-placeholder" id="mainPlaceholder"
@@ -501,7 +514,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                                         id="mainRemoveBtn"
                                         onclick="event.stopPropagation();removeMainImage()">✕</button>
                             </div>
-                            @error('image')<div class="field-error" style="margin-top:6px">{{ $message }}</div>@enderror
+                            @error('image_uploaded')<div class="field-error" style="margin-top:6px">{{ $message }}</div>@enderror
                         </div>
 
                         {{-- Galerie secondaire --}}
@@ -526,7 +539,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                                 <div class="gallery-slot" id="galleryAddBtn"
                                      onclick="document.getElementById('galleryInput').click()"
                                      title="Ajouter une photo"
-                                     style="{{ count($existingGallery) >= 6 ? 'display:none' : '' }}">
+                                     style="{{ count($existingGallery) >= 20 ? 'display:none' : '' }}">
                                     ➕
                                 </div>
 
@@ -535,7 +548,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                             {{-- Input picker caché — NE porte PAS name (les fichiers vont dans des inputs dynamiques) --}}
                             <input type="file" id="galleryInput" accept="image/*" multiple style="display:none">
                             <div class="field-hint" style="margin-top:8px">
-                                Cliquez ✕ pour supprimer · ➕ pour ajouter · max 6 photos.
+                                Cliquez ✕ pour supprimer · ➕ pour ajouter · max 20 photos.
                             </div>
                         </div>
                     </div>
@@ -697,32 +710,71 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 @push('scripts')
 <script>
 /* ══════════════════════════════════════════════
-   UPLOAD IMAGE PRINCIPALE
-   L'input est caché — on le déclenche via onclick
-   sur la zone. Drag & drop aussi supporté.
+   UPLOAD IMAGE PRINCIPALE — 100% AJAX
+   Aucun fichier soumis dans le formulaire.
+   Le chemin retourné par le serveur est stocké
+   dans l'input caché #mainImageUploaded.
    ══════════════════════════════════════════════ */
 const mainInput             = document.getElementById('mainImageInput');
 const mainPreview           = document.getElementById('mainPreview');
 const mainPlaceholder       = document.getElementById('mainPlaceholder');
 const mainRemoveBtn         = document.getElementById('mainRemoveBtn');
+const mainImageUploaded     = document.getElementById('mainImageUploaded');
 const previewImgEl          = document.getElementById('previewImgEl');
 const previewImgPlaceholder = document.getElementById('previewImgPlaceholder');
+const mainUploadZone        = document.getElementById('mainUploadZone');
 
-/* Quand l'utilisateur sélectionne un fichier */
-mainInput.addEventListener('change', function() {
+let mainUploading = false;
+
+/* Sélection fichier → upload AJAX immédiat */
+mainInput.addEventListener('change', function () {
     const file = this.files[0];
+    this.value = ''; // reset pour permettre de re-sélectionner le même fichier
     if (!file) return;
-
-    /* Validation taille côté client */
-    if (file.size > 20 * 1024 * 1024) {
-        alert('Image trop lourde — maximum 20 Mo.');
-        this.value = '';
-        return;
-    }
-
-    const url = URL.createObjectURL(file);
-    showMainPreview(url);
+    if (file.size > 20 * 1024 * 1024) { alert('Image trop lourde — maximum 20 Mo.'); return; }
+    uploadMainImage(file);
 });
+
+/* Upload via AJAX */
+async function uploadMainImage(file) {
+    if (mainUploading) return;
+    mainUploading = true;
+
+    /* État : chargement */
+    mainPreview.classList.remove('visible');
+    mainRemoveBtn.classList.remove('visible');
+    mainPlaceholder.style.display = 'none';
+    mainUploadZone.style.pointerEvents = 'none';
+
+    const spinner = document.createElement('div');
+    spinner.className = 'upload-uploading';
+    spinner.innerHTML = `<span class="upload-spin">⏳</span>
+                         <div class="upload-uploading-txt">Upload en cours…</div>`;
+    mainUploadZone.appendChild(spinner);
+
+    try {
+        const fd = new FormData();
+        fd.append('file',   file);
+        fd.append('folder', 'products');
+        fd.append('_token', CSRF);
+
+        const res = await fetch(UPLOAD_URL, { method: 'POST', body: fd });
+        let json;
+        try { json = await res.json(); } catch { throw new Error('Réponse serveur invalide'); }
+        if (!res.ok || !json.path) throw new Error(json.message || `Erreur ${res.status}`);
+
+        mainImageUploaded.value = json.path;
+        showMainPreview(json.url);
+
+    } catch (err) {
+        mainPlaceholder.style.display = '';
+        alert(`Erreur upload image : ${err.message}`);
+    } finally {
+        spinner.remove();
+        mainUploadZone.style.pointerEvents = '';
+        mainUploading = false;
+    }
+}
 
 /* Afficher la prévisualisation */
 function showMainPreview(url) {
@@ -730,7 +782,6 @@ function showMainPreview(url) {
     mainPreview.classList.add('visible');
     mainPlaceholder.style.display = 'none';
     mainRemoveBtn.classList.add('visible');
-    /* Sync vers la sidebar preview */
     if (previewImgEl) {
         previewImgEl.src = url;
         previewImgEl.style.display = 'block';
@@ -738,17 +789,15 @@ function showMainPreview(url) {
     }
 }
 
-/* Supprimer l'image sélectionnée */
+/* Supprimer l'image */
 function removeMainImage() {
     mainInput.value = '';
+    mainImageUploaded.value = '';
     mainPreview.src = '';
     mainPreview.classList.remove('visible');
     mainPlaceholder.style.display = '';
     mainRemoveBtn.classList.remove('visible');
-    if (previewImgEl) {
-        previewImgEl.src = '';
-        previewImgEl.style.display = 'none';
-    }
+    if (previewImgEl) { previewImgEl.src = ''; previewImgEl.style.display = 'none'; }
     if (previewImgPlaceholder) previewImgPlaceholder.style.display = '';
 }
 
@@ -762,79 +811,96 @@ zone.addEventListener('drop', e => {
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith('image/')) {
         if (file.size > 20 * 1024 * 1024) { alert('Image trop lourde — maximum 20 Mo.'); return; }
-        const dt = new DataTransfer();
-        dt.items.add(file);
-        mainInput.files = dt.files;
-        showMainPreview(URL.createObjectURL(file));
+        uploadMainImage(file);
     }
 });
 
 /* ══════════════════════════════════════════════
-   GALERIE — images existantes + nouvelles
+   GALERIE — upload AJAX image par image
+   (évite "POST data is too large")
    ══════════════════════════════════════════════ */
 
-/* Supprimer une image EXISTANTE (déjà enregistrée en BDD)
-   → retire le slot + son input hidden gallery_keep[]
-   → le contrôleur détectera l'absence et supprimera le fichier */
+const CSRF       = document.querySelector('meta[name="csrf-token"]').content;
+const UPLOAD_URL = '{{ route("products.upload.image") }}';
+
+function updateGalleryAddBtn() {
+    const total  = document.querySelectorAll('#galleryGrid .gallery-slot.has-image').length;
+    const addBtn = document.getElementById('galleryAddBtn');
+    if (addBtn) addBtn.style.display = total >= 20 ? 'none' : '';
+}
+
+/* Supprimer une image EXISTANTE */
 function removeExistingGallerySlot(btn) {
     btn.closest('.gallery-slot').remove();
     updateGalleryAddBtn();
 }
 
-/* Supprimer une NOUVELLE image (pas encore enregistrée)
-   → retire le slot + son input file caché dynamique */
+/* Supprimer une NOUVELLE image (uploadée via AJAX) */
 function removeNewGallerySlot(btn) {
     const slot = btn.closest('.gallery-slot');
-    if (slot._hiddenInput) slot._hiddenInput.remove();
+    if (slot._hiddenPath) slot._hiddenPath.remove();
     slot.remove();
     updateGalleryAddBtn();
 }
 
-/* Afficher/masquer le bouton ➕ selon le nombre total d'images */
-function updateGalleryAddBtn() {
-    const total  = document.querySelectorAll('#galleryGrid .gallery-slot.has-image').length;
+/* Upload une image via AJAX, crée le slot + input caché path */
+async function uploadGalleryFile(file) {
+    const total = document.querySelectorAll('#galleryGrid .gallery-slot.has-image').length;
+    if (total >= 20) { alert('Maximum 20 photos de galerie atteint.'); return; }
+    if (file.size > 20 * 1024 * 1024) { alert(`"${file.name}" dépasse 20 Mo.`); return; }
+
+    /* Slot "en cours d'upload" */
     const addBtn = document.getElementById('galleryAddBtn');
-    if (addBtn) addBtn.style.display = total >= 6 ? 'none' : '';
+    const slot = document.createElement('div');
+    slot.className = 'gallery-slot has-image';
+    slot.innerHTML = `
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+                    justify-content:center;background:var(--brand-mlt);gap:6px">
+            <div style="font-size:20px">⏳</div>
+            <div style="font-size:10px;color:var(--brand-dk);font-weight:700">Upload…</div>
+        </div>`;
+    addBtn.parentNode.insertBefore(slot, addBtn);
+    updateGalleryAddBtn();
+
+    try {
+        const fd = new FormData();
+        fd.append('file',   file);
+        fd.append('folder', 'products/gallery');
+        fd.append('_token', CSRF);
+
+        const res  = await fetch(UPLOAD_URL, { method: 'POST', body: fd });
+        let json;
+        try { json = await res.json(); } catch { throw new Error('Réponse serveur invalide (HTML ?)'); }
+
+        if (!res.ok || !json.path) throw new Error(json.message || `Erreur ${res.status}`);
+
+        /* Input caché avec le chemin (pas le fichier) */
+        const hiddenPath = document.createElement('input');
+        hiddenPath.type  = 'hidden';
+        hiddenPath.name  = 'gallery_uploaded[]';
+        hiddenPath.value = json.path;
+        document.getElementById('productForm').appendChild(hiddenPath);
+        slot._hiddenPath = hiddenPath;
+
+        slot.innerHTML = `
+            <img src="${json.url}" alt=""
+                 style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">
+            <button type="button" class="gallery-slot-remove"
+                    onclick="removeNewGallerySlot(this)" title="Supprimer">✕</button>`;
+        slot.querySelector('.gallery-slot-remove').addEventListener('click', () => {
+            hiddenPath.remove();
+        });
+
+    } catch (err) {
+        slot.remove();
+        updateGalleryAddBtn();
+        alert(`Erreur upload : ${err.message}`);
+    }
 }
 
-/* Quand l'utilisateur sélectionne de nouveaux fichiers via le picker */
-document.getElementById('galleryInput').addEventListener('change', function() {
-    Array.from(this.files).forEach(file => {
-        const total = document.querySelectorAll('#galleryGrid .gallery-slot.has-image').length;
-        if (total >= 6) { alert('Maximum 6 photos de galerie atteint.'); return; }
-        if (file.size > 20 * 1024 * 1024) {
-            alert(`"${file.name}" dépasse 20 Mo.`);
-            return;
-        }
-
-        /* Créer un <input type="file"> caché avec CE fichier précis
-           (sera soumis avec le formulaire sous name="images[]") */
-        const hiddenInput = document.createElement('input');
-        hiddenInput.type     = 'file';
-        hiddenInput.name     = 'images[]';
-        hiddenInput.style.display = 'none';
-        hiddenInput.accept   = 'image/*';
-        const dt = new DataTransfer();
-        dt.items.add(file);
-        hiddenInput.files = dt.files;
-        document.getElementById('productForm').appendChild(hiddenInput);
-
-        /* Créer le slot visuel avec l'aperçu + croix */
-        const url  = URL.createObjectURL(file);
-        const slot = document.createElement('div');
-        slot.className = 'gallery-slot has-image';
-        slot.innerHTML = `
-            <img src="${url}" alt="" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">
-            <button type="button" class="gallery-slot-remove"
-                    onclick="removeNewGallerySlot(this)" title="Annuler">✕</button>
-        `;
-        slot._hiddenInput = hiddenInput; /* lien entre slot et son input */
-
-        const addBtn = document.getElementById('galleryAddBtn');
-        addBtn.parentNode.insertBefore(slot, addBtn);
-        updateGalleryAddBtn();
-    });
-    this.value = ''; /* reset picker pour pouvoir re-sélectionner le même fichier */
+document.getElementById('galleryInput').addEventListener('change', function () {
+    Array.from(this.files).forEach(file => uploadGalleryFile(file));
+    this.value = '';
 });
 
 /* ── Preview live ── */
@@ -913,14 +979,23 @@ function updatePreviewMeta() {
     document.getElementById('previewMeta').innerHTML = html;
 }
 
-/* ── Submit loader ── */
-document.getElementById('productForm').addEventListener('submit', () => {
-    /* Le picker galleryInput n'a jamais de name et est toujours désactivé
-       (les fichiers sont dans des inputs dynamiques name="images[]").
-       L'input image principale est désactivé s'il est vide. */
+/* ── Submit ── */
+document.getElementById('productForm').addEventListener('submit', function (e) {
+    /* Bloquer si un upload est en cours */
+    if (mainUploading) {
+        e.preventDefault();
+        alert('Attendez la fin de l\'upload de l\'image principale.');
+        return;
+    }
+    if (document.querySelector('#galleryGrid [style*="Upload"]')) {
+        e.preventDefault();
+        alert('Attendez la fin des uploads de galerie.');
+        return;
+    }
+    /* Désactiver le picker galerie (pas de name = pas soumis de toute façon) */
     document.getElementById('galleryInput').disabled = true;
-    const mainInput = document.getElementById('mainImageInput');
-    if (mainInput && !mainInput.files.length) mainInput.disabled = true;
+    /* Désactiver le picker image principale (pas de name, upload déjà fait) */
+    document.getElementById('mainImageInput').disabled = true;
 
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;

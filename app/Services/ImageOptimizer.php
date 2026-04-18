@@ -32,38 +32,46 @@ class ImageOptimizer
      */
     public static function store(UploadedFile $file, string $folder = 'products'): string
     {
-        $prevMemory = ini_set('memory_limit', '256M');
+        // Augmente la mémoire pour traiter les grandes images (photos de téléphone = ~15-20 Mo)
+        $prevMemory = ini_set('memory_limit', '512M');
+        // Augmente le temps d'exécution par image (pour les traitements en lot)
+        $prevTime = ini_get('max_execution_time');
+        set_time_limit(300);
 
-        $manager  = new ImageManager(new Driver());
-        $filename = Str::random(20);
-        $rawPath  = $file->getRealPath();
-        $disk     = self::disk();
+        try {
+            $manager  = new ImageManager(new Driver());
+            $filename = Str::random(20);
+            $rawPath  = $file->getRealPath();
+            $disk     = self::disk();
 
-        $sizes = [
-            'thumb'  => 300,
-            'medium' => 800,
-            'large'  => 1600,
-        ];
+            $sizes = [
+                'thumb'  => 300,
+                'medium' => 800,
+                'large'  => 1600,
+            ];
 
-        $paths = [];
+            $paths = [];
 
-        foreach ($sizes as $key => $width) {
-            $img     = $manager->decode($rawPath);
-            $img->scaleDown(width: $width);
-            $encoded = $img->encode(new WebpEncoder(quality: 82));
+            foreach ($sizes as $key => $width) {
+                $img     = $manager->decode($rawPath);
+                $img->scaleDown(width: $width);
+                $encoded = $img->encode(new WebpEncoder(quality: 82));
 
-            $path = "{$folder}/{$key}/{$filename}.webp";
-            Storage::disk($disk)->put($path, (string) $encoded);
-            $paths[$key] = $path;
+                $path = "{$folder}/{$key}/{$filename}.webp";
+                Storage::disk($disk)->put($path, (string) $encoded);
+                $paths[$key] = $path;
 
-            unset($img, $encoded);
+                unset($img, $encoded);
+                gc_collect_cycles(); // libère la mémoire entre chaque taille
+            }
+
+            return $paths['medium'];
+
+        } finally {
+            // Restaure les paramètres d'origine dans tous les cas
+            if ($prevMemory !== false) ini_set('memory_limit', $prevMemory);
+            if ($prevTime !== false)   set_time_limit((int) $prevTime);
         }
-
-        if ($prevMemory !== false) {
-            ini_set('memory_limit', $prevMemory);
-        }
-
-        return $paths['medium'];
     }
 
     /**

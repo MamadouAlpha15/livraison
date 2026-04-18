@@ -136,26 +136,21 @@ class ProductController extends Controller
             'is_available'     => 'nullable|boolean',
             'allergens'        => 'nullable|string|max:500',
             'tags'             => 'nullable|string|max:500',
-            'image'            => 'nullable|image|max:20480',
-            'images'           => 'nullable|array',
-            'images.*'         => 'nullable|image|max:20480',
-            'gallery_keep'     => 'nullable|array',
-            'gallery_keep.*'   => 'nullable|string',
+            'image_uploaded'   => 'nullable|string|max:500', // 
+            'gallery_uploaded' => 'nullable|array|max:20',
+            'gallery_uploaded.*' => 'nullable|string|max:500',
         ]);
 
         $shop = Auth::user()->shop;
 
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = ImageOptimizer::store($request->file('image'), 'products');
-        }
+        // Image principale uploadée via AJAX (chemin déjà stocké sur le disque)
+        $imagePath = $request->input('image_uploaded') ?: null;
 
+        // Galerie uploadée via AJAX
         $gallery = [];
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $img) {
-                if ($img && $img->isValid()) {
-                    $gallery[] = ImageOptimizer::store($img, 'products/gallery');
-                }
+        foreach ($request->input('gallery_uploaded', []) as $path) {
+            if ($path && is_string($path)) {
+                $gallery[] = $path;
             }
         }
 
@@ -218,9 +213,11 @@ class ProductController extends Controller
             'is_available'     => 'nullable|boolean',
             'allergens'        => 'nullable|string|max:500',
             'tags'             => 'nullable|string|max:500',
-            'image'            => 'nullable|image|max:20480',
-            'images'           => 'nullable|array',
-            'images.*'         => 'nullable|image|max:20480',
+            'image_uploaded'   => 'nullable|string|max:500',
+            'gallery_keep'     => 'nullable|array',
+            'gallery_keep.*'   => 'nullable|string|max:500',
+            'gallery_uploaded' => 'nullable|array|max:20',
+            'gallery_uploaded.*' => 'nullable|string|max:500',
         ]);
 
         $data = $request->only([
@@ -233,29 +230,29 @@ class ProductController extends Controller
         $data['is_featured']  = $request->boolean('is_featured', false);
         $data['is_available'] = $request->boolean('is_available', true);
 
-        if ($request->hasFile('image')) {
-            ImageOptimizer::delete($product->image);
-            $data['image'] = ImageOptimizer::store($request->file('image'), 'products');
+        // Image principale : chemin uploadé via AJAX
+        $newImagePath = $request->input('image_uploaded') ?: null;
+        if ($newImagePath !== $product->image) {
+            // Nouvelle image ou suppression → supprimer l'ancienne
+            if ($product->image) ImageOptimizer::delete($product->image);
+            $data['image'] = $newImagePath;
         }
 
-        // Galerie : gallery_keep[] = chemins à conserver, images[] = nouvelles photos
-        $keep    = $request->input('gallery_keep', []);
+        // Galerie : gallery_keep[] = existantes à conserver, gallery_uploaded[] = nouvelles (AJAX)
+        $keep    = array_filter($request->input('gallery_keep', []), fn($p) => $p && is_string($p));
         $current = $product->gallery ? json_decode($product->gallery, true) : [];
 
-        // Supprimer les fichiers qui ont été retirés (présents dans current mais absents de keep)
+        // Supprimer les fichiers retirés par l'utilisateur
         foreach ($current as $path) {
             if (!in_array($path, $keep)) {
                 ImageOptimizer::delete($path);
             }
         }
 
-        // Nouvelles photos uploadées
         $newGallery = array_values($keep);
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $img) {
-                if ($img && $img->isValid()) {
-                    $newGallery[] = ImageOptimizer::store($img, 'products/gallery');
-                }
+        foreach ($request->input('gallery_uploaded', []) as $path) {
+            if ($path && is_string($path)) {
+                $newGallery[] = $path;
             }
         }
 
@@ -322,5 +319,61 @@ class ProductController extends Controller
             ->with('success', 'Produit "' . $name . '" supprimé avec succès.');
     }
 
-    
+    /**
+     * Upload AJAX d'une seule image (galerie ou principale).
+     * Chaque image est envoyée séparément → jamais de POST trop grand.
+     * Retourne le chemin stocké pour l'injecter dans un champ caché du formulaire.
+     */
+    public function uploadImage(Request $request)
+    {
+        $request->validate([
+            'file'   => ['required', 'file', 'mimes:jpg,jpeg,png,webp,gif', 'max:20480'],
+            'folder' => ['nullable', 'string', 'in:products,products/gallery'],
+        ]);
+
+        $folder = $request->input('folder', 'products/gallery');
+        $path   = ImageOptimizer::store($request->file('file'), $folder);
+
+        return response()->json(['path' => $path, 'url' => ImageOptimizer::url($path, 'medium')]);
+    }
+
+    /**
+     * Filtre les fichiers invalides ou vides d'un champ file[] avant la validation.
+     * Résout l'erreur "The images.X failed to upload." causée par la règle implicite
+     * `uploaded` de Laravel qui s'exécute même quand le fichier est vide ou corrompu.
+     *
+     * IMPORTANT : on utilise \Symfony\Component\HttpFoundation\File\UploadedFile
+     * car $request->files->get() retourne des instances Symfony (pas Laravel).
+     * \Illuminate\Http\UploadedFile étend cette classe, donc le check couvre les deux.
+     */
+    private function cleanImageFiles(Request $request, string $field): void
+    {
+        $value = $request->files->get($field);
+
+        if ($value === null) {
+            return; // rien à nettoyer
+        }
+
+        $isValid = fn($f) =>
+            $f instanceof \Symfony\Component\HttpFoundation\File\UploadedFile
+            && $f->isValid()
+            && $f->getSize() > 0;
+
+        // Fichier unique (champ image principale)
+        if (!is_array($value)) {
+            if (!$isValid($value)) {
+                $request->files->remove($field);
+            }
+            return;
+        }
+
+        // Tableau de fichiers (champ images[])
+        $valid = array_values(array_filter($value, $isValid));
+
+        if (empty($valid)) {
+            $request->files->remove($field);
+        } else {
+            $request->files->set($field, $valid);
+        }
+    }
 }

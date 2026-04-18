@@ -532,7 +532,11 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
                 <div class="amz-card-img" onclick="goToProduct('{{ route('client.orders.createFromProduct', $product) }}')">
                     @if($product->image)
-                        <img src="{{ asset('storage/'.$product->image) }}" alt="{{ $product->name }}" loading="lazy">
+                        <img src="{{ \App\Services\ImageOptimizer::url($product->image, 'thumb') ?? asset('storage/'.$product->image) }}"
+                             srcset="{{ \App\Services\ImageOptimizer::url($product->image, 'thumb') }} 300w,
+                                     {{ \App\Services\ImageOptimizer::url($product->image, 'medium') }} 800w"
+                             sizes="(max-width:600px) 150px, 300px"
+                             alt="{{ $product->name }}" loading="lazy">
                     @else
                         <div class="amz-card-img-ph">🏷️</div>
                     @endif

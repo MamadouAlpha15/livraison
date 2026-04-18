@@ -228,7 +228,11 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                 <div class="prod-gallery-col">
                     <div class="prod-main-img" id="mainImgWrap">
                         @if($product->image)
-                            <img src="{{ asset('storage/'.$product->image) }}" id="mainImg" alt="{{ $product->name }}">
+                            <img src="{{ \App\Services\ImageOptimizer::url($product->image, 'medium') ?? asset('storage/'.$product->image) }}"
+                                 srcset="{{ \App\Services\ImageOptimizer::url($product->image, 'medium') }} 800w,
+                                         {{ \App\Services\ImageOptimizer::url($product->image, 'large') }} 1600w"
+                                 sizes="(max-width:600px) 100vw, 400px"
+                                 id="mainImg" alt="{{ $product->name }}">
                         @else
                             <div class="prod-main-img-ph">🏷️</div>
                         @endif
@@ -344,7 +348,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
                         <div class="order-summary-prod">
                             @if($product->image)
-                                <img src="{{ asset('storage/'.$product->image) }}" class="order-summary-prod-img" alt="">
+                                <img src="{{ \App\Services\ImageOptimizer::url($product->image, 'thumb') ?? asset('storage/'.$product->image) }}" class="order-summary-prod-img" alt="" loading="lazy">
                             @else
                                 <div class="order-summary-prod-ph">🏷️</div>
                             @endif

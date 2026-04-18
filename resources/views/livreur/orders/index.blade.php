@@ -51,9 +51,9 @@
                 @php $item = $order->items->first(); @endphp
                 <div class="d-flex align-items-center gap-2">
                   @if($item->product && $item->product->image)
-                    <img src="{{ asset('storage/'.$item->product->image) }}"
+                    <img src="{{ \App\Services\ImageOptimizer::url($item->product->image, 'thumb') ?? asset('storage/'.$item->product->image) }}"
                          alt="{{ $item->product->name }}"
-                         class="product-thumb border">
+                         class="product-thumb border" loading="lazy">
                   @endif
                   <div class="small">
                     <div class="fw-semibold">{{ $item->product->name ?? 'Produit supprimé' }}</div>
@@ -163,9 +163,9 @@
           @php $item = $order->items->first(); @endphp
           <div class="d-flex align-items-center gap-2 mb-2">
             @if($item->product && $item->product->image)
-              <img src="{{ asset('storage/'.$item->product->image) }}"
+              <img src="{{ \App\Services\ImageOptimizer::url($item->product->image, 'thumb') ?? asset('storage/'.$item->product->image) }}"
                    alt="{{ $item->product->name }}"
-                   class="product-thumb border">
+                   class="product-thumb border" loading="lazy">
             @endif
             <div class="small">
               <div class="fw-semibold">{{ $item->product->name ?? 'Produit supprimé' }}</div>

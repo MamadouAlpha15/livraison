@@ -180,16 +180,19 @@
     {{-- LEFT IMAGE --}}
     <div class="left">
         <img id="mainImage"
-             src="{{ asset('storage/' . $product->image) }}"
+             src="{{ \App\Services\ImageOptimizer::url($product->image, 'medium') ?? asset('storage/'.$product->image) }}"
+             srcset="{{ \App\Services\ImageOptimizer::url($product->image, 'medium') }} 800w,
+                     {{ \App\Services\ImageOptimizer::url($product->image, 'large') }} 1600w"
+             sizes="(max-width:768px) 100vw, 600px"
              class="main-image">
 
         <div class="gallery">
-            <img src="{{ asset('storage/' . $product->image) }}"
-                 onclick="changeImage(this.src)">
+            <img src="{{ \App\Services\ImageOptimizer::url($product->image, 'thumb') ?? asset('storage/'.$product->image) }}"
+                 onclick="changeImage('{{ \App\Services\ImageOptimizer::url($product->image, 'medium') ?? asset('storage/'.$product->image) }}')">
 
             @foreach($gallery as $img)
-                <img src="{{ asset('storage/' . $img) }}"
-                     onclick="changeImage(this.src)">
+                <img src="{{ \App\Services\ImageOptimizer::url($img, 'thumb') ?? asset('storage/'.$img) }}"
+                     onclick="changeImage('{{ \App\Services\ImageOptimizer::url($img, 'medium') ?? asset('storage/'.$img) }}')">
             @endforeach
         </div>
     </div>

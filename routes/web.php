@@ -65,7 +65,7 @@ use App\Http\Controllers\Admin\StatController;
 
 /* ── Contrôleurs : Avis & Reviews ── */
 use App\Http\Controllers\Vendeur\ReviewController as VendeurReviewController;
-use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\Client\ReviewController;
 
 /* ── Contrôleurs : Entreprises de livraison ── */
 use App\Http\Controllers\DeliveryCompanyController;
@@ -341,6 +341,9 @@ Route::middleware(['auth', 'role:vendeur,admin'])->group(function () {
     /* Actions supplémentaires produits */
     Route::post('products/{product}/toggle',    [ProductController::class, 'toggleActive'])->name('products.toggle');
     Route::post('products/{product}/duplicate', [ProductController::class, 'duplicate'])   ->name('products.duplicate');
+
+    /* Upload AJAX image unique (galerie ou principale) — évite le POST trop grand */
+    Route::post('products/upload-image', [ProductController::class, 'uploadImage'])->name('products.upload.image');
 
     /* ── Commandes (vendeur) ── */
     Route::get('orders',                         [VendeurOrderController::class, 'index'])     ->name('orders.index');

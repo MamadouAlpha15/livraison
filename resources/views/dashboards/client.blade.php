@@ -576,20 +576,47 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 /* ══ FILTRES CATÉGORIES ══ */
 .cats {
     display: flex; gap: 8px; margin-bottom: 20px;
-    overflow-x: auto; padding-bottom: 4px;
-    scrollbar-width: none;
+    overflow-x: auto; padding-bottom: 6px;
+    scrollbar-width: none; -ms-overflow-style: none;
 }
 .cats::-webkit-scrollbar { display: none; }
+
+/* ── Pill ── */
 .cat-pill {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 8px 16px; border-radius: 50px; flex-shrink: 0;
     font-size: 13px; font-weight: 600; font-family: var(--font);
     border: 1.5px solid var(--border); background: var(--surface);
     color: var(--text-2); cursor: pointer; white-space: nowrap;
-    text-decoration: none; transition: all .15s;
+    text-decoration: none; transition: all .18s;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+    outline: none;
+    /* bouton reset */
+    appearance: none; -webkit-appearance: none;
 }
-.cat-pill:hover { border-color: var(--orange); color: var(--orange); background: var(--orange-lt); }
-.cat-pill.active { background: var(--orange); color: #fff; border-color: var(--orange-dk); }
+.cat-pill:hover {
+    border-color: var(--orange); color: var(--orange);
+    background: var(--orange-lt);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(240,106,15,.18);
+}
+.cat-pill.active {
+    background: linear-gradient(135deg, var(--orange), var(--orange-dk));
+    color: #fff; border-color: var(--orange-dk);
+    box-shadow: 0 4px 14px rgba(240,106,15,.35);
+    transform: translateY(-1px);
+}
+.cat-pill.active:hover { opacity: .9; }
+
+/* Compteur dans la pill */
+.cat-pill-cnt {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 18px; height: 18px; padding: 0 5px;
+    border-radius: 10px; font-size: 10.5px; font-weight: 700;
+    background: rgba(0,0,0,.08); color: inherit;
+    transition: all .18s;
+}
+.cat-pill.active .cat-pill-cnt { background: rgba(255,255,255,.25); }
 
 /* ══ GRILLE BOUTIQUES ══ */
 .shops-grid {
@@ -1072,36 +1099,118 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     </div>
     @endif
 
-    {{-- Catégories — affiche seulement les types qui ont des boutiques --}}
+    {{-- Catégories — TOUS les types créés par les boutiques --}}
     <div id="categories" style="scroll-margin-top:80px">
         <div class="cats" id="catFilter">
-            {{-- Toutes --}}
-            <a href="#boutiques"
-               class="cat-pill {{ $activeType === '' ? 'active' : '' }}"
-               onclick="filterByType('', this); return false;">
-                🏪 Toutes
-            </a>
             @php
-                /* types distincts des boutiques approuvées */
-                $existingTypes = \App\Models\Shop::where('is_approved', true)
-                    ->whereNotNull('type')->distinct()->pluck('type')->toArray();
-                $catDefs = [
-                    'Alimentation'=>'🍽️','Restaurant'=>'🍽️','Épicerie'=>'🛒','Boulangerie'=>'🥖',
-                    'Vêtements'=>'👗','Bijouterie'=>'💎','Mode'=>'👗',
-                    'Électronique'=>'📱','Informatique'=>'💻','Téléphonie'=>'📞',
-                    'Beauté & Cosmétiques'=>'💄','Pharmacie'=>'💊','Parfumerie'=>'🌸',
+                /* ── Emojis prédéfinis (extensible) ── */
+                $catEmojis = [
+                    'alimentation'          => '🍽️',
+                    'restaurant'            => '🍽️',
+                    'épicerie'              => '🛒',
+                    'epicerie'              => '🛒',
+                    'boulangerie'           => '🥖',
+                    'pâtisserie'            => '🎂',
+                    'patisserie'            => '🎂',
+                    'vêtements'             => '👗',
+                    'vetements'             => '👗',
+                    'mode'                  => '👗',
+                    'bijouterie'            => '💎',
+                    'bijoux'                => '💎',
+                    'électronique'          => '📱',
+                    'electronique'          => '📱',
+                    'informatique'          => '💻',
+                    'téléphonie'            => '📞',
+                    'telephonie'            => '📞',
+                    'beauté & cosmétiques'  => '💄',
+                    'beaute & cosmetiques'  => '💄',
+                    'beauté'                => '💄',
+                    'beaute'                => '💄',
+                    'cosmétiques'           => '💄',
+                    'cosmetiques'           => '💄',
+                    'pharmacie'             => '💊',
+                    'parfumerie'            => '🌸',
+                    'auto & moto'           => '🚗',
+                    'auto'                  => '🚗',
+                    'moto'                  => '🏍️',
+                    'automobile'            => '🚗',
+                    'sport'                 => '⚽',
+                    'sport & loisirs'       => '⚽',
+                    'jouets'                => '🧸',
+                    'enfants'               => '🧸',
+                    'maison'                => '🏠',
+                    'décoration'            => '🏠',
+                    'decoration'            => '🏠',
+                    'mobilier'              => '🛋️',
+                    'librairie'             => '📚',
+                    'livres'                => '📚',
+                    'musique'               => '🎵',
+                    'téléphone'             => '📱',
+                    'telephone'             => '📱',
+                    'high-tech'             => '🖥️',
+                    'high tech'             => '🖥️',
+                    'jardin'                => '🌿',
+                    'agriculture'           => '🌾',
+                    'animalerie'            => '🐾',
+                    'voyage'                => '✈️',
+                    'artisanat'             => '🎨',
+                    'art'                   => '🎨',
+                    'santé'                 => '🏥',
+                    'sante'                 => '🏥',
+                    'médical'               => '🏥',
+                    'medical'               => '🏥',
+                    'construction'          => '🏗️',
+                    'quincaillerie'         => '🔧',
+                    'outillage'             => '🔧',
+                    'fournitures'           => '✏️',
+                    'bureau'                => '✏️',
+                    'supermarché'           => '🛒',
+                    'supermarche'           => '🛒',
+                    'épices'                => '🌶️',
+                    'épice'                 => '🌶️',
+                    'boissons'              => '🥤',
+                    'chaussures'            => '👟',
+                    'accessoires'           => '👜',
+                    'sacs'                  => '👜',
                 ];
-                /* on n'affiche que les types qui existent en base */
-                $typesToShow = array_filter($existingTypes, fn($t) => isset($catDefs[$t]));
-                /* dédoublonnage et tri */
-                sort($typesToShow);
+
+                /* Récupère TOUS les types distincts des boutiques approuvées du pays */
+                $existingTypes = \App\Models\Shop::where('is_approved', true)
+                    ->whereNotNull('type')
+                    ->where('type', '!=', '')
+                    ->when(auth()->user()?->country, fn($q, $c) => $q->where('country', $c))
+                    ->distinct()
+                    ->orderBy('type')
+                    ->pluck('type')
+                    ->toArray();
+
+                /* Fonction : trouver l'emoji pour un type (clé normalisée) */
+                $getEmoji = function(string $type) use ($catEmojis): string {
+                    $key = mb_strtolower(trim($type));
+                    // Correspondance exacte d'abord
+                    if (isset($catEmojis[$key])) return $catEmojis[$key];
+                    // Correspondance partielle (ex: "Auto & Moto occasion" → 'auto')
+                    foreach ($catEmojis as $k => $e) {
+                        if (str_contains($key, $k)) return $e;
+                    }
+                    return '🏪'; // fallback
+                };
             @endphp
-            @foreach($typesToShow as $t)
-            <a href="#boutiques"
-               class="cat-pill {{ $activeType === $t ? 'active' : '' }}"
-               onclick="filterByType('{{ $t }}', this); return false;">
-                {{ $catDefs[$t] ?? '🏪' }} {{ $t }}
-            </a>
+
+            {{-- Pill "Toutes" --}}
+            <button class="cat-pill {{ $activeType === '' ? 'active' : '' }}"
+                    onclick="filterByType('', this)">
+                🏪 Toutes <span class="cat-pill-cnt" id="catCntAll">{{ $shops->total() }}</span>
+            </button>
+
+            {{-- Une pill par type existant en base --}}
+            @foreach($existingTypes as $t)
+            <button class="cat-pill {{ $activeType === $t ? 'active' : '' }}"
+                    data-type-val="{{ $t }}"
+                    onclick="filterByType(this.dataset.typeVal, this)">
+                {{ $getEmoji($t) }} {{ $t }}
+                <span class="cat-pill-cnt" data-cat="{{ $t }}">…</span>
+            </button>
             @endforeach
         </div>
     </div>
@@ -1655,26 +1764,55 @@ document.getElementById('globalSearch')?.addEventListener('keydown', e => {
 });
 
 /* ══════════════════════════════════════════
-   FILTRE CATÉGORIES — SANS SCROLL EN HAUT
+   FILTRE CATÉGORIES
 ══════════════════════════════════════════ */
+
+/* Initialise les compteurs par catégorie au chargement */
+(function initCatCounts() {
+    const counts = {};
+    document.querySelectorAll('#shopsGrid .shop-card').forEach(card => {
+        const t = (card.dataset.type || '').toLowerCase();
+        counts[t] = (counts[t] || 0) + 1;
+    });
+
+    // Total dans pill "Toutes"
+    const allEl = document.getElementById('catCntAll');
+    if (allEl) {
+        const total = document.querySelectorAll('#shopsGrid .shop-card').length;
+        allEl.textContent = total;
+    }
+
+    // Compteur par catégorie
+    document.querySelectorAll('#catFilter .cat-pill-cnt[data-cat]').forEach(el => {
+        const key = (el.dataset.cat || '').toLowerCase();
+        el.textContent = counts[key] || 0;
+    });
+})();
+
 function filterByType(type, pillEl) {
-    /* 1. Mise à jour pills actives */
+    /* 1. Pills actives */
     document.querySelectorAll('#catFilter .cat-pill').forEach(p => p.classList.remove('active'));
     pillEl.classList.add('active');
 
-    /* 2. Filtre visuel des cartes */
+    /* 2. Filtre cartes — comparaison exacte (insensible à la casse) */
     let count = 0;
     document.querySelectorAll('#shopsGrid .shop-card').forEach(card => {
-        const cardType = card.dataset.type || '';
-        const match = !type || cardType.includes(type.toLowerCase());
+        const cardType = (card.dataset.type || '').toLowerCase();
+        const filterKey = type.toLowerCase();
+        const match = !type || cardType === filterKey;
         card.style.display = match ? '' : 'none';
         if (match) count++;
     });
+
+    /* 3. Mise à jour compteur global */
     const sc = document.getElementById('shopCount');
     if (sc) sc.textContent = count;
 
-    /* 3. Si besoin AJAX pour charger d'autres pages (optionnel — désactivé ici) */
-    /* 4. Ne pas remonter en haut — pas de changement d'URL */
+    /* 4. Mise à jour compteur "Toutes" */
+    const allEl = document.getElementById('catCntAll');
+    if (allEl && !type) {
+        allEl.textContent = document.querySelectorAll('#shopsGrid .shop-card').length;
+    }
 }
 
 /* ══════════════════════════════════════════

@@ -1,160 +1,773 @@
 @extends('layouts.app')
+@php $bodyClass = 'is-dashboard'; @endphp
 
 @push('styles')
 <style>
-/* ====== General ====== */
-body { background-color: #f8f9fa; }
-.card { border-radius: 1rem; transition: transform .2s, box-shadow .2s; }
-.card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
-.badge { font-size: .85rem; }
-.table thead { background-color: #0d6efd; color: white; }
-.table td, .table th { vertical-align: middle; }
-img.product-thumb { width: 80px; height: 80px; object-fit: cover; border-radius: .5rem; }
+*, *::before, *::after { box-sizing: border-box; }
 
-/* ====== Responsive Cards ====== */
-.order-card { border-radius: 1rem; transition: transform .2s, box-shadow .2s; }
-.order-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-@media(max-width:767.98px){
-    .order-card { padding: 1rem; margin-bottom: 1rem; }
-    img.product-thumb { width: 60px; height: 60px; }
+:root {
+    --orange:    #f06a0f;
+    --orange-dk: #d45a00;
+    --orange-lt: #fff4ec;
+    --orange-bd: #fcd9b6;
+    --green:     #10b981;
+    --green-lt:  #ecfdf5;
+    --blue:      #3b82f6;
+    --blue-lt:   #eff6ff;
+    --yellow:    #f59e0b;
+    --yellow-lt: #fffbeb;
+    --red:       #ef4444;
+    --red-lt:    #fef2f2;
+    --text:      #0f172a;
+    --text-2:    #475569;
+    --muted:     #94a3b8;
+    --border:    #e2e8f0;
+    --surface:   #ffffff;
+    --bg:        #f8f9fc;
+    --font:      system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --mono:      'JetBrains Mono', 'Fira Code', monospace;
+    --r:         14px;
+    --r-sm:      9px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
+    --shadow:    0 4px 20px rgba(0,0,0,.08);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,.12);
+}
+
+html, body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Page wrapper ── */
+.orders-page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 28px 16px 60px;
+}
+
+/* ── Top Bar ── */
+.top-bar {
+    background: linear-gradient(135deg, var(--orange) 0%, var(--orange-dk) 60%, #b84e00 100%);
+    margin: -28px -16px 28px;
+    padding: 0 20px;
+    height: 62px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 4px 18px rgba(240,106,15,.35);
+    position: relative;
+    overflow: hidden;
+}
+.top-bar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+}
+.top-bar::after {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.07);
+    pointer-events: none;
+}
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: rgba(255,255,255,.18);
+    border: 1.5px solid rgba(255,255,255,.35);
+    border-radius: 30px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: var(--font);
+    text-decoration: none;
+    backdrop-filter: blur(4px);
+    transition: all .18s;
+    white-space: nowrap;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+}
+.btn-back:hover {
+    background: rgba(255,255,255,.30);
+    border-color: rgba(255,255,255,.6);
+    color: #fff;
+    transform: translateX(-2px);
+    box-shadow: 0 3px 12px rgba(0,0,0,.15);
+}
+.btn-back svg {
+    width: 15px; height: 15px;
+    stroke: #fff;
+    flex-shrink: 0;
+    transition: transform .18s;
+}
+.btn-back:hover svg { transform: translateX(-2px); }
+.top-bar-title {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+.top-bar-title h1 {
+    font-size: 17px;
+    font-weight: 800;
+    color: #fff;
+    margin: 0;
+    letter-spacing: -.3px;
+    line-height: 1.2;
+    text-shadow: 0 1px 3px rgba(0,0,0,.15);
+}
+.top-bar-title p {
+    font-size: 11.5px;
+    color: rgba(255,255,255,.78);
+    margin: 2px 0 0;
+    font-weight: 500;
+}
+.top-bar-ico {
+    font-size: 28px;
+    position: relative;
+    z-index: 1;
+    opacity: .9;
+    flex-shrink: 0;
+}
+
+/* ── Stats ── */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+}
+.stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: var(--shadow-sm);
+    transition: transform .15s, box-shadow .15s;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.stat-ico {
+    width: 42px; height: 42px;
+    border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 19px; flex-shrink: 0;
+}
+.stat-ico.orange { background: var(--orange-lt); }
+.stat-ico.yellow { background: var(--yellow-lt); }
+.stat-ico.blue   { background: var(--blue-lt); }
+.stat-ico.green  { background: var(--green-lt); }
+.stat-val {
+    font-size: 22px; font-weight: 800; color: var(--text);
+    letter-spacing: -.5px; line-height: 1;
+}
+.stat-lbl { font-size: 11.5px; color: var(--muted); margin-top: 3px; font-weight: 500; }
+
+/* ── Filtres ── */
+.filter-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+.filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-2);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all .15s;
+    white-space: nowrap;
+}
+.filter-btn:hover { border-color: var(--orange); color: var(--orange); }
+.filter-btn.active {
+    background: var(--orange);
+    border-color: var(--orange-dk);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(240,106,15,.3);
+}
+.filter-btn .cnt {
+    background: rgba(0,0,0,.08);
+    border-radius: 20px;
+    padding: 1px 7px;
+    font-size: 11px;
+}
+.filter-btn.active .cnt { background: rgba(255,255,255,.25); }
+
+/* ── Order cards ── */
+.orders-list { display: flex; flex-direction: column; gap: 14px; }
+
+.order-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--r);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: transform .15s, box-shadow .15s, border-color .15s;
+}
+.order-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+    border-color: var(--orange-bd);
+}
+
+/* Card top strip coloré selon le statut */
+.order-card-strip {
+    height: 3px;
+    width: 100%;
+}
+.strip-pending  { background: linear-gradient(90deg, var(--yellow), #fbbf24); }
+.strip-confirm  { background: linear-gradient(90deg, var(--blue), #60a5fa); }
+.strip-delivery { background: linear-gradient(90deg, var(--orange), #fb923c); }
+.strip-done     { background: linear-gradient(90deg, var(--green), #34d399); }
+.strip-cancel   { background: linear-gradient(90deg, var(--red), #f87171); }
+
+.order-card-body {
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: 72px 1fr auto;
+    gap: 14px;
+    align-items: start;
+}
+
+/* Image produit */
+.order-thumb {
+    width: 72px; height: 72px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+}
+.order-thumb-placeholder {
+    width: 72px; height: 72px;
+    border-radius: 10px;
+    background: var(--orange-lt);
+    border: 1.5px solid var(--orange-bd);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; flex-shrink: 0;
+}
+
+/* Info centrale */
+.order-info {}
+.order-meta {
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap; margin-bottom: 5px;
+}
+.order-num {
+    font-size: 11px; font-weight: 700;
+    color: var(--orange); font-family: var(--mono);
+    background: var(--orange-lt);
+    border: 1px solid var(--orange-bd);
+    border-radius: 5px; padding: 2px 7px;
+}
+.order-date { font-size: 11.5px; color: var(--muted); }
+.order-shop {
+    font-size: 15px; font-weight: 700; color: var(--text);
+    margin-bottom: 3px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.order-product {
+    font-size: 12.5px; color: var(--text-2);
+    margin-bottom: 8px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.order-items-extra {
+    font-size: 11.5px; color: var(--muted);
+    font-style: italic;
+}
+
+/* Badge statut */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 11px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    border: 1.5px solid;
+}
+.status-pending  { background: var(--yellow-lt); color: #92400e; border-color: #fde68a; }
+.status-confirm  { background: var(--blue-lt);   color: #1e40af; border-color: #bfdbfe; }
+.status-delivery { background: var(--orange-lt); color: var(--orange-dk); border-color: var(--orange-bd); }
+.status-done     { background: var(--green-lt);  color: #065f46; border-color: #a7f3d0; }
+.status-cancel   { background: var(--red-lt);    color: #991b1b; border-color: #fecaca; }
+
+/* Droite */
+.order-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+}
+.order-total {
+    font-size: 17px; font-weight: 800; color: var(--text);
+    font-family: var(--mono); letter-spacing: -.5px;
+    white-space: nowrap;
+}
+.order-currency {
+    font-size: 11px; font-weight: 600; color: var(--muted);
+}
+
+/* Barre de progression statut */
+.order-progress {
+    padding: 12px 20px 16px;
+    border-top: 1px solid var(--border);
+    background: #fafbfc;
+}
+.progress-steps {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+.progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 14px; left: 14px; right: 14px;
+    height: 2px;
+    background: var(--border);
+    z-index: 0;
+}
+.progress-fill {
+    position: absolute;
+    top: 14px; left: 14px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--orange), #fb923c);
+    z-index: 1;
+    transition: width .4s ease;
+}
+.prog-step {
+    display: flex; flex-direction: column; align-items: center;
+    flex: 1; position: relative; z-index: 2;
+}
+.prog-dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; margin-bottom: 5px;
+    transition: all .25s;
+}
+.prog-dot.done {
+    background: var(--orange);
+    border-color: var(--orange-dk);
+    color: #fff;
+    box-shadow: 0 0 0 3px var(--orange-lt);
+}
+.prog-dot.current {
+    background: var(--surface);
+    border-color: var(--orange);
+    color: var(--orange);
+    box-shadow: 0 0 0 3px var(--orange-lt);
+    animation: pulse-dot 1.5s infinite;
+}
+.prog-dot.canceled {
+    background: var(--red-lt);
+    border-color: var(--red);
+    color: var(--red);
+}
+@keyframes pulse-dot {
+    0%,100% { box-shadow: 0 0 0 3px var(--orange-lt); }
+    50%      { box-shadow: 0 0 0 6px rgba(240,106,15,.15); }
+}
+.prog-lbl {
+    font-size: 10px; font-weight: 600;
+    color: var(--muted); text-align: center;
+    line-height: 1.2;
+}
+.prog-lbl.active { color: var(--orange); }
+
+/* Footer carte */
+.order-card-footer {
+    padding: 10px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+    background: #fafbfc;
+}
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 14px;
+    border-radius: var(--r-sm);
+    font-size: 12.5px;
+    font-weight: 600;
+    font-family: var(--font);
+    cursor: pointer;
+    text-decoration: none;
+    border: 1.5px solid;
+    transition: all .15s;
+    white-space: nowrap;
+}
+.btn-track {
+    background: var(--orange-lt);
+    border-color: var(--orange-bd);
+    color: var(--orange-dk);
+}
+.btn-track:hover {
+    background: var(--orange);
+    color: #fff;
+    border-color: var(--orange-dk);
+}
+.btn-review {
+    background: var(--green-lt);
+    border-color: #a7f3d0;
+    color: #065f46;
+}
+.btn-review:hover {
+    background: var(--green);
+    color: #fff;
+    border-color: var(--green);
+}
+.btn-cancel-sm {
+    background: var(--red-lt);
+    border-color: #fecaca;
+    color: #991b1b;
+}
+.btn-cancel-sm:hover {
+    background: var(--red);
+    color: #fff;
+    border-color: var(--red);
+}
+
+/* ── Empty state ── */
+.empty-state {
+    text-align: center;
+    padding: 64px 24px;
+    background: var(--surface);
+    border: 2px dashed var(--border);
+    border-radius: var(--r);
+}
+.empty-ico { font-size: 52px; margin-bottom: 16px; opacity: .6; }
+.empty-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.empty-sub { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+
+/* ── Pagination ── */
+.pagination-wrap { margin-top: 28px; display: flex; justify-content: center; }
+.pagination-wrap .pagination { gap: 4px; display: flex; flex-wrap: wrap; justify-content: center; }
+.pagination-wrap .page-link {
+    border-radius: 8px !important;
+    border: 1.5px solid var(--border) !important;
+    color: var(--text-2) !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    padding: 7px 13px !important;
+    transition: all .15s !important;
+}
+.pagination-wrap .page-link:hover {
+    background: var(--orange-lt) !important;
+    border-color: var(--orange-bd) !important;
+    color: var(--orange) !important;
+}
+.pagination-wrap .page-item.active .page-link {
+    background: var(--orange) !important;
+    border-color: var(--orange-dk) !important;
+    color: #fff !important;
+    box-shadow: 0 2px 8px rgba(240,106,15,.3) !important;
+}
+
+/* ── Flash ── */
+.flash-success {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--green-lt);
+    border: 1.5px solid #a7f3d0;
+    border-radius: var(--r-sm);
+    padding: 12px 16px;
+    font-size: 13.5px; font-weight: 500; color: #065f46;
+    margin-bottom: 20px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .order-card-body { grid-template-columns: 56px 1fr; }
+    .order-right { flex-direction: row; align-items: center; grid-column: 1 / -1; border-top: 1px solid var(--border); padding-top: 10px; }
+    .order-total { font-size: 15px; }
+    .order-thumb, .order-thumb-placeholder { width: 56px; height: 56px; }
+    .prog-lbl { display: none; }
+    .top-bar { margin: -28px -12px 24px; padding: 0 14px; height: 56px; }
+    .top-bar-title h1 { font-size: 15px; }
+    .btn-back { padding: 7px 13px; font-size: 12.5px; }
+}
+@media (max-width: 420px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .stat-card { padding: 12px 14px; }
+    .stat-val { font-size: 18px; }
+    .orders-page { padding: 16px 12px 40px; }
+    .filter-bar { gap: 4px; }
+    .filter-btn { padding: 6px 11px; font-size: 12px; }
+    .top-bar { margin: -16px -12px 20px; height: 52px; }
+    .top-bar-title p { display: none; }
 }
 </style>
 @endpush
 
 @section('content')
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>📦 Mes commandes</h2>
+@php
+use App\Models\Order;
+
+$statusConfig = [
+    Order::STATUS_EN_ATTENTE   => ['class'=>'pending',  'strip'=>'strip-pending',  'label'=>'En attente',  'ico'=>'⏳', 'step'=>0],
+    Order::STATUS_CONFIRMEE    => ['class'=>'confirm',  'strip'=>'strip-confirm',  'label'=>'Confirmée',   'ico'=>'📦', 'step'=>1],
+    Order::STATUS_EN_LIVRAISON => ['class'=>'delivery', 'strip'=>'strip-delivery', 'label'=>'En livraison','ico'=>'🚚', 'step'=>2],
+    Order::STATUS_LIVREE       => ['class'=>'done',     'strip'=>'strip-done',     'label'=>'Livrée',      'ico'=>'✅', 'step'=>3],
+    Order::STATUS_ANNULEE      => ['class'=>'cancel',   'strip'=>'strip-cancel',   'label'=>'Annulée',     'ico'=>'❌', 'step'=>-1],
+];
+
+// Compteurs
+$totalCount    = $orders->total();
+$pendingCount  = $orders->getCollection()->where('status', Order::STATUS_EN_ATTENTE)->count();
+$deliveryCount = $orders->getCollection()->where('status', Order::STATUS_EN_LIVRAISON)->count();
+$doneCount     = $orders->getCollection()->where('status', Order::STATUS_LIVREE)->count();
+
+// Filtre actif (URL ?status=...)
+$activeFilter  = request('status', 'all');
+
+// Devise de la première commande
+$devise = $orders->first()?->shop?->currency ?? 'GNF';
+@endphp
+
+<div class="orders-page">
+
+    {{-- ── Top Bar ── --}}
+    <div class="top-bar">
+        <a href="{{ route('client.dashboard') }}" class="btn-back">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"/>
+            </svg>
+            Retour
+        </a>
+        <div class="top-bar-title">
+            <h1>Mes commandes</h1>
+            <p>Suivez toutes vos commandes en temps réel</p>
+        </div>
+        <div class="top-bar-ico">📦</div>
     </div>
 
+    {{-- ── Flash ── --}}
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+    <div class="flash-success">
+        <span style="font-size:18px">✅</span>
+        {{ session('success') }}
+    </div>
     @endif
 
-    {{-- Desktop Table --}}
-    <div class="d-none d-md-block">
-        <table class="table table-hover table-bordered align-middle">
-            <thead class="table-primary">
-                <tr>
-                    <th>#</th>
-                    <th>Boutique</th>
-                    <th>Produit</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($orders as $order)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $order->shop->name }}</td>
-                    <td>
-                        @if($order->items->first()?->product?->image)
-                            <img src="{{ asset('storage/' . $order->items->first()->product->image) }}" 
-                                 alt="Produit" class="product-thumb">
-                            <div class="small mt-1">{{ Str::limit($order->items->first()->product->name, 30) }}</div>
-                        @else
-                            <span class="text-muted">Aucun produit</span>
-                        @endif
-                    </td>
-                    <td class="fw-bold">{{ number_format($order->total, 0, ',', ' ') }} GNF</td>
-                    <td>
-                        @switch($order->status)
-                            @case(\App\Models\Order::STATUS_EN_ATTENTE)
-                                <span class="badge bg-warning text-dark">⏳ En attente</span>
-                            @break
-                            @case(\App\Models\Order::STATUS_CONFIRMEE)
-                                <span class="badge bg-info text-dark">📦 Confirmée</span>
-                            @break
-                            @case(\App\Models\Order::STATUS_EN_LIVRAISON)
-                                <span class="badge bg-primary text-white">🚚 En livraison</span>
-                            @break
-                            @case(\App\Models\Order::STATUS_LIVREE)
-                                <span class="badge bg-success">✅ Livrée</span>
-                            @break
-                            @case(\App\Models\Order::STATUS_ANNULEE)
-                                <span class="badge bg-danger">❌ Annulée</span>
-                            @break
-                            @default
-                                <span class="badge bg-secondary">❔ Inconnu</span>
-                        @endswitch
-                    </td>
-                    <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="6" class="text-center text-muted">Aucune commande.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-        <div class="mt-3">{{ $orders->links() }}</div>
+    {{-- ── Stats ── --}}
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-ico orange">📦</div>
+            <div>
+                <div class="stat-val">{{ $orders->total() }}</div>
+                <div class="stat-lbl">Total commandes</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-ico yellow">⏳</div>
+            <div>
+                <div class="stat-val">{{ $pendingCount }}</div>
+                <div class="stat-lbl">En attente</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-ico blue">🚚</div>
+            <div>
+                <div class="stat-val">{{ $deliveryCount }}</div>
+                <div class="stat-lbl">En livraison</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-ico green">✅</div>
+            <div>
+                <div class="stat-val">{{ $doneCount }}</div>
+                <div class="stat-lbl">Livrées</div>
+            </div>
+        </div>
     </div>
 
-    {{-- Mobile Cards --}}
-    <div class="d-md-none">
-        @forelse($orders as $order)
-        <div class="card shadow-sm order-card mb-3">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <div>
-                        <h5 class="fw-bold mb-1">{{ $order->shop->name }}</h5>
-                        <p class="text-muted mb-1">Total : {{ number_format($order->total, 0, ',', ' ') }} GNF</p>
-                        <p class="text-muted mb-0">{{ $order->created_at->format('d/m/Y H:i') }}</p>
+    {{-- ── Filtres ── --}}
+    <div class="filter-bar">
+        <a href="{{ request()->fullUrlWithQuery(['status' => 'all']) }}"
+           class="filter-btn {{ $activeFilter === 'all' ? 'active' : '' }}">
+            Toutes <span class="cnt">{{ $orders->total() }}</span>
+        </a>
+        <a href="{{ request()->fullUrlWithQuery(['status' => Order::STATUS_EN_ATTENTE]) }}"
+           class="filter-btn {{ $activeFilter === Order::STATUS_EN_ATTENTE ? 'active' : '' }}">
+            ⏳ En attente
+        </a>
+        <a href="{{ request()->fullUrlWithQuery(['status' => Order::STATUS_CONFIRMEE]) }}"
+           class="filter-btn {{ $activeFilter === Order::STATUS_CONFIRMEE ? 'active' : '' }}">
+            📦 Confirmées
+        </a>
+        <a href="{{ request()->fullUrlWithQuery(['status' => Order::STATUS_EN_LIVRAISON]) }}"
+           class="filter-btn {{ $activeFilter === Order::STATUS_EN_LIVRAISON ? 'active' : '' }}">
+            🚚 En livraison
+        </a>
+        <a href="{{ request()->fullUrlWithQuery(['status' => Order::STATUS_LIVREE]) }}"
+           class="filter-btn {{ $activeFilter === Order::STATUS_LIVREE ? 'active' : '' }}">
+            ✅ Livrées
+        </a>
+        <a href="{{ request()->fullUrlWithQuery(['status' => Order::STATUS_ANNULEE]) }}"
+           class="filter-btn {{ $activeFilter === Order::STATUS_ANNULEE ? 'active' : '' }}">
+            ❌ Annulées
+        </a>
+    </div>
+
+    {{-- ── Liste des commandes ── --}}
+    @if($orders->isEmpty())
+    <div class="empty-state">
+        <div class="empty-ico">🛍️</div>
+        <div class="empty-title">Aucune commande trouvée</div>
+        <div class="empty-sub">Vous n'avez pas encore passé de commande.<br>Découvrez nos boutiques et commencez vos achats !</div>
+        <a href="{{ route('client.dashboard') }}" class="btn-back" style="background:linear-gradient(135deg,var(--orange),var(--orange-dk));border-color:transparent;box-shadow:0 4px 14px rgba(240,106,15,.35)">
+            🏪 Découvrir les boutiques
+        </a>
+    </div>
+    @else
+    <div class="orders-list">
+        @foreach($orders as $order)
+        @php
+            $cfg     = $statusConfig[$order->status] ?? $statusConfig[Order::STATUS_EN_ATTENTE];
+            $step    = $cfg['step'];
+            $firstItem   = $order->items->first();
+            $firstProduct = $firstItem?->product;
+            $extraItems  = $order->items->count() - 1;
+            $devise      = $order->shop?->currency ?? 'GNF';
+
+            // Progression (0=attente, 1=confirmée, 2=livraison, 3=livrée)
+            $steps = [
+                ['ico'=>'🕐','lbl'=>'Reçue'],
+                ['ico'=>'📦','lbl'=>'Confirmée'],
+                ['ico'=>'🚚','lbl'=>'En route'],
+                ['ico'=>'🏠','lbl'=>'Livrée'],
+            ];
+            $fillPct = $step >= 0 ? min(($step / 3) * 100, 100) : 0;
+        @endphp
+
+        <div class="order-card">
+            {{-- Strip coloré --}}
+            <div class="order-card-strip {{ $cfg['strip'] }}"></div>
+
+            {{-- Corps principal --}}
+            <div class="order-card-body">
+
+                {{-- Image produit --}}
+                @if($firstProduct?->image)
+                    <img src="{{ \App\Services\ImageOptimizer::url($firstProduct->image, 'thumb') ?? asset('storage/'.$firstProduct->image) }}"
+                         alt="{{ $firstProduct->name }}"
+                         class="order-thumb"
+                         loading="lazy"
+                         width="72" height="72">
+                @else
+                    <div class="order-thumb-placeholder">🛍️</div>
+                @endif
+
+                {{-- Infos ── --}}
+                <div class="order-info">
+                    <div class="order-meta">
+                        <span class="order-num">#{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</span>
+                        <span class="order-date">{{ $order->created_at->format('d/m/Y · H:i') }}</span>
                     </div>
+                    <div class="order-shop">🏪 {{ $order->shop?->name ?? '—' }}</div>
+                    @if($firstProduct)
+                    <div class="order-product">
+                        {{ Str::limit($firstProduct->name, 40) }}
+                        @if($extraItems > 0)
+                            <span class="order-items-extra">+ {{ $extraItems }} autre{{ $extraItems > 1 ? 's' : '' }}</span>
+                        @endif
+                    </div>
+                    @endif
+                    <span class="status-badge status-{{ $cfg['class'] }}">
+                        {{ $cfg['ico'] }} {{ $cfg['label'] }}
+                    </span>
+                </div>
+
+                {{-- Total ── --}}
+                <div class="order-right">
                     <div>
-                        @switch($order->status)
-                            @case(\App\Models\Order::STATUS_EN_ATTENTE)
-                                <span class="badge bg-warning text-dark">⏳</span>
-                            @break
-                            @case(\App\Models\Order::STATUS_CONFIRMEE)
-                                <span class="badge bg-info text-dark">📦</span>
-                            @break
-                            @case(\App\Models\Order::STATUS_EN_LIVRAISON)
-                                <span class="badge bg-primary text-white">🚚</span>
-                            @break
-                            @case(\App\Models\Order::STATUS_LIVREE)
-                                <span class="badge bg-success">✅</span>
-                            @break
-                            @case(\App\Models\Order::STATUS_ANNULEE)
-                                <span class="badge bg-danger">❌</span>
-                            @break
-                            @default
-                                <span class="badge bg-secondary">❔</span>
-                        @endswitch
+                        <div class="order-total">{{ number_format($order->total, 0, ',', ' ') }}</div>
+                        <div class="order-currency">{{ $devise }}</div>
                     </div>
                 </div>
 
-                {{-- Produit image --}}
-                @if($order->items->first()?->product?->image)
-                    <div class="text-center mb-2">
-                        <img src="{{ asset('storage/' . $order->items->first()->product->image) }}" 
-                             alt="Produit" class="product-thumb">
-                        <div class="small mt-1">{{ Str::limit($order->items->first()->product->name, 30) }}</div>
-                    </div>
-                @endif
+            </div>
 
-                {{-- Action buttons --}}
-                <div class="d-flex gap-2 mt-2">
-                    <a href="{{ route('orders.show', $order) }}" class="btn btn-outline-primary btn-sm flex-fill">🔎 Détails</a>
-                    @if($order->status == \App\Models\Order::STATUS_EN_ATTENTE)
-                        <form action="{{ route('orders.confirm', $order) }}" method="POST" class="flex-fill">
-                            @csrf @method('PUT')
-                            <button class="btn btn-success btn-sm w-100">✅ Confirmer</button>
-                        </form>
-                        <form action="{{ route('orders.cancel', $order) }}" method="POST" class="flex-fill">
-                            @csrf @method('PUT')
-                            <button class="btn btn-danger btn-sm w-100">❌ Annuler</button>
-                        </form>
+            {{-- Barre de progression (pas pour les annulées) ── --}}
+            @if($step >= 0)
+            <div class="order-progress">
+                <div class="progress-steps">
+                    <div class="progress-fill" style="width: {{ $fillPct }}%"></div>
+                    @foreach($steps as $i => $s)
+                    <div class="prog-step">
+                        <div class="prog-dot {{ $i < $step ? 'done' : ($i === $step ? 'current' : '') }}">
+                            @if($i < $step) ✓ @else {{ $s['ico'] }} @endif
+                        </div>
+                        <div class="prog-lbl {{ $i === $step ? 'active' : '' }}">{{ $s['lbl'] }}</div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @else
+            {{-- Annulée ── --}}
+            <div style="padding:10px 20px;background:#fef2f2;border-top:1px solid #fecaca;font-size:12px;color:#991b1b;font-weight:600;display:flex;align-items:center;gap:6px">
+                ❌ Cette commande a été annulée
+            </div>
+            @endif
+
+            {{-- Footer actions ── --}}
+            <div class="order-card-footer">
+                <div style="font-size:11.5px;color:var(--muted)">
+                    Qté : <strong style="color:var(--text)">{{ $order->items->sum('quantity') }}</strong> article{{ $order->items->sum('quantity') > 1 ? 's' : '' }}
+                    &middot; {{ $order->items->count() }} produit{{ $order->items->count() > 1 ? 's' : '' }}
+                </div>
+                <div style="display:flex;gap:7px;flex-wrap:wrap">
+                    {{-- Suivre ── --}}
+                    <a href="{{ route('orders.show', $order) }}" class="btn-action btn-track">
+                        🔍 Suivre
+                    </a>
+                    {{-- Avis (si livrée et pas encore d'avis) ── --}}
+                    @if($order->status === Order::STATUS_LIVREE && !$order->review)
+                    <a href="{{ route('client.reviews.create', $order) }}" class="btn-action btn-review">
+                        ⭐ Laisser un avis
+                    </a>
                     @endif
                 </div>
             </div>
+
         </div>
-        @empty
-        <div class="text-center text-muted">Aucune commande.</div>
-        @endforelse
-        <div class="mt-3">{{ $orders->links() }}</div>
+        @endforeach
     </div>
+
+    {{-- Pagination ── --}}
+    <div class="pagination-wrap">
+        {{ $orders->appends(request()->query())->links() }}
+    </div>
+    @endif
+
 </div>
 @endsection
