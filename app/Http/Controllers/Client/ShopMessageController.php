@@ -416,6 +416,47 @@ class ShopMessageController extends Controller
         ]);
     }
 
+    // GET /client/notifications/poll — temps réel commandes + messages
+    public function pollAll(Request $request)
+    {
+        $client = Auth::user();
+
+        $messagesUnread = ShopMessage::where('receiver_id', $client->id)
+            ->whereNull('read_at')
+            ->count();
+
+        $orders = \App\Models\Order::where('user_id', $client->id)
+            ->with('shop:id,name,image')
+            ->latest('updated_at')
+            ->take(5)
+            ->get()
+            ->map(fn($o) => [
+                'id'           => $o->id,
+                'status'       => $o->status,
+                'updated_at'   => $o->updated_at->toIso8601String(),
+                'shop_name'    => $o->shop?->name ?? 'Boutique',
+                'total'        => $o->total,
+            ]);
+
+        $popularShops = \App\Models\Shop::where('is_approved', true)
+            ->withCount(['orders as orders_count' => fn($q) => $q->where('status','livrée')])
+            ->orderByDesc('orders_count')
+            ->take(5)
+            ->get()
+            ->map(fn($s) => [
+                'id'          => $s->id,
+                'name'        => $s->name,
+                'orders_count'=> $s->orders_count,
+                'image'       => $s->image ? asset('storage/'.$s->image) : null,
+            ]);
+
+        return response()->json([
+            'messages_unread' => $messagesUnread,
+            'orders'          => $orders,
+            'popular_shops'   => $popularShops,
+        ]);
+    }
+
     private function getDevise($shop): string
     {
         // Si la boutique a une devise définie, on la retourne

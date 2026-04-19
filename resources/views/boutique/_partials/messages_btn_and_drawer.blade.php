@@ -342,11 +342,10 @@
 
 {{-- ══ BOUTON TOPBAR → redirige vers le hub dédié ══ --}}
 <a href="{{ route('boutique.messages.hub') }}"
-   class="msg-topbar-btn {{ $totalUnread > 0 ? 'has-unread' : '' }}">
+   class="msg-topbar-btn {{ $totalUnread > 0 ? 'has-unread' : '' }}" id="msgTopbarBtn">
     💬 <span class="btn-label">Messages</span>
-    @if($totalUnread > 0)
-    <span class="msg-topbar-count" id="msgTopbarCount">{{ $totalUnread }}</span>
-    @endif
+    <span class="msg-topbar-count" id="msgTopbarCount"
+          style="{{ $totalUnread > 0 ? '' : 'display:none' }}">{{ $totalUnread > 0 ? $totalUnread : '' }}</span>
 </a>
 
 {{-- ══ OVERLAY ══ --}}
@@ -812,9 +811,10 @@ function removeUnreadVisual(clientId) {
     const drawerBadge = document.querySelector('.msg-drawer-badge');
     if (drawerBadge) drawerBadge.style.display = 'none';
 
-    const topbarBtn   = document.querySelector('.msg-topbar-btn');
-    const topbarCount = document.querySelector('.msg-topbar-count');
-    if (topbarCount) topbarCount.remove();
+    /* Cacher le badge sans le supprimer du DOM (le polling doit pouvoir le retrouver) */
+    const topbarBtn   = document.getElementById('msgTopbarBtn');
+    const topbarCount = document.getElementById('msgTopbarCount');
+    if (topbarCount) { topbarCount.style.display = 'none'; topbarCount.textContent = ''; }
     if (topbarBtn)   topbarBtn.classList.remove('has-unread');
 
     document.querySelectorAll('.msg-conv-item').forEach(item => {

@@ -88,6 +88,40 @@
             color: #fff;
         }
         .btn-ghost:hover { background: rgba(255,255,255,.25); color: #fff; }
+
+        /* ── Pagination Bootstrap 5 — style global ── */
+        .pagination { gap: 3px; flex-wrap: wrap; }
+        .page-link {
+            border-radius: 8px !important;
+            border: 1px solid #dee2e6;
+            color: #374151;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 13px;
+            transition: all .15s;
+            background: #fff;
+        }
+        .page-link:hover {
+            background: #ecfdf5;
+            border-color: #6ee7b7;
+            color: #059669;
+        }
+        .page-item.active .page-link {
+            background: #10b981;
+            border-color: #059669;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(16,185,129,.35);
+        }
+        .page-item.disabled .page-link {
+            opacity: .45;
+            background: #f9fafb;
+        }
+        /* Conteneur centré */
+        .pagination-wrap {
+            display: flex;
+            justify-content: center;
+            padding: 16px 0 4px;
+        }
     </style>
 
     @stack('styles')

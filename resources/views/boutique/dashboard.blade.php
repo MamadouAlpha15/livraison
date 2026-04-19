@@ -559,12 +559,13 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         <nav class="sb-nav">
             <a href="{{ route('boutique.dashboard') }}" class="sb-item active" style="margin-bottom:4px"><span class="ico">⊞</span> Tableau de bord</a> 
             <div class="sb-section">Boutique</div>
-            <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">📦</span> Commandes @if($pendingCount > 0)<span class="sb-badge">{{ $pendingCount }}</span>@endif</a>
+            <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">💬</span> Messages <span class="sb-badge" id="sbMsgBadge" style="display:none"></span></a>
+            <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">📦</span> Commandes <span class="sb-badge" id="sbOrdersBadge" style="{{ $pendingCount > 0 ? '' : 'display:none' }}">{{ $pendingCount }}</span></a>
             <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">🏷️</span> Produits</a>
             <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">👥</span> Clients</a>
             <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">🧑‍💼</span> Équipe</a>
             <div class="sb-section">Livraison</div>
-            <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">🚴</span> Livreurs @if($livreursDisponibles->count() > 0)<span class="sb-badge">{{ $livreursDisponibles->count() }}</span>@endif</a>
+            <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">🚴</span> Livreurs <span class="sb-badge" id="sbLivreursBadge" style="{{ $livreursDisponibles->count() > 0 ? '' : 'display:none' }}">{{ $livreursDisponibles->count() }}</span></a>
             <a href="{{ route('delivery.companies.index') }}" class="sb-item"><span class="ico">🏢</span> Partenaires</a>
             <div class="sb-section">Finances</div>
             <div class="sb-group">
@@ -608,6 +609,24 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 <div class="tb-sub">{{ now()->translatedFormat('l j F Y') }}</div>
             </div>
             <div class="tb-actions">
+
+                {{-- Cloche notifications temps réel --}}
+                <div class="notif-bell-wrap" id="notifBellWrap" style="position:relative;display:inline-flex">
+                    <button class="btn btn-sm" id="notifBellBtn" onclick="toggleNotifDropdown()" title="Notifications" style="position:relative;padding:6px 10px;font-size:15px">
+                        🔔
+                        <span id="notifBellCount" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:#fff;font-size:9px;font-weight:800;min-width:16px;height:16px;border-radius:20px;padding:0 3px;display:none;align-items:center;justify-content:center;border:2px solid #fff"></span>
+                    </button>
+                    <div id="notifDropdown" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);width:280px;z-index:500;overflow:hidden">
+                        <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between">
+                            🔔 Notifications <span id="notifDropdownTotal" style="background:var(--brand-lt);color:var(--brand-dk);font-size:10px;padding:1px 7px;border-radius:20px">0</span>
+                        </div>
+                        <div id="notifList" style="max-height:260px;overflow-y:auto"></div>
+                        <div style="padding:8px 14px;border-top:1px solid var(--border);display:flex;gap:6px">
+                            <a href="{{ route('boutique.orders.index') }}" class="btn btn-sm" style="flex:1;justify-content:center;font-size:11px">📦 Commandes</a>
+                            <a href="{{ route('boutique.messages.hub') }}" class="btn btn-sm" style="flex:1;justify-content:center;font-size:11px">💬 Messages</a>
+                        </div>
+                    </div>
+                </div>
 
                 {{-- Bouton Messages (depuis partial) --}}
                 @include('boutique._partials.messages_btn_and_drawer')
@@ -1121,5 +1140,147 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     loadPeriod('this_month');
 });
+</script>
+
+{{-- ══════════════════════════════════════════════════
+     NOTIFICATIONS TEMPS RÉEL — polling global vendeur
+══════════════════════════════════════════════════ --}}
+<script>
+(function () {
+    const CSRF = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+
+    /* ── État local ── */
+    let _prevMsg    = -1;   /* -1 = premier poll, pas de toast */
+    let _prevOrders = -1;   /* -1 = premier poll, pas de toast */
+    let _notifOpen  = false;
+    let _alerts     = [];   /* file d'alertes en attente */
+
+    /* ── Helpers badge générique ── */
+    function setBadge(id, count) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (count > 0) {
+            el.textContent = count > 99 ? '99+' : count;
+            el.style.display = '';
+        } else {
+            el.style.display = 'none';
+        }
+    }
+
+    /* ── Toast bas d'écran ── */
+    function showToast(msg, type) {
+        const t = document.createElement('div');
+        t.style.cssText = `
+            position:fixed;bottom:${20 + document.querySelectorAll('.rt-toast').length * 60}px;
+            right:20px;background:${type==='order'?'#0d1f18':type==='msg'?'#1e40af':'#1f2937'};
+            color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:600;
+            z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,.25);
+            animation:slideInRight .3s cubic-bezier(.23,1,.32,1);
+            display:flex;align-items:center;gap:10px;max-width:280px;cursor:pointer;
+        `;
+        t.className = 'rt-toast';
+        t.innerHTML = msg;
+        t.onclick   = () => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); };
+        document.body.appendChild(t);
+        setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(120%)';
+            t.style.transition='all .3s'; setTimeout(()=>t.remove(),300); }, 5000);
+    }
+
+    /* ── Dropdown notifications ── */
+    function renderNotifList() {
+        const list = document.getElementById('notifList');
+        if (!list) return;
+        if (!_alerts.length) {
+            list.innerHTML = '<div style="padding:20px;text-align:center;color:#9ca3af;font-size:12.5px">✅ Aucune alerte</div>';
+            return;
+        }
+        list.innerHTML = _alerts.slice(0,8).map(a => `
+            <a href="${a.url}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #f3f6f4;text-decoration:none;transition:background .12s" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background=''">
+                <span style="font-size:18px;flex-shrink:0">${a.ico}</span>
+                <div style="flex:1;min-width:0">
+                    <div style="font-size:12.5px;font-weight:600;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.msg}</div>
+                    <div style="font-size:10.5px;color:#9ca3af;margin-top:1px">${a.time}</div>
+                </div>
+                <span style="font-size:14px;color:#d1d5db">›</span>
+            </a>
+        `).join('');
+    }
+
+    window.toggleNotifDropdown = function() {
+        _notifOpen = !_notifOpen;
+        const dd = document.getElementById('notifDropdown');
+        if (dd) dd.style.display = _notifOpen ? 'block' : 'none';
+        if (_notifOpen) renderNotifList();
+    };
+
+    document.addEventListener('click', e => {
+        if (!e.target.closest('#notifBellWrap')) {
+            _notifOpen = false;
+            const dd = document.getElementById('notifDropdown');
+            if (dd) dd.style.display = 'none';
+        }
+    });
+
+    /* ── Push alerte dans la file ── */
+    function pushAlert(ico, msg, url) {
+        const now = new Date();
+        const time = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+        _alerts.unshift({ ico, msg, url, time });
+        if (_alerts.length > 20) _alerts.pop();
+    }
+
+    /* ── Polling principal ── */
+    async function pollNotifications() {
+        try {
+            const res = await fetch('/boutique/notifications/poll', {
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }
+            });
+            if (!res.ok) return;
+            const d = await res.json();
+
+            /* Messages */
+            setBadge('sbMsgBadge', d.messages_unread);
+            setBadge('msgTopbarCount', d.messages_unread);
+            /* aussi mettre à jour la classe "has-unread" du bouton topbar */
+            const msgBtn = document.getElementById('msgTopbarBtn');
+            if (msgBtn) msgBtn.classList.toggle('has-unread', d.messages_unread > 0);
+            if (_prevMsg >= 0 && d.messages_unread > _prevMsg) {
+                const n = d.messages_unread - _prevMsg;
+                showToast(`💬 <div>${n} nouveau${n>1?'x':''} message${n>1?'s':''} client</div>`, 'msg');
+                pushAlert('💬', `${n} nouveau${n>1?'x':''} message${n>1?'s':''} non lu${n>1?'s':''}`, '{{ route("boutique.messages.hub") }}');
+            }
+            _prevMsg = d.messages_unread;
+
+            /* Commandes */
+            setBadge('sbOrdersBadge', d.orders_pending);
+            if (_prevOrders >= 0 && d.orders_pending > _prevOrders) {
+                const n = d.orders_pending - _prevOrders;
+                showToast(`📦 <div>${n} nouvelle${n>1?'s':''} commande${n>1?'s':''} !</div>`, 'order');
+                pushAlert('📦', `${n} nouvelle${n>1?'s':''} commande${n>1?'s':''}`, '{{ route("boutique.orders.index") }}');
+            }
+            _prevOrders = d.orders_pending;
+
+            /* Livreurs */
+            setBadge('sbLivreursBadge', d.livreurs_available);
+
+            /* Cloche totale */
+            const total = d.messages_unread + d.orders_pending;
+            setBadge('notifBellCount', total);
+            const totalEl = document.getElementById('notifDropdownTotal');
+            if (totalEl) totalEl.textContent = total;
+
+            if (_notifOpen) renderNotifList();
+        } catch(e) {}
+    }
+
+    /* ── Démarrage ── */
+    pollNotifications();
+    setInterval(pollNotifications, 6000);
+
+    /* ── Animation CSS (injected once) ── */
+    const s = document.createElement('style');
+    s.textContent = `@keyframes slideInRight{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}`;
+    document.head.appendChild(s);
+})();
 </script>
 @endpush

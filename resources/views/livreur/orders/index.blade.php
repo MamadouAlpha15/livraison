@@ -40,7 +40,7 @@
 
             {{-- Infos client --}}
             <td>
-              <strong>{{ $order->client->name }}</strong><br>
+              <strong>{{ $order->client->name ?? 'Client inconnu' }}</strong><br>
               📞 {{ $order->client->phone ?? '—' }}<br>
               📍 {{ $order->client->address ?? 'Adresse non renseignée' }}
             </td>
@@ -126,7 +126,7 @@
       </tbody>
     </table>
   </div>
-  {{ $orders->links() }}
+  <div class="pagination-wrap">{{ $orders->links() }}</div>
 </div>
 
 {{-- ============================ MOBILE (< md) ============================ --}}
@@ -139,7 +139,7 @@
         {{-- En-tête --}}
         <div class="d-flex justify-content-between align-items-start mb-2">
           <div>
-            <div class="fw-semibold">{{ $order->client->name }}</div>
+            <div class="fw-semibold">{{ $order->client->name ?? 'Client inconnu' }}</div>
             <div class="text-muted small">
               📞 {{ $order->client->phone ?? '—' }}<br>
               📍 {{ $order->client->address ?? '—' }}
@@ -201,7 +201,7 @@
     <div class="text-center text-muted">Aucune commande assignée.</div>
   @endforelse
 
-  {{ $orders->links() }}
+  <div class="pagination-wrap">{{ $orders->links() }}</div>
 </div>
 @endsection
 

@@ -319,6 +319,10 @@ Route::get('messages/poll',
     [BoutiqueMessageController::class, 'poll'])
     ->name('messages.poll');
 
+Route::get('notifications/poll',
+    [BoutiqueMessageController::class, 'pollAll'])
+    ->name('notifications.poll');
+
 Route::post('messages/read',
     [BoutiqueMessageController::class, 'markAsRead'])
     ->name('messages.read');
@@ -461,6 +465,7 @@ Route::middleware(['auth', 'role:client'])
             Route::post('/messages/propose-price',            [ShopMessageController::class, 'proposePrice']) ->name('messages.propose');
             Route::post('/messages/confirm-offer/{message}',  [ShopMessageController::class, 'confirmOffer']) ->name('messages.confirm');
             Route::get('/messages/poll',                       [ShopMessageController::class, 'poll'])          ->name('messages.client.poll');
+            Route::get('/notifications/poll',                  [ShopMessageController::class, 'pollAll'])       ->name('client.notifications.poll');
 
         /* Commandes classiques */
         Route::resource('orders', OrderController::class)->only(['index', 'store', 'create']);

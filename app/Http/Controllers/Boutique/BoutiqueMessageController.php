@@ -421,4 +421,33 @@ class BoutiqueMessageController extends Controller
 
         return response()->json(['messages' => $messages]);
     }
+
+    // GET /boutique/notifications/poll — toutes les compteurs en temps réel
+    public function pollAll(Request $request)
+    {
+        $vendeur = Auth::user();
+        $shop    = $vendeur->shop ?? $vendeur->assignedShop;
+        if (!$shop) return response()->json(['messages_unread'=>0,'orders_pending'=>0,'livreurs_available'=>0,'total'=>0]);
+
+        $messagesUnread = ShopMessage::where('shop_id', $shop->id)
+            ->whereNull('read_at')
+            ->whereHas('sender', fn($q) => $q->where('role', 'client'))
+            ->count();
+
+        $ordersPending = $shop->orders()
+            ->whereIn('status', ['pending','en_attente','en attente','confirmée','processing','nouvelle'])
+            ->count();
+
+        $livreursAvailable = \App\Models\User::where('role', 'livreur')
+            ->where('is_available', true)
+            ->where('shop_id', $shop->id)
+            ->count();
+
+        return response()->json([
+            'messages_unread'    => $messagesUnread,
+            'orders_pending'     => $ordersPending,
+            'livreurs_available' => $livreursAvailable,
+            'total'              => $messagesUnread + $ordersPending,
+        ]);
+    }
 }
