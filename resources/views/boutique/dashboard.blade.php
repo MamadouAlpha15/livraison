@@ -16,11 +16,11 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
-    --brand:      #10b981;
+    --brand:      #10b981; /* couleur des ecritures */
     --brand-dk:   #059669;
     --brand-lt:   #d1fae5;
     --brand-mlt:  #ecfdf5;
-    --sb-bg:      #0d1f18;
+    --sb-bg:      #0d1f18; /* l'arriere plan du side bar */
     --sb-border:  rgba(255,255,255,.06);
     --sb-act:     rgba(16,185,129,.14);
     --sb-hov:     rgba(255,255,255,.04);
@@ -52,7 +52,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .dash-wrap .main { margin-left: var(--sb-w); flex: 1; min-width: 0; }
 
 /* SIDEBAR */
-.sidebar { background: var(--sb-bg); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; width: var(--sb-w); overflow-y: scroll; scrollbar-width: thin; scrollbar-color: rgba(16,185,129,.4) rgba(255,255,255,.05); z-index: 40; border-right: 1px solid rgba(0,0,0,.2); }
+.sidebar { background: var(--sb-bg); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; width: var(--sb-w); overflow-y: scroll; scrollbar-width: thin; scrollbar-color:  rgba(255,255,255,.05); z-index: 40; border-right: 1px solid rgba(0,0,0,.2); }
 .sidebar::-webkit-scrollbar { width: 4px; }
 .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,.04); }
 .sidebar::-webkit-scrollbar-thumb { background: rgba(16,185,129,.4); border-radius: 4px; }
@@ -62,7 +62,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .sb-close:hover { background: rgba(239,68,68,.18); border-color: rgba(239,68,68,.3); color: #fca5a5; }
 @media (max-width: 900px) { .sb-close { display: flex; } }
 .sb-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; }
-.sb-logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, var(--brand), #059669); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(16,185,129,.35); }
+.sb-logo-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
 .sb-shop-name { font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 148px; }
 .sb-status { display: flex; align-items: center; gap: 6px; margin-top: 9px; font-size: 10.5px; color: var(--sb-txt); font-weight: 500; }
 .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--brand); flex-shrink: 0; animation: blink 2.2s ease-in-out infinite; box-shadow: 0 0 5px var(--brand); }
@@ -538,7 +538,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     <aside class="sidebar" id="sidebar">
         <div class="sb-brand">
             <a href="{{ route('boutique.dashboard') }}" class="sb-logo">
-                <div class="sb-logo-icon">🛍️</div>
+                <div class="sb-logo-icon"><img src="/images/Shopio2.jpeg" alt="Shopio" style="width:50px;height:50px;object-fit:cover;border-radius:9px"></div>
                 <span class="sb-shop-name">{{ $shop->name }}</span>
             </a>
             <button class="sb-close" id="btnCloseSidebar" aria-label="Fermer le menu">✕</button>
@@ -557,7 +557,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             </div>
         </div>
         <nav class="sb-nav">
-            <a href="{{ route('boutique.dashboard') }}" class="sb-item active" style="margin-bottom:4px"><span class="ico">⊞</span> Tableau de bord</a>
+            <a href="{{ route('boutique.dashboard') }}" class="sb-item active" style="margin-bottom:4px"><span class="ico">⊞</span> Tableau de bord</a> 
             <div class="sb-section">Boutique</div>
             <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">📦</span> Commandes @if($pendingCount > 0)<span class="sb-badge">{{ $pendingCount }}</span>@endif</a>
             <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">🏷️</span> Produits</a>

@@ -363,7 +363,7 @@ $fillPct     = min(($currentStep / (count($steps) - 1)) * 100, 100);
             }
 
             // ── Stop si livraison terminée ──
-            if (data.status === 'livrée' || data.status === 'livrée') {
+            if (data.status === 'livrée' || data.status === 'livree' || data.status === 'delivered') {
                 clearInterval(pollInterval);
                 setOnline(false);
                 lastEl.textContent = '✅ Livraison terminée.';

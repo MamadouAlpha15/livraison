@@ -955,13 +955,13 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     </div>
 
     <div class="nav-actions">
-        {{-- Bouton messages --}}
-        <button class="nav-msg-btn" onclick="openMsgDrawer()" title="Mes messages">
+        {{-- Bouton messages → hub dédié --}}
+        <a href="{{ route('client.messages.hub') }}" class="nav-msg-btn" title="Mes messages" style="text-decoration:none">
             💬
             <span class="nav-msg-badge {{ $myUnread > 0 ? 'show' : '' }}" id="navMsgBadge">
                 {{ $myUnread > 0 ? $myUnread : '' }}
             </span>
-        </button>
+        </a>
 
         <a href="{{ route('client.orders.index') }}" class="nav-orders-btn">
             📦 <span>Mes commandes</span>
@@ -1835,6 +1835,8 @@ function closeMsgDrawer() {
 let _currentProductId = null;
 let _currentConvKey    = null;
 let _csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+let _modalLastMsgId  = 0;
+let _modalPollTimer  = null;
 
 function openMsgModal(conv) {
     _currentProductId = conv.productId;
@@ -1886,16 +1888,70 @@ function openMsgModal(conv) {
     document.getElementById('mmInput').style.height = '';
     document.getElementById('msgModalOverlay').classList.add('open');
 
+    /* Dernier ID message connu — évite les doublons en polling */
+    _modalLastMsgId = conv.msgs && conv.msgs.length > 0
+        ? Math.max(...conv.msgs.map(m => m.id || 0))
+        : 0;
+
     /* Marquer les messages comme lus dès l'ouverture */
     if (conv.productId) {
         markMessagesRead(conv.productId, conv.key);
     }
+
+    /* Lancer le polling pour messages du vendeur en temps réel */
+    startClientModalPolling();
 }
 
 function closeMsgModal() {
     document.getElementById('msgModalOverlay').classList.remove('open');
+    stopClientModalPolling();
     _currentProductId = null;
     _currentConvKey    = null;
+    _modalLastMsgId   = 0;
+}
+
+/* ══════════════════════════════════════════
+   POLLING MESSAGES EN TEMPS RÉEL (modal client)
+══════════════════════════════════════════ */
+function startClientModalPolling() {
+    stopClientModalPolling();
+    _modalPollTimer = setInterval(async function() {
+        if (!_currentProductId) return;
+        try {
+            const res = await fetch(`/client/products/${_currentProductId}/messages`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept':           'application/json',
+                    'X-CSRF-TOKEN':     _csrfToken,
+                }
+            });
+            if (!res.ok) return;
+            const msgs = await res.json();
+            const thread = document.getElementById('mmThread');
+            const newMsgs = msgs.filter(m => m.id > _modalLastMsgId);
+
+            for (const msg of newMsgs) {
+                _modalLastMsgId = Math.max(_modalLastMsgId, msg.id);
+                if (thread.querySelector('[data-msg-id="' + msg.id + '"]')) continue;
+                if (msg.mine) continue; /* déjà affiché localement */
+                if (msg.type && msg.type !== 'text') continue; /* cartes négociation ignorées */
+
+                const parts = (msg.sender || '').split(' ');
+                const av = (parts[0]?.[0] ?? '?').toUpperCase() + (parts[1]?.[0] ?? '').toUpperCase();
+
+                /* Retirer le message "vide" si présent */
+                const empty = thread.querySelector('[style*="text-align:center"]');
+                if (empty) empty.remove();
+
+                thread.prepend(buildBubble({ id: msg.id, body: msg.body, mine: false, av, time: msg.time, read: false }));
+            }
+        } catch(e) {}
+    }, 3000);
+}
+
+function stopClientModalPolling() {
+    clearInterval(_modalPollTimer);
+    _modalPollTimer = null;
 }
 
 /* Fermer sur clic overlay */
@@ -1912,6 +1968,7 @@ document.addEventListener('keydown', e => {
 function buildBubble(m) {
     const row = document.createElement('div');
     row.className = 'msg-bubble-row ' + (m.mine ? 'from-me' : 'from-them');
+    if (m.id) row.dataset.msgId = m.id;
     row.innerHTML = `
         <div class="msg-bubble-av">${escHtml(m.av)}</div>
         <div>
@@ -2009,6 +2066,9 @@ async function sendMsg(e) {
         });
 
         if (res.ok) {
+            const data = await res.json().catch(() => ({}));
+            if (data.message_id) _modalLastMsgId = Math.max(_modalLastMsgId, data.message_id);
+
             /* Ajouter la bulle directement dans le thread */
             const now = new Date();
             const timeStr = String(now.getDate()).padStart(2,'0') + '/'
@@ -2017,6 +2077,7 @@ async function sendMsg(e) {
                           + String(now.getMinutes()).padStart(2,'0');
 
             const bubble = buildBubble({
+                id: data.message_id || 0,
                 body: body, mine: true,
                 av: '{{ $initials }}',
                 time: timeStr, read: false,
@@ -2160,6 +2221,58 @@ document.addEventListener('DOMContentLoaded', () => {
         openProfileModal('del');
     @endif
 });
+
+/* ══════════════════════════════════════════
+   POLLING NOTIFICATIONS MESSAGES (toutes les 3s)
+   Met à jour le badge sans recharger la page
+══════════════════════════════════════════ */
+async function pollClientMessages() {
+    try {
+        const res = await fetch('{{ route("client.messages.client.poll") }}', {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': _csrfToken,
+                'Accept': 'application/json',
+            }
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+
+        /* ── Mettre à jour le badge de l'icône 💬 dans la navbar ── */
+        const badge = document.getElementById('navMsgBadge');
+        if (badge) {
+            if (data.unread > 0) {
+                badge.textContent = data.unread;
+                badge.classList.add('show');
+            } else {
+                badge.textContent = '';
+                badge.classList.remove('show');
+            }
+        }
+
+        /* ── Si nouveau message reçu, faire pulser l'icône ── */
+        if (data.has_new) {
+            const btn = document.querySelector('.nav-msg-btn');
+            if (btn) {
+                btn.style.animation = 'none';
+                btn.offsetHeight; /* forcer reflow */
+                btn.style.animation = 'msgPulse .6s ease 3';
+            }
+        }
+    } catch(e) {}
+}
+
+/* Animation pulse sur le bouton message */
+const _pulseStyle = document.createElement('style');
+_pulseStyle.textContent = `
+@keyframes msgPulse {
+    0%,100% { transform: scale(1); }
+    50%      { transform: scale(1.18); }
+}`;
+document.head.appendChild(_pulseStyle);
+
+/* Démarrer le polling dès le chargement */
+setInterval(pollClientMessages, 3000);
 
 /* ══════════════════════════════════════════
    ANIMATIONS ENTRÉE BOUTIQUES

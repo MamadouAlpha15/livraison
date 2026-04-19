@@ -66,7 +66,10 @@ class Order extends Model
 
 
 protected $casts = [
-  'last_ping_at' => 'datetime',
+    'last_ping_at' => 'datetime',
+    'current_lat'  => 'float',
+    'current_lng'  => 'float',
+    'total'        => 'float',
 ];
 
 /* Statuts normalisés en français */

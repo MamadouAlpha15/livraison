@@ -65,15 +65,24 @@
     background: #fff;
 }
 
-    /* GALLERY */
+    /* IMAGE WRAP */
+    .main-img-wrap {
+        position: relative; display: flex; align-items: center; justify-content: center;
+        background: #fafafa; border-radius: 12px; overflow: hidden; margin-bottom: 10px;
+    }
+
+    /* GALLERY THUMBS */
     .gallery {
         display: flex;
         gap: 8px;
         margin-top: 10px;
         overflow-x: auto;
+        padding-bottom: 4px;
     }
+    .gallery::-webkit-scrollbar { height: 4px; }
+    .gallery::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
 
-    .gallery img {
+    .gal-thumb {
         width: 70px;
         height: 70px;
         border-radius: 10px;
@@ -83,10 +92,24 @@
         flex-shrink: 0;
         transition: 0.2s;
     }
+    .gal-thumb:hover { border-color: #ff6a00; transform: scale(1.05); }
+    .gal-thumb.active { border-color: #ff6a00; box-shadow: 0 0 0 2px #ffe0cc; }
 
-    .gallery img:hover {
-        border-color: #ff6a00;
-        transform: scale(1.05);
+    /* ARROWS */
+    .gal-arrow {
+        position: absolute; top: 50%; transform: translateY(-50%);
+        background: rgba(0,0,0,.42); color: #fff; border: none; border-radius: 50%;
+        width: 38px; height: 38px; font-size: 22px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: background .15s; z-index: 2; line-height: 1;
+    }
+    .gal-arrow:hover { background: rgba(0,0,0,.7); }
+    .gal-arrow-l { left: 8px; }
+    .gal-arrow-r { right: 8px; }
+    .gal-counter {
+        position: absolute; bottom: 8px; right: 10px;
+        background: rgba(0,0,0,.5); color: #fff; font-size: 11px; font-weight: 700;
+        padding: 2px 8px; border-radius: 20px; pointer-events: none;
     }
 
     /* RIGHT CONTENT */
@@ -179,22 +202,38 @@
 
     {{-- LEFT IMAGE --}}
     <div class="left">
-        <img id="mainImage"
-             src="{{ \App\Services\ImageOptimizer::url($product->image, 'medium') ?? asset('storage/'.$product->image) }}"
-             srcset="{{ \App\Services\ImageOptimizer::url($product->image, 'medium') }} 800w,
-                     {{ \App\Services\ImageOptimizer::url($product->image, 'large') }} 1600w"
-             sizes="(max-width:768px) 100vw, 600px"
-             class="main-image">
+        <div class="main-img-wrap" id="mainImgWrap">
+            <img id="mainImage"
+                 src="{{ \App\Services\ImageOptimizer::url($product->image, 'medium') ?? asset('storage/'.$product->image) }}"
+                 class="main-image" style="cursor:zoom-in" onclick="openLightbox(_curIdx)">
+            @if(count($gallery) > 0)
+            <button class="gal-arrow gal-arrow-l" onclick="switchIdx(_curIdx - 1)">‹</button>
+            <button class="gal-arrow gal-arrow-r" onclick="switchIdx(_curIdx + 1)">›</button>
+            <div class="gal-counter" id="galCounter"></div>
+            @endif
+        </div>
 
-        <div class="gallery">
-            <img src="{{ \App\Services\ImageOptimizer::url($product->image, 'thumb') ?? asset('storage/'.$product->image) }}"
-                 onclick="changeImage('{{ \App\Services\ImageOptimizer::url($product->image, 'medium') ?? asset('storage/'.$product->image) }}')">
+        @php
+            $allPhotos = array_filter(array_merge(
+                [$product->image ? (\App\Services\ImageOptimizer::url($product->image, 'medium') ?? asset('storage/'.$product->image)) : null],
+                array_map(fn($g) => \App\Services\ImageOptimizer::url($g, 'medium') ?? asset('storage/'.$g), $gallery)
+            ));
+            $allThumbs = array_filter(array_merge(
+                [$product->image ? (\App\Services\ImageOptimizer::url($product->image, 'thumb') ?? asset('storage/'.$product->image)) : null],
+                array_map(fn($g) => \App\Services\ImageOptimizer::url($g, 'thumb') ?? asset('storage/'.$g), $gallery)
+            ));
+            $allPhotos = array_values($allPhotos);
+            $allThumbs = array_values($allThumbs);
+        @endphp
 
-            @foreach($gallery as $img)
-                <img src="{{ \App\Services\ImageOptimizer::url($img, 'thumb') ?? asset('storage/'.$img) }}"
-                     onclick="changeImage('{{ \App\Services\ImageOptimizer::url($img, 'medium') ?? asset('storage/'.$img) }}')">
+        @if(count($allThumbs) > 1)
+        <div class="gallery" id="galThumbRow">
+            @foreach($allThumbs as $i => $thumb)
+            <img src="{{ $thumb }}" class="gal-thumb {{ $i === 0 ? 'active' : '' }}"
+                 data-idx="{{ $i }}" onclick="switchIdx({{ $i }})" alt="Photo {{ $i+1 }}" loading="lazy">
             @endforeach
         </div>
+        @endif
     </div>
 
     {{-- RIGHT INFO --}}
@@ -226,15 +265,95 @@
 </div>
 
 <script>
-    function changeImage(src) {
-        document.getElementById('mainImage').src = src;
+/* ── Photos ── */
+const _allPhotos = @json($allPhotos);
+let _curIdx = 0;
+
+function switchIdx(idx) {
+    if (!_allPhotos.length) return;
+    _curIdx = ((idx % _allPhotos.length) + _allPhotos.length) % _allPhotos.length;
+    document.getElementById('mainImage').src = _allPhotos[_curIdx];
+
+    /* miniatures */
+    document.querySelectorAll('.gal-thumb').forEach((t, i) => {
+        t.classList.toggle('active', i === _curIdx);
+        if (i === _curIdx) t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    });
+
+    /* compteur */
+    const ctr = document.getElementById('galCounter');
+    if (ctr && _allPhotos.length > 1) ctr.textContent = `${_curIdx + 1} / ${_allPhotos.length}`;
+}
+
+/* Lightbox plein écran */
+function openLightbox(startIdx) {
+    if (!_allPhotos.length) return;
+    let idx = startIdx || _curIdx;
+
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:9999;display:flex;align-items:center;justify-content:center;';
+
+    const img = document.createElement('img');
+    img.style.cssText = 'max-width:92%;max-height:92%;object-fit:contain;border-radius:10px;user-select:none;';
+
+    const setImg = (i) => {
+        idx = ((i % _allPhotos.length) + _allPhotos.length) % _allPhotos.length;
+        img.src = _allPhotos[idx];
+        ctr.textContent = _allPhotos.length > 1 ? `${idx + 1} / ${_allPhotos.length}` : '';
+    };
+
+    const ctr = document.createElement('div');
+    ctr.style.cssText = 'position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:#fff;font-size:13px;font-weight:700;background:rgba(0,0,0,.5);padding:4px 14px;border-radius:20px;';
+
+    const close = document.createElement('button');
+    close.textContent = '✕';
+    close.style.cssText = 'position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:20px;width:40px;height:40px;border-radius:50%;cursor:pointer;';
+    close.onclick = () => document.body.removeChild(overlay);
+
+    let touchX = 0;
+    overlay.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; });
+    overlay.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].clientX - touchX;
+        if (Math.abs(dx) > 40) setImg(idx + (dx < 0 ? 1 : -1));
+    });
+    overlay.addEventListener('click', e => { if (e.target === overlay) document.body.removeChild(overlay); });
+
+    if (_allPhotos.length > 1) {
+        const mkArrow = (dir, label) => {
+            const btn = document.createElement('button');
+            btn.textContent = label;
+            btn.style.cssText = `position:absolute;top:50%;transform:translateY(-50%);${dir}:16px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:28px;width:48px;height:48px;border-radius:50%;cursor:pointer;`;
+            btn.onclick = (e) => { e.stopPropagation(); setImg(idx + (dir === 'left' ? -1 : 1)); };
+            return btn;
+        };
+        overlay.appendChild(mkArrow('left', '‹'));
+        overlay.appendChild(mkArrow('right', '›'));
     }
 
-    function goBack() {
-        if (window.history.length > 1) {
-            window.history.back();
-        } else {
-            window.location.href = "/client/dashboard";
-        }
+    overlay.appendChild(img);
+    overlay.appendChild(ctr);
+    overlay.appendChild(close);
+    document.body.appendChild(overlay);
+    setImg(idx);
+
+    const onKey = (e) => {
+        if (e.key === 'Escape') { document.body.removeChild(overlay); document.removeEventListener('keydown', onKey); }
+        if (e.key === 'ArrowLeft')  setImg(idx - 1);
+        if (e.key === 'ArrowRight') setImg(idx + 1);
+    };
+    document.addEventListener('keydown', onKey);
+}
+
+/* Initialiser le compteur au chargement */
+document.addEventListener('DOMContentLoaded', () => {
+    if (_allPhotos.length > 1) {
+        const ctr = document.getElementById('galCounter');
+        if (ctr) ctr.textContent = `1 / ${_allPhotos.length}`;
     }
+});
+
+function goBack() {
+    if (window.history.length > 1) window.history.back();
+    else window.location.href = '/client/dashboard';
+}
 </script>

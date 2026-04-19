@@ -237,7 +237,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
     <aside class="sidebar" id="sidebar">
         <div class="sb-brand">
             <a href="{{ route('boutique.dashboard') }}" class="sb-logo">
-                <div class="sb-logo-icon">🛍️</div>
+               <div class="sb-logo-icon"><img src="/images/Shopio.jpeg" alt="Shopio" style="width:40px;height:40px;object-fit:cover;border-radius:9px"></div>
                 <span class="sb-shop-name">{{ $shop->name ?? 'Boutique' }}</span>
             </a>
             <button class="sb-close" id="btnCloseSidebar">✕</button>

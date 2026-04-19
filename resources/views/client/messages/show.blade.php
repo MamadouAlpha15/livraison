@@ -397,10 +397,10 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
 
         @else
             {{-- ══ MESSAGE TEXTE NORMAL ══ --}}
-            <div class="msg-row {{ $isMine ? 'mine' : 'theirs' }}">
-                <div class="msg-av">{{ $isMine ? $initials : $sInit }}</div>
+            <div class="msg-row {{ $isMine ? 'mine' : 'theirs' }}" data-msg-id="{{ $msg->id }}">
+                @if(!$isMine)<div class="msg-av">{{ $sInit }}</div>@endif
                 <div class="msg-content">
-                    <div class="msg-sender">{{ $isMine ? 'Vous' : $senderName }}</div>
+                    @if(!$isMine)<div class="msg-sender">{{ $senderName }}</div>@endif
                     <div class="msg-bubble">{{ $msg->body }}</div>
                     <div class="msg-meta">
                         <span class="msg-time">{{ $msg->created_at->format('d/m H:i') }}</span>
@@ -434,9 +434,9 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
                       placeholder="Écrire un message au vendeur…"
                       rows="1"
                       required
-                      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();document.getElementById('chatForm').submit()}"
+                      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"
                       oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
-            <button type="submit" class="chat-send-btn" title="Envoyer">➤</button>
+            <button type="button" onclick="sendMessage()" class="chat-send-btn" title="Envoyer">➤</button>
         </form>
     </div>
 
@@ -449,14 +449,21 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
 
 @push('scripts')
 <script>
-const CSRF   = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
-const DEVISE = '{{ $devise }}';
+const CSRF      = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+const DEVISE    = '{{ $devise }}';
+const INITIALS  = '{{ $initials }}';
+const STORE_URL = '{{ route("client.messages.store", $product) }}';
+const POLL_URL  = '{{ route("client.messages.index", $product) }}';
+const CONFIRM_URL = '{{ url("client/messages/confirm-offer") }}';
+const PROPOSE_URL = '{{ route("client.messages.propose") }}';
+const PRODUCT_ID  = {{ $product->id }};
+const PRODUCT_PRICE = {{ $product->price }};
 
-/* ── Auto-scroll ── */
-document.addEventListener('DOMContentLoaded', () => {
-    scrollBottom();
-});
+/* Dernier ID message connu — pour ne pas dupliquer */
+let _lastMsgId = {{ $messages->isNotEmpty() ? $messages->last()->id : 0 }};
 
+/* ── Auto-scroll au chargement ── */
+document.addEventListener('DOMContentLoaded', () => scrollBottom());
 function scrollBottom() {
     const t = document.getElementById('chatThread');
     if (t) t.scrollTop = t.scrollHeight;
@@ -466,16 +473,90 @@ function scrollBottom() {
 function showToast(msg, type = 'success') {
     const el = document.getElementById('chatToast');
     el.textContent = msg;
-    el.className   = 'chat-toast ' + type + ' show';
+    el.className = 'chat-toast ' + type + ' show';
     setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 /* ── Panneau proposition ── */
 function toggleProposePanel() {
     const panel = document.getElementById('proposePanel');
     panel.classList.toggle('open');
-    if (panel.classList.contains('open')) {
-        document.getElementById('proposePriceInput').focus();
+    if (panel.classList.contains('open')) document.getElementById('proposePriceInput').focus();
+}
+
+/* ── Construire une bulle texte simple ── */
+function buildTextRow(msg) {
+    const row = document.createElement('div');
+    row.className = 'msg-row ' + (msg.mine ? 'mine' : 'theirs');
+    if (msg.id) row.dataset.msgId = msg.id;
+
+    const tick = msg.mine
+        ? (msg.read ? '<span class="msg-read">✓✓</span>' : '')
+        : '';
+
+    if (msg.mine) {
+        /* CLIENT — droite : pas d'avatar, pas de nom */
+        row.innerHTML =
+            '<div class="msg-content">' +
+                '<div class="msg-bubble">' + escHtml(msg.body) + '</div>' +
+                '<div class="msg-meta"><span class="msg-time">' + escHtml(msg.time) + '</span>' + tick + '</div>' +
+            '</div>';
+    } else {
+        /* VENDEUR — gauche : avatar + nom */
+        row.innerHTML =
+            '<div class="msg-av">' + escHtml(msg.sender_init || '?') + '</div>' +
+            '<div class="msg-content">' +
+                '<div class="msg-sender">' + escHtml(msg.sender) + '</div>' +
+                '<div class="msg-bubble">' + escHtml(msg.body) + '</div>' +
+                '<div class="msg-meta"><span class="msg-time">' + escHtml(msg.time) + '</span></div>' +
+            '</div>';
+    }
+    return row;
+}
+
+/* ── Envoyer un message texte en AJAX ── */
+async function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const body  = input.value.trim();
+    if (!body) return;
+
+    const btn = document.querySelector('.chat-send-btn');
+    if (btn) btn.disabled = true;
+
+    try {
+        const res  = await fetch(STORE_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify({ body }),
+        });
+        const data = await res.json();
+
+        if (data.sent) {
+            input.value = '';
+            input.style.height = 'auto';
+
+            const now  = new Date();
+            const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+            const fakeMsg = { mine: true, body, time, read: false, id: data.message_id || 0 };
+
+            if (data.message_id) _lastMsgId = Math.max(_lastMsgId, data.message_id);
+
+            const thread = document.getElementById('chatThread');
+            /* Retirer le message "vide" si présent */
+            const empty = thread.querySelector('.chat-empty');
+            if (empty) empty.remove();
+
+            thread.appendChild(buildTextRow(fakeMsg));
+            scrollBottom();
+        }
+    } catch(e) {
+        showToast('❌ Erreur réseau. Réessayez.', 'error');
+    } finally {
+        if (btn) btn.disabled = false;
     }
 }
 
@@ -483,35 +564,19 @@ function toggleProposePanel() {
 async function sendPriceProposal() {
     const input = document.getElementById('proposePriceInput');
     const price = parseFloat(input.value);
-
-    if (!price || price < 1) {
-        showToast('❌ Veuillez entrer un prix valide.', 'error');
-        return;
-    }
+    if (!price || price < 1) { showToast('❌ Veuillez entrer un prix valide.', 'error'); return; }
 
     try {
-        const res = await fetch('{{ route("client.messages.propose") }}', {
+        const res = await fetch(PROPOSE_URL, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': CSRF,
-                'Accept': 'application/json',
-            },
-            body: JSON.stringify({
-                product_id:     {{ $product->id }},
-                proposed_price: price,
-            }),
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
+            body: JSON.stringify({ product_id: PRODUCT_ID, proposed_price: price }),
         });
-
         if (!res.ok) throw new Error();
-
         showToast('💰 Proposition envoyée au vendeur !', 'success');
         document.getElementById('proposePanel').classList.remove('open');
         input.value = '';
-
-        // Rafraîchir pour voir la carte
         setTimeout(() => location.reload(), 1200);
-
     } catch(e) {
         showToast('❌ Erreur lors de l\'envoi. Réessayez.', 'error');
     }
@@ -520,29 +585,19 @@ async function sendPriceProposal() {
 /* ── Confirmer une offre vendeur ── */
 async function confirmOffer(messageId, btn) {
     if (!confirm('Confirmer cette offre et créer la commande ?')) return;
-
     btn.disabled = true;
     btn.classList.add('loading');
     btn.textContent = '⏳ Création de la commande…';
-
     try {
-        const res = await fetch(`{{ url('client/messages/confirm-offer') }}/${messageId}`, {
+        const res  = await fetch(CONFIRM_URL + '/' + messageId, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': CSRF,
-                'Accept': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
         });
-
         const data = await res.json();
-
         if (data.success) {
             showToast('🎉 Commande n°' + data.order_id + ' créée avec succès !', 'success');
             setTimeout(() => location.reload(), 1500);
-        } else {
-            throw new Error();
-        }
+        } else throw new Error();
     } catch(e) {
         btn.disabled = false;
         btn.classList.remove('loading');
@@ -551,33 +606,66 @@ async function confirmOffer(messageId, btn) {
     }
 }
 
-/* ── Polling toutes les 5s ── */
-let lastCount = {{ $messages->count() }};
-
+/* ── Polling toutes les 3s — ajoute les nouveaux messages sans recharger ── */
 async function pollMessages() {
     try {
-        const res = await fetch('{{ route("client.messages.index", $product) }}', {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': CSRF,
-            }
+        const res = await fetch(POLL_URL, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }
         });
         if (!res.ok) return;
         const msgs = await res.json();
 
-        if (msgs.length > lastCount) {
-            lastCount = msgs.length;
-            // On recharge pour afficher les nouvelles cartes de négociation proprement
-            location.reload();
+        const thread  = document.getElementById('chatThread');
+        const newMsgs = msgs.filter(m => m.id > _lastMsgId);
+
+        for (const msg of newMsgs) {
+            /* Éviter les doublons */
+            if (thread.querySelector('[data-msg-id="' + msg.id + '"]')) continue;
+
+            /* Cartes de négociation → reload pour afficher les boutons PHP */
+            if (msg.type && msg.type !== 'text') {
+                location.reload();
+                return;
+            }
+
+            /* Message texte du vendeur → on l'ajoute directement */
+            if (!msg.mine) {
+                const empty = thread.querySelector('.chat-empty');
+                if (empty) empty.remove();
+
+                /* Calculer les initiales du vendeur depuis le nom */
+                const parts = (msg.sender || '').split(' ');
+                msg.sender_init = (parts[0]?.[0] ?? '?').toUpperCase() + (parts[1]?.[0] ?? '').toUpperCase();
+
+                thread.appendChild(buildTextRow(msg));
+                scrollBottom();
+            }
+            _lastMsgId = Math.max(_lastMsgId, msg.id);
         }
     } catch(e) {}
 }
 
-function escHtml(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+setInterval(pollMessages, 3000);
 
-setInterval(pollMessages, 5000);
+/* ── Polling badge navbar (toutes les 3s) ── */
+async function pollBadge() {
+    try {
+        const res = await fetch('{{ route("client.messages.client.poll") }}', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' }
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const badge = document.getElementById('navMsgBadge');
+        if (!badge) return;
+        if (data.unread > 0) {
+            badge.textContent = data.unread;
+            badge.classList.add('show');
+        } else {
+            badge.textContent = '';
+            badge.classList.remove('show');
+        }
+    } catch(e) {}
+}
+setInterval(pollBadge, 3000);
 </script>
 @endpush

@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#f06a0f">
-    <title>{{ $title ?? config('app.name', 'Application') }}</title>
+    <title>{{ $title ?? config('app.name', 'Shopio') }}</title>
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/Shopio2.jpeg') }}">
+    <link rel="shortcut icon" type="image/jpeg" href="{{ asset('images/Shopio2.jpeg') }}">
+
 
     {{-- ══ Ressource hints (connexions anticipées) ══ --}}
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
@@ -94,10 +97,11 @@
     {{-- ═══ NAVBAR (cachée sur dashboard via body.is-dashboard) ═══ --}}
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top app-navbar">
         <div class="container-xxl">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url('/') }}">
-                <i class="bi bi-bag-check-fill"></i>
-                {{ config('app.name', 'Application') }}
+             <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url('/') }}">
+                <img src="{{ asset('images/Shopio2.jpeg') }}" alt="Shopio" style="height:32px;width:auto;object-fit:contain">
+                {{ config('app.name', 'Shopio') }}
             </a>
+           
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#topnav" aria-controls="topnav"

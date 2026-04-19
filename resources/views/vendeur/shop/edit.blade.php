@@ -477,8 +477,8 @@ input[type=range]::-webkit-slider-thumb {
     <aside class="form-sidebar">
 
         <a href="{{ route('boutique.dashboard') }}" class="sidebar-logo">
-            <div class="sidebar-logo-ico">🛍️</div>
-            {{ config('app.name', 'ShopManager') }}
+           <div class="sb-logo-icon"><img src="/images/Shopio2.jpeg" alt="Shopio" style="width:50px;height:50px;object-fit:cover;border-radius:9px"></div>
+          
         </a>
 
         <h1 class="sidebar-title">

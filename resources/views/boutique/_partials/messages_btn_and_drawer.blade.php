@@ -114,28 +114,137 @@
 .msg-modal-prod-name { font-size: 12.5px; font-weight: 700; color: var(--text); }
 .msg-modal-prod-price { font-size: 11.5px; color: var(--brand); font-weight: 800; font-family: var(--mono); }
 
-/* Thread */
-.msg-modal-thread { flex: 1; overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; background: #fafcfb; }
-.msg-modal-thread::-webkit-scrollbar { width: 4px; }
-.msg-modal-thread::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-.msg-date-sep { text-align: center; font-size: 10px; color: var(--muted); font-weight: 600; display: flex; align-items: center; gap: 8px; margin: 4px 0; }
-.msg-date-sep::before, .msg-date-sep::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+/* Thread — fond style chat moderne */
+.msg-modal-thread {
+    flex: 1; overflow-y: auto;
+    padding: 18px 16px;
+    display: flex; flex-direction: column; gap: 6px;
+    background: #efeae1;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4cfc8' fill-opacity='0.25'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.msg-modal-thread::-webkit-scrollbar { width: 5px; }
+.msg-modal-thread::-webkit-scrollbar-thumb { background: rgba(0,0,0,.15); border-radius: 4px; }
 
-/* Bulles normales */
-.msg-bubble-row { display: flex; gap: 8px; max-width: 82%; }
-.msg-bubble-row.mine { margin-left: auto; flex-direction: row-reverse; }
-.msg-bav { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: #fff; align-self: flex-end; }
-.msg-bubble-row:not(.mine) .msg-bav { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
-.msg-bubble-row.mine .msg-bav { background: linear-gradient(135deg, var(--brand), #059669); }
-.msg-bcontent { display: flex; flex-direction: column; gap: 3px; }
-.msg-bsender { font-size: 10px; font-weight: 600; color: var(--muted); }
-.msg-bubble-row.mine .msg-bsender { text-align: right; }
-.msg-bubble { padding: 9px 13px; border-radius: 16px; font-size: 13px; line-height: 1.5; word-break: break-word; }
-.msg-bubble-row:not(.mine) .msg-bubble { background: var(--surface); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 3px; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
-.msg-bubble-row.mine .msg-bubble { background: var(--brand); color: #fff; border-bottom-right-radius: 3px; }
-.msg-bmeta { font-size: 9.5px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+/* ── Séparateur de date ── */
+.msg-date-sep {
+    display: flex; align-items: center; justify-content: center;
+    margin: 10px 0;
+}
+.msg-date-sep span {
+    background: rgba(255,255,255,.9);
+    padding: 3px 14px; border-radius: 20px;
+    font-size: 10.5px; color: #666; font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0,0,0,.12);
+}
+
+/* ── Ligne de bulle ── */
+.msg-bubble-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    margin-bottom: 4px;
+    animation: msgIn .18s ease;
+}
+@keyframes msgIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+/* Message CLIENT (gauche) */
+.msg-bubble-row:not(.mine) {
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+/* Message VENDEUR (droite) */
+.msg-bubble-row.mine {
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+}
+
+/* Avatar client */
+.msg-bav {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: #fff; font-size: 11px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,.2);
+}
+
+/* Contenu (nom + bulle + méta) */
+.msg-bcontent {
+    display: flex; flex-direction: column;
+    max-width: 72%;
+}
+
+/* Nom client au-dessus de sa bulle */
+.msg-bsender {
+    font-size: 10.5px; font-weight: 700;
+    color: #3b82f6; margin-bottom: 3px; padding-left: 4px;
+}
+
+/* Bulle */
+.msg-bubble {
+    padding: 9px 14px 7px;
+    border-radius: 18px;
+    font-size: 13.5px; line-height: 1.55;
+    word-break: break-word;
+}
+
+/* Bulle CLIENT — blanche, queue bas-gauche */
+.msg-bubble-row:not(.mine) .msg-bubble {
+    background: #fff;
+    color: #111;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.12);
+}
+
+/* Bulle VENDEUR — verte, queue bas-droite */
+.msg-bubble-row.mine .msg-bubble {
+    background: #dcf8c6;
+    color: #0e1a0e;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.12);
+}
+
+/* Méta : heure + ticks */
+.msg-bmeta {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 10px; color: #999;
+    margin-top: 3px; padding: 0 4px;
+}
 .msg-bubble-row.mine .msg-bmeta { justify-content: flex-end; }
-.msg-read-tick { color: var(--brand); }
+.msg-read-tick { color: #34b7f1; }
+.msg-sent-tick { color: #aaa; }
+
+/* Zone réponse — redesignée */
+.msg-modal-reply {
+    padding: 10px 14px; border-top: 1px solid rgba(0,0,0,.08);
+    background: #f0f0f0;
+    display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0;
+}
+.msg-modal-input {
+    flex: 1; padding: 10px 16px;
+    border: none; border-radius: 24px;
+    font-size: 13.5px; font-family: var(--font);
+    color: #111; background: #fff;
+    outline: none; resize: none;
+    min-height: 42px; max-height: 110px;
+    line-height: 1.45;
+    box-shadow: 0 1px 3px rgba(0,0,0,.12);
+    transition: box-shadow .15s;
+}
+.msg-modal-input:focus { box-shadow: 0 2px 8px rgba(0,0,0,.18); }
+.msg-modal-input::placeholder { color: #aaa; }
+.msg-modal-send {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: linear-gradient(135deg, #25d366, #128c7e);
+    color: #fff; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+    transition: all .18s;
+    box-shadow: 0 3px 10px rgba(18,140,126,.4);
+}
+.msg-modal-send:hover { transform: scale(1.1); box-shadow: 0 5px 16px rgba(18,140,126,.5); }
+.msg-modal-send:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 
 /* ── Cartes Négociation (modal) ── */
 .nego-card { border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.1); width: 100%; max-width: 290px; }
@@ -231,14 +340,14 @@
 }
 </style>
 
-{{-- ══ BOUTON TOPBAR ══ --}}
-<button class="msg-topbar-btn {{ $totalUnread > 0 ? 'has-unread' : '' }}"
-        onclick="openMsgDrawer()" type="button">
+{{-- ══ BOUTON TOPBAR → redirige vers le hub dédié ══ --}}
+<a href="{{ route('boutique.messages.hub') }}"
+   class="msg-topbar-btn {{ $totalUnread > 0 ? 'has-unread' : '' }}">
     💬 <span class="btn-label">Messages</span>
     @if($totalUnread > 0)
-    <span class="msg-topbar-count">{{ $totalUnread }}</span>
+    <span class="msg-topbar-count" id="msgTopbarCount">{{ $totalUnread }}</span>
     @endif
-</button>
+</a>
 
 {{-- ══ OVERLAY ══ --}}
 <div class="msg-overlay" id="msgOverlay" onclick="closeMsgDrawer()"></div>
@@ -325,6 +434,7 @@
                     {{ $cInit }}
                     @if($hasUnread)<div class="msg-unread-dot"></div>@endif
                 </div>
+               
                 <div class="msg-conv-body">
                     <div class="msg-conv-name">
                         {{ $cName }}
@@ -376,7 +486,7 @@
                 <input type="hidden" name="product_id" id="mmProductId">
                 <textarea name="body" id="mmInput" class="msg-modal-input"
                           placeholder="Écrire un message…" rows="1" required
-                          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();document.getElementById('mmForm').submit()}"
+                          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();document.getElementById('mmForm').dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}))}"
                           oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
                 <button type="submit" class="msg-modal-send">➤</button>
             </form>
@@ -423,7 +533,8 @@ function closeMsgDrawer() {
 function openMsgModal(conv) {
     if (!conv || !conv.messages) return;
 
-    /* 1. Ouvrir la modal en premier (avant tout traitement) */
+    /* 1. Fermer le drawer + ouvrir la modal */
+    closeMsgDrawer();
     document.getElementById('msgModalOverlay').classList.add('open');
     window._currentConv = conv;
 
@@ -433,20 +544,30 @@ function openMsgModal(conv) {
     document.getElementById('mmSub').textContent  =
         conv.messages.length + ' message' + (conv.messages.length !== 1 ? 's' : '');
 
-    /* 3. Barre produit */
+    /* 3. Barre produit — construction en une seule assignation */
     const prodBar = document.getElementById('mmProd');
     if (conv.productName) {
-        prodBar.style.display = 'flex';
-        prodBar.innerHTML = conv.productImg
+        const imgHtml = conv.productImg
             ? `<img src="${escHtml(conv.productImg)}" class="msg-modal-prod-img" alt="">`
             : `<div class="msg-modal-prod-ph">🏷️</div>`;
-        prodBar.innerHTML += `<div>
+        const priceHtml = conv.productPrice
+            ? `<div class="msg-modal-prod-price">${escHtml(conv.productPrice)}</div>` : '';
+        prodBar.style.display = 'flex';
+        const prodUrl = conv.productId ? `/produit/${conv.productId}` : '#';
+        prodBar.innerHTML = imgHtml + `<div style="flex:1;min-width:0">
             <div class="msg-modal-prod-name">${escHtml(conv.productName)}</div>
-            ${conv.productPrice ? `<div class="msg-modal-prod-price">${escHtml(conv.productPrice)}</div>` : ''}
-        </div>`;
+            ${priceHtml}
+        </div>
+        <a href="${prodUrl}" target="_blank"
+           style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:var(--primary,#3b82f6);color:#fff;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap"
+           title="Voir la fiche produit">
+            🖼️ Voir le produit
+        </a>`;
     } else {
         prodBar.style.display = 'none';
     }
+
+    
 
     /* 4. Thread messages */
     const thread = document.getElementById('mmThread');
@@ -457,48 +578,20 @@ function openMsgModal(conv) {
         /* Séparateur de date */
         if (msg.dateKey !== lastDate) {
             const sep = document.createElement('div');
-            sep.className   = 'msg-date-sep';
-            sep.textContent = msg.date || '';
+            sep.className = 'msg-date-sep';
+            sep.innerHTML = '<span>' + escHtml(msg.date || '') + '</span>';
             thread.appendChild(sep);
             lastDate = msg.dateKey;
         }
-
-        const row    = document.createElement('div');
-        const avInit = msg.mine ? VENDEUR_INIT : (conv.clientInit || '?');
-        const msgType = msg.type || 'text';
-
-        if (msgType === 'price_proposal' || msgType === 'price_offer' || msgType === 'order_created') {
-            /* ── Carte négociation ── */
-            row.className = 'msg-bubble-row' + (msg.mine ? ' mine' : '');
-            row.innerHTML =
-                '<div class="msg-bav">' + escHtml(avInit) + '</div>' +
-                '<div class="msg-bcontent">' +
-                    '<div class="msg-bsender">' + (msg.mine ? 'Vous' : escHtml(conv.clientName || '')) + '</div>' +
-                    buildNegoCard(msg, conv) +
-                    '<div class="msg-bmeta">' +
-                        '<span>' + escHtml(msg.time || '') + '</span>' +
-                        (msg.mine ? (msg.read ? '<span class="msg-read-tick">✓✓ Lu</span>' : '<span style="font-size:9px">✓ Envoyé</span>') : '') +
-                    '</div>' +
-                '</div>';
-        } else {
-            /* ── Message texte normal ── */
-            row.className = 'msg-bubble-row' + (msg.mine ? ' mine' : '');
-            row.innerHTML =
-                '<div class="msg-bav">' + escHtml(avInit) + '</div>' +
-                '<div class="msg-bcontent">' +
-                    '<div class="msg-bsender">' + (msg.mine ? 'Vous' : escHtml(conv.clientName || '')) + '</div>' +
-                    '<div class="msg-bubble">' + escHtml(msg.body || '') + '</div>' +
-                    '<div class="msg-bmeta">' +
-                        '<span>' + escHtml(msg.time || '') + '</span>' +
-                        (msg.mine ? (msg.read ? '<span class="msg-read-tick">✓✓ Lu</span>' : '<span style="font-size:9px">✓ Envoyé</span>') : '') +
-                    '</div>' +
-                '</div>';
-        }
-
-        thread.appendChild(row);
+        thread.appendChild(buildMsgRow(msg, conv));
     });
 
     setTimeout(function() { thread.scrollTop = thread.scrollHeight; }, 60);
+
+    /* 4b. Initialiser le dernier ID connu + démarrer le polling temps réel */
+    const msgs = conv.messages || [];
+    _lastMsgId = msgs.length > 0 ? Math.max(...msgs.map(m => m.id || 0)) : 0;
+    startModalPolling();
 
     /* 5. Formulaire réponse */
     document.getElementById('mmForm').action     = conv.replyUrl || '#';
@@ -518,6 +611,42 @@ function openMsgModal(conv) {
         .then(function(d) { if (d && d.success) removeUnreadVisual(conv.clientId); })
         .catch(function() {});
     } catch(e) {}
+}
+
+/* ── Construire une ligne de message (utilisée partout : init + polling + AJAX) ── */
+function buildMsgRow(msg, conv) {
+    const row     = document.createElement('div');
+    row.className = 'msg-bubble-row' + (msg.mine ? ' mine' : '');
+    if (msg.id) row.dataset.msgId = msg.id;
+
+    const tick = msg.mine
+        ? (msg.read
+            ? '<span class="msg-read-tick">✓✓ Lu</span>'
+            : '<span class="msg-sent-tick">✓ Envoyé</span>')
+        : '';
+
+    const meta = '<div class="msg-bmeta"><span>' + escHtml(msg.time || '') + '</span>' + tick + '</div>';
+
+    const msgType = msg.type || 'text';
+    const isNego  = msgType === 'price_proposal' || msgType === 'price_offer' || msgType === 'order_created';
+    const content = isNego
+        ? buildNegoCard(msg, conv) + meta
+        : '<div class="msg-bubble">' + escHtml(msg.body || '') + '</div>' + meta;
+
+    if (msg.mine) {
+        /* VENDEUR — droite : pas d'avatar, pas de nom, juste la bulle verte */
+        row.innerHTML = '<div class="msg-bcontent">' + content + '</div>';
+    } else {
+        /* CLIENT — gauche : avatar bleu + nom + bulle blanche */
+        const avInit = conv.clientInit || '?';
+        row.innerHTML =
+            '<div class="msg-bav">' + escHtml(avInit) + '</div>' +
+            '<div class="msg-bcontent">' +
+                '<div class="msg-bsender">' + escHtml(conv.clientName || 'Client') + '</div>' +
+                content +
+            '</div>';
+    }
+    return row;
 }
 
 /* ── Construire une carte de négociation ── */
@@ -700,9 +829,75 @@ function removeUnreadVisual(clientId) {
     });
 }
 
+/* ── Polling temps réel du modal ── */
+let _modalPollTimer = null;
+let _lastMsgId      = 0; // ID du dernier message connu (pour détecter les nouveaux)
+
+function startModalPolling() {
+    stopModalPolling(); // On s'assure qu'il n'y a qu'un seul timer actif
+    _modalPollTimer = setInterval(async function() {
+        const conv = window._currentConv;
+        if (!conv) return; // Si le modal est fermé, on ne fait rien
+
+        try {
+            // On construit l'URL avec les paramètres de la conversation ouverte
+            const params = new URLSearchParams({ client_id: conv.clientId });
+            if (conv.productId) params.append('product_id', conv.productId);
+
+            const res  = await fetch('{{ route("boutique.messages.conversation") }}?' + params, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': _csrf() }
+            });
+            const data = await res.json();
+            if (!data.messages) return;
+
+            // On cherche les messages plus récents que le dernier connu
+            const thread   = document.getElementById('mmThread');
+            const newMsgs  = data.messages.filter(m => m.id > _lastMsgId);
+
+            if (newMsgs.length > 0) {
+                newMsgs.forEach(function(msg) {
+                    // On ne rajoute pas les messages déjà affichés
+                    if (document.querySelector('[data-msg-id="' + msg.id + '"]')) return;
+
+                    // Si c'est un nouveau groupe de date, on ajoute le séparateur
+                    const lastSep = thread.querySelector('.msg-date-sep:last-of-type');
+                    if (!lastSep || lastSep.dataset.dateKey !== msg.dateKey) {
+                        const sep = document.createElement('div');
+                        sep.className = 'msg-date-sep';
+                        sep.dataset.dateKey = msg.dateKey;
+                        sep.innerHTML = '<span>' + escHtml(msg.date || '') + '</span>';
+                        thread.appendChild(sep);
+                    }
+
+                    thread.appendChild(buildMsgRow(msg, conv));
+                });
+
+                // On met à jour le dernier ID connu
+                _lastMsgId = data.messages[data.messages.length - 1].id;
+
+                // On fait défiler vers le bas automatiquement
+                thread.scrollTop = thread.scrollHeight;
+
+                // On met à jour le compteur de messages dans le header
+                const total = data.messages.length;
+                document.getElementById('mmSub').textContent = total + ' message' + (total !== 1 ? 's' : '');
+            }
+        } catch(e) { /* Erreur réseau silencieuse */ }
+    }, 3000); // Toutes les 3 secondes
+}
+
+function stopModalPolling() {
+    if (_modalPollTimer) {
+        clearInterval(_modalPollTimer);
+        _modalPollTimer = null;
+    }
+}
+
 function closeMsgModal() {
     document.getElementById('msgModalOverlay').classList.remove('open');
+    stopModalPolling(); // On arrête le polling quand le modal se ferme
     window._currentConv = null;
+    _lastMsgId = 0;
 }
 
 function escHtml(s) {
@@ -711,5 +906,70 @@ function escHtml(s) {
 
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') { closeMsgModal(); closeMsgDrawer(); }
+});
+
+/* ── Soumission du formulaire de réponse en AJAX (sans recharger la page) ── */
+document.getElementById('mmForm').addEventListener('submit', async function(e) {
+    e.preventDefault(); // On bloque la soumission normale (qui rechargerait la page)
+
+    const conv  = window._currentConv;
+    const input = document.getElementById('mmInput');
+    const body  = input.value.trim();
+
+    // Si le message est vide, on ne fait rien
+    if (!body) return;
+
+    const btn = this.querySelector('button[type="submit"]');
+    if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
+
+    try {
+        // On envoie le message via fetch (sans recharger la page)
+        const res = await fetch(this.action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': _csrf(),
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify({
+                body:       body,
+                client_id:  document.getElementById('mmClientId').value,
+                product_id: document.getElementById('mmProductId').value || null,
+            }),
+        });
+
+        const data = await res.json();
+
+        if (data.success || data.sent) {
+            // On vide le champ de saisie
+            input.value = '';
+            input.style.height = 'auto';
+
+            // On ajoute le message dans le thread
+            const thread = document.getElementById('mmThread');
+            const now    = new Date();
+            const time   = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+
+            const fakeMsg = {
+                id: data.message_id || 0,
+                mine: true,
+                body: body,
+                time: time,
+                read: false,
+                type: 'text',
+            };
+            if (data.message_id) _lastMsgId = Math.max(_lastMsgId, data.message_id);
+            thread.appendChild(buildMsgRow(fakeMsg, window._currentConv));
+
+            thread.scrollTop = thread.scrollHeight;
+        } else {
+            negoToast('❌ Erreur lors de l\'envoi.', 'error');
+        }
+    } catch(e) {
+        negoToast('❌ Erreur réseau. Réessayez.', 'error');
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '➤'; }
+    }
 });
 </script>

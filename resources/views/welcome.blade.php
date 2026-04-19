@@ -645,8 +645,8 @@ body {
 ══════════════════════════════════════════ --}}
 <nav class="top-nav">
     <a href="{{ url('/') }}" class="nav-brand">
-        <div class="nav-brand-icon">🛍️</div>
-        {{ config('app.name', 'ShopManager') }}
+        <img src="{{ asset('images/Shopio2.jpeg') }}" alt="Shopio" style="height:50px;width:auto;object-fit:contain;border-radius:8px">
+        {{ config('app.name', 'Shopio') }}
     </a>
     <div class="nav-links">
         <a href="#features"  class="nav-link-item">Fonctionnalités</a>

@@ -210,11 +210,13 @@ Route::middleware('auth')->group(function () {
     ════════════════════════════════════════════════════════════════════ */
 
     /* Afficher la position d'une commande */
-    Route::get('/orders/{order}/position',  [OrderTrackingController::class, 'show'])  ->name('orders.position.show');
-    /* Mettre à jour la position GPS */
-    Route::post('/orders/{order}/position', [OrderTrackingController::class, 'update'])->name('orders.position.update');
-    /* ⚠ Simulation GPS (à supprimer en production) */
-    Route::get('/orders/{order}/simulate-move', [OrderTrackingTestController::class, 'simulate'])->name('orders.simulate.move');
+    Route::get('/orders/{order}/position', [OrderTrackingController::class, 'show'])
+        ->name('orders.position.show');
+
+    /* Mettre à jour la position GPS — max 30 requêtes/minute par livreur */
+    Route::post('/orders/{order}/position', [OrderTrackingController::class, 'update'])
+        ->middleware('throttle:30,1')
+        ->name('orders.position.update');
 
 }); // fin middleware('auth')
 
@@ -303,6 +305,11 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('export/payments/pdf',   [ExportController::class, 'exportPaymentsPdf']) ->name('export.payments.pdf');
         Route::get('export/stats/pdf',      [ExportController::class, 'exportStatsPdf'])    ->name('export.stats.pdf');
 
+        // === HUB MESSAGES (page dédiée vendeur) ===
+Route::get('messages',
+    [BoutiqueMessageController::class, 'hub'])
+    ->name('messages.hub');
+
         // === MESSAGES CLIENTS ===
 Route::post('messages/reply/{client}/{product?}',
     [BoutiqueMessageController::class, 'reply'])
@@ -324,6 +331,10 @@ Route::post('messages/price-offer',
 Route::post('messages/refuse-proposal/{message}',
     [BoutiqueMessageController::class, 'refuseProposal'])
     ->name('messages.refuse-proposal');
+
+Route::get('messages/conversation',
+    [BoutiqueMessageController::class, 'getConversation'])
+    ->name('messages.conversation');
     });
 
 
@@ -439,13 +450,17 @@ Route::middleware(['auth', 'role:client'])
         /* Tableau de bord */
         Route::get('/dashboard', [ClientDashboard::class, 'index'])->name('dashboard');
         
-            /* Message pour les clients */
+            /* Hub de messagerie (page dédiée style WhatsApp) */
+            Route::get('/messages', [ShopMessageController::class, 'hub'])->name('messages.hub');
+
+        /* Message pour les clients */
             Route::get('/products/{product}/messages',  [ShopMessageController::class, 'index'])->name('messages.index');
             Route::post('/products/{product}/message',  [ShopMessageController::class, 'store'])->name('messages.store');
 
             /* Négociation de prix */
             Route::post('/messages/propose-price',            [ShopMessageController::class, 'proposePrice']) ->name('messages.propose');
             Route::post('/messages/confirm-offer/{message}',  [ShopMessageController::class, 'confirmOffer']) ->name('messages.confirm');
+            Route::get('/messages/poll',                       [ShopMessageController::class, 'poll'])          ->name('messages.client.poll');
 
         /* Commandes classiques */
         Route::resource('orders', OrderController::class)->only(['index', 'store', 'create']);
