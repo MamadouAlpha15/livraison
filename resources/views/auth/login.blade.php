@@ -1,61 +1,107 @@
 <x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+
+    <div class="ab-title">Bon retour 👋</div>
+    <p class="ab-sub">Connectez-vous à votre compte Shopio</p>
+
+    {{-- Status message --}}
+    @if (session('status'))
+        <div class="f-alert f-alert-success">{{ session('status') }}</div>
+    @endif
+
+    {{-- Errors globaux --}}
+    @if ($errors->any())
+        <div class="f-alert" style="background:#fef2f2;color:#991b1b;border:1px solid #fecaca;margin-bottom:18px">
+            {{ $errors->first() }}
+        </div>
+    @endif
 
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>   
-              <!-- Sélecteur de rôle -->
-<div class="mt-4">
-    <x-input-label for="role" :value="__('Se connecter en tant que')" />
-    <select id="role" name="role" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" required>
-        <option value="client">Client</option>
-        <option value="admin">Admin de boutique</option>
-        <option value="superAdmin">SuperAdmin </option>
-        <option value="vendeur">Vendeur</option>
-        <option value="livreur">Livreur</option>
-        <option value="employe">Employé</option>
-    </select>
-    <x-input-error :messages="$errors->get('role')" class="mt-2" />
-</div>
-
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        {{-- Rôle en cards --}}
+        <div class="f-group">
+            <label class="f-label">Je me connecte en tant que</label>
+            <input type="hidden" name="role" id="roleInput" value="{{ old('role', 'client') }}">
+            <div class="role-cards">
+                <div class="role-card {{ old('role','client') === 'client'     ? 'active':'' }}" onclick="setRole('client')">
+                    <span class="rc-ico">🛒</span>Client
+                </div>
+                <div class="role-card {{ old('role') === 'admin'               ? 'active':'' }}" onclick="setRole('admin')">
+                    <span class="rc-ico">🏪</span>Admin boutique
+                </div>
+                <div class="role-card {{ old('role') === 'livreur'             ? 'active':'' }}" onclick="setRole('livreur')">
+                    <span class="rc-ico">🛵</span>Livreur
+                </div>
+                <div class="role-card {{ old('role') === 'employe'             ? 'active':'' }}" onclick="setRole('employe')">
+                    <span class="rc-ico">👷</span>Employé
+                </div>
+                <div class="role-card {{ old('role') === 'vendeur'             ? 'active':'' }}" onclick="setRole('vendeur')">
+                    <span class="rc-ico">🧑‍💼</span>Vendeur
+                </div>
+                <div class="role-card {{ old('role') === 'superAdmin'          ? 'active':'' }}" onclick="setRole('superAdmin')">
+                    <span class="rc-ico">⚙️</span>Super Admin
+                </div>
+            </div>
+            @error('role')<p class="f-error">{{ $message }}</p>@enderror
         </div>
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
-                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
+        {{-- Email --}}
+        <div class="f-group">
+            <label class="f-label" for="email">Adresse email</label>
+            <div class="f-icon-wrap">
+                <span class="f-ico">✉️</span>
+                <input id="email" class="f-input {{ $errors->has('email') ? 'f-input-err':'' }}"
+                       type="email" name="email" value="{{ old('email') }}"
+                       required autofocus autocomplete="username"
+                       placeholder="exemple@email.com">
+            </div>
+            @error('email')<p class="f-error">{{ $message }}</p>@enderror
+        </div>
+
+        {{-- Mot de passe --}}
+        <div class="f-group">
+            <label class="f-label" for="password">Mot de passe</label>
+            <div class="f-icon-wrap f-pw-wrap">
+                <span class="f-ico">🔒</span>
+                <input id="password" class="f-input {{ $errors->has('password') ? 'f-input-err':'' }}"
+                       type="password" name="password"
+                       required autocomplete="current-password"
+                       placeholder="••••••••">
+                <button type="button" class="f-pw-eye" onclick="togglePw('password',this)" title="Afficher">👁️</button>
+            </div>
+            @error('password')<p class="f-error">{{ $message }}</p>@enderror
+        </div>
+
+        {{-- Remember + forgot --}}
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:24px">
+            <label class="f-check">
+                <input type="checkbox" name="remember" {{ old('remember') ? 'checked':'' }}>
+                <span>Se souvenir de moi</span>
             </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
             @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
+                <a href="{{ route('password.request') }}" class="auth-link" style="font-size:13px">Mot de passe oublié ?</a>
             @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
         </div>
+
+        <button type="submit" class="btn-auth">Se connecter →</button>
+
+        <p style="text-align:center;margin-top:20px;font-size:13px;color:#6b7280">
+            Pas encore de compte ?
+            <a href="{{ route('register') }}" class="auth-link">Créer un compte</a>
+        </p>
     </form>
+
+    <script>
+        function setRole(val) {
+            document.getElementById('roleInput').value = val;
+            document.querySelectorAll('.role-card').forEach(c => c.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+        function togglePw(id, btn) {
+            const inp = document.getElementById(id);
+            if (inp.type === 'password') { inp.type = 'text';     btn.textContent = '🙈'; }
+            else                         { inp.type = 'password'; btn.textContent = '👁️'; }
+        }
+    </script>
+
 </x-guest-layout>

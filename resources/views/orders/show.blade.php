@@ -2,6 +2,7 @@
 @extends('layouts.app')
 
 @section('title', 'Suivi commande #' . str_pad($order->id, 5, '0', STR_PAD_LEFT))
+@php $bodyClass = 'is-dashboard'; @endphp
 
 @push('styles')
 <link rel="stylesheet"

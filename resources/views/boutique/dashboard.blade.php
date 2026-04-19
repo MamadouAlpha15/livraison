@@ -190,14 +190,23 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 /* CHART */
 .chart-wrap { margin-bottom: 22px; }
-.chart-inner { padding: 16px 18px; }
-.chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 80px; padding: 0 2px; margin-bottom: 8px; }
-.bar-wrap { flex: 1; height: 100%; display: flex; align-items: flex-end; }
-.bar { width: 100%; border-radius: 4px 4px 0 0; background: var(--brand); opacity: .9; transition: opacity .15s, height .5s cubic-bezier(.23,1,.32,1); cursor: pointer; }
-.bar:hover { opacity: 1; }
-.bar.dim { opacity: .22; }
-.bar-labels { display: flex; gap: 6px; padding: 0 2px; }
-.bar-lbl { flex: 1; text-align: center; font-size: 10px; color: var(--muted); font-family: var(--mono); }
+.rc-header { padding: 16px 20px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.rc-header-left .rc-title { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+.rc-total { font-size: 26px; font-weight: 800; color: var(--text); font-family: var(--mono); line-height: 1; }
+.rc-total sup { font-size: 13px; font-weight: 600; vertical-align: super; color: var(--muted); }
+.rc-delta { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-top: 6px; }
+.rc-delta.up   { background: #d1fae5; color: #065f46; }
+.rc-delta.down { background: #fee2e2; color: #991b1b; }
+.rc-delta.flat { background: #f3f4f6; color: #6b7280; }
+.rc-header-right { text-align: right; font-size: 11px; color: var(--muted); }
+.rc-header-right .rc-best { font-size: 12px; font-weight: 700; color: var(--brand); }
+.rc-svg-wrap { padding: 4px 20px 16px; position: relative; }
+.rc-tooltip { position: absolute; background: #1e293b; color: #f8fafc; border-radius: 8px; padding: 8px 12px; font-size: 11.5px; pointer-events: none; opacity: 0; transition: opacity .15s; white-space: nowrap; box-shadow: 0 4px 16px rgba(0,0,0,.25); z-index: 10; }
+.rc-tooltip strong { display: block; font-size: 13px; font-family: var(--mono); color: #34d399; }
+.rc-tooltip span   { color: #94a3b8; font-size: 10px; }
+.rc-day-dots { display: flex; justify-content: space-around; padding: 0 0 2px; }
+.rc-day-dot { flex: 1; text-align: center; font-size: 10px; color: var(--muted); font-family: var(--mono); }
+.rc-day-dot.today { color: var(--brand); font-weight: 700; }
 
 /* CONTENT GRID */
 .content-grid { display: grid; grid-template-columns: 1fr 380px; gap: 18px; margin-bottom: 22px; }
@@ -484,7 +493,10 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         $commJour   = (float) \App\Models\CourierCommission::whereHas('order', function ($q) use ($shop, $day) {
             $q->where('shop_id', $shop->id)->whereDate('created_at', $day);
         })->where('status', 'payée')->sum('amount');
-        return ['label' => $now->copy()->subDays($i)->isoFormat('dd'), 'value' => max(0, $caJour - $commJour), 'today' => $i === 0];
+        $d = $now->copy()->subDays($i);
+        $d->locale('fr');
+        $label = ucfirst($d->isoFormat('ddd')); // Lun, Mar, Mer, Jeu, Ven, Sam, Dim
+        return ['label' => $label, 'value' => max(0, $caJour - $commJour), 'today' => $i === 0];
     });
     $max7 = $days7->max('value') ?: 1;
     $recentOrders = $shop->orders()->with('user')->latest()->take(6)->get();
@@ -794,16 +806,116 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             </div>
 
             {{-- CHART 7J --}}
+            {{-- ===================== REVENUE CHART 7J ===================== --}}
+            @php
+                $W = 660; $H = 160;
+                $pL = 52; $pR = 16; $pT = 16; $pB = 28;
+                $iW = $W - $pL - $pR;
+                $iH = $H - $pT - $pB;
+                $n7 = count($days7);
+                $pts = [];
+                foreach ($days7 as $i => $day) {
+                    $px = $pL + ($n7 > 1 ? ($i / ($n7 - 1)) * $iW : $iW / 2);
+                    $py = $pT + $iH - ($max7 > 0 ? ($day['value'] / $max7) * $iH : 0);
+                    $pts[] = ['x' => round($px,2), 'y' => round($py,2), 'v' => $day['value'], 'lbl' => $day['label'], 'today' => $day['today']];
+                }
+                $polyline   = implode(' ', array_map(fn($p) => $p['x'].','.$p['y'], $pts));
+                $areaPoints = ($pts[0]['x'].','.(  $pT+$iH).' '.$polyline.' '.$pts[$n7-1]['x'].','.(  $pT+$iH));
+                $week7Total = $days7->sum('value');
+                $bestDay    = $days7->sortByDesc('value')->first();
+                // Y-axis labels: 0, mid, max
+                $yGrid = [
+                    ['val' => $max7,     'y' => $pT],
+                    ['val' => $max7 / 2, 'y' => $pT + $iH / 2],
+                    ['val' => 0,         'y' => $pT + $iH],
+                ];
+                function rcFmt($n) {
+                    if ($n >= 1000000) return round($n/1000000,1).'M';
+                    if ($n >= 1000)    return round($n/1000).'k';
+                    return round($n);
+                }
+            @endphp
             <div class="card chart-wrap">
-                <div class="card-hd"><span class="card-title">Revenus — 7 derniers jours</span><span style="font-size:11px;color:var(--muted);font-weight:500">{{ $devise }}</span></div>
-                <div class="chart-inner">
-                    <div class="chart-bars" id="chartBars">
+                {{-- Header --}}
+                <div class="rc-header">
+                    <div class="rc-header-left">
+                        <div class="rc-title">Revenus — 7 derniers jours</div>
+                        <div class="rc-total">
+                            <sup>{{ $devise }} </sup>{{ number_format($week7Total, 0, ',', ' ') }}
+                        </div>
+                        @php
+                            $prevWeek = $days7->sum('value'); // placeholder — could add prev-week query
+                            // show today vs yesterday as delta proxy
+                            $todayVal = $days7->last()['value'];
+                            $yesterVal = $days7->count() >= 2 ? $days7->get($days7->count()-2)['value'] : 0;
+                            $rcDelta = $yesterVal > 0 ? round((($todayVal - $yesterVal)/$yesterVal)*100,1) : ($todayVal > 0 ? 100 : 0);
+                        @endphp
+                        <div class="rc-delta {{ $rcDelta > 0 ? 'up' : ($rcDelta < 0 ? 'down' : 'flat') }}">
+                            @if($rcDelta > 0) ↑ +{{ $rcDelta }}% aujourd'hui vs hier
+                            @elseif($rcDelta < 0) ↓ {{ $rcDelta }}% aujourd'hui vs hier
+                            @else → Stable aujourd'hui
+                            @endif
+                        </div>
+                    </div>
+                    <div class="rc-header-right">
+                        <div style="margin-bottom:2px">Meilleure journée</div>
+                        <div class="rc-best">{{ $bestDay['label'] }} — {{ number_format($bestDay['value'],0,',',' ') }} {{ $devise }}</div>
+                        <div style="margin-top:6px">Moy. / jour</div>
+                        <div style="font-weight:700;color:var(--text);font-size:12px">{{ number_format($week7Total/7,0,',',' ') }} {{ $devise }}</div>
+                    </div>
+                </div>
+
+                {{-- SVG Chart --}}
+                <div class="rc-svg-wrap">
+                    <div class="rc-tooltip" id="rcTip">
+                        <span id="rcTipDay"></span>
+                        <strong id="rcTipVal"></strong>
+                    </div>
+                    <svg viewBox="0 0 {{ $W }} {{ $H }}" width="100%" height="160" preserveAspectRatio="none" overflow="visible" style="display:block">
+                        <defs>
+                            <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%"   stop-color="#10b981" stop-opacity=".25"/>
+                                <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+                            </linearGradient>
+                        </defs>
+
+                        {{-- Y gridlines --}}
+                        @foreach($yGrid as $g)
+                        <line x1="{{ $pL }}" y1="{{ $g['y'] }}" x2="{{ $W - $pR }}" y2="{{ $g['y'] }}"
+                              stroke="#e5e7eb" stroke-width="1" stroke-dasharray="{{ $g['val'] > 0 ? '4 4' : 'none' }}"/>
+                        <text x="{{ $pL - 6 }}" y="{{ $g['y'] + 4 }}" text-anchor="end"
+                              font-size="9" fill="#9ca3af" font-family="monospace">{{ rcFmt($g['val']) }}</text>
+                        @endforeach
+
+                        {{-- Area fill --}}
+                        <polygon points="{{ $areaPoints }}" fill="url(#areaGrad)"/>
+
+                        {{-- Line --}}
+                        <polyline points="{{ $polyline }}" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+
+                        {{-- Points + hit areas --}}
+                        @foreach($pts as $i => $p)
+                        <circle cx="{{ $p['x'] }}" cy="{{ $p['y'] }}" r="4"
+                                fill="{{ $p['today'] ? '#10b981' : '#fff' }}"
+                                stroke="#10b981" stroke-width="2"
+                                class="rc-pt"
+                                data-val="{{ $p['v'] }}"
+                                data-lbl="{{ $p['lbl'] }}"
+                                data-today="{{ $p['today'] ? '1' : '0' }}"/>
+                        {{-- invisible wide hit area --}}
+                        <rect x="{{ $p['x'] - 20 }}" y="{{ $pT }}" width="40" height="{{ $iH }}"
+                              fill="transparent"
+                              class="rc-hit"
+                              data-idx="{{ $i }}"/>
+                        @endforeach
+                    </svg>
+
+                    {{-- X-axis day labels --}}
+                    <div class="rc-day-dots" style="margin-left:{{ $pL }}px;margin-right:{{ $pR }}px">
                         @foreach($days7 as $day)
-                        @php $pct = $day['value'] > 0 ? max(round(($day['value']/$max7)*100), 5) : 0; @endphp
-                        <div class="bar-wrap"><div class="bar {{ $day['today'] ? '' : 'dim' }}" data-h="{{ $pct }}" style="height:0%" title="{{ $day['label'] }} : {{ number_format($day['value'],0,',',' ') }} {{ $devise }}"></div></div>
+                        <div class="rc-day-dot {{ $day['today'] ? 'today' : '' }}">{{ $day['label'] }}</div>
                         @endforeach
                     </div>
-                    <div class="bar-labels">@foreach($days7 as $day)<div class="bar-lbl">{{ $day['label'] }}</div>@endforeach</div>
                 </div>
             </div>
 
@@ -1043,10 +1155,46 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    /* Chart 7j */
-    document.querySelectorAll('#chartBars .bar').forEach((bar, i) => {
-        setTimeout(() => { bar.style.transition = 'height 0.55s cubic-bezier(.23,1,.32,1)'; bar.style.height = bar.dataset.h + '%'; }, i * 60);
-    });
+    /* Revenue Chart 7j — tooltip */
+    (function() {
+        const tip    = document.getElementById('rcTip');
+        const tipDay = document.getElementById('rcTipDay');
+        const tipVal = document.getElementById('rcTipVal');
+        const DEVISE = '{{ $devise }}';
+        const pts    = document.querySelectorAll('.rc-pt');
+        const hits   = document.querySelectorAll('.rc-hit');
+
+        function showTip(pt, rect) {
+            const v = parseInt(pt.dataset.val);
+            tipDay.textContent = pt.dataset.lbl + (pt.dataset.today === '1' ? " (aujourd'hui)" : '');
+            tipVal.textContent = v.toLocaleString('fr-FR') + ' ' + DEVISE;
+            tip.style.opacity  = '1';
+            // position relative to svg wrap
+            const wrap = tip.parentElement.getBoundingClientRect();
+            const cx   = rect ? rect.left + rect.width/2 - wrap.left : 0;
+            const cy   = rect ? rect.top - wrap.top - 60 : 0;
+            tip.style.left = Math.max(0, cx - tip.offsetWidth/2) + 'px';
+            tip.style.top  = Math.max(0, cy) + 'px';
+        }
+
+        pts.forEach(pt => {
+            pt.addEventListener('mouseenter', function(e) {
+                this.setAttribute('r', '6');
+                showTip(this, this.getBoundingClientRect());
+            });
+            pt.addEventListener('mouseleave', function() {
+                this.setAttribute('r', '4');
+                tip.style.opacity = '0';
+            });
+        });
+
+        hits.forEach((hit, i) => {
+            const pt = pts[i];
+            if (!pt) return;
+            hit.addEventListener('mouseenter', () => pt.dispatchEvent(new Event('mouseenter')));
+            hit.addEventListener('mouseleave', () => pt.dispatchEvent(new Event('mouseleave')));
+        });
+    })();
 
     /* Sparklines */
     document.querySelectorAll('.sp-fill').forEach((el, i) => { setTimeout(() => { el.style.width = el.dataset.pct + '%'; }, 100 + i * 90); });

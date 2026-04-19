@@ -231,33 +231,136 @@ body {
 
 /* ── Image dashboard mockup ── */
 .hero-mockup {
-    margin-top: 60px; width: 100%; max-width: 960px;
+    margin-top: 64px; width: 100%; max-width: 1020px;
     animation: fadeUp .9s .5s ease both;
+    position: relative;
 }
+
+/* Halo lumineux derrière */
+.hero-mockup::before {
+    content: '';
+    position: absolute;
+    inset: -40px -60px;
+    background: radial-gradient(ellipse at 50% 60%, rgba(16,185,129,.22) 0%, rgba(5,150,105,.08) 50%, transparent 75%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Grille déco derrière */
+.hero-mockup::after {
+    content: '';
+    position: absolute;
+    inset: 20px -20px -20px;
+    background-image:
+        linear-gradient(rgba(16,185,129,.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16,185,129,.07) 1px, transparent 1px);
+    background-size: 36px 36px;
+    border-radius: 20px;
+    z-index: 0;
+    mask-image: radial-gradient(ellipse at 50% 50%, black 30%, transparent 80%);
+}
+
+.hero-mockup-outer {
+    position: relative; z-index: 1;
+    transform: perspective(1600px) rotateX(3deg);
+    transform-origin: center bottom;
+    transition: transform .6s ease;
+}
+.hero-mockup-outer:hover { transform: perspective(1600px) rotateX(0deg); }
+
 .hero-mockup-inner {
     position: relative;
-    border-radius: 16px; overflow: hidden;
+    border-radius: 14px; overflow: hidden;
     box-shadow:
-        0 0 0 1px rgba(255,255,255,.08),
-        0 40px 80px rgba(0,0,0,.6),
-        0 0 60px rgba(16,185,129,.08);
+        0 0 0 1px rgba(255,255,255,.10),
+        0 2px 0 rgba(255,255,255,.06),
+        0 20px 60px rgba(0,0,0,.7),
+        0 60px 120px rgba(0,0,0,.5),
+        0 0 80px rgba(16,185,129,.12),
+        inset 0 1px 0 rgba(255,255,255,.08);
 }
+
+/* Barre navigateur réaliste */
 .hero-mockup-bar {
-    background: #1e293b;
-    height: 36px; display: flex; align-items: center; gap: 6px; padding: 0 14px;
-    border-bottom: 1px solid rgba(255,255,255,.06);
+    background: linear-gradient(180deg, #252f3e 0%, #1e2a38 100%);
+    height: 40px; display: flex; align-items: center; gap: 10px; padding: 0 16px;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+    position: relative;
 }
-.mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
-.hero-mockup img {
-    width: 100%; display: block;
+.mockup-dots { display: flex; gap: 7px; flex-shrink: 0; }
+.mockup-dot  { width: 11px; height: 11px; border-radius: 50%; }
+.mockup-url  {
+    flex: 1; max-width: 340px; margin: 0 auto;
+    background: rgba(255,255,255,.07); border-radius: 6px;
+    height: 24px; display: flex; align-items: center; padding: 0 10px; gap: 6px;
+    font-size: 11px; color: rgba(255,255,255,.45); font-family: monospace;
+    border: 1px solid rgba(255,255,255,.06);
 }
+.mockup-url-lock { font-size: 10px; color: #10b981; }
+.mockup-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.mockup-action-btn {
+    width: 24px; height: 18px; border-radius: 4px;
+    background: rgba(255,255,255,.06); display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: rgba(255,255,255,.3);
+}
+
+.hero-mockup img { width: 100%; display: block; }
+
+/* Cartes stat flottantes */
+.mockup-float {
+    position: absolute; z-index: 4;
+    background: rgba(15, 23, 35, 0.88);
+    backdrop-filter: blur(12px) saturate(1.4);
+    -webkit-backdrop-filter: blur(12px) saturate(1.4);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 12px; padding: 10px 14px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(16,185,129,.1);
+    animation: floatCard 3s ease-in-out infinite;
+    min-width: 140px;
+}
+.mockup-float.f1 { top: 14%; left: -60px; animation-delay: 0s; }
+.mockup-float.f2 { top: 44%; right: -64px; animation-delay: 1s; }
+.mockup-float.f3 { bottom: 12%; left: -48px; animation-delay: 2s; }
+@keyframes floatCard {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-8px); }
+}
+.mf-label { font-size: 10px; color: rgba(255,255,255,.45); font-weight: 500; margin-bottom: 3px; text-transform: uppercase; letter-spacing: .06em; }
+.mf-val   { font-size: 18px; font-weight: 800; color: #fff; font-family: monospace; line-height: 1; }
+.mf-val span { font-size: 10px; font-weight: 600; color: #10b981; margin-left: 4px; }
+.mf-ico   { font-size: 20px; margin-bottom: 4px; }
+.mf-bar   { height: 3px; border-radius: 2px; background: rgba(255,255,255,.1); margin-top: 6px; overflow: hidden; }
+.mf-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, #10b981, #34d399); }
+
+/* Badge "LIVE" */
+.mockup-live {
+    position: absolute; top: -14px; right: 20px; z-index: 5;
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #fff; font-size: 10px; font-weight: 700; letter-spacing: .08em;
+    padding: 4px 10px; border-radius: 20px;
+    display: flex; align-items: center; gap: 5px;
+    box-shadow: 0 4px 16px rgba(16,185,129,.4);
+}
+.mockup-live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #fff; animation: pulse 1.4s ease infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+
 .hero-mockup-placeholder {
     background: linear-gradient(180deg, #0f1f18 0%, #1a2e20 100%);
-    height: 420px; display: flex; align-items: center; justify-content: center;
+    height: 480px; display: flex; align-items: center; justify-content: center;
     flex-direction: column; gap: 12px;
 }
 .hero-mockup-placeholder .ico { font-size: 48px; opacity: .4; }
 .hero-mockup-placeholder p { font-size: 13px; color: rgba(255,255,255,.3); font-weight: 500; }
+
+@media (max-width: 900px) {
+    .mockup-float.f1, .mockup-float.f2, .mockup-float.f3 { display: none; }
+    .hero-mockup-outer { transform: none !important; }
+    .hero-mockup::after { display: none; }
+}
 
 /* Animations */
 @keyframes fadeDown {
@@ -628,26 +731,160 @@ body {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   RESPONSIVE
+   HAMBURGER MOBILE
+════════════════════════════════════════════════════════════════ */
+.nav-hamburger {
+    display: none; flex-direction: column; gap: 5px;
+    cursor: pointer; padding: 6px; border: none; background: none;
+}
+.nav-hamburger span {
+    display: block; width: 22px; height: 2px;
+    background: rgba(255,255,255,.8); border-radius: 2px;
+    transition: transform .25s, opacity .25s;
+}
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.nav-mobile-menu {
+    display: none; position: fixed;
+    top: 64px; left: 0; right: 0; z-index: 99;
+    background: rgba(10,22,40,.97);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255,255,255,.07);
+    padding: 16px 20px 24px;
+    flex-direction: column; gap: 6px;
+}
+.nav-mobile-menu.open { display: flex; }
+.nav-mobile-link {
+    display: block; padding: 11px 14px; border-radius: 10px;
+    font-size: 15px; font-weight: 600; color: rgba(255,255,255,.75);
+    text-decoration: none; transition: background .15s, color .15s;
+}
+.nav-mobile-link:hover { background: rgba(255,255,255,.08); color: #fff; }
+.nav-mobile-divider { height: 1px; background: rgba(255,255,255,.07); margin: 8px 0; }
+.nav-mobile-btn {
+    display: block; padding: 13px; border-radius: 10px;
+    font-size: 15px; font-weight: 700; text-align: center;
+    text-decoration: none; margin-top: 4px;
+}
+.nav-mobile-btn-outline {
+    border: 1.5px solid rgba(255,255,255,.2); color: rgba(255,255,255,.8);
+    background: transparent;
+}
+.nav-mobile-btn-green {
+    background: var(--green); color: #fff;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   RESPONSIVE — TABLET (≤ 1024px)
+════════════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+    .hero-mockup { padding: 0 12px; }
+    .pricing-grid { grid-template-columns: repeat(2,1fr); }
+    .company-cta  { padding: 44px 32px; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   RESPONSIVE — TABLETTE (≤ 900px)
 ════════════════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
-    .features-grid  { grid-template-columns: repeat(2,1fr); }
-    .steps-grid     { grid-template-columns: repeat(2,1fr); gap: 32px; }
+    /* Navbar */
+    .top-nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    .nav-hamburger { display: flex; }
+
+    /* Hero */
+    .hero-section { padding: 88px 20px 60px; }
+    .hero-stats { gap: 24px; flex-wrap: wrap; }
+
+    /* Mockup */
+    .mockup-float { display: none; }
+    .hero-mockup  { padding: 0 8px; margin-top: 48px; }
+    .hero-mockup::after { display: none; }
+    .hero-mockup-outer { transform: none !important; }
+
+    /* Grilles */
+    .features-grid { grid-template-columns: repeat(2,1fr); gap: 14px; }
+    .steps-grid    { grid-template-columns: repeat(2,1fr); gap: 36px 20px; }
     .steps-grid::before { display: none; }
-    .shops-grid     { grid-template-columns: repeat(3,1fr); gap:16px; }
-    .proof-grid     { grid-template-columns: 1fr; }
-    .pricing-grid   { grid-template-columns: 1fr; }
-    .faq-grid       { grid-template-columns: 1fr; }
-    .top-nav        { padding: 0 20px; }
-    .nav-links .nav-link-item { display: none; }
+    .shops-grid    { grid-template-columns: repeat(2,1fr); gap: 16px; }
+    .proof-grid    { grid-template-columns: repeat(2,1fr); }
+    .pricing-grid  { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
+    .faq-grid      { grid-template-columns: 1fr; }
+
+    /* Sections */
+    .section { padding: 60px 20px; }
+    .section-sub { margin-bottom: 32px; }
+
+    /* CTA entreprise */
+    .company-cta {
+        margin: 0; flex-direction: column;
+        align-items: flex-start; padding: 36px 28px; border-radius: 16px;
+    }
+
+    /* Footer */
+    .footer-inner { gap: 24px; }
+    .site-footer  { padding: 40px 24px 24px; }
 }
-@media (max-width: 560px) {
-    .features-grid  { grid-template-columns: 1fr; }
-    .shops-grid     { grid-template-columns: 1fr; gap:14px; }
-    .hero-stats     { gap: 20px; }
-    .hero-stat-sep  { display: none; }
-    .company-cta    { margin: 0 16px; padding: 32px 22px; }
-    .site-footer    { padding: 40px 20px 20px; }
+
+/* ════════════════════════════════════════════════════════════════
+   RESPONSIVE — MOBILE (≤ 640px)
+════════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+    /* Hero */
+    .hero-section { padding: 80px 16px 52px; }
+    .hero-title   { letter-spacing: -1px; }
+    .hero-sub     { font-size: 15px; }
+    .hero-cta     { flex-direction: column; align-items: stretch; width: 100%; }
+    .cta-btn      { justify-content: center; padding: 14px 20px; }
+    .hero-stats   { gap: 16px; }
+    .hero-stat-sep { display: none; }
+    .hero-stat-val { font-size: 22px; }
+
+    /* Mockup bar */
+    .mockup-url   { max-width: 160px; font-size: 9px; }
+    .mockup-actions { display: none; }
+
+    /* Grilles */
+    .features-grid { grid-template-columns: 1fr; gap: 12px; }
+    .steps-grid    { grid-template-columns: 1fr; gap: 28px; }
+    .shops-grid    { grid-template-columns: 1fr; gap: 14px; }
+    .proof-grid    { grid-template-columns: 1fr; }
+
+    /* Cards */
+    .feature-card  { padding: 22px 18px; }
+    .shop-img-wrap { height: 160px; }
+
+    /* Sections */
+    .section       { padding: 48px 16px; }
+    .section-title { letter-spacing: -.5px; margin-bottom: 10px; }
+
+    /* CTA Livraison */
+    .company-cta  { margin: 0; padding: 28px 20px; border-radius: 14px; }
+    .company-cta-txt h2 { font-size: 22px; }
+    .company-cta-actions { width: 100%; flex-direction: column; }
+    .company-cta-actions .cta-btn { justify-content: center; }
+
+    /* Pricing */
+    .pricing-grid  { max-width: 100%; }
+
+    /* Footer */
+    .footer-inner  { flex-direction: column; gap: 28px; }
+    .footer-bottom { flex-direction: column; text-align: center; gap: 6px; }
+    .site-footer   { padding: 36px 16px 20px; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   RESPONSIVE — PETIT MOBILE (≤ 400px)
+════════════════════════════════════════════════════════════════ */
+@media (max-width: 400px) {
+    .hero-section  { padding: 74px 14px 44px; }
+    .nav-brand     { font-size: 15px; }
+    .hero-mockup-bar { height: 32px; }
+    .mockup-dot    { width: 8px; height: 8px; }
+    .mockup-url    { display: none; }
+    .hero-stats    { flex-direction: column; align-items: center; gap: 14px; }
 }
 </style>
 @endpush
@@ -659,7 +896,7 @@ body {
 ══════════════════════════════════════════ --}}
 <nav class="top-nav">
     <a href="{{ url('/') }}" class="nav-brand">
-        <img src="{{ asset('images/Shopio2.jpeg') }}" alt="Shopio" style="height:50px;width:auto;object-fit:contain;border-radius:8px">
+        <img src="{{ asset('images/Shopio.jpeg') }}" alt="Shopio" style="height:50px;width:auto;object-fit:contain;border-radius:8px">
         {{ config('app.name', 'Shopio') }}
     </a>
     <div class="nav-links">
@@ -680,7 +917,33 @@ body {
         @endif
         @endguest
     </div>
+
+    {{-- Hamburger mobile --}}
+    <button class="nav-hamburger" id="navHamburger" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+    </button>
 </nav>
+
+{{-- Menu mobile déroulant --}}
+<div class="nav-mobile-menu" id="navMobileMenu">
+    <a href="#features"  class="nav-mobile-link" onclick="closeMobileMenu()">✨ Fonctionnalités</a>
+    <a href="#how"       class="nav-mobile-link" onclick="closeMobileMenu()">🔄 Comment ça marche</a>
+    <a href="#shops"     class="nav-mobile-link" onclick="closeMobileMenu()">🏪 Boutiques</a>
+    <a href="#pricing"   class="nav-mobile-link" onclick="closeMobileMenu()">💳 Tarifs</a>
+    <div class="nav-mobile-divider"></div>
+    @guest
+    <a href="{{ route('login') }}"    class="nav-mobile-btn nav-mobile-btn-outline">Se connecter</a>
+    <a href="{{ route('register') }}" class="nav-mobile-btn nav-mobile-btn-green">🚀 Créer un compte — Gratuit</a>
+    @else
+    @php
+        $role2 = Auth::user()->role;
+        $map2  = ['superadmin'=>'admin.dashboard','admin'=>'boutique.dashboard','vendeur'=>'vendeur.dashboard','client'=>'client.dashboard','company'=>'company.dashboard','livreur'=>'livreur.dashboard'];
+    @endphp
+    @if(isset($map2[$role2]))
+    <a href="{{ route($map2[$role2]) }}" class="nav-mobile-btn nav-mobile-btn-green">Mon dashboard →</a>
+    @endif
+    @endguest
+</div>
 
 {{-- ══════════════════════════════════════════
      HERO
@@ -752,21 +1015,63 @@ body {
     </div>
 
     {{-- Mockup dashboard --}}
-    <div class="hero-mockup" style="max-width:960px;width:100%">
-        <div class="hero-mockup-inner">
-            <div class="hero-mockup-bar">
-                <span class="mockup-dot" style="background:#ff5f57"></span>
-                <span class="mockup-dot" style="background:#febc2e"></span>
-                <span class="mockup-dot" style="background:#28c840"></span>
+    <div class="hero-mockup">
+
+        {{-- Cartes flottantes --}}
+        <div class="mockup-float f1">
+            <div class="mf-ico">💰</div>
+            <div class="mf-label">CA aujourd'hui</div>
+            <div class="mf-val">2 840 000 <span>↑ +18%</span></div>
+            <div class="mf-bar"><div class="mf-bar-fill" style="width:72%"></div></div>
+        </div>
+        <div class="mockup-float f2">
+            <div class="mf-ico">📦</div>
+            <div class="mf-label">Commandes en attente</div>
+            <div class="mf-val">12 <span>en cours</span></div>
+            <div class="mf-bar"><div class="mf-bar-fill" style="width:55%"></div></div>
+        </div>
+        <div class="mockup-float f3">
+            <div class="mf-ico">🛵</div>
+            <div class="mf-label">Livreurs disponibles</div>
+            <div class="mf-val">5 <span>actifs</span></div>
+            <div class="mf-bar"><div class="mf-bar-fill" style="width:83%"></div></div>
+        </div>
+
+        <div class="hero-mockup-outer">
+            {{-- Badge LIVE --}}
+            <div class="mockup-live">
+                <span class="mockup-live-dot"></span>
+                LIVE PREVIEW
             </div>
-            @if(file_exists(public_path('images/dashboard.png')))
-                <img src="{{ asset('images/dashboard.png') }}" alt="Dashboard preview">
-            @else
-                <div class="hero-mockup-placeholder">
-                    <span class="ico">📊</span>
-                    <p>Aperçu du dashboard — ajoute dashboard.png dans public/images/</p>
+
+            <div class="hero-mockup-inner">
+                {{-- Barre navigateur réaliste --}}
+                <div class="hero-mockup-bar">
+                    <div class="mockup-dots">
+                        <span class="mockup-dot" style="background:#ff5f57"></span>
+                        <span class="mockup-dot" style="background:#febc2e"></span>
+                        <span class="mockup-dot" style="background:#28c840"></span>
+                    </div>
+                    <div class="mockup-url">
+                        <span class="mockup-url-lock">🔒</span>
+                        shopio.app/boutique/dashboard
+                    </div>
+                    <div class="mockup-actions">
+                        <div class="mockup-action-btn">←</div>
+                        <div class="mockup-action-btn">→</div>
+                        <div class="mockup-action-btn">↻</div>
+                    </div>
                 </div>
-            @endif
+
+                @if(file_exists(public_path('images/dashboard2.png')))
+                    <img src="{{ asset('images/dashboard2.png') }}" alt="Dashboard Shopio preview" loading="lazy">
+                @else
+                    <div class="hero-mockup-placeholder">
+                        <span class="ico">📊</span>
+                        <p>Aperçu du dashboard — ajoute dashboard2.png dans public/images/</p>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 </section>
@@ -1107,6 +1412,17 @@ body {
 
 @push('scripts')
 <script>
+function closeMobileMenu() {
+    const h = document.getElementById('navHamburger');
+    const m = document.getElementById('navMobileMenu');
+    if (h && m) {
+        m.classList.remove('open');
+        h.classList.remove('open');
+        h.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
     /* ── Animation compteurs hero ──────────────────────────────────
@@ -1147,6 +1463,24 @@ document.addEventListener('DOMContentLoaded', () => {
             ? 'rgba(10,22,40,.98)'
             : 'rgba(10,22,40,.92)';
     });
+
+    /* ── Hamburger menu mobile ───────────────────────────────────*/
+    const hamburger   = document.getElementById('navHamburger');
+    const mobileMenu  = document.getElementById('navMobileMenu');
+    if (hamburger && mobileMenu) {
+        hamburger.addEventListener('click', () => {
+            const open = mobileMenu.classList.toggle('open');
+            hamburger.classList.toggle('open', open);
+            hamburger.setAttribute('aria-expanded', open);
+            document.body.style.overflow = open ? 'hidden' : '';
+        });
+        // Fermer en cliquant hors du menu
+        document.addEventListener('click', e => {
+            if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+                closeMobileMenu();
+            }
+        });
+    }
 
     /* ── Reveal au scroll ─────────────────────────────────────────
      * Les cartes de features et étapes apparaissent en fondu

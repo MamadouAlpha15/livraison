@@ -366,6 +366,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 </style>
 @endpush
 
+
 @section('content')
 @php $devise = $shop->currency ?? 'GNF'; @endphp
 @php $bodyClass = 'is-dashboard'; @endphp
@@ -435,7 +436,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 {{-- NAVBAR --}}
 <nav class="amz-nav">
-    <a href="{{ route('client.dashboard') }}" class="amz-nav-logo">Ma<span>Boutique</span></a>
+    <a href="{{ route('client.dashboard') }}" class="amz-nav-logo"> <img src="{{ asset('images/Shopio2.jpeg') }}" alt="Shopio" style="height:50px;width:auto;object-fit:contain;border-radius:8px">
+        {{ config('app.name', 'Shopio') }}</a>
     <a href="{{ route('client.dashboard') }}" class="amz-back">← Retour</a>
     <div class="amz-nav-search">
         <input type="text" id="prodSearch" placeholder="Rechercher dans {{ $shop->name }}…">

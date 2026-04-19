@@ -411,7 +411,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 <nav class="top-nav">
     <a href="{{ url('/') }}" class="nav-brand">
          <div class="sb-logo-icon"><img src="/images/Shopio2.jpeg" alt="Shopio" style="width:40px;height:40px;object-fit:cover;border-radius:9px"></div>
-                <span class="sb-shop-name">{{ $shop->name ?? 'Boutique' }}</span>
+                
         {{ config('app.name', 'ShopManager') }}
     </a>
     <div class="nav-links">

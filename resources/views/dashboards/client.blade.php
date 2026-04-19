@@ -940,7 +940,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 {{-- ══ NAVBAR ══ --}}
 <nav class="nav">
     <a href="{{ route('client.dashboard') }}" class="nav-logo">
-        <span>Ma</span><span>Boutique</span>
+         <img src="{{ asset('images/Shopio2.jpeg') }}" alt="Shopio" style="height:60px;width:auto;object-fit:contain;border-radius:8px">
+       
     </a>
 
     <div class="nav-links">
