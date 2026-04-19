@@ -379,44 +379,58 @@ body {
 
 .shops-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
-    margin-bottom: 32px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 36px;
 }
 .shop-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--r);
+    border-radius: 18px;
     overflow: hidden;
-    transition: all .2s;
+    transition: all .25s;
     text-decoration: none;
-    display: block;
+    display: flex; flex-direction: column;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
 }
 .shop-card:hover {
-    box-shadow: 0 8px 28px rgba(0,0,0,.08);
+    box-shadow: 0 16px 48px rgba(0,0,0,.11);
     border-color: var(--green-lt);
-    transform: translateY(-4px);
+    transform: translateY(-6px);
 }
 .shop-img-wrap {
-    height: 120px; overflow: hidden;
+    height: 180px; overflow: hidden;
     background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
     display: flex; align-items: center; justify-content: center;
+    position: relative;
 }
 .shop-img-wrap img {
     width: 100%; height: 100%; object-fit: cover;
-    transition: transform .4s;
+    transition: transform .45s ease;
 }
-.shop-card:hover .shop-img-wrap img { transform: scale(1.05); }
-.shop-img-placeholder { font-size: 40px; }
-.shop-info { padding: 14px 16px; }
-.shop-name { font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-.shop-meta { font-size: 11px; color: var(--muted); }
-.shop-badge {
-    display: inline-block;
-    background: var(--green-mlt); color: var(--green-dk);
+.shop-card:hover .shop-img-wrap img { transform: scale(1.07); }
+.shop-img-placeholder { font-size: 52px; opacity: .55; }
+.shop-img-wrap .shop-badge {
+    position: absolute; top: 12px; right: 12px;
+    background: rgba(16,185,129,.92); color: #fff;
     font-size: 10px; font-weight: 700;
-    padding: 2px 8px; border-radius: 20px;
-    margin-top: 6px;
+    padding: 3px 10px; border-radius: 20px;
+    backdrop-filter: blur(4px);
+}
+.shop-info { padding: 18px 20px 20px; flex: 1; display: flex; flex-direction: column; }
+.shop-name { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 5px; line-height: 1.25; }
+.shop-meta { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+.shop-cta {
+    margin-top: auto;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 9px 18px; border-radius: 10px;
+    font-size: 13px; font-weight: 700;
+    background: var(--green-mlt); color: var(--green-dk);
+    border: 1.5px solid var(--green-lt);
+    transition: all .15s;
+}
+.shop-card:hover .shop-cta {
+    background: var(--green); color: #fff; border-color: var(--green-dk);
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -620,7 +634,7 @@ body {
     .features-grid  { grid-template-columns: repeat(2,1fr); }
     .steps-grid     { grid-template-columns: repeat(2,1fr); gap: 32px; }
     .steps-grid::before { display: none; }
-    .shops-grid     { grid-template-columns: repeat(2,1fr); }
+    .shops-grid     { grid-template-columns: repeat(3,1fr); gap:16px; }
     .proof-grid     { grid-template-columns: 1fr; }
     .pricing-grid   { grid-template-columns: 1fr; }
     .faq-grid       { grid-template-columns: 1fr; }
@@ -629,7 +643,7 @@ body {
 }
 @media (max-width: 560px) {
     .features-grid  { grid-template-columns: 1fr; }
-    .shops-grid     { grid-template-columns: repeat(2,1fr); }
+    .shops-grid     { grid-template-columns: 1fr; gap:14px; }
     .hero-stats     { gap: 20px; }
     .hero-stat-sep  { display: none; }
     .company-cta    { margin: 0 16px; padding: 32px 22px; }
@@ -846,27 +860,33 @@ body {
         <p class="section-sub">Découvrez les boutiques déjà présentes sur la plateforme et commandez dès maintenant.</p>
 
         <div class="shops-grid">
-            @foreach($shops->take(8) as $shop)
+            @foreach($shops->take(3) as $shop)
             <a href="{{ route('public.shops.products', $shop) }}" class="shop-card">
                 <div class="shop-img-wrap">
                     @if(!empty($shop->image))
-                        <img src="{{ asset('storage/'.$shop->image) }}" alt="{{ $shop->name }}">
+                        <img src="{{ asset('storage/'.$shop->image) }}" alt="{{ $shop->name }}" loading="lazy">
                     @else
                         <span class="shop-img-placeholder">🛍️</span>
                     @endif
+                    <span class="shop-badge">✓ Actif</span>
                 </div>
                 <div class="shop-info">
                     <div class="shop-name">{{ $shop->name }}</div>
-                    <div class="shop-meta">{{ $shop->type ?? 'Boutique' }} · {{ $shop->products_count ?? 0 }} produit(s)</div>
-                    <div class="shop-badge">✓ Actif</div>
+                    <div class="shop-meta">
+                        {{ $shop->type ?? 'Boutique' }} &nbsp;·&nbsp;
+                        📦 {{ $shop->products_count ?? 0 }} produit{{ ($shop->products_count ?? 0) > 1 ? 's' : '' }}
+                        @if($shop->address) &nbsp;·&nbsp; 📍 {{ Str::limit($shop->address, 18) }} @endif
+                    </div>
+                    <span class="shop-cta">Visiter la boutique →</span>
                 </div>
             </a>
             @endforeach
         </div>
 
         <div style="text-align:center">
-            <a href="{{ route('welcome') }}" class="cta-btn cta-primary" style="display:inline-flex">
-                Voir toutes les boutiques →
+            <a href="{{ route('shops.index') }}" class="cta-btn cta-primary" style="display:inline-flex;align-items:center;gap:8px">
+                🏪 Voir toutes les boutiques
+                <span style="background:rgba(255,255,255,.2);padding:2px 9px;border-radius:20px;font-size:12px">{{ $shops->count() }}+</span>
             </a>
         </div>
     </div>
@@ -1051,7 +1071,7 @@ body {
     <div class="footer-inner">
         <div class="footer-brand">
             <a href="{{ url('/') }}" class="footer-logo">
-                <div class="footer-logo-ico">🛍️</div>
+                  <div class="sb-logo-icon"><img src="/images/Shopio2.jpeg" alt="Shopio" style="width:40px;height:40px;object-fit:cover;border-radius:9px"></div>
                 {{ config('app.name', 'ShopManager') }}
             </a>
             <p class="footer-desc">La plateforme tout-en-un pour gérer votre boutique, vos livraisons et vos clients en Guinée.</p>

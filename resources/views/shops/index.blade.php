@@ -1,5 +1,6 @@
 @extends('layouts.app')
 
+
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -9,10 +10,10 @@
    VARIABLES
 ═══════════════════════════════════════════ */
 :root {
-    --gr:      #f06a0f;
-    --gr-dk:   #d45a08;
-    --gr-lt:   #fff4ed;
-    --gr-mlt:  #fff8f5;
+    --gr:      #10b981;
+    --gr-dk:   #059669;
+    --gr-lt:   #d1fae5;
+    --gr-mlt:  #ecfdf5;
     --dark:    #0a1628;
     --dark2:   #111f3a;
     --txt:     #0f172a;
@@ -92,20 +93,20 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 .shops-hero-glow {
     position: absolute;
     width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(240,106,15,.15) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(16,185,129,.15) 0%, transparent 70%);
     top: 50%; left: 50%; transform: translate(-50%, -60%);
     pointer-events: none;
 }
 .shops-hero-badge {
     display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(240,106,15,.12); border: 1px solid rgba(240,106,15,.25);
-    color: #f9a87d; font-size: 11px; font-weight: 700;
+    background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.25);
+    color: #34d399; font-size: 11px; font-weight: 700;
     padding: 5px 13px; border-radius: 20px;
     margin-bottom: 18px;
 }
 .shops-hero-badge-dot {
     width: 6px; height: 6px; border-radius: 50%;
-    background: #f9a87d; box-shadow: 0 0 6px #f9a87d;
+    background: #34d399; box-shadow: 0 0 6px #34d399;
     animation: blink 2s ease-in-out infinite;
 }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
@@ -217,87 +218,113 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 ════════════════════════════════════════════ */
 .shops-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
     margin-bottom: 48px;
 }
 
 .shop-card {
     background: var(--surf);
     border: 1px solid var(--border);
-    border-radius: var(--r);
+    border-radius: 20px;
     overflow: hidden;
     text-decoration: none;
     display: flex; flex-direction: column;
-    transition: box-shadow .2s, border-color .2s, transform .2s;
+    transition: box-shadow .25s, border-color .25s, transform .25s;
     animation: fadeUp .35s ease both;
+    box-shadow: 0 2px 10px rgba(0,0,0,.04);
 }
 .shop-card:hover {
-    box-shadow: 0 10px 32px rgba(0,0,0,.09);
+    box-shadow: 0 20px 60px rgba(0,0,0,.12);
     border-color: var(--gr-lt);
-    transform: translateY(-5px);
+    transform: translateY(-7px);
 }
 @keyframes fadeUp {
-    from { opacity:0; transform:translateY(16px); }
+    from { opacity:0; transform:translateY(18px); }
     to   { opacity:1; transform:translateY(0); }
 }
 
 /* Image */
 .sc-img {
-    height: 140px; overflow: hidden;
+    height: 190px; overflow: hidden;
     background: linear-gradient(135deg, var(--gr-mlt), var(--gr-lt));
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0; position: relative;
 }
 .sc-img img {
     width: 100%; height: 100%; object-fit: cover;
-    transition: transform .45s ease;
+    transition: transform .5s ease;
 }
-.shop-card:hover .sc-img img { transform: scale(1.07); }
-.sc-img-ph { font-size: 44px; opacity: .6; }
+.shop-card:hover .sc-img img { transform: scale(1.08); }
+.sc-img-ph { font-size: 52px; opacity: .5; }
+
+/* Overlay au hover */
+.sc-img::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.25) 0%, transparent 60%);
+    opacity: 0; transition: opacity .25s;
+}
+.shop-card:hover .sc-img::after { opacity: 1; }
 
 /* Badge "Actif" flottant */
 .sc-badge {
-    position: absolute; top: 10px; right: 10px;
-    background: rgba(240,106,15,.9); color: #fff;
-    font-size: .68rem; font-weight: 700;
-    padding: 3px 9px; border-radius: 20px;
-    backdrop-filter: blur(4px);
+    position: absolute; top: 12px; right: 12px;
+    background: rgba(16,185,129,.92); color: #fff;
+    font-size: .68rem; font-weight: 800;
+    padding: 4px 11px; border-radius: 20px;
+    backdrop-filter: blur(6px);
+    z-index: 1;
+    letter-spacing: .3px;
 }
 
 /* Body de la carte */
 .sc-body {
-    padding: 16px 18px 18px;
+    padding: 20px 22px 22px;
     display: flex; flex-direction: column; flex: 1;
 }
 .sc-name {
-    font-size: 15px; font-weight: 800; color: var(--txt);
-    margin-bottom: 5px; line-height: 1.25;
+    font-size: 16px; font-weight: 800; color: var(--txt);
+    margin-bottom: 4px; line-height: 1.25;
 }
 .sc-type {
-    font-size: 11.5px; color: var(--muted);
-    text-transform: uppercase; letter-spacing: .05em;
-    font-weight: 600; margin-bottom: 10px;
+    display: inline-flex; align-items: center;
+    font-size: 11px; color: var(--gr-dk);
+    text-transform: uppercase; letter-spacing: .06em;
+    font-weight: 700; margin-bottom: 12px;
+    background: var(--gr-mlt); border: 1px solid var(--gr-lt);
+    padding: 2px 9px; border-radius: 20px;
+    width: fit-content;
 }
 .sc-meta {
-    display: flex; align-items: center; gap: 1rem;
-    font-size: 12px; color: var(--txt2); margin-bottom: 14px;
+    display: flex; align-items: center; gap: 14px;
+    font-size: 12px; color: var(--txt2); margin-bottom: 16px;
+    flex-wrap: wrap;
 }
-.sc-meta-item { display: flex; align-items: center; gap: .3rem; }
+.sc-meta-item {
+    display: flex; align-items: center; gap: 4px;
+    background: var(--bg); border: 1px solid var(--border);
+    padding: 3px 9px; border-radius: 20px;
+    font-weight: 600;
+}
+
+/* Rating étoiles déco */
+.sc-stars { color: #f59e0b; font-size: 11px; letter-spacing: 1px; margin-bottom: 14px; }
 
 /* Bouton CTA */
 .sc-btn {
     margin-top: auto;
-    display: block; text-align: center;
-    padding: .55rem 1rem;
-    border-radius: 8px;
-    font-size: .82rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: .65rem 1rem;
+    border-radius: 10px;
+    font-size: .83rem; font-weight: 700;
     background: var(--gr-mlt); color: var(--gr-dk);
     border: 1.5px solid var(--gr-lt);
-    text-decoration: none; transition: background .15s, color .15s;
+    text-decoration: none; transition: all .18s;
 }
 .shop-card:hover .sc-btn {
-    background: var(--gr); color: #fff; border-color: var(--gr);
+    background: var(--gr); color: #fff; border-color: var(--gr-dk);
+    box-shadow: 0 4px 14px rgba(16,185,129,.35);
 }
 
 /* ── Empty state ── */
@@ -357,8 +384,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 /* ════════════════════════════════════════════
    RESPONSIVE
 ════════════════════════════════════════════ */
-@media (max-width: 1024px) {
-    .shops-grid { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 1100px) {
+    .shops-grid { grid-template-columns: repeat(3, 1fr); gap: 18px; }
 }
 @media (max-width: 768px) {
     .shops-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
@@ -366,11 +393,14 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
     .nav-links .nav-link-item { display: none; }
     .shops-hero { padding: 88px 16px 48px; }
     .shops-main { padding: 32px 16px 60px; }
+    .sc-img { height: 150px; }
 }
 @media (max-width: 480px) {
     .shops-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-    .sc-img { height: 110px; }
-    .sc-name { font-size: 13px; }
+    .sc-img { height: 120px; }
+    .sc-name { font-size: 13.5px; }
+    .sc-body { padding: 14px 15px 16px; }
+    .sc-btn { font-size: .78rem; padding: .55rem; }
 }
 </style>
 @endpush
@@ -380,7 +410,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 {{-- ══════════ NAVBAR ══════════ --}}
 <nav class="top-nav">
     <a href="{{ url('/') }}" class="nav-brand">
-        <div class="nav-brand-icon">🛍️</div>
+         <div class="sb-logo-icon"><img src="/images/Shopio2.jpeg" alt="Shopio" style="width:40px;height:40px;object-fit:cover;border-radius:9px"></div>
+                <span class="sb-shop-name">{{ $shop->name ?? 'Boutique' }}</span>
         {{ config('app.name', 'ShopManager') }}
     </a>
     <div class="nav-links">
@@ -479,7 +510,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
         @foreach($shops as $i => $shop)
         <a href="{{ route('public.shops.products', $shop) }}"
            class="shop-card"
-           style="animation-delay: {{ ($i % 12) * 50 }}ms">
+           style="animation-delay: {{ ($i % 12) * 55 }}ms">
 
             {{-- Image --}}
             <div class="sc-img">
@@ -500,18 +531,23 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
                     <div class="sc-type">{{ $shop->type }}</div>
                 @endif
 
+                <div class="sc-stars">★★★★★</div>
+
                 <div class="sc-meta">
                     <span class="sc-meta-item">
-                        📦 <span>{{ $shop->products_count ?? 0 }} produit{{ ($shop->products_count ?? 0) > 1 ? 's' : '' }}</span>
+                        📦 {{ $shop->products_count ?? 0 }} produit{{ ($shop->products_count ?? 0) > 1 ? 's' : '' }}
                     </span>
-                    @if($shop->address)
-                    <span class="sc-meta-item">
-                        📍 <span>{{ Str::limit($shop->address, 20) }}</span>
-                    </span>
+                    @if($shop->country)
+                    <span class="sc-meta-item">🌍 {{ $shop->country }}</span>
+                    @elseif($shop->address)
+                    <span class="sc-meta-item">📍 {{ Str::limit($shop->address, 16) }}</span>
                     @endif
                 </div>
 
-                <span class="sc-btn">Voir la boutique →</span>
+                <span class="sc-btn">
+                    Visiter la boutique
+                    <span style="font-size:15px">→</span>
+                </span>
             </div>
         </a>
         @endforeach

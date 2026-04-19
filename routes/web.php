@@ -111,6 +111,10 @@ use App\Http\Controllers\Client\ProductController as ClientProductController;
 /* Page d'accueil */
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
+/* Liste publique de toutes les boutiques */
+Route::get('/shops', [PublicShopController::class, 'index'])
+    ->name('shops.index');
+
 /* Produits publics d'une boutique */
 Route::get('/shops/{shop}/products', [PublicShopController::class, 'products'])
     ->name('public.shops.products');
