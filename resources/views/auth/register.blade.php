@@ -46,26 +46,190 @@
                         onchange="updateFlag(this)"
                         style="width:100%;padding:9px 12px 9px 40px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;color:#374151;background:#fff;appearance:none;-webkit-appearance:none;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)">
                     <option value="">-- Sélectionner votre pays --</option>
-                    <option value="SN" data-flag="🇸🇳" {{ old('country') === 'SN' ? 'selected' : '' }}>🇸🇳 Sénégal</option>
-                    <option value="GN" data-flag="🇬🇳" {{ old('country') === 'GN' ? 'selected' : '' }}>🇬🇳 Guinée</option>
-                    <option value="CI" data-flag="🇨🇮" {{ old('country') === 'CI' ? 'selected' : '' }}>🇨🇮 Côte d'Ivoire</option>
-                    <option value="ML" data-flag="🇲🇱" {{ old('country') === 'ML' ? 'selected' : '' }}>🇲🇱 Mali</option>
-                    <option value="BF" data-flag="🇧🇫" {{ old('country') === 'BF' ? 'selected' : '' }}>🇧🇫 Burkina Faso</option>
-                    <option value="CM" data-flag="🇨🇲" {{ old('country') === 'CM' ? 'selected' : '' }}>🇨🇲 Cameroun</option>
-                    <option value="TG" data-flag="🇹🇬" {{ old('country') === 'TG' ? 'selected' : '' }}>🇹🇬 Togo</option>
-                    <option value="BJ" data-flag="🇧🇯" {{ old('country') === 'BJ' ? 'selected' : '' }}>🇧🇯 Bénin</option>
-                    <option value="NE" data-flag="🇳🇪" {{ old('country') === 'NE' ? 'selected' : '' }}>🇳🇪 Niger</option>
-                    <option value="GA" data-flag="🇬🇦" {{ old('country') === 'GA' ? 'selected' : '' }}>🇬🇦 Gabon</option>
-                    <option value="CG" data-flag="🇨🇬" {{ old('country') === 'CG' ? 'selected' : '' }}>🇨🇬 Congo</option>
-                    <option value="CD" data-flag="🇨🇩" {{ old('country') === 'CD' ? 'selected' : '' }}>🇨🇩 RD Congo</option>
-                    <option value="GH" data-flag="🇬🇭" {{ old('country') === 'GH' ? 'selected' : '' }}>🇬🇭 Ghana</option>
-                    <option value="NG" data-flag="🇳🇬" {{ old('country') === 'NG' ? 'selected' : '' }}>🇳🇬 Nigeria</option>
-                    <option value="MA" data-flag="🇲🇦" {{ old('country') === 'MA' ? 'selected' : '' }}>🇲🇦 Maroc</option>
-                    <option value="DZ" data-flag="🇩🇿" {{ old('country') === 'DZ' ? 'selected' : '' }}>🇩🇿 Algérie</option>
-                    <option value="TN" data-flag="🇹🇳" {{ old('country') === 'TN' ? 'selected' : '' }}>🇹🇳 Tunisie</option>
-                    <option value="FR" data-flag="🇫🇷" {{ old('country') === 'FR' ? 'selected' : '' }}>🇫🇷 France</option>
-                    <option value="BE" data-flag="🇧🇪" {{ old('country') === 'BE' ? 'selected' : '' }}>🇧🇪 Belgique</option>
-                    <option value="CA" data-flag="🇨🇦" {{ old('country') === 'CA' ? 'selected' : '' }}>🇨🇦 Canada</option>
+                    @php
+                    $countries = [
+                        /* ── Afrique de l'Ouest ── */
+                        'BJ'=>['🇧🇯','Bénin'],
+                        'BF'=>['🇧🇫','Burkina Faso'],
+                        'CV'=>['🇨🇻','Cap-Vert'],
+                        'CI'=>['🇨🇮','Côte d\'Ivoire'],
+                        'GM'=>['🇬🇲','Gambie'],
+                        'GH'=>['🇬🇭','Ghana'],
+                        'GN'=>['🇬🇳','Guinée'],
+                        'GW'=>['🇬🇼','Guinée-Bissau'],
+                        'GQ'=>['🇬🇶','Guinée équatoriale'],
+                        'LR'=>['🇱🇷','Libéria'],
+                        'ML'=>['🇲🇱','Mali'],
+                        'MR'=>['🇲🇷','Mauritanie'],
+                        'NE'=>['🇳🇪','Niger'],
+                        'NG'=>['🇳🇬','Nigeria'],
+                        'SN'=>['🇸🇳','Sénégal'],
+                        'SL'=>['🇸🇱','Sierra Leone'],
+                        'TG'=>['🇹🇬','Togo'],
+                        /* ── Afrique Centrale ── */
+                        'AO'=>['🇦🇴','Angola'],
+                        'CM'=>['🇨🇲','Cameroun'],
+                        'CF'=>['🇨🇫','Centrafrique'],
+                        'TD'=>['🇹🇩','Tchad'],
+                        'CG'=>['🇨🇬','Congo'],
+                        'CD'=>['🇨🇩','RD Congo'],
+                        'GA'=>['🇬🇦','Gabon'],
+                        'ST'=>['🇸🇹','São Tomé-et-Príncipe'],
+                        /* ── Afrique de l'Est ── */
+                        'BI'=>['🇧🇮','Burundi'],
+                        'KM'=>['🇰🇲','Comores'],
+                        'DJ'=>['🇩🇯','Djibouti'],
+                        'ER'=>['🇪🇷','Érythrée'],
+                        'ET'=>['🇪🇹','Éthiopie'],
+                        'KE'=>['🇰🇪','Kenya'],
+                        'MG'=>['🇲🇬','Madagascar'],
+                        'MW'=>['🇲🇼','Malawi'],
+                        'MU'=>['🇲🇺','Maurice'],
+                        'MZ'=>['🇲🇿','Mozambique'],
+                        'RW'=>['🇷🇼','Rwanda'],
+                        'SC'=>['🇸🇨','Seychelles'],
+                        'SO'=>['🇸🇴','Somalie'],
+                        'SS'=>['🇸🇸','Soudan du Sud'],
+                        'SD'=>['🇸🇩','Soudan'],
+                        'TZ'=>['🇹🇿','Tanzanie'],
+                        'UG'=>['🇺🇬','Ouganda'],
+                        'ZM'=>['🇿🇲','Zambie'],
+                        'ZW'=>['🇿🇼','Zimbabwe'],
+                        /* ── Afrique Australe ── */
+                        'BW'=>['🇧🇼','Botswana'],
+                        'LS'=>['🇱🇸','Lesotho'],
+                        'NA'=>['🇳🇦','Namibie'],
+                        'ZA'=>['🇿🇦','Afrique du Sud'],
+                        'SZ'=>['🇸🇿','Eswatini'],
+                        /* ── Afrique du Nord ── */
+                        'DZ'=>['🇩🇿','Algérie'],
+                        'EG'=>['🇪🇬','Égypte'],
+                        'LY'=>['🇱🇾','Libye'],
+                        'MA'=>['🇲🇦','Maroc'],
+                        'TN'=>['🇹🇳','Tunisie'],
+                        /* ── Europe ── */
+                        'AL'=>['🇦🇱','Albanie'],
+                        'DE'=>['🇩🇪','Allemagne'],
+                        'AT'=>['🇦🇹','Autriche'],
+                        'BE'=>['🇧🇪','Belgique'],
+                        'BY'=>['🇧🇾','Biélorussie'],
+                        'BA'=>['🇧🇦','Bosnie-Herzégovine'],
+                        'BG'=>['🇧🇬','Bulgarie'],
+                        'HR'=>['🇭🇷','Croatie'],
+                        'CY'=>['🇨🇾','Chypre'],
+                        'CZ'=>['🇨🇿','Tchéquie'],
+                        'DK'=>['🇩🇰','Danemark'],
+                        'ES'=>['🇪🇸','Espagne'],
+                        'EE'=>['🇪🇪','Estonie'],
+                        'FI'=>['🇫🇮','Finlande'],
+                        'FR'=>['🇫🇷','France'],
+                        'GR'=>['🇬🇷','Grèce'],
+                        'HU'=>['🇭🇺','Hongrie'],
+                        'IE'=>['🇮🇪','Irlande'],
+                        'IT'=>['🇮🇹','Italie'],
+                        'LV'=>['🇱🇻','Lettonie'],
+                        'LT'=>['🇱🇹','Lituanie'],
+                        'LU'=>['🇱🇺','Luxembourg'],
+                        'MK'=>['🇲🇰','Macédoine du Nord'],
+                        'MT'=>['🇲🇹','Malte'],
+                        'MD'=>['🇲🇩','Moldavie'],
+                        'ME'=>['🇲🇪','Monténégro'],
+                        'NL'=>['🇳🇱','Pays-Bas'],
+                        'NO'=>['🇳🇴','Norvège'],
+                        'PL'=>['🇵🇱','Pologne'],
+                        'PT'=>['🇵🇹','Portugal'],
+                        'RO'=>['🇷🇴','Roumanie'],
+                        'GB'=>['🇬🇧','Royaume-Uni'],
+                        'RU'=>['🇷🇺','Russie'],
+                        'RS'=>['🇷🇸','Serbie'],
+                        'SK'=>['🇸🇰','Slovaquie'],
+                        'SI'=>['🇸🇮','Slovénie'],
+                        'SE'=>['🇸🇪','Suède'],
+                        'CH'=>['🇨🇭','Suisse'],
+                        'UA'=>['🇺🇦','Ukraine'],
+                        /* ── Amériques ── */
+                        'AR'=>['🇦🇷','Argentine'],
+                        'BO'=>['🇧🇴','Bolivie'],
+                        'BR'=>['🇧🇷','Brésil'],
+                        'CA'=>['🇨🇦','Canada'],
+                        'CL'=>['🇨🇱','Chili'],
+                        'CO'=>['🇨🇴','Colombie'],
+                        'CR'=>['🇨🇷','Costa Rica'],
+                        'CU'=>['🇨🇺','Cuba'],
+                        'DO'=>['🇩🇴','Rép. Dominicaine'],
+                        'EC'=>['🇪🇨','Équateur'],
+                        'SV'=>['🇸🇻','Salvador'],
+                        'GT'=>['🇬🇹','Guatemala'],
+                        'HT'=>['🇭🇹','Haïti'],
+                        'HN'=>['🇭🇳','Honduras'],
+                        'JM'=>['🇯🇲','Jamaïque'],
+                        'MX'=>['🇲🇽','Mexique'],
+                        'NI'=>['🇳🇮','Nicaragua'],
+                        'PA'=>['🇵🇦','Panama'],
+                        'PY'=>['🇵🇾','Paraguay'],
+                        'PE'=>['🇵🇪','Pérou'],
+                        'PR'=>['🇵🇷','Porto Rico'],
+                        'TT'=>['🇹🇹','Trinité-et-Tobago'],
+                        'US'=>['🇺🇸','États-Unis'],
+                        'UY'=>['🇺🇾','Uruguay'],
+                        'VE'=>['🇻🇪','Venezuela'],
+                        /* ── Asie ── */
+                        'SA'=>['🇸🇦','Arabie Saoudite'],
+                        'AM'=>['🇦🇲','Arménie'],
+                        'AZ'=>['🇦🇿','Azerbaïdjan'],
+                        'BH'=>['🇧🇭','Bahreïn'],
+                        'BD'=>['🇧🇩','Bangladesh'],
+                        'KH'=>['🇰🇭','Cambodge'],
+                        'CN'=>['🇨🇳','Chine'],
+                        'KP'=>['🇰🇵','Corée du Nord'],
+                        'KR'=>['🇰🇷','Corée du Sud'],
+                        'AE'=>['🇦🇪','Émirats arabes unis'],
+                        'GE'=>['🇬🇪','Géorgie'],
+                        'IN'=>['🇮🇳','Inde'],
+                        'ID'=>['🇮🇩','Indonésie'],
+                        'IQ'=>['🇮🇶','Irak'],
+                        'IR'=>['🇮🇷','Iran'],
+                        'IL'=>['🇮🇱','Israël'],
+                        'JP'=>['🇯🇵','Japon'],
+                        'JO'=>['🇯🇴','Jordanie'],
+                        'KZ'=>['🇰🇿','Kazakhstan'],
+                        'KW'=>['🇰🇼','Koweït'],
+                        'KG'=>['🇰🇬','Kirghizistan'],
+                        'LA'=>['🇱🇦','Laos'],
+                        'LB'=>['🇱🇧','Liban'],
+                        'MY'=>['🇲🇾','Malaisie'],
+                        'MV'=>['🇲🇻','Maldives'],
+                        'MN'=>['🇲🇳','Mongolie'],
+                        'MM'=>['🇲🇲','Myanmar'],
+                        'NP'=>['🇳🇵','Népal'],
+                        'OM'=>['🇴🇲','Oman'],
+                        'UZ'=>['🇺🇿','Ouzbékistan'],
+                        'PK'=>['🇵🇰','Pakistan'],
+                        'PS'=>['🇵🇸','Palestine'],
+                        'PH'=>['🇵🇭','Philippines'],
+                        'QA'=>['🇶🇦','Qatar'],
+                        'SG'=>['🇸🇬','Singapour'],
+                        'LK'=>['🇱🇰','Sri Lanka'],
+                        'SY'=>['🇸🇾','Syrie'],
+                        'TJ'=>['🇹🇯','Tadjikistan'],
+                        'TW'=>['🇹🇼','Taïwan'],
+                        'TH'=>['🇹🇭','Thaïlande'],
+                        'TM'=>['🇹🇲','Turkménistan'],
+                        'TR'=>['🇹🇷','Turquie'],
+                        'VN'=>['🇻🇳','Vietnam'],
+                        'YE'=>['🇾🇪','Yémen'],
+                        /* ── Océanie ── */
+                        'AU'=>['🇦🇺','Australie'],
+                        'FJ'=>['🇫🇯','Fidji'],
+                        'NZ'=>['🇳🇿','Nouvelle-Zélande'],
+                        'PG'=>['🇵🇬','Papouasie-Nouvelle-Guinée'],
+                        'WS'=>['🇼🇸','Samoa'],
+                        'VU'=>['🇻🇺','Vanuatu'],
+                    ];
+                    @endphp
+                    @foreach($countries as $code => $info)
+                    <option value="{{ $code }}" data-flag="{{ $info[0] }}" {{ old('country') === $code ? 'selected' : '' }}>{{ $info[0] }} {{ $info[1] }}</option>
+                    @endforeach
                 </select>
             </div>
             @error('country')

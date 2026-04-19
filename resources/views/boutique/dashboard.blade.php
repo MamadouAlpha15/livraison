@@ -620,7 +620,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                         <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between">
                             🔔 Notifications <span id="notifDropdownTotal" style="background:var(--brand-lt);color:var(--brand-dk);font-size:10px;padding:1px 7px;border-radius:20px">0</span>
                         </div>
-                        <div id="notifList" style="max-height:260px;overflow-y:auto"></div>
+                        <div id="notifList" style="max-height:320px;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:#d1d5db #f9fafb"></div>
                         <div style="padding:8px 14px;border-top:1px solid var(--border);display:flex;gap:6px">
                             <a href="{{ route('boutique.orders.index') }}" class="btn btn-sm" style="flex:1;justify-content:center;font-size:11px">📦 Commandes</a>
                             <a href="{{ route('boutique.messages.hub') }}" class="btn btn-sm" style="flex:1;justify-content:center;font-size:11px">💬 Messages</a>
@@ -1150,10 +1150,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const CSRF = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
     /* ── État local ── */
-    let _prevMsg    = -1;   /* -1 = premier poll, pas de toast */
-    let _prevOrders = -1;   /* -1 = premier poll, pas de toast */
+    let _prevMsg    = -1;
+    let _prevOrders = -1;
     let _notifOpen  = false;
-    let _alerts     = [];   /* file d'alertes en attente */
+
+    /* Restaurer les alertes depuis sessionStorage (persiste entre navigations) */
+    let _alerts = [];
+    try {
+        const saved = sessionStorage.getItem('boutique_notif_alerts');
+        if (saved) _alerts = JSON.parse(saved);
+    } catch(e) {}
+
+    function _saveAlerts() {
+        try { sessionStorage.setItem('boutique_notif_alerts', JSON.stringify(_alerts)); } catch(e) {}
+    }
 
     /* ── Helpers badge générique ── */
     function setBadge(id, count) {
@@ -1187,6 +1197,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* ── Dropdown notifications ── */
+    let _alertIdSeq = 0;
+
     function renderNotifList() {
         const list = document.getElementById('notifList');
         if (!list) return;
@@ -1194,17 +1206,56 @@ document.addEventListener('DOMContentLoaded', () => {
             list.innerHTML = '<div style="padding:20px;text-align:center;color:#9ca3af;font-size:12.5px">✅ Aucune alerte</div>';
             return;
         }
-        list.innerHTML = _alerts.slice(0,8).map(a => `
-            <a href="${a.url}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #f3f6f4;text-decoration:none;transition:background .12s" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background=''">
-                <span style="font-size:18px;flex-shrink:0">${a.ico}</span>
-                <div style="flex:1;min-width:0">
-                    <div style="font-size:12.5px;font-weight:600;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.msg}</div>
-                    <div style="font-size:10.5px;color:#9ca3af;margin-top:1px">${a.time}</div>
-                </div>
-                <span style="font-size:14px;color:#d1d5db">›</span>
-            </a>
-        `).join('');
+        list.innerHTML = _alerts.slice(0, 20).map(a => {
+            const isOrder = a.type === 'order';
+            /* Badge "En cours" pour les commandes non livrées */
+            const badge = isOrder
+                ? `<span style="font-size:9px;font-weight:700;background:#fef3c7;color:#92400e;border:1px solid #fde68a;border-radius:20px;padding:1px 6px;white-space:nowrap;flex-shrink:0">En cours</span>`
+                : '';
+            /* Bouton × uniquement pour les messages (pas pour les commandes) */
+            const closeBtn = !isOrder
+                ? `<button onclick="event.stopPropagation();_dismissAlert(${a.id})"
+                           title="Supprimer"
+                           style="flex-shrink:0;width:28px;height:28px;border:none;background:none;
+                                  color:#9ca3af;font-size:15px;cursor:pointer;border-radius:6px;
+                                  display:flex;align-items:center;justify-content:center;
+                                  margin-right:6px;transition:all .15s"
+                           onmouseover="this.style.background='#fee2e2';this.style.color='#dc2626'"
+                           onmouseout="this.style.background='none';this.style.color='#9ca3af'">×</button>`
+                : '';
+            /* onclick : dismiss seulement pour les messages, pas pour les commandes */
+            const clickHandler = isOrder ? '' : `onclick="_dismissAlert(${a.id})"`;
+            const rowBg = isOrder ? '#fffbeb' : '#fff';
+            const rowHover = isOrder ? '#fef9ec' : '#f9fafb';
+
+            return `
+            <div style="display:flex;align-items:center;border-bottom:1px solid #f3f6f4;background:${rowBg};transition:background .12s"
+                 onmouseover="this.style.background='${rowHover}'" onmouseout="this.style.background='${rowBg}'">
+                <a href="${a.url}" ${clickHandler}
+                   style="display:flex;align-items:center;gap:10px;flex:1;padding:10px 12px;text-decoration:none;min-width:0">
+                    <span style="font-size:18px;flex-shrink:0">${a.ico}</span>
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:12.5px;font-weight:600;color:#111;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.msg}</div>
+                        <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+                            <span style="font-size:10.5px;color:#9ca3af">${a.time}</span>
+                            ${badge}
+                        </div>
+                    </div>
+                    <span style="font-size:13px;color:#d1d5db;flex-shrink:0;margin-left:4px">›</span>
+                </a>
+                ${closeBtn}
+            </div>`;
+        }).join('');
     }
+
+    /* ── Supprimer une alerte par son id (uniquement type message) ── */
+    window._dismissAlert = function(id) {
+        _alerts = _alerts.filter(a => a.id !== id);
+        _saveAlerts();
+        renderNotifList();
+        const totalEl = document.getElementById('notifDropdownTotal');
+        if (totalEl) totalEl.textContent = _alerts.length;
+    };
 
     window.toggleNotifDropdown = function() {
         _notifOpen = !_notifOpen;
@@ -1222,11 +1273,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /* ── Push alerte dans la file ── */
-    function pushAlert(ico, msg, url) {
+    function pushAlert(ico, msg, url, type) {
         const now = new Date();
         const time = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-        _alerts.unshift({ ico, msg, url, time });
-        if (_alerts.length > 20) _alerts.pop();
+        _alerts.unshift({ id: ++_alertIdSeq, ico, msg, url, time, type: type || 'msg' });
+        if (_alerts.length > 30) _alerts.pop();
+        _saveAlerts();
     }
 
     /* ── Polling principal ── */
@@ -1241,22 +1293,41 @@ document.addEventListener('DOMContentLoaded', () => {
             /* Messages */
             setBadge('sbMsgBadge', d.messages_unread);
             setBadge('msgTopbarCount', d.messages_unread);
-            /* aussi mettre à jour la classe "has-unread" du bouton topbar */
             const msgBtn = document.getElementById('msgTopbarBtn');
             if (msgBtn) msgBtn.classList.toggle('has-unread', d.messages_unread > 0);
             if (_prevMsg >= 0 && d.messages_unread > _prevMsg) {
                 const n = d.messages_unread - _prevMsg;
                 showToast(`💬 <div>${n} nouveau${n>1?'x':''} message${n>1?'s':''} client</div>`, 'msg');
-                pushAlert('💬', `${n} nouveau${n>1?'x':''} message${n>1?'s':''} non lu${n>1?'s':''}`, '{{ route("boutique.messages.hub") }}');
+                pushAlert('💬', `${n} nouveau${n>1?'x':''} message${n>1?'s':''} non lu${n>1?'s':''}`, '{{ route("boutique.messages.hub") }}', 'msg');
             }
             _prevMsg = d.messages_unread;
 
-            /* Commandes */
+            /* Commandes — une seule entrée dans _alerts, compteur mis à jour */
             setBadge('sbOrdersBadge', d.orders_pending);
-            if (_prevOrders >= 0 && d.orders_pending > _prevOrders) {
-                const n = d.orders_pending - _prevOrders;
-                showToast(`📦 <div>${n} nouvelle${n>1?'s':''} commande${n>1?'s':''} !</div>`, 'order');
-                pushAlert('📦', `${n} nouvelle${n>1?'s':''} commande${n>1?'s':''}`, '{{ route("boutique.orders.index") }}');
+            if (d.orders_pending > 0) {
+                const label = `${d.orders_pending} commande${d.orders_pending > 1 ? 's' : ''} en attente`;
+                const existing = _alerts.find(a => a.type === 'order');
+                if (existing) {
+                    /* Mettre à jour le compteur de l'entrée existante */
+                    existing.msg = label;
+                    if (_prevOrders >= 0 && d.orders_pending > _prevOrders) {
+                        const n = d.orders_pending - _prevOrders;
+                        showToast(`📦 <div>${n} nouvelle${n>1?'s':''} commande${n>1?'s':''} !</div>`, 'order');
+                        existing.time = new Date().getHours().toString().padStart(2,'0')+':'+new Date().getMinutes().toString().padStart(2,'0');
+                    }
+                } else {
+                    /* Créer l'entrée commande pour la première fois */
+                    if (_prevOrders >= 0 && d.orders_pending > _prevOrders) {
+                        const n = d.orders_pending - _prevOrders;
+                        showToast(`📦 <div>${n} nouvelle${n>1?'s':''} commande${n>1?'s':''} !</div>`, 'order');
+                    }
+                    pushAlert('📦', label, '{{ route("boutique.orders.index") }}', 'order');
+                }
+                _saveAlerts();
+            } else if (d.orders_pending === 0 && _alerts.some(a => a.type === 'order')) {
+                /* Plus aucune commande en attente → supprimer l'entrée */
+                _alerts = _alerts.filter(a => a.type !== 'order');
+                _saveAlerts();
             }
             _prevOrders = d.orders_pending;
 
@@ -1267,7 +1338,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const total = d.messages_unread + d.orders_pending;
             setBadge('notifBellCount', total);
             const totalEl = document.getElementById('notifDropdownTotal');
-            if (totalEl) totalEl.textContent = total;
+            if (totalEl) totalEl.textContent = _alerts.length;
 
             if (_notifOpen) renderNotifList();
         } catch(e) {}
@@ -1277,9 +1348,15 @@ document.addEventListener('DOMContentLoaded', () => {
     pollNotifications();
     setInterval(pollNotifications, 6000);
 
-    /* ── Animation CSS (injected once) ── */
+    /* ── Animation CSS + scrollbar notifList ── */
     const s = document.createElement('style');
-    s.textContent = `@keyframes slideInRight{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}`;
+    s.textContent = `
+        @keyframes slideInRight{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+        #notifList::-webkit-scrollbar{width:5px;}
+        #notifList::-webkit-scrollbar-track{background:#f9fafb;}
+        #notifList::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:4px;}
+        #notifList::-webkit-scrollbar-thumb:hover{background:#9ca3af;}
+    `;
     document.head.appendChild(s);
 })();
 </script>
