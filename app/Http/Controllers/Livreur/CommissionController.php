@@ -11,8 +11,11 @@ class CommissionController extends Controller
 {
     public function index()
     {
-        $livreurId = Auth::id();
+        $livreur   = Auth::user();
+        $livreurId = $livreur->id;
         abort_unless($livreurId, 403);
+        $shop  = $livreur->shop ?? $livreur->assignedShop;
+        $devise = $shop?->currency ?? 'GNF';
 
         // Commissions en attente
         $pending = CourierCommission::with(['order', 'shop'])
@@ -37,7 +40,7 @@ class CommissionController extends Controller
             ->sum('amount');
 
         return view('livreur.commissions.index', compact(
-            'pending', 'paid', 'pendingTotal', 'paidTotal'
+            'pending', 'paid', 'pendingTotal', 'paidTotal', 'devise'
         ));
     }
 }
