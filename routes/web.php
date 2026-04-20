@@ -340,6 +340,10 @@ Route::post('messages/refuse-proposal/{message}',
     [BoutiqueMessageController::class, 'refuseProposal'])
     ->name('messages.refuse-proposal');
 
+Route::post('messages/counter-proposal',
+    [BoutiqueMessageController::class, 'counterProposal'])
+    ->name('messages.counter-proposal');
+
 Route::get('messages/conversation',
     [BoutiqueMessageController::class, 'getConversation'])
     ->name('messages.conversation');
@@ -476,6 +480,8 @@ Route::middleware(['auth', 'role:client'])
             /* Négociation de prix */
             Route::post('/messages/propose-price',            [ShopMessageController::class, 'proposePrice']) ->name('messages.propose');
             Route::post('/messages/confirm-offer/{message}',  [ShopMessageController::class, 'confirmOffer']) ->name('messages.confirm');
+            Route::post('/messages/refuse-offer/{message}',   [ShopMessageController::class, 'refuseOffer'])  ->name('messages.refuse-offer');
+            Route::post('/messages/counter-offer',             [ShopMessageController::class, 'counterOffer']) ->name('messages.counter-offer');
             Route::get('/messages/poll',                       [ShopMessageController::class, 'poll'])          ->name('messages.client.poll');
             Route::get('/notifications/poll',                  [ShopMessageController::class, 'pollAll'])       ->name('client.notifications.poll');
 

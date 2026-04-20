@@ -255,7 +255,7 @@ class ShopMessageController extends Controller
         // 3. Le statut doit être "pending" (pas déjà accepté ou refusé)
         // Si l'une de ces conditions est fausse → erreur 403 (accès refusé)
         abort_unless(
-            $message->type === ShopMessage::TYPE_PRICE_OFFER &&
+            in_array($message->type, [ShopMessage::TYPE_PRICE_OFFER, ShopMessage::TYPE_COUNTER_OFFER]) &&
             $message->receiver_id === $client->id &&
             $message->proposal_status === ShopMessage::STATUS_PENDING,
             403
@@ -457,6 +457,81 @@ class ShopMessageController extends Controller
             'orders'          => $orders,
             'popular_shops'   => $popularShops,
         ]);
+    }
+
+    // POST /client/messages/refuse-offer/{message} — client refuse une offre/contre-offre vendeur
+    public function refuseOffer(Request $request, ShopMessage $message)
+    {
+        $client = Auth::user();
+        abort_unless(
+            in_array($message->type, [ShopMessage::TYPE_PRICE_OFFER, ShopMessage::TYPE_COUNTER_OFFER]) &&
+            $message->receiver_id === $client->id &&
+            $message->proposal_status === ShopMessage::STATUS_PENDING,
+            403
+        );
+
+        $message->update(['proposal_status' => ShopMessage::STATUS_REFUSED]);
+
+        $product = Product::with('shop')->find($message->product_id);
+        $devise  = $product?->shop?->currency ?? 'GNF';
+
+        ShopMessage::create([
+            'shop_id'     => $message->shop_id,
+            'product_id'  => $message->product_id,
+            'sender_id'   => $client->id,
+            'receiver_id' => $message->sender_id,
+            'body'        => "❌ Le client a refusé l'offre de "
+                            . number_format($message->proposed_price, 0, ',', ' ')
+                            . " {$devise}. Une nouvelle négociation est possible.",
+            'type'        => ShopMessage::TYPE_TEXT,
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    // POST /client/messages/counter-offer — client contre-propose face à l'offre vendeur
+    public function counterOffer(Request $request)
+    {
+        $request->validate([
+            'message_id'    => ['required', 'exists:shop_messages,id'],
+            'counter_price' => ['required', 'numeric', 'min:1'],
+        ]);
+
+        $client   = Auth::user();
+        $original = ShopMessage::findOrFail($request->message_id);
+
+        abort_unless(
+            in_array($original->type, [ShopMessage::TYPE_PRICE_OFFER, ShopMessage::TYPE_COUNTER_OFFER]) &&
+            $original->receiver_id === $client->id &&
+            $original->proposal_status === ShopMessage::STATUS_PENDING,
+            403
+        );
+
+        $product = Product::with('shop')->find($original->product_id);
+        $shop    = $product?->shop;
+        $devise  = $shop?->currency ?? 'GNF';
+        $vendeur = $shop?->user;
+        abort_unless($vendeur, 403);
+
+        $counterPrice = (float) $request->counter_price;
+
+        // Marquer l'offre originale comme refusée (remplacée)
+        $original->update(['proposal_status' => ShopMessage::STATUS_REFUSED]);
+
+        // Créer la contre-offre du client
+        ShopMessage::create([
+            'shop_id'         => $original->shop_id,
+            'product_id'      => $original->product_id,
+            'sender_id'       => $client->id,
+            'receiver_id'     => $vendeur->id,
+            'body'            => "🔄 Contre-proposition du client : "
+                                . number_format($counterPrice, 0, ',', ' ') . " {$devise}.",
+            'type'            => ShopMessage::TYPE_COUNTER_OFFER,
+            'proposed_price'  => $counterPrice,
+            'proposal_status' => ShopMessage::STATUS_PENDING,
+        ]);
+
+        return response()->json(['success' => true]);
     }
 
     private function getDevise($shop): string

@@ -129,6 +129,24 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 .nego-confirm-btn:disabled { opacity:.6; cursor:not-allowed; transform:none; }
 .nego-meta { font-size:10.5px; color:#667781; margin-top:6px; text-align:right; }
 
+/* Boutons action négociation client */
+.nego-card-actions { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+.nego-card-btn { flex:1; min-width:70px; padding:8px 8px; border-radius:8px; border:none; font-size:11.5px; font-weight:700; cursor:pointer; font-family:var(--font); transition:all .15s; text-align:center; }
+.nego-btn-accept  { background:linear-gradient(135deg,#10b981,#059669); color:#fff; }
+.nego-btn-accept:hover { background:linear-gradient(135deg,#059669,#047857); }
+.nego-btn-counter { background:#fef3c7; color:#92400e; border:1.5px solid #fde68a; }
+.nego-btn-counter:hover { background:#fde68a; }
+.nego-btn-refuse  { background:#fee2e2; color:#991b1b; border:1.5px solid #fecaca; }
+.nego-btn-refuse:hover { background:#fecaca; }
+.nego-counter-form { display:none; margin-top:8px; }
+.nego-counter-row  { display:flex; gap:6px; align-items:center; margin-top:6px; flex-wrap:wrap; }
+.nego-counter-input { flex:1; min-width:80px; padding:8px 12px; border-radius:20px; border:1.5px solid #fde68a; font-size:13px; font-weight:600; font-family:monospace; outline:none; background:#fff; }
+.nego-counter-input:focus { box-shadow:0 0 0 3px rgba(245,158,11,.2); }
+.nego-counter-devise { font-size:11px; font-weight:700; color:#92400e; white-space:nowrap; }
+.nego-counter-send { padding:8px 14px; border-radius:20px; background:var(--yellow); color:#fff; border:none; font-size:12px; font-weight:700; cursor:pointer; font-family:var(--font); }
+.nego-counter-send:hover { background:#d97706; }
+.nego-counter-card .nego-head { background:linear-gradient(135deg,#ede9fe,#ddd6fe); color:#5b21b6; }
+
 /* Input zone */
 .hub-input-zone { background:#f0f2f5; border-top:1px solid var(--border); padding:10px 14px; display:flex; gap:10px; align-items:flex-end; flex-shrink:0; }
 .hub-textarea { flex:1; padding:10px 16px; border-radius:24px; border:none; background:#fff; font-size:13.5px; font-family:var(--font); outline:none; resize:none; min-height:42px; max-height:120px; line-height:1.5; box-shadow:0 1px 2px rgba(0,0,0,.1); }
@@ -668,6 +686,7 @@ function buildDateSep(label) {
 function buildRow(msg) {
     if (msg.type === 'price_proposal') return buildProposalCard(msg);
     if (msg.type === 'price_offer')    return buildOfferCard(msg);
+    if (msg.type === 'price_counter')  return buildCounterCard(msg);
     if (msg.type === 'order_created')  return buildOrderCard(msg);
     if (msg.type === 'images')         return buildImagesRow(msg);
     return buildTextRow(msg);
@@ -808,9 +827,29 @@ function buildOfferCard(msg) {
     const wrap = document.createElement('div');
     wrap.className = 'nego-wrap theirs'; if (msg.id) wrap.dataset.msgId = msg.id;
     const isPending = msg.proposal_status === 'pending';
-    const confirmBtn = isPending
-        ? `<button class="nego-confirm-btn" onclick="confirmOffer(${msg.id},this)">✓ Confirmer et commander</button>`
-        : `<div class="nego-status ${msg.proposal_status==='accepted'?'s-accepted':'s-refused'}">${msg.proposal_status==='accepted'?'✅ Offre confirmée — commande créée':'✕ Offre expirée'}</div>`;
+
+    let actionsHtml = '';
+    if (isPending) {
+        actionsHtml = `
+          <div class="nego-card-actions">
+            <button class="nego-card-btn nego-btn-accept" onclick="confirmOffer(${msg.id},this)">✅ Accepter</button>
+            <button class="nego-card-btn nego-btn-counter" onclick="toggleClientCounterInput(this,${msg.id},${msg.proposed_price})">🔄 Contre-offre</button>
+            <button class="nego-card-btn nego-btn-refuse" onclick="refuseClientOffer(${msg.id},this)">✕ Refuser</button>
+          </div>
+          <div class="nego-counter-form" id="cliCounterForm_${msg.id}">
+            <div class="nego-counter-row">
+              <input type="number" class="nego-counter-input" id="cliCounterInput_${msg.id}" placeholder="Votre contre-offre…" min="1" step="500">
+              <span class="nego-counter-devise">${escHtml(devise)}</span>
+              <button class="nego-counter-send" onclick="sendClientCounter(${msg.id},this)">Envoyer ✓</button>
+            </div>
+          </div>`;
+    } else {
+        const st = msg.proposal_status === 'accepted'
+            ? '<div class="nego-status s-accepted">✅ Offre confirmée — commande créée</div>'
+            : '<div class="nego-status s-refused">✕ Offre refusée</div>';
+        actionsHtml = st;
+    }
+
     wrap.innerHTML = `
       <div class="nego-card nego-offer">
         <div class="nego-head">🎉 Offre spéciale du vendeur</div>
@@ -818,7 +857,7 @@ function buildOfferCard(msg) {
           <div class="nego-amount">${fmtPrice(msg.proposed_price, devise)}</div>
           ${raw>0 ? `<div class="nego-original">Prix catalogue : ${fmtPrice(raw, devise)}</div>` : ''}
           ${disc>0 ? `<div class="nego-discount">Vous économisez ${disc}% !</div>` : ''}
-          ${confirmBtn}
+          ${actionsHtml}
           <div class="nego-meta">${escHtml(msg.time||'')}</div>
         </div>
       </div>`;
@@ -840,6 +879,113 @@ function buildOrderCard(msg) {
         </div>
       </div>`;
     return wrap;
+}
+
+function buildCounterCard(msg) {
+    const raw = _prodData.prodPriceRaw ? parseFloat(_prodData.prodPriceRaw) : 0;
+    const devise = _prodData.devise || 'GNF';
+    const disc = raw > 0 ? Math.round((1 - msg.proposed_price / raw) * 100) : 0;
+    const wrap = document.createElement('div');
+    wrap.className = 'nego-wrap ' + (msg.mine ? 'mine' : 'theirs');
+    if (msg.id) wrap.dataset.msgId = msg.id;
+    const isPending = msg.proposal_status === 'pending';
+
+    let actionsHtml = '';
+    if (!msg.mine && isPending) {
+        actionsHtml = `
+          <div class="nego-card-actions">
+            <button class="nego-card-btn nego-btn-accept" onclick="confirmOffer(${msg.id},this)">✅ Accepter</button>
+            <button class="nego-card-btn nego-btn-counter" onclick="toggleClientCounterInput(this,${msg.id},${msg.proposed_price})">🔄 Contre-offre</button>
+            <button class="nego-card-btn nego-btn-refuse" onclick="refuseClientOffer(${msg.id},this)">✕ Refuser</button>
+          </div>
+          <div class="nego-counter-form" id="cliCounterForm_${msg.id}">
+            <div class="nego-counter-row">
+              <input type="number" class="nego-counter-input" id="cliCounterInput_${msg.id}" placeholder="Votre contre-offre…" min="1" step="500">
+              <span class="nego-counter-devise">${escHtml(devise)}</span>
+              <button class="nego-counter-send" onclick="sendClientCounter(${msg.id},this)">Envoyer ✓</button>
+            </div>
+          </div>`;
+    } else if (!isPending) {
+        const st = msg.proposal_status === 'accepted'
+            ? '<div class="nego-status s-accepted">✅ Acceptée</div>'
+            : '<div class="nego-status s-refused">✕ Refusée</div>';
+        actionsHtml = st;
+    } else {
+        actionsHtml = '<div class="nego-status s-pending">⏳ En attente de réponse…</div>';
+    }
+
+    const label = msg.mine ? '🔄 Votre contre-offre' : '🔄 Contre-offre du vendeur';
+    wrap.innerHTML = `
+      <div class="nego-card nego-counter-card">
+        <div class="nego-head">${label}</div>
+        <div class="nego-body">
+          <div class="nego-amount">${fmtPrice(msg.proposed_price, devise)}</div>
+          ${raw>0 ? `<div class="nego-original">Prix catalogue : ${fmtPrice(raw, devise)}</div>` : ''}
+          ${disc>0 ? `<div class="nego-discount">${msg.mine?'-':'Vous économisez '}${disc}%</div>` : ''}
+          ${actionsHtml}
+          <div class="nego-meta">${escHtml(msg.time||'')}</div>
+        </div>
+      </div>`;
+    return wrap;
+}
+
+function toggleClientCounterInput(btn, msgId, currentPrice) {
+    const form = document.getElementById('cliCounterForm_' + msgId);
+    if (!form) return;
+    const isOpen = form.style.display === 'block';
+    form.style.display = isOpen ? 'none' : 'block';
+    if (!isOpen) {
+        const inp = document.getElementById('cliCounterInput_' + msgId);
+        if (inp) { inp.value = Math.floor(currentPrice * 1.05); inp.focus(); }
+    }
+}
+
+async function sendClientCounter(msgId, btn) {
+    const inp = document.getElementById('cliCounterInput_' + msgId);
+    const price = parseFloat(inp?.value);
+    if (!price || price < 1) { alert('Entrez un prix valide.'); return; }
+
+    btn.disabled = true; btn.textContent = '⏳…';
+    try {
+        const res = await fetch('/client/messages/counter-offer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
+            body: JSON.stringify({ message_id: msgId, counter_price: price }),
+        });
+        const data = await res.json();
+        if (data.success) {
+            _lastMsgId = 0;
+            await loadConv();
+        } else {
+            alert(data.message || 'Erreur lors de l\'envoi.');
+            btn.disabled = false; btn.textContent = 'Envoyer ✓';
+        }
+    } catch(e) {
+        alert('Erreur réseau.');
+        btn.disabled = false; btn.textContent = 'Envoyer ✓';
+    }
+}
+
+async function refuseClientOffer(msgId, btn) {
+    if (!confirm('Refuser cette offre ?')) return;
+    btn.disabled = true; btn.textContent = '⏳…';
+    try {
+        const res = await fetch(`/client/messages/refuse-offer/${msgId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
+        });
+        const data = await res.json();
+        if (data.success) {
+            _lastMsgId = 0;
+            await loadConv();
+        } else {
+            alert(data.message || 'Erreur.');
+            btn.disabled = false; btn.textContent = '✕ Refuser';
+        }
+    } catch(e) {
+        alert('Erreur réseau.');
+        btn.disabled = false; btn.textContent = '✕ Refuser';
+    }
 }
 
 function fmtPrice(n, devise) {

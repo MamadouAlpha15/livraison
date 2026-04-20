@@ -1284,6 +1284,7 @@ function buildDateSep(label) {
 function buildRow(msg) {
     const type = msg.type || 'text';
     if (type === 'price_proposal') return buildProposalCard(msg);
+    if (type === 'price_counter')  return buildCounterCard(msg);
     if (type === 'price_offer')    return buildOfferCard(msg);
     if (type === 'order_created')  return buildOrderCard(msg);
     if (type === 'images') {
@@ -1582,10 +1583,9 @@ document.getElementById('imgLightbox')?.addEventListener('click', e => {
 
 /* Proposition du client → carte jaune + boutons Accepter/Refuser */
 function buildProposalCard(msg) {
-    const status   = msg.proposal_status || 'pending';
-    const price    = msg.proposed_price ? fmtPrice(msg.proposed_price, _currentDevise) : '—';
+    const status    = msg.proposal_status || 'pending';
+    const price     = msg.proposed_price ? fmtPrice(msg.proposed_price, _currentDevise) : '—';
     const isPending = status === 'pending';
-
     const statusLabels = { pending: '⏳ En attente', accepted: '✅ Acceptée', refused: '❌ Refusée' };
     const statusClass  = { pending: 'pending', accepted: 'accepted', refused: 'refused' };
 
@@ -1593,11 +1593,24 @@ function buildProposalCard(msg) {
         <div class="nego-card-actions">
             <button class="nego-card-btn nego-btn-accept"
                     onclick="showOfferPanel(${msg.proposed_price || 0}, ${msg.id})">
-                ✓ Accepter & contre-offrir
+                ✅ Accepter
+            </button>
+            <button class="nego-card-btn nego-btn-counter"
+                    onclick="toggleCounterInput(this, ${msg.id}, ${msg.proposed_price || 0})">
+                🔄 Contre-proposer
             </button>
             <button class="nego-card-btn nego-btn-refuse"
                     onclick="refuseProposal(${msg.id}, this)">
                 ✕ Refuser
+            </button>
+        </div>
+        <div class="nego-counter-form" id="counterForm_${msg.id}" style="display:none">
+            <input type="number" class="nego-counter-input" id="counterInput_${msg.id}"
+                   placeholder="Votre prix…" min="1" step="500"
+                   value="${Math.round((msg.proposed_price || 0) * 1.1)}">
+            <span class="nego-counter-devise">${escHtml(_currentDevise)}</span>
+            <button class="nego-card-btn nego-btn-accept" onclick="sendCounterProposal(${msg.id}, this)">
+                Envoyer ✓
             </button>
         </div>` : '';
 
@@ -1610,12 +1623,96 @@ function buildProposalCard(msg) {
             <div class="nego-card-body">
                 <span class="nego-status ${statusClass[status] || 'pending'}">${statusLabels[status] || status}</span>
                 <div class="nego-card-price">${escHtml(price)}</div>
-                <div class="nego-card-note">${escHtml(msg.body || '')}</div>
             </div>
             ${actionsHtml}
             <div style="padding:0 14px 8px;font-size:10.5px;color:#9ca3af">${escHtml(msg.time || '')}</div>
         </div>`;
     return wrap;
+}
+
+/* Contre-offre reçue du client (type price_counter, mine=false) */
+function buildCounterCard(msg) {
+    const status    = msg.proposal_status || 'pending';
+    const price     = msg.proposed_price ? fmtPrice(msg.proposed_price, _currentDevise) : '—';
+    const isPending = status === 'pending';
+    const isMine    = msg.mine;
+    const statusLabels = { pending: '⏳ En attente', accepted: '✅ Acceptée', refused: '❌ Refusée' };
+    const statusClass  = { pending: 'pending', accepted: 'accepted', refused: 'refused' };
+
+    // Si c'est ma contre-offre (vendeur), afficher en lecture seule
+    const actionsHtml = (!isMine && isPending) ? `
+        <div class="nego-card-actions">
+            <button class="nego-card-btn nego-btn-accept"
+                    onclick="showOfferPanel(${msg.proposed_price || 0}, ${msg.id})">
+                ✅ Accepter
+            </button>
+            <button class="nego-card-btn nego-btn-counter"
+                    onclick="toggleCounterInput(this, ${msg.id}, ${msg.proposed_price || 0})">
+                🔄 Contre-proposer
+            </button>
+            <button class="nego-card-btn nego-btn-refuse"
+                    onclick="refuseProposal(${msg.id}, this)">
+                ✕ Refuser
+            </button>
+        </div>
+        <div class="nego-counter-form" id="counterForm_${msg.id}" style="display:none">
+            <input type="number" class="nego-counter-input" id="counterInput_${msg.id}"
+                   placeholder="Votre prix…" min="1" step="500"
+                   value="${Math.round((msg.proposed_price || 0) * 1.05)}">
+            <span class="nego-counter-devise">${escHtml(_currentDevise)}</span>
+            <button class="nego-card-btn nego-btn-accept" onclick="sendCounterProposal(${msg.id}, this)">
+                Envoyer ✓
+            </button>
+        </div>` : '';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'hub-msg-row ' + (isMine ? 'mine' : 'theirs');
+    if (msg.id) wrap.dataset.msgId = msg.id;
+    wrap.innerHTML = `
+        <div class="nego-card ${isMine ? 'nego-offer' : 'nego-proposal'}">
+            <div class="nego-card-head">🔄 Contre-proposition ${isMine ? 'envoyée' : '— client'}</div>
+            <div class="nego-card-body">
+                <span class="nego-status ${statusClass[status] || 'pending'}">${statusLabels[status] || status}</span>
+                <div class="nego-card-price">${escHtml(price)}</div>
+            </div>
+            ${actionsHtml}
+            <div style="padding:0 14px 8px;font-size:10.5px;color:#9ca3af;text-align:${isMine?'right':'left'}">${escHtml(msg.time || '')}</div>
+        </div>`;
+    return wrap;
+}
+
+function toggleCounterInput(btn, msgId, currentPrice) {
+    const form = document.getElementById('counterForm_' + msgId);
+    if (!form) return;
+    form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+    if (form.style.display === 'flex') {
+        document.getElementById('counterInput_' + msgId)?.focus();
+    }
+}
+
+async function sendCounterProposal(msgId, btn) {
+    const input = document.getElementById('counterInput_' + msgId);
+    const price = parseFloat(input?.value);
+    if (!price || price < 1) { showToast('❌ Entrez un prix valide', 'err'); return; }
+    btn.disabled = true; btn.textContent = '⏳…';
+    try {
+        const res = await fetch('/boutique/messages/counter-proposal', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify({ message_id: msgId, counter_price: price }),
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast('✅ Contre-proposition envoyée !', 'ok');
+            await loadConv();
+        } else {
+            showToast('❌ ' + (data.message || 'Erreur'), 'err');
+            btn.disabled = false; btn.textContent = 'Envoyer ✓';
+        }
+    } catch(e) {
+        showToast('❌ Erreur réseau', 'err');
+        btn.disabled = false; btn.textContent = 'Envoyer ✓';
+    }
 }
 
 /* Offre du vendeur → carte verte en lecture seule */

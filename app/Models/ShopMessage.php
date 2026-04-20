@@ -9,10 +9,11 @@ class ShopMessage extends Model
 {
     // Types de messages
     const TYPE_TEXT           = 'text';
-    const TYPE_IMAGES         = 'images';          // vendeur envoie des photos
-    const TYPE_PRICE_PROPOSAL = 'price_proposal'; // client propose un prix
-    const TYPE_PRICE_OFFER    = 'price_offer';    // vendeur envoie une offre formelle
-    const TYPE_ORDER_CREATED  = 'order_created';  // confirmation commande négociée
+    const TYPE_IMAGES         = 'images';           // vendeur envoie des photos
+    const TYPE_PRICE_PROPOSAL = 'price_proposal';  // client propose un prix
+    const TYPE_PRICE_OFFER    = 'price_offer';     // vendeur envoie une offre formelle
+    const TYPE_COUNTER_OFFER  = 'price_counter';   // contre-offre (vendeur ou client)
+    const TYPE_ORDER_CREATED  = 'order_created';   // confirmation commande négociée
 
     // Statuts de proposition/offre
     const STATUS_PENDING  = 'pending';

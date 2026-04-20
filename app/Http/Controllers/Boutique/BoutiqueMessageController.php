@@ -277,7 +277,48 @@ class BoutiqueMessageController extends Controller
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
 
-        // Confirmation JSON de succès
+        return response()->json(['success' => true]);
+    }
+
+    // POST /boutique/messages/counter-proposal — vendeur contre-propose un prix
+    public function counterProposal(Request $request)
+    {
+        $request->validate([
+            'message_id'     => ['required', 'exists:shop_messages,id'],
+            'counter_price'  => ['required', 'numeric', 'min:1'],
+        ]);
+
+        $vendeur = Auth::user();
+        $shop    = $vendeur->shop ?? $vendeur->assignedShop;
+        abort_unless($shop, 403);
+
+        $original = ShopMessage::findOrFail($request->message_id);
+        abort_unless(
+            $original->shop_id === $shop->id &&
+            in_array($original->type, [ShopMessage::TYPE_PRICE_PROPOSAL, ShopMessage::TYPE_COUNTER_OFFER]) &&
+            $original->proposal_status === ShopMessage::STATUS_PENDING,
+            403
+        );
+
+        $devise       = $shop->currency ?? 'GNF';
+        $counterPrice = (float) $request->counter_price;
+
+        // Marquer la proposition originale comme "refusée" (remplacée par la contre-offre)
+        $original->update(['proposal_status' => ShopMessage::STATUS_REFUSED]);
+
+        // Créer la contre-offre du vendeur
+        ShopMessage::create([
+            'shop_id'         => $shop->id,
+            'product_id'      => $original->product_id,
+            'sender_id'       => $vendeur->id,
+            'receiver_id'     => $original->sender_id,
+            'body'            => "🔄 Contre-proposition du vendeur : "
+                                . number_format($counterPrice, 0, ',', ' ') . " {$devise}.",
+            'type'            => ShopMessage::TYPE_COUNTER_OFFER,
+            'proposed_price'  => $counterPrice,
+            'proposal_status' => ShopMessage::STATUS_PENDING,
+        ]);
+
         return response()->json(['success' => true]);
     }
 
