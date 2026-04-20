@@ -219,7 +219,12 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     flex-shrink: 0;
 }
 .hub-send-btn:hover { background: var(--green-dk); transform: scale(1.06); }
-.hub-send-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.hub-send-btn:disabled { opacity: .7; cursor: not-allowed; transform: none; }
+.hub-send-btn .spin { display:inline-block; animation:btnSpin .7s linear infinite; }
+@keyframes btnSpin { to { transform:rotate(360deg); } }
+.img-sending-bubble { display:flex; align-items:center; gap:10px; background:#fff; border-radius:12px; padding:12px 16px; max-width:260px; box-shadow:0 1px 3px rgba(0,0,0,.15); }
+.img-sending-spinner { width:22px; height:22px; border:3px solid #e9edef; border-top-color:var(--green); border-radius:50%; animation:btnSpin .7s linear infinite; flex-shrink:0; }
+.img-sending-text { font-size:13px; color:var(--muted); font-weight:600; }
 
 /* Bouton + photo */
 .hub-attach-btn {
@@ -1387,6 +1392,20 @@ async function sendImagesMsg() {
     if (!_clientId || !_pendingFiles.length) return;
     const btn = document.getElementById('hubSendBtn');
     btn.disabled = true;
+    const origIcon = btn.innerHTML;
+    btn.innerHTML = `<span class="spin">↻</span>`;
+
+    /* Bulle "envoi en cours" dans le thread */
+    const thread = document.getElementById('hubThread');
+    const sendingRow = document.createElement('div');
+    sendingRow.className = 'hub-msg-row mine';
+    sendingRow.id = '__sendingBubble';
+    sendingRow.innerHTML = `<div class="img-sending-bubble">
+        <div class="img-sending-spinner"></div>
+        <span class="img-sending-text">Envoi de ${_pendingFiles.length} photo(s)…</span>
+    </div>`;
+    thread.appendChild(sendingRow);
+    thread.scrollTop = thread.scrollHeight;
 
     const fd = new FormData();
     _pendingFiles.forEach(f => fd.append('images[]', f));
@@ -1402,16 +1421,15 @@ async function sendImagesMsg() {
             body: fd,
         });
         const data = await res.json();
+        document.getElementById('__sendingBubble')?.remove();
         if (data.sent || data.success) {
-            const thread = document.getElementById('hubThread');
-            const empty  = thread.querySelector('.hub-thread-empty');
+            const empty = thread.querySelector('.hub-thread-empty');
             if (empty) empty.remove();
             const now  = new Date();
             const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
             thread.appendChild(buildImagesRow({ id: data.message_id, mine: true, images: data.images, time, read: false, type: 'images' }));
             thread.scrollTop = thread.scrollHeight;
             if (data.message_id) _lastMsgId = Math.max(_lastMsgId, data.message_id);
-            // Reset
             _pendingFiles = [];
             renderImgPreview();
             if (_convEl) {
@@ -1426,9 +1444,11 @@ async function sendImagesMsg() {
             showToast('❌ Erreur lors de l\'envoi', 'err');
         }
     } catch(e) {
+        document.getElementById('__sendingBubble')?.remove();
         showToast('❌ Erreur réseau', 'err');
     } finally {
         btn.disabled = false;
+        btn.innerHTML = origIcon;
     }
 }
 
