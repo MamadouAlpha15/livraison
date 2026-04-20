@@ -347,6 +347,10 @@ Route::get('messages/conversation',
 Route::post('messages/images/{client}/{product?}',
     [BoutiqueMessageController::class, 'sendImages'])
     ->name('messages.send-images');
+
+Route::get('messages/image-status/{message}',
+    [BoutiqueMessageController::class, 'imageStatus'])
+    ->name('messages.image-status');
     });
 
 

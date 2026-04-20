@@ -497,7 +497,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                                 <div class="upload-placeholder" id="mainPlaceholder">
                                     <span class="upload-placeholder-ico">📷</span>
                                     <div class="upload-placeholder-txt">Photo principale</div>
-                                    <div class="upload-placeholder-hint">JPG · PNG · WEBP — Max 20 Mo</div>
+                                    <div class="upload-placeholder-hint">JPG · PNG · WEBP — Max 2 Mo</div>
                                 </div>
                                 <button type="button" class="img-remove"
                                         id="mainRemoveBtn"

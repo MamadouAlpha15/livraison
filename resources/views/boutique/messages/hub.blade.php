@@ -1286,7 +1286,14 @@ function buildRow(msg) {
     if (type === 'price_proposal') return buildProposalCard(msg);
     if (type === 'price_offer')    return buildOfferCard(msg);
     if (type === 'order_created')  return buildOrderCard(msg);
-    if (type === 'images')         return buildImagesRow(msg);
+    if (type === 'images') {
+        if (msg.image_status === 'processing') {
+            const row = buildProcessingRow(msg.id, msg.body?.match(/\d+/)?.[0] ?? '?', msg.time);
+            pollImageReady(msg.id, row, msg.body?.match(/\d+/)?.[0] ?? '?');
+            return row;
+        }
+        return buildImagesRow(msg);
+    }
     return buildTextRow(msg);
 }
 
@@ -1297,6 +1304,49 @@ function buildTextRow(msg) {
     const tick = msg.mine ? `<span class="hub-msg-tick">${msg.read ? '✓✓' : '✓'}</span>` : '';
     row.innerHTML = `<div class="hub-msg-bubble">${escHtml(msg.body)}<div class="hub-msg-meta"><span class="hub-msg-time">${escHtml(msg.time || '')}</span>${tick}</div></div>`;
     return row;
+}
+
+/* Bulle affichée pendant que le job optimise les images */
+function buildProcessingRow(msgId, count, time) {
+    const row = document.createElement('div');
+    row.className = 'hub-msg-row mine';
+    row.dataset.msgId = msgId;
+    row.dataset.processing = '1';
+    row.innerHTML = `<div class="img-sending-bubble">
+        <div class="img-sending-spinner"></div>
+        <span class="img-sending-text">⚙️ Optimisation de ${count} photo(s)…</span>
+        <span style="font-size:10px;color:var(--muted);margin-left:4px">${time}</span>
+    </div>`;
+    return row;
+}
+
+/* Polling toutes les 2s jusqu'à ce que le job soit terminé */
+function pollImageReady(msgId, row, count) {
+    const interval = setInterval(async () => {
+        try {
+            const res = await fetch(`/boutique/messages/image-status/${msgId}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }
+            });
+            if (!res.ok) return;
+            const data = await res.json();
+
+            if (data.status === 'ready' && data.images.length > 0) {
+                clearInterval(interval);
+                const now  = new Date();
+                const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+                const newRow = buildImagesRow({ id: msgId, mine: true, images: data.images, time, read: false, type: 'images' });
+                row.replaceWith(newRow);
+            } else if (data.status === 'failed') {
+                clearInterval(interval);
+                row.innerHTML = `<div class="img-sending-bubble" style="background:#fee2e2">
+                    <span style="color:#991b1b;font-size:13px">❌ Échec optimisation — ${count} photo(s)</span>
+                </div>`;
+            }
+        } catch(e) {}
+    }, 2000);
+
+    // Arrêter au bout de 5 minutes max
+    setTimeout(() => clearInterval(interval), 300_000);
 }
 
 function buildImagesRow(msg) {
@@ -1427,9 +1477,20 @@ async function sendImagesMsg() {
             if (empty) empty.remove();
             const now  = new Date();
             const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
-            thread.appendChild(buildImagesRow({ id: data.message_id, mine: true, images: data.images, time, read: false, type: 'images' }));
-            thread.scrollTop = thread.scrollHeight;
+
             if (data.message_id) _lastMsgId = Math.max(_lastMsgId, data.message_id);
+
+            if (data.image_status === 'processing') {
+                // Afficher bulle "optimisation en cours" et poller jusqu'à ce que ce soit prêt
+                const row = buildProcessingRow(data.message_id, data.count, time);
+                thread.appendChild(row);
+                thread.scrollTop = thread.scrollHeight;
+                pollImageReady(data.message_id, row, data.count);
+            } else {
+                thread.appendChild(buildImagesRow({ id: data.message_id, mine: true, images: data.images, time, read: false, type: 'images' }));
+                thread.scrollTop = thread.scrollHeight;
+            }
+
             _pendingFiles = [];
             renderImgPreview();
             if (_convEl) {
@@ -1439,7 +1500,7 @@ async function sendImagesMsg() {
                 if (t) t.textContent = 'À l\'instant';
                 document.getElementById('convList').prepend(_convEl);
             }
-            showToast(`✅ ${data.count} photo(s) envoyée(s)`, 'ok');
+            showToast(`✅ ${data.count} photo(s) en cours d'optimisation…`, 'ok');
         } else {
             showToast('❌ Erreur lors de l\'envoi', 'err');
         }

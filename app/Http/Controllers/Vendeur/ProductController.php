@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Schema;
 use App\Services\ImageOptimizer;
+use App\Jobs\ProcessProductImageJob;
+use Illuminate\Support\Str;
 
 
 class ProductController extends Controller
@@ -332,9 +334,29 @@ class ProductController extends Controller
         ]);
 
         $folder = $request->input('folder', 'products/gallery');
-        $path   = ImageOptimizer::store($request->file('file'), $folder);
+        $file   = $request->file('file');
 
-        return response()->json(['path' => $path, 'url' => ImageOptimizer::url($path, 'medium')]);
+        // 1. Sauvegarder le fichier brut en temp
+        $filename = Str::random(20);
+        $ext      = $file->getClientOriginalExtension();
+        $rawPath  = "temp/{$filename}.{$ext}";
+        Storage::disk('public')->put($rawPath, file_get_contents($file->getRealPath()));
+
+        // 2. Dispatcher le job (sync en dev → tourne immédiatement ; database en prod → tourne en fond)
+        ProcessProductImageJob::dispatch($rawPath, $folder, $filename);
+
+        // 3. Chemin final WebP (créé par le job)
+        $finalPath = "{$folder}/medium/{$filename}.webp";
+
+        // 4. URL de preview :
+        //    - sync (dev) : le job a déjà tourné, le WebP existe → on renvoie l'URL WebP
+        //    - database (prod) : le WebP n'existe pas encore → on renvoie le temp comme fallback
+        $webpExists = Storage::disk('public')->exists($finalPath);
+        $previewUrl = $webpExists
+            ? asset('storage/' . $finalPath)
+            : asset('storage/' . $rawPath);
+
+        return response()->json(['path' => $finalPath, 'url' => $previewUrl]);
     }
 
     /**

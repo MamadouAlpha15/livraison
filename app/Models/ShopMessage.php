@@ -22,7 +22,7 @@ class ShopMessage extends Model
     protected $fillable = [
         'shop_id', 'product_id',
         'sender_id', 'receiver_id',
-        'body', 'images', 'read_at',
+        'body', 'images', 'image_status', 'read_at',
         'type', 'proposed_price', 'proposal_status', 'negotiated_order_id',
     ];
 

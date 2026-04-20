@@ -21,6 +21,9 @@ use App\Models\ShopMessage;  // Messages entre clients et vendeurs
 use App\Models\User;         // Utilisateurs (clients, vendeurs...)
 use App\Models\Product;      // Produits de la boutique
 use App\Services\ImageOptimizer;
+use App\Jobs\ProcessImageJob;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 // Outils Laravel
 use Illuminate\Http\Request;           // Données envoyées par le formulaire/AJAX
@@ -411,7 +414,10 @@ class BoutiqueMessageController extends Controller
             'proposed_price'      => $m->proposed_price ? (float)$m->proposed_price : null,
             'proposal_status'     => $m->proposal_status,
             'negotiated_order_id' => $m->negotiated_order_id,
-            'images'              => $m->images ? array_map(fn($p) => ImageOptimizer::url($p, 'large') ?? asset('storage/'.$p), $m->images) : [],
+            'images'              => ($m->image_status === 'ready' && $m->images)
+                                        ? array_map(fn($p) => ImageOptimizer::url($p, 'large') ?? asset('storage/'.$p), $m->images)
+                                        : [],
+            'image_status'        => $m->image_status ?? 'ready',
         ])->values();
 
         // Marquer les messages reçus comme lus automatiquement
@@ -438,36 +444,66 @@ class BoutiqueMessageController extends Controller
         $shop    = $vendeur->shop ?? $vendeur->assignedShop;
         abort_unless($shop, 403);
 
-        $paths = [];
+        // 1. Sauvegarder les fichiers bruts en temp (ultra rapide — pas de traitement)
+        $tempPaths = [];
         foreach ($request->file('images') as $file) {
-            $paths[] = ImageOptimizer::store($file, 'messages/' . $shop->id);
+            $tempName  = 'temp/' . Str::random(24) . '.' . $file->getClientOriginalExtension();
+            Storage::disk('local')->put($tempName, file_get_contents($file->getRealPath()));
+            $tempPaths[] = $tempName;
         }
 
+        $count = count($tempPaths);
+
+        // 2. Créer le message en statut "processing" avec des URLs temporaires
         $msg = ShopMessage::create([
-            'shop_id'     => $shop->id,
-            'product_id'  => $product?->id,
-            'sender_id'   => $vendeur->id,
-            'receiver_id' => $client->id,
-            'body'        => count($paths) . ' photo(s)',
-            'images'      => $paths,
-            'type'        => ShopMessage::TYPE_IMAGES,
+            'shop_id'      => $shop->id,
+            'product_id'   => $product?->id,
+            'sender_id'    => $vendeur->id,
+            'receiver_id'  => $client->id,
+            'body'         => $count . ' photo(s)',
+            'images'       => [],
+            'image_status' => 'processing',
+            'type'         => ShopMessage::TYPE_IMAGES,
         ]);
 
-        // Marquer les messages du client comme lus
+        // 3. Dispatcher le job en arrière-plan (n'attend pas la fin)
+        ProcessImageJob::dispatch($msg->id, $tempPaths, 'messages/' . $shop->id);
+
+        // 4. Marquer les messages du client comme lus
         ShopMessage::where('shop_id', $shop->id)
             ->where('sender_id', $client->id)
             ->where('receiver_id', $vendeur->id)
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
 
-        $imageUrls = array_map(fn($p) => ImageOptimizer::url($p, 'large') ?? asset('storage/'.$p), $paths);
-
         return response()->json([
             'success'    => true,
             'sent'       => true,
             'message_id' => $msg->id,
-            'images'     => $imageUrls,
-            'count'      => count($paths),
+            'images'     => [],
+            'image_status' => 'processing',
+            'count'      => $count,
+        ]);
+    }
+
+    // GET /boutique/messages/image-status/{message} — vérifie si les images sont prêtes
+    public function imageStatus(ShopMessage $message)
+    {
+        if ($message->image_status !== 'ready' || empty($message->images)) {
+            return response()->json([
+                'status' => $message->image_status,
+                'images' => [],
+            ]);
+        }
+
+        $urls = array_map(
+            fn($p) => ImageOptimizer::url($p, 'large') ?? asset('storage/' . $p),
+            $message->images
+        );
+
+        return response()->json([
+            'status' => 'ready',
+            'images' => $urls,
         ]);
     }
 
