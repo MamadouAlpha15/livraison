@@ -20,6 +20,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ShopMessage;  // Messages entre clients et vendeurs
 use App\Models\User;         // Utilisateurs (clients, vendeurs...)
 use App\Models\Product;      // Produits de la boutique
+use App\Services\ImageOptimizer;
 
 // Outils Laravel
 use Illuminate\Http\Request;           // Données envoyées par le formulaire/AJAX
@@ -410,6 +411,7 @@ class BoutiqueMessageController extends Controller
             'proposed_price'      => $m->proposed_price ? (float)$m->proposed_price : null,
             'proposal_status'     => $m->proposal_status,
             'negotiated_order_id' => $m->negotiated_order_id,
+            'images'              => $m->images ? array_map(fn($p) => ImageOptimizer::url($p, 'large') ?? asset('storage/'.$p), $m->images) : [],
         ])->values();
 
         // Marquer les messages reçus comme lus automatiquement
@@ -420,6 +422,53 @@ class BoutiqueMessageController extends Controller
             ->update(['read_at' => now()]);
 
         return response()->json(['messages' => $messages]);
+    }
+
+    // POST /boutique/messages/images/{client}/{product?} — vendeur envoie des photos
+    public function sendImages(Request $request, User $client, ?Product $product = null)
+    {
+        abort_unless($request->isXmlHttpRequest(), 403);
+
+        $request->validate([
+            'images'   => ['required', 'array', 'min:1', 'max:20'],
+            'images.*' => ['required', 'image', 'mimes:jpeg,jpg,png,webp,gif', 'max:10240'],
+        ]);
+
+        $vendeur = Auth::user();
+        $shop    = $vendeur->shop ?? $vendeur->assignedShop;
+        abort_unless($shop, 403);
+
+        $paths = [];
+        foreach ($request->file('images') as $file) {
+            $paths[] = ImageOptimizer::store($file, 'messages/' . $shop->id);
+        }
+
+        $msg = ShopMessage::create([
+            'shop_id'     => $shop->id,
+            'product_id'  => $product?->id,
+            'sender_id'   => $vendeur->id,
+            'receiver_id' => $client->id,
+            'body'        => count($paths) . ' photo(s)',
+            'images'      => $paths,
+            'type'        => ShopMessage::TYPE_IMAGES,
+        ]);
+
+        // Marquer les messages du client comme lus
+        ShopMessage::where('shop_id', $shop->id)
+            ->where('sender_id', $client->id)
+            ->where('receiver_id', $vendeur->id)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        $imageUrls = array_map(fn($p) => ImageOptimizer::url($p, 'large') ?? asset('storage/'.$p), $paths);
+
+        return response()->json([
+            'success'    => true,
+            'sent'       => true,
+            'message_id' => $msg->id,
+            'images'     => $imageUrls,
+            'count'      => count($paths),
+        ]);
     }
 
     // GET /boutique/notifications/poll — toutes les compteurs en temps réel

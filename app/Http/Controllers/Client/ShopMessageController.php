@@ -26,6 +26,7 @@ use App\Models\ShopMessage;  // Table "shop_messages" — messages
 use Illuminate\Http\Request;            // Contient les données envoyées par le formulaire/AJAX
 use Illuminate\Support\Facades\Auth;   // Pour récupérer l'utilisateur connecté
 use Illuminate\Support\Facades\DB;     // Pour les transactions (grouper plusieurs opérations SQL en une)
+use App\Services\ImageOptimizer;
 
 // ============================================================
 // Classe ShopMessageController
@@ -80,10 +81,11 @@ class ShopMessageController extends Controller
                     'time'                => $m->created_at->format('H:i'),   // Heure (ex: "14:30")
                     'date'                => $m->created_at->diffForHumans(), // Durée relative (ex: "il y a 5 min")
                     'read'                => $m->read_at !== null,            // true si le message a été lu
-                    'type'                => $m->type ?? 'text',              // Type : 'text', 'price_proposal', etc.
-                    'proposed_price'      => $m->proposed_price,              // Prix proposé (si négociation)
-                    'proposal_status'     => $m->proposal_status,             // Statut : pending, accepted, refused
-                    'negotiated_order_id' => $m->negotiated_order_id,        // ID commande créée après négociation
+                    'type'                => $m->type ?? 'text',
+                    'proposed_price'      => $m->proposed_price,
+                    'proposal_status'     => $m->proposal_status,
+                    'negotiated_order_id' => $m->negotiated_order_id,
+                    'images'              => $m->images ? array_map(fn($p) => ImageOptimizer::url($p, 'large') ?? asset('storage/'.$p), $m->images) : [],
                 ]);
 
             // On marque tous les messages reçus par ce client comme lus

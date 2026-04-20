@@ -343,6 +343,10 @@ Route::post('messages/refuse-proposal/{message}',
 Route::get('messages/conversation',
     [BoutiqueMessageController::class, 'getConversation'])
     ->name('messages.conversation');
+
+Route::post('messages/images/{client}/{product?}',
+    [BoutiqueMessageController::class, 'sendImages'])
+    ->name('messages.send-images');
     });
 
 

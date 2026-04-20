@@ -202,7 +202,9 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .hub-input-zone {
     background: #f0f2f5; border-top: 1px solid var(--border);
     padding: 10px 14px; display: flex; gap: 10px; align-items: flex-end; flex-shrink: 0;
+    flex-direction: column;
 }
+.hub-input-row { display: flex; gap: 10px; align-items: flex-end; width: 100%; }
 .hub-textarea {
     flex: 1; padding: 10px 16px; border-radius: 24px; border: none;
     background: #fff; font-size: 13.5px; font-family: var(--font);
@@ -214,9 +216,175 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     background: var(--green); color: #fff; border: none;
     cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;
     transition: background .15s, transform .1s; box-shadow: 0 2px 6px rgba(37,211,102,.35);
+    flex-shrink: 0;
 }
 .hub-send-btn:hover { background: var(--green-dk); transform: scale(1.06); }
 .hub-send-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+/* Bouton + photo */
+.hub-attach-btn {
+    width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+    background: #fff; border: 1.5px solid var(--border);
+    cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center;
+    transition: background .15s, border-color .15s; color: #667781;
+}
+.hub-attach-btn:hover { background: #e9edef; border-color: #aaa; }
+
+/* Preview images avant envoi */
+.hub-img-preview {
+    display: none; flex-wrap: wrap; gap: 8px;
+    padding: 8px 0 2px; width: 100%;
+}
+.hub-img-preview.has-files { display: flex; }
+.hub-img-thumb-wrap {
+    position: relative; width: 72px; height: 72px; border-radius: 8px; overflow: hidden;
+    border: 2px solid var(--green); flex-shrink: 0;
+}
+.hub-img-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hub-img-thumb-del {
+    position: absolute; top: 2px; right: 2px; width: 18px; height: 18px;
+    background: rgba(0,0,0,.6); border-radius: 50%; border: none;
+    color: #fff; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.hub-img-count {
+    font-size: 11px; color: var(--muted); align-self: center; padding-left: 4px;
+}
+
+/* ═══ BULLES PHOTOS — style WhatsApp ═══ */
+.msg-img-bubble {
+    padding: 3px; border-radius: 12px; overflow: hidden;
+    max-width: 280px; cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,.15);
+}
+.hub-msg-row.mine   .msg-img-bubble { background: #dcf8c6; border-bottom-right-radius: 2px; }
+.hub-msg-row.theirs .msg-img-bubble { background: #fff;     border-bottom-left-radius: 2px; }
+
+/* Grille d'images */
+.wsp-grid { display: grid; gap: 2px; border-radius: 10px; overflow: hidden; }
+
+/* 1 image */
+.wsp-grid.n1 { grid-template-columns: 1fr; }
+.wsp-grid.n1 .wsp-cell { height: 220px; }
+
+/* 2 images côte à côte */
+.wsp-grid.n2 { grid-template-columns: 1fr 1fr; }
+.wsp-grid.n2 .wsp-cell { height: 160px; }
+
+/* 3 images : grande à gauche, deux empilées à droite */
+.wsp-grid.n3 { grid-template-columns: 1fr 1fr; grid-template-rows: 110px 110px; }
+.wsp-grid.n3 .wsp-cell:first-child { grid-row: span 2; height: 222px; }
+.wsp-grid.n3 .wsp-cell { height: 110px; }
+
+/* 4 images : grille 2×2 */
+.wsp-grid.n4 { grid-template-columns: 1fr 1fr; }
+.wsp-grid.n4 .wsp-cell { height: 130px; }
+
+/* 5 images : 2 en haut, 3 en bas */
+.wsp-grid.n5 { grid-template-columns: repeat(3, 1fr); grid-template-rows: 110px 110px; }
+.wsp-grid.n5 .wsp-cell:nth-child(1),
+.wsp-grid.n5 .wsp-cell:nth-child(2) { grid-column: span 1; }
+.wsp-grid.n5 .wsp-cell:first-child { grid-column: 1 / 3; }
+
+/* 6+ images : grille 3 colonnes */
+.wsp-grid.n6plus { grid-template-columns: repeat(3, 1fr); }
+.wsp-grid.n6plus .wsp-cell { height: 88px; }
+
+/* Cellule image */
+.wsp-cell {
+    position: relative; overflow: hidden;
+    background: #e9edef; cursor: zoom-in;
+}
+.wsp-cell img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform .25s ease, filter .2s;
+}
+.wsp-cell:hover img { transform: scale(1.04); filter: brightness(.88); }
+
+/* Overlay "+X" sur la dernière cellule quand > 6 */
+.wsp-more-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,.52);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 22px; font-weight: 700;
+    pointer-events: none;
+}
+
+/* Méta (heure + tick) en bas de la bulle */
+.msg-img-meta {
+    display: flex; justify-content: flex-end; align-items: center;
+    gap: 4px; padding: 3px 6px 2px;
+    font-size: 11px; color: #667781;
+}
+.hub-msg-row.mine .msg-img-meta { color: #59724a; }
+
+/* ═══ LIGHTBOX style WhatsApp Web ═══ */
+.img-lightbox {
+    display: none; position: fixed; inset: 0; z-index: 9999;
+    background: #000; flex-direction: column;
+    animation: lbFadeIn .2s ease both;
+}
+@keyframes lbFadeIn { from{opacity:0} to{opacity:1} }
+.img-lightbox.open { display: flex; }
+
+/* Topbar lightbox */
+.lb-topbar {
+    height: 56px; background: rgba(0,0,0,.7); backdrop-filter: blur(8px);
+    display: flex; align-items: center; padding: 0 16px; gap: 14px;
+    flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,.08);
+    position: relative; z-index: 1;
+}
+.lb-counter-top { color: rgba(255,255,255,.8); font-size: 14px; font-weight: 600; flex: 1; }
+.lb-close-btn {
+    width: 38px; height: 38px; border-radius: 50%; border: none;
+    background: rgba(255,255,255,.1); color: #fff; font-size: 20px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+}
+.lb-close-btn:hover { background: rgba(255,255,255,.2); }
+
+/* Zone image principale */
+.lb-main {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+}
+.lb-main img {
+    max-width: 94vw; max-height: calc(100vh - 140px);
+    object-fit: contain; border-radius: 6px;
+    transition: opacity .2s, transform .2s;
+    user-select: none;
+}
+.lb-main img.lb-loading { opacity: .4; transform: scale(.97); }
+
+/* Flèches navigation */
+.lb-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 48px; height: 48px; border-radius: 50%; border: none;
+    background: rgba(255,255,255,.12); color: #fff; font-size: 26px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background .15s, transform .15s; z-index: 2;
+    backdrop-filter: blur(4px);
+}
+.lb-arrow:hover { background: rgba(255,255,255,.25); transform: translateY(-50%) scale(1.08); }
+.lb-arrow.lb-prev { left: 14px; }
+.lb-arrow.lb-next { right: 14px; }
+.lb-arrow[disabled] { opacity: 0; pointer-events: none; }
+
+/* Strip de thumbnails en bas */
+.lb-strip {
+    height: 72px; background: rgba(0,0,0,.7); backdrop-filter: blur(8px);
+    display: flex; align-items: center; gap: 6px;
+    padding: 0 16px; overflow-x: auto; flex-shrink: 0;
+    border-top: 1px solid rgba(255,255,255,.08);
+    scrollbar-width: none;
+}
+.lb-strip::-webkit-scrollbar { display: none; }
+.lb-thumb {
+    width: 52px; height: 52px; border-radius: 6px; overflow: hidden;
+    flex-shrink: 0; cursor: pointer; opacity: .5;
+    border: 2px solid transparent; transition: opacity .15s, border-color .15s;
+}
+.lb-thumb.active { opacity: 1; border-color: #25d366; }
+.lb-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 /* Toast */
 .hub-toast {
@@ -591,16 +759,39 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 
             {{-- Input --}}
             <div class="hub-input-zone">
-                <textarea id="hubInput" class="hub-textarea" placeholder="Écrire un message au client…" rows="1"
-                    onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendHubMsg()}"
-                    oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
-                <button class="hub-send-btn" onclick="sendHubMsg()" id="hubSendBtn" title="Envoyer">➤</button>
+                {{-- Preview images sélectionnées --}}
+                <div class="hub-img-preview" id="hubImgPreview"></div>
+
+                <div class="hub-input-row">
+                    {{-- Bouton + photo (vendeur seulement) --}}
+                    <input type="file" id="hubImgInput" accept="image/*" multiple style="display:none" onchange="onImgSelected(this)">
+                    <button class="hub-attach-btn" title="Envoyer des photos (max 20)" onclick="document.getElementById('hubImgInput').click()">📷</button>
+
+                    <textarea id="hubInput" class="hub-textarea" placeholder="Écrire un message au client…" rows="1"
+                        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendHubMsg()}"
+                        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+                    <button class="hub-send-btn" onclick="sendHubMsg()" id="hubSendBtn" title="Envoyer">➤</button>
+                </div>
             </div>
         </div>
     </main>
 </div>
 
 <div class="hub-toast" id="hubToast"></div>
+
+{{-- Lightbox WhatsApp-style --}}
+<div class="img-lightbox" id="imgLightbox">
+    <div class="lb-topbar">
+        <span class="lb-counter-top" id="lbCounter">1 / 1</span>
+        <button class="lb-close-btn" onclick="closeLightbox()">✕</button>
+    </div>
+    <div class="lb-main">
+        <button class="lb-arrow lb-prev" id="lbPrev" onclick="lbNav(-1)">‹</button>
+        <img id="lbImg" src="" alt="Photo">
+        <button class="lb-arrow lb-next" id="lbNext" onclick="lbNav(1)">›</button>
+    </div>
+    <div class="lb-strip" id="lbStrip"></div>
+</div>
 
 {{-- ═══ MODAL DÉTAIL PRODUIT ═══ --}}
 <div class="prod-modal-overlay" id="prodModalOverlay" onclick="closeProdModal()">
@@ -923,6 +1114,13 @@ async function pollConv() {
 /* ── Envoyer un message ── */
 async function sendHubMsg() {
     if (!_clientId) return;
+
+    // Si des images sont en attente, les envoyer
+    if (_pendingFiles.length > 0) {
+        await sendImagesMsg();
+        return;
+    }
+
     const input = document.getElementById('hubInput');
     const body  = input.value.trim();
     if (!body) return;
@@ -1083,6 +1281,7 @@ function buildRow(msg) {
     if (type === 'price_proposal') return buildProposalCard(msg);
     if (type === 'price_offer')    return buildOfferCard(msg);
     if (type === 'order_created')  return buildOrderCard(msg);
+    if (type === 'images')         return buildImagesRow(msg);
     return buildTextRow(msg);
 }
 
@@ -1094,6 +1293,211 @@ function buildTextRow(msg) {
     row.innerHTML = `<div class="hub-msg-bubble">${escHtml(msg.body)}<div class="hub-msg-meta"><span class="hub-msg-time">${escHtml(msg.time || '')}</span>${tick}</div></div>`;
     return row;
 }
+
+function buildImagesRow(msg) {
+    const imgs = msg.images || [];
+    const n    = imgs.length;
+    if (!n) return buildTextRow(msg);
+
+    const row = document.createElement('div');
+    row.className = 'hub-msg-row ' + (msg.mine ? 'mine' : 'theirs');
+    if (msg.id) row.dataset.msgId = msg.id;
+
+    const tick     = msg.mine ? `<span class="hub-msg-tick">${msg.read ? '✓✓' : '✓'}</span>` : '';
+    const imgsAttr = escHtml(JSON.stringify(imgs));
+
+    const gridCls = n===1?'n1': n===2?'n2': n===3?'n3': n===4?'n4': n===5?'n5': 'n6plus';
+    const visible  = n <= 6 ? n : 6;
+
+    let cells = '';
+    for (let i = 0; i < visible; i++) {
+        const isLast  = i === visible - 1;
+        const hidden  = n - visible;
+        const overlay = (isLast && hidden > 0)
+            ? `<div class="wsp-more-overlay">+${hidden}</div>` : '';
+        cells += `<div class="wsp-cell" data-idx="${i}">
+            <img src="${escHtml(imgs[i])}" alt="Photo ${i+1}" loading="lazy">
+            ${overlay}
+        </div>`;
+    }
+
+    row.innerHTML = `
+        <div class="msg-img-bubble">
+            <div class="wsp-grid ${gridCls}" data-imgs="${imgsAttr}">${cells}</div>
+            <div class="msg-img-meta">
+                <span style="font-size:11px">${escHtml(msg.time||'')}</span>${tick}
+            </div>
+        </div>`;
+
+    row.querySelectorAll('.wsp-cell').forEach(cell => {
+        cell.addEventListener('click', () => {
+            const grid = cell.closest('.wsp-grid');
+            const allImgs = JSON.parse(grid.dataset.imgs || '[]');
+            openLightbox(allImgs, parseInt(cell.dataset.idx, 10));
+        });
+    });
+
+    return row;
+}
+
+/* ── Gestion des images à envoyer ── */
+let _pendingFiles = []; // DataTransfer-like list of files
+
+function onImgSelected(input) {
+    const files = Array.from(input.files);
+    if (!files.length) return;
+
+    // Cumul avec ce qui est déjà sélectionné (max 20 total)
+    const remaining = 20 - _pendingFiles.length;
+    const toAdd = files.slice(0, remaining);
+    if (files.length > remaining) showToast(`Max 20 photos. ${files.length - remaining} ignorée(s).`, 'err');
+
+    toAdd.forEach(f => _pendingFiles.push(f));
+    input.value = ''; // reset pour pouvoir re-sélectionner les mêmes
+    renderImgPreview();
+}
+
+function renderImgPreview() {
+    const wrap = document.getElementById('hubImgPreview');
+    wrap.innerHTML = '';
+    if (!_pendingFiles.length) { wrap.classList.remove('has-files'); return; }
+    wrap.classList.add('has-files');
+
+    _pendingFiles.forEach((f, i) => {
+        const url = URL.createObjectURL(f);
+        const div = document.createElement('div');
+        div.className = 'hub-img-thumb-wrap';
+        div.innerHTML = `<img src="${url}" alt="">
+            <button class="hub-img-thumb-del" onclick="removeImgFile(${i})" title="Supprimer">✕</button>`;
+        wrap.appendChild(div);
+    });
+
+    const count = document.createElement('span');
+    count.className = 'hub-img-count';
+    count.textContent = `${_pendingFiles.length}/20`;
+    wrap.appendChild(count);
+}
+
+function removeImgFile(i) {
+    _pendingFiles.splice(i, 1);
+    renderImgPreview();
+}
+
+async function sendImagesMsg() {
+    if (!_clientId || !_pendingFiles.length) return;
+    const btn = document.getElementById('hubSendBtn');
+    btn.disabled = true;
+
+    const fd = new FormData();
+    _pendingFiles.forEach(f => fd.append('images[]', f));
+    if (_clientId)  fd.append('client_id',  _clientId);
+    if (_productId) fd.append('product_id', _productId);
+    fd.append('_token', CSRF);
+
+    try {
+        const pid = _productId ?? 0;
+        const res  = await fetch(`/boutique/messages/images/${_clientId}/${pid}`, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': CSRF, 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+            body: fd,
+        });
+        const data = await res.json();
+        if (data.sent || data.success) {
+            const thread = document.getElementById('hubThread');
+            const empty  = thread.querySelector('.hub-thread-empty');
+            if (empty) empty.remove();
+            const now  = new Date();
+            const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+            thread.appendChild(buildImagesRow({ id: data.message_id, mine: true, images: data.images, time, read: false, type: 'images' }));
+            thread.scrollTop = thread.scrollHeight;
+            if (data.message_id) _lastMsgId = Math.max(_lastMsgId, data.message_id);
+            // Reset
+            _pendingFiles = [];
+            renderImgPreview();
+            if (_convEl) {
+                const p = _convEl.querySelector('.hub-conv-preview');
+                if (p) p.textContent = `📷 ${data.count} photo(s)`;
+                const t = _convEl.querySelector('.hub-conv-time');
+                if (t) t.textContent = 'À l\'instant';
+                document.getElementById('convList').prepend(_convEl);
+            }
+            showToast(`✅ ${data.count} photo(s) envoyée(s)`, 'ok');
+        } else {
+            showToast('❌ Erreur lors de l\'envoi', 'err');
+        }
+    } catch(e) {
+        showToast('❌ Erreur réseau', 'err');
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+/* ── Lightbox WhatsApp-style ── */
+let _lbImgs = [], _lbIdx = 0;
+
+function openLightbox(imgs, idx) {
+    _lbImgs = imgs; _lbIdx = idx;
+    const lb = document.getElementById('imgLightbox');
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    lbRender();
+    lbBuildStrip();
+    document.addEventListener('keydown', lbKey);
+}
+
+function lbRender() {
+    const img  = document.getElementById('lbImg');
+    img.classList.add('lb-loading');
+    const src  = _lbImgs[_lbIdx];
+    const tmp  = new Image();
+    tmp.onload = () => { img.src = src; img.classList.remove('lb-loading'); };
+    tmp.src    = src;
+    document.getElementById('lbCounter').textContent = `${_lbIdx + 1} / ${_lbImgs.length}`;
+    document.getElementById('lbPrev').disabled = _lbIdx === 0;
+    document.getElementById('lbNext').disabled = _lbIdx === _lbImgs.length - 1;
+    // Sync strip
+    document.querySelectorAll('.lb-thumb').forEach((t, i) => {
+        t.classList.toggle('active', i === _lbIdx);
+        if (i === _lbIdx) t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    });
+}
+
+function lbBuildStrip() {
+    const strip = document.getElementById('lbStrip');
+    strip.innerHTML = _lbImgs.map((url, i) =>
+        `<div class="lb-thumb ${i===_lbIdx?'active':''}" onclick="lbGo(${i})">
+            <img src="${escHtml(url)}" alt="" loading="lazy">
+        </div>`
+    ).join('');
+}
+
+function lbGo(idx) { _lbIdx = idx; lbRender(); }
+
+function closeLightbox() {
+    document.getElementById('imgLightbox').classList.remove('open');
+    document.body.style.overflow = '';
+    document.removeEventListener('keydown', lbKey);
+}
+
+function lbNav(dir) {
+    const next = _lbIdx + dir;
+    if (next < 0 || next >= _lbImgs.length) return;
+    _lbIdx = next;
+    lbRender();
+}
+
+function lbKey(e) {
+    if (e.key === 'ArrowLeft')  lbNav(-1);
+    if (e.key === 'ArrowRight') lbNav(1);
+    if (e.key === 'Escape')     closeLightbox();
+}
+
+// Fermer en cliquant sur le fond sombre
+document.getElementById('imgLightbox')?.addEventListener('click', e => {
+    if (e.target === document.getElementById('lbImg')) return;
+    if (e.target.closest('.lb-topbar,.lb-arrow,.lb-thumb,.lb-strip')) return;
+    if (e.target === e.currentTarget || e.target.classList.contains('lb-main')) closeLightbox();
+});
 
 /* Proposition du client → carte jaune + boutons Accepter/Refuser */
 function buildProposalCard(msg) {

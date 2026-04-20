@@ -9,6 +9,7 @@ class ShopMessage extends Model
 {
     // Types de messages
     const TYPE_TEXT           = 'text';
+    const TYPE_IMAGES         = 'images';          // vendeur envoie des photos
     const TYPE_PRICE_PROPOSAL = 'price_proposal'; // client propose un prix
     const TYPE_PRICE_OFFER    = 'price_offer';    // vendeur envoie une offre formelle
     const TYPE_ORDER_CREATED  = 'order_created';  // confirmation commande négociée
@@ -21,13 +22,14 @@ class ShopMessage extends Model
     protected $fillable = [
         'shop_id', 'product_id',
         'sender_id', 'receiver_id',
-        'body', 'read_at',
+        'body', 'images', 'read_at',
         'type', 'proposed_price', 'proposal_status', 'negotiated_order_id',
     ];
 
     protected $casts = [
         'read_at'        => 'datetime',
         'proposed_price' => 'decimal:2',
+        'images'         => 'array',
     ];
 
     /* ── Relations ── */

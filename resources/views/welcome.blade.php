@@ -305,7 +305,15 @@ body {
     font-size: 9px; color: rgba(255,255,255,.3);
 }
 
-.hero-mockup img { width: 100%; display: block; }
+.hero-mockup img {
+    width: 100%; display: block;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: transform;
+    filter: url(#img-sharpen) contrast(1.06) saturate(1.04);
+    -webkit-filter: contrast(1.06) saturate(1.04);
+    image-rendering: -webkit-optimize-contrast;
+}
 
 /* Cartes stat flottantes */
 .mockup-float {
@@ -730,6 +738,12 @@ body {
     font-size: 12px; flex-wrap: wrap; gap: 8px;
 }
 
+/* Perspective moins agressive pour éviter le flou */
+.hero-mockup-outer {
+    transform: perspective(2400px) rotateX(2deg);
+}
+.hero-mockup-outer:hover { transform: perspective(2400px) rotateX(0deg); }
+
 /* ════════════════════════════════════════════════════════════════
    HAMBURGER MOBILE
 ════════════════════════════════════════════════════════════════ */
@@ -890,6 +904,16 @@ body {
 @endpush
 
 @section('content')
+
+{{-- Filtre SVG invisible pour accentuer la netteté de l'image --}}
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+        <filter id="img-sharpen" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+            <feConvolveMatrix order="3" preserveAlpha="true"
+                kernelMatrix="0 -0.6 0  -0.6 3.4 -0.6  0 -0.6 0"/>
+        </filter>
+    </defs>
+</svg>
 
 {{-- ══════════════════════════════════════════
      NAVBAR CUSTOM
