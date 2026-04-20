@@ -143,6 +143,12 @@ Route::get('/dashboard', function () {
     };
 })->middleware(['auth'])->name('dashboard');
 
+/* ── Changement de mot de passe forcé (1ère connexion) ── */
+Route::middleware('auth')->group(function () {
+    Route::get('/changer-mot-de-passe',  [\App\Http\Controllers\Auth\ForcePasswordChangeController::class, 'showForm'])->name('password.change.form');
+    Route::post('/changer-mot-de-passe', [\App\Http\Controllers\Auth\ForcePasswordChangeController::class, 'update'])  ->name('password.change.update');
+});
+
 Route::middleware('auth')->group(function () {
 
     /* Profil utilisateur */

@@ -228,8 +228,18 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .p-danger  { background: #fee2e2; color: #991b1b; }
 .p-muted   { background: #f3f6f4; color: #6b7280; }
 
-/* LIVRAISON */
-.tab-bar { display: flex; border-bottom: 1px solid var(--border); padding: 0 18px; gap: 0; }
+/* ═══ CARTE LIVRAISON ═══ */
+.delivery-card { border-radius: 16px !important; overflow: hidden; border: none !important; box-shadow: 0 4px 20px rgba(0,0,0,.08) !important; }
+.delivery-card-hero { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%); padding: 18px 20px 14px; display: flex; align-items: center; justify-content: space-between; }
+.delivery-card-hero-left { display: flex; align-items: center; gap: 12px; }
+.delivery-card-icon { width: 44px; height: 44px; background: rgba(255,255,255,.12); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.delivery-card-title { font-size: 15px; font-weight: 800; color: #fff; margin: 0; }
+.delivery-card-sub { font-size: 11px; color: rgba(255,255,255,.55); margin-top: 2px; }
+.delivery-card-manage { font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,.8); text-decoration: none; background: rgba(255,255,255,.1); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,.2); transition: all .15s; }
+.delivery-card-manage:hover { background: rgba(255,255,255,.2); color: #fff; }
+
+/* Tabs */
+.tab-bar { display: flex; border-bottom: 1px solid var(--border); padding: 0 16px; gap: 0; background: #fff; }
 .tab-btn { padding: 11px 14px; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; border: none; background: none; font-family: var(--font); border-bottom: 2.5px solid transparent; transition: color .15s, border-color .15s; display: flex; align-items: center; gap: 6px; white-space: nowrap; margin-bottom: -1px; }
 .tab-btn:hover { color: var(--text); }
 .tab-btn.active { color: var(--brand); border-bottom-color: var(--brand); }
@@ -237,18 +247,32 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .tab-count.zero { background: #f3f6f4; color: var(--muted); }
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
-.no-livreur-notice { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 20px 18px; text-align: center; }
-.no-livreur-notice .notice-icon { font-size: 28px; }
-.no-livreur-notice .notice-title { font-size: 13px; font-weight: 700; color: var(--text); }
-.no-livreur-notice .notice-sub   { font-size: 12px; color: var(--muted); line-height: 1.5; }
-.lv-list { display: flex; flex-direction: column; }
-.lv-row { display: flex; align-items: center; gap: 11px; padding: 11px 18px; border-bottom: 1px solid #f3f6f4; transition: background .12s; }
+
+/* Livreurs */
+.lv-list { display: flex; flex-direction: column; padding: 6px 0; }
+.lv-row { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid #f3f6f4; transition: background .12s; cursor: pointer; }
 .lv-row:last-child { border-bottom: none; }
-.lv-row:hover { background: var(--bg); }
-.lv-av { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.lv-row:hover { background: #f8fafc; }
+.lv-av { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #fff; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
 .lv-info { flex: 1; min-width: 0; }
-.lv-nm { font-size: 12.5px; font-weight: 600; color: var(--text); }
-.lv-mt { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.lv-nm { font-size: 13px; font-weight: 700; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lv-phone { font-size: 11.5px; color: #059669; font-weight: 600; margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+.lv-phone-warn { font-size: 11px; color: #f59e0b; font-weight: 600; margin-top: 2px; }
+.lv-status-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; flex-shrink: 0; }
+.lv-status-badge.available { background: #d1fae5; color: #065f46; }
+.lv-status-badge.busy { background: #fef3c7; color: #92400e; }
+.lv-wa-btn { width: 30px; height: 30px; background: #25d366; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; text-decoration: none; transition: transform .15s, box-shadow .15s; }
+.lv-wa-btn:hover { transform: scale(1.12); box-shadow: 0 4px 12px rgba(37,211,102,.4); }
+.lv-footer { padding: 10px 16px; text-align: center; border-top: 1px solid #f3f6f4; }
+.lv-footer a { font-size: 12px; font-weight: 700; color: var(--brand); text-decoration: none; }
+.lv-footer a:hover { text-decoration: underline; }
+
+/* Notice aucun livreur */
+.no-livreur-notice { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 28px 20px; text-align: center; }
+.no-livreur-notice .notice-icon { font-size: 36px; }
+.no-livreur-notice .notice-title { font-size: 14px; font-weight: 700; color: var(--text); }
+.no-livreur-notice .notice-sub   { font-size: 12px; color: var(--muted); line-height: 1.6; max-width: 260px; }
+
 .status-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 .status-dot.available { background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,.5); }
 .status-dot.busy      { background: #f59e0b; box-shadow: 0 0 6px rgba(245,158,11,.5); }
@@ -945,42 +969,89 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 <div class="right-col">
                     @if($hasLivreurs)
                     <div class="card delivery-card">
-                        <div class="card-hd" style="padding-bottom:0;border-bottom:none"><span class="card-title">Livraison</span></div>
+                        {{-- Hero header --}}
+                        <div class="delivery-card-hero">
+                            <div class="delivery-card-hero-left">
+                                <div class="delivery-card-icon">🚴</div>
+                                <div>
+                                    <div class="delivery-card-title">Livraison</div>
+                                    <div class="delivery-card-sub">{{ $livreursDisponibles->count() }} livreur(s) disponible(s)</div>
+                                </div>
+                            </div>
+                            <a href="{{ route('boutique.employees.index') }}" class="delivery-card-manage">Gérer →</a>
+                        </div>
+                        {{-- Tabs --}}
                         <div class="tab-bar">
                             <button class="tab-btn active" data-tab="livreurs">🚴 Livreurs <span class="tab-count">{{ $livreursDisponibles->count() }}</span></button>
                             @if($hasCompanies)<button class="tab-btn" data-tab="companies">🏢 Entreprises <span class="tab-count {{ $deliveryCompanies->count() === 0 ? 'zero':'' }}">{{ $deliveryCompanies->count() }}</span></button>@endif
                         </div>
+                        {{-- Liste livreurs --}}
                         <div class="tab-panel active" id="tab-livreurs">
                             <div class="lv-list">
                                 @foreach($livreursDisponibles->take(5) as $i => $livreur)
-                                @php $lp=explode(' ',$livreur->name);$linit=strtoupper(substr($lp[0],0,1)).strtoupper(substr($lp[1]??'X',0,1));$lcol=$avColors[$i%count($avColors)];$busy=!empty($livreur->current_order_id); @endphp
-                                <a href="{{ route('delivery.companies.index') }}" class="lv-row" style="text-decoration:none">
-                                    <div class="lv-av {{ $lcol }}">{{ $linit }}</div>
-                                    <div class="lv-info"><div class="lv-nm">{{ $livreur->name }}</div><div class="lv-mt">{{ $livreur->phone ?? 'Aucun téléphone' }}@if($busy) &nbsp;·&nbsp; <span style="color:#f59e0b">En course</span>@endif</div></div>
-                                    <span class="status-dot {{ $busy ? 'busy':'available' }}" title="{{ $busy ? 'En course':'Disponible' }}"></span>
-                                </a>
+                                @php
+                                    $lp    = explode(' ', $livreur->name);
+                                    $linit = strtoupper(substr($lp[0],0,1)).strtoupper(substr($lp[1]??'X',0,1));
+                                    $lcol  = $avColors[$i % count($avColors)];
+                                    $busy  = !empty($livreur->current_order_id);
+                                    $waNum = preg_replace('/\D/', '', $livreur->phone ?? '');
+                                @endphp
+                                <div class="lv-row">
+                                    <div class="lv-av" style="background:{{ $lcol }}">{{ $linit }}</div>
+                                    <div class="lv-info">
+                                        <div class="lv-nm">{{ $livreur->name }}</div>
+                                        @if($livreur->phone)
+                                            <div class="lv-phone">
+                                                <span>📞</span>
+                                                <a href="tel:{{ $livreur->phone }}" style="color:inherit;text-decoration:none">{{ $livreur->phone }}</a>
+                                            </div>
+                                        @else
+                                            <div class="lv-phone-warn">⚠️ Pas de téléphone</div>
+                                        @endif
+                                    </div>
+                                    <span class="lv-status-badge {{ $busy ? 'busy' : 'available' }}">{{ $busy ? 'En course' : 'Dispo' }}</span>
+                                    @if($waNum)
+                                    <a href="https://wa.me/{{ $waNum }}" target="_blank" class="lv-wa-btn" title="Contacter par WhatsApp">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                                    </a>
+                                    @endif
+                                </div>
                                 @endforeach
-                                @if($livreursDisponibles->count() > 5)<div style="padding:10px 18px;text-align:center"><a href="{{ route('delivery.companies.index') }}" class="btn btn-ghost btn-sm">+ {{ $livreursDisponibles->count()-5 }} livreur(s) →</a></div>@endif
                             </div>
+                            @if($livreursDisponibles->count() > 5)
+                            <div class="lv-footer">
+                                <a href="{{ route('boutique.employees.index') }}">+ {{ $livreursDisponibles->count()-5 }} autre(s) livreur(s) →</a>
+                            </div>
+                            @endif
                         </div>
                         @if($hasCompanies)
                         <div class="tab-panel" id="tab-companies">
                             @include('boutique._partials.delivery_companies_list', ['companies' => $deliveryCompanies->take(4)])
-                            @if($deliveryCompanies->count() > 4)<div style="padding:10px 18px;text-align:center"><a href="{{ route('delivery.companies.index') }}" class="btn btn-ghost btn-sm">Voir toutes →</a></div>@endif
+                            @if($deliveryCompanies->count() > 4)<div class="lv-footer"><a href="{{ route('delivery.companies.index') }}">Voir toutes →</a></div>@endif
                         </div>
                         @endif
                     </div>
                     @else
                     <div class="card delivery-card">
-                        <div class="card-hd"><span class="card-title">Livraison</span><a href="{{ route('delivery.companies.index') }}" class="btn btn-ghost btn-sm">Gérer →</a></div>
+                        {{-- Hero header vide --}}
+                        <div class="delivery-card-hero">
+                            <div class="delivery-card-hero-left">
+                                <div class="delivery-card-icon">🚚</div>
+                                <div>
+                                    <div class="delivery-card-title">Livraison</div>
+                                    <div class="delivery-card-sub">Aucun livreur actif</div>
+                                </div>
+                            </div>
+                            <a href="{{ route('boutique.employees.create') }}" class="delivery-card-manage">+ Ajouter →</a>
+                        </div>
                         @if(!$hasCompanies)
                         <div class="no-livreur-notice">
-                            <div class="notice-icon">🚚</div>
+                            <div class="notice-icon">🚴</div>
                             <div class="notice-title">Aucun livreur disponible</div>
-                            <div class="notice-sub">Votre boutique n'a pas encore de livreurs assignés.<br>Vous pouvez ajouter vos propres livreurs dans <strong>Équipe</strong>, ou contacter une entreprise de livraison partenaire.</div>
-                            <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;justify-content:center">
-                                <a href="{{ route('boutique.employees.index') }}" class="btn btn-sm">👥 Ajouter un livreur</a>
-                                <a href="{{ route('delivery.companies.index') }}" class="btn btn-primary btn-sm">🏢 Trouver une entreprise</a>
+                            <div class="notice-sub">Ajoutez vos propres livreurs dans <strong>Équipe</strong>, ou contactez une entreprise partenaire.</div>
+                            <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;justify-content:center">
+                                <a href="{{ route('boutique.employees.create') }}" class="btn btn-sm">👥 Ajouter un livreur</a>
+                                <a href="{{ route('delivery.companies.index') }}" class="btn btn-primary btn-sm">🏢 Entreprise partenaire</a>
                             </div>
                         </div>
                         @else

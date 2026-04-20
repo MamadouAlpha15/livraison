@@ -20,7 +20,8 @@ class User extends Authenticatable
         'country',       // code ISO 2 lettres ex: SN, CI, ML
         'shop_id',       // FK vers la boutique principale de l'utilisateur
         'role_in_shop',  // ex: admin|vendeur|livreur (rôle dans la boutique)
-        'is_available',  // pour les livreurs
+        'is_available',          // pour les livreurs
+        'must_change_password',  // forcé à changer son mot de passe à la 1ère connexion
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -28,8 +29,9 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password'          => 'hashed',
+            'email_verified_at'    => 'datetime',
+            'password'             => 'hashed',
+            'must_change_password' => 'boolean',
         ];
     }
 

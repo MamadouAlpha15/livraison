@@ -13,9 +13,12 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Ici on enregistre nos middlewares personnalisés
         $middleware->alias([
-            'role' => \App\Http\Middleware\RoleMiddleware::class,
-             'scope.shop' => \App\Http\Middleware\ScopeShop::class,
+            'role'          => \App\Http\Middleware\RoleMiddleware::class,
+            'scope.shop'    => \App\Http\Middleware\ScopeShop::class,
+            'force.pwd'     => \App\Http\Middleware\ForcePasswordChange::class,
         ]);
+
+        $middleware->appendToGroup('web', \App\Http\Middleware\ForcePasswordChange::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

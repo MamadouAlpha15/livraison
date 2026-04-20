@@ -429,6 +429,11 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                                 <div>
                                     <div class="emp-name">{{ $emp->name }}</div>
                                     <div class="emp-email">{{ $emp->email }}</div>
+                                    @if($emp->phone)
+                                    <div style="font-size:11.5px;color:#059669;margin-top:2px">📞 {{ $emp->phone }}</div>
+                                    @else
+                                    <div style="font-size:11px;color:#f59e0b;margin-top:2px">⚠️ Pas de téléphone</div>
+                                    @endif
                                 </div>
                             </div>
                         </td>
@@ -441,12 +446,15 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                             {{ $emp->created_at->diffForHumans() }}
                         </td>
                         <td>
+                            <div style="display:flex;gap:6px;align-items:center">
+                            <a href="{{ route('boutique.employees.edit', $emp) }}" class="btn btn-sm" style="background:#f0f2f5;color:#374151;border:1px solid #d1d5db">✏️ Modifier</a>
                             <form method="POST"
                                   action="{{ route('boutique.employees.destroy', $emp) }}"
                                   onsubmit="return confirm('Supprimer {{ addslashes($emp->name) }} ?')">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="btn btn-danger btn-sm">🗑️ Supprimer</button>
                             </form>
+                            </div>
                         </td>
                     </tr>
                     @endforeach

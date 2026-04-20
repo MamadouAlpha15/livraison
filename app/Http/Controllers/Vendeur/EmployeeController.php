@@ -42,6 +42,7 @@ class EmployeeController extends Controller
         $request->validate([
             'name'         => 'required|string|max:255',
             'email'        => 'required|email|unique:users,email',
+            'phone'         => 'required|string|max:255',
             'password'     => 'required|min:6|confirmed',
             'role_in_shop' => 'required|in:vendeur,livreur,employe',
         ]);
@@ -53,16 +54,57 @@ class EmployeeController extends Controller
         };
 
         User::create([
+            'name'                 => $request->name,
+            'email'                => $request->email,
+            'phone'                =>$request->phone,
+            'password'             => Hash::make($request->password),
+            'role'                 => $globalRole,
+            'shop_id'              => $shopId,
+            'role_in_shop'         => $request->role_in_shop,
+            'must_change_password' => true,
+        ]);
+
+        return redirect()->route('boutique.employees.create')
+            ->with('success', 'Compte créé avec succès !')
+            ->with('new_email', $request->email)
+            ->with('new_password', $request->password)
+            ->with('new_name', $request->name);
+    }
+
+    public function edit(User $employee)
+    {
+        $user   = Auth::user();
+        $shop   = $user->shop ?: $user->assignedShop;
+        abort_unless($shop && $employee->shop_id === $shop->id, 403);
+
+        return view('vendeur.employees.edit', compact('employee'));
+    }
+
+    public function update(Request $request, User $employee)
+    {
+        $user   = Auth::user();
+        $shop   = $user->shop ?: $user->assignedShop;
+        abort_unless($shop && $employee->shop_id === $shop->id, 403);
+
+        $request->validate([
+            'name'         => 'required|string|max:255',
+            'phone'        => 'nullable|string|max:255',
+            'role_in_shop' => 'required|in:vendeur,livreur,employe',
+        ]);
+
+        $employee->update([
             'name'         => $request->name,
-            'email'        => $request->email,
-            'password'     => Hash::make($request->password),
-            'role'         => $globalRole,      // rôle global
-            'shop_id'      => $shopId,          // <= rattache bien à MA boutique
+            'phone'        => $request->phone,
             'role_in_shop' => $request->role_in_shop,
+            'role'         => match($request->role_in_shop) {
+                'vendeur' => 'vendeur',
+                'livreur' => 'livreur',
+                default   => 'employe',
+            },
         ]);
 
         return redirect()->route('boutique.employees.index')
-            ->with('success','Utilisateur ajouté avec succès.');
+            ->with('success', 'Employé mis à jour avec succès.');
     }
 
     public function destroy(User $employee)
