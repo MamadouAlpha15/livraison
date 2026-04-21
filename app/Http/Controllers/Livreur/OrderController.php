@@ -19,13 +19,16 @@ class OrderController extends Controller
      */
     public function index()
     {
-        // Récupère toutes les commandes assignées au livreur actuellement connecté,
-        // triées par date décroissante et paginées.
-        $orders = Order::where('livreur_id', Auth::id())
-            ->latest()
-            ->paginate(10);
+        $livreur = Auth::user();
+        $shop    = $livreur->shop ?? $livreur->assignedShop;
+        $devise  = $shop?->currency ?? 'GNF';
 
-        return view('livreur.orders.index', compact('orders'));
+        $orders = Order::where('livreur_id', $livreur->id)
+            ->with(['items.product', 'client', 'shop'])
+            ->latest()
+            ->paginate(15);
+
+        return view('livreur.orders.index', compact('orders', 'devise'));
     }
 
     /**

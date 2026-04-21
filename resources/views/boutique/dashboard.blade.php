@@ -574,7 +574,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     <aside class="sidebar" id="sidebar">
         <div class="sb-brand">
             <a href="{{ route('boutique.dashboard') }}" class="sb-logo">
-                <div class="sb-logo-icon"><img src="/images/Shopio2.jpeg" alt="Shopio" style="width:50px;height:50px;object-fit:cover;border-radius:9px"></div>
+                <div class="sb-logo-icon"><img src="/images/Shopio.jpeg" alt="Shopio" style="width:50px;height:50px;object-fit:cover;border-radius:9px"></div>
                 <span class="sb-shop-name">{{ $shop->name }}</span>
             </a>
             <button class="sb-close" id="btnCloseSidebar" aria-label="Fermer le menu">✕</button>
@@ -1026,7 +1026,16 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                         </div>
                         @if($hasCompanies)
                         <div class="tab-panel" id="tab-companies">
-                            @include('boutique._partials.delivery_companies_list', ['companies' => $deliveryCompanies->take(4)])
+                            <div class="co-list">
+                                @foreach($deliveryCompanies->take(4) as $company)
+                                <div class="co-row" onclick="window.location='{{ route('company.chat.show', $company) }}'" title="Ouvrir la discussion">
+                                    <div class="co-logo">@if(!empty($company->logo))<img src="{{ asset('storage/'.$company->logo) }}" alt="{{ $company->name }}">@else 🚚 @endif</div>
+                                    <div class="co-info"><div class="co-nm">{{ $company->name }}</div><div class="co-mt">{{ $company->phone ?? 'Contact non renseigné' }}</div></div>
+                                    @if($company->commission_rate)<span class="co-commission">{{ number_format($company->commission_rate*100,1) }}%</span>@endif
+                                    <a href="{{ route('company.chat.show', $company) }}" class="btn btn-sm btn-primary" onclick="event.stopPropagation()">💬 Contacter</a>
+                                </div>
+                                @endforeach
+                            </div>
                             @if($deliveryCompanies->count() > 4)<div class="lv-footer"><a href="{{ route('delivery.companies.index') }}">Voir toutes →</a></div>@endif
                         </div>
                         @endif
