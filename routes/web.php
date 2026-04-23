@@ -382,6 +382,7 @@ Route::middleware(['auth', 'role:vendeur,admin'])->group(function () {
     Route::put('shop/{shop}',       [ShopController::class, 'update'])->name('shop.update');
 
     /* ── Produits ── */
+    Route::get('products/top-ventes', [ProductController::class, 'topSales'])->name('products.top');
     Route::resource('products', ProductController::class)->except(['show']);
 
     /* Actions supplémentaires produits */

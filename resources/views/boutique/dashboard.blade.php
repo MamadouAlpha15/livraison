@@ -520,8 +520,9 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         $d = $now->copy()->subDays($i);
         $d->locale('fr');
         $label = ucfirst($d->isoFormat('ddd')); // Lun, Mar, Mer, Jeu, Ven, Sam, Dim
-        return ['label' => $label, 'value' => max(0, $caJour - $commJour), 'today' => $i === 0];
-    });
+        $dow = $d->dayOfWeek === 0 ? 7 : $d->dayOfWeek; // 1=Lun … 7=Dim
+        return ['label' => $label, 'value' => max(0, $caJour - $commJour), 'today' => $i === 0, 'dow' => $dow];
+    })->sortBy('dow')->values();
     $max7 = $days7->max('value') ?: 1;
     $recentOrders = $shop->orders()->with('user')->latest()->take(6)->get();
     $topProducts = $shop->products()->withCount('orderItems')->orderByDesc('order_items_count')->take(5)->get();
@@ -740,9 +741,6 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 </div>
             </div>
 
-            @if($shop->commission_rate)
-            <div class="comm-banner">💡 <span>Taux de commission : <strong>{{ $shop->commission_rate_percent }}%</strong> — appliqué à chaque commande validée.</span></div>
-            @endif
 
             {{-- BLOC A --}}
             <div class="today-grid">
@@ -1088,7 +1086,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             {{-- TOP PRODUITS --}}
             @if($topProducts->isNotEmpty())
             <div class="card">
-                <div class="card-hd"><span class="card-title">Top produits — ventes du mois</span><a href="{{ route('products.index') }}" class="btn btn-ghost btn-sm">Tous les produits →</a></div>
+                <div class="card-hd"><span class="card-title" style="cursor:pointer;" onclick="window.location='{{ route('products.top') }}'">Top produits — ventes du mois 🏆</span><a href="{{ route('products.top') }}" class="btn btn-ghost btn-sm">Voir le classement →</a></div>
                 <div class="card-bd">
                     @foreach($topProducts as $product)
                     @php $pct = round(($product->order_items_count / $maxSales)*100); @endphp

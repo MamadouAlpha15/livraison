@@ -383,38 +383,6 @@ textarea.field-input { resize: vertical; min-height: 90px; }
     font-size: 14px; display: flex; align-items: center; justify-content: center;
 }
 
-/* ── Commission slider ── */
-.commission-wrap {
-    background: var(--bg);
-    border: 1.5px solid var(--border);
-    border-radius: var(--r-sm);
-    padding: 16px 18px;
-}
-.commission-header {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 12px;
-}
-.commission-val {
-    font-size: 24px; font-weight: 800; font-family: var(--mono);
-    color: var(--brand); letter-spacing: -1px;
-}
-.commission-val span { font-size: 14px; }
-input[type=range] {
-    width: 100%; height: 6px; border-radius: 3px;
-    background: linear-gradient(to right, var(--brand) 0%, var(--brand) 20%, var(--border) 20%, var(--border) 100%);
-    outline: none; appearance: none; cursor: pointer;
-}
-input[type=range]::-webkit-slider-thumb {
-    appearance: none; width: 20px; height: 20px;
-    border-radius: 50%; background: var(--brand);
-    border: 3px solid #fff; box-shadow: 0 1px 6px rgba(16,185,129,.4);
-    cursor: pointer;
-}
-.commission-labels {
-    display: flex; justify-content: space-between;
-    font-size: 10px; color: var(--muted); margin-top: 6px;
-    font-family: var(--mono);
-}
 
 /* ── Boutons navigation ── */
 .form-nav {
@@ -531,7 +499,7 @@ input[type=range]::-webkit-slider-thumb {
             </div>
             <div class="step-row" data-step="3">
                 <div class="step-dot">3</div>
-                <span class="step-txt">Devise & commission</span>
+                <span class="step-txt">Devise</span>
             </div>
             <div class="step-row" data-step="4">
                 <div class="step-dot">4</div>
@@ -732,16 +700,16 @@ input[type=range]::-webkit-slider-thumb {
                 <div class="form-nav">
                     <button type="button" class="btn-back" onclick="goToStep(1)">← Retour</button>
                     <button type="button" class="btn-next" onclick="goToStep(3)">
-                        Devise & commission <span>→</span>
+                        Devise <span>→</span>
                     </button>
                 </div>
             </div>
 
-            {{-- ══ ÉTAPE 3 : Devise & Commission ══ --}}
+            {{-- ══ ÉTAPE 3 : Devise ══ --}}
             <div class="form-section" id="section-3">
                 <div class="section-hd">
-                    <h2>💱 Devise & Commission</h2>
-                    <p>Choisissez votre devise et définissez le taux de commission livreurs.</p>
+                    <h2>💱 Devise</h2>
+                    <p>Choisissez la devise utilisée dans votre boutique.</p>
                 </div>
 
                 {{-- Sélecteur de devise personnalisé --}}
@@ -767,32 +735,6 @@ input[type=range]::-webkit-slider-thumb {
                         </div>
                     </div>
                     <div class="field-hint">La devise sera affichée sur toutes vos commandes et factures.</div>
-                </div>
-
-                {{-- Commission slider --}}
-                <div class="field-group">
-                    <label class="field-label">Taux de commission livreurs</label>
-                    <div class="commission-wrap">
-                        <div class="commission-header">
-                            <div>
-                                <div style="font-size:12px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px">Commission par livraison</div>
-                                <div style="font-size:11.5px;color:var(--muted)">Appliqué automatiquement à chaque commande livrée</div>
-                            </div>
-                            <div class="commission-val">
-                                <span id="commissionDisplay">20</span>%
-                            </div>
-                        </div>
-                        <input type="range" name="commission_rate" id="commission_rate"
-                               min="0" max="50" step="0.5"
-                               value="{{ old('commission_rate', 20) }}"
-                               oninput="updateCommission(this.value)">
-                        <div class="commission-labels">
-                            <span>0%</span><span>10%</span><span>20%</span><span>30%</span><span>40%</span><span>50%</span>
-                        </div>
-                    </div>
-                    <div class="field-hint">
-                        Recommandé : entre 10% et 25%. Ce taux est déduit du montant de chaque commande livrée.
-                    </div>
                 </div>
 
                 <div class="form-nav">
@@ -837,7 +779,6 @@ input[type=range]::-webkit-slider-thumb {
                         <div><strong style="color:var(--text)">Email :</strong> <span id="recapEmail">—</span></div>
                         <div><strong style="color:var(--text)">Téléphone :</strong> <span id="recapPhone">—</span></div>
                         <div><strong style="color:var(--text)">Devise :</strong> <span id="recapCurrency">GNF</span></div>
-                        <div><strong style="color:var(--text)">Commission :</strong> <span id="recapCommission">20%</span></div>
                     </div>
                 </div>
 
@@ -1021,18 +962,6 @@ if (defaultCurrency) {
     selectCurrency(defaultCurrency.code, defaultCurrency.name, defaultCurrency.flag);
 }
 
-/* ════════════════════════════════════════════════════════════════
-   COMMISSION SLIDER
-════════════════════════════════════════════════════════════════ */
-function updateCommission(val) {
-    document.getElementById('commissionDisplay').textContent = parseFloat(val).toFixed(val % 1 === 0 ? 0 : 1);
-    /* Mettre à jour le dégradé du slider */
-    const pct = (val / 50) * 100;
-    document.getElementById('commission_rate').style.background =
-        `linear-gradient(to right, var(--brand) 0%, var(--brand) ${pct}%, var(--border) ${pct}%, var(--border) 100%)`;
-    document.getElementById('recapCommission').textContent = parseFloat(val).toFixed(1) + '%';
-}
-updateCommission(document.getElementById('commission_rate').value);
 
 /* ════════════════════════════════════════════════════════════════
    UPLOAD IMAGE
@@ -1117,7 +1046,6 @@ function updateRecap() {
     document.getElementById('recapEmail').textContent      = document.getElementById('email').value || '—';
     document.getElementById('recapPhone').textContent      = document.getElementById('phone').value || '—';
     document.getElementById('recapCurrency').textContent   = document.getElementById('currency_hidden').value || 'GNF';
-    document.getElementById('recapCommission').textContent = parseFloat(document.getElementById('commission_rate').value).toFixed(1) + '%';
 }
 
 /* ════════════════════════════════════════════════════════════════

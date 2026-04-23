@@ -93,7 +93,12 @@ class OrderController extends Controller
     abort_unless($shopId && $order->shop_id === $shopId, 403, 'Action non autorisée.');
 
     $data = $request->validate([
-        'livreur_id' => ['required', 'exists:users,id'],
+        'livreur_id'          => ['required', 'exists:users,id'],
+        'delivery_fee'        => ['required', 'numeric', 'min:0'],
+        'delivery_destination'=> ['nullable', 'string', 'max:255'],
+    ], [
+        'delivery_fee.required' => 'Le frais de livraison est obligatoire.',
+        'delivery_fee.min'      => 'Le frais doit être un montant positif.',
     ]);
 
     // Vérifier que le livreur appartient bien à la boutique
@@ -102,30 +107,43 @@ class OrderController extends Controller
         ->where('shop_id', $shopId)
         ->firstOrFail();
 
-    // ⚡ On assigne uniquement le livreur
-    $order->livreur_id = $livreur->id;
-    $order->save();
+    // Assigner le livreur + enregistrer frais et destination
+    $order->update([
+        'livreur_id'           => $livreur->id,
+        'delivery_fee'         => $data['delivery_fee'],
+        'delivery_destination' => $data['delivery_destination'] ?? null,
+    ]);
 
-    // notifier le livreur (optionnel)
+    // Créer ou mettre à jour la commission avec le montant fixe
+    \App\Models\CourierCommission::updateOrCreate(
+        ['order_id' => $order->id],
+        [
+            'livreur_id'  => $livreur->id,
+            'shop_id'     => $order->shop_id,
+            'order_total' => $order->total,
+            'rate'        => 0,
+            'amount'      => $data['delivery_fee'],
+            'status'      => 'en_attente',
+        ]
+    );
+
+    // Notifier le livreur
     if (method_exists($livreur, 'notify')) {
         try {
             $livreur->notify(new OrderStatusNotification($order, 'Une commande vous a été assignée.'));
-        } catch (\Throwable $e) {
-            // ignore si notification non configurée
-        }
+        } catch (\Throwable $e) {}
     }
 
-    // Vérifier si la requête est AJAX (fetch)
     if ($request->ajax()) {
         return response()->json([
-            'success' => true,
+            'success'      => true,
             'livreur_name' => $livreur->name,
+            'delivery_fee' => $data['delivery_fee'],
         ]);
     }
 
-    // fallback pour navigation classique
     return redirect()->route('vendeur.orders.index')
-        ->with('success', 'Commande assignée à ' . $livreur->name . '.');
+        ->with('success', 'Commande assignée à ' . $livreur->name . ' · Frais : ' . number_format($data['delivery_fee'], 0, ',', ' ') . ' ' . ($shop?->currency ?? 'GNF') . '.');
 }
 
 

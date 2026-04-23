@@ -527,36 +527,39 @@ input[type=checkbox] {
     ════════════════════════════════════════════════════════════ --}}
     @if($status === 'en_attente' && $commissions->count())
 
+    {{-- ── Guide étapes ── --}}
+    <div style="background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);border-radius:14px;padding:18px 22px;margin-bottom:20px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;">
+        <div style="font-size:18px;flex-shrink:0;">💡</div>
+        <div style="flex:1;min-width:200px;">
+            <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:8px;">Comment payer un livreur ?</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <div style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border-radius:10px;padding:7px 12px;">
+                    <span style="width:22px;height:22px;background:var(--warning);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">1</span>
+                    <span style="font-size:12px;color:rgba(255,255,255,.8);font-weight:600;">Entrez le montant à payer</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border-radius:10px;padding:7px 12px;">
+                    <span style="width:22px;height:22px;background:var(--warning);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">2</span>
+                    <span style="font-size:12px;color:rgba(255,255,255,.8);font-weight:600;">Cochez les lignes à payer</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border-radius:10px;padding:7px 12px;">
+                    <span style="width:22px;height:22px;background:var(--warning);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">3</span>
+                    <span style="font-size:12px;color:rgba(255,255,255,.8);font-weight:600;">Ajoutez une référence (optionnel)</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;background:rgba(16,185,129,.2);border-radius:10px;padding:7px 12px;border:1px solid rgba(16,185,129,.3);">
+                    <span style="width:22px;height:22px;background:var(--brand);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">4</span>
+                    <span style="font-size:12px;color:#6ee7b7;font-weight:600;">Cliquez "Marquer comme payées"</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <form id="payForm" action="{{ route('boutique.commissions.pay') }}" method="POST">
         @csrf
-
-        {{-- ── Barre sticky de paiement ── --}}
-        <div class="payout-bar" id="payoutBar">
-
-            {{-- Compteur de sélection --}}
-            <span class="payout-count" id="selectionCount">0 sélectionné</span>
-
-            {{-- Référence de paiement --}}
-            <input type="text" name="payout_ref"
-                   class="payout-input"
-                   placeholder="Référence (ex: VIRT/2026-001)">
-
-            {{-- Note interne --}}
-            <input type="text" name="payout_note"
-                   class="payout-input"
-                   placeholder="Note interne (optionnel)" style="flex:2">
-
-            {{-- Bouton marquer payé --}}
-            <button type="submit" id="markPaidBtn" class="btn btn-primary" disabled>
-                ✅ Marquer comme PAYÉES
-            </button>
-
-        </div>
 
         {{-- ── Table des commissions ── --}}
         <div class="comm-card">
             <div class="comm-card-hd">
-                <span class="comm-card-title">Commissions en attente</span>
+                <span class="comm-card-title">⏳ Commissions en attente de paiement</span>
                 <label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer">
                     <input type="checkbox" id="checkAll"> Tout sélectionner
                 </label>
@@ -568,10 +571,9 @@ input[type=checkbox] {
                         <th style="width:36px"></th>
                         <th>Réf cmd</th>
                         <th>Livreur</th>
-                        <th>Montant commande</th>
-                        <th>Commission</th>
-                        <th>Statut</th>
-                        <th>Créée le</th>
+                        <th>Destination</th>
+                        <th style="background:#fef9ec;color:#92400e;">💰 Montant à payer</th>
+                        <th>Date</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -579,49 +581,56 @@ input[type=checkbox] {
                     @php
                         $lv   = $c->livreur;
                         $linit = $lv ? $init($lv->name) : 'LV';
+                        $dest = $c->order?->delivery_destination ?: $c->order?->client?->address ?: null;
                     @endphp
                     <tr class="comm-row" data-id="{{ $c->id }}">
+
+                        {{-- Checkbox --}}
                         <td>
-                            <input type="checkbox"
-                                   name="ids[]"
-                                   value="{{ $c->id }}"
-                                   class="rowCheckbox">
+                            <input type="checkbox" name="ids[]" value="{{ $c->id }}" class="rowCheckbox">
                         </td>
 
-                        {{-- Référence commande --}}
+                        {{-- Réf commande --}}
                         <td><span class="ref-cell">#{{ $c->order_id }}</span></td>
 
-                        {{-- Livreur avec avatar --}}
+                        {{-- Livreur --}}
                         <td>
                             <div class="lv-chip">
                                 <div class="lv-av">{{ $linit }}</div>
                                 {{ $lv?->name ?? '—' }}
                             </div>
-                        </td>
-
-                        {{-- Montant de la commande --}}
-                        <td>
-                            <div class="amount">
-                                {{ number_format($c->order_total ?? 0, 0, ',', ' ') }}
-                                <small>{{ $devise }}</small>
-                            </div>
-                        </td>
-
-                        {{-- Montant commission avec devise --}}
-                        <td>
-                            <div class="amount" style="color:var(--warning)">
-                                {{ number_format($c->amount, 0, ',', ' ') }}
-                                <small>{{ $devise }}</small>
-                            </div>
-                            @if($c->rate)
-                            <div style="font-size:10px;color:var(--muted)">
-                                Taux : {{ number_format($c->rate * 100, 1) }}%
-                            </div>
+                            @if($lv?->phone)
+                            <div style="font-size:10.5px;color:var(--muted);margin-top:3px;">📞 {{ $lv->phone }}</div>
                             @endif
                         </td>
 
-                        {{-- Statut --}}
-                        <td><span class="pill p-warning">⏳ En attente</span></td>
+                        {{-- Destination --}}
+                        <td>
+                            @if($dest)
+                                <span style="font-size:12px;color:var(--text-2)">📍 {{ $dest }}</span>
+                            @else
+                                <span style="color:var(--muted);font-size:12px">—</span>
+                            @endif
+                        </td>
+
+                        {{-- Montant éditable — mis en avant --}}
+                        <td style="background:#fffbeb;">
+                            <div style="display:flex;flex-direction:column;gap:4px;">
+                                <div style="font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.4px;">Saisir le montant ✏️</div>
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    <input type="number"
+                                           name="amounts[{{ $c->id }}]"
+                                           class="comm-amount-input"
+                                           value="{{ $c->amount ?: '' }}"
+                                           min="0"
+                                           placeholder="Ex: 50000"
+                                           style="width:120px;padding:8px 12px;border:2px solid #f59e0b;border-radius:8px;font-size:14px;font-weight:800;font-family:var(--mono);color:#92400e;background:#fff;outline:none;transition:border-color .15s,box-shadow .15s;"
+                                           onfocus="this.style.borderColor='#d97706';this.style.boxShadow='0 0 0 3px rgba(245,158,11,.2)'"
+                                           onblur="this.style.borderColor='#f59e0b';this.style.boxShadow='none'">
+                                    <span style="font-size:11px;font-weight:700;color:#92400e;white-space:nowrap;">{{ $devise }}</span>
+                                </div>
+                            </div>
+                        </td>
 
                         {{-- Date --}}
                         <td>
@@ -638,6 +647,18 @@ input[type=checkbox] {
             <div class="pagination-wrap">
                 {{ $commissions->withQueryString()->links() }}
             </div>
+        </div>
+
+        {{-- ── Barre de paiement en bas ── --}}
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:var(--shadow);" id="payoutBar">
+            <span class="payout-count" id="selectionCount" style="flex-shrink:0;">0 sélectionné</span>
+            <input type="text" name="payout_ref" class="payout-input"
+                   placeholder="📎 Référence paiement (ex: Orange Money 001)">
+            <input type="text" name="payout_note" class="payout-input"
+                   placeholder="📝 Note interne (optionnel)" style="flex:2">
+            <button type="submit" id="markPaidBtn" class="btn btn-primary" disabled style="flex-shrink:0;padding:10px 20px;font-size:13.5px;">
+                ✅ Marquer comme PAYÉES
+            </button>
         </div>
 
     </form>
@@ -665,7 +686,7 @@ input[type=checkbox] {
                 <tr>
                     <th>Réf cmd</th>
                     <th>Livreur</th>
-                    <th>Montant commande</th>
+                    <th>Destination</th>
                     <th>Commission</th>
                     <th>Statut</th>
                     <th>Référence paiement</th>
@@ -677,6 +698,9 @@ input[type=checkbox] {
                 @php
                     $lv    = $c->livreur;
                     $linit = $lv ? $init($lv->name) : 'LV';
+                    $dest  = $c->order?->delivery_destination
+                          ?: $c->order?->client?->address
+                          ?: null;
                 @endphp
                 <tr>
                     <td><span class="ref-cell">#{{ $c->order_id }}</span></td>
@@ -688,12 +712,13 @@ input[type=checkbox] {
                         </div>
                     </td>
 
-                    {{-- Montant commande --}}
+                    {{-- Destination --}}
                     <td>
-                        <div class="amount">
-                            {{ number_format($c->order_total ?? 0, 0, ',', ' ') }}
-                            <small>{{ $devise }}</small>
-                        </div>
+                        @if($dest)
+                            <span style="font-size:12px;color:var(--text-2)">📍 {{ $dest }}</span>
+                        @else
+                            <span style="color:var(--muted);font-size:12px">—</span>
+                        @endif
                     </td>
 
                     {{-- Commission avec devise --}}
@@ -702,11 +727,6 @@ input[type=checkbox] {
                             {{ number_format($c->amount, 0, ',', ' ') }}
                             <small>{{ $devise }}</small>
                         </div>
-                        @if($c->rate)
-                        <div style="font-size:10px;color:var(--muted)">
-                            {{ number_format($c->rate * 100, 1) }}%
-                        </div>
-                        @endif
                     </td>
 
                     <td>

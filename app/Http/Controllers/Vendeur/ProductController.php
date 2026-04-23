@@ -47,6 +47,49 @@ class ProductController extends Controller
     ];
 
     /* ─────────────────────────────────────────────
+     | TOP VENTES DU MOIS
+     ───────────────────────────────────────────── */
+    public function topSales()
+    {
+        $user = Auth::user();
+        $shop = $user->shop ?? $user->assignedShop;
+        abort_unless($shop, 403);
+
+        $now = now();
+        $devise = $shop->currency ?? 'GNF';
+
+        $topProducts = $shop->products()
+            ->with(['orderItems' => function ($q) use ($now) {
+                $q->whereHas('order', function ($o) use ($now) {
+                    $o->whereMonth('created_at', $now->month)
+                      ->whereYear('created_at', $now->year)
+                      ->whereNotIn('status', ['annulée', 'cancelled']);
+                });
+            }])
+            ->withCount(['orderItems as monthly_sales' => function ($q) use ($now) {
+                $q->whereHas('order', function ($o) use ($now) {
+                    $o->whereMonth('created_at', $now->month)
+                      ->whereYear('created_at', $now->year)
+                      ->whereNotIn('status', ['annulée', 'cancelled']);
+                });
+            }])
+            ->withSum(['orderItems as monthly_revenue' => function ($q) use ($now) {
+                $q->whereHas('order', function ($o) use ($now) {
+                    $o->whereMonth('created_at', $now->month)
+                      ->whereYear('created_at', $now->year)
+                      ->whereNotIn('status', ['annulée', 'cancelled']);
+                });
+            }], 'price')
+            ->orderByDesc('monthly_sales')
+            ->take(20)
+            ->get();
+
+        $maxSales = $topProducts->max('monthly_sales') ?: 1;
+
+        return view('boutique.products.top', compact('shop', 'topProducts', 'maxSales', 'devise', 'now'));
+    }
+
+    /* ─────────────────────────────────────────────
      | INDEX
      ───────────────────────────────────────────── */
     public function index(Request $request)

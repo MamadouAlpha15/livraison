@@ -20,7 +20,7 @@ class CommissionController extends Controller
         $status = $request->get('status', CourierCommission::STATUS_EN_ATTENTE);
 
         $query = CourierCommission::where('shop_id', $shop->id)
-            ->with(['livreur', 'order'])
+            ->with(['livreur', 'order.client', 'order.items.product'])
             ->orderByDesc('id');
 
         if (in_array($status, [CourierCommission::STATUS_EN_ATTENTE, CourierCommission::STATUS_PAYEE])) {
@@ -47,10 +47,12 @@ class CommissionController extends Controller
     public function pay(Request $request)
     {
         $data = $request->validate([
-            'ids'         => ['required', 'array'],
-            'ids.*'       => ['integer'],
-            'payout_ref'  => ['nullable', 'string', 'max:190'],
-            'payout_note' => ['nullable', 'string'],
+            'ids'          => ['required', 'array'],
+            'ids.*'        => ['integer'],
+            'amounts'      => ['nullable', 'array'],
+            'amounts.*'    => ['nullable', 'numeric', 'min:0'],
+            'payout_ref'   => ['nullable', 'string', 'max:190'],
+            'payout_note'  => ['nullable', 'string'],
         ]);
 
         $user = Auth::user();
@@ -73,10 +75,14 @@ class CommissionController extends Controller
             }
 
             foreach ($rows as $c) {
-                $c->status     = CourierCommission::STATUS_PAYEE;
-                $c->paid_at    = now();
-                $c->payout_ref = $data['payout_ref']  ?? $c->payout_ref;
-                $c->payout_note= $data['payout_note'] ?? $c->payout_note;
+                $c->status      = CourierCommission::STATUS_PAYEE;
+                $c->paid_at     = now();
+                $c->payout_ref  = $data['payout_ref']  ?? $c->payout_ref;
+                $c->payout_note = $data['payout_note'] ?? $c->payout_note;
+                // Mettre à jour le montant si saisi
+                if (isset($data['amounts'][$c->id]) && $data['amounts'][$c->id] !== null) {
+                    $c->amount = $data['amounts'][$c->id];
+                }
                 $c->save();
             }
 

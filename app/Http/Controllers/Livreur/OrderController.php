@@ -104,19 +104,15 @@ class OrderController extends Controller
             $exists = CourierCommission::where('order_id', $order->id)->exists();
 
             if (! $exists) {
-                // Récupérer le taux de commission depuis la boutique, sinon utiliser config par défaut
-                $rate = $order->shop->commission_rate ?? config('delivery.commission_rate', 0.20);
+                // Montant fixe défini par le vendeur lors de l'assignation
+                $amount = $order->delivery_fee ?? 0;
 
-                // Calculer le montant (arrondi à 2 décimales)
-                $amount = round($order->total * $rate, 2);
-
-                // Créer la commission : status 'en_attente' (non payée)
                 CourierCommission::create([
                     'order_id'    => $order->id,
                     'livreur_id'  => $order->livreur_id,
                     'shop_id'     => $order->shop_id,
                     'order_total' => $order->total,
-                    'rate'        => $rate,
+                    'rate'        => 0,
                     'amount'      => $amount,
                     'status'      => 'en_attente',
                 ]);

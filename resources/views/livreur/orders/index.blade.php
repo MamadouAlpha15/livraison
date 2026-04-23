@@ -225,9 +225,18 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
                 </div>
 
                 <div class="ord-info-block">
-                    <div class="lbl">Adresse</div>
-                    <div class="val" style="font-size:12px;color:var(--muted)">📍 {{ $client?->address ?? 'Non renseignée' }}</div>
+                    <div class="lbl">Destination</div>
+                    <div class="val" style="font-size:12px;color:var(--muted)">📍 {{ $order->delivery_destination ?? $client?->address ?? 'Non renseignée' }}</div>
                 </div>
+
+                @if($order->delivery_fee)
+                <div class="ord-info-block" style="grid-column:1/-1">
+                    <div class="lbl">Ma commission</div>
+                    <div class="val" style="font-size:16px;font-weight:900;color:var(--green-dk);font-family:monospace">
+                        💰 {{ number_format($order->delivery_fee, 0, ',', ' ') }} {{ $devise }}
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
 
