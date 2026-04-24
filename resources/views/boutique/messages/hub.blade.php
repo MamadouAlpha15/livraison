@@ -13,6 +13,7 @@
 :root {
     --orange: #f90; --orange-dk: #e47911; --navy: #131921; --navy-2: #232f3e;
     --green: #25d366; --green-dk: #128c7e; --border: #e9edef;
+    --brand: #6366f1; --brand-dk: #4f46e5; --brand-lt: #e0e7ff;
     --text: #111b21; --muted: #667781; --surface: #fff; --bg: #f0f2f5;
     --font: 'Inter', sans-serif; --nav-h: 56px; --sidebar-w: 360px;
 }
@@ -143,11 +144,11 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .hub-prod-img:hover { opacity: .85; }
 .hub-prod-img-ph { cursor: pointer; }
 .hub-prod-view-btn {
-    font-size: 12px; color: var(--green-dk); text-decoration: none; font-weight: 700;
+    font-size: 12px; color: var(--brand-dk); text-decoration: none; font-weight: 700;
     white-space: nowrap; flex-shrink: 0; padding: 7px 13px; border-radius: 8px;
-    border: 1.5px solid var(--green); background: #d1fae5; transition: all .15s;
+    border: 1.5px solid var(--brand); background: var(--brand-lt); transition: all .15s;
 }
-.hub-prod-view-btn:hover { background: #a7f3d0; }
+.hub-prod-view-btn:hover { background: #c7d2fe; }
 
 /* Barre d'actions rapides vendeur */
 .hub-vendor-actions {
@@ -159,8 +160,8 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
     cursor: pointer; border: none; transition: all .15s; font-family: var(--font);
 }
-.hub-action-offer  { background: #d1fae5; color: #065f46; }
-.hub-action-offer:hover  { background: #a7f3d0; }
+.hub-action-offer  { background: #e0e7ff; color: #3730a3; }
+.hub-action-offer:hover  { background: #c7d2fe; }
 .hub-action-refuse { background: #fee2e2; color: #991b1b; }
 .hub-action-refuse:hover { background: #fca5a5; }
 
@@ -417,14 +418,14 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .nego-proposal { background: #fffbeb; border: 1.5px solid #f59e0b; }
 .nego-proposal .nego-card-head { background: #fef3c7; color: #92400e; }
 .nego-proposal .nego-card-price { color: #b45309; }
-.nego-btn-accept { background: #d1fae5; color: #065f46; }
-.nego-btn-accept:hover { background: #a7f3d0; }
+.nego-btn-accept { background: #e0e7ff; color: #3730a3; }
+.nego-btn-accept:hover { background: #c7d2fe; }
 .nego-btn-refuse { background: #fee2e2; color: #991b1b; }
 .nego-btn-refuse:hover { background: #fca5a5; }
 /* offer (vendeur envoyé → vert) */
-.nego-offer { background: #f0fdf4; border: 1.5px solid var(--green); }
-.nego-offer .nego-card-head { background: #dcfce7; color: #065f46; }
-.nego-offer .nego-card-price { color: #16a34a; }
+.nego-offer { background: #eef2ff; border: 1.5px solid var(--brand); }
+.nego-offer .nego-card-head { background: #e0e7ff; color: #3730a3; }
+.nego-offer .nego-card-price { color: #4f46e5; }
 /* refused (refusé → rouge clair) */
 .nego-refused { background: #fff1f2; border: 1.5px solid #fca5a5; }
 .nego-refused .nego-card-head { background: #fee2e2; color: #991b1b; }
@@ -436,23 +437,23 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 /* status badge */
 .nego-status { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 20px; margin-bottom: 6px; }
 .nego-status.pending  { background: #fef3c7; color: #92400e; }
-.nego-status.accepted { background: #d1fae5; color: #065f46; }
+.nego-status.accepted { background: #e0e7ff; color: #3730a3; }
 .nego-status.refused  { background: #fee2e2; color: #991b1b; }
 .nego-status.confirmed{ background: #dbeafe; color: #1e40af; }
 
 /* ── Offer panel ── */
 .hub-offer-panel {
-    background: #f0fdf4; border-top: 2px solid var(--green);
+    background: #eef2ff; border-top: 2px solid var(--brand);
     padding: 12px 16px; flex-shrink: 0; display: none; flex-direction: column; gap: 8px;
 }
 .hub-offer-panel.open { display: flex; }
-.hub-offer-panel-title { font-size: 12px; font-weight: 800; color: #065f46; text-transform: uppercase; letter-spacing: .4px; }
+.hub-offer-panel-title { font-size: 12px; font-weight: 800; color: #3730a3; text-transform: uppercase; letter-spacing: .4px; }
 .hub-offer-hint { font-size: 11.5px; color: var(--muted); }
 .hub-offer-panel-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.hub-offer-input { flex: 1; padding: 9px 14px; border-radius: 8px; border: 1.5px solid var(--green); font-size: 14px; font-family: var(--font); outline: none; min-width: 120px; }
+.hub-offer-input { flex: 1; padding: 9px 14px; border-radius: 8px; border: 1.5px solid var(--brand); font-size: 14px; font-family: var(--font); outline: none; min-width: 120px; }
 .hub-offer-devise { font-size: 13px; font-weight: 700; color: var(--muted); flex-shrink: 0; }
-.hub-offer-submit { padding: 9px 20px; background: var(--green); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); transition: background .15s; }
-.hub-offer-submit:hover { background: var(--green-dk); }
+.hub-offer-submit { padding: 9px 20px; background: var(--brand); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); transition: background .15s; }
+.hub-offer-submit:hover { background: var(--brand-dk); }
 .hub-offer-cancel { padding: 9px 16px; background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; cursor: pointer; font-family: var(--font); }
 .hub-offer-cancel:hover { background: #f5f6f6; }
 
@@ -581,7 +582,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .prod-modal-body { padding: 18px 20px 24px; }
 .prod-modal-name { font-size: 18px; font-weight: 800; color: #111; margin-bottom: 8px; line-height: 1.3; }
 .prod-modal-price { font-size: 22px; font-weight: 900; color: #b12704; font-family: monospace; margin-bottom: 6px; }
-.prod-modal-stock { font-size: 12px; font-weight: 700; color: #065f46; background: #d1fae5; display: inline-flex; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
+.prod-modal-stock { font-size: 12px; font-weight: 700; color: #3730a3; background: #e0e7ff; display: inline-flex; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
 .prod-modal-stock.low { color: #92400e; background: #fef3c7; }
 .prod-modal-stock.out { color: #991b1b; background: #fee2e2; }
 .prod-modal-desc { font-size: 13.5px; color: #444; line-height: 1.65; white-space: pre-wrap; }
@@ -615,8 +616,8 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     object-fit: cover; cursor: pointer; border: 2px solid transparent;
     transition: border-color .15s, transform .15s;
 }
-.pm-thumb:hover { border-color: var(--green); transform: scale(1.05); }
-.pm-thumb.active { border-color: var(--green); box-shadow: 0 0 0 2px #d1fae5; }
+.pm-thumb:hover { border-color: var(--brand); transform: scale(1.05); }
+.pm-thumb.active { border-color: var(--brand); box-shadow: 0 0 0 2px #e0e7ff; }
 </style>
 </head>
 <body>
@@ -738,7 +739,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
                     <a class="hub-prod-view-btn" id="hubProdViewBtn" href="#" target="_blank">Voir →</a>
                     <button class="hub-prod-view-btn" id="hubOfferTriggerBtn"
                             onclick="showOfferPanel(null, null)"
-                            style="background:#d1fae5;border-color:var(--green-dk);color:#065f46;cursor:pointer;font-family:var(--font)">
+                            style="background:#e0e7ff;border-color:var(--brand-dk);color:#3730a3;cursor:pointer;font-family:var(--font)">
                         💰 Faire une offre
                     </button>
                 </div>

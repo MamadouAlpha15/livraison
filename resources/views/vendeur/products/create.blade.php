@@ -14,9 +14,9 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 :root {
-    --brand:     #10b981; --brand-dk: #059669;
-    --brand-lt:  #d1fae5; --brand-mlt: #ecfdf5;
-    --bg:        #f6f8f7; --surface:  #ffffff;
+    --brand:     #6366f1; --brand-dk: #4f46e5;
+    --brand-lt:  #e0e7ff; --brand-mlt: #eef2ff;
+    --bg:        #f8fafc; --surface:  #ffffff;
     --border:    #e2e8f0; --border-dk: #cbd5e1;
     --text:      #0f172a; --text-2:   #475569; --muted: #94a3b8;
     --danger:    #ef4444; --danger-lt: #fef2f2;
@@ -83,7 +83,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 }
 .field-input:focus, .field-select:focus, .field-textarea:focus {
     border-color: var(--brand);
-    box-shadow: 0 0 0 3px rgba(16,185,129,.12);
+    box-shadow: 0 0 0 3px rgba(99,102,241,.12);
 }
 .field-input.error  { border-color: var(--danger); }
 .field-error { font-size: 11.5px; color: var(--danger); margin-top: 4px; }
@@ -199,7 +199,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 
 /* ── Allergens & tags ── */
 .tag-input-wrap { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: var(--r-sm); min-height: 42px; cursor: text; transition: border-color .15s; }
-.tag-input-wrap:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(16,185,129,.12); }
+.tag-input-wrap:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(99,102,241,.12); }
 .tag-chip { display: inline-flex; align-items: center; gap: 4px; background: var(--brand-lt); color: var(--brand-dk); font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
 .tag-chip-remove { background: none; border: none; cursor: pointer; color: var(--brand-dk); font-size: 13px; padding: 0; line-height: 1; }
 .tag-real-input { border: none; outline: none; font-size: 13px; font-family: var(--font); flex: 1; min-width: 80px; background: transparent; }
@@ -216,7 +216,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
     border: 1.5px solid var(--brand-dk);
     cursor: pointer; transition: all .15s;
     display: inline-flex; align-items: center; gap: 7px;
-    box-shadow: 0 4px 14px rgba(16,185,129,.3);
+    box-shadow: 0 4px 14px rgba(99,102,241,.3);
 }
 .btn-submit:hover { background: var(--brand-dk); transform: translateY(-1px); }
 .btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }

@@ -25,11 +25,11 @@
 .emp-submit { width:100%; padding:13px; background:linear-gradient(135deg,#f90,#e47911); color:#fff; border:none; border-radius:12px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; transition:opacity .15s; }
 .emp-submit:hover { opacity:.9; }
 .emp-info-box { background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:14px 16px; margin-bottom:20px; font-size:13px; color:#1e40af; line-height:1.6; }
-.emp-copy-box { display:none; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:14px 16px; margin-top:16px; }
-.emp-copy-box p { margin:0 0 10px; font-size:13px; font-weight:700; color:#065f46; }
+.emp-copy-box { display:none; background:#eef2ff; border:1px solid #c7d2fe; border-radius:10px; padding:14px 16px; margin-top:16px; }
+.emp-copy-box p { margin:0 0 10px; font-size:13px; font-weight:700; color:#3730a3; }
 .emp-copy-row { display:flex; gap:8px; align-items:center; margin-bottom:6px; font-size:13px; color:#374151; }
-.emp-copy-row span { font-family:monospace; background:#fff; padding:4px 10px; border-radius:6px; border:1px solid #d1fae5; flex:1; }
-.emp-copy-btn { padding:5px 12px; background:#10b981; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:12px; font-weight:700; white-space:nowrap; }
+.emp-copy-row span { font-family:monospace; background:#fff; padding:4px 10px; border-radius:6px; border:1px solid #e0e7ff; flex:1; }
+.emp-copy-btn { padding:5px 12px; background:#6366f1; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:12px; font-weight:700; white-space:nowrap; }
 .emp-wa-btn { display:flex; align-items:center; gap:8px; width:100%; padding:10px 16px; background:#25d366; color:#fff; border:none; border-radius:10px; font-size:13.5px; font-weight:700; cursor:pointer; margin-top:8px; font-family:inherit; }
 </style>
 
@@ -45,7 +45,7 @@
     <div class="emp-card-body">
 
         @if (session('success'))
-        <div style="background:#d1fae5;border:1px solid #a7f3d0;border-radius:10px;padding:12px 16px;margin-bottom:16px;color:#065f46;font-size:13.5px;font-weight:600;">
+        <div style="background:#eef2ff;border:1px solid #a5b4fc;border-radius:10px;padding:12px 16px;margin-bottom:16px;color:#3730a3;font-size:13.5px;font-weight:600;">
             ✅ {{ session('success') }}
         </div>
         @endif

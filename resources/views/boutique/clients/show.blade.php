@@ -22,8 +22,8 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
-    --brand:     #10b981; --brand-dk: #059669; --brand-lt: #d1fae5; --brand-mlt: #ecfdf5;
-    --bg:        #f6f8f7; --surface:  #ffffff; --border:   #e8eceb; --border-dk: #d4d9d7;
+    --brand:     #6366f1; --brand-dk: #4f46e5; --brand-lt: #e0e7ff; --brand-mlt: #eef2ff;
+    --bg:        #f8fafc; --surface:  #ffffff; --border:   #e2e8f0; --border-dk: #cbd5e1;
     --text:      #0f1c18; --text-2:   #4b5c56; --muted:    #8a9e98;
     --font:      'Plus Jakarta Sans', sans-serif;
     --mono:      'JetBrains Mono', monospace;
@@ -60,16 +60,16 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 .profile-card::before {
     content: '';
     position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    background: linear-gradient(90deg, var(--brand), #34d399);
+    background: linear-gradient(90deg, var(--brand), #4f46e5);
 }
 
 /* Grand avatar */
 .profile-av {
     width: 64px; height: 64px; border-radius: 50%;
-    background: linear-gradient(135deg, #059669, #2563eb);
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
     display: flex; align-items: center; justify-content: center;
     font-size: 22px; font-weight: 700; color: #fff; flex-shrink: 0;
-    box-shadow: 0 0 0 3px rgba(16,185,129,.2);
+    box-shadow: 0 0 0 3px rgba(99,102,241,.25);
 }
 
 .profile-info { flex: 1; min-width: 0; }
@@ -143,7 +143,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 
 /* Pills statut */
 .pill { display: inline-block; font-size: 10.5px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
-.p-success { background: #d1fae5; color: #065f46; }
+.p-success { background: #e0e7ff; color: #3730a3; }
 .p-warning { background: #fef3c7; color: #92400e; }
 .p-info    { background: #dbeafe; color: #1e40af; }
 .p-danger  { background: #fee2e2; color: #991b1b; }
@@ -217,7 +217,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
     <div class="stats-grid">
 
         {{-- Total dépensé --}}
-        <div class="stat-card" style="border-top:3px solid #10b981">
+        <div class="stat-card" style="border-top:3px solid #6366f1">
             <div class="stat-ico">💰</div>
             <div class="stat-val">{{ number_format(($stats->total_depense ?? 0)/1000, 0) }}k</div>
             <div class="stat-lbl">GNF dépensés</div>

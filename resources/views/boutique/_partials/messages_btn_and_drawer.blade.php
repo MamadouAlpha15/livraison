@@ -60,7 +60,7 @@
 @keyframes pulse-red { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.5)} 50%{box-shadow:0 0 0 6px rgba(239,68,68,0)} }
 .msg-drawer-close { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); color: rgba(255,255,255,.7); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }
 .msg-drawer-close:hover { background: rgba(239,68,68,.25); color: #fca5a5; border-color: rgba(239,68,68,.3); }
-.msg-drawer-sub { padding: 8px 18px; background: rgba(16,185,129,.06); border-bottom: 1px solid var(--border); font-size: 11px; color: var(--muted); flex-shrink: 0; }
+.msg-drawer-sub { padding: 8px 18px; background: rgba(99,102,241,.06); border-bottom: 1px solid var(--border); font-size: 11px; color: var(--muted); flex-shrink: 0; }
 
 /* Liste conversations */
 .msg-drawer-list { flex: 1; overflow-y: auto; }
@@ -87,7 +87,7 @@
 /* Négociation badge dans la liste */
 .msg-nego-badge { font-size: 9px; font-weight: 800; padding: 1px 6px; border-radius: 10px; flex-shrink: 0; }
 .msg-nego-badge.proposal { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-.msg-nego-badge.offer    { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+.msg-nego-badge.offer    { background: #e0e7ff; color: #3730a3; border: 1px solid #a5b4fc; }
 
 .msg-drawer-empty { padding: 48px 20px; text-align: center; font-size: 13px; color: var(--muted); }
 .msg-drawer-empty .ico { font-size: 36px; display: block; margin-bottom: 10px; opacity: .35; }
@@ -108,7 +108,7 @@
 .msg-modal-close:hover { background: rgba(239,68,68,.25); color: #fca5a5; }
 
 /* Barre produit */
-.msg-modal-prod { display: flex; align-items: center; gap: 10px; padding: 9px 18px; background: linear-gradient(90deg, #ecfdf5, #f0fdf4); border-bottom: 1px solid #d1fae5; flex-shrink: 0; }
+.msg-modal-prod { display: flex; align-items: center; gap: 10px; padding: 9px 18px; background: linear-gradient(90deg, #eef2ff, #e0e7ff); border-bottom: 1px solid #c7d2fe; flex-shrink: 0; }
 .msg-modal-prod-img { width: 38px; height: 38px; border-radius: var(--r-sm); object-fit: cover; border: 1px solid var(--border); flex-shrink: 0; }
 .msg-modal-prod-ph { width: 38px; height: 38px; border-radius: var(--r-sm); background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
 .msg-modal-prod-name { font-size: 12.5px; font-weight: 700; color: var(--text); }
@@ -252,28 +252,28 @@
 
 .nego-card-header { padding: 9px 13px; font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; display: flex; align-items: center; gap: 5px; }
 .nego-card.proposal .nego-card-header { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; }
-.nego-card.offer    .nego-card-header { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
+.nego-card.offer    .nego-card-header { background: linear-gradient(135deg, #e0e7ff, #c7d2fe); color: #3730a3; }
 .nego-card.order-ok .nego-card-header { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1e40af; }
 
 .nego-card-body { background: #fff; padding: 13px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 14px 14px; }
 .nego-card-amount { font-size: 20px; font-weight: 900; color: #0f1111; font-family: monospace; line-height: 1; margin-bottom: 3px; }
 .nego-card-original { font-size: 10.5px; color: #6b7280; text-decoration: line-through; margin-bottom: 2px; }
-.nego-card-discount { font-size: 10px; font-weight: 700; color: #059669; background: #d1fae5; display: inline-flex; padding: 2px 7px; border-radius: 20px; margin-bottom: 8px; }
+.nego-card-discount { font-size: 10px; font-weight: 700; color: #4f46e5; background: #e0e7ff; display: inline-flex; padding: 2px 7px; border-radius: 20px; margin-bottom: 8px; }
 .nego-card-status { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; }
 .nego-status-pending  { background: #fef3c7; color: #92400e; }
-.nego-status-accepted { background: #d1fae5; color: #065f46; }
+.nego-status-accepted { background: #e0e7ff; color: #3730a3; }
 .nego-status-refused  { background: #fee2e2; color: #991b1b; }
 
 /* Boutons action vendeur */
 .nego-actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
 .nego-btn-accept {
     flex: 1; padding: 8px 12px; border-radius: 8px;
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
     color: #fff; border: none; font-size: 12px; font-weight: 700;
     cursor: pointer; font-family: var(--font); transition: all .15s;
     display: flex; align-items: center; justify-content: center; gap: 4px;
 }
-.nego-btn-accept:hover { background: linear-gradient(135deg, #059669, #047857); transform: scale(1.03); }
+.nego-btn-accept:hover { background: linear-gradient(135deg, #4f46e5, #4338ca); transform: scale(1.03); }
 .nego-btn-refuse {
     flex: 1; padding: 8px 12px; border-radius: 8px;
     background: linear-gradient(135deg, #fef2f2, #fee2e2);
@@ -285,25 +285,25 @@
 .nego-btn-refuse:hover { background: #fecaca; transform: scale(1.03); }
 
 /* Formulaire offre vendeur */
-.nego-offer-form { display: none; background: linear-gradient(135deg, #f0fdf4, #ecfdf5); border: 1.5px solid #6ee7b7; border-radius: 10px; padding: 12px; margin-top: 10px; }
+.nego-offer-form { display: none; background: linear-gradient(135deg, #eef2ff, #e0e7ff); border: 1.5px solid #a5b4fc; border-radius: 10px; padding: 12px; margin-top: 10px; }
 .nego-offer-form.open { display: block; }
-.nego-offer-form-title { font-size: 11.5px; font-weight: 800; color: #065f46; margin-bottom: 8px; }
+.nego-offer-form-title { font-size: 11.5px; font-weight: 800; color: #3730a3; margin-bottom: 8px; }
 .nego-offer-row { display: flex; gap: 6px; align-items: center; }
 .nego-offer-input {
-    flex: 1; padding: 8px 12px; border: 1.5px solid #6ee7b7; border-radius: 8px;
+    flex: 1; padding: 8px 12px; border: 1.5px solid #a5b4fc; border-radius: 8px;
     font-size: 14px; font-weight: 700; font-family: monospace; color: #0f1111;
     outline: none; background: #fff; transition: border-color .15s;
 }
-.nego-offer-input:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,.15); }
-.nego-offer-devise { font-size: 11px; font-weight: 700; color: #065f46; }
+.nego-offer-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.15); }
+.nego-offer-devise { font-size: 11px; font-weight: 700; color: #3730a3; }
 .nego-offer-send {
     padding: 8px 16px; border-radius: 8px;
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
     color: #fff; border: none; font-size: 12px; font-weight: 700;
     cursor: pointer; font-family: var(--font); white-space: nowrap;
     transition: all .15s;
 }
-.nego-offer-send:hover { background: linear-gradient(135deg, #059669, #047857); }
+.nego-offer-send:hover { background: linear-gradient(135deg, #4f46e5, #4338ca); }
 .nego-offer-send:disabled { opacity: .6; cursor: not-allowed; }
 
 /* Commande créée badge */
@@ -314,8 +314,8 @@
 /* Zone réponse */
 .msg-modal-reply { padding: 12px 18px; border-top: 1px solid var(--border); background: var(--surface); display: flex; gap: 10px; align-items: flex-end; flex-shrink: 0; }
 .msg-modal-input { flex: 1; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 22px; font-size: 13px; font-family: var(--font); color: var(--text); background: var(--bg); outline: none; resize: none; min-height: 40px; max-height: 100px; line-height: 1.45; transition: border-color .15s, box-shadow .15s; }
-.msg-modal-input:focus { border-color: var(--brand); background: var(--surface); box-shadow: 0 0 0 3px rgba(16,185,129,.12); }
-.msg-modal-send { width: 40px; height: 40px; border-radius: 50%; background: var(--brand); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; transition: all .15s; box-shadow: 0 3px 10px rgba(16,185,129,.35); }
+.msg-modal-input:focus { border-color: var(--brand); background: var(--surface); box-shadow: 0 0 0 3px rgba(99,102,241,.12); }
+.msg-modal-send { width: 40px; height: 40px; border-radius: 50%; background: var(--brand); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; transition: all .15s; box-shadow: 0 3px 10px rgba(99,102,241,.35); }
 .msg-modal-send:hover { background: var(--brand-dk); transform: scale(1.08); }
 
 /* Toast boutique */
@@ -328,7 +328,7 @@
     z-index: 2000; transition: transform .3s cubic-bezier(.23,1,.32,1);
 }
 .nego-toast.show { transform: translateX(-50%) translateY(0); }
-.nego-toast.success { background: linear-gradient(135deg, #065f46, #047857); }
+.nego-toast.success { background: linear-gradient(135deg, #3730a3, #4f46e5); }
 .nego-toast.error   { background: linear-gradient(135deg, #991b1b, #b91c1c); }
 
 /* Responsive */

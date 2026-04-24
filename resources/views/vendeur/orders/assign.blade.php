@@ -5,7 +5,7 @@
 @push('styles')
 <style>
 :root {
-    --navy:#0f172a; --navy2:#1e3a5f; --orange:#f90; --orange-dk:#e47911;
+    --navy:#0f172a; --navy2:#1e1b4b; --brand:#6366f1; --brand-dk:#4f46e5;
     --green:#10b981; --green-lt:#d1fae5; --green-dk:#065f46;
     --blue:#3b82f6; --blue-lt:#dbeafe; --border:#e9edef;
     --muted:#64748b; --text:#0f172a; --bg:#f1f5f9;
@@ -56,8 +56,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text)}
 }
 .as-livreur-card:first-child { margin-top:14px; }
 .as-livreur-card:last-child  { margin-bottom:14px; }
-.as-livreur-card:hover       { border-color:var(--orange); box-shadow:0 4px 16px rgba(255,153,0,.15); }
-.as-livreur-card.selected    { border-color:var(--orange); background:#fff8f0; box-shadow:0 4px 20px rgba(255,153,0,.2); }
+.as-livreur-card:hover       { border-color:var(--brand); box-shadow:0 4px 16px rgba(99,102,241,.15); }
+.as-livreur-card.selected    { border-color:var(--brand); background:#eef2ff; box-shadow:0 4px 20px rgba(99,102,241,.15); }
 .as-livreur-card.assigned    { border-color:var(--green); background:#f0fdf4; cursor:default; }
 
 .as-lv-top { display:flex; align-items:center; gap:12px; }
@@ -74,12 +74,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text)}
 .as-fee-label { font-size:12px; font-weight:700; color:var(--muted); margin-bottom:6px; display:block; }
 .as-fee-row   { display:flex; gap:10px; align-items:stretch; }
 .as-fee-input { flex:1; padding:10px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:14px; font-weight:600; font-family:monospace; outline:none; transition:border-color .15s; }
-.as-fee-input:focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(255,153,0,.15); }
+.as-fee-input:focus { border-color:var(--brand); box-shadow:0 0 0 3px rgba(99,102,241,.15); }
 .as-dest-input { width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:13px; outline:none; font-family:var(--font); margin-top:8px; transition:border-color .15s; }
-.as-dest-input:focus { border-color:var(--orange); box-shadow:0 0 0 3px rgba(255,153,0,.15); }
+.as-dest-input:focus { border-color:var(--brand); box-shadow:0 0 0 3px rgba(99,102,241,.15); }
 .as-fee-devise { padding:10px 12px; background:var(--bg); border:1.5px solid var(--border); border-radius:10px; font-size:12px; font-weight:700; color:var(--muted); white-space:nowrap; }
-.as-assign-btn { width:100%; margin-top:12px; padding:13px; background:linear-gradient(135deg,var(--orange),var(--orange-dk)); color:#fff; border:none; border-radius:12px; font-size:14px; font-weight:800; cursor:pointer; font-family:var(--font); display:flex; align-items:center; justify-content:center; gap:8px; transition:all .2s; box-shadow:0 4px 14px rgba(255,153,0,.35); }
-.as-assign-btn:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(255,153,0,.45); }
+.as-assign-btn { width:100%; margin-top:12px; padding:13px; background:linear-gradient(135deg,var(--brand),var(--brand-dk)); color:#fff; border:none; border-radius:12px; font-size:14px; font-weight:800; cursor:pointer; font-family:var(--font); display:flex; align-items:center; justify-content:center; gap:8px; transition:all .2s; box-shadow:0 4px 14px rgba(99,102,241,.35); }
+.as-assign-btn:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(99,102,241,.45); }
 .as-assign-btn:disabled { opacity:.6; cursor:not-allowed; transform:none; }
 
 /* Badge assigné */
@@ -251,7 +251,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text)}
         <div style="padding:32px 20px;text-align:center;color:var(--muted);">
             <div style="font-size:36px;margin-bottom:10px;opacity:.3">🚴</div>
             <div style="font-size:13px;font-weight:600">Aucun livreur rattaché à cette boutique.</div>
-            <a href="{{ route('boutique.employees.create') }}" style="display:inline-block;margin-top:12px;padding:9px 16px;background:var(--orange);color:#fff;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;">+ Ajouter un livreur</a>
+            <a href="{{ route('boutique.employees.create') }}" style="display:inline-block;margin-top:12px;padding:9px 16px;background:var(--brand);color:#fff;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;">+ Ajouter un livreur</a>
         </div>
         @endforelse
     </div>

@@ -5,7 +5,8 @@
 @push('styles')
 <style>
 :root {
-    --navy:#0f172a; --navy2:#1e3a5f; --orange:#f90; --orange-dk:#e47911;
+    --navy:#0f172a; --navy2:#1e1b4b; --brand:#6366f1; --brand-dk:#4f46e5;
+    --orange:#f90; --orange-dk:#e47911;
     --green:#10b981; --green-lt:#d1fae5; --yellow:#f59e0b; --yellow-lt:#fef3c7;
     --red:#ef4444; --red-lt:#fee2e2; --blue:#3b82f6; --blue-lt:#dbeafe;
     --purple:#8b5cf6; --purple-lt:#ede9fe;
@@ -85,7 +86,7 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
     justify-content:space-between; border-bottom:1px solid var(--border);
 }
 .lv-card-title { font-size:14px; font-weight:800; color:var(--text); }
-.lv-card-link { font-size:12px; font-weight:700; color:var(--orange); text-decoration:none; }
+.lv-card-link { font-size:12px; font-weight:700; color:var(--brand); text-decoration:none; }
 .lv-card-link:hover { text-decoration:underline; }
 
 /* ─── COMMANDES RECENTES ─── */
@@ -143,7 +144,7 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
 
 /* ─── STAT COMMISSION ─── */
 .lv-commission-hero {
-    background:linear-gradient(135deg,#065f46,#047857);
+    background:linear-gradient(135deg,#1e1b4b,#3730a3);
     padding:20px; text-align:center;
 }
 .lv-commission-hero .amount { font-size:28px; font-weight:900; color:#fff; font-family:monospace; }

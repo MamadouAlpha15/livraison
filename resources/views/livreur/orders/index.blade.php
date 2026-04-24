@@ -5,7 +5,7 @@
 @push('styles')
 <style>
 :root {
-    --navy:#0f172a; --navy2:#1e3a5f; --orange:#f90; --orange-dk:#e47911;
+    --navy:#0f172a; --navy2:#1e1b4b; --brand:#6366f1; --brand-dk:#4f46e5;
     --green:#10b981; --green-lt:#d1fae5; --green-dk:#065f46;
     --blue:#3b82f6; --blue-lt:#dbeafe; --blue-dk:#1d4ed8;
     --yellow:#f59e0b; --yellow-lt:#fef3c7; --yellow-dk:#92400e;
@@ -34,7 +34,7 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
 /* ── FILTRES ── */
 .ord-filters { display:flex; gap:8px; flex-wrap:wrap; padding:0 24px; margin-top:-48px; position:relative; z-index:2; }
 .ord-filter-btn { padding:9px 16px; border-radius:20px; border:none; font-size:12.5px; font-weight:700; cursor:pointer; font-family:var(--font); background:#fff; color:var(--muted); box-shadow:0 2px 8px rgba(0,0,0,.08); transition:all .15s; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
-.ord-filter-btn:hover, .ord-filter-btn.active { background:var(--orange); color:#fff; box-shadow:0 4px 14px rgba(255,153,0,.35); }
+.ord-filter-btn:hover, .ord-filter-btn.active { background:var(--brand); color:#fff; box-shadow:0 4px 14px rgba(99,102,241,.35); }
 
 /* ── BODY ── */
 .ord-body { padding:20px 24px; display:flex; flex-direction:column; gap:14px; }
@@ -71,7 +71,7 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
 .ord-info-block .lbl { font-size:10.5px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin-bottom:3px; }
 .ord-info-block .val { font-size:13px; font-weight:600; color:var(--text); }
 .ord-info-block .val.amount { font-size:15px; font-weight:900; color:var(--navy); font-family:monospace; }
-.ord-info-block .val.phone  { color:var(--green-dk); }
+.ord-info-block .val.phone  { color:var(--brand); }
 .ord-wa-link { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; color:#25d366; text-decoration:none; margin-top:3px; }
 
 /* Footer carte — boutons action */

@@ -16,31 +16,41 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
-    --brand:      #10b981; /* couleur des ecritures */
-    --brand-dk:   #059669;
-    --brand-lt:   #d1fae5;
-    --brand-mlt:  #ecfdf5;
-    --sb-bg:      #0d1f18; /* l'arriere plan du side bar */
-    --sb-border:  rgba(255,255,255,.06);
-    --sb-act:     rgba(16,185,129,.14);
-    --sb-hov:     rgba(255,255,255,.04);
-    --sb-txt:     rgba(255,255,255,.55);
+    /* ── Accent indigo premium ── */
+    --brand:      #6366f1;
+    --brand-dk:   #4f46e5;
+    --brand-lt:   #e0e7ff;
+    --brand-mlt:  #eef2ff;
+
+    /* ── Sidebar noir profond ── */
+    --sb-bg:      #0e0e16;
+    --sb-border:  rgba(255,255,255,.08);
+    --sb-act:     rgba(99,102,241,.52);
+    --sb-hov:     rgba(255,255,255,.07);
+    --sb-txt:     rgba(255,255,255,.62);
     --sb-txt-act: #fff;
-    --bg:         #f6f8f7;
+
+    /* ── Surfaces ── */
+    --bg:         #f8fafc;
     --surface:    #ffffff;
-    --border:     #e8eceb;
-    --border-dk:  #d4d9d7;
-    --text:       #0f1c18;
-    --text-2:     #4b5c56;
-    --muted:      #8a9e98;
+    --border:     #e2e8f0;
+    --border-dk:  #cbd5e1;
+
+    /* ── Texte ── */
+    --text:       #0f172a;
+    --text-2:     #475569;
+    --muted:      #94a3b8;
+
+    /* ── Typo & divers ── */
     --font:       'Plus Jakarta Sans', sans-serif;
     --mono:       'JetBrains Mono', monospace;
-    --r:          14px;
-    --r-sm:       9px;
-    --r-xs:       6px;
-    --shadow-sm:  0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
-    --shadow:     0 4px 16px rgba(0,0,0,.07), 0 1px 4px rgba(0,0,0,.04);
-    --sb-w:       230px;
+    --r:          12px;
+    --r-sm:       8px;
+    --r-xs:       5px;
+    --shadow-sm:  0 1px 3px rgba(0,0,0,.05), 0 1px 2px rgba(0,0,0,.03);
+    --shadow:     0 4px 20px rgba(0,0,0,.06), 0 1px 4px rgba(0,0,0,.03);
+    --shadow-lg:  0 10px 40px rgba(0,0,0,.08);
+    --sb-w:       232px;
     --top-h:      58px;
 }
 
@@ -52,11 +62,11 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .dash-wrap .main { margin-left: var(--sb-w); flex: 1; min-width: 0; }
 
 /* SIDEBAR */
-.sidebar { background: var(--sb-bg); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; width: var(--sb-w); overflow-y: scroll; scrollbar-width: thin; scrollbar-color:  rgba(255,255,255,.05); z-index: 40; border-right: 1px solid rgba(0,0,0,.2); }
+.sidebar { background: linear-gradient(180deg, #0f0f59 0%, #0e0e16 40%, #10103a 100%); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; width: var(--sb-w); overflow-y: scroll; scrollbar-width: thin; scrollbar-color: rgba(99,102,241,.35) transparent; z-index: 40; border-right: 1px solid rgba(99,102,241,.15); box-shadow: 6px 0 30px rgba(0,0,0,.35); }
 .sidebar::-webkit-scrollbar { width: 4px; }
 .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,.04); }
-.sidebar::-webkit-scrollbar-thumb { background: rgba(16,185,129,.4); border-radius: 4px; }
-.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(16,185,129,.7); }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(99,102,241,.4); border-radius: 4px; }
+.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,.7); }
 .sb-brand { padding: 18px 16px 14px; border-bottom: 1px solid var(--sb-border); flex-shrink: 0; position: relative; }
 .sb-close { display: none; position: absolute; top: 14px; right: 12px; width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.10); color: rgba(255,255,255,.6); font-size: 18px; line-height: 1; cursor: pointer; align-items: center; justify-content: center; transition: background .15s, color .15s; flex-shrink: 0; }
 .sb-close:hover { background: rgba(239,68,68,.18); border-color: rgba(239,68,68,.3); color: #fca5a5; }
@@ -68,19 +78,21 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--brand); flex-shrink: 0; animation: blink 2.2s ease-in-out infinite; box-shadow: 0 0 5px var(--brand); }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
 .sb-nav { padding: 10px 10px 32px; flex: 1; display: flex; flex-direction: column; gap: 1px; overflow: visible; }
-.sb-section { font-size: 9.5px; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,255,255,.2); padding: 12px 8px 4px; font-weight: 600; }
-.sb-item { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500; color: var(--sb-txt); text-decoration: none; transition: background .15s, color .15s; position: relative; }
-.sb-item:hover { background: var(--sb-hov); color: rgba(255,255,255,.8); }
-.sb-item.active { background: var(--sb-act); color: var(--sb-txt-act); }
-.sb-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 18px; background: var(--brand); border-radius: 0 3px 3px 0; }
-.sb-item .ico { font-size: 14px; width: 20px; text-align: center; flex-shrink: 0; }
+.sb-section { font-size: 9px; text-transform: uppercase; letter-spacing: 1.4px; color: rgba(255,255,255,.35); padding: 16px 10px 5px; font-weight: 700; }
+.sb-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500; color: var(--sb-txt); text-decoration: none; transition: background .15s, color .15s; position: relative; }
+.sb-item:hover { background: var(--sb-hov); color: rgba(255,255,255,.85); }
+.sb-item.active { background: var(--sb-act); color: var(--sb-txt-act); box-shadow: 0 2px 12px rgba(99,102,241,.25); }
+.sb-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #a5b4fc; border-radius: 0 3px 3px 0; box-shadow: 2px 0 8px rgba(165,180,252,.5); }
+.sb-item .ico { font-size: 13px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border-radius: 7px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.06); transition: background .15s; }
+.sb-item:hover .ico { background: rgba(255,255,255,.09); }
+.sb-item.active .ico { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.2); }
 .sb-badge { margin-left: auto; background: var(--brand); color: #fff; font-size: 10px; font-weight: 700; border-radius: 20px; padding: 1px 7px; font-family: var(--mono); min-width: 20px; text-align: center; }
 .sb-badge.warn { background: #f59e0b; }
 .sb-group { display: flex; flex-direction: column; }
-.sb-group-toggle { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500; color: var(--sb-txt); cursor: pointer; transition: background .15s, color .15s; user-select: none; border: none; background: none; width: 100%; text-align: left; font-family: var(--font); }
-.sb-group-toggle:hover { background: var(--sb-hov); color: rgba(255,255,255,.8); }
-.sb-group-toggle.open { color: rgba(255,255,255,.9); background: rgba(255,255,255,.03); }
-.sb-group-toggle .ico { font-size: 14px; width: 20px; text-align: center; flex-shrink: 0; }
+.sb-group-toggle { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500; color: var(--sb-txt); cursor: pointer; transition: background .15s, color .15s; user-select: none; border: none; background: none; width: 100%; text-align: left; font-family: var(--font); }
+.sb-group-toggle:hover { background: var(--sb-hov); color: rgba(255,255,255,.85); }
+.sb-group-toggle.open { color: rgba(255,255,255,.9); background: rgba(255,255,255,.04); }
+.sb-group-toggle .ico { font-size: 13px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border-radius: 7px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.06); }
 .sb-group-toggle .sb-arrow { margin-left: auto; font-size: 10px; color: rgba(255,255,255,.25); transition: transform .2s; flex-shrink: 0; }
 .sb-group-toggle.open .sb-arrow { transform: rotate(90deg); color: rgba(255,255,255,.5); }
 .sb-sub { display: none; flex-direction: column; gap: 1px; margin-left: 12px; padding-left: 14px; border-left: 1px solid rgba(255,255,255,.07); margin-top: 2px; margin-bottom: 4px; overflow: visible; }
@@ -88,18 +100,18 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .sb-sub .sb-item { font-size: 12.5px; padding: 6px 10px; color: rgba(255,255,255,.45); }
 .sb-sub .sb-item:hover { color: rgba(255,255,255,.75); }
 .sb-sub .sb-item.active { color: var(--sb-txt-act); background: var(--sb-act); }
-.sb-footer { padding: 12px 10px; border-top: 1px solid var(--sb-border); flex-shrink: 0; display: flex; flex-direction: column; gap: 6px; position: sticky; bottom: 0; background: var(--sb-bg); z-index: 1; }
-.sb-scroll-hint { position: sticky; top: auto; bottom: 72px; width: 100%; height: 40px; background: linear-gradient(to bottom, transparent, rgba(13,31,24,.9)); pointer-events: none; z-index: 2; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; transition: opacity .3s; margin-top: -40px; align-self: flex-end; }
+.sb-footer { padding: 12px 10px; border-top: 1px solid rgba(255,255,255,.08); flex-shrink: 0; display: flex; flex-direction: column; gap: 6px; position: sticky; bottom: 0; background: linear-gradient(180deg, transparent 0%, #0b0b12 25%); z-index: 1; }
+.sb-scroll-hint { position: sticky; top: auto; bottom: 72px; width: 100%; height: 40px; background: linear-gradient(to bottom, transparent, rgba(17,17,24,.95)); pointer-events: none; z-index: 2; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; transition: opacity .3s; margin-top: -40px; align-self: flex-end; }
 .sb-scroll-hint.hidden { opacity: 0; pointer-events: none; }
 .sb-scroll-hint-arrow { display: flex; flex-direction: column; align-items: center; gap: 2px; animation: bounceDown 1.5s ease-in-out infinite; }
-.sb-scroll-hint-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(16,185,129,.6); }
+.sb-scroll-hint-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(99,102,241,.6); }
 .sb-scroll-hint-dot:nth-child(2) { opacity: .5; margin-top: -2px; }
 .sb-scroll-hint-dot:nth-child(3) { opacity: .25; margin-top: -2px; }
 @keyframes bounceDown { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
-.sb-user { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--r-sm); text-decoration: none; transition: background .15s; }
-.sb-user:hover { background: var(--sb-hov); }
-.sb-av { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), #16a34a); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(16,185,129,.25); }
-.sb-uname { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.85); }
+.sb-user { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--r-sm); text-decoration: none; transition: background .15s, border-color .15s; border: 1px solid transparent; }
+.sb-user:hover { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.07); }
+.sb-av { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #4338ca); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(99,102,241,.45), 0 2px 8px rgba(99,102,241,.3); letter-spacing: -.5px; }
+.sb-uname { font-size: 12.5px; font-weight: 700; color: rgba(255,255,255,.9); }
 .sb-urole { font-size: 10px; color: var(--sb-txt); margin-top: 1px; }
 .sb-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; border-radius: var(--r-sm); background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.15); color: rgba(252,165,165,.85); font-size: 12px; font-weight: 600; font-family: var(--font); cursor: pointer; text-decoration: none; transition: background .15s, color .15s, border-color .15s; text-align: left; }
 .sb-logout:hover { background: rgba(220,38,38,.18); border-color: rgba(220,38,38,.35); color: #fca5a5; }
@@ -164,29 +176,33 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 /* PAGE */
 .content { padding: 22px 24px; flex: 1; }
 .flash { margin: 12px 24px 0; padding: 10px 14px; font-size: 12.5px; font-weight: 500; border-radius: var(--r-sm); border: 1px solid; display: flex; align-items: center; gap: 8px; }
-.flash-success { background: #ecfdf5; border-color: #6ee7b7; color: #065f46; }
+.flash-success { background: #eef2ff; border-color: #a5b4fc; color: #3730a3; }
 .flash-info    { background: #eff6ff; border-color: #93c5fd; color: #1e40af; }
 .flash-warning { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
 .flash-danger  { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
-.comm-banner { background: var(--brand-mlt); border: 1px solid var(--brand-lt); border-radius: var(--r-sm); padding: 10px 14px; display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: #065f46; margin-bottom: 20px; font-weight: 500; }
+.comm-banner { background: var(--brand-mlt); border: 1px solid var(--brand-lt); border-radius: var(--r-sm); padding: 10px 14px; display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: #3730a3; margin-bottom: 20px; font-weight: 500; }
 
 /* KPI GRID */
 .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
-.kpi { background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--kpi-color, var(--brand)); border-radius: var(--r); padding: 16px 18px 14px; position: relative; overflow: hidden; box-shadow: var(--shadow-sm); transition: box-shadow .2s, border-color .2s; }
-.kpi:hover { box-shadow: var(--shadow); }
-.kpi-icon { width: 36px; height: 36px; background: var(--kpi-bg, var(--brand-mlt)); border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; font-size: 16px; margin-bottom: 10px; }
-.kpi-lbl { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: .3px; margin-bottom: 4px; text-transform: uppercase; }
-.kpi-val { font-size: 24px; font-weight: 700; color: var(--text); letter-spacing: -.8px; font-family: var(--mono); line-height: 1; }
+.kpi { background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--kpi-color, var(--brand)); border-radius: var(--r); padding: 18px 20px 16px; position: relative; overflow: hidden; box-shadow: var(--shadow-sm); transition: box-shadow .22s, transform .22s, border-color .15s; }
+.kpi:hover { box-shadow: 0 8px 28px rgba(0,0,0,.09), 0 2px 6px rgba(0,0,0,.04); transform: translateY(-2px); }
+.kpi-icon { width: 44px; height: 44px; background: var(--kpi-bg, var(--brand-mlt)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 12px; border: 1.5px solid var(--kpi-border, rgba(0,0,0,.08)); box-shadow: 0 0 0 3px var(--kpi-ring, transparent), 0 2px 10px var(--kpi-glow, rgba(0,0,0,.06)); }
+.kpi-lbl { font-size: 10.5px; color: var(--muted); font-weight: 700; letter-spacing: .4px; margin-bottom: 5px; text-transform: uppercase; }
+.kpi-val { font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -.8px; font-family: var(--mono); line-height: 1; }
 .kpi-unit { font-size: 10px; color: var(--muted); margin-top: 4px; }
-.kpi-delta { font-size: 11px; font-weight: 600; margin-top: 6px; display: flex; align-items: center; gap: 3px; }
-.up   { color: #059669; }
+.kpi-delta { font-size: 11px; font-weight: 700; margin-top: 7px; display: flex; align-items: center; gap: 3px; }
+.up   { color: #16a34a; }
 .down { color: #dc2626; }
 
 /* CARDS */
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow-sm); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow-sm);   transition: all 0.3s ease; }
 .card-hd { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .card-title { font-size: 13px; font-weight: 700; color: var(--text); }
 .card-bd { padding: 16px 18px; }
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
 
 /* CHART */
 .chart-wrap { margin-bottom: 22px; }
@@ -195,14 +211,14 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .rc-total { font-size: 26px; font-weight: 800; color: var(--text); font-family: var(--mono); line-height: 1; }
 .rc-total sup { font-size: 13px; font-weight: 600; vertical-align: super; color: var(--muted); }
 .rc-delta { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-top: 6px; }
-.rc-delta.up   { background: #d1fae5; color: #065f46; }
+.rc-delta.up   { background: #dcfce7; color: #15803d; }
 .rc-delta.down { background: #fee2e2; color: #991b1b; }
 .rc-delta.flat { background: #f3f4f6; color: #6b7280; }
 .rc-header-right { text-align: right; font-size: 11px; color: var(--muted); }
 .rc-header-right .rc-best { font-size: 12px; font-weight: 700; color: var(--brand); }
 .rc-svg-wrap { padding: 4px 20px 16px; position: relative; }
 .rc-tooltip { position: absolute; background: #1e293b; color: #f8fafc; border-radius: 8px; padding: 8px 12px; font-size: 11.5px; pointer-events: none; opacity: 0; transition: opacity .15s; white-space: nowrap; box-shadow: 0 4px 16px rgba(0,0,0,.25); z-index: 10; }
-.rc-tooltip strong { display: block; font-size: 13px; font-family: var(--mono); color: #34d399; }
+.rc-tooltip strong { display: block; font-size: 13px; font-family: var(--mono); color: #a5b4fc; }
 .rc-tooltip span   { color: #94a3b8; font-size: 10px; }
 .rc-day-dots { display: flex; justify-content: space-around; padding: 0 0 2px; }
 .rc-day-dot { flex: 1; text-align: center; font-size: 10px; color: var(--muted); font-family: var(--mono); }
@@ -222,7 +238,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .onam { font-weight: 600; color: var(--text); margin-top: 1px; }
 .oamt { font-family: var(--mono); font-weight: 600; color: var(--text); white-space: nowrap; text-align: right; }
 .pill { display: inline-block; font-size: 10.5px; font-weight: 600; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
-.p-success { background: #d1fae5; color: #065f46; }
+.p-success { background: #dcfce7; color: #15803d; }
 .p-warning { background: #fef3c7; color: #92400e; }
 .p-info    { background: #dbeafe; color: #1e40af; }
 .p-danger  { background: #fee2e2; color: #991b1b; }
@@ -256,10 +272,10 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .lv-av { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #fff; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
 .lv-info { flex: 1; min-width: 0; }
 .lv-nm { font-size: 13px; font-weight: 700; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.lv-phone { font-size: 11.5px; color: #059669; font-weight: 600; margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+.lv-phone { font-size: 11.5px; color: var(--brand); font-weight: 600; margin-top: 2px; display: flex; align-items: center; gap: 4px; }
 .lv-phone-warn { font-size: 11px; color: #f59e0b; font-weight: 600; margin-top: 2px; }
 .lv-status-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; flex-shrink: 0; }
-.lv-status-badge.available { background: #d1fae5; color: #065f46; }
+.lv-status-badge.available { background: #dcfce7; color: #15803d; }
 .lv-status-badge.busy { background: #fef3c7; color: #92400e; }
 .lv-wa-btn { width: 30px; height: 30px; background: #25d366; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; text-decoration: none; transition: transform .15s, box-shadow .15s; }
 .lv-wa-btn:hover { transform: scale(1.12); box-shadow: 0 4px 12px rgba(37,211,102,.4); }
@@ -274,7 +290,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .no-livreur-notice .notice-sub   { font-size: 12px; color: var(--muted); line-height: 1.6; max-width: 260px; }
 
 .status-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-.status-dot.available { background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,.5); }
+.status-dot.available { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,.5); }
 .status-dot.busy      { background: #f59e0b; box-shadow: 0 0 6px rgba(245,158,11,.5); }
 .co-list { display: flex; flex-direction: column; }
 .co-row { display: flex; align-items: center; gap: 11px; padding: 11px 18px; border-bottom: 1px solid #f3f6f4; transition: background .12s; cursor: pointer; }
@@ -291,12 +307,12 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .sp-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 .sp-row:last-child { margin-bottom: 0; }
 .sp-lbl { font-size: 12px; font-weight: 500; color: var(--text-2); width: 110px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sp-track { flex: 1; height: 7px; background: #eef1f0; border-radius: 4px; overflow: hidden; }
+.sp-track { flex: 1; height: 7px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
 .sp-fill { height: 100%; border-radius: 4px; background: var(--brand); transition: width 1.1s cubic-bezier(.23,1,.32,1); }
 .sp-val { font-family: var(--mono); font-size: 11.5px; font-weight: 600; color: var(--text); width: 30px; text-align: right; flex-shrink: 0; }
 
 /* AVATAR COLORS */
-.av-green  { background: #059669; }
+.av-green  { background: #6366f1; }
 .av-blue   { background: #2563eb; }
 .av-amber  { background: #d97706; }
 .av-purple { background: #7c3aed; }
@@ -350,22 +366,23 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 /* ÉTAPE 1 CSS */
 .today-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
-.today-card { background: linear-gradient(135deg, #0d1f18 0%, #1a3328 100%); border: 1px solid rgba(16,185,129,.2); border-radius: var(--r); padding: 20px 22px; display: flex; align-items: center; gap: 16px; box-shadow: 0 4px 20px rgba(0,0,0,.12); position: relative; overflow: hidden; }
-.today-card::after { content: ''; position: absolute; right: -20px; top: -20px; width: 100px; height: 100px; background: rgba(16,185,129,.06); border-radius: 50%; }
-.today-icon { width: 48px; height: 48px; background: rgba(16,185,129,.15); border: 1px solid rgba(16,185,129,.25); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-.today-lbl  { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
-.today-val  { font-size: 26px; font-weight: 700; color: #fff; font-family: var(--mono); letter-spacing: -1px; line-height: 1; }
-.today-unit { font-size: 10px; color: rgba(255,255,255,.35); margin-top: 3px; }
+.today-card { background: linear-gradient(90deg, #291d95, #291d95, #aa28d9 ); border: 1px solid rgba(99,102,241,.35); border-radius: var(--r); padding: 20px 22px; display: flex; align-items: center; gap: 16px; box-shadow: 0 8px 32px rgba(79,70,229,.35), 0 2px 8px rgba(0,0,0,.2); position: relative; overflow: hidden; }
+.today-card::before { content: ''; position: absolute; right: -30px; top: -30px; width: 140px; height: 140px; background: rgba(255,255,255,.06); border-radius: 50%; pointer-events: none; }
+.today-card::after  { content: ''; position: absolute; left: -20px; bottom: -30px; width: 110px; height: 110px; background: rgba(255,255,255,.04); border-radius: 50%; pointer-events: none; }
+.today-icon { width: 48px; height: 48px; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; backdrop-filter: blur(4px); }
+.today-lbl  { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.55); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 4px; }
+.today-val  { font-size: 26px; font-weight: 800; color: #fff; font-family: var(--mono); letter-spacing: -1px; line-height: 1; text-shadow: 0 2px 8px rgba(0,0,0,.2); }
+.today-unit { font-size: 10px; color: rgba(255,255,255,.45); margin-top: 3px; }
 .today-delta { font-size: 11px; font-weight: 700; margin-top: 6px; display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px; border-radius: 20px; }
-.today-delta.up   { background: rgba(16,185,129,.2); color: #34d399; }
-.today-delta.down { background: rgba(239,68,68,.2);  color: #fca5a5; }
-.today-delta.flat { background: rgba(255,255,255,.08); color: rgba(255,255,255,.4); }
+.today-delta.up   { background: rgba(255,255,255,.15); color: #c7d2fe; border: 1px solid rgba(255,255,255,.2); }
+.today-delta.down { background: rgba(239,68,68,.25);  color: #fca5a5; border: 1px solid rgba(239,68,68,.3); }
+.today-delta.flat { background: rgba(255,255,255,.08); color: rgba(255,255,255,.5); }
 .alerts-zone { margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
 .alert-item { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: var(--r-sm); border: 1px solid; font-size: 12.5px; font-weight: 500; animation: slideIn .3s ease; }
 @keyframes slideIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
 .alert-item.danger  { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
 .alert-item.warning { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
-.alert-item.success { background: #ecfdf5; border-color: #6ee7b7; color: #065f46; }
+.alert-item.success { background: #eef2ff; border-color: #a5b4fc; color: #3730a3; }
 .alert-item.info    { background: #eff6ff; border-color: #93c5fd; color: #1e40af; }
 .alert-ico  { font-size: 16px; flex-shrink: 0; }
 .alert-msg  { flex: 1; line-height: 1.4; }
@@ -373,12 +390,14 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .alert-cta:hover { opacity: 1; }
 .kanban-section { margin-bottom: 22px; }
 .kanban-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-.kanban-col { background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--k-color); border-radius: var(--r); padding: 14px 14px 12px; text-align: center; box-shadow: var(--shadow-sm); transition: box-shadow .2s, transform .2s; cursor: default; }
-.kanban-col:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
-.kanban-ico   { font-size: 20px; margin-bottom: 8px; }
-.kanban-count { font-size: 28px; font-weight: 700; font-family: var(--mono); color: var(--k-color); line-height: 1; letter-spacing: -1px; }
-.kanban-lbl   { font-size: 10.5px; font-weight: 600; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: .4px; }
-.kanban-col.has-items { background: var(--k-bg); }
+.kanban-col { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px 14px 14px; text-align: center; box-shadow: var(--shadow-sm); transition: all .2s; cursor: default; position: relative; overflow: hidden; }
+.kanban-col::after { content: ''; position: absolute; bottom: -10px; right: -10px; width: 55px; height: 55px; border-radius: 50%; background: var(--k-color); opacity: .05; pointer-events: none; }
+.kanban-col:hover { box-shadow: var(--shadow); transform: translateY(-3px); border-color: var(--k-color); }
+.kanban-ico-wrap { width: 46px; height: 46px; border-radius: 50%; background: var(--k-bg); border: 2.5px solid var(--k-color); box-shadow: 0 0 0 4px var(--k-bg), 0 4px 14px rgba(0,0,0,.10); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 20px; transition: transform .2s; }
+.kanban-col:hover .kanban-ico-wrap { transform: scale(1.1); }
+.kanban-count { font-size: 30px; font-weight: 800; font-family: var(--mono); color: var(--k-color); line-height: 1; letter-spacing: -1.5px; }
+.kanban-lbl   { font-size: 10px; font-weight: 700; color: var(--muted); margin-top: 5px; text-transform: uppercase; letter-spacing: .5px; }
+.kanban-col.has-items { background: var(--k-bg); border-color: var(--k-color); }
 .quick-section { margin-bottom: 22px; }
 .quick-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); box-shadow: var(--shadow-sm); overflow: hidden; }
 .quick-card-hd { padding: 13px 18px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
@@ -438,7 +457,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .period-btns { display: flex; flex-wrap: wrap; gap: 6px; padding: 14px 18px; border-bottom: 1px solid var(--border); }
 .period-btn { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; font-family: var(--font); border: 1px solid var(--border-dk); background: var(--bg); color: var(--text-2); cursor: pointer; transition: all .15s; white-space: nowrap; }
 .period-btn:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-mlt); }
-.period-btn.active { background: var(--brand); color: #fff; border-color: var(--brand-dk); box-shadow: 0 2px 8px rgba(16,185,129,.25); }
+.period-btn.active { background: var(--brand); color: #fff; border-color: var(--brand-dk); box-shadow: 0 2px 8px rgba(99,102,241,.25); }
 .period-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
 .period-stat { padding: 16px 18px; border-right: 1px solid var(--border); text-align: center; }
 .period-stat:last-child { border-right: none; }
@@ -468,7 +487,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 }
 .period-bar-wrap:hover .period-bar-tooltip { opacity: 1; }
 .tt-date   { font-size: 9px; color: rgba(255,255,255,.45); display: block; margin-bottom: 3px; }
-.tt-ca     { color: #34d399; font-size: 12px; display: block; }
+.tt-ca     { color: #a5b4fc; font-size: 12px; display: block; }
 .tt-detail { color: rgba(255,255,255,.55); font-size: 9.5px; display: block; margin-top: 2px; }
 
 .period-bar { width: 100%; border-radius: 3px 3px 0 0; background: var(--brand); opacity: .8; transition: height .4s cubic-bezier(.23,1,.32,1), opacity .15s; cursor: pointer; position: relative; min-height: 2px; }
@@ -488,12 +507,78 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     .period-stat:nth-child(2) { border-right: none; }
     .period-stat:nth-child(3) { border-top: 1px solid var(--border); }
 }
+
+/* ═══════════════════════════════
+   PREMIUM ENHANCEMENTS
+═══════════════════════════════ */
+
+/* Sidebar active item — glow premium (override) */
+.sb-item.active {
+    background: linear-gradient(90deg, rgba(99,102,241,.58) 0%, rgba(99,102,241,.32) 100%);
+    box-shadow: 0 2px 14px rgba(99,102,241,.22), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.sb-item.active::before { box-shadow: 2px 0 10px rgba(165,180,252,.6), 0 0 8px rgba(99,102,241,.35); }
+
+/* Topbar search */
+.tb-search { display:flex; align-items:center; gap:8px; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:6px 14px; font-size:12px; color:var(--muted); cursor:pointer; white-space:nowrap; transition:border-color .15s, box-shadow .15s; flex-shrink:0; min-width:160px; }
+.tb-search:hover { border-color:var(--brand-lt); box-shadow:0 0 0 3px rgba(99,102,241,.08); }
+.tb-search kbd { background:#f1f5f9; border:1px solid var(--border-dk); border-radius:4px; padding:1px 5px; font-size:10px; color:var(--muted); font-family:var(--mono); margin-left:auto; }
+@media(max-width:680px){ .tb-search{ display:none; } }
+
+/* Topbar icon button */
+.tb-icon-btn { width:34px; height:34px; border-radius:8px; background:transparent; border:1px solid var(--border); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:15px; transition:all .15s; color:var(--text-2); flex-shrink:0; text-decoration:none; }
+.tb-icon-btn:hover { background:var(--brand-mlt); border-color:var(--brand-lt); color:var(--brand); }
+
+/* Topbar greeting */
+.tb-greeting { font-size:14px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tb-greeting-sub { font-size:11px; color:var(--muted); margin-top:1px; }
+
+/* Hero card wave decoration */
+.today-wave { position:absolute; right:0; top:0; bottom:0; width:55%; pointer-events:none; overflow:hidden; z-index:0; }
+.today-wave svg { position:absolute; right:-10px; bottom:0; width:115%; height:100%; }
+.today-icon, .today-card > div:not(.today-wave) { position:relative; z-index:1; }
+
+/* KPI card - subtle brand accent dot */
+.kpi::before { content:''; position:absolute; top:0; right:14px; width:4px; height:4px; border-radius:50%; background:var(--kpi-color, var(--brand)); opacity:.5; margin-top:9px; }
+
+/* KPI card hover lift */
+.kpi { transition:box-shadow .2s, transform .2s; }
+.kpi:hover { box-shadow:0 8px 32px rgba(99,102,241,.12), 0 2px 8px rgba(0,0,0,.05); transform:translateY(-2px); }
+
+/* Charts side-by-side */
+.charts-duo { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:22px; }
+@media(max-width:860px){ .charts-duo{ grid-template-columns:1fr; } }
+
+/* Mini bar chart (commandes) */
+.mini-chart-hd { padding:16px 20px 0; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+.mini-chart-lbl { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
+.mini-chart-val { font-size:22px; font-weight:800; font-family:var(--mono); color:var(--text); letter-spacing:-.5px; line-height:1; }
+.mini-chart-sub { font-size:10px; color:var(--muted); margin-top:2px; }
+.mini-period-badge { font-size:11px; color:var(--muted); background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:4px 10px; font-weight:600; white-space:nowrap; }
+.mini-delta { font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:3px; padding:2px 8px; border-radius:20px; margin-top:5px; }
+.mini-delta.up { background:#dcfce7; color:#15803d; } .mini-delta.down { background:#fee2e2; color:#991b1b; }
+.mini-bars-wrap { display:flex; align-items:flex-end; gap:4px; padding:16px 20px 6px; height:110px; }
+.mini-bar-col { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:2px; height:100%; }
+.mini-bar { width:100%; border-radius:3px 3px 0 0; background:var(--brand); opacity:.7; min-height:2px; transition:height .5s cubic-bezier(.23,1,.32,1), opacity .15s; cursor:pointer; }
+.mini-bar:hover { opacity:1; }
+.mini-bar-lbl { font-size:9px; color:var(--muted); font-family:var(--mono); }
+.mini-bar-labs { display:flex; gap:4px; padding:0 20px 12px; }
+
+/* Résumé rapide */
+.perf-grid { display:grid; grid-template-columns:1fr 268px; gap:16px; margin-bottom:22px; align-items:start; }
+@media(max-width:1000px){ .perf-grid{ grid-template-columns:1fr; } }
+.resume-items { display:flex; flex-direction:column; gap:10px; }
+.resume-item { display:flex; align-items:center; gap:12px; padding:13px 16px; background:var(--bg); border:1px solid var(--border); border-radius:var(--r-sm); transition:all .18s; }
+.resume-item:hover { border-color:var(--brand-lt); background:var(--brand-mlt); transform:translateX(3px); }
+.resume-item-ico { width:36px; height:36px; border-radius:9px; background:var(--surface); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.resume-item-val { font-size:19px; font-weight:800; font-family:var(--mono); color:var(--text); letter-spacing:-.5px; line-height:1; }
+.resume-item-lbl { font-size:10.5px; color:var(--muted); margin-top:2px; font-weight:600; }
 </style>
 @endpush
 
 @php
     $parts    = explode(' ', auth()->user()->name);
-    $initials = strtoupper(substr($parts[0],0,1)) . strtoupper(substr($parts[1] ?? 'X', 0, 1));
+    $initials = strtoupper(substr($parts[0],0,1)) . (isset($parts[1]) ? strtoupper(substr($parts[1],0,1)) : strtoupper(substr($parts[0],1,1)));
     $now      = \Illuminate\Support\Carbon::now();
 
     $commissionsPaieesMonth = (float) \App\Models\CourierCommission::where('shop_id', $shop->id)->where('status', 'payée')->whereMonth('created_at', $now->month)->whereYear('created_at', $now->year)->sum('amount');
@@ -537,7 +622,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         'annulée'=>['label'=>'Annulé','cls'=>'p-danger'],
     ];
     $pendingCount = $shop->orders()->whereIn('status',['en attente','en_attente','pending','confirmée','processing'])->count();
-    $avColors = ['av-green','av-blue','av-amber','av-purple','av-teal','av-rose'];
+    $avColors = ['#10b981','#6366f1','#f59e0b','#8b5cf6','#14b8a6','#f43f5e'];
     $devise = $shop->currency ?? 'GNF';
     $caGrossToday    = (float) $shop->orders()->whereDate('created_at', today())->where('status','livrée')->sum('total');
     $commToday       = (float) \App\Models\CourierCommission::whereHas('order', function ($q) use ($shop) { $q->where('shop_id', $shop->id)->whereDate('created_at', today()); })->where('status', 'payée')->sum('amount');
@@ -554,10 +639,10 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     if (!$shop->is_approved) $alerts->push(['type'=>'warning','ico'=>'⏳','msg'=>"Votre boutique est en attente de validation par l'administrateur",'link'=>null,'cta'=>null]);
     if ($caTodayDelta >= 20 && $caToday > 0) $alerts->push(['type'=>'success','ico'=>'🎉','msg'=>"Excellente journée ! Vos revenus d'aujourd'hui sont en hausse de {$caTodayDelta}% vs hier",'link'=>null,'cta'=>null]);
     $kanban = [
-        ['label'=>'En attente','count'=>$shop->orders()->whereIn('status',['pending','en attente','en_attente'])->count(),'color'=>'#f59e0b','bg'=>'#fffbeb','ico'=>'📥'],
-        ['label'=>'Confirmées','count'=>$shop->orders()->whereIn('status',['confirmed','confirmée','processing'])->count(),'color'=>'#3b82f6','bg'=>'#eff6ff','ico'=>'✅'],
-        ['label'=>'En livraison','count'=>$shop->orders()->whereIn('status',['en_livraison','delivering','shipped'])->count(),'color'=>'#8b5cf6','bg'=>'#f5f3ff','ico'=>'🚴'],
-        ['label'=>'Terminées','count'=>$shop->orders()->whereMonth('created_at',$now->month)->where('status','livrée')->count(),'color'=>'#10b981','bg'=>'#ecfdf5','ico'=>'🎯'],
+        ['label'=>'En attente','count'=>$shop->orders()->whereIn('status',['pending','en attente','en_attente'])->count(),'color'=>'#f59e0b','bg'=>'#fffbeb','ico'=>'⏰'],
+        ['label'=>'Confirmées','count'=>$shop->orders()->whereIn('status',['confirmed','confirmée','processing'])->count(),'color'=>'#10b981','bg'=>'#ecfdf5','ico'=>'✅'],
+        ['label'=>'En livraison','count'=>$shop->orders()->whereIn('status',['en_livraison','delivering','shipped'])->count(),'color'=>'#6366f1','bg'=>'#eef2ff','ico'=>'🚚'],
+        ['label'=>'Terminées','count'=>$shop->orders()->whereMonth('created_at',$now->month)->where('status','livrée')->count(),'color'=>'#22c55e','bg'=>'#dcfce7','ico'=>'✅'],
         ['label'=>'Annulées','count'=>$shop->orders()->whereMonth('created_at',$now->month)->whereIn('status',['annulée','cancelled'])->count(),'color'=>'#ef4444','bg'=>'#fef2f2','ico'=>'❌'],
     ];
     $hasLivreurs  = $livreursDisponibles->isNotEmpty();
@@ -567,6 +652,19 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             $q->whereHas('order', function ($o) use ($now) { $o->whereMonth('created_at', $now->month)->whereYear('created_at', $now->year); });
         }])
         ->having('ventes_mois', '=', 0)->orderBy('created_at', 'desc')->take(5)->get();
+    /* Résumé rapide */
+    $totalProduits    = $shop->products()->count();
+    $clientsActifsCount = $shop->orders()->distinct('user_id')->count('user_id');
+    $livreursActifsCount = $livreursDisponibles->count();
+    $partenairesCount = isset($deliveryCompanies) ? $deliveryCompanies->count() : 0;
+    /* Mini bar chart commandes 7j */
+    $cmdDays7 = collect(range(6,0))->map(function($i) use ($shop, $now) {
+        $day = $now->copy()->subDays($i)->toDateString();
+        $cnt = $shop->orders()->whereDate('created_at', $day)->whereNotIn('status',['annulée','cancelled'])->count();
+        $d   = $now->copy()->subDays($i); $d->locale('fr');
+        return ['label' => ucfirst($d->isoFormat('ddd')), 'count' => $cnt, 'today' => $i === 0];
+    })->values();
+    $maxCmd7 = $cmdDays7->max('count') ?: 1;
 @endphp
 
 <div class="dash-wrap" id="dashWrap">
@@ -642,10 +740,18 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         <div class="topbar">
             <button class="btn-hamburger" id="btnMenu" aria-label="Menu">☰</button>
             <div class="tb-info">
-                <div class="tb-title">{{ $shop->name }}</div>
-                <div class="tb-sub">{{ now()->translatedFormat('l j F Y') }}</div>
+                <div class="tb-greeting">Bonjour, {{ auth()->user()->name }} 👋</div>
+                <div class="tb-greeting-sub">Voici ce qui se passe avec votre boutique aujourd'hui.</div>
             </div>
+
+            <div class="tb-search">
+                🔍 Rechercher... <kbd>Ctrl K</kbd>
+            </div>
+
             <div class="tb-actions">
+
+                {{-- Mode sombre --}}
+                <button class="tb-icon-btn" id="btnDarkMode" title="Mode sombre / clair">🌙</button>
 
                 {{-- Cloche notifications temps réel --}}
                 <div class="notif-bell-wrap" id="notifBellWrap" style="position:relative;display:inline-flex">
@@ -704,8 +810,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
             {{-- KPI Grid --}}
             <div class="kpi-grid" style="margin-bottom:22px">
-                <div class="kpi" style="--kpi-color:#10b981;--kpi-bg:#ecfdf5">
-                    <div class="kpi-icon">💰</div>
+                <div class="kpi"  style="--kpi-color:#8b5cf6;--kpi-bg:#f5f3ff">
+                    <div class="kpi-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);border-color:rgba(139,92,246,.3);box-shadow:0 0 0 3px rgba(139,92,246,.12),0 4px 14px rgba(139,92,246,.4)">💰</div>
                     <div class="kpi-lbl">Revenu net</div>
                     <div class="kpi-val">{{ number_format($caMonth,0,',',' ') }}</div>
                     <div class="kpi-unit">{{ $devise }} · {{ $now->translatedFormat('F Y') }}</div>
@@ -718,22 +824,22 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     </div>
                     @endif
                 </div>
-                <div class="kpi" style="--kpi-color:#3b82f6;--kpi-bg:#eff6ff">
-                    <div class="kpi-icon">📦</div>
+                <div class="kpi" style="--kpi-color:#8b5cf6;--kpi-bg:#f5f3ff">
+                    <div class="kpi-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);border-color:rgba(139,92,246,.3);box-shadow:0 0 0 3px rgba(139,92,246,.12),0 4px 14px rgba(139,92,246,.4)">📦</div>
                     <div class="kpi-lbl">Commandes ce mois</div>
                     <div class="kpi-val">{{ $cmdMonth }}</div>
                     <div class="kpi-unit">commandes</div>
                     <div class="kpi-delta {{ $cmdToday >= $cmdYest ? 'up':'down' }}">{{ $cmdToday >= $cmdYest ? '↑':'↓' }} {{ $cmdToday }} aujourd'hui</div>
                 </div>
-                <div class="kpi" style="--kpi-color:#f59e0b;--kpi-bg:#fffbeb">
-                    <div class="kpi-icon">🛒</div>
+                <div class="kpi" style="--kpi-color:#d97706;--kpi-bg:#fffbeb">
+                    <div class="kpi-icon" style="background:linear-gradient(135deg,#f59e0b,#b45309);border-color:rgba(169, 141, 110, 0.3);box-shadow:0 0 0 3px rgba(217,119,6,.12),0 4px 14px rgba(147, 94, 33, 0.4)">🛒</div>
                     <div class="kpi-lbl">Panier moyen</div>
                     <div class="kpi-val">{{ number_format($panier,0,',',' ') }}</div>
                     <div class="kpi-unit">{{ $devise }} / commande</div>
                     <div class="kpi-delta {{ $caDelta >= 0 ? 'up':'down' }}">{{ $caDelta >= 0 ? '↑':'↓' }} {{ abs($caDelta) }}%</div>
                 </div>
-                <div class="kpi" style="--kpi-color:#8b5cf6;--kpi-bg:#f5f3ff">
-                    <div class="kpi-icon">🚴</div>
+                <div class="kpi" style="--kpi-color:#d97706;--kpi-bg:#fffbeb">
+                    <div class="kpi-icon" style="background:linear-gradient(135deg,#f59e0b,#b45309);border-color:rgba(217,119,6,.3);box-shadow:0 0 0 3px rgba(217,119,6,.12),0 4px 14px rgba(217,119,6,.4)">🚴</div>
                     <div class="kpi-lbl">Taux de livraison</div>
                     <div class="kpi-val">{{ $tauxLiv }}%</div>
                     <div class="kpi-unit">{{ $livres }} / {{ $totalCmdMonth }} livrées</div>
@@ -759,12 +865,20 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                         <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.12);display:flex;flex-direction:column;gap:3px">
                             <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.4)"><span>CA brut</span><span style="font-family:var(--mono);color:rgba(255,255,255,.6)">{{ number_format($caGrossToday,0,',',' ') }}</span></div>
                             <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.4)"><span>Commissions</span><span style="font-family:var(--mono);color:#fca5a5">− {{ number_format($commToday,0,',',' ') }}</span></div>
-                            <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;padding-top:3px;border-top:1px dashed rgba(255,255,255,.1)"><span style="color:#34d399">Net</span><span style="font-family:var(--mono);color:#34d399">{{ number_format($caToday,0,',',' ') }}</span></div>
+                            <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;padding-top:3px;border-top:1px dashed rgba(255,255,255,.1)"><span style="color:#a5b4fc">Net</span><span style="font-family:var(--mono);color:#a5b4fc">{{ number_format($caToday,0,',',' ') }}</span></div>
                         </div>
                         @endif
                     </div>
+                    {{-- Wave sparkline décoration --}}
+                    <div class="today-wave">
+                        <svg viewBox="0 0 200 100" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0,70 C20,70 25,30 50,40 C75,50 80,20 100,25 C120,30 130,60 150,50 C170,40 180,15 200,20 L200,100 L0,100 Z" fill="rgba(255,255,255,.12)"/>
+                            <path d="M0,80 C25,80 30,50 55,58 C80,66 90,35 115,42 C140,49 150,68 175,60 C190,55 200,35 210,30 L210,100 L0,100 Z" fill="rgba(255,255,255,.07)"/>
+                            <path d="M0,70 C20,70 25,30 50,40 C75,50 80,20 100,25 C120,30 130,60 150,50 C170,40 180,15 200,20" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+                        </svg>
+                    </div>
                 </div>
-                <div class="today-card">
+                <div class="today-card" style="background:linear-gradient(135deg, #0c1a35 0%, #0f2850 40%, #0d3060 100%); box-shadow:0 8px 32px rgba(15,40,80,.4), 0 2px 8px rgba(0,0,0,.25); border-color:rgba(59,130,246,.25)">
                     <div class="today-icon">📦</div>
                     <div>
                         <div class="today-lbl">Commandes aujourd'hui</div>
@@ -775,6 +889,14 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                             @elseif($cmdToday < $cmdYest) ↓ {{ $cmdYest - $cmdToday }} de moins vs hier
                             @else — Même niveau qu'hier @endif
                         </div>
+                    </div>
+                    {{-- Wave sparkline décoration --}}
+                    <div class="today-wave">
+                        <svg viewBox="0 0 200 100" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0,60 C15,60 25,80 50,65 C75,50 85,25 110,35 C135,45 140,70 165,55 C182,44 195,20 210,25 L210,100 L0,100 Z" fill="rgba(99,102,241,.18)"/>
+                            <path d="M0,75 C20,75 30,90 55,78 C80,66 90,42 115,50 C140,58 150,78 175,68 C192,61 200,42 210,38 L210,100 L0,100 Z" fill="rgba(99,102,241,.10)"/>
+                            <path d="M0,60 C15,60 25,80 50,65 C75,50 85,25 110,35 C135,45 140,70 165,55 C182,44 195,20 210,25" stroke="rgba(99,102,241,.55)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+                        </svg>
                     </div>
                 </div>
             </div>
@@ -801,11 +923,10 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 <div class="kanban-grid">
                     @foreach($kanban as $col)
                     <div class="kanban-col {{ $col['count'] > 0 ? 'has-items' : '' }}" style="--k-color:{{ $col['color'] }};--k-bg:{{ $col['bg'] }}">
-                        <div class="kanban-ico">{{ $col['ico'] }}</div>
+                        <div class="kanban-ico-wrap">{{ $col['ico'] }}</div>
                         <div class="kanban-count">{{ $col['count'] }}</div>
                         <div class="kanban-lbl">{{ $col['label'] }}</div>
-                        @if($col['label'] === 'En livraison' && $col['count'] > 0)<div style="font-size:9px;color:var(--muted);margin-top:3px;font-weight:600">🔴 En cours</div>
-                        @elseif($col['label'] === 'Terminées')<div style="font-size:9px;color:var(--muted);margin-top:3px">ce mois</div>@endif
+                        @if($col['label'] === 'Terminées')<div style="font-size:9px;color:var(--muted);margin-top:3px;font-weight:600">ce mois</div>@endif
                     </div>
                     @endforeach
                 </div>
@@ -820,14 +941,14 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     </div>
                     <div class="quick-grid">
                         <a href="{{ route('boutique.orders.index') }}" class="quick-btn" style="--q-bg:#fffbeb;--q-border:#fde68a;--q-color:#f59e0b"><div class="quick-btn-ico">📋</div><div class="quick-btn-lbl">Commandes</div><div class="quick-btn-sub">Voir & gérer</div></a>
-                        <a href="{{ route('products.create') }}" class="quick-btn" style="--q-bg:#ecfdf5;--q-border:#6ee7b7;--q-color:#10b981"><div class="quick-btn-ico">➕</div><div class="quick-btn-lbl">Nouveau produit</div><div class="quick-btn-sub">Ajouter au catalogue</div></a>
+                        <a href="{{ route('products.create') }}" class="quick-btn" style="--q-bg:#eef2ff;--q-border:#a5b4fc;--q-color:#6366f1"><div class="quick-btn-ico">➕</div><div class="quick-btn-lbl">Nouveau produit</div><div class="quick-btn-sub">Ajouter au catalogue</div></a>
                         <a href="{{ route('boutique.livreurs.index') }}" class="quick-btn" style="--q-bg:#f5f3ff;--q-border:#c4b5fd;--q-color:#8b5cf6"><div class="quick-btn-ico">🚴</div><div class="quick-btn-lbl">Livreurs</div><div class="quick-btn-sub">Voir en ligne</div></a>
                         <a href="{{ route('boutique.payments.index') }}" class="quick-btn" style="--q-bg:#eff6ff;--q-border:#93c5fd;--q-color:#3b82f6"><div class="quick-btn-ico">💳</div><div class="quick-btn-lbl">Paiements</div><div class="quick-btn-sub">Revenus reçus</div></a>
                     </div>
                 </div>
             </div>
 
-            {{-- CHART 7J --}}
+            {{-- CHARTS DUO : Revenus + Commandes 7j --}}
             {{-- ===================== REVENUE CHART 7J ===================== --}}
             @php
                 $W = 660; $H = 160;
@@ -857,7 +978,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     return round($n);
                 }
             @endphp
-            <div class="card chart-wrap">
+            <div class="charts-duo">
+            <div class="card chart-wrap" style="margin-bottom:0">
                 {{-- Header --}}
                 <div class="rc-header">
                     <div class="rc-header-left">
@@ -896,8 +1018,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     <svg viewBox="0 0 {{ $W }} {{ $H }}" width="100%" height="160" preserveAspectRatio="none" overflow="visible" style="display:block">
                         <defs>
                             <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%"   stop-color="#10b981" stop-opacity=".25"/>
-                                <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+                                <stop offset="0%"   stop-color="#6366f1" stop-opacity=".2"/>
+                                <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
                             </linearGradient>
                         </defs>
 
@@ -913,13 +1035,13 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                         <polygon points="{{ $areaPoints }}" fill="url(#areaGrad)"/>
 
                         {{-- Line --}}
-                        <polyline points="{{ $polyline }}" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+                        <polyline points="{{ $polyline }}" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
 
                         {{-- Points + hit areas --}}
                         @foreach($pts as $i => $p)
                         <circle cx="{{ $p['x'] }}" cy="{{ $p['y'] }}" r="4"
-                                fill="{{ $p['today'] ? '#10b981' : '#fff' }}"
-                                stroke="#10b981" stroke-width="2"
+                                fill="{{ $p['today'] ? '#6366f1' : '#fff' }}"
+                                stroke="#6366f1" stroke-width="2"
                                 class="rc-pt"
                                 data-val="{{ $p['v'] }}"
                                 data-lbl="{{ $p['lbl'] }}"
@@ -940,6 +1062,38 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     </div>
                 </div>
             </div>
+
+            {{-- Mini bar chart : Commandes 7j --}}
+            <div class="card" style="margin-bottom:0">
+                <div class="mini-chart-hd">
+                    <div>
+                        <div class="mini-chart-lbl">Commandes</div>
+                        <div class="mini-chart-val">{{ $cmdDays7->sum('count') }}</div>
+                        <div class="mini-chart-sub">7 derniers jours</div>
+                        @php $cmdDelta7 = $cmdDays7->count() >= 2 ? ($cmdDays7->last()['count'] - $cmdDays7->get($cmdDays7->count()-2)['count']) : 0; @endphp
+                        <div class="mini-delta {{ $cmdDelta7 >= 0 ? 'up' : 'down' }}">
+                            {{ $cmdDelta7 >= 0 ? '↑ +'.$cmdDelta7 : '↓ '.$cmdDelta7 }} aujourd'hui
+                        </div>
+                    </div>
+                    <span class="mini-period-badge">30 derniers jours ▾</span>
+                </div>
+                <div class="mini-bars-wrap">
+                    @foreach($cmdDays7 as $cd)
+                    @php $hPct = $maxCmd7 > 0 ? max(round(($cd['count']/$maxCmd7)*100),2) : 2; @endphp
+                    <div class="mini-bar-col">
+                        <div class="mini-bar {{ $cd['today'] ? 'actuel' : '' }}"
+                             data-h="{{ $hPct }}"
+                             style="height:0%;{{ $cd['today'] ? 'opacity:1' : '' }}"></div>
+                    </div>
+                    @endforeach
+                </div>
+                <div class="mini-bar-labs">
+                    @foreach($cmdDays7 as $cd)
+                    <div class="mini-bar-lbl" style="flex:1;text-align:center;{{ $cd['today'] ? 'color:var(--brand);font-weight:700' : '' }}">{{ $cd['label'] }}</div>
+                    @endforeach
+                </div>
+            </div>
+            </div>{{-- /charts-duo --}}
 
             {{-- CONTENT GRID --}}
             <div class="content-grid">
@@ -989,7 +1143,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                                 @foreach($livreursDisponibles->take(5) as $i => $livreur)
                                 @php
                                     $lp    = explode(' ', $livreur->name);
-                                    $linit = strtoupper(substr($lp[0],0,1)).strtoupper(substr($lp[1]??'X',0,1));
+                                    $linit = strtoupper(substr($lp[0],0,1)).(isset($lp[1]) ? strtoupper(substr($lp[1],0,1)) : strtoupper(substr($lp[0],1,1)));
                                     $lcol  = $avColors[$i % count($avColors)];
                                     $busy  = !empty($livreur->current_order_id);
                                     $waNum = preg_replace('/\D/', '', $livreur->phone ?? '');
@@ -1122,8 +1276,9 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 @endif
             </div>
 
-            {{-- SÉLECTEUR DE PÉRIODE --}}
-            <div class="card period-card" id="periodCard">
+            {{-- SÉLECTEUR DE PÉRIODE + RÉSUMÉ RAPIDE --}}
+            <div class="perf-grid">
+            <div class="card period-card" id="periodCard" style="margin-bottom:0">
                 <div class="card-hd">
                     <span class="card-title">📅 Analyse par période</span>
                     <span class="period-label" id="periodLabel">Période : <strong>Ce mois</strong></span>
@@ -1170,6 +1325,52 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     </div>
                 </div>
             </div>
+
+            {{-- Résumé rapide --}}
+            <div class="card" style="margin-bottom:0">
+                <div class="card-hd"><span class="card-title">📊 Résumé rapide</span></div>
+                <div class="card-bd">
+                    <div class="resume-items">
+                        <div class="resume-item">
+                            <div class="resume-item-ico">🛒</div>
+                            <div>
+                                <div class="resume-item-val">{{ $totalProduits }}</div>
+                                <div class="resume-item-lbl">Total produits</div>
+                            </div>
+                        </div>
+                        <div class="resume-item">
+                            <div class="resume-item-ico">👥</div>
+                            <div>
+                                <div class="resume-item-val">{{ $clientsActifsCount }}</div>
+                                <div class="resume-item-lbl">Clients actifs</div>
+                            </div>
+                        </div>
+                        <div class="resume-item">
+                            <div class="resume-item-ico">🚴</div>
+                            <div>
+                                <div class="resume-item-val">{{ $livreursActifsCount }}</div>
+                                <div class="resume-item-lbl">Livreurs actifs</div>
+                            </div>
+                        </div>
+                        <div class="resume-item">
+                            <div class="resume-item-ico">🏢</div>
+                            <div>
+                                <div class="resume-item-val">{{ $partenairesCount }}</div>
+                                <div class="resume-item-lbl">Partenaires</div>
+                            </div>
+                        </div>
+                        <div class="resume-item" style="border-color:var(--brand-lt);background:var(--brand-mlt)">
+                            <div class="resume-item-ico" style="background:var(--brand-mlt);border-color:var(--brand-lt)">💰</div>
+                            <div>
+                                <div class="resume-item-val" style="color:var(--brand);font-size:16px">{{ number_format($caMonth/1000000,1) }}M</div>
+                                <div class="resume-item-lbl" style="color:var(--brand-dk)">Revenu net ce mois</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            </div>{{-- /perf-grid --}}
 
         </div>{{-- /content --}}
     </main>
@@ -1274,8 +1475,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     })();
 
-    /* Sparklines */
+    /* Sparklines produits */
     document.querySelectorAll('.sp-fill').forEach((el, i) => { setTimeout(() => { el.style.width = el.dataset.pct + '%'; }, 100 + i * 90); });
+
+    /* Mini bars commandes */
+    document.querySelectorAll('.mini-bar').forEach((bar, i) => {
+        setTimeout(() => { bar.style.transition = 'height .5s cubic-bezier(.23,1,.32,1)'; bar.style.height = bar.dataset.h + '%'; }, 100 + i * 60);
+    });
+
+    /* Dark mode toggle */
+    const btnDark = document.getElementById('btnDarkMode');
+    if (btnDark) {
+        btnDark.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            btnDark.textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
+        });
+    }
+
+    /* Search bar (Ctrl+K) */
+    document.addEventListener('keydown', e => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); }
+    });
 
     /* Période */
     const periodLabels = { yesterday:'Hier', today:"Aujourd'hui", '7days':'7 derniers jours', '30days':'30 derniers jours', this_month:'Ce mois', last_month:'Mois dernier', this_year:'Cette année', last_year:'Année dernière' };
@@ -1408,7 +1628,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const t = document.createElement('div');
         t.style.cssText = `
             position:fixed;bottom:${20 + document.querySelectorAll('.rt-toast').length * 60}px;
-            right:20px;background:${type==='order'?'#0d1f18':type==='msg'?'#1e40af':'#1f2937'};
+            right:20px;background:${type==='order'?'#111118':type==='msg'?'#1e40af':'#1f2937'};
             color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:600;
             z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,.25);
             animation:slideInRight .3s cubic-bezier(.23,1,.32,1);
