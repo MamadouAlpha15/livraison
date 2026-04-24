@@ -206,22 +206,22 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 /* CHART */
 .chart-wrap { margin-bottom: 22px; }
-.rc-header { padding: 16px 20px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.rc-header-left .rc-title { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
-.rc-total { font-size: 26px; font-weight: 800; color: var(--text); font-family: var(--mono); line-height: 1; }
-.rc-total sup { font-size: 13px; font-weight: 600; vertical-align: super; color: var(--muted); }
-.rc-delta { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-top: 6px; }
+.rc-header { padding: 18px 22px 14px; border-bottom: 1px solid rgba(99,102,241,.1); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: linear-gradient(135deg,rgba(99,102,241,.045) 0%,rgba(139,92,246,.02) 100%); }
+.rc-header-left .rc-title { font-size: 10.5px; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 6px; }
+.rc-total { font-size: 28px; font-weight: 800; color: var(--text); font-family: var(--mono); line-height: 1; letter-spacing: -1px; }
+.rc-total sup { font-size: 12px; font-weight: 600; vertical-align: super; color: var(--muted); margin-right: 2px; }
+.rc-delta { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-top: 8px; }
 .rc-delta.up   { background: #dcfce7; color: #15803d; }
 .rc-delta.down { background: #fee2e2; color: #991b1b; }
 .rc-delta.flat { background: #f3f4f6; color: #6b7280; }
-.rc-header-right { text-align: right; font-size: 11px; color: var(--muted); }
-.rc-header-right .rc-best { font-size: 12px; font-weight: 700; color: var(--brand); }
-.rc-svg-wrap { padding: 4px 20px 16px; position: relative; }
-.rc-tooltip { position: absolute; background: #1e293b; color: #f8fafc; border-radius: 8px; padding: 8px 12px; font-size: 11.5px; pointer-events: none; opacity: 0; transition: opacity .15s; white-space: nowrap; box-shadow: 0 4px 16px rgba(0,0,0,.25); z-index: 10; }
-.rc-tooltip strong { display: block; font-size: 13px; font-family: var(--mono); color: #a5b4fc; }
+.rc-header-right { text-align: right; font-size: 11px; color: var(--muted); background: rgba(99,102,241,.04); border: 1px solid rgba(99,102,241,.1); border-radius: 10px; padding: 10px 14px; }
+.rc-header-right .rc-best { font-size: 12px; font-weight: 700; color: var(--brand); margin-top: 2px; }
+.rc-svg-wrap { padding: 14px 22px 4px; position: relative; }
+.rc-tooltip { position: absolute; background: linear-gradient(135deg,#1e1b4b,#2d2b6e); color: #f8fafc; border-radius: 10px; padding: 10px 14px; font-size: 11.5px; pointer-events: none; opacity: 0; transition: opacity .15s; white-space: nowrap; box-shadow: 0 8px 28px rgba(99,102,241,.4),0 2px 8px rgba(0,0,0,.2); z-index: 10; border: 1px solid rgba(165,180,252,.2); }
+.rc-tooltip strong { display: block; font-size: 14px; font-family: var(--mono); color: #a5b4fc; }
 .rc-tooltip span   { color: #94a3b8; font-size: 10px; }
-.rc-day-dots { display: flex; justify-content: space-around; padding: 0 0 2px; }
-.rc-day-dot { flex: 1; text-align: center; font-size: 10px; color: var(--muted); font-family: var(--mono); }
+.rc-day-dots { display: flex; justify-content: space-around; padding: 2px 0 4px; }
+.rc-day-dot { flex: 1; text-align: center; font-size: 9.5px; color: var(--muted); font-family: var(--mono); }
 .rc-day-dot.today { color: var(--brand); font-weight: 700; }
 
 /* CONTENT GRID */
@@ -546,23 +546,27 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .kpi:hover { box-shadow:0 8px 32px rgba(99,102,241,.12), 0 2px 8px rgba(0,0,0,.05); transform:translateY(-2px); }
 
 /* Charts side-by-side */
-.charts-duo { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:22px; }
+.charts-duo { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:24px; }
 @media(max-width:860px){ .charts-duo{ grid-template-columns:1fr; } }
+.charts-duo .card { border:1px solid rgba(99,102,241,.12); box-shadow:0 4px 28px rgba(99,102,241,.08),0 1px 6px rgba(0,0,0,.04); overflow:hidden; }
+.card.chart-wrap { border-top:3px solid #6366f1; }
+.charts-duo>.card:not(.chart-wrap) { border-top:3px solid #8b5cf6; }
 
 /* Mini bar chart (commandes) */
-.mini-chart-hd { padding:16px 20px 0; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
-.mini-chart-lbl { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px; }
-.mini-chart-val { font-size:22px; font-weight:800; font-family:var(--mono); color:var(--text); letter-spacing:-.5px; line-height:1; }
-.mini-chart-sub { font-size:10px; color:var(--muted); margin-top:2px; }
-.mini-period-badge { font-size:11px; color:var(--muted); background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:4px 10px; font-weight:600; white-space:nowrap; }
-.mini-delta { font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:3px; padding:2px 8px; border-radius:20px; margin-top:5px; }
+.mini-chart-hd { padding:18px 22px 12px; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; background:linear-gradient(135deg,rgba(139,92,246,.045) 0%,rgba(99,102,241,.02) 100%); border-bottom:1px solid rgba(139,92,246,.1); }
+.mini-chart-lbl { font-size:10.5px; font-weight:700; color:#8b5cf6; text-transform:uppercase; letter-spacing:.6px; margin-bottom:6px; }
+.mini-chart-val { font-size:26px; font-weight:800; font-family:var(--mono); color:var(--text); letter-spacing:-.8px; line-height:1; }
+.mini-chart-sub { font-size:10px; color:var(--muted); margin-top:3px; }
+.mini-period-badge { font-size:10.5px; color:#8b5cf6; background:rgba(139,92,246,.09); border:1px solid rgba(139,92,246,.2); border-radius:20px; padding:4px 12px; font-weight:700; white-space:nowrap; cursor:pointer; align-self:flex-start; margin-top:4px; }
+.mini-delta { font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:3px; padding:3px 10px; border-radius:20px; margin-top:7px; }
 .mini-delta.up { background:#dcfce7; color:#15803d; } .mini-delta.down { background:#fee2e2; color:#991b1b; }
-.mini-bars-wrap { display:flex; align-items:flex-end; gap:4px; padding:16px 20px 6px; height:110px; }
-.mini-bar-col { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:2px; height:100%; }
-.mini-bar { width:100%; border-radius:3px 3px 0 0; background:var(--brand); opacity:.7; min-height:2px; transition:height .5s cubic-bezier(.23,1,.32,1), opacity .15s; cursor:pointer; }
-.mini-bar:hover { opacity:1; }
+.mini-bars-wrap { display:flex; align-items:flex-end; gap:5px; padding:18px 22px 6px; height:120px; }
+.mini-bar-col { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; }
+.mini-bar { width:80%; border-radius:6px 6px 0 0; background:linear-gradient(180deg,#a78bfa 0%,#7c3aed 100%); opacity:.45; min-height:3px; transition:height .65s cubic-bezier(.23,1,.32,1), opacity .2s, box-shadow .2s; cursor:pointer; }
+.mini-bar:hover { opacity:.85; box-shadow:0 -4px 14px rgba(139,92,246,.4); }
+.mini-bar.actuel { background:linear-gradient(180deg,#c4b5fd 0%,#7c3aed 100%); opacity:1; box-shadow:0 -6px 20px rgba(139,92,246,.55); }
 .mini-bar-lbl { font-size:9px; color:var(--muted); font-family:var(--mono); }
-.mini-bar-labs { display:flex; gap:4px; padding:0 20px 12px; }
+.mini-bar-labs { display:flex; gap:5px; padding:0 22px 14px; }
 
 /* Résumé rapide */
 .perf-grid { display:grid; grid-template-columns:1fr 268px; gap:16px; margin-bottom:22px; align-items:start; }
@@ -1018,30 +1022,48 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     <svg viewBox="0 0 {{ $W }} {{ $H }}" width="100%" height="160" preserveAspectRatio="none" overflow="visible" style="display:block">
                         <defs>
                             <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%"   stop-color="#6366f1" stop-opacity=".2"/>
+                                <stop offset="0%"   stop-color="#8b5cf6" stop-opacity=".38"/>
+                                <stop offset="45%"  stop-color="#6366f1" stop-opacity=".14"/>
                                 <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
                             </linearGradient>
+                            <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+                                <stop offset="0%"   stop-color="#8b5cf6"/>
+                                <stop offset="100%" stop-color="#6366f1"/>
+                            </linearGradient>
+                            <filter id="glowLine" x="-10%" y="-80%" width="120%" height="260%">
+                                <feGaussianBlur stdDeviation="3.5" result="blur"/>
+                                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                            <filter id="glowDot" x="-80%" y="-80%" width="260%" height="260%">
+                                <feGaussianBlur stdDeviation="4" result="blur"/>
+                                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
                         </defs>
 
-                        {{-- Y gridlines --}}
+                        {{-- Y gridlines premium --}}
                         @foreach($yGrid as $g)
                         <line x1="{{ $pL }}" y1="{{ $g['y'] }}" x2="{{ $W - $pR }}" y2="{{ $g['y'] }}"
-                              stroke="#e5e7eb" stroke-width="1" stroke-dasharray="{{ $g['val'] > 0 ? '4 4' : 'none' }}"/>
-                        <text x="{{ $pL - 6 }}" y="{{ $g['y'] + 4 }}" text-anchor="end"
-                              font-size="9" fill="#9ca3af" font-family="monospace">{{ rcFmt($g['val']) }}</text>
+                              stroke="rgba(99,102,241,.12)" stroke-width="1" stroke-dasharray="{{ $g['val'] > 0 ? '5 6' : 'none' }}"/>
+                        <text x="{{ $pL - 8 }}" y="{{ $g['y'] + 4 }}" text-anchor="end"
+                              font-size="9" fill="#94a3b8" font-family="monospace">{{ rcFmt($g['val']) }}</text>
                         @endforeach
 
                         {{-- Area fill --}}
                         <polygon points="{{ $areaPoints }}" fill="url(#areaGrad)"/>
 
+                        {{-- Glow line shadow --}}
+                        <polyline points="{{ $polyline }}" fill="none" stroke="rgba(139,92,246,.35)" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
                         {{-- Line --}}
-                        <polyline points="{{ $polyline }}" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+                        <polyline points="{{ $polyline }}" fill="none" stroke="url(#lineGrad)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
 
                         {{-- Points + hit areas --}}
                         @foreach($pts as $i => $p)
-                        <circle cx="{{ $p['x'] }}" cy="{{ $p['y'] }}" r="4"
-                                fill="{{ $p['today'] ? '#6366f1' : '#fff' }}"
-                                stroke="#6366f1" stroke-width="2"
+                        @if($p['today'])
+                        <circle cx="{{ $p['x'] }}" cy="{{ $p['y'] }}" r="9" fill="rgba(139,92,246,.18)" stroke="none"/>
+                        @endif
+                        <circle cx="{{ $p['x'] }}" cy="{{ $p['y'] }}" r="{{ $p['today'] ? 5 : 3.5 }}"
+                                fill="{{ $p['today'] ? '#8b5cf6' : '#fff' }}"
+                                stroke="{{ $p['today'] ? '#c4b5fd' : '#6366f1' }}" stroke-width="{{ $p['today'] ? 2.5 : 1.8 }}"
                                 class="rc-pt"
                                 data-val="{{ $p['v'] }}"
                                 data-lbl="{{ $p['lbl'] }}"

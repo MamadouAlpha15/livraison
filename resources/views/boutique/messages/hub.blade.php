@@ -72,10 +72,10 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .hub-conv-item.active { background: #f0f2f5; }
 .hub-conv-av {
     width: 50px; height: 50px; border-radius: 50%;
-    background: linear-gradient(135deg, #075e54, #128c7e);
     color: #fff; font-size: 15px; font-weight: 700;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
 }
 .hub-conv-body { flex: 1; min-width: 0; }
 .hub-conv-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px;
@@ -646,13 +646,28 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
                    oninput="filterConvs(this.value)">
         </div>
         <div class="hub-conv-list" id="convList">
+            @php
+            $avPalette = [
+                'linear-gradient(135deg,#6366f1,#4338ca)',
+                'linear-gradient(135deg,#10b981,#059669)',
+                'linear-gradient(135deg,#f59e0b,#d97706)',
+                'linear-gradient(135deg,#8b5cf6,#6d28d9)',
+                'linear-gradient(135deg,#ef4444,#b91c1c)',
+                'linear-gradient(135deg,#14b8a6,#0d9488)',
+                'linear-gradient(135deg,#f97316,#ea580c)',
+                'linear-gradient(135deg,#06b6d4,#0891b2)',
+                'linear-gradient(135deg,#ec4899,#be185d)',
+                'linear-gradient(135deg,#84cc16,#4d7c0f)',
+            ];
+            @endphp
             @forelse($conversations as $conv)
             @php
                 $client   = $conv->client;
                 $product  = $conv->product;
                 $cName    = $client?->name ?? 'Client';
                 $cParts   = explode(' ', $cName);
-                $cInit    = strtoupper(substr($cParts[0],0,1)) . strtoupper(substr($cParts[1] ?? 'X',0,1));
+                $cInit    = strtoupper(substr($cParts[0],0,1)) . (isset($cParts[1]) ? strtoupper(substr($cParts[1],0,1)) : strtoupper(substr($cParts[0],1,1)));
+                $cColor   = $avPalette[($client?->id ?? $loop->index) % count($avPalette)];
                 $preview  = Str::limit($conv->lastMsg->body ?? '…', 40);
                 $timeAgo  = $conv->lastMsg->created_at->diffForHumans(null, true);
                 $prodImg    = $product?->image ? asset('storage/'.$product->image) : '';
@@ -680,7 +695,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
                  data-prod-stock="{{ $prodStock ?? '' }}"
                  data-search="{{ strtolower($cName . ' ' . $prodName) }}"
                  onclick="selectConv({{ $conv->clientId }}, {{ $conv->productId ?? 'null' }}, this)">
-                <div class="hub-conv-av">{{ $cInit }}</div>
+                <div class="hub-conv-av" style="background:{{ $cColor }}">{{ $cInit }}</div>
                 <div class="hub-conv-body">
                     <div class="hub-conv-name">{{ $cName }}</div>
                     <div class="hub-conv-preview">
