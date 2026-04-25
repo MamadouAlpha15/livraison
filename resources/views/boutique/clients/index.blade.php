@@ -1,4 +1,4 @@
-{{--
+﻿{{--
     resources/views/boutique/clients/index.blade.php
     Route  : GET /boutique/clients → Boutique\ClientController@index → name('boutique.clients.index')
     Variables :
@@ -81,23 +81,23 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 .sb-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; }
 .sb-logo-icon { width: 36px; height: 36px; border-radius: 9px; overflow: hidden; flex-shrink: 0; }
-.sb-shop-name { font-size: 14px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 148px; letter-spacing: -.2px; }
+.sb-shop-name { font-size: 14.5px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 148px; letter-spacing: -.3px; color: #fff; }
 .sb-status { display: flex; align-items: center; gap: 6px; margin-top: 9px; font-size: 10.5px; color: var(--sb-txt); font-weight: 500; }
 .pulse { width: 6px; height: 6px; border-radius: 50%; background: #6ee7b7; flex-shrink: 0; animation: blink 2.2s ease-in-out infinite; box-shadow: 0 0 5px #6ee7b7; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
 
 .sb-nav { padding: 10px 10px 32px; flex: 1; display: flex; flex-direction: column; gap: 1px; overflow: visible; }
-.sb-section { font-size: 9px; text-transform: uppercase; letter-spacing: 1.4px; color: rgba(255,255,255,.35); padding: 16px 10px 5px; font-weight: 700; }
+.sb-section { font-size: 9.5px; text-transform: uppercase; letter-spacing: 1.8px; color: rgba(255,255,255,.48); padding: 16px 10px 5px; font-weight: 800; }
 .sb-item {
     display: flex; align-items: center; gap: 10px;
     padding: 7px 10px; border-radius: var(--r-sm);
-    font-size: 13px; font-weight: 500;
-    color: var(--sb-txt); text-decoration: none;
+    font-size: 13.5px; font-weight: 600;
+    color: rgba(255,255,255,.78); text-decoration: none; letter-spacing: -.1px;
     transition: background .15s, color .15s; position: relative;
 }
-.sb-item:hover { background: var(--sb-hov); color: rgba(255,255,255,.88); }
+.sb-item:hover { background: var(--sb-hov); color: rgba(255,255,255,.96); }
 .sb-item.active {
-    background: var(--sb-act); color: var(--sb-txt-act);
+    background: var(--sb-act); color: #fff;
     box-shadow: 0 2px 12px rgba(99,102,241,.25);
 }
 .sb-item.active::before {
@@ -120,13 +120,13 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .sb-group-toggle {
     display: flex; align-items: center; gap: 10px;
     padding: 7px 10px; border-radius: var(--r-sm);
-    font-size: 13px; font-weight: 500; color: var(--sb-txt); cursor: pointer;
+    font-size: 13.5px; font-weight: 600; color: rgba(255,255,255,.78); cursor: pointer;
     transition: background .15s, color .15s;
     user-select: none; border: none; background: none;
     width: 100%; text-align: left; font-family: var(--font);
 }
-.sb-group-toggle:hover { background: var(--sb-hov); color: rgba(255,255,255,.88); }
-.sb-group-toggle.open  { color: rgba(255,255,255,.9); background: rgba(255,255,255,.04); }
+.sb-group-toggle:hover { background: var(--sb-hov); color: rgba(255,255,255,.96); }
+.sb-group-toggle.open  { color: #fff; background: rgba(255,255,255,.05); }
 .sb-group-toggle .ico  {
     font-size: 13px; width: 26px; height: 26px; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
@@ -135,13 +135,13 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 }
 .sb-group-toggle:hover .ico { background: rgba(255,255,255,.09); }
 .sb-group-toggle.open .ico  { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.14); }
-.sb-group-toggle .sb-arrow { margin-left: auto; font-size: 10px; color: rgba(255,255,255,.25); transition: transform .2s; flex-shrink: 0; }
-.sb-group-toggle.open .sb-arrow { transform: rotate(90deg); color: rgba(255,255,255,.5); }
-.sb-sub { display: none; flex-direction: column; gap: 1px; margin-left: 12px; padding-left: 14px; border-left: 1px solid rgba(255,255,255,.07); margin-top: 2px; margin-bottom: 4px; overflow: visible; }
+.sb-group-toggle .sb-arrow { margin-left: auto; font-size: 10px; color: rgba(255,255,255,.32); transition: transform .2s; flex-shrink: 0; }
+.sb-group-toggle.open .sb-arrow { transform: rotate(90deg); color: rgba(255,255,255,.6); }
+.sb-sub { display: none; flex-direction: column; gap: 1px; margin-left: 12px; padding-left: 14px; border-left: 1px solid rgba(255,255,255,.1); margin-top: 2px; margin-bottom: 4px; overflow: visible; }
 .sb-sub.open { display: flex; }
-.sb-sub .sb-item { font-size: 12.5px; padding: 6px 10px; color: rgba(255,255,255,.45); }
-.sb-sub .sb-item:hover { color: rgba(255,255,255,.75); }
-.sb-sub .sb-item.active { color: var(--sb-txt-act); background: var(--sb-act); }
+.sb-sub .sb-item { font-size: 13px; font-weight: 500; padding: 6px 10px; color: rgba(255,255,255,.62); letter-spacing: 0; }
+.sb-sub .sb-item:hover { color: rgba(255,255,255,.92); }
+.sb-sub .sb-item.active { color: #fff; background: var(--sb-act); font-weight: 600; }
 
 .sb-scroll-hint {
     position: sticky; bottom: 0; width: 100%; height: 44px;
@@ -180,9 +180,9 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     box-shadow: 0 0 0 2px rgba(99,102,241,.45), 0 2px 8px rgba(99,102,241,.3);
     letter-spacing: -.5px;
 }
-.sb-uname { font-size: 12.5px; font-weight: 700; color: rgba(255,255,255,.9); }
-.sb-urole { font-size: 10px; color: var(--sb-txt); margin-top: 1px; }
-.sb-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; border-radius: var(--r-sm); background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.15); color: rgba(252,165,165,.85); font-size: 12px; font-weight: 600; font-family: var(--font); cursor: pointer; text-decoration: none; transition: background .15s, color .15s, border-color .15s; text-align: left; }
+.sb-uname { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: -.2px; }
+.sb-urole { font-size: 10.5px; color: rgba(255,255,255,.52); margin-top: 1px; font-weight: 500; }
+.sb-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; border-radius: var(--r-sm); background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.15); color: rgba(252,165,165,.92); font-size: 12.5px; font-weight: 600; font-family: var(--font); cursor: pointer; text-decoration: none; transition: background .15s, color .15s, border-color .15s; text-align: left; }
 .sb-logout:hover { background: rgba(220,38,38,.18); border-color: rgba(220,38,38,.35); color: #fca5a5; }
 .sb-logout .ico { font-size: 13px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 7px; background: rgba(220,38,38,.12); border: 1px solid rgba(220,38,38,.18); flex-shrink: 0; }
 
