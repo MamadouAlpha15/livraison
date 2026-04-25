@@ -553,12 +553,31 @@ class BoutiqueMessageController extends Controller
     {
         $vendeur = Auth::user();
         $shop    = $vendeur->shop ?? $vendeur->assignedShop;
-        if (!$shop) return response()->json(['messages_unread'=>0,'orders_pending'=>0,'livreurs_available'=>0,'total'=>0]);
+        if (!$shop) return response()->json(['messages_unread'=>0,'orders_pending'=>0,'livreurs_available'=>0,'total'=>0,'latest_messages'=>[]]);
 
-        $messagesUnread = ShopMessage::where('shop_id', $shop->id)
+        $unreadQuery = ShopMessage::where('shop_id', $shop->id)
+            ->whereNull('read_at')
+            ->whereHas('sender', fn($q) => $q->where('role', 'client'));
+
+        $messagesUnread = $unreadQuery->count();
+
+        // Derniers messages non lus avec expéditeur et produit
+        $latestMessages = ShopMessage::where('shop_id', $shop->id)
             ->whereNull('read_at')
             ->whereHas('sender', fn($q) => $q->where('role', 'client'))
-            ->count();
+            ->with(['sender:id,name', 'product:id,name'])
+            ->orderByDesc('id')
+            ->limit(5)
+            ->get()
+            ->map(fn($m) => [
+                'id'           => $m->id,
+                'sender_name'  => $m->sender?->name ?? 'Client',
+                'body'         => $m->type === 'images'
+                    ? '📷 ' . ($m->body ?: 'Photo(s)')
+                    : \Illuminate\Support\Str::limit($m->body ?? '', 60),
+                'product_name' => $m->product?->name,
+                'time'         => $m->created_at->format('H:i'),
+            ]);
 
         $ordersPending = $shop->orders()
             ->whereIn('status', ['pending','en_attente','en attente','confirmée','processing','nouvelle'])
@@ -574,6 +593,7 @@ class BoutiqueMessageController extends Controller
             'orders_pending'     => $ordersPending,
             'livreurs_available' => $livreursAvailable,
             'total'              => $messagesUnread + $ordersPending,
+            'latest_messages'    => $latestMessages,
         ]);
     }
 }

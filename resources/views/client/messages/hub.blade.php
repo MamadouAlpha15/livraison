@@ -148,11 +148,30 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 .nego-counter-card .nego-head { background:linear-gradient(135deg,#ede9fe,#ddd6fe); color:#5b21b6; }
 
 /* Input zone */
-.hub-input-zone { background:#f0f2f5; border-top:1px solid var(--border); padding:10px 14px; display:flex; gap:10px; align-items:flex-end; flex-shrink:0; }
+.hub-input-zone { background:#f0f2f5; border-top:1px solid var(--border); padding:10px 14px; display:flex; flex-direction:column; gap:6px; flex-shrink:0; }
+.hub-input-row { display:flex; gap:10px; align-items:flex-end; width:100%; }
 .hub-textarea { flex:1; padding:10px 16px; border-radius:24px; border:none; background:#fff; font-size:13.5px; font-family:var(--font); outline:none; resize:none; min-height:42px; max-height:120px; line-height:1.5; box-shadow:0 1px 2px rgba(0,0,0,.1); }
 .hub-send-btn { width:44px; height:44px; border-radius:50%; background:var(--orange); color:var(--navy); border:none; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .15s,transform .1s; box-shadow:0 2px 6px rgba(255,153,0,.35); }
 .hub-send-btn:hover { background:var(--orange-dk); transform:scale(1.06); }
 .hub-send-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+
+/* Bouton photo */
+.hub-attach-btn { width:44px; height:44px; border-radius:50%; flex-shrink:0; background:#fff; border:1.5px solid var(--border); font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s,border-color .15s; color:#667781; }
+.hub-attach-btn:hover { background:#e9edef; border-color:#aaa; }
+
+/* Preview images avant envoi */
+.hub-img-preview { display:none; flex-wrap:wrap; gap:8px; padding:6px 0 0; width:100%; }
+.hub-img-preview.has-files { display:flex; }
+.hub-img-thumb-wrap { position:relative; width:68px; height:68px; border-radius:8px; overflow:hidden; border:2px solid var(--orange); flex-shrink:0; }
+.hub-img-thumb-wrap img { width:100%; height:100%; object-fit:cover; display:block; }
+.hub-img-thumb-del { position:absolute; top:2px; right:2px; width:18px; height:18px; background:rgba(0,0,0,.6); border-radius:50%; border:none; color:#fff; font-size:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; }
+.hub-img-count { font-size:11px; font-weight:700; color:var(--muted); align-self:flex-end; padding:2px 6px; background:#e9edef; border-radius:10px; }
+
+/* Bulle "envoi / optimisation en cours" */
+.img-sending-bubble { display:flex; align-items:center; gap:10px; background:#fff; border-radius:12px; padding:12px 16px; max-width:260px; box-shadow:0 1px 3px rgba(0,0,0,.15); }
+.img-sending-spinner { width:20px; height:20px; border:3px solid #e9edef; border-top-color:var(--orange); border-radius:50%; animation:spinImg .7s linear infinite; flex-shrink:0; }
+@keyframes spinImg { to { transform:rotate(360deg); } }
+.img-sending-text { font-size:13px; color:var(--muted); font-weight:600; }
 
 .hub-thread-loader,.hub-thread-empty { text-align:center; padding:60px 20px; color:var(--muted); font-size:13.5px; }
 
@@ -259,8 +278,10 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 
     /* Zone saisie */
     .hub-input-zone { padding:7px 8px; gap:7px; }
+    .hub-input-row { gap:7px; }
     .hub-textarea { font-size:13px; padding:8px 13px; }
     .hub-send-btn { width:40px; height:40px; font-size:16px; }
+    .hub-attach-btn { width:40px; height:40px; font-size:16px; }
 
     /* Thread */
     .hub-thread { padding:12px 8px; }
@@ -277,8 +298,11 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
     .hub-propose-btn { font-size:10px; padding:4px 8px; }
     .hub-msg-row { max-width:92%; }
     .nego-wrap { max-width:94%; }
-    .hub-input-zone { padding:6px 6px; gap:5px; }
-    .hub-send-btn { width:38px; height:38px; font-size:15px; }
+    .hub-input-zone { padding:6px 6px; gap:4px; }
+    .hub-input-row { gap:5px; }
+    .hub-send-btn { width:36px; height:36px; font-size:15px; }
+    .hub-attach-btn { width:36px; height:36px; font-size:15px; }
+    .hub-img-thumb-wrap { width:56px; height:56px; }
 }
 </style>
 @endpush
@@ -407,10 +431,15 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 
         {{-- Input --}}
         <div class="hub-input-zone">
-            <textarea id="hubInput" class="hub-textarea" placeholder="Écrire un message…" rows="1"
-                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendHubMsg()}"
-                oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
-            <button class="hub-send-btn" onclick="sendHubMsg()" id="hubSendBtn">➤</button>
+            <div class="hub-img-preview" id="hubImgPreview"></div>
+            <div class="hub-input-row">
+                <input type="file" id="hubImgInput" accept="image/*" multiple style="display:none" onchange="onImgSelected(this)">
+                <button class="hub-attach-btn" title="Envoyer des photos (max 20)" onclick="document.getElementById('hubImgInput').click()">📷</button>
+                <textarea id="hubInput" class="hub-textarea" placeholder="Écrire un message…" rows="1"
+                    onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendHubMsg()}"
+                    oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+                <button class="hub-send-btn" onclick="sendHubMsg()" id="hubSendBtn">➤</button>
+            </div>
         </div>
     </div>
 </main>
@@ -436,11 +465,12 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 const CSRF     = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 const INITIALS = '{{ $initials }}';
 
-let _productId = null;
-let _convEl    = null;
-let _lastMsgId = 0;
-let _pollTimer = null;
-let _prodData  = {};
+let _productId    = null;
+let _convEl       = null;
+let _lastMsgId    = 0;
+let _pollTimer    = null;
+let _prodData     = {};
+let _pendingFiles = [];
 
 /* ── Filtrer ── */
 function filterConvs(q) {
@@ -479,6 +509,10 @@ async function selectConv(productId, el) {
 
     /* Fermer panel propose si ouvert */
     document.getElementById('hubProposePanel').classList.remove('open');
+
+    /* Vider la sélection de photos */
+    _pendingFiles = [];
+    renderImgPreview();
 
     document.getElementById('hubThread').innerHTML = '<div class="hub-thread-loader">⏳ Chargement…</div>';
     _lastMsgId = 0;
@@ -619,6 +653,13 @@ async function pollConv() {
 /* ── Envoyer message texte ── */
 async function sendHubMsg() {
     if (!_productId) return;
+
+    // Si des photos sont en attente, les envoyer en priorité
+    if (_pendingFiles.length > 0) {
+        await sendImagesMsg();
+        return;
+    }
+
     const input = document.getElementById('hubInput');
     const body  = input.value.trim();
     if (!body) return;
@@ -655,6 +696,151 @@ async function sendHubMsg() {
     finally { btn.disabled = false; document.getElementById('hubInput').focus(); }
 }
 
+/* ── Gestion des photos à envoyer ── */
+function onImgSelected(input) {
+    const files = Array.from(input.files);
+    if (!files.length) return;
+    const remaining = 20 - _pendingFiles.length;
+    const toAdd = files.slice(0, remaining);
+    if (files.length > remaining) alert(`Maximum 20 photos. ${files.length - remaining} ignorée(s).`);
+    toAdd.forEach(f => _pendingFiles.push(f));
+    input.value = '';
+    renderImgPreview();
+}
+
+function renderImgPreview() {
+    const wrap = document.getElementById('hubImgPreview');
+    wrap.innerHTML = '';
+    if (!_pendingFiles.length) { wrap.classList.remove('has-files'); return; }
+    wrap.classList.add('has-files');
+
+    _pendingFiles.forEach((f, i) => {
+        const url = URL.createObjectURL(f);
+        const div = document.createElement('div');
+        div.className = 'hub-img-thumb-wrap';
+        div.innerHTML = `<img src="${url}" alt=""><button class="hub-img-thumb-del" onclick="removeImgFile(${i})">✕</button>`;
+        wrap.appendChild(div);
+    });
+
+    const count = document.createElement('span');
+    count.className = 'hub-img-count';
+    count.textContent = `${_pendingFiles.length}/20`;
+    wrap.appendChild(count);
+}
+
+function removeImgFile(i) {
+    _pendingFiles.splice(i, 1);
+    renderImgPreview();
+}
+
+async function sendImagesMsg() {
+    if (!_productId || !_pendingFiles.length) return;
+    const btn = document.getElementById('hubSendBtn');
+    btn.disabled = true;
+    const origIcon = btn.innerHTML;
+    btn.innerHTML = '<span style="display:inline-block;animation:spinImg .7s linear infinite">↻</span>';
+
+    const thread = document.getElementById('hubThread');
+    const sendingRow = document.createElement('div');
+    sendingRow.className = 'hub-msg-row mine';
+    sendingRow.id = '__sendingBubble';
+    sendingRow.innerHTML = `<div class="img-sending-bubble">
+        <div class="img-sending-spinner"></div>
+        <span class="img-sending-text">Envoi de ${_pendingFiles.length} photo(s)…</span>
+    </div>`;
+    thread.appendChild(sendingRow);
+    thread.scrollTop = thread.scrollHeight;
+
+    const fd = new FormData();
+    _pendingFiles.forEach(f => fd.append('images[]', f));
+    if (_productId) fd.append('product_id', _productId);
+    fd.append('_token', CSRF);
+
+    try {
+        const pid = _productId ?? 0;
+        const res  = await fetch(`/client/messages/images/${pid}`, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': CSRF, 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+            body: fd,
+        });
+        const data = await res.json();
+        document.getElementById('__sendingBubble')?.remove();
+
+        if (data.sent || data.success) {
+            thread.querySelector('.hub-thread-empty')?.remove();
+            const now  = new Date();
+            const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+            if (data.message_id) _lastMsgId = Math.max(_lastMsgId, data.message_id);
+
+            if (data.image_status === 'processing') {
+                const row = buildProcessingRow(data.message_id, data.count, time);
+                thread.appendChild(row);
+                thread.scrollTop = thread.scrollHeight;
+                pollImageReady(data.message_id, row, data.count);
+            } else {
+                thread.appendChild(buildImagesRow({ id: data.message_id, mine: true, images: data.images, time, read: false, type: 'images' }));
+                thread.scrollTop = thread.scrollHeight;
+            }
+
+            _pendingFiles = [];
+            renderImgPreview();
+            if (_convEl) {
+                const p = _convEl.querySelector('.hub-conv-preview');
+                if (p) p.textContent = `📷 ${data.count} photo(s)`;
+                const t = _convEl.querySelector('.hub-conv-time');
+                if (t) t.textContent = 'À l\'instant';
+            }
+        } else {
+            alert('Erreur lors de l\'envoi des photos.');
+        }
+    } catch(e) {
+        document.getElementById('__sendingBubble')?.remove();
+        alert('Erreur réseau.');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = origIcon;
+    }
+}
+
+function buildProcessingRow(msgId, count, time) {
+    const row = document.createElement('div');
+    row.className = 'hub-msg-row mine';
+    row.dataset.msgId = String(msgId);
+    row.dataset.processing = '1';
+    row.innerHTML = `<div class="img-sending-bubble">
+        <div class="img-sending-spinner"></div>
+        <span class="img-sending-text">⚙️ Optimisation de ${count} photo(s)…</span>
+        <span style="font-size:10px;color:var(--muted);margin-left:4px">${time}</span>
+    </div>`;
+    return row;
+}
+
+function pollImageReady(msgId, row, count) {
+    const interval = setInterval(async () => {
+        try {
+            const res = await fetch(`/client/messages/image-status/${msgId}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }
+            });
+            if (!res.ok) return;
+            const data = await res.json();
+
+            if (data.status === 'ready' && data.images.length > 0) {
+                clearInterval(interval);
+                const now  = new Date();
+                const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+                const newRow = buildImagesRow({ id: msgId, mine: true, images: data.images, time, read: false, type: 'images' });
+                row.replaceWith(newRow);
+            } else if (data.status === 'failed') {
+                clearInterval(interval);
+                row.innerHTML = `<div class="img-sending-bubble" style="background:#fee2e2">
+                    <span style="color:#991b1b;font-size:13px">❌ Échec optimisation — ${count} photo(s)</span>
+                </div>`;
+            }
+        } catch(e) {}
+    }, 2000);
+    setTimeout(() => clearInterval(interval), 300_000);
+}
+
 /* ── Confirmer une offre vendeur ── */
 async function confirmOffer(msgId, btn) {
     if (!confirm('Confirmer cette offre et créer la commande ?')) return;
@@ -688,7 +874,14 @@ function buildRow(msg) {
     if (msg.type === 'price_offer')    return buildOfferCard(msg);
     if (msg.type === 'price_counter')  return buildCounterCard(msg);
     if (msg.type === 'order_created')  return buildOrderCard(msg);
-    if (msg.type === 'images')         return buildImagesRow(msg);
+    if (msg.type === 'images') {
+        if (msg.image_status === 'processing') {
+            const row = buildProcessingRow(msg.id, msg.body?.match(/\d+/)?.[0] ?? '?', msg.time);
+            pollImageReady(msg.id, row, msg.body?.match(/\d+/)?.[0] ?? '?');
+            return row;
+        }
+        return buildImagesRow(msg);
+    }
     return buildTextRow(msg);
 }
 

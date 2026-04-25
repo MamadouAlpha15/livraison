@@ -23,10 +23,13 @@ use App\Models\Product;      // Table "products" — produits
 use App\Models\ShopMessage;  // Table "shop_messages" — messages
 
 // Outils Laravel
-use Illuminate\Http\Request;            // Contient les données envoyées par le formulaire/AJAX
-use Illuminate\Support\Facades\Auth;   // Pour récupérer l'utilisateur connecté
-use Illuminate\Support\Facades\DB;     // Pour les transactions (grouper plusieurs opérations SQL en une)
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use App\Services\ImageOptimizer;
+use App\Jobs\ProcessImageJob;
 
 // ============================================================
 // Classe ShopMessageController
@@ -85,7 +88,10 @@ class ShopMessageController extends Controller
                     'proposed_price'      => $m->proposed_price,
                     'proposal_status'     => $m->proposal_status,
                     'negotiated_order_id' => $m->negotiated_order_id,
-                    'images'              => $m->images ? array_map(fn($p) => ImageOptimizer::url($p, 'large') ?? asset('storage/'.$p), $m->images) : [],
+                    'images'              => ($m->image_status === 'ready' && $m->images)
+                                                ? array_map(fn($p) => ImageOptimizer::url($p, 'large') ?? asset('storage/'.$p), $m->images)
+                                                : [],
+                    'image_status'        => $m->image_status ?? 'ready',
                 ]);
 
             // On marque tous les messages reçus par ce client comme lus
@@ -534,10 +540,87 @@ class ShopMessageController extends Controller
         return response()->json(['success' => true]);
     }
 
+    // POST /client/messages/images/{product?} — client envoie des photos au vendeur
+    public function sendImages(Request $request, ?Product $product = null)
+    {
+        abort_unless($request->isXmlHttpRequest(), 403);
+
+        $request->validate([
+            'images'   => ['required', 'array', 'min:1', 'max:20'],
+            'images.*' => ['required', 'image', 'mimes:jpeg,jpg,png,webp,gif', 'max:10240'],
+        ]);
+
+        $client = Auth::user();
+
+        // Résoudre le produit depuis le form si non passé en route
+        if (!$product && $request->filled('product_id')) {
+            $product = Product::find($request->product_id);
+        }
+
+        $shop = $product?->shop;
+        abort_unless($shop && $shop->is_approved, 404);
+
+        $vendeur = $shop->user;
+        abort_unless($vendeur, 404);
+
+        $tempPaths = [];
+        foreach ($request->file('images') as $file) {
+            $tempName  = 'temp/' . Str::random(24) . '.' . $file->getClientOriginalExtension();
+            Storage::disk('local')->put($tempName, file_get_contents($file->getRealPath()));
+            $tempPaths[] = $tempName;
+        }
+
+        $count = count($tempPaths);
+
+        $msg = ShopMessage::create([
+            'shop_id'      => $shop->id,
+            'product_id'   => $product?->id,
+            'sender_id'    => $client->id,
+            'receiver_id'  => $vendeur->id,
+            'body'         => $count . ' photo(s)',
+            'images'       => [],
+            'image_status' => 'processing',
+            'type'         => ShopMessage::TYPE_IMAGES,
+        ]);
+
+        ProcessImageJob::dispatch($msg->id, $tempPaths, 'messages/' . $shop->id);
+
+        return response()->json([
+            'success'      => true,
+            'sent'         => true,
+            'message_id'   => $msg->id,
+            'images'       => [],
+            'image_status' => 'processing',
+            'count'        => $count,
+        ]);
+    }
+
+    // GET /client/messages/image-status/{message} — vérifie si les images du client sont prêtes
+    public function imageStatus(ShopMessage $message)
+    {
+        $client = Auth::user();
+        abort_unless($message->sender_id === $client->id, 403);
+
+        if ($message->image_status !== 'ready' || empty($message->images)) {
+            return response()->json([
+                'status' => $message->image_status,
+                'images' => [],
+            ]);
+        }
+
+        $urls = array_map(
+            fn($p) => ImageOptimizer::url($p, 'large') ?? asset('storage/' . $p),
+            $message->images
+        );
+
+        return response()->json([
+            'status' => 'ready',
+            'images' => $urls,
+        ]);
+    }
+
     private function getDevise($shop): string
     {
-        // Si la boutique a une devise définie, on la retourne
-        // Sinon on retourne 'GNF' (Franc Guinéen) comme valeur par défaut
         return $shop->currency ?? 'GNF';
     }
 }

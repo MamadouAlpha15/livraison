@@ -1,6 +1,4 @@
-{{--
-    resources/views/admin/reports/index.blade.php
---}}
+{{-- resources/views/admin/reports/index.blade.php --}}
 
 @extends('layouts.app')
 
@@ -117,11 +115,31 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .page-wrap { padding: 22px 22px 60px; }
 
 /* Header */
-.page-hd { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.page-hd { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
 .page-title { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -.4px; margin: 0 0 4px; }
 .page-sub   { font-size: 13px; color: var(--muted); margin: 0; }
 .devise-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--brand-mlt); color: var(--brand-dk); border: 1px solid var(--brand-lt); font-size: 11px; font-weight: 700; font-family: var(--mono); padding: 4px 10px; border-radius: 20px; }
 .super-badge  { display: inline-flex; align-items: center; gap: 5px; background: #fef3c7; color: #92400e; border: 1px solid #fde68a; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+
+/* PERIOD FILTER BAR */
+.filter-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 18px; margin-bottom: 22px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; box-shadow: var(--shadow-sm); }
+.filter-bar-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; flex-shrink: 0; }
+.period-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.period-btn { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid var(--border-dk); background: var(--bg); color: var(--text-2); cursor: pointer; text-decoration: none; transition: all .15s; }
+.period-btn:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-mlt); }
+.period-btn.active { background: var(--brand); color: #fff; border-color: var(--brand-dk); box-shadow: 0 2px 8px rgba(99,102,241,.3); }
+.filter-sep { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
+.custom-dates { display: flex; align-items: center; gap: 8px; }
+.custom-dates input[type="date"] { padding: 5px 10px; border: 1px solid var(--border-dk); border-radius: var(--r-sm); font-size: 12px; font-family: var(--font); color: var(--text); background: var(--bg); cursor: pointer; }
+.custom-dates input[type="date"]:focus { outline: none; border-color: var(--brand); }
+.btn-apply { padding: 6px 14px; border-radius: var(--r-sm); font-size: 12px; font-weight: 700; border: none; background: var(--brand); color: #fff; cursor: pointer; transition: background .15s; }
+.btn-apply:hover { background: var(--brand-dk); }
+.btn-export { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: var(--r-sm); font-size: 12px; font-weight: 700; border: 1px solid #22c55e; background: rgba(34,197,94,.08); color: #16a34a; text-decoration: none; transition: all .15s; flex-shrink: 0; }
+.btn-export:hover { background: rgba(34,197,94,.18); border-color: #16a34a; }
+
+/* Period label */
+.period-label-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; font-size: 12px; color: var(--muted); }
+.period-label-pill { background: var(--brand-mlt); color: var(--brand-dk); border: 1px solid var(--brand-lt); font-size: 11.5px; font-weight: 700; padding: 4px 12px; border-radius: 20px; font-family: var(--mono); }
 
 /* Section title */
 .sec-title { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin: 28px 0 12px; display: flex; align-items: center; gap: 8px; }
@@ -143,44 +161,47 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .kpi-delta.down { background: #fef2f2; color: #991b1b; }
 .kpi-delta.flat { background: #f3f6f4; color: var(--muted); }
 .kpi-explain { font-size: 10.5px; color: var(--muted); margin-top: 5px; line-height: 1.5; }
+.kpi-full { font-size: 10px; color: var(--brand); font-family: var(--mono); margin-top: 3px; font-weight: 700; display: block; }
 
-/* ── Valeur exacte sous le chiffre abrégé (mobile + desktop) ── */
-.kpi-full {
-    font-size: 10px;  color: var(--brand); font-family: var(--mono);
-    margin-top: 3px; font-weight: 700; display: block;
-}
-
-/* Graphique barres */
+/* Chart.js card */
 .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow-sm); margin-bottom: 22px; }
-.chart-card-hd { padding: 13px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--bg); }
+.chart-card-hd { padding: 13px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--bg); flex-wrap: wrap; gap: 8px; }
 .chart-card-title { font-size: 13px; font-weight: 700; color: var(--text); }
 .chart-body { padding: 18px 18px 12px; }
-.chart-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+.chart-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
 .chart-tab { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid var(--border-dk); background: var(--bg); color: var(--text-2); cursor: pointer; transition: all .15s; }
 .chart-tab.active { background: var(--brand); color: #fff; border-color: var(--brand-dk); }
-.chart-bars-wrap { display: flex; align-items: flex-end; gap: 8px; height: 100px; margin-bottom: 8px; }
-.chart-bar-col { flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 3px; }
-.chart-bar { width: 100%; border-radius: 4px 4px 0 0; background: var(--brand); opacity: .85; transition: height .6s cubic-bezier(.23,1,.32,1), opacity .15s; cursor: pointer; position: relative; min-height: 3px; }
-.chart-bar.actuel { opacity: 1; }
-.chart-bar:hover { opacity: 1; }
-.chart-bar::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 5px); left: 50%; transform: translateX(-50%); background: #0f1c18; color: #fff; font-size: 10px; font-weight: 600; font-family: var(--mono); padding: 3px 7px; border-radius: 4px; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .15s; z-index: 10; }
-.chart-bar:hover::after { opacity: 1; }
-.chart-bar.orders-bar { background: #3b82f6; }
-.chart-nb { font-size: 9px; color: var(--muted); font-family: var(--mono); }
-.chart-labels { display: flex; gap: 8px; }
-.chart-lbl { flex: 1; text-align: center; font-size: 10px; color: var(--muted); font-family: var(--mono); }
-.chart-lbl.actuel { color: var(--brand); font-weight: 700; }
+.chartjs-wrap { position: relative; height: 220px; }
 
-/* Top produits */
+/* Top cards */
 .top-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow-sm); margin-bottom: 22px; }
 .sp-row { display: flex; align-items: center; gap: 12px; padding: 10px 18px; border-bottom: 1px solid #f3f6f4; }
 .sp-row:last-child { border-bottom: none; }
 .sp-rank { width: 22px; font-size: 11px; font-weight: 700; color: var(--muted); text-align: center; flex-shrink: 0; }
 .sp-rank.top { color: #f59e0b; font-size: 14px; }
 .sp-lbl  { flex: 1; font-size: 12.5px; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sp-sub  { font-size: 10.5px; color: var(--muted); font-weight: 400; margin-left: 4px; }
 .sp-track { width: 120px; height: 6px; background: #eef1f0; border-radius: 3px; overflow: hidden; flex-shrink: 0; }
 .sp-fill  { height: 100%; border-radius: 3px; background: var(--brand); transition: width 1s cubic-bezier(.23,1,.32,1); }
-.sp-val   { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--text); width: 28px; text-align: right; flex-shrink: 0; }
+.sp-fill.green { background: #22c55e; }
+.sp-val   { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--text); width: 50px; text-align: right; flex-shrink: 0; }
+
+/* Two-col grid for top sections */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 22px; }
+
+/* Client stats donut-like */
+.client-stats-wrap { display: flex; flex-direction: column; gap: 14px; padding: 18px; }
+.client-stat-row { display: flex; align-items: center; gap: 12px; }
+.client-stat-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.client-stat-label { flex: 1; font-size: 13px; font-weight: 600; color: var(--text); }
+.client-stat-val { font-family: var(--mono); font-size: 14px; font-weight: 800; color: var(--text); }
+.client-stat-pct { font-size: 11px; color: var(--muted); margin-left: 4px; }
+.client-bar-wrap { height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden; margin-top: 6px; }
+.client-bar-fill { height: 100%; border-radius: 4px; transition: width 1s cubic-bezier(.23,1,.32,1); }
+
+/* No data state */
+.no-data { padding: 32px 18px; text-align: center; color: var(--muted); font-size: 13px; }
+.no-data-ico { font-size: 32px; margin-bottom: 10px; display: block; }
 
 /* Liens rapides */
 .links-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 22px; }
@@ -200,6 +221,9 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     .kpi-grid-4 { grid-template-columns: repeat(2,1fr); }
     .kpi-grid-3 { grid-template-columns: repeat(2,1fr); }
     .links-grid { grid-template-columns: repeat(2,1fr); }
+    .two-col { grid-template-columns: 1fr; }
+    .btn-export { margin-left: 0; width: 100%; justify-content: center; }
+    .filter-sep { display: none; }
 }
 @media (max-width: 560px) {
     .kpi-grid-4, .kpi-grid-3, .kpi-grid-2 { grid-template-columns: 1fr 1fr; }
@@ -207,7 +231,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     .page-wrap { padding: 14px 12px 40px; }
     .kpi-val { font-size: 20px; }
     .sp-track { width: 70px; }
-    .chart-tabs { flex-wrap: wrap; gap: 4px; }
+    .custom-dates { flex-wrap: wrap; }
 }
 @media (max-width: 380px) {
     .kpi-grid-4, .kpi-grid-3, .kpi-grid-2 { grid-template-columns: 1fr; }
@@ -226,6 +250,18 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     $parts    = explode(' ', auth()->user()->name);
     $initials = strtoupper(substr($parts[0],0,1)) . strtoupper(substr($parts[1] ?? 'X',0,1));
     $pendingCount = $shop->orders()->whereIn('status',['pending','en attente','en_attente','confirmée','processing'])->count();
+
+    $exportUrl = route('boutique.reports.export', array_filter([
+        'period' => $period,
+        'from'   => $period === 'custom' ? $dateFrom->format('Y-m-d') : null,
+        'to'     => $period === 'custom' ? $dateTo->format('Y-m-d') : null,
+    ]));
+
+    // Chart data for JS
+    $chartLabels  = $chartMois->pluck('label')->toJson();
+    $chartRevenue = $chartMois->pluck('revenue')->toJson();
+    $chartOrders  = $chartMois->pluck('orders')->toJson();
+    $chartActuel  = $chartMois->search(fn($m) => $m['actuel']);
 @endphp
 
 <div class="dash-wrap">
@@ -319,13 +355,50 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         </div>
     </div>
 
-    {{-- SECTION 1 : CE MOIS --}}
-    <div class="sec-title">📅 Ce mois-ci</div>
+    {{-- FILTER BAR --}}
+    <form method="GET" action="{{ route('boutique.reports.index') }}" id="filterForm">
+    <div class="filter-bar">
+        <span class="filter-bar-label">Période :</span>
+        <div class="period-btns">
+            @foreach(['month' => 'Ce mois', '3months' => '3 mois', '6months' => '6 mois', 'year' => 'Cette année', 'custom' => 'Personnalisée'] as $key => $lbl)
+            <button type="button" class="period-btn {{ $period === $key ? 'active' : '' }}"
+                onclick="setPeriod('{{ $key }}')">{{ $lbl }}</button>
+            @endforeach
+        </div>
+
+        <div class="filter-sep"></div>
+
+        <div class="custom-dates" id="customDates" style="{{ $period === 'custom' ? '' : 'display:none' }}">
+            <input type="date" name="from" value="{{ $period === 'custom' ? $dateFrom->format('Y-m-d') : '' }}"
+                   max="{{ now()->format('Y-m-d') }}" placeholder="Début">
+            <span style="color:var(--muted);font-size:12px">→</span>
+            <input type="date" name="to" value="{{ $period === 'custom' ? $dateTo->format('Y-m-d') : '' }}"
+                   max="{{ now()->format('Y-m-d') }}" placeholder="Fin">
+            <button type="submit" class="btn-apply">Appliquer</button>
+        </div>
+
+        <input type="hidden" name="period" id="periodInput" value="{{ $period }}">
+
+        <a href="{{ $exportUrl }}" class="btn-export">
+            ⬇️ Exporter CSV
+        </a>
+    </div>
+    </form>
+
+    {{-- Period label --}}
+    <div class="period-label-bar">
+        <span>Données pour :</span>
+        <span class="period-label-pill">{{ $periodLabel }}</span>
+        <span>· du {{ $dateFrom->format('d/m/Y') }} au {{ $dateTo->format('d/m/Y') }}</span>
+    </div>
+
+    {{-- SECTION 1 : KPI PÉRIODE --}}
+    <div class="sec-title">📅 {{ $periodLabel }}</div>
     <div class="kpi-grid-2" style="margin-bottom:14px">
 
         <div class="kpi" style="--kc:#6366f1">
             <div class="kpi-ico">💰</div>
-            <div class="kpi-lbl">Revenu net ce mois</div>
+            <div class="kpi-lbl">Revenu net — période</div>
             <div class="kpi-val" title="{{ number_format($revenueThisMonth, 0, ',', ' ') }} {{ $devise }}">
                 {{ $fmt($revenueThisMonth) }}
             </div>
@@ -334,68 +407,69 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             @endif
             <div class="kpi-unit">{{ $devise }}</div>
             <div class="kpi-delta {{ $revenueDelta >= 0 ? 'up' : 'down' }}">
-                {{ $revenueDelta >= 0 ? '↑' : '↓' }} {{ abs($revenueDelta) }}% vs mois précédent
+                {{ $revenueDelta >= 0 ? '↑' : '↓' }} {{ abs($revenueDelta) }}% vs période précédente
             </div>
-            <div class="kpi-explain">CA livrée ce mois, moins les commissions payées aux livreurs.</div>
+            <div class="kpi-explain">CA livrée sur la période, moins les commissions payées aux livreurs.</div>
         </div>
 
         <div class="kpi" style="--kc:#3b82f6">
             <div class="kpi-ico">📦</div>
-            <div class="kpi-lbl">Commandes ce mois</div>
+            <div class="kpi-lbl">Commandes — période</div>
             <div class="kpi-val">{{ $ordersThisMonth }}</div>
             <div class="kpi-unit">commandes reçues</div>
-            <div class="kpi-explain">Toutes les commandes passées ce mois, quel que soit leur statut.</div>
+            <div class="kpi-explain">Toutes les commandes passées sur cette période, quel que soit leur statut.</div>
         </div>
 
     </div>
 
     {{-- SECTION 2 : PIPELINE --}}
-    <div class="sec-title">📊 État des commandes (global)</div>
+    <div class="sec-title">📊 Pipeline commandes — période</div>
     <div class="kpi-grid-4" style="margin-bottom:22px">
         <div class="kpi" style="--kc:#6b7280">
-            <div class="kpi-ico">🗂️</div><div class="kpi-lbl">Total commandes</div>
+            <div class="kpi-ico">🗂️</div><div class="kpi-lbl">Total (all time)</div>
             <div class="kpi-val">{{ $totalOrders }}</div>
             <div class="kpi-unit">depuis le début</div>
-            <div class="kpi-explain">Toutes les commandes créées dans cette boutique.</div>
         </div>
         <div class="kpi" style="--kc:#f59e0b">
             <div class="kpi-ico">⏳</div><div class="kpi-lbl">En attente</div>
             <div class="kpi-val">{{ $pendingOrders }}</div>
             <div class="kpi-unit">à traiter</div>
-            <div class="kpi-explain">Commandes reçues mais pas encore confirmées. À traiter rapidement.</div>
         </div>
         <div class="kpi" style="--kc:#8b5cf6">
             <div class="kpi-ico">🚴</div><div class="kpi-lbl">En livraison</div>
             <div class="kpi-val">{{ $deliveringOrders }}</div>
             <div class="kpi-unit">en route</div>
-            <div class="kpi-explain">Commandes actuellement en cours de livraison par un livreur.</div>
         </div>
         <div class="kpi" style="--kc:#ef4444">
             <div class="kpi-ico">❌</div><div class="kpi-lbl">Annulées</div>
             <div class="kpi-val">{{ $cancelledOrders }}</div>
             <div class="kpi-unit">commandes perdues</div>
-            <div class="kpi-explain">Si ce chiffre est élevé, investiguer les raisons d'annulation.</div>
         </div>
     </div>
 
     {{-- SECTION 3 : PERFORMANCE --}}
-    <div class="sec-title">🎯 Performance</div>
-    <div class="kpi-grid-3">
+    <div class="sec-title">🎯 Performance — période</div>
+    <div class="kpi-grid-4">
         <div class="kpi" style="--kc:#6366f1">
-            <div class="kpi-ico">✅</div><div class="kpi-lbl">Commandes livrées</div>
+            <div class="kpi-ico">✅</div><div class="kpi-lbl">Livrées</div>
             <div class="kpi-val">{{ $deliveredOrders }}</div>
             <div class="kpi-unit">livrées avec succès</div>
-            <div class="kpi-explain">Commandes arrivées à destination. C'est votre indicateur de succès principal.</div>
         </div>
         <div class="kpi" style="--kc:{{ $tauxLivraison >= 80 ? '#6366f1' : ($tauxLivraison >= 50 ? '#f59e0b' : '#ef4444') }}">
             <div class="kpi-ico">{{ $tauxLivraison >= 80 ? '🏆' : ($tauxLivraison >= 50 ? '⚠️' : '🚨') }}</div>
-            <div class="kpi-lbl">Taux de livraison</div>
+            <div class="kpi-lbl">Taux livraison</div>
             <div class="kpi-val">{{ $tauxLivraison }}%</div>
             <div class="kpi-unit">des commandes livrées</div>
+        </div>
+        <div class="kpi" style="--kc:{{ $tauxAnnulation <= 10 ? '#22c55e' : ($tauxAnnulation <= 25 ? '#f59e0b' : '#ef4444') }}">
+            <div class="kpi-ico">{{ $tauxAnnulation <= 10 ? '✅' : ($tauxAnnulation <= 25 ? '⚠️' : '🚨') }}</div>
+            <div class="kpi-lbl">Taux annulation</div>
+            <div class="kpi-val">{{ $tauxAnnulation }}%</div>
+            <div class="kpi-unit">des commandes annulées</div>
             <div class="kpi-explain">
-                @if($tauxLivraison >= 80) ✓ Excellent — votre service est très fiable.
-                @elseif($tauxLivraison >= 50) ⚠ Moyen — des améliorations sont possibles.
-                @else 🚨 Faible — investiguer les causes d'échec de livraison.
+                @if($tauxAnnulation <= 10) Très faible — excellent signe.
+                @elseif($tauxAnnulation <= 25) Modéré — à surveiller.
+                @else Élevé — investiguer les raisons.
                 @endif
             </div>
         </div>
@@ -407,57 +481,30 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             @if($panierMoyen >= 1_000_000)
             <div class="kpi-full">= {{ number_format($panierMoyen, 0, ',', ' ') }} {{ $devise }}</div>
             @endif
-            <div class="kpi-unit">{{ $devise }} / commande livrée</div>
-            <div class="kpi-explain">Montant moyen dépensé par commande livrée. Plus c'est élevé, mieux c'est.</div>
+            <div class="kpi-unit">{{ $devise }} / commande</div>
         </div>
     </div>
 
-    {{-- SECTION 4 : GRAPHIQUE --}}
+    {{-- SECTION 4 : GRAPHIQUE CHART.JS --}}
     <div class="sec-title">📈 Évolution sur 6 mois</div>
     <div class="chart-card">
         <div class="chart-card-hd">
             <span class="chart-card-title">Revenus & Commandes — 6 derniers mois</span>
             <div class="chart-tabs">
-                <button class="chart-tab active" data-chart="revenue">💰 Revenus</button>
-                <button class="chart-tab" data-chart="orders">📦 Commandes</button>
+                <button class="chart-tab active" id="tabRevenue" onclick="switchChart('revenue')">💰 Revenus</button>
+                <button class="chart-tab" id="tabOrders" onclick="switchChart('orders')">📦 Commandes</button>
             </div>
         </div>
         <div class="chart-body">
-            <div class="chart-bars-wrap" id="chartBars">
-                @foreach($chartMois as $m)
-                @php
-                    $hRev = $m['revenue'] > 0 ? max(round(($m['revenue']/$maxRevenue)*100), 4) : 2;
-                    $hOrd = $m['orders']  > 0 ? max(round(($m['orders'] /$maxOrders) *100), 4) : 2;
-                    $tipRev = number_format($m['revenue'],0,',',' ').' '.$devise.' · '.$m['orders'].' cmd';
-                    $tipOrd = $m['orders'].' commandes · '.number_format($m['revenue'],0,',',' ').' '.$devise;
-                @endphp
-                <div class="chart-bar-col">
-                    <div class="chart-nb" id="nb-{{ $loop->index }}">{{ $m['orders'] > 0 ? $m['orders'] : '' }}</div>
-                    <div class="chart-bar {{ $m['actuel'] ? 'actuel' : '' }}"
-                         id="bar-{{ $loop->index }}"
-                         data-h-revenue="{{ $hRev }}"
-                         data-h-orders="{{ $hOrd }}"
-                         data-tip-revenue="{{ $tipRev }}"
-                         data-tip-orders="{{ $tipOrd }}"
-                         data-h="{{ $hRev }}"
-                         data-tip="{{ $tipRev }}"
-                         style="height:0%">
-                    </div>
-                </div>
-                @endforeach
-            </div>
-            <div class="chart-labels">
-                @foreach($chartMois as $m)
-                <div class="chart-lbl {{ $m['actuel'] ? 'actuel' : '' }}">{{ $m['label'] }}</div>
-                @endforeach
+            <div class="chartjs-wrap">
+                <canvas id="mainChart"></canvas>
             </div>
         </div>
     </div>
 
     {{-- SECTION 5 : FINANCES --}}
-    <div class="sec-title">💳 Finances</div>
+    <div class="sec-title">💳 Finances globales</div>
     <div class="kpi-grid-3">
-
         <div class="kpi" style="--kc:#6366f1">
             <div class="kpi-ico">💵</div><div class="kpi-lbl">Revenu net total</div>
             <div class="kpi-val" title="{{ number_format($totalRevenue, 0, ',', ' ') }} {{ $devise }}">
@@ -467,9 +514,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <div class="kpi-full">= {{ number_format($totalRevenue, 0, ',', ' ') }} {{ $devise }}</div>
             @endif
             <div class="kpi-unit">{{ $devise }}</div>
-            <div class="kpi-explain">CA livré - commissions payées aux livreurs. Votre vrai revenu net.</div>
+            <div class="kpi-explain">CA livré - commissions payées. Votre vrai revenu net.</div>
         </div>
-
         <div class="kpi" style="--kc:#f59e0b">
             <div class="kpi-ico">⏳</div><div class="kpi-lbl">Commissions à payer</div>
             <div class="kpi-val" title="{{ number_format($commissionsPending, 0, ',', ' ') }} {{ $devise }}">
@@ -478,13 +524,11 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             @if($commissionsPending >= 1_000_000)
             <div class="kpi-full">= {{ number_format($commissionsPending, 0, ',', ' ') }} {{ $devise }}</div>
             @endif
-            <div class="kpi-unit">{{ $devise }} · à régler aux livreurs</div>
+            <div class="kpi-unit">{{ $devise }} · à régler</div>
             <div class="kpi-explain">
-                Ce montant est dû à vos livreurs.
                 <a href="{{ route('boutique.commissions.index') }}" style="color:var(--brand);font-weight:600">Payer maintenant →</a>
             </div>
         </div>
-
         <div class="kpi" style="--kc:#3b82f6">
             <div class="kpi-ico">✅</div><div class="kpi-lbl">Commissions payées</div>
             <div class="kpi-val" title="{{ number_format($commissionsPaid, 0, ',', ' ') }} {{ $devise }}">
@@ -493,10 +537,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             @if($commissionsPaid >= 1_000_000)
             <div class="kpi-full">= {{ number_format($commissionsPaid, 0, ',', ' ') }} {{ $devise }}</div>
             @endif
-            <div class="kpi-unit">{{ $devise }} · déjà réglés</div>
-            <div class="kpi-explain">Total des commissions déjà versées à vos livreurs.</div>
+            <div class="kpi-unit">{{ $devise }} · réglés</div>
         </div>
-
     </div>
 
     {{-- SECTION 6 : ÉQUIPE --}}
@@ -506,38 +548,147 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <div class="kpi-ico">👤</div><div class="kpi-lbl">Vendeurs actifs</div>
             <div class="kpi-val">{{ $vendors }}</div>
             <div class="kpi-unit">vendeurs rattachés</div>
-            <div class="kpi-explain">Nombre de vendeurs ayant traité des commandes dans cette boutique.</div>
         </div>
         <div class="kpi" style="--kc:#7c3aed">
             <div class="kpi-ico">🚴</div><div class="kpi-lbl">Livreurs actifs</div>
             <div class="kpi-val">{{ $livreurs }}</div>
             <div class="kpi-unit">livreurs rattachés</div>
-            <div class="kpi-explain">Nombre de livreurs ayant effectué au moins une livraison.</div>
         </div>
     </div>
 
-    {{-- SECTION 7 : TOP PRODUITS --}}
-    @if(isset($topProducts) && $topProducts->count() > 0)
-    @php $maxVentes = $topProducts->max('ventes') ?: 1; $rangs = ['🥇','🥈','🥉','4','5']; @endphp
-    <div class="sec-title">🏆 Top produits ce mois</div>
-    <div class="top-card">
-        <div class="chart-card-hd">
-            <span class="chart-card-title">Produits les plus vendus ce mois</span>
-            <a href="{{ route('products.index') }}" style="font-size:11px;color:var(--brand);font-weight:600;text-decoration:none">Voir tous →</a>
-        </div>
-        @foreach($topProducts as $i => $product)
-        @php $pct = round(($product->ventes/$maxVentes)*100); @endphp
-        <div class="sp-row">
-            <span class="sp-rank {{ $i < 3 ? 'top' : '' }}">{{ $rangs[$i] ?? $i+1 }}</span>
-            <span class="sp-lbl" title="{{ $product->name }}">{{ Str::limit($product->name, 30) }}</span>
-            <div class="sp-track"><div class="sp-fill" data-pct="{{ $pct }}" style="width:0%"></div></div>
-            <span class="sp-val">{{ $product->ventes }}</span>
-        </div>
-        @endforeach
-    </div>
-    @endif
+    {{-- SECTION 7 : TOP PRODUITS + TOP LIVREURS (côte à côte) --}}
+    <div class="sec-title">🏆 Classements — {{ $periodLabel }}</div>
+    <div class="two-col">
 
-    {{-- SECTION 8 : LIENS RAPIDES --}}
+        {{-- Top produits --}}
+        <div class="top-card">
+            <div class="chart-card-hd">
+                <span class="chart-card-title">🏷️ Top produits vendus</span>
+                <a href="{{ route('products.top') }}" style="font-size:11px;color:var(--brand);font-weight:600;text-decoration:none">Voir tous →</a>
+            </div>
+            @if(isset($topProducts) && $topProducts->count() > 0)
+            @php $maxVentes = $topProducts->max('ventes') ?: 1; $rangs = ['🥇','🥈','🥉','4','5']; @endphp
+            @foreach($topProducts as $i => $product)
+            @php $pct = round(($product->ventes/$maxVentes)*100); @endphp
+            <div class="sp-row">
+                <span class="sp-rank {{ $i < 3 ? 'top' : '' }}">{{ $rangs[$i] ?? $i+1 }}</span>
+                <span class="sp-lbl" title="{{ $product->name }}">{{ Str::limit($product->name, 28) }}</span>
+                <div class="sp-track"><div class="sp-fill" data-pct="{{ $pct }}" style="width:0%"></div></div>
+                <span class="sp-val">{{ $product->ventes }}<span class="sp-sub">vte</span></span>
+            </div>
+            @endforeach
+            @else
+            <div class="no-data"><span class="no-data-ico">📭</span>Aucune vente sur cette période.</div>
+            @endif
+        </div>
+
+        {{-- Top livreurs --}}
+        <div class="top-card">
+            <div class="chart-card-hd">
+                <span class="chart-card-title">🚴 Top livreurs</span>
+                <a href="{{ route('boutique.livreurs.index') }}" style="font-size:11px;color:var(--brand);font-weight:600;text-decoration:none">Voir tous →</a>
+            </div>
+            @if(isset($topLivreurs) && $topLivreurs->count() > 0)
+            @php $maxLiv = $topLivreurs->max('livraisons') ?: 1; $rangs2 = ['🥇','🥈','🥉','4','5']; @endphp
+            @foreach($topLivreurs as $i => $livreur)
+            @php $pct2 = round(($livreur->livraisons/$maxLiv)*100); @endphp
+            <div class="sp-row">
+                <span class="sp-rank {{ $i < 3 ? 'top' : '' }}">{{ $rangs2[$i] ?? $i+1 }}</span>
+                <span class="sp-lbl" title="{{ $livreur->name }}">{{ Str::limit($livreur->name, 22) }}</span>
+                <div class="sp-track"><div class="sp-fill green" data-pct="{{ $pct2 }}" style="width:0%"></div></div>
+                <span class="sp-val">{{ $livreur->livraisons }}<span class="sp-sub">liv</span></span>
+            </div>
+            @endforeach
+            @else
+            <div class="no-data"><span class="no-data-ico">🚴</span>Aucune livraison sur cette période.</div>
+            @endif
+        </div>
+
+    </div>
+
+    {{-- SECTION 8 : CLIENTS NOUVEAUX VS FIDÈLES --}}
+    <div class="sec-title">👥 Rétention clients — {{ $periodLabel }}</div>
+    @php
+        $cTotal    = $clientStats['total']    ?? 0;
+        $cNouveaux = $clientStats['nouveaux'] ?? 0;
+        $cFideles  = $clientStats['fideles']  ?? 0;
+        $pctNouv   = $cTotal > 0 ? round(($cNouveaux / $cTotal) * 100) : 0;
+        $pctFid    = $cTotal > 0 ? round(($cFideles  / $cTotal) * 100) : 0;
+    @endphp
+    <div class="two-col" style="margin-bottom:22px">
+        <div class="top-card">
+            <div class="chart-card-hd">
+                <span class="chart-card-title">👤 Clients sur la période</span>
+            </div>
+            <div class="client-stats-wrap">
+                <div>
+                    <div class="client-stat-row">
+                        <span class="client-stat-dot" style="background:#6366f1"></span>
+                        <span class="client-stat-label">Nouveaux clients</span>
+                        <span class="client-stat-val">{{ $cNouveaux }}<span class="client-stat-pct">({{ $pctNouv }}%)</span></span>
+                    </div>
+                    <div class="client-bar-wrap">
+                        <div class="client-bar-fill" data-pct="{{ $pctNouv }}" style="width:0%;background:#6366f1"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="client-stat-row">
+                        <span class="client-stat-dot" style="background:#22c55e"></span>
+                        <span class="client-stat-label">Clients fidèles</span>
+                        <span class="client-stat-val">{{ $cFideles }}<span class="client-stat-pct">({{ $pctFid }}%)</span></span>
+                    </div>
+                    <div class="client-bar-wrap">
+                        <div class="client-bar-fill" data-pct="{{ $pctFid }}" style="width:0%;background:#22c55e"></div>
+                    </div>
+                </div>
+                <div style="margin-top:8px;padding-top:10px;border-top:1px solid var(--border)">
+                    <div class="client-stat-row">
+                        <span class="client-stat-dot" style="background:var(--muted)"></span>
+                        <span class="client-stat-label" style="color:var(--muted)">Total clients uniques</span>
+                        <span class="client-stat-val" style="color:var(--muted)">{{ $cTotal }}</span>
+                    </div>
+                    <div class="kpi-explain" style="margin-top:8px">
+                        Un client <strong>fidèle</strong> a déjà commandé avant cette période.
+                        Un client <strong>nouveau</strong> commande pour la 1ère fois.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="kpi-grid-2" style="margin:0;align-content:start;gap:12px">
+            <div class="kpi" style="--kc:#6366f1;grid-column:1/-1">
+                <div class="kpi-ico">📋</div>
+                <div class="kpi-lbl">Export CSV</div>
+                <div style="font-size:13px;color:var(--text-2);margin:6px 0 12px;line-height:1.5">
+                    Téléchargez toutes les commandes de la période sélectionnée avec détails (client, livreur, montants, statut).
+                </div>
+                <a href="{{ $exportUrl }}" class="btn-export" style="display:inline-flex;margin:0">
+                    ⬇️ Exporter — {{ $periodLabel }}
+                </a>
+            </div>
+            <div class="kpi" style="--kc:#f59e0b">
+                <div class="kpi-ico">📊</div>
+                <div class="kpi-lbl">Taux rétention</div>
+                <div class="kpi-val">{{ $cTotal > 0 ? $pctFid : 0 }}%</div>
+                <div class="kpi-unit">clients sont fidèles</div>
+                <div class="kpi-explain">
+                    @if($pctFid >= 50) Excellent — vous fidélisez bien vos clients.
+                    @elseif($pctFid >= 25) Moyen — travaillez la fidélisation.
+                    @else Faible — concentrez-vous sur la rétention.
+                    @endif
+                </div>
+            </div>
+            <div class="kpi" style="--kc:#6366f1">
+                <div class="kpi-ico">✨</div>
+                <div class="kpi-lbl">Nouveaux clients</div>
+                <div class="kpi-val">{{ $cNouveaux }}</div>
+                <div class="kpi-unit">1ère commande</div>
+                <div class="kpi-explain">Clients qui commandent pour la 1ère fois sur cette période.</div>
+            </div>
+        </div>
+    </div>
+
+    {{-- SECTION 9 : LIENS RAPIDES --}}
     <div class="sec-title">🔗 Accès rapide</div>
     <div class="links-grid">
         <a href="{{ route('boutique.orders.index') }}" class="quick-link"><span class="quick-link-ico">📦</span><span class="quick-link-lbl">Commandes</span><span class="quick-link-sub">{{ $pendingOrders }} en attente</span></a>
@@ -553,6 +704,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 function toggleGroup(btn) {
     const sub = btn.nextElementSibling;
@@ -581,37 +733,100 @@ function toggleGroup(btn) {
     setTimeout(updateScrollHint, 300);
 })();
 
+/* Period filter */
+function setPeriod(p) {
+    document.getElementById('periodInput').value = p;
+    document.querySelectorAll('.period-btn').forEach(b => b.classList.toggle('active', b.getAttribute('onclick').includes("'"+p+"'")));
+    document.getElementById('customDates').style.display = p === 'custom' ? 'flex' : 'none';
+    if (p !== 'custom') document.getElementById('filterForm').submit();
+}
+
+/* Chart.js */
+const chartLabels  = {!! $chartLabels !!};
+const chartRevenue = {!! $chartRevenue !!};
+const chartOrders  = {!! $chartOrders !!};
+const actuelIdx    = {{ $chartActuel !== false ? (int)$chartActuel : 5 }};
+const devise       = '{{ $devise }}';
+
+const bgColors = chartLabels.map((_, i) => i === actuelIdx ? 'rgba(99,102,241,1)' : 'rgba(99,102,241,0.5)');
+const bgGreen  = chartLabels.map((_, i) => i === actuelIdx ? 'rgba(34,197,94,1)'   : 'rgba(34,197,94,0.5)');
+
+let currentMode = 'revenue';
+let mainChart;
+
+function formatNum(n) {
+    if (n >= 1000000) return (n/1000000).toFixed(1).replace('.',',')+' M';
+    if (n >= 1000)    return (n/1000).toFixed(0)+' k';
+    return n.toString();
+}
+
+function buildChart(mode) {
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    const isRev = mode === 'revenue';
+    const data  = isRev ? chartRevenue : chartOrders;
+    const color = isRev ? bgColors : bgGreen;
+    const label = isRev ? ('Revenu net (' + devise + ')') : 'Commandes';
+
+    if (mainChart) mainChart.destroy();
+
+    mainChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: chartLabels,
+            datasets: [{
+                label,
+                data,
+                backgroundColor: color,
+                borderRadius: 6,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => isRev
+                            ? ' ' + formatNum(ctx.parsed.y) + ' ' + devise
+                            : ' ' + ctx.parsed.y + ' commande(s)'
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#94a3b8' } },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,.04)' },
+                    ticks: {
+                        font: { size: 11 }, color: '#94a3b8',
+                        callback: (v) => isRev ? formatNum(v) : v
+                    }
+                }
+            }
+        }
+    });
+}
+
+function switchChart(mode) {
+    currentMode = mode;
+    document.getElementById('tabRevenue').classList.toggle('active', mode === 'revenue');
+    document.getElementById('tabOrders').classList.toggle('active',  mode === 'orders');
+    buildChart(mode);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    /* Animation barres graphique */
-    document.querySelectorAll('#chartBars .chart-bar').forEach((bar, i) => {
-        setTimeout(() => { bar.style.transition = 'height .6s cubic-bezier(.23,1,.32,1)'; bar.style.height = bar.dataset.h + '%'; }, i * 80);
-    });
+    buildChart('revenue');
 
-    /* Sparklines top produits */
+    /* Sparklines top produits & livreurs */
     document.querySelectorAll('.sp-fill').forEach((el, i) => {
-        setTimeout(() => { el.style.width = el.dataset.pct + '%'; }, 200 + i * 100);
+        setTimeout(() => { el.style.width = el.dataset.pct + '%'; }, 200 + i * 80);
     });
 
-    /* Afficher .kpi-full sur desktop au survol */
-    document.querySelectorAll('.kpi-full').forEach(el => {
-        el.style.display = '';
-    });
-
-    /* Tabs graphique */
-    document.querySelectorAll('.chart-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-            document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            const type = tab.dataset.chart;
-            document.querySelectorAll('#chartBars .chart-bar').forEach((bar, i) => {
-                const h   = bar.dataset['h' + (type === 'revenue' ? 'Revenue' : 'Orders')];
-                const tip = bar.dataset['tip' + (type === 'revenue' ? 'Revenue' : 'Orders')];
-                bar.dataset.tip = tip;
-                bar.classList.toggle('orders-bar', type === 'orders');
-                bar.style.transition = 'height .4s cubic-bezier(.23,1,.32,1)';
-                setTimeout(() => { bar.style.height = h + '%'; }, i * 40);
-            });
-        });
+    /* Client bars */
+    document.querySelectorAll('.client-bar-fill').forEach((el, i) => {
+        setTimeout(() => { el.style.width = el.dataset.pct + '%'; }, 300 + i * 150);
     });
 });
 </script>

@@ -5,16 +5,14 @@
     Variables :
       $commissions  → LengthAwarePaginator<CourierCommission>
       $status       → string  ('en_attente' | 'payée')
-      $totalPending → float   (total en attente)
-      $totalPaid    → float   (total payé)
+      $totalPending → float
+      $totalPaid    → float
       $shop         → Shop
-      $devise       → string  (ex: GNF, EUR, USD)
+      $devise       → string
 --}}
 
 @extends('layouts.app')
-
 @section('title', 'Commissions · ' . $shop->name)
-
 @php $bodyClass = 'is-dashboard'; @endphp
 
 @push('styles')
@@ -27,21 +25,20 @@
     --brand:      #6366f1; --brand-dk:  #4f46e5;
     --brand-lt:   #e0e7ff; --brand-mlt: #eef2ff;
     --sb-bg:      #0e0e16; --sb-border: rgba(255,255,255,.08);
-    --sb-act:     rgba(99,102,241,.52);
-    --sb-hov:     rgba(255,255,255,.07);
-    --sb-txt:     rgba(255,255,255,.62);
-    --sb-txt-act: #fff;
+    --sb-act:     rgba(99,102,241,.52); --sb-hov: rgba(255,255,255,.07);
+    --sb-txt:     rgba(255,255,255,.62); --sb-txt-act: #fff;
     --bg:         #f8fafc; --surface:   #ffffff;
     --border:     #e2e8f0; --border-dk: #cbd5e1;
     --text:       #0f172a; --text-2:    #475569; --muted: #94a3b8;
     --warning:    #f59e0b; --warning-lt: #fef3c7;
+    --red:        #ef4444; --red-lt:    #fef2f2;
+    --green:      #10b981; --green-lt:  #ecfdf5;
     --font:       'Plus Jakarta Sans', sans-serif;
     --mono:       'JetBrains Mono', monospace;
     --r: 14px; --r-sm: 9px;
     --shadow-sm:  0 1px 3px rgba(0,0,0,.06);
     --shadow:     0 4px 16px rgba(0,0,0,.07);
-    --sb-w:       232px;
-    --top-h:      58px;
+    --sb-w: 232px; --top-h: 58px;
 }
 html { font-family: var(--font); }
 body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smoothing: antialiased; }
@@ -62,12 +59,10 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     z-index: 40;
 }
 .sidebar::-webkit-scrollbar { width: 3px; }
-.sidebar::-webkit-scrollbar-track { background: transparent; }
 .sidebar::-webkit-scrollbar-thumb { background: rgba(99,102,241,.35); border-radius: 3px; }
-.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,.6); }
 .sb-brand { padding: 18px 16px 14px; border-bottom: 1px solid var(--sb-border); flex-shrink: 0; position: relative; }
-.sb-close { display: none; position: absolute; top: 14px; right: 12px; width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.10); color: rgba(255,255,255,.6); font-size: 18px; cursor: pointer; align-items: center; justify-content: center; transition: background .15s, color .15s; }
-.sb-close:hover { background: rgba(239,68,68,.18); border-color: rgba(239,68,68,.3); color: #fca5a5; }
+.sb-close { display: none; position: absolute; top: 14px; right: 12px; width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.10); color: rgba(255,255,255,.6); font-size: 18px; cursor: pointer; align-items: center; justify-content: center; transition: background .15s; }
+.sb-close:hover { background: rgba(239,68,68,.18); color: #fca5a5; }
 @media (max-width: 900px) { .sb-close { display: flex; } }
 .sb-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; }
 .sb-logo-icon { width: 36px; height: 36px; border-radius: 9px; overflow: hidden; flex-shrink: 0; }
@@ -75,45 +70,34 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .sb-status { display: flex; align-items: center; gap: 6px; margin-top: 9px; font-size: 10.5px; color: var(--sb-txt); font-weight: 500; }
 .pulse { width: 6px; height: 6px; border-radius: 50%; background: #6ee7b7; flex-shrink: 0; animation: blink 2.2s ease-in-out infinite; box-shadow: 0 0 5px #6ee7b7; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
-.sb-nav { padding: 10px 10px 32px; flex: 1; display: flex; flex-direction: column; gap: 1px; overflow: visible; }
+.sb-nav { padding: 10px 10px 32px; flex: 1; display: flex; flex-direction: column; gap: 1px; }
 .sb-section { font-size: 9px; text-transform: uppercase; letter-spacing: 1.4px; color: rgba(255,255,255,.35); padding: 16px 10px 5px; font-weight: 700; }
 .sb-item { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500; color: var(--sb-txt); text-decoration: none; transition: background .15s, color .15s; position: relative; }
 .sb-item:hover { background: var(--sb-hov); color: rgba(255,255,255,.88); }
 .sb-item.active { background: var(--sb-act); color: var(--sb-txt-act); box-shadow: 0 2px 12px rgba(99,102,241,.25); }
-.sb-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #a5b4fc; border-radius: 0 3px 3px 0; box-shadow: 2px 0 8px rgba(165,180,252,.5); }
-.sb-item .ico { font-size: 13px; width: 26px; height: 26px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 7px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.06); transition: background .15s; }
-.sb-item:hover .ico { background: rgba(255,255,255,.09); }
+.sb-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #a5b4fc; border-radius: 0 3px 3px 0; }
+.sb-item .ico { font-size: 13px; width: 26px; height: 26px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 7px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.06); }
 .sb-item.active .ico { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.2); }
-.sb-badge { margin-left: auto; background: var(--brand); color: #fff; font-size: 10px; font-weight: 700; border-radius: 20px; padding: 1px 7px; font-family: var(--mono); min-width: 20px; text-align: center; }
+.sb-badge { margin-left: auto; background: var(--brand); color: #fff; font-size: 10px; font-weight: 700; border-radius: 20px; padding: 1px 7px; font-family: var(--mono); }
 .sb-group { display: flex; flex-direction: column; }
-.sb-group-toggle { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500; color: var(--sb-txt); cursor: pointer; transition: background .15s, color .15s; user-select: none; border: none; background: none; width: 100%; text-align: left; font-family: var(--font); }
+.sb-group-toggle { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500; color: var(--sb-txt); cursor: pointer; transition: background .15s; border: none; background: none; width: 100%; text-align: left; font-family: var(--font); }
 .sb-group-toggle:hover { background: var(--sb-hov); color: rgba(255,255,255,.88); }
-.sb-group-toggle.open { color: rgba(255,255,255,.9); background: rgba(255,255,255,.04); }
-.sb-group-toggle .ico { font-size: 13px; width: 26px; height: 26px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 7px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.06); transition: background .15s; }
-.sb-group-toggle:hover .ico { background: rgba(255,255,255,.09); }
-.sb-group-toggle.open .ico { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.14); }
-.sb-group-toggle .sb-arrow { margin-left: auto; font-size: 10px; color: rgba(255,255,255,.25); transition: transform .2s; flex-shrink: 0; }
+.sb-group-toggle .ico { font-size: 13px; width: 26px; height: 26px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 7px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.06); }
+.sb-group-toggle .sb-arrow { margin-left: auto; font-size: 10px; color: rgba(255,255,255,.25); transition: transform .2s; }
 .sb-group-toggle.open .sb-arrow { transform: rotate(90deg); color: rgba(255,255,255,.5); }
-.sb-sub { display: none; flex-direction: column; gap: 1px; margin-left: 12px; padding-left: 14px; border-left: 1px solid rgba(255,255,255,.07); margin-top: 2px; margin-bottom: 4px; overflow: visible; }
+.sb-sub { display: none; flex-direction: column; gap: 1px; margin-left: 12px; padding-left: 14px; border-left: 1px solid rgba(255,255,255,.07); margin-top: 2px; margin-bottom: 4px; }
 .sb-sub.open { display: flex; }
 .sb-sub .sb-item { font-size: 12.5px; padding: 6px 10px; color: rgba(255,255,255,.45); }
 .sb-sub .sb-item:hover { color: rgba(255,255,255,.75); }
 .sb-sub .sb-item.active { color: var(--sb-txt-act); background: var(--sb-act); }
-.sb-scroll-hint { position: sticky; bottom: 0; width: 100%; height: 44px; background: linear-gradient(to bottom, transparent, rgba(17,17,24,.95)); pointer-events: none; z-index: 2; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px; transition: opacity .3s; margin-top: -44px; align-self: flex-end; }
-.sb-scroll-hint.hidden { opacity: 0; }
-.sb-scroll-hint-arrow { display: flex; flex-direction: column; align-items: center; gap: 2px; animation: bounceDown 1.5s ease-in-out infinite; }
-.sb-scroll-hint-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(99,102,241,.7); }
-.sb-scroll-hint-dot:nth-child(2) { opacity: .5; margin-top: -2px; }
-.sb-scroll-hint-dot:nth-child(3) { opacity: .25; margin-top: -2px; }
-@keyframes bounceDown { 0%,100%{transform:translateY(0)} 50%{transform:translateY(4px)} }
-.sb-footer { padding: 12px 10px; border-top: 1px solid rgba(255,255,255,.08); flex-shrink: 0; display: flex; flex-direction: column; gap: 6px; position: sticky; bottom: 0; background: linear-gradient(180deg,transparent 0%,#0b0b12 25%); z-index: 1; }
-.sb-user { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--r-sm); text-decoration: none; border: 1px solid transparent; transition: background .15s, border-color .15s; }
-.sb-user:hover { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.07); }
-.sb-av { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#4338ca); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(99,102,241,.45),0 2px 8px rgba(99,102,241,.3); letter-spacing: -.5px; }
+.sb-footer { padding: 12px 10px; border-top: 1px solid rgba(255,255,255,.08); flex-shrink: 0; display: flex; flex-direction: column; gap: 6px; background: linear-gradient(180deg,transparent 0%,#0b0b12 25%); }
+.sb-user { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--r-sm); text-decoration: none; border: 1px solid transparent; transition: background .15s; }
+.sb-user:hover { background: rgba(255,255,255,.06); }
+.sb-av { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#4338ca); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(99,102,241,.45); }
 .sb-uname { font-size: 12.5px; font-weight: 700; color: rgba(255,255,255,.9); }
 .sb-urole { font-size: 10px; color: var(--sb-txt); margin-top: 1px; }
-.sb-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; border-radius: var(--r-sm); background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.15); color: rgba(252,165,165,.85); font-size: 12px; font-weight: 600; font-family: var(--font); cursor: pointer; text-decoration: none; transition: background .15s, color .15s, border-color .15s; text-align: left; }
-.sb-logout:hover { background: rgba(220,38,38,.18); border-color: rgba(220,38,38,.35); color: #fca5a5; }
+.sb-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; border-radius: var(--r-sm); background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.15); color: rgba(252,165,165,.85); font-size: 12px; font-weight: 600; font-family: var(--font); cursor: pointer; text-decoration: none; transition: background .15s; text-align: left; }
+.sb-logout:hover { background: rgba(220,38,38,.18); color: #fca5a5; }
 .sb-logout .ico { font-size: 13px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 7px; background: rgba(220,38,38,.12); border: 1px solid rgba(220,38,38,.18); flex-shrink: 0; }
 .sb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 39; }
 
@@ -124,254 +108,363 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .tb-info { flex: 1; min-width: 0; }
 .tb-title { font-size: 14px; font-weight: 700; color: var(--text); }
 .tb-sub   { font-size: 11px; color: var(--muted); margin-top: 1px; }
-
-/* ── Page intérieure ── */
 .page-wrap { padding: 22px 22px 60px; }
 
-/* ── Header ── */
-.page-hd {
-    display: flex; align-items: flex-start;
-    justify-content: space-between; gap: 16px;
-    margin-bottom: 22px; flex-wrap: wrap;
-}
+/* ══ HEADER ══ */
+.page-hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
 .page-title { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -.4px; margin: 0 0 4px; }
 .page-sub   { font-size: 13px; color: var(--muted); margin: 0; }
-.devise-badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    background: var(--brand-mlt); color: var(--brand-dk);
-    border: 1px solid var(--brand-lt);
-    font-size: 11px; font-weight: 700; font-family: var(--mono);
-    padding: 4px 10px; border-radius: 20px;
-}
+.devise-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--brand-mlt); color: var(--brand-dk); border: 1px solid var(--brand-lt); font-size: 11px; font-weight: 700; font-family: var(--mono); padding: 4px 10px; border-radius: 20px; }
 
-/* ── KPI cards ── */
+/* ══ KPI ══ */
 .kpi-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
-.kpi-card {
-    border-radius: var(--r); padding: 22px 24px;
-    display: flex; align-items: center; gap: 16px;
-    position: relative; overflow: hidden;
-    box-shadow: var(--shadow-sm);
-}
-.kpi-card.pending {
-    background: linear-gradient(135deg, #451a03, #78350f);
-    border: 1px solid rgba(245,158,11,.25);
-}
-.kpi-card.paid {
-    background: linear-gradient(135deg,  #161021, #4F46E5);
-    border: 1px solid rgba(99,102,241,.25);
-}
-.kpi-card::after {
-    content: ''; position: absolute; right: -30px; top: -30px;
-    width: 120px; height: 120px; border-radius: 50%;
-    background: rgba(255,255,255,.04); pointer-events: none;
-}
-.kpi-ico {
-    width: 52px; height: 52px; border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px; flex-shrink: 0;
-}
+.kpi-card { border-radius: var(--r); padding: 22px 24px; display: flex; align-items: center; gap: 16px; position: relative; overflow: hidden; box-shadow: var(--shadow-sm); }
+.kpi-card.pending { background: linear-gradient(135deg, #451a03, #78350f); border: 1px solid rgba(245,158,11,.25); }
+.kpi-card.paid    { background: linear-gradient(135deg, #161021, #4F46E5); border: 1px solid rgba(99,102,241,.25); }
+.kpi-card::after  { content: ''; position: absolute; right: -30px; top: -30px; width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,.04); pointer-events: none; }
+.kpi-ico { width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
 .kpi-card.pending .kpi-ico { background: rgba(245,158,11,.15); border: 1px solid rgba(245,158,11,.25); }
-.kpi-card.paid    .kpi-ico { background: rgba(99,102,241,.15);  border: 1px solid rgba(99,102,241,.25); }
-.kpi-lbl { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 5px; }
-.kpi-val { font-size: 28px; font-weight: 800; font-family: var(--mono); letter-spacing: -1px; line-height: 1; }
+.kpi-card.paid    .kpi-ico { background: rgba(99,102,241,.15); border: 1px solid rgba(99,102,241,.25); }
+.kpi-lbl  { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 5px; }
+.kpi-val  { font-size: 28px; font-weight: 800; font-family: var(--mono); letter-spacing: -1px; line-height: 1; }
 .kpi-card.pending .kpi-val { color: #fcd34d; }
 .kpi-card.paid    .kpi-val { color: #a5b4fc; }
 .kpi-unit { font-size: 11px; color: rgba(255,255,255,.35); margin-top: 3px; }
+.kpi-sub  { font-size: 11px; color: rgba(255,255,255,.3); margin-top: 6px; }
 
-/* ── Filtres ── */
-.filter-bar {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--r-sm); padding: 12px 16px;
-    display: flex; align-items: center; gap: 10px;
-    margin-bottom: 20px; box-shadow: var(--shadow-sm);
-    flex-wrap: wrap;
+/* ══ TABS STATUT ══ */
+.status-tabs { display: flex; gap: 0; margin-bottom: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow-sm); }
+.status-tab {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 13px 20px; font-size: 13.5px; font-weight: 700;
+    text-decoration: none; color: var(--muted); border-bottom: 3px solid transparent;
+    transition: all .18s; cursor: pointer; border: none; background: none; font-family: var(--font);
 }
-.filter-select {
-    padding: 8px 14px; border-radius: var(--r-sm);
-    border: 1.5px solid var(--border-dk);
-    font-size: 13px; font-family: var(--font);
-    color: var(--text); background: var(--surface);
-    outline: none; transition: border-color .15s; min-width: 160px;
+.status-tab:hover { background: var(--bg); color: var(--text); }
+.status-tab.active {
+    color: var(--brand-dk); background: var(--brand-mlt);
+    border-bottom: 3px solid var(--brand);
 }
-.filter-select:focus { border-color: var(--brand); }
+.status-tab .tab-count {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--brand); color: #fff;
+    font-size: 10px; font-weight: 800; border-radius: 20px;
+    padding: 1px 7px; font-family: var(--mono); min-width: 20px;
+}
+.status-tab:not(.active) .tab-count { background: var(--border); color: var(--muted); }
 
-/* ── Sticky payout form ── */
+/* ══ GUIDE ÉTAPES ══ */
+.how-to {
+    background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    border-radius: var(--r); padding: 18px 22px; margin-bottom: 20px;
+    display: flex; gap: 16px; align-items: flex-start;
+}
+.how-to-steps { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
+.how-to-step {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,.08); border-radius: 10px; padding: 8px 13px;
+    font-size: 12px; color: rgba(255,255,255,.82); font-weight: 600;
+}
+.how-to-step.final { background: rgba(99,102,241,.2); border: 1px solid rgba(99,102,241,.3); color: #a5b4fc; }
+.step-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--warning); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; flex-shrink: 0;
+}
+.how-to-step.final .step-num { background: var(--brand); }
+
+/* ══ BARRE PAIEMENT ══ */
 .payout-bar {
-    position: sticky; top: 0; z-index: 30;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--r);
-    padding: 14px 18px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 14px 18px;
     display: flex; align-items: center; gap: 10px;
-    margin-bottom: 18px;
-    box-shadow: var(--shadow);
-    flex-wrap: wrap;
-    transition: box-shadow .2s;
+    margin-bottom: 18px; box-shadow: var(--shadow); flex-wrap: wrap;
 }
-.payout-bar.has-selection {
-    border-color: var(--brand);
-    box-shadow: 0 0 0 3px rgba(99,102,241,.12), var(--shadow);
-}
+.payout-bar.has-selection { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(99,102,241,.12), var(--shadow); }
 .payout-input {
-    flex: 1; min-width: 180px;
-    padding: 9px 14px; border-radius: var(--r-sm);
-    border: 1.5px solid var(--border-dk);
-    font-size: 13px; font-family: var(--font);
-    color: var(--text); background: var(--bg);
-    outline: none; transition: border-color .15s;
+    flex: 1; min-width: 160px; padding: 9px 14px; border-radius: var(--r-sm);
+    border: 1.5px solid var(--border-dk); font-size: 13px; font-family: var(--font);
+    color: var(--text); background: var(--bg); outline: none; transition: border-color .15s;
 }
 .payout-input:focus { border-color: var(--brand); background: var(--surface); }
-.payout-count {
-    font-size: 12px; font-weight: 700; color: var(--muted);
-    white-space: nowrap; padding: 8px 12px;
-    background: var(--bg); border-radius: var(--r-sm);
-    border: 1px solid var(--border);
-}
+.payout-count { font-size: 12px; font-weight: 700; color: var(--muted); white-space: nowrap; padding: 8px 12px; background: var(--bg); border-radius: var(--r-sm); border: 1px solid var(--border); }
 .payout-count.active { background: var(--brand-mlt); color: var(--brand-dk); border-color: var(--brand-lt); }
 
-/* ── Boutons ── */
-.btn {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 8px 16px; border-radius: var(--r-sm);
-    font-size: 13px; font-weight: 600; font-family: var(--font);
-    border: 1px solid var(--border-dk); background: var(--surface);
-    color: var(--text-2); cursor: pointer; text-decoration: none;
-    transition: all .15s; white-space: nowrap;
+/* Total live */
+.payout-total {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: var(--r-sm);
+    background: #fef9ec; border: 1.5px solid #f59e0b;
+    font-family: var(--mono); font-size: 14px; font-weight: 800; color: #92400e;
+    white-space: nowrap; transition: all .2s;
 }
+.payout-total.zero { background: var(--bg); border-color: var(--border); color: var(--muted); }
+.payout-total-lbl { font-size: 10px; font-weight: 600; color: #b45309; font-family: var(--font); display: block; margin-bottom: 1px; }
+
+/* ══ BOUTONS ══ */
+.btn { display: inline-flex; align-items: center; gap: 5px; padding: 8px 16px; border-radius: var(--r-sm); font-size: 13px; font-weight: 600; font-family: var(--font); border: 1px solid var(--border-dk); background: var(--surface); color: var(--text-2); cursor: pointer; text-decoration: none; transition: all .15s; white-space: nowrap; }
 .btn:hover { background: var(--bg); border-color: var(--brand); color: var(--brand); }
 .btn-sm { padding: 6px 12px; font-size: 12px; }
 .btn-primary { background: var(--brand); color: #fff; border-color: var(--brand-dk); box-shadow: 0 2px 8px rgba(99,102,241,.3); }
 .btn-primary:hover { background: var(--brand-dk); color: #fff; }
 .btn-primary:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+.btn-export { background: var(--green-lt); color: #065f46; border-color: #a7f3d0; }
+.btn-export:hover { background: var(--green); color: #fff; border-color: var(--green); }
 
-/* ── Card table ── */
-.comm-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow-sm);
-    margin-bottom: 18px;
-}
-.comm-card-hd {
-    padding: 13px 20px; border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-    background: var(--bg);
-}
+/* ══ TABLE ══ */
+.comm-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow-sm); margin-bottom: 18px; }
+.comm-card-hd { padding: 13px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--bg); flex-wrap: wrap; gap: 8px; }
 .comm-card-title { font-size: 13px; font-weight: 700; color: var(--text); }
-
-/* ── Table ── */
 .tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-.tbl thead th {
-    padding: 11px 14px; text-align: left;
-    font-size: 10px; font-weight: 700; color: var(--muted);
-    text-transform: uppercase; letter-spacing: .6px;
-    background: var(--bg); border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-}
+.tbl thead th { padding: 11px 14px; text-align: left; font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; background: var(--bg); border-bottom: 1px solid var(--border); white-space: nowrap; }
 .tbl tbody td { padding: 12px 14px; border-bottom: 1px solid #f3f6f4; vertical-align: middle; }
 .tbl tbody tr:last-child td { border-bottom: none; }
 .tbl tbody tr:hover td { background: #fafcfb; }
 .tbl tbody tr.selected td { background: var(--brand-mlt); }
+.tbl tbody tr.row-warn td { background: #fff7ed; }
+input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-color: var(--brand); cursor: pointer; }
 
-/* Checkbox custom */
-input[type=checkbox] {
-    width: 16px; height: 16px; border-radius: 4px;
-    accent-color: var(--brand); cursor: pointer;
-}
+/* Montant commande (référence) */
+.order-amount { font-family: var(--mono); font-size: 12px; color: var(--text-2); font-weight: 600; }
+.order-amount small { display: block; font-size: 9.5px; color: var(--muted); font-family: var(--font); margin-top: 1px; }
 
-/* Livreur chip */
-.lv-chip {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: #f3f6f4; border: 1px solid var(--border);
-    border-radius: 20px; padding: 3px 10px 3px 4px;
-    font-size: 12px; font-weight: 600; color: var(--text-2);
-}
-.lv-av {
-    width: 22px; height: 22px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--brand), #2563eb);
-    color: #fff; display: flex; align-items: center;
-    justify-content: center; font-size: 8px; font-weight: 700;
-}
+/* Destination livraison */
+.dest-cell { font-size: 12.5px; font-weight: 600; color: var(--text); max-width: 180px; }
+.dest-cell small { display: block; font-size: 10px; color: var(--muted); margin-top: 2px; font-family: var(--font); font-weight: 500; }
+.dest-empty { font-size: 12px; color: var(--muted); font-style: italic; }
 
-/* Montant */
+/* Input montant commission */
+.comm-input {
+    width: 130px; padding: 8px 12px;
+    border: 2px solid #f59e0b; border-radius: 8px;
+    font-size: 14px; font-weight: 800; font-family: var(--mono);
+    color: #92400e; background: #fff; outline: none;
+    transition: border-color .15s, box-shadow .15s;
+}
+.comm-input:focus { border-color: #d97706; box-shadow: 0 0 0 3px rgba(245,158,11,.2); }
+.comm-input.warn { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(239,68,68,.15) !important; }
+
+/* Lv chip */
+.lv-chip { display: inline-flex; align-items: center; gap: 6px; background: #f3f6f4; border: 1px solid var(--border); border-radius: 20px; padding: 3px 10px 3px 4px; font-size: 12px; font-weight: 600; color: var(--text-2); }
+.lv-av { width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), #2563eb); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; }
 .amount { font-family: var(--mono); font-weight: 700; font-size: 13.5px; color: var(--text); white-space: nowrap; }
 .amount small { font-size: 10px; color: var(--muted); font-weight: 500; }
-
-/* Pills */
 .pill { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
 .p-success { background: #e0e7ff; color: #3730a3; }
 .p-warning { background: #fef3c7; color: #92400e; }
-
 .ref-cell { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.ref-link { font-family: var(--mono); font-size: 11.5px; color: var(--brand); font-weight: 700; text-decoration: none; }
+.ref-link:hover { text-decoration: underline; color: var(--brand-dk); }
 .date-cell { font-size: 12px; color: var(--text-2); }
 .date-cell small { font-size: 10px; color: var(--muted); display: block; }
 
-/* ── Flash ── */
-.flash {
-    padding: 10px 14px; border-radius: var(--r-sm); border: 1px solid;
-    font-size: 13px; font-weight: 500; margin-bottom: 18px;
-    display: flex; align-items: center; gap: 8px;
-}
+/* ══ ALERTE LIGNE ══ */
+.row-alert { font-size: 11px; color: var(--red); font-weight: 600; margin-top: 4px; display: none; }
+.row-alert.visible { display: block; }
+
+/* ══ FLASH ══ */
+.flash { padding: 10px 14px; border-radius: var(--r-sm); border: 1px solid; font-size: 13px; font-weight: 500; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
 .flash-success { background: #eef2ff; border-color: #a5b4fc; color: #3730a3; }
 .flash-danger  { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
 
-/* Empty */
-.empty-state { padding: 48px 20px; text-align: center; }
-.empty-state .ico { font-size: 38px; display: block; margin-bottom: 10px; opacity: .35; }
-.empty-state p { font-size: 14px; color: var(--muted); }
+/* ══ EMPTY ══ */
+.empty-state { padding: 56px 20px; text-align: center; }
+.empty-state .ico { font-size: 40px; display: block; margin-bottom: 12px; opacity: .3; }
+.empty-state h3 { font-size: 15px; font-weight: 700; color: var(--text); margin: 0 0 6px; }
+.empty-state p { font-size: 13px; color: var(--muted); margin: 0; }
 
-/* Pagination */
+/* ══ PAGINATION ══ */
 .pagination-wrap { display: flex; justify-content: center; padding: 14px 0 2px; }
 
+/* ══ MODAL CONFIRMATION ══ */
+.modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 500;
+    background: rgba(0,0,0,.55); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+    background: var(--surface); border-radius: 20px;
+    padding: 0; width: 100%; max-width: 440px; margin: 20px;
+    box-shadow: 0 24px 60px rgba(0,0,0,.25);
+    animation: modalIn .25s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes modalIn { from { opacity:0; transform:scale(.92) translateY(12px); } to { opacity:1; transform:scale(1) translateY(0); } }
+.modal-header {
+    padding: 22px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+}
+.modal-ico { font-size: 28px; flex-shrink: 0; }
+.modal-title { font-size: 17px; font-weight: 800; color: var(--text); margin: 0; }
+.modal-sub   { font-size: 13px; color: var(--muted); margin: 4px 0 0; }
+.modal-body { padding: 20px 24px; }
+.modal-summary {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--r-sm); padding: 14px 18px;
+    display: flex; flex-direction: column; gap: 10px;
+}
+.modal-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+.modal-row .lbl { color: var(--text-2); }
+.modal-row .val { font-weight: 700; color: var(--text); font-family: var(--mono); }
+.modal-row.total { border-top: 1px solid var(--border); padding-top: 10px; }
+.modal-row.total .lbl { font-weight: 700; color: var(--text); font-family: var(--font); }
+.modal-row.total .val { font-size: 18px; color: var(--brand-dk); }
+.modal-footer { padding: 0 24px 24px; display: flex; gap: 10px; }
+.modal-cancel { flex: 1; padding: 11px; border-radius: var(--r-sm); border: 1.5px solid var(--border); background: var(--surface); font-size: 13.5px; font-weight: 700; font-family: var(--font); cursor: pointer; color: var(--text-2); transition: all .15s; }
+.modal-cancel:hover { border-color: var(--border-dk); background: var(--bg); }
+.modal-confirm { flex: 2; padding: 11px; border-radius: var(--r-sm); border: none; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; font-size: 13.5px; font-weight: 700; font-family: var(--font); cursor: pointer; box-shadow: 0 4px 14px rgba(99,102,241,.35); transition: all .15s; }
+.modal-confirm:hover { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+
+/* ══ TOOLTIP ══ */
+.tooltip-wrap { position: relative; display: inline-flex; align-items: center; }
+.tooltip-icon { width: 16px; height: 16px; border-radius: 50%; background: var(--border); color: var(--muted); font-size: 10px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; cursor: help; margin-left: 5px; flex-shrink: 0; }
+.tooltip-box { display: none; position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #0f172a; color: #e2e8f0; font-size: 11px; font-weight: 500; padding: 7px 11px; border-radius: 8px; white-space: nowrap; z-index: 100; pointer-events: none; font-family: var(--font); }
+.tooltip-box::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: #0f172a; }
+.tooltip-wrap:hover .tooltip-box { display: block; }
+
+/* ══ TABLE SCROLL (tablette) ══ */
+.tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
 /* ══ RESPONSIVE ══ */
+
+/* Tablette large */
 @media (max-width: 900px) {
     .dash-wrap .main { margin-left: 0; }
     .sidebar { transform: translateX(-100%); transition: transform .25s cubic-bezier(.23,1,.32,1); }
     .sidebar.open { transform: translateX(0); }
     .sb-overlay.open { display: block; }
     .btn-hamburger { display: flex; }
-    /* La payout-bar sticky doit rester sous la topbar */
-    .payout-bar { top: var(--top-h); }
+    /* Masquer colonnes secondaires sur tablette */
+    .col-montant { display: none; }
+    .col-date    { display: none; }
 }
+
+/* Tablette portrait */
+@media (max-width: 768px) {
+    .page-wrap { padding: 14px 14px 40px; }
+    .kpi-card { padding: 14px 16px; gap: 10px; }
+    .kpi-val { font-size: 22px; }
+    .kpi-ico { width: 40px; height: 40px; font-size: 18px; }
+    .status-tab { font-size: 12.5px; padding: 12px 14px; }
+    .how-to-step { font-size: 11.5px; padding: 6px 10px; }
+    .payout-bar { gap: 8px; }
+}
+
+/* Mobile : table → cartes + barre de paiement empilée */
 @media (max-width: 640px) {
     .kpi-row { grid-template-columns: 1fr; }
-    .page-wrap { padding: 14px 12px 40px; }
-    .payout-bar { flex-direction: column; align-items: stretch; flex-wrap: nowrap; }
-    .payout-input { min-width: unset; }
-    .tbl thead th:nth-child(4),
-    .tbl tbody td:nth-child(4) { display: none; }
-    .tbl thead th:nth-child(7),
-    .tbl tbody td:nth-child(7) { display: none; }
-    .kpi-card { padding: 16px 18px; gap: 12px; }
-    .kpi-val { font-size: 22px; }
-    .kpi-ico { width: 42px; height: 42px; font-size: 20px; }
+    .page-wrap { padding: 12px 10px 40px; }
+    .how-to { flex-direction: column; padding: 14px 16px; }
+    .status-tab { font-size: 12px; padding: 11px 10px; }
+
+    /* Payout bar → colonne unique */
+    .payout-bar {
+        flex-direction: column; align-items: stretch; flex-wrap: nowrap;
+        padding: 12px; gap: 10px;
+    }
+    .payout-count { text-align: center; justify-content: center; }
+    .payout-input { width: 100%; min-width: unset; }
+    #markPaidBtn { width: 100%; justify-content: center; align-self: auto; padding: 13px; }
+
+    /* ── TABLE → CARTES ── */
+    .tbl-wrap { overflow-x: visible; }
+    .tbl thead { display: none; }
+    .tbl, .tbl tbody { display: block; }
+
+    .tbl tbody tr {
+        display: block;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        margin-bottom: 12px;
+        overflow: hidden;
+        background: var(--surface);
+        box-shadow: var(--shadow-sm);
+    }
+    .tbl tbody tr.selected {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 2px rgba(99,102,241,.18);
+    }
+    .tbl tbody tr.row-warn { background: #fff7ed; }
+
+    .tbl tbody td {
+        display: flex !important; /* override col-montant/col-date display:none */
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 14px;
+        border-bottom: 1px solid #f3f4f6;
+        font-size: 13px;
+        background: transparent !important;
+        gap: 10px;
+        min-height: 40px;
+    }
+    .tbl tbody td:last-child { border-bottom: none; }
+
+    /* Label auto via data-label */
+    .tbl tbody td::before {
+        content: attr(data-label);
+        font-size: 10px; font-weight: 700; color: var(--muted);
+        text-transform: uppercase; letter-spacing: .5px;
+        flex-shrink: 0; white-space: nowrap;
+    }
+    /* Cellule sans label (checkbox) */
+    .tbl tbody td[data-label=""] { justify-content: flex-start; }
+    .tbl tbody td[data-label=""]::before { display: none; }
+
+    /* Cellule commission → colonne pleine largeur */
+    .td-comm {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        background: #fffbeb !important;
+        gap: 6px !important;
+    }
+    .td-comm::before { margin-bottom: 2px; }
+    .comm-input { width: 100%; box-sizing: border-box; }
 }
+
+/* Petits mobiles */
 @media (max-width: 480px) {
-    .filter-bar { flex-direction: column; align-items: stretch; }
-    .filter-select { min-width: unset; width: 100%; }
+    .page-wrap { padding: 10px 8px 36px; }
+    .status-tab span.tab-label { display: none; }
+    .kpi-val { font-size: 18px; }
+    .kpi-sub { font-size: 10px; }
+    .modal-box { margin: 8px; }
+    .modal-header { padding: 16px 16px 12px; }
+    .modal-body  { padding: 14px 16px; }
+    .modal-footer { padding: 0 16px 16px; }
+}
+
+/* Très petits écrans */
+@media (max-width: 360px) {
+    .page-wrap { padding: 8px 6px 32px; }
+    .tbl tbody td { padding: 9px 10px; }
+    .payout-bar { padding: 10px; }
+    .kpi-val { font-size: 16px; }
 }
 </style>
 @endpush
 
 @section('content')
-
 @php
     $devise   = $devise ?? ($shop->currency ?? 'GNF');
-    $init     = fn(string $n): string => strtoupper(substr(explode(' ',$n)[0],0,1))
-                                       . strtoupper(substr(explode(' ',$n)[1]??'X',0,1));
     $parts    = explode(' ', auth()->user()->name);
     $initials = strtoupper(substr($parts[0],0,1)) . strtoupper(substr($parts[1] ?? 'X',0,1));
+    $init     = fn(string $n): string => strtoupper(substr(explode(' ',$n)[0],0,1))
+                                       . strtoupper(substr(explode(' ',$n)[1] ?? substr($n,1,1),0,1));
     $pendingCount = $shop->orders()->whereIn('status',['pending','en attente','en_attente','confirmée','processing'])->count();
 @endphp
 
 <div class="dash-wrap">
 
-{{-- ══════ SIDEBAR ══════ --}}
+{{-- ══ SIDEBAR ══ --}}
 <aside class="sidebar" id="sidebar">
     <div class="sb-brand">
         <a href="{{ route('boutique.dashboard') }}" class="sb-logo">
-           <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width:100%;height:100%;object-fit:cover;border-radius:9px"></div>
+            <div class="sb-logo-icon"><img src="/images/shopio3.jpeg" alt="Shopio" style="width:100%;height:100%;object-fit:cover;border-radius:9px"></div>
             <span class="sb-shop-name">{{ $shop->name }}</span>
         </a>
-        <button class="sb-close" id="btnCloseSidebar" aria-label="Fermer le menu">✕</button>
+        <button class="sb-close" id="btnCloseSidebar">✕</button>
         <div class="sb-status">
             <span class="pulse"></span>
             {{ $shop->is_approved ? 'Boutique active' : 'En attente de validation' }}
@@ -379,69 +472,39 @@ input[type=checkbox] {
             {{ ucfirst(auth()->user()->role_in_shop ?? auth()->user()->role) }}
         </div>
     </div>
-    <div class="sb-scroll-hint" id="sbScrollHint">
-        <div class="sb-scroll-hint-arrow">
-            <div class="sb-scroll-hint-dot"></div>
-            <div class="sb-scroll-hint-dot"></div>
-            <div class="sb-scroll-hint-dot"></div>
-        </div>
-    </div>
     <nav class="sb-nav">
         <a href="{{ route('boutique.dashboard') }}" class="sb-item" style="margin-bottom:4px">
             <span class="ico">⊞</span> Tableau de bord
         </a>
         <div class="sb-section">Boutique</div>
-        <a href="{{ route('boutique.messages.hub') }}" class="sb-item">
-            <span class="ico">💬</span> Messages
-        </a>
+        <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">💬</span> Messages</a>
         <a href="{{ route('boutique.orders.index') }}" class="sb-item">
             <span class="ico">📦</span> Commandes
             @if($pendingCount > 0)<span class="sb-badge">{{ $pendingCount }}</span>@endif
         </a>
-        <a href="{{ route('products.index') }}" class="sb-item">
-            <span class="ico">🏷️</span> Produits
-        </a>
-        <a href="{{ route('boutique.clients.index') }}" class="sb-item">
-            <span class="ico">👥</span> Clients
-        </a>
-        <a href="{{ route('boutique.employees.index') }}" class="sb-item">
-            <span class="ico">🧑‍💼</span> Équipe
-        </a>
+        <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">🏷️</span> Produits</a>
+        <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">👥</span> Clients</a>
+        <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">🧑‍💼</span> Équipe</a>
         <div class="sb-section">Livraison</div>
-        <a href="{{ route('boutique.livreurs.index') }}" class="sb-item">
-            <span class="ico">🚴</span> Livreurs
-        </a>
-        <a href="{{ route('delivery.companies.index') }}" class="sb-item">
-            <span class="ico">🏢</span> Partenaires
-        </a>
+        <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">🚴</span> Livreurs</a>
+        <a href="{{ route('delivery.companies.index') }}" class="sb-item"><span class="ico">🏢</span> Partenaires</a>
         <div class="sb-section">Finances</div>
         <div class="sb-group">
             <button class="sb-group-toggle open" onclick="toggleGroup(this)" type="button">
-                <span class="ico">💰</span>
-                Finances & Rapports
+                <span class="ico">💰</span> Finances & Rapports
                 <span class="sb-arrow" style="transform:rotate(90deg);color:rgba(255,255,255,.5)">▶</span>
             </button>
             <div class="sb-sub open">
-                <a href="{{ route('boutique.payments.index') }}" class="sb-item">
-                    <span class="ico">💳</span> Paiements
-                </a>
-                <a href="{{ route('boutique.commissions.index') }}" class="sb-item active">
-                    <span class="ico">📊</span> Commissions
-                </a>
-                <a href="{{ route('boutique.reports.index') }}" class="sb-item">
-                    <span class="ico">📋</span> Rapports
-                </a>
+                <a href="{{ route('boutique.payments.index') }}" class="sb-item"><span class="ico">💳</span> Paiements</a>
+                <a href="{{ route('boutique.commissions.index') }}" class="sb-item active"><span class="ico">📊</span> Commissions</a>
+                <a href="{{ route('boutique.reports.index') }}" class="sb-item"><span class="ico">📋</span> Rapports</a>
                 @if(auth()->user()->role === 'admin')
-                <a href="{{ route('shop.edit', $shop) }}" class="sb-item">
-                    <span class="ico">⚙️</span> Paramètres
-                </a>
+                <a href="{{ route('shop.edit', $shop) }}" class="sb-item"><span class="ico">⚙️</span> Paramètres</a>
                 @endif
             </div>
         </div>
         <div class="sb-section">Aide</div>
-        <a href="{{ route('support.index') }}" class="sb-item">
-            <span class="ico">🎧</span> Support
-        </a>
+        <a href="{{ route('support.index') }}" class="sb-item"><span class="ico">🎧</span> Support</a>
     </nav>
     <div class="sb-footer">
         <a href="{{ route('profile.edit') }}" class="sb-user">
@@ -453,18 +516,16 @@ input[type=checkbox] {
         </a>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <button type="submit" class="sb-logout">
-                <span class="ico">⎋</span> Se déconnecter
-            </button>
+            <button type="submit" class="sb-logout"><span class="ico">⎋</span> Se déconnecter</button>
         </form>
     </div>
 </aside>
 <div class="sb-overlay" id="sbOverlay"></div>
 
-{{-- ══════ MAIN ══════ --}}
+{{-- ══ MAIN ══ --}}
 <main class="main">
     <div class="topbar">
-        <button class="btn-hamburger" id="btnMenu" aria-label="Menu">☰</button>
+        <button class="btn-hamburger" id="btnMenu">☰</button>
         <div class="tb-info">
             <div class="tb-title">💸 Commissions livreurs</div>
             <div class="tb-sub">{{ $shop->name }} · <span style="font-family:var(--mono);font-size:10px;background:var(--brand-mlt);color:var(--brand-dk);padding:1px 7px;border-radius:10px;border:1px solid var(--brand-lt)">{{ $devise }}</span></div>
@@ -477,39 +538,30 @@ input[type=checkbox] {
     <div class="page-hd">
         <div>
             <h1 class="page-title">💸 Commissions livreurs</h1>
-            <p class="page-sub">
-                {{ $shop->name }}
-                &nbsp;·&nbsp;
-                <span class="devise-badge">💱 {{ $devise }}</span>
-            </p>
+            <p class="page-sub">{{ $shop->name }} &nbsp;·&nbsp; <span class="devise-badge">💱 {{ $devise }}</span></p>
         </div>
     </div>
 
-    {{-- ── KPI : En attente + Payé ── --}}
+    {{-- ── KPI ── --}}
     <div class="kpi-row">
-
-        {{-- En attente — fond ambré sombre --}}
         <div class="kpi-card pending">
             <div class="kpi-ico">⏳</div>
             <div>
                 <div class="kpi-lbl">Total en attente</div>
-                {{-- Devise dynamique de la boutique --}}
                 <div class="kpi-val">{{ number_format($totalPending, 0, ',', ' ') }}</div>
                 <div class="kpi-unit">{{ $devise }}</div>
+                <div class="kpi-sub">Commissions non encore payées</div>
             </div>
         </div>
-
-        {{-- Payé — fond vert sombre --}}
         <div class="kpi-card paid">
             <div class="kpi-ico">✅</div>
             <div>
-                <div class="kpi-lbl">Total payé</div>
-                {{-- Devise dynamique de la boutique --}}
+                <div class="kpi-lbl">Total déjà payé</div>
                 <div class="kpi-val">{{ number_format($totalPaid, 0, ',', ' ') }}</div>
                 <div class="kpi-unit">{{ $devise }}</div>
+                <div class="kpi-sub">Paiements confirmés aux livreurs</div>
             </div>
         </div>
-
     </div>
 
     {{-- Flash --}}
@@ -522,51 +574,35 @@ input[type=checkbox] {
         @endif
     @endforeach
 
-    {{-- ── Filtre statut ── --}}
-    <div class="filter-bar">
-        <span style="font-size:12.5px;font-weight:600;color:var(--text-2)">Afficher :</span>
-        <form method="GET" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <select name="status" class="filter-select" onchange="this.form.submit()">
-                <option value="en_attente" {{ $status === 'en_attente' ? 'selected' : '' }}>
-                    ⏳ En attente
-                </option>
-                <option value="payé" {{ $status === 'payé' ? 'selected' : '' }}>
-                    ✅ Payées
-                </option>
-            </select>
-        </form>
-        <span style="font-size:11px;color:var(--muted);margin-left:auto">
-            {{ $commissions->total() }} commission(s)
-        </span>
+    {{-- ── TABS STATUT ── --}}
+    <div class="status-tabs">
+        <a href="{{ route('boutique.commissions.index', ['status' => 'en_attente']) }}"
+           class="status-tab {{ $status === 'en_attente' ? 'active' : '' }}">
+            ⏳ <span class="tab-label">En attente</span>
+            <span class="tab-count">{{ $status === 'en_attente' ? $commissions->total() : '—' }}</span>
+        </a>
+        <a href="{{ route('boutique.commissions.index', ['status' => 'payée']) }}"
+           class="status-tab {{ $status !== 'en_attente' ? 'active' : '' }}">
+            ✅ <span class="tab-label">Payées</span>
+            <span class="tab-count">{{ $status !== 'en_attente' ? $commissions->total() : '—' }}</span>
+        </a>
     </div>
 
-    {{-- ════════════════════════════════════════════════════════════
-         CAS A : Commissions EN ATTENTE → formulaire de paiement
-    ════════════════════════════════════════════════════════════ --}}
+    {{-- ════════════════════════════════════════
+         CAS A : EN ATTENTE → paiement
+    ════════════════════════════════════════ --}}
     @if($status === 'en_attente' && $commissions->count())
 
-    {{-- ── Guide étapes ── --}}
-    <div style="background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);border-radius:14px;padding:18px 22px;margin-bottom:20px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;">
-        <div style="font-size:18px;flex-shrink:0;">💡</div>
-        <div style="flex:1;min-width:200px;">
-            <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:8px;">Comment payer un livreur ?</div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                <div style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border-radius:10px;padding:7px 12px;">
-                    <span style="width:22px;height:22px;background:var(--warning);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">1</span>
-                    <span style="font-size:12px;color:rgba(255,255,255,.8);font-weight:600;">Entrez le montant à payer</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border-radius:10px;padding:7px 12px;">
-                    <span style="width:22px;height:22px;background:var(--warning);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">2</span>
-                    <span style="font-size:12px;color:rgba(255,255,255,.8);font-weight:600;">Cochez les lignes à payer</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border-radius:10px;padding:7px 12px;">
-                    <span style="width:22px;height:22px;background:var(--warning);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">3</span>
-                    <span style="font-size:12px;color:rgba(255,255,255,.8);font-weight:600;">Ajoutez une référence (optionnel)</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:7px;background:rgba(99,102,241,.2);border-radius:10px;padding:7px 12px;border:1px solid rgba(99,102,241,.3);">
-                    <span style="width:22px;height:22px;background:var(--brand);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">4</span>
-                    <span style="font-size:12px;color:#a5b4fc;font-weight:600;">Cliquez "Marquer comme payées"</span>
-                </div>
+    {{-- Guide étapes --}}
+    <div class="how-to">
+        <div style="font-size:20px;flex-shrink:0;margin-top:2px">💡</div>
+        <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:10px">Comment payer un livreur ?</div>
+            <div class="how-to-steps">
+                <div class="how-to-step"><span class="step-num">1</span>Cochez les lignes à payer</div>
+                <div class="how-to-step"><span class="step-num">2</span>Saisissez le montant dans chaque ligne</div>
+                <div class="how-to-step"><span class="step-num">3</span>Ajoutez une référence paiement (ex: Orange Money)</div>
+                <div class="how-to-step final"><span class="step-num">4</span>Cliquez "Marquer comme payées"</div>
             </div>
         </div>
     </div>
@@ -574,85 +610,142 @@ input[type=checkbox] {
     <form id="payForm" action="{{ route('boutique.commissions.pay') }}" method="POST">
         @csrf
 
-        {{-- ── Table des commissions ── --}}
+        {{-- Barre de paiement HAUT --}}
+        <div class="payout-bar" id="payoutBar">
+            <span class="payout-count" id="selectionCount">0 sélectionné</span>
+
+            {{-- Total live --}}
+            <div style="display:flex;flex-direction:column;">
+                <span class="payout-total-lbl">Total à payer</span>
+                <div class="payout-total zero" id="payoutTotal">0 <span style="font-size:10px;font-weight:600;font-family:var(--font)">{{ $devise }}</span></div>
+            </div>
+
+            {{-- Référence paiement avec tooltip --}}
+            <div style="flex:1;min-width:160px;display:flex;flex-direction:column;gap:3px;">
+                <label style="font-size:11px;font-weight:700;color:var(--text-2);display:flex;align-items:center;">
+                    📎 Référence paiement
+                    <div class="tooltip-wrap">
+                        <span class="tooltip-icon">?</span>
+                        <div class="tooltip-box">Ex : "Orange Money #001", "Virement banque". Sert à retrouver ce paiement.</div>
+                    </div>
+                </label>
+                <input type="text" name="payout_ref" class="payout-input" placeholder="Ex: Orange Money 001, Wave...">
+            </div>
+
+            {{-- Note interne avec tooltip --}}
+            <div style="flex:2;min-width:160px;display:flex;flex-direction:column;gap:3px;">
+                <label style="font-size:11px;font-weight:700;color:var(--text-2);display:flex;align-items:center;">
+                    📝 Note interne
+                    <div class="tooltip-wrap">
+                        <span class="tooltip-icon">?</span>
+                        <div class="tooltip-box">Visible uniquement par vous et vos admins. Le livreur ne la voit pas.</div>
+                    </div>
+                </label>
+                <input type="text" name="payout_note" class="payout-input" placeholder="Ex: Paiement semaine 17 - vérifié">
+            </div>
+
+            <button type="button" id="markPaidBtn" class="btn btn-primary" disabled
+                    onclick="openConfirmModal()"
+                    style="flex-shrink:0;padding:10px 20px;font-size:13.5px;align-self:flex-end">
+                ✅ Marquer comme payées
+            </button>
+        </div>
+
+        {{-- Table --}}
         <div class="comm-card">
             <div class="comm-card-hd">
-                <span class="comm-card-title">⏳ Commissions en attente de paiement</span>
+                <span class="comm-card-title">⏳ Commissions en attente — <span style="color:var(--brand);font-family:var(--mono)">{{ $commissions->total() }}</span> au total</span>
                 <label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer">
                     <input type="checkbox" id="checkAll"> Tout sélectionner
                 </label>
             </div>
 
+            <div class="tbl-wrap">
             <table class="tbl">
                 <thead>
                     <tr>
                         <th style="width:36px"></th>
-                        <th>Réf cmd</th>
+                        <th>Réf commande</th>
                         <th>Livreur</th>
-                        <th>Destination</th>
-                        <th style="background:#fef9ec;color:#92400e;">💰 Montant à payer</th>
-                        <th>Date</th>
+                        <th>📍 Destination</th>
+                        <th class="col-montant">Montant commande</th>
+                        <th style="background:#fef9ec;color:#92400e;">💰 Commission à payer</th>
+                        <th class="col-date">Date</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($commissions as $c)
                     @php
-                        $lv   = $c->livreur;
+                        $lv    = $c->livreur;
                         $linit = $lv ? $init($lv->name) : 'LV';
-                        $dest = $c->order?->delivery_destination ?: $c->order?->client?->address ?: null;
+                        $orderTotal = $c->order?->total ?? null;
+                        $dest  = $c->order?->delivery_destination
+                              ?: $c->order?->client?->address;
                     @endphp
                     <tr class="comm-row" data-id="{{ $c->id }}">
 
-                        {{-- Checkbox --}}
-                        <td>
+                        <td data-label="">
                             <input type="checkbox" name="ids[]" value="{{ $c->id }}" class="rowCheckbox">
                         </td>
 
-                        {{-- Réf commande --}}
-                        <td><span class="ref-cell">#{{ $c->order_id }}</span></td>
-
-                        {{-- Livreur --}}
-                        <td>
-                            <div class="lv-chip">
-                                <div class="lv-av">{{ $linit }}</div>
-                                {{ $lv?->name ?? '—' }}
-                            </div>
-                            @if($lv?->phone)
-                            <div style="font-size:10.5px;color:var(--muted);margin-top:3px;">📞 {{ $lv->phone }}</div>
+                        <td data-label="Réf commande">
+                            @if($c->order_id)
+                                <a href="{{ route('orders.show', $c->order_id) }}" class="ref-link" title="Voir la commande">#{{ $c->order_id }}</a>
+                            @else
+                                <span class="ref-cell">—</span>
                             @endif
                         </td>
 
-                        {{-- Destination --}}
-                        <td>
+                        <td data-label="Livreur">
+                            <div style="text-align:right">
+                                <div class="lv-chip">
+                                    <div class="lv-av">{{ $linit }}</div>
+                                    {{ $lv?->name ?? '—' }}
+                                </div>
+                                @if($lv?->phone)
+                                <div style="font-size:10.5px;color:var(--muted);margin-top:3px">📞 {{ $lv->phone }}</div>
+                                @endif
+                            </div>
+                        </td>
+
+                        <td data-label="Destination">
                             @if($dest)
-                                <span style="font-size:12px;color:var(--text-2)">📍 {{ $dest }}</span>
+                                <div class="dest-cell" style="text-align:right">
+                                    📍 {{ $dest }}
+                                    <small>{{ $c->order?->delivery_destination ? 'Destination' : 'Adresse client' }}</small>
+                                </div>
+                            @else
+                                <span class="dest-empty">Non renseignée</span>
+                            @endif
+                        </td>
+
+                        <td data-label="Montant cmd" class="col-montant">
+                            @if($orderTotal)
+                                <div class="order-amount" style="text-align:right">
+                                    {{ number_format($orderTotal, 0, ',', ' ') }} <span style="font-size:10px;color:var(--muted)">{{ $devise }}</span>
+                                    <small>Total commande</small>
+                                </div>
                             @else
                                 <span style="color:var(--muted);font-size:12px">—</span>
                             @endif
                         </td>
 
-                        {{-- Montant éditable — mis en avant --}}
-                        <td style="background:#fffbeb;">
-                            <div style="display:flex;flex-direction:column;gap:4px;">
-                                <div style="font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.4px;">Saisir le montant ✏️</div>
-                                <div style="display:flex;align-items:center;gap:6px;">
-                                    <input type="number"
-                                           name="amounts[{{ $c->id }}]"
-                                           class="comm-amount-input"
-                                           value="{{ $c->amount ?: '' }}"
-                                           min="0"
-                                           placeholder="Ex: 50000"
-                                           style="width:120px;padding:8px 12px;border:2px solid #f59e0b;border-radius:8px;font-size:14px;font-weight:800;font-family:var(--mono);color:#92400e;background:#fff;outline:none;transition:border-color .15s,box-shadow .15s;"
-                                           onfocus="this.style.borderColor='#d97706';this.style.boxShadow='0 0 0 3px rgba(245,158,11,.2)'"
-                                           onblur="this.style.borderColor='#f59e0b';this.style.boxShadow='none'">
-                                    <span style="font-size:11px;font-weight:700;color:#92400e;white-space:nowrap;">{{ $devise }}</span>
-                                </div>
+                        <td data-label="Commission à payer" class="td-comm">
+                            <div style="display:flex;align-items:center;gap:6px;width:100%">
+                                <input type="number"
+                                       name="amounts[{{ $c->id }}]"
+                                       class="comm-input comm-amount-input"
+                                       data-row="{{ $c->id }}"
+                                       value="{{ $c->amount ?: '' }}"
+                                       min="0"
+                                       placeholder="Ex: 50 000">
+                                <span style="font-size:11px;font-weight:700;color:#92400e;white-space:nowrap">{{ $devise }}</span>
                             </div>
+                            <div class="row-alert" id="alert-{{ $c->id }}">⚠️ Entrez un montant avant de payer</div>
                         </td>
 
-                        {{-- Date --}}
-                        <td>
-                            <div class="date-cell">
+                        <td data-label="Date" class="col-date">
+                            <div class="date-cell" style="text-align:right">
                                 {{ $c->created_at->format('d/m/Y') }}
                                 <small>{{ $c->created_at->format('H:i') }}</small>
                             </div>
@@ -661,124 +754,121 @@ input[type=checkbox] {
                     @endforeach
                 </tbody>
             </table>
+            </div>{{-- /tbl-wrap --}}
 
-            <div class="pagination-wrap">
-                {{ $commissions->withQueryString()->links() }}
-            </div>
-        </div>
-
-        {{-- ── Barre de paiement en bas ── --}}
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:var(--shadow);" id="payoutBar">
-            <span class="payout-count" id="selectionCount" style="flex-shrink:0;">0 sélectionné</span>
-            <input type="text" name="payout_ref" class="payout-input"
-                   placeholder="📎 Référence paiement (ex: Orange Money 001)">
-            <input type="text" name="payout_note" class="payout-input"
-                   placeholder="📝 Note interne (optionnel)" style="flex:2">
-            <button type="submit" id="markPaidBtn" class="btn btn-primary" disabled style="flex-shrink:0;padding:10px 20px;font-size:13.5px;">
-                ✅ Marquer comme PAYÉES
-            </button>
+            <div class="pagination-wrap">{{ $commissions->withQueryString()->links() }}</div>
         </div>
 
     </form>
 
-    {{-- ════════════════════════════════════════════════════════════
-         CAS B : Commissions PAYÉES → lecture seule
-    ════════════════════════════════════════════════════════════ --}}
+    {{-- ════════════════════════════════════════
+         CAS B : PAYÉES → lecture seule
+    ════════════════════════════════════════ --}}
     @else
 
     <div class="comm-card">
         <div class="comm-card-hd">
             <span class="comm-card-title">
-                {{ $status === 'en_attente' ? 'Commissions en attente' : 'Commissions payées' }}
+                {{ $status === 'en_attente' ? '⏳ Commissions en attente' : '✅ Commissions payées' }}
             </span>
+            @if($status !== 'en_attente' && $commissions->count())
+            <a href="{{ route('boutique.commissions.export') }}" class="btn btn-sm btn-export">
+                ⬇️ Exporter CSV
+            </a>
+            @endif
         </div>
 
         @if($commissions->isEmpty())
         <div class="empty-state">
             <span class="ico">💸</span>
-            <p>Aucune commission {{ $status === 'payé' ? 'payée' : 'en attente' }} pour le moment.</p>
+            <h3>Aucune commission {{ $status !== 'en_attente' ? 'payée' : 'en attente' }}</h3>
+            <p>{{ $status === 'en_attente' ? 'Tous vos livreurs ont été payés.' : 'Vous n\'avez pas encore effectué de paiement.' }}</p>
         </div>
         @else
+        <div class="tbl-wrap">
         <table class="tbl">
             <thead>
                 <tr>
-                    <th>Réf cmd</th>
+                    <th>Réf commande</th>
                     <th>Livreur</th>
-                    <th>Destination</th>
-                    <th>Commission</th>
+                    <th>📍 Destination</th>
+                    <th class="col-montant">Montant commande</th>
+                    <th>Commission payée</th>
                     <th>Statut</th>
                     <th>Référence paiement</th>
-                    <th>Payée le</th>
+                    <th class="col-date">Payée le</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($commissions as $c)
                 @php
-                    $lv    = $c->livreur;
-                    $linit = $lv ? $init($lv->name) : 'LV';
-                    $dest  = $c->order?->delivery_destination
-                          ?: $c->order?->client?->address
-                          ?: null;
+                    $lv        = $c->livreur;
+                    $linit     = $lv ? $init($lv->name) : 'LV';
+                    $orderTotal= $c->order?->total ?? null;
+                    $dest      = $c->order?->delivery_destination
+                              ?: $c->order?->client?->address;
                 @endphp
                 <tr>
-                    <td><span class="ref-cell">#{{ $c->order_id }}</span></td>
-
-                    <td>
+                    <td data-label="Réf">
+                        @if($c->order_id)
+                            <a href="{{ route('orders.show', $c->order_id) }}" class="ref-link">#{{ $c->order_id }}</a>
+                        @else
+                            <span class="ref-cell">—</span>
+                        @endif
+                    </td>
+                    <td data-label="Livreur">
                         <div class="lv-chip">
                             <div class="lv-av">{{ $linit }}</div>
                             {{ $lv?->name ?? '—' }}
                         </div>
                     </td>
-
-                    {{-- Destination --}}
-                    <td>
+                    <td data-label="Destination">
                         @if($dest)
-                            <span style="font-size:12px;color:var(--text-2)">📍 {{ $dest }}</span>
+                            <div class="dest-cell" style="text-align:right">📍 {{ $dest }}</div>
+                        @else
+                            <span class="dest-empty">—</span>
+                        @endif
+                    </td>
+                    <td data-label="Montant cmd" class="col-montant">
+                        @if($orderTotal)
+                            <div class="order-amount" style="text-align:right">
+                                {{ number_format($orderTotal, 0, ',', ' ') }} <span style="font-size:10px;color:var(--muted)">{{ $devise }}</span>
+                                <small>Total commande</small>
+                            </div>
                         @else
                             <span style="color:var(--muted);font-size:12px">—</span>
                         @endif
                     </td>
-
-                    {{-- Commission avec devise --}}
-                    <td>
-                        <div class="amount">
-                            {{ number_format($c->amount, 0, ',', ' ') }}
-                            <small>{{ $devise }}</small>
-                        </div>
+                    <td data-label="Commission">
+                        <div class="amount">{{ number_format($c->amount, 0, ',', ' ') }} <small>{{ $devise }}</small></div>
                     </td>
-
-                    <td>
+                    <td data-label="Statut">
                         @if($c->status === 'en_attente')
                             <span class="pill p-warning">⏳ En attente</span>
                         @else
                             <span class="pill p-success">✓ Payée</span>
                         @endif
                     </td>
-
-                    <td>
+                    <td data-label="Réf paiement">
                         @if($c->payout_ref)
-                            <span class="ref-cell">{{ $c->payout_ref }}</span>
+                            <span class="ref-cell" style="text-align:right">{{ $c->payout_ref }}</span>
                         @else
                             <span style="color:var(--muted);font-size:12px">—</span>
                         @endif
                     </td>
-
-                    <td>
-                        <div class="date-cell">
+                    <td data-label="Payée le" class="col-date">
+                        <div class="date-cell" style="text-align:right">
                             {{ optional($c->paid_at)->format('d/m/Y') ?? '—' }}
-                            @if($c->paid_at)
-                            <small>{{ $c->paid_at->format('H:i') }}</small>
-                            @endif
+                            @if($c->paid_at)<small>{{ $c->paid_at->format('H:i') }}</small>@endif
                         </div>
                     </td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
-
-        <div class="pagination-wrap">
-            {{ $commissions->withQueryString()->links() }}
-        </div>
+        </div>{{-- /tbl-wrap --}}
+        </table>
+        <div class="pagination-wrap">{{ $commissions->withQueryString()->links() }}</div>
         @endif
     </div>
 
@@ -788,34 +878,60 @@ input[type=checkbox] {
 </main>
 </div>{{-- /dash-wrap --}}
 
+{{-- ══ MODAL CONFIRMATION ══ --}}
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <span class="modal-ico">💸</span>
+            <div>
+                <div class="modal-title">Confirmer le paiement</div>
+                <div class="modal-sub">Cette action est irréversible</div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div class="modal-summary">
+                <div class="modal-row">
+                    <span class="lbl">Livreurs sélectionnés</span>
+                    <span class="val" id="modalCount">—</span>
+                </div>
+                <div class="modal-row">
+                    <span class="lbl">Référence paiement</span>
+                    <span class="val" id="modalRef" style="font-family:var(--font);font-size:13px">—</span>
+                </div>
+                <div class="modal-row total">
+                    <span class="lbl">Total à décaisser</span>
+                    <span class="val" id="modalTotal">— {{ $devise }}</span>
+                </div>
+            </div>
+            <p style="font-size:12px;color:var(--muted);margin:12px 0 0;line-height:1.6">
+                Les commissions sélectionnées seront marquées comme <strong>payées</strong>. Vous ne pourrez plus les modifier.
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-cancel" onclick="closeConfirmModal()">Annuler</button>
+            <button class="modal-confirm" id="modalConfirmBtn">✅ Confirmer le paiement</button>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
 <script>
 /* ══ SIDEBAR ══ */
 function toggleGroup(btn) {
-    const sub    = btn.nextElementSibling;
+    const sub = btn.nextElementSibling;
     const isOpen = sub.classList.contains('open');
     document.querySelectorAll('.sb-sub.open').forEach(s => {
         s.classList.remove('open');
         s.previousElementSibling?.classList.remove('open');
     });
-    if (!isOpen) {
-        sub.classList.add('open');
-        btn.classList.add('open');
-        const sidebar = document.getElementById('sidebar');
-        setTimeout(() => {
-            const support = sidebar?.querySelector('a[href*="support"]');
-            if (support && sidebar) support.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 220);
-    }
+    if (!isOpen) { sub.classList.add('open'); btn.classList.add('open'); }
 }
 
 (function initSidebar() {
-    const sidebar    = document.getElementById('sidebar');
-    const overlay    = document.getElementById('sbOverlay');
-    const scrollHint = document.getElementById('sbScrollHint');
-
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sbOverlay');
     document.getElementById('btnMenu')?.addEventListener('click', () => {
         sidebar.classList.add('open'); overlay.classList.add('open');
     });
@@ -825,18 +941,9 @@ function toggleGroup(btn) {
     document.getElementById('btnCloseSidebar')?.addEventListener('click', () => {
         sidebar.classList.remove('open'); overlay.classList.remove('open');
     });
-
-    function updateScrollHint() {
-        if (!sidebar || !scrollHint) return;
-        const atBottom    = sidebar.scrollTop + sidebar.clientHeight >= sidebar.scrollHeight - 16;
-        const needsScroll = sidebar.scrollHeight > sidebar.clientHeight + 20;
-        scrollHint.classList.toggle('hidden', atBottom || !needsScroll);
-    }
-    sidebar?.addEventListener('scroll', updateScrollHint);
-    window.addEventListener('resize', updateScrollHint);
-    setTimeout(updateScrollHint, 300);
 })();
 
+/* ══ LOGIQUE PAIEMENT ══ */
 document.addEventListener('DOMContentLoaded', () => {
 
     const checkAll      = document.getElementById('checkAll');
@@ -844,64 +951,145 @@ document.addEventListener('DOMContentLoaded', () => {
     const markPaidBtn   = document.getElementById('markPaidBtn');
     const payoutBar     = document.getElementById('payoutBar');
     const selCount      = document.getElementById('selectionCount');
+    const totalEl       = document.getElementById('payoutTotal');
     const payForm       = document.getElementById('payForm');
 
-    /* ── Mettre à jour l'état du bouton + compteur ── */
+    if (!payForm) return; /* Vue "payées" : pas de formulaire */
+
+    /* ── Calcul du total en live ── */
+    function calcTotal() {
+        let sum = 0;
+        document.querySelectorAll('.comm-row').forEach(row => {
+            const cb  = row.querySelector('.rowCheckbox');
+            const inp = row.querySelector('.comm-amount-input');
+            if (cb?.checked && inp) {
+                const v = parseFloat(inp.value) || 0;
+                sum += v;
+            }
+        });
+        return sum;
+    }
+
+    /* ── Mise à jour globale ── */
     function updateState() {
         const checked = Array.from(rowCheckboxes).filter(cb => cb.checked);
         const n       = checked.length;
+        const total   = calcTotal();
 
+        /* Bouton */
         if (markPaidBtn) markPaidBtn.disabled = n === 0;
 
+        /* Compteur */
         if (selCount) {
             selCount.textContent = n > 0 ? `${n} sélectionné${n > 1 ? 's' : ''}` : '0 sélectionné';
             selCount.className   = 'payout-count' + (n > 0 ? ' active' : '');
         }
 
-        /* Mettre en valeur la barre sticky quand une sélection est active */
-        if (payoutBar) {
-            payoutBar.classList.toggle('has-selection', n > 0);
+        /* Total live */
+        if (totalEl) {
+            const fmt = new Intl.NumberFormat('fr-FR').format(total);
+            totalEl.innerHTML = `${fmt} <span style="font-size:10px;font-weight:600;font-family:var(--font)">{{ $devise }}</span>`;
+            totalEl.classList.toggle('zero', total === 0);
         }
 
-        /* Colorier les lignes sélectionnées */
+        /* Surlignage lignes */
         document.querySelectorAll('.comm-row').forEach(row => {
             const cb = row.querySelector('.rowCheckbox');
             row.classList.toggle('selected', cb?.checked ?? false);
         });
+
+        /* Bordure barre */
+        if (payoutBar) payoutBar.classList.toggle('has-selection', n > 0);
     }
 
-    /* ── Sélectionner / désélectionner tout ── */
+    /* ── Tout sélectionner ── */
     checkAll?.addEventListener('change', e => {
         rowCheckboxes.forEach(cb => cb.checked = e.target.checked);
         updateState();
     });
 
-    /* ── Écouter chaque checkbox ── */
+    /* ── Chaque checkbox ── */
     rowCheckboxes.forEach(cb => cb.addEventListener('change', () => {
-        /* Synchroniser la checkbox "tout sélectionner" */
-        if (checkAll) {
-            checkAll.checked = Array.from(rowCheckboxes).every(c => c.checked);
-        }
+        if (checkAll) checkAll.checked = Array.from(rowCheckboxes).every(c => c.checked);
         updateState();
     }));
 
-    /* ── Validation avant envoi ── */
-    payForm?.addEventListener('submit', e => {
-        const checked = Array.from(rowCheckboxes).filter(cb => cb.checked);
-        if (checked.length === 0) {
-            e.preventDefault();
-            alert('Veuillez sélectionner au moins une commission à marquer comme payée.');
-            return;
-        }
-        /* Désactiver le bouton pour éviter le double-submit */
-        if (markPaidBtn) {
-            markPaidBtn.disabled   = true;
-            markPaidBtn.textContent = '⏳ Traitement…';
-        }
+    /* ── Chaque input montant → recalcul live ── */
+    document.querySelectorAll('.comm-amount-input').forEach(inp => {
+        inp.addEventListener('input', () => {
+            const rowId = inp.dataset.row;
+            const alert = document.getElementById('alert-' + rowId);
+            /* Retirer l'alerte dès qu'on saisit */
+            if (parseFloat(inp.value) > 0) {
+                inp.classList.remove('warn');
+                if (alert) alert.classList.remove('visible');
+            }
+            updateState();
+        });
     });
 
-    /* Init */
+    /* ── Init ── */
     updateState();
+});
+
+/* ══ MODAL CONFIRMATION ══ */
+function openConfirmModal() {
+    const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
+    const checked       = Array.from(rowCheckboxes).filter(cb => cb.checked);
+
+    /* Validation : vérifier montants */
+    let hasError = false;
+    checked.forEach(cb => {
+        const row   = cb.closest('.comm-row');
+        const rowId = row?.dataset.id;
+        const inp   = row?.querySelector('.comm-amount-input');
+        const alert = document.getElementById('alert-' + rowId);
+        if (!inp || !(parseFloat(inp.value) > 0)) {
+            inp?.classList.add('warn');
+            if (alert) alert.classList.add('visible');
+            hasError = true;
+        }
+    });
+    if (hasError) {
+        /* Scroller vers la première erreur */
+        const firstWarn = document.querySelector('.comm-input.warn');
+        firstWarn?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+
+    /* Remplir le modal */
+    let total = 0;
+    checked.forEach(cb => {
+        const row = cb.closest('.comm-row');
+        const inp = row?.querySelector('.comm-amount-input');
+        total += parseFloat(inp?.value || 0);
+    });
+    const ref    = document.querySelector('input[name="payout_ref"]')?.value || '(aucune)';
+    const fmt    = new Intl.NumberFormat('fr-FR').format(total);
+
+    document.getElementById('modalCount').textContent = checked.length + ' livreur' + (checked.length > 1 ? 's' : '');
+    document.getElementById('modalRef').textContent   = ref;
+    document.getElementById('modalTotal').textContent = fmt + ' {{ $devise }}';
+
+    document.getElementById('confirmModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    /* Confirmer → soumettre le form */
+    document.getElementById('modalConfirmBtn').onclick = function() {
+        this.textContent = '⏳ Traitement…';
+        this.disabled = true;
+        document.getElementById('payForm').submit();
+    };
+}
+
+function closeConfirmModal() {
+    document.getElementById('confirmModal').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+/* Fermer le modal en cliquant en dehors */
+document.getElementById('confirmModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeConfirmModal();
 });
 </script>
 @endpush

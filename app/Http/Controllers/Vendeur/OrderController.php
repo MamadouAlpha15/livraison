@@ -34,6 +34,19 @@ class OrderController extends Controller
         return view('vendeur.orders.index', compact('orders'));
     }
 
+    public function show(Order $order)
+    {
+        $user   = Auth::user();
+        $shop   = $user->shop ?: $user->assignedShop;
+        $shopId = $shop?->id;
+
+        abort_unless($shopId && $order->shop_id === $shopId, 403, 'Action non autorisée.');
+
+        $order->load(['items.product', 'client', 'livreur', 'payment', 'commission']);
+
+        return view('vendeur.orders.show', compact('order', 'shop'));
+    }
+
     /**
      * Confirmer une commande de MA boutique
      * -> envoie vers l'écran d'assignation pour choisir un livreur

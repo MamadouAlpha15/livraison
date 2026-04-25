@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CommissionController extends Controller
 {
@@ -94,5 +95,51 @@ class CommissionController extends Controller
         });
 
         return back()->with('success', 'Les commissions sélectionnées ont été marquées comme PAYÉES.');
+    }
+
+    public function export(): StreamedResponse
+    {
+        $user = Auth::user();
+        $shop = $user->shop ?: $user->assignedShop;
+        abort_unless($shop, 403);
+
+        $commissions = CourierCommission::where('shop_id', $shop->id)
+            ->where('status', CourierCommission::STATUS_PAYEE)
+            ->with(['livreur', 'order.client'])
+            ->orderByDesc('paid_at')
+            ->get();
+
+        $devise = $shop->currency ?? 'GNF';
+        $filename = 'commissions_payees_' . now()->format('Ymd_His') . '.csv';
+
+        return response()->streamDownload(function () use ($commissions, $devise) {
+            $out = fopen('php://output', 'w');
+            // BOM UTF-8 pour Excel
+            fputs($out, "\xEF\xBB\xBF");
+            fputcsv($out, [
+                'Réf commande', 'Livreur', 'Téléphone livreur',
+                'Destination livraison',
+                'Montant commande (' . $devise . ')',
+                'Commission payée (' . $devise . ')',
+                'Référence paiement', 'Note interne', 'Payée le',
+            ], ';');
+
+            foreach ($commissions as $c) {
+                fputcsv($out, [
+                    $c->order_id ? '#' . $c->order_id : '—',
+                    $c->livreur?->name ?? '—',
+                    $c->livreur?->phone ?? '—',
+                    $c->order?->delivery_destination ?: ($c->order?->client?->address ?? '—'),
+                    $c->order?->total ?? '—',
+                    number_format($c->amount, 0, ',', ' '),
+                    $c->payout_ref  ?? '—',
+                    $c->payout_note ?? '—',
+                    optional($c->paid_at)->format('d/m/Y H:i') ?? '—',
+                ], ';');
+            }
+            fclose($out);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
     }
 }

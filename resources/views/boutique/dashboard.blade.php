@@ -748,9 +748,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 <div class="tb-greeting-sub">Voici ce qui se passe avec votre boutique aujourd'hui.</div>
             </div>
 
-            <div class="tb-search">
-                🔍 Rechercher... <kbd>Ctrl K</kbd>
-            </div>
+            
 
             <div class="tb-actions">
 
@@ -1606,6 +1604,15 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.classList.add('active'); loadPeriod(btn.dataset.period);
         });
     });
+
+    /* Badge "30 derniers jours ▾" → déclenche l'analyse 30j + scroll */
+    document.querySelector('.mini-period-badge')?.addEventListener('click', () => {
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+        const btn30 = document.querySelector('.period-btn[data-period="30days"]');
+        if (btn30) { btn30.classList.add('active'); loadPeriod('30days'); }
+        document.getElementById('periodCard')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
     loadPeriod('this_month');
 });
 </script>
@@ -1618,9 +1625,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const CSRF = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
     /* ── État local ── */
-    let _prevMsg    = -1;
-    let _prevOrders = -1;
-    let _notifOpen  = false;
+    let _prevMsg       = -1;
+    let _prevOrders    = -1;
+    let _notifOpen     = false;
+    /* Persiste entre navigations pour éviter de re-notifier les mêmes messages */
+    let _lastSeenMsgId = parseInt(sessionStorage.getItem('bq_last_msg_id') || '0', 10);
 
     /* Restaurer les alertes depuis sessionStorage (persiste entre navigations) */
     let _alerts = [];
@@ -1741,10 +1750,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /* ── Push alerte dans la file ── */
-    function pushAlert(ico, msg, url, type) {
-        const now = new Date();
-        const time = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-        _alerts.unshift({ id: ++_alertIdSeq, ico, msg, url, time, type: type || 'msg' });
+    function pushAlert(ico, msg, url, type, body, time) {
+        if (!time) {
+            const now = new Date();
+            time = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+        }
+        _alerts.unshift({ id: ++_alertIdSeq, ico, msg, url, time, type: type || 'msg', body: body || '' });
         if (_alerts.length > 30) _alerts.pop();
         _saveAlerts();
     }
@@ -1763,10 +1774,26 @@ document.addEventListener('DOMContentLoaded', () => {
             setBadge('msgTopbarCount', d.messages_unread);
             const msgBtn = document.getElementById('msgTopbarBtn');
             if (msgBtn) msgBtn.classList.toggle('has-unread', d.messages_unread > 0);
-            if (_prevMsg >= 0 && d.messages_unread > _prevMsg) {
-                const n = d.messages_unread - _prevMsg;
-                showToast(`💬 <div>${n} nouveau${n>1?'x':''} message${n>1?'s':''} client</div>`, 'msg');
-                pushAlert('💬', `${n} nouveau${n>1?'x':''} message${n>1?'s':''} non lu${n>1?'s':''}`, '{{ route("boutique.messages.hub") }}', 'msg');
+
+            /* Nouveaux messages — même logique au 1er poll et aux suivants */
+            if (Array.isArray(d.latest_messages) && d.latest_messages.length > 0) {
+                const newMsgs = d.latest_messages.filter(m => m.id > _lastSeenMsgId);
+                if (newMsgs.length > 0) {
+                    /* Toast seulement si ce n'est pas le premier poll (évite le spam au chargement) */
+                    if (_prevMsg >= 0) {
+                        const n = newMsgs.length;
+                        showToast(`💬 <div>${n} nouveau${n>1?'x':''} message${n>1?'s':''} non lu${n>1?'s':''}</div>`, 'msg');
+                    }
+                    /* Alertes individuelles (du plus ancien au plus récent dans la cloche) */
+                    [...newMsgs].reverse().forEach(m => {
+                        const label = m.product_name
+                            ? `${m.sender_name} · ${m.product_name} — message non lu`
+                            : `${m.sender_name} — message non lu`;
+                        pushAlert('💬', label, '{{ route("boutique.messages.hub") }}', 'msg', '', m.time);
+                    });
+                    _lastSeenMsgId = newMsgs[0].id;
+                    try { sessionStorage.setItem('bq_last_msg_id', _lastSeenMsgId); } catch(e) {}
+                }
             }
             _prevMsg = d.messages_unread;
 

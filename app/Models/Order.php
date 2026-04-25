@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\CourierCommission;
 
 class Order extends Model
 {
@@ -95,7 +96,12 @@ protected $casts = [
     }
 
     public function user()
-{
-    return $this->belongsTo(User::class);
-}
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function commission()
+    {
+        return $this->hasOne(CourierCommission::class);
+    }
 }

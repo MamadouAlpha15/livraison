@@ -290,12 +290,14 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('payments', [VendeurPaymentController::class, 'index'])->name('payments.index');
 
         /* Commissions */
-        Route::get('commissions',       [VendeurCommissionController::class, 'index'])->name('commissions.index');
-        Route::post('commissions/pay',  [VendeurCommissionController::class, 'pay'])  ->name('commissions.pay');
+        Route::get('commissions',            [VendeurCommissionController::class, 'index']) ->name('commissions.index');
+        Route::post('commissions/pay',       [VendeurCommissionController::class, 'pay'])   ->name('commissions.pay');
+        Route::get('commissions/export',     [VendeurCommissionController::class, 'export'])->name('commissions.export');
 
         /* Rapports & Statistiques */
-        Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
-        Route::get('stats',   [StatController::class, 'index'])  ->name('stats.index');
+        Route::get('reports',        [ReportController::class, 'index']) ->name('reports.index');
+        Route::get('reports/export', [ReportController::class, 'export'])->name('reports.export');
+        Route::get('stats',          [StatController::class, 'index'])   ->name('stats.index');
 
         /* Clients de la boutique */
         Route::get('clients',         [\App\Http\Controllers\Boutique\ClientController::class, 'index'])->name('clients.index');
@@ -394,6 +396,7 @@ Route::middleware(['auth', 'role:vendeur,admin'])->group(function () {
 
     /* ── Commandes (vendeur) ── */
     Route::get('orders',                         [VendeurOrderController::class, 'index'])     ->name('orders.index');
+    Route::get('orders/{order}',                 [VendeurOrderController::class, 'show'])      ->name('orders.show');
     Route::put('orders/{order}/confirm',         [VendeurOrderController::class, 'confirm'])   ->name('orders.confirm');
     Route::put('orders/{order}/cancel',          [VendeurOrderController::class, 'cancel'])    ->name('orders.cancel');
     Route::get('orders/{order}/assign',          [VendeurOrderController::class, 'showAssign'])->name('orders.assign.show');
@@ -491,6 +494,8 @@ Route::middleware(['auth', 'role:client'])
             Route::post('/messages/counter-offer',             [ShopMessageController::class, 'counterOffer']) ->name('messages.counter-offer');
             Route::get('/messages/poll',                       [ShopMessageController::class, 'poll'])          ->name('messages.client.poll');
             Route::get('/notifications/poll',                  [ShopMessageController::class, 'pollAll'])       ->name('client.notifications.poll');
+            Route::post('/messages/images/{product?}',         [ShopMessageController::class, 'sendImages'])    ->name('messages.client.send-images');
+            Route::get('/messages/image-status/{message}',     [ShopMessageController::class, 'imageStatus'])   ->name('messages.client.image-status');
 
         /* Commandes classiques */
         Route::resource('orders', OrderController::class)->only(['index', 'store', 'create']);
