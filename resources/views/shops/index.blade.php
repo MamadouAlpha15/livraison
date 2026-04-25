@@ -10,12 +10,12 @@
    VARIABLES
 ═══════════════════════════════════════════ */
 :root {
-    --gr:      #10b981;
-    --gr-dk:   #059669;
-    --gr-lt:   #d1fae5;
-    --gr-mlt:  #ecfdf5;
-    --dark:    #0a1628;
-    --dark2:   #111f3a;
+    --gr:      #6366f1;
+    --gr-dk:   #4f46e5;
+    --gr-lt:   #e0e7ff;
+    --gr-mlt:  #eef2ff;
+    --dark:    #0a0a1e;
+    --dark2:   #0e0e16;
     --txt:     #0f172a;
     --txt2:    #475569;
     --muted:   #94a3b8;
@@ -39,7 +39,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     padding: 0 40px; height: 64px;
     display: flex; align-items: center; justify-content: space-between;
-    background: rgba(10,22,40,.96);
+    background: rgba(10,10,30,.96);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255,255,255,.06);
 }
@@ -50,10 +50,10 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 }
 .nav-brand-icon {
     width: 34px; height: 34px;
-    background: linear-gradient(135deg, var(--gr), #f9a87d);
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
     border-radius: 9px; display: flex; align-items: center;
     justify-content: center; font-size: 16px;
-    box-shadow: 0 2px 10px rgba(240,106,15,.4);
+    box-shadow: 0 2px 10px rgba(99,102,241,.4);
 }
 .nav-links { display: flex; align-items: center; gap: 8px; }
 .nav-link-item {
@@ -93,20 +93,20 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 .shops-hero-glow {
     position: absolute;
     width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(16,185,129,.15) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(99,102,241,.18) 0%, rgba(139,92,246,.08) 60%, transparent 70%);
     top: 50%; left: 50%; transform: translate(-50%, -60%);
     pointer-events: none;
 }
 .shops-hero-badge {
     display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.25);
-    color: #34d399; font-size: 11px; font-weight: 700;
+    background: rgba(99,102,241,.12); border: 1px solid rgba(99,102,241,.25);
+    color: #a5b4fc; font-size: 11px; font-weight: 700;
     padding: 5px 13px; border-radius: 20px;
     margin-bottom: 18px;
 }
 .shops-hero-badge-dot {
     width: 6px; height: 6px; border-radius: 50%;
-    background: #34d399; box-shadow: 0 0 6px #34d399;
+    background: #a5b4fc; box-shadow: 0 0 6px #a5b4fc;
     animation: blink 2s ease-in-out infinite;
 }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
@@ -117,7 +117,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
     line-height: 1.1;
 }
 .shops-hero h1 span {
-    background: linear-gradient(135deg, #f9a87d, #f06a0f, #06b6d4);
+    background: linear-gradient(135deg, #a5b4fc, #6366f1, #8b5cf6);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     background-clip: text;
 }
@@ -270,7 +270,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 /* Badge "Actif" flottant */
 .sc-badge {
     position: absolute; top: 12px; right: 12px;
-    background: rgba(16,185,129,.92); color: #fff;
+    background: rgba(99,102,241,.92); color: #fff;
     font-size: .68rem; font-weight: 800;
     padding: 4px 11px; border-radius: 20px;
     backdrop-filter: blur(6px);
@@ -324,7 +324,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 }
 .shop-card:hover .sc-btn {
     background: var(--gr); color: #fff; border-color: var(--gr-dk);
-    box-shadow: 0 4px 14px rgba(16,185,129,.35);
+    box-shadow: 0 4px 14px rgba(99,102,241,.35);
 }
 
 /* ── Empty state ── */

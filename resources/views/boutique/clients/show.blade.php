@@ -10,6 +10,7 @@
 --}}
 
 @extends('layouts.app')
+<p>dfdfs</p>
 
 @section('title', 'Fiche · ' . $user->name)
 

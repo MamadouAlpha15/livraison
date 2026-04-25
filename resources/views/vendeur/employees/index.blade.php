@@ -253,7 +253,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 <aside class="sidebar" id="sidebar">
     <div class="sb-brand">
         <a href="{{ route('boutique.dashboard') }}" class="sb-logo">
-            <div class="sb-logo-icon"><img src="/images/Shopio.jpeg" alt="Shopio" style="width:50px;height:50px;object-fit:cover;border-radius:9px"></div>
+            <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width:100%;height:100%;object-fit:cover;border-radius:9px"></div>
             <span class="sb-shop-name">{{ $shop->name ?? 'Boutique' }}</span>
         </a>
         <button class="sb-close" id="btnCloseSidebar" aria-label="Fermer le menu">✕</button>
@@ -382,13 +382,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     <div class="stat-lbl">Total</div>
                 </div>
             </div>
-            <div class="stat-chip" style="--sc-color:#1e40af">
-                <span class="stat-ico">🏪</span>
-                <div>
-                    <div class="stat-val">{{ $vendeurs }}</div>
-                    <div class="stat-lbl">Vendeurs</div>
-                </div>
-            </div>
+           
             <div class="stat-chip" style="--sc-color:var(--brand)">
                 <span class="stat-ico">🚴</span>
                 <div>
@@ -396,13 +390,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     <div class="stat-lbl">Livreurs</div>
                 </div>
             </div>
-            <div class="stat-chip" style="--sc-color:#7c3aed">
-                <span class="stat-ico">🧑‍💼</span>
-                <div>
-                    <div class="stat-val">{{ $employes }}</div>
-                    <div class="stat-lbl">Employés</div>
-                </div>
-            </div>
+           
         </div>
 
         {{-- ── TABLE DESKTOP (> 640px) ── --}}

@@ -11,7 +11,7 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-    --orange: #f90; --orange-dk: #e47911; --navy: #131921; --navy-2: #232f3e;
+    --orange: rgb(77, 14, 149); --orange-dk: #e47911; --navy: #131921; --navy-2: #232f3e;
     --green: #25d366; --green-dk: #128c7e; --border: #e9edef;
     --brand: #6366f1; --brand-dk: #4f46e5; --brand-lt: #e0e7ff;
     --text: #111b21; --muted: #667781; --surface: #fff; --bg: #f0f2f5;
@@ -625,7 +625,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 {{-- Topbar --}}
 <header class="topbar">
     <a href="{{ route('boutique.dashboard') }}" class="topbar-logo">
-        <img src="{{ asset('images/Shopio.jpeg') }}" alt="Shopio">
+        <img src="{{ asset('images/Shopio3.jpeg') }}" alt="Shopio">
         <span class="topbar-logo-name">Shopio</span>
     </a>
     <div class="topbar-sep"></div>

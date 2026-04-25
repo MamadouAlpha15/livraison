@@ -368,7 +368,7 @@ input[type=checkbox] {
 <aside class="sidebar" id="sidebar">
     <div class="sb-brand">
         <a href="{{ route('boutique.dashboard') }}" class="sb-logo">
-            <div class="sb-logo-icon"><img src="/images/Shopio.jpeg" alt="Shopio" style="width:50px;height:50px;object-fit:cover;border-radius:9px"></div>
+           <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width:100%;height:100%;object-fit:cover;border-radius:9px"></div>
             <span class="sb-shop-name">{{ $shop->name }}</span>
         </a>
         <button class="sb-close" id="btnCloseSidebar" aria-label="Fermer le menu">✕</button>

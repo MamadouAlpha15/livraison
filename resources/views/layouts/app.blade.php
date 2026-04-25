@@ -6,8 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#f06a0f">
     <title>{{ $title ?? config('app.name', 'Shopio') }}</title>
-    <link rel="icon" type="image/jpeg" href="{{ asset('images/Shopio2.jpeg') }}">
-    <link rel="shortcut icon" type="image/jpeg" href="{{ asset('images/Shopio2.jpeg') }}">
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/Shopio3.jpeg') }}">
+    <link rel="shortcut icon" type="image/jpeg" href="{{ asset('images/Shopio3.jpeg') }}">
 
 
     {{-- ══ Ressource hints (connexions anticipées) ══ --}}

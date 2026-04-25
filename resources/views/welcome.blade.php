@@ -20,12 +20,14 @@ Variables injectées depuis WelcomeController :
    VARIABLES & BASE
 ════════════════════════════════════════════════════════════════ */
 :root {
-    --green:     #10b981;
-    --green-dk:  #059669;
-    --green-lt:  #d1fae5;
-    --green-mlt: #ecfdf5;
-    --dark:      #0a1628;
-    --dark-2:    #111f3a;
+    --green:     #6366f1;
+    --green-dk:  #4f46e5;
+    --green-lt:  #e0e7ff;
+    --green-mlt: #eef2ff;
+    --violet:    #8b5cf6;
+    --indigo-lt: #a5b4fc;
+    --dark:      #0a0a1e;
+    --dark-2:    #0f0f3a;
     --text:      #0f172a;
     --text-2:    #475569;
     --muted:     #94a3b8;
@@ -59,9 +61,9 @@ body {
     padding: 0 40px;
     height: 64px;
     display: flex; align-items: center; justify-content: space-between;
-    background: rgba(10,22,40,.92);
+    background: rgba(10,10,30,.92);
     backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255,255,255,.06);
+    border-bottom: 1px solid rgba(99,102,241,.12);
     transition: background .3s;
 }
 .nav-brand {
@@ -71,11 +73,24 @@ body {
 }
 .nav-brand-icon {
     width: 34px; height: 34px;
-    background: linear-gradient(135deg, var(--green), #34d399);
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
     border-radius: 9px;
     display: flex; align-items: center; justify-content: center;
     font-size: 16px;
-    box-shadow: 0 2px 10px rgba(16,185,129,.4);
+    box-shadow: 0 2px 10px rgba(99,102,241,.4);
+}
+.nav-logo-img {
+    height: 40px; width: 40px; object-fit: cover; border-radius: 10px;
+    border: 2px solid rgba(170,40,217,.5);
+    box-shadow: 0 0 0 3px rgba(41,29,149,.35), 0 4px 14px rgba(170,40,217,.35);
+    flex-shrink: 0;
+}
+.nav-brand-name {
+    background: linear-gradient(90deg, #c4b5fd, #e879f9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 18px; font-weight: 800; letter-spacing: -.3px;
 }
 .nav-links {
     display: flex; align-items: center; gap: 8px;
@@ -106,7 +121,7 @@ body {
 ════════════════════════════════════════════════════════════════ */
 .hero-section {
     min-height: 100vh;
-    background: var(--dark);
+    background: linear-gradient(90deg, #100c31, #261360, #772595);
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     padding: 100px 24px 80px;
@@ -123,20 +138,20 @@ body {
     pointer-events: none;
 }
 
-/* Lumière verte derrière le titre */
+/* Halo indigo/violet derrière le titre */
 .hero-glow {
     position: absolute;
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(16,185,129,.18) 0%, transparent 70%);
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(99,102,241,.22) 0%, rgba(139,92,246,.1) 45%, transparent 70%);
     top: 50%; left: 50%; transform: translate(-50%, -60%);
     pointer-events: none;
 }
 
 .hero-badge {
     display: inline-flex; align-items: center; gap: 7px;
-    background: rgba(16,185,129,.12);
-    border: 1px solid rgba(16,185,129,.25);
-    color: #34d399;
+    background: rgba(99,102,241,.14);
+    border: 1px solid rgba(99,102,241,.3);
+    color: #a5b4fc;
     font-size: 12px; font-weight: 700;
     padding: 6px 14px; border-radius: 20px;
     margin-bottom: 24px;
@@ -144,8 +159,8 @@ body {
 }
 .hero-badge-dot {
     width: 6px; height: 6px; border-radius: 50%;
-    background: #34d399;
-    box-shadow: 0 0 6px #34d399;
+    background: #a5b4fc;
+    box-shadow: 0 0 6px #a5b4fc;
     animation: blink 2s ease-in-out infinite;
 }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
@@ -163,7 +178,7 @@ body {
     animation: fadeDown .7s .1s ease both;
 }
 .hero-title span {
-    background: linear-gradient(135deg, #34d399, #10b981, #06b6d4);
+    background: linear-gradient(135deg, #a5b4fc, #6366f1, #8b5cf6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -190,12 +205,12 @@ body {
     border: none; cursor: pointer;
 }
 .cta-primary {
-    background: var(--green); color: #fff;
-    box-shadow: 0 4px 20px rgba(16,185,129,.4);
+    background: linear-gradient(135deg,#6366f1,#4f46e5); color: #fff;
+    box-shadow: 0 4px 20px rgba(99,102,241,.45);
 }
 .cta-primary:hover {
-    background: var(--green-dk); color: #fff;
-    box-shadow: 0 6px 28px rgba(16,185,129,.5);
+    background: linear-gradient(135deg,#4f46e5,#3730a3); color: #fff;
+    box-shadow: 0 6px 28px rgba(99,102,241,.55);
     transform: translateY(-1px);
 }
 .cta-secondary {
@@ -241,7 +256,7 @@ body {
     content: '';
     position: absolute;
     inset: -40px -60px;
-    background: radial-gradient(ellipse at 50% 60%, rgba(16,185,129,.22) 0%, rgba(5,150,105,.08) 50%, transparent 75%);
+    background: radial-gradient(ellipse at 50% 60%, rgba(99,102,241,.25) 0%, rgba(139,92,246,.1) 50%, transparent 75%);
     border-radius: 50%;
     pointer-events: none;
     z-index: 0;
@@ -253,8 +268,8 @@ body {
     position: absolute;
     inset: 20px -20px -20px;
     background-image:
-        linear-gradient(rgba(16,185,129,.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(16,185,129,.07) 1px, transparent 1px);
+        linear-gradient(rgba(99,102,241,.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99,102,241,.08) 1px, transparent 1px);
     background-size: 36px 36px;
     border-radius: 20px;
     z-index: 0;
@@ -277,7 +292,7 @@ body {
         0 2px 0 rgba(255,255,255,.06),
         0 20px 60px rgba(0,0,0,.7),
         0 60px 120px rgba(0,0,0,.5),
-        0 0 80px rgba(16,185,129,.12),
+        0 0 80px rgba(99,102,241,.18),
         inset 0 1px 0 rgba(255,255,255,.08);
 }
 
@@ -318,12 +333,12 @@ body {
 /* Cartes stat flottantes */
 .mockup-float {
     position: absolute; z-index: 4;
-    background: rgba(15, 23, 35, 0.88);
+    background: rgba(10, 10, 30, 0.9);
     backdrop-filter: blur(12px) saturate(1.4);
     -webkit-backdrop-filter: blur(12px) saturate(1.4);
-    border: 1px solid rgba(255,255,255,.12);
+    border: 1px solid rgba(99,102,241,.2);
     border-radius: 12px; padding: 10px 14px;
-    box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(16,185,129,.1);
+    box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(99,102,241,.12);
     animation: floatCard 3s ease-in-out infinite;
     min-width: 140px;
 }
@@ -336,19 +351,19 @@ body {
 }
 .mf-label { font-size: 10px; color: rgba(255,255,255,.45); font-weight: 500; margin-bottom: 3px; text-transform: uppercase; letter-spacing: .06em; }
 .mf-val   { font-size: 18px; font-weight: 800; color: #fff; font-family: monospace; line-height: 1; }
-.mf-val span { font-size: 10px; font-weight: 600; color: #10b981; margin-left: 4px; }
+.mf-val span { font-size: 10px; font-weight: 600; color: #a5b4fc; margin-left: 4px; }
 .mf-ico   { font-size: 20px; margin-bottom: 4px; }
 .mf-bar   { height: 3px; border-radius: 2px; background: rgba(255,255,255,.1); margin-top: 6px; overflow: hidden; }
-.mf-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, #10b981, #34d399); }
+.mf-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, #6366f1, #8b5cf6); }
 
 /* Badge "LIVE" */
 .mockup-live {
     position: absolute; top: -14px; right: 20px; z-index: 5;
-    background: linear-gradient(135deg, #059669, #10b981);
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
     color: #fff; font-size: 10px; font-weight: 700; letter-spacing: .08em;
     padding: 4px 10px; border-radius: 20px;
     display: flex; align-items: center; gap: 5px;
-    box-shadow: 0 4px 16px rgba(16,185,129,.4);
+    box-shadow: 0 4px 16px rgba(99,102,241,.45);
 }
 .mockup-live-dot {
     width: 6px; height: 6px; border-radius: 50%;
@@ -357,7 +372,7 @@ body {
 @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
 
 .hero-mockup-placeholder {
-    background: linear-gradient(180deg, #0f1f18 0%, #1a2e20 100%);
+    background: linear-gradient(180deg, #0f0f2e 0%, #0a0a1e 100%);
     height: 480px; display: flex; align-items: center; justify-content: center;
     flex-direction: column; gap: 12px;
 }
@@ -429,14 +444,14 @@ body {
     position: relative; overflow: hidden;
 }
 .feature-card:hover {
-    box-shadow: 0 8px 32px rgba(0,0,0,.07);
+    box-shadow: 0 8px 32px rgba(99,102,241,.1);
     border-color: var(--green-lt);
     transform: translateY(-3px);
 }
 .feature-card::after {
     content: '';
     position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, var(--green), #34d399);
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
     opacity: 0; transition: opacity .2s;
 }
 .feature-card:hover::after { opacity: 1; }
@@ -463,7 +478,7 @@ body {
     content: '';
     position: absolute; top: 40px; left: 10%; right: 10%;
     height: 2px;
-    background: linear-gradient(90deg, var(--green-lt), var(--green), var(--green-lt));
+    background: linear-gradient(90deg, var(--green-lt), #6366f1, var(--green-lt));
     z-index: 0;
 }
 .step-item {
@@ -475,8 +490,8 @@ body {
     width: 52px; height: 52px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     font-size: 18px; font-weight: 800; font-family: var(--mono);
-    background: var(--green); color: #fff;
-    box-shadow: 0 4px 16px rgba(16,185,129,.35);
+    background: linear-gradient(135deg,#6366f1,#8b5cf6); color: #fff;
+    box-shadow: 0 4px 16px rgba(99,102,241,.4);
     margin-bottom: 18px;
     border: 3px solid #fff;
 }
@@ -505,13 +520,13 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,.04);
 }
 .shop-card:hover {
-    box-shadow: 0 16px 48px rgba(0,0,0,.11);
+    box-shadow: 0 16px 48px rgba(99,102,241,.12);
     border-color: var(--green-lt);
     transform: translateY(-6px);
 }
 .shop-img-wrap {
     height: 180px; overflow: hidden;
-    background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+    background: linear-gradient(135deg, #eef2ff, #f5f3ff);
     display: flex; align-items: center; justify-content: center;
     position: relative;
 }
@@ -523,7 +538,7 @@ body {
 .shop-img-placeholder { font-size: 52px; opacity: .55; }
 .shop-img-wrap .shop-badge {
     position: absolute; top: 12px; right: 12px;
-    background: rgba(16,185,129,.92); color: #fff;
+    background: rgba(99,102,241,.9); color: #fff;
     font-size: 10px; font-weight: 700;
     padding: 3px 10px; border-radius: 20px;
     backdrop-filter: blur(4px);
@@ -641,7 +656,8 @@ body {
    CTA ENTREPRISE DE LIVRAISON
 ════════════════════════════════════════════════════════════════ */
 .company-cta {
-    background: linear-gradient(135deg, #0a1628 0%, #1a2e20 100%);
+    background: linear-gradient(135deg, #0a0a1e 0%, #0f0f3a 60%, #10103a 100%);
+    border: 1px solid rgba(99,102,241,.2);
     border-radius: 20px;
     padding: 56px 40px;
     display: flex; align-items: center;
@@ -649,12 +665,13 @@ body {
     flex-wrap: wrap;
     position: relative; overflow: hidden;
     margin: 0 24px;
+    box-shadow: 0 8px 40px rgba(99,102,241,.15);
 }
 .company-cta::before {
     content: '';
     position: absolute; right: -80px; top: -80px;
     width: 300px; height: 300px;
-    background: radial-gradient(circle, rgba(16,185,129,.15) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(99,102,241,.2) 0%, rgba(139,92,246,.08) 50%, transparent 70%);
 }
 .company-cta-txt h2 {
     font-family: var(--display);
@@ -716,7 +733,7 @@ body {
 }
 .footer-logo-ico {
     width: 30px; height: 30px; border-radius: 7px;
-    background: linear-gradient(135deg, var(--green), #34d399);
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
     display: flex; align-items: center; justify-content: center;
     font-size: 14px;
 }
@@ -763,9 +780,9 @@ body {
 .nav-mobile-menu {
     display: none; position: fixed;
     top: 64px; left: 0; right: 0; z-index: 99;
-    background: rgba(10,22,40,.97);
+    background: rgba(10,10,30,.97);
     backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(255,255,255,.07);
+    border-bottom: 1px solid rgba(99,102,241,.12);
     padding: 16px 20px 24px;
     flex-direction: column; gap: 6px;
 }
@@ -787,7 +804,7 @@ body {
     background: transparent;
 }
 .nav-mobile-btn-green {
-    background: var(--green); color: #fff;
+    background: linear-gradient(135deg,#6366f1,#4f46e5); color: #fff;
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -806,6 +823,8 @@ body {
     /* Navbar */
     .top-nav { padding: 0 20px; }
     .nav-links { display: none; }
+    .nav-logo-img { width: 36px; height: 36px; }
+    .nav-brand-name { font-size: 16px; }
     .nav-hamburger { display: flex; }
 
     /* Hero */
@@ -894,7 +913,8 @@ body {
 ════════════════════════════════════════════════════════════════ */
 @media (max-width: 400px) {
     .hero-section  { padding: 74px 14px 44px; }
-    .nav-brand     { font-size: 15px; }
+    .nav-logo-img  { width: 32px; height: 32px; border-radius: 8px; }
+    .nav-brand-name { font-size: 14px; }
     .hero-mockup-bar { height: 32px; }
     .mockup-dot    { width: 8px; height: 8px; }
     .mockup-url    { display: none; }
@@ -920,8 +940,8 @@ body {
 ══════════════════════════════════════════ --}}
 <nav class="top-nav">
     <a href="{{ url('/') }}" class="nav-brand">
-        <img src="{{ asset('images/Shopio.jpeg') }}" alt="Shopio" style="height:50px;width:auto;object-fit:contain;border-radius:8px">
-        {{ config('app.name', 'Shopio') }}
+        <img src="/images/shopio3.jpeg" alt="Shopio" class="nav-logo-img">
+        <span class="nav-brand-name">{{ config('app.name', 'Shopio') }}</span>
     </a>
     <div class="nav-links">
         <a href="#features"  class="nav-link-item">Fonctionnalités</a>
@@ -1077,7 +1097,7 @@ body {
                         <span class="mockup-dot" style="background:#28c840"></span>
                     </div>
                     <div class="mockup-url">
-                        <span class="mockup-url-lock">🔒</span>
+                        <span class="mockup-url-lock" style="color:#a5b4fc">🔒</span>
                         shopio.app/boutique/dashboard
                     </div>
                     <div class="mockup-actions">
@@ -1088,7 +1108,7 @@ body {
                 </div>
 
                 @if(file_exists(public_path('images/dashboard2.png')))
-                    <img src="{{ asset('images/dashboard2.png') }}" alt="Dashboard Shopio preview" loading="lazy">
+                    <img src="{{ asset('images/dashboard1.png') }}" alt="Dashboard Shopio preview" loading="lazy">
                 @else
                     <div class="hero-mockup-placeholder">
                         <span class="ico">📊</span>
@@ -1228,7 +1248,7 @@ body {
 <section style="background:var(--dark);padding:80px 24px">
     <div style="max-width:1100px;margin:0 auto">
         <div style="text-align:center;margin-bottom:48px">
-            <div class="section-badge" style="background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.25);color:#34d399">Ils nous font confiance</div>
+            <div class="section-badge" style="background:rgba(99,102,241,.14);border-color:rgba(99,102,241,.3);color:#a5b4fc">Ils nous font confiance</div>
             <h2 class="section-title" style="color:#fff">Ce que disent<br><span>nos utilisateurs</span></h2>
         </div>
         <div class="proof-grid">
@@ -1236,7 +1256,7 @@ body {
                 <div class="proof-stars">★★★★★</div>
                 <p class="proof-text">"Depuis que j'utilise cette plateforme, mes ventes ont augmenté de 40%. Le suivi des livraisons en temps réel a vraiment changé la donne avec mes clients."</p>
                 <div class="proof-author">
-                    <div class="proof-av" style="background:#059669">AM</div>
+                    <div class="proof-av" style="background:linear-gradient(135deg,#6366f1,#4338ca)">AM</div>
                     <div>
                         <div class="proof-name">Aminata Camara</div>
                         <div class="proof-role">Propriétaire boutique · Conakry</div>
@@ -1400,8 +1420,8 @@ body {
     <div class="footer-inner">
         <div class="footer-brand">
             <a href="{{ url('/') }}" class="footer-logo">
-                  <div class="sb-logo-icon"><img src="/images/Shopio2.jpeg" alt="Shopio" style="width:40px;height:40px;object-fit:cover;border-radius:9px"></div>
-                {{ config('app.name', 'ShopManager') }}
+                <img src="/images/shopio3.jpeg" alt="Shopio" style="width:40px;height:40px;object-fit:cover;border-radius:10px;border:2px solid rgba(170,40,217,.4);box-shadow:0 0 0 3px rgba(41,29,149,.25)">
+                <span style="background:linear-gradient(90deg,#c4b5fd,#e879f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:800">{{ config('app.name', 'Shopio') }}</span>
             </a>
             <p class="footer-desc">La plateforme tout-en-un pour gérer votre boutique, vos livraisons et vos clients en Guinée.</p>
         </div>
@@ -1484,8 +1504,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const nav = document.querySelector('.top-nav');
     window.addEventListener('scroll', () => {
         nav.style.background = window.scrollY > 60
-            ? 'rgba(10,22,40,.98)'
-            : 'rgba(10,22,40,.92)';
+            ? 'rgba(10,10,30,.98)'
+            : 'rgba(10,10,30,.92)';
     });
 
     /* ── Hamburger menu mobile ───────────────────────────────────*/

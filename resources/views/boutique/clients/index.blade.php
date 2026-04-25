@@ -208,23 +208,27 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .page-title { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -.4px; margin: 0 0 4px; }
 .page-sub   { font-size: 13px; color: var(--text-2); margin: 0; }
 
-/* ── KPI mini ── */
+/* ── KPI Stats ── */
 .kpi-mini {
-    display: flex; gap: 12px; flex-wrap: wrap;
-    margin-bottom: 22px;
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
+    margin-bottom: 28px;
 }
 .kpi-chip {
     background: var(--surface);
-    border: 1px solid var(--border);
+    border: 1px solid rgba(99,102,241,.1);
     border-radius: var(--r);
-    padding: 14px 18px;
-    min-width: 150px;
-    box-shadow: var(--shadow-sm);
-    flex: 1;
+    padding: 22px 22px 18px;
+    box-shadow: 0 4px 20px rgba(99,102,241,.05),0 1px 4px rgba(0,0,0,.03);
+    display: flex; flex-direction: column;
+    transition: transform .2s, box-shadow .2s;
+    overflow: hidden; position: relative;
 }
-.kpi-chip-lbl { font-size: 10.5px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 4px; }
-.kpi-chip-val { font-size: 22px; font-weight: 700; color: var(--text); font-family: var(--mono); letter-spacing: -.5px; }
-.kpi-chip-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.kpi-chip::after { content:''; position:absolute; bottom:-16px; right:-16px; width:72px; height:72px; border-radius:50%; background:var(--k-accent,rgba(99,102,241,.07)); pointer-events:none; }
+.kpi-chip:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(99,102,241,.1),0 2px 8px rgba(0,0,0,.04); }
+.kpi-chip-ico { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:14px; background:var(--k-ico-bg,rgba(99,102,241,.1)); border:1.5px solid var(--k-ico-border,rgba(99,102,241,.2)); box-shadow:0 0 0 3px var(--k-ico-ring,rgba(99,102,241,.06)), 0 3px 10px var(--k-ico-glow,rgba(99,102,241,.15)); }
+.kpi-chip-lbl { font-size:10.5px; font-weight:700; color:var(--k-color,#6366f1); text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
+.kpi-chip-val { font-size:30px; font-weight:800; color:var(--text); font-family:var(--mono); letter-spacing:-1.2px; line-height:1; }
+.kpi-chip-sub { font-size:11px; color:var(--muted); margin-top:6px; }
 
 /* ── Barre recherche + tri ── */
 .toolbar {
@@ -324,34 +328,33 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 /* ── Pagination ── */
 .pagination-wrap { display: flex; justify-content: center; margin-top: 8px; }
 
-/* ── Couleurs avatars ── */
-.av-green  { background: #6366f1; }
-.av-blue   { background: #2563eb; }
-.av-amber  { background: #d97706; }
-.av-purple { background: #7c3aed; }
-.av-teal   { background: #0891b2; }
-.av-rose   { background: #e11d48; }
+/* ── Table premium ── */
+.tbl thead th {
+    background: linear-gradient(135deg,rgba(99,102,241,.05),rgba(139,92,246,.03));
+    border-bottom: 1px solid rgba(99,102,241,.1);
+    color: #6366f1;
+}
+.tbl tbody tr:hover td { background: rgba(99,102,241,.025); cursor: pointer; }
+.clients-card { border: 1px solid rgba(99,102,241,.1); box-shadow: 0 4px 20px rgba(99,102,241,.05),0 1px 4px rgba(0,0,0,.03); }
 
-/* ── TOP CLIENTS PODIUM ─────────────────────────────────────────
-   Card avec 5 colonnes représentant le classement du mois.
-   Chaque colonne : médaille + avatar + nom + barre + montant.
-   ─────────────────────────────────────────────────────────────── */
+/* ── TOP CLIENTS PREMIUM ── */
 .top-card {
     background: var(--surface);
-    border: 1px solid var(--border);
+    border: 1px solid rgba(99,102,241,.12);
     border-radius: var(--r);
     overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 22px;
+    box-shadow: 0 4px 24px rgba(99,102,241,.07),0 1px 4px rgba(0,0,0,.04);
+    margin-bottom: 28px;
 }
 .top-card-hd {
-    padding: 14px 18px;
-    border-bottom: 1px solid var(--border);
+    padding: 16px 22px 14px;
+    background: linear-gradient(135deg,rgba(99,102,241,.06) 0%,rgba(139,92,246,.03) 100%);
+    border-bottom: 1px solid rgba(99,102,241,.1);
     display: flex; align-items: center; justify-content: space-between;
 }
 .top-card-title {
-    font-size: 13px; font-weight: 700; color: var(--text);
-    display: flex; align-items: center; gap: 6px;
+    font-size: 13.5px; font-weight: 700; color: var(--text);
+    display: flex; align-items: center; gap: 8px;
 }
 .top-grid {
     display: grid;
@@ -360,50 +363,36 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 }
 .top-item {
     display: flex; flex-direction: column;
-    align-items: center; gap: 6px;
-    padding: 20px 12px 18px;
+    align-items: center; gap: 7px;
+    padding: 22px 12px 20px;
     border-right: 1px solid var(--border);
     text-decoration: none;
-    transition: background .15s;
+    transition: background .18s, transform .18s;
+    position: relative;
 }
+.top-item:first-child { background: linear-gradient(180deg,rgba(245,158,11,.04) 0%,transparent 100%); }
 .top-item:last-child { border-right: none; }
-.top-item:hover { background: var(--bg); }
+.top-item:hover { background: var(--bg); transform: translateY(-2px); }
 
-/* Médaille en grand */
-.top-medal { font-size: 22px; line-height: 1; }
-
-/* Avatar circulaire */
+.top-medal { font-size: 24px; line-height: 1; }
 .top-av {
-    width: 44px; height: 44px; border-radius: 50%;
+    width: 48px; height: 48px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 700; color: #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,.12);
+    font-size: 15px; font-weight: 800; color: #fff;
+    box-shadow: 0 3px 12px rgba(0,0,0,.18);
 }
-
-/* Nom du client */
+.top-item:first-child .top-av { width:56px; height:56px; font-size:17px; box-shadow:0 4px 18px rgba(245,158,11,.35); }
 .top-name {
     font-size: 12px; font-weight: 700; color: var(--text);
     text-align: center; line-height: 1.2;
 }
-
-/* Barre de progression */
 .top-bar-track {
-    width: 100%; height: 5px;
-    background: #eef1f0; border-radius: 3px; overflow: hidden;
+    width: 80%; height: 4px;
+    background: rgba(0,0,0,.06); border-radius: 3px; overflow: hidden;
 }
-.top-bar-fill {
-    height: 100%; border-radius: 3px;
-    transition: width 1s cubic-bezier(.23,1,.32,1);
-}
-
-/* Montant et nb commandes */
-.top-amount {
-    font-size: 11px; font-weight: 700; font-family: var(--mono);
-    color: var(--text); text-align: center;
-}
-.top-cmds {
-    font-size: 10px; color: var(--muted); text-align: center;
-}
+.top-bar-fill { height: 100%; border-radius: 3px; transition: width 1s cubic-bezier(.23,1,.32,1); }
+.top-amount { font-size: 11.5px; font-weight: 700; font-family: var(--mono); color: var(--text); text-align: center; }
+.top-cmds { font-size: 10px; color: var(--muted); text-align: center; }
 
 /* ══════════════════════════════════════════
    CARTES MOBILES — remplacent la table
@@ -492,7 +481,19 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 @php
     $parts    = explode(' ', auth()->user()->name);
-    $initials = strtoupper(substr($parts[0],0,1)) . strtoupper(substr($parts[1] ?? 'X',0,1));
+    $initials = strtoupper(substr($parts[0],0,1)) . (isset($parts[1]) ? strtoupper(substr($parts[1],0,1)) : strtoupper(substr($parts[0],1,1)));
+    $avPalette = [
+        'linear-gradient(135deg,#6366f1,#4338ca)',
+        'linear-gradient(135deg,#10b981,#059669)',
+        'linear-gradient(135deg,#f59e0b,#d97706)',
+        'linear-gradient(135deg,#8b5cf6,#6d28d9)',
+        'linear-gradient(135deg,#ef4444,#b91c1c)',
+        'linear-gradient(135deg,#14b8a6,#0d9488)',
+        'linear-gradient(135deg,#f97316,#ea580c)',
+        'linear-gradient(135deg,#06b6d4,#0891b2)',
+        'linear-gradient(135deg,#ec4899,#be185d)',
+        'linear-gradient(135deg,#84cc16,#4d7c0f)',
+    ];
     $pendingCount = $shop->orders()->whereIn('status',['pending','en attente','en_attente','confirmée','processing'])->count();
 @endphp
 
@@ -502,7 +503,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 <aside class="sidebar" id="sidebar">
     <div class="sb-brand">
         <a href="{{ route('boutique.dashboard') }}" class="sb-logo">
-            <div class="sb-logo-icon"><img src="/images/Shopio.jpeg" alt="Shopio" style="width:50px;height:50px;object-fit:cover;border-radius:9px"></div>
+            <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width:100%;height:100%;object-fit:cover;border-radius:9px"></div>
             <span class="sb-shop-name">{{ $shop->name }}</span>
         </a>
         <button class="sb-close" id="btnCloseSidebar" aria-label="Fermer le menu">✕</button>
@@ -629,24 +630,24 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
          ════════════════════════════════════════════════════════════ --}}
     <div class="kpi-mini">
 
-        {{-- Total clients distincts --}}
-        <div class="kpi-chip">
+        <div class="kpi-chip" style="border-top:3px solid #6366f1;--k-color:#6366f1;--k-accent:rgba(99,102,241,.08);--k-ico-bg:rgba(99,102,241,.1);--k-ico-border:rgba(99,102,241,.22);--k-ico-ring:rgba(99,102,241,.06);--k-ico-glow:rgba(99,102,241,.15)">
+            <div class="kpi-chip-ico">👥</div>
             <div class="kpi-chip-lbl">Total clients</div>
             <div class="kpi-chip-val">{{ $totalClients }}</div>
-            <div class="kpi-chip-sub">clients uniques</div>
+            <div class="kpi-chip-sub">clients uniques enregistrés</div>
         </div>
 
-        {{-- Nouveaux ce mois --}}
-        <div class="kpi-chip" style="border-top:3px solid #6366f1">
+        <div class="kpi-chip" style="border-top:3px solid #8b5cf6;--k-color:#8b5cf6;--k-accent:rgba(139,92,246,.08);--k-ico-bg:rgba(139,92,246,.1);--k-ico-border:rgba(139,92,246,.22);--k-ico-ring:rgba(139,92,246,.06);--k-ico-glow:rgba(139,92,246,.15)">
+            <div class="kpi-chip-ico">🆕</div>
             <div class="kpi-chip-lbl">Nouveaux ce mois</div>
-            <div class="kpi-chip-val" style="color:var(--brand)">{{ $nouveauxCeMois }}</div>
-            <div class="kpi-chip-sub">ont commandé ce mois</div>
+            <div class="kpi-chip-val" style="color:#8b5cf6">{{ $nouveauxCeMois }}</div>
+            <div class="kpi-chip-sub">ont commandé en {{ now()->translatedFormat('F') }}</div>
         </div>
 
-        {{-- CA total généré par les clients --}}
-        <div class="kpi-chip" style="border-top:3px solid #3b82f6">
+        <div class="kpi-chip" style="border-top:3px solid #3b82f6;--k-color:#3b82f6;--k-accent:rgba(59,130,246,.08);--k-ico-bg:rgba(59,130,246,.1);--k-ico-border:rgba(59,130,246,.22);--k-ico-ring:rgba(59,130,246,.06);--k-ico-glow:rgba(59,130,246,.15)">
+            <div class="kpi-chip-ico">💰</div>
             <div class="kpi-chip-lbl">CA total généré</div>
-            <div class="kpi-chip-val" style="color:#2563eb">{{ number_format($caTotal/1000, 0) }}k</div>
+            <div class="kpi-chip-val" style="color:#2563eb">{{ $caTotal >= 1000000 ? number_format($caTotal/1000000,1).'M' : number_format($caTotal/1000,0).'k' }}</div>
             <div class="kpi-chip-sub">{{ $shop->currency ?? 'GNF' }} cumulés</div>
         </div>
 
@@ -723,9 +724,15 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             ->take(5)
             ->get();
         $maxTop = $topClientsMonth->max('total_mois') ?: 1;
-        $avColors = ['av-green','av-blue','av-amber','av-purple','av-teal'];
-        $medailles = ['🥇','🥈','🥉','4e','5e'];
+        $medailles   = ['🥇','🥈','🥉','4ᵉ','5ᵉ'];
         $medalColors = ['#f59e0b','#9ca3af','#b45309','#6b7280','#6b7280'];
+        $medalBars   = [
+            'linear-gradient(90deg,#f59e0b,#d97706)',
+            'linear-gradient(90deg,#9ca3af,#6b7280)',
+            'linear-gradient(90deg,#cd7c2b,#b45309)',
+            'linear-gradient(90deg,#818cf8,#6366f1)',
+            'linear-gradient(90deg,#818cf8,#6366f1)',
+        ];
     @endphp
 
     @if($topClientsMonth->isNotEmpty())
@@ -739,27 +746,20 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         <div class="top-grid">
             @foreach($topClientsMonth as $i => $item)
             @php
-                $c     = $item->user;
+                $c    = $item->user;
                 if (!$c) continue;
-                $parts = explode(' ', $c->name ?? 'C L');
-                $init  = strtoupper(substr($parts[0],0,1)).strtoupper(substr($parts[1]??'X',0,1));
-                $col   = $avColors[$i % count($avColors)];
-                $pct   = round(($item->total_mois / $maxTop) * 100);
+                $tp   = explode(' ', $c->name ?? 'CL');
+                $init = strtoupper(substr($tp[0],0,1)).(isset($tp[1]) ? strtoupper(substr($tp[1],0,1)) : strtoupper(substr($tp[0],1,1)));
+                $cCol = $avPalette[$c->id % count($avPalette)];
+                $pct  = round(($item->total_mois / $maxTop) * 100);
             @endphp
             <a href="{{ route('boutique.clients.show', $c) }}" class="top-item">
-                {{-- Médaille --}}
-                <div class="top-medal" style="color:{{ $medalColors[$i] }}">
-                    {{ $medailles[$i] }}
-                </div>
-                {{-- Avatar --}}
-                <div class="top-av {{ $col }}">{{ $init }}</div>
-                {{-- Nom --}}
+                <div class="top-medal" style="color:{{ $medalColors[$i] }}">{{ $medailles[$i] }}</div>
+                <div class="top-av" style="background:{{ $cCol }}">{{ $init }}</div>
                 <div class="top-name">{{ Str::limit($c->name, 14) }}</div>
-                {{-- Barre de progression --}}
                 <div class="top-bar-track">
-                    <div class="top-bar-fill" data-pct="{{ $pct }}" style="width:0%;background:{{ $medalColors[$i] }}"></div>
+                    <div class="top-bar-fill" data-pct="{{ $pct }}" style="width:0%;background:{{ $medalBars[$i] }}"></div>
                 </div>
-                {{-- Montant --}}
                 <div class="top-amount">{{ number_format($item->total_mois/1000,0) }}k {{ $shop->currency ?? 'GNF' }}</div>
                 <div class="top-cmds">{{ $item->nb_cmd_mois }} cmd</div>
             </a>
@@ -773,10 +773,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
          Chaque ligne : avatar + nom + email + téléphone +
          montant total + nb commandes + dernière cmd + badge top + lien fiche
          ════════════════════════════════════════════════════════════ --}}
-    @php
-        $avCols    = ['av-green','av-blue','av-amber','av-purple','av-teal','av-rose'];
-        $medailles = ['🥇','🥈','🥉','4e','5e'];
-    @endphp
+    @php $medailles = ['🥇','🥈','🥉','4ᵉ','5ᵉ']; @endphp
 
     {{-- ════ TABLE DESKTOP (visible > 700px) ════ --}}
     <div class="clients-card clients-table">
@@ -805,16 +802,16 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 @php
                     $client = $item->user;
                     if (!$client) continue;
-                    $parts  = explode(' ', $client->name ?? 'C L');
-                    $init   = strtoupper(substr($parts[0],0,1)) . strtoupper(substr($parts[1] ?? 'X',0,1));
-                    $col    = $avCols[$i % count($avCols)];
-                    $isTop  = in_array($client->id, $topClientIds);
-                    $rang   = array_search($client->id, $topClientIds);
+                    $cp    = explode(' ', $client->name ?? 'CL');
+                    $init  = strtoupper(substr($cp[0],0,1)).(isset($cp[1]) ? strtoupper(substr($cp[1],0,1)) : strtoupper(substr($cp[0],1,1)));
+                    $cGrad = $avPalette[$client->id % count($avPalette)];
+                    $isTop = in_array($client->id, $topClientIds);
+                    $rang  = array_search($client->id, $topClientIds);
                 @endphp
                 <tr onclick="window.location='{{ route('boutique.clients.show', $client) }}'" style="cursor:pointer">
                     <td>
                         <div class="client-cell">
-                            <div class="c-av {{ $col }}">{{ $init }}</div>
+                            <div class="c-av" style="background:{{ $cGrad }}">{{ $init }}</div>
                             <div>
                                 <div class="c-name">{{ $client->name }}</div>
                                 @if($client->email)<div class="c-email">{{ $client->email }}</div>@endif
@@ -856,18 +853,18 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         @php
             $client = $item->user;
             if (!$client) continue;
-            $parts  = explode(' ', $client->name ?? 'C L');
-            $init   = strtoupper(substr($parts[0],0,1)) . strtoupper(substr($parts[1] ?? 'X',0,1));
-            $col    = $avCols[$i % count($avCols)];
-            $isTop  = in_array($client->id, $topClientIds);
-            $rang   = array_search($client->id, $topClientIds);
+            $cp    = explode(' ', $client->name ?? 'CL');
+            $init  = strtoupper(substr($cp[0],0,1)).(isset($cp[1]) ? strtoupper(substr($cp[1],0,1)) : strtoupper(substr($cp[0],1,1)));
+            $cGrad = $avPalette[$client->id % count($avPalette)];
+            $isTop = in_array($client->id, $topClientIds);
+            $rang  = array_search($client->id, $topClientIds);
         @endphp
         <div class="m-client-card">
 
             {{-- Header : avatar + nom + badge top ── --}}
             <div class="m-client-hd">
                 <div class="m-client-info">
-                    <div class="c-av {{ $col }}" style="width:38px;height:38px;font-size:12px;flex-shrink:0">{{ $init }}</div>
+                    <div class="c-av" style="background:{{ $cGrad }};width:38px;height:38px;font-size:12px;flex-shrink:0">{{ $init }}</div>
                     <div style="flex:1;min-width:0">
                         <div class="c-name" style="font-size:13.5px">{{ $client->name }}</div>
                         @if($client->phone)

@@ -3,6 +3,7 @@
 
 @section('title', $product->name)
 
+
 @php
     $gallery = $product->gallery ? json_decode($product->gallery, true) : [];
 @endphp
