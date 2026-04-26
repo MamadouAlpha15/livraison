@@ -12,7 +12,7 @@ use App\Notifications\OrderStatusNotification;
 
 class OrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $shopId = Auth::user()->currentShopId();
         if (!$shopId) {
@@ -20,23 +20,47 @@ class OrderController extends Controller
                 ->with('error', 'Aucune boutique rattachée à votre compte.');
         }
 
-        $orders = Order::with(['client', 'shop', 'livreur', 'items.product'])
+        $q = Order::with(['client', 'shop', 'livreur', 'items.product'])
             ->inShop($shopId)
-            ->latest()
-            ->paginate(10);
+            ->latest();
+
+        // Filtre recherche (client name ou order id)
+        if ($search = $request->get('search')) {
+            $q->where(function ($query) use ($search) {
+                $query->whereHas('client', fn($c) => $c->where('name', 'like', "%{$search}%"))
+                      ->orWhere('id', is_numeric($search) ? $search : null);
+            });
+        }
+
+        // Filtre statut
+        if ($status = $request->get('status')) {
+            $q->where('status', $status);
+        }
+
+        // Filtre date
+        $dateFilter = $request->get('date', 'all');
+        $dateFrom   = $request->get('from');
+        $dateTo     = $request->get('to');
+        match ($dateFilter) {
+            'today'  => $q->whereDate('created_at', today()),
+            'week'   => $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+            'month'  => $q->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year),
+            'custom' => $q->when($dateFrom, fn($qq) => $qq->whereDate('created_at', '>=', $dateFrom))
+                          ->when($dateTo,   fn($qq) => $qq->whereDate('created_at', '<=', $dateTo)),
+            default  => null,
+        };
+
+        $orders = $q->paginate(15)->withQueryString();
 
         $livreurs = User::livreurs()->inShop($shopId)->orderBy('name')->get();
         $shop     = Auth::user()->shop ?? Auth::user()->assignedShop;
         $devise   = $shop?->currency ?? 'GNF';
 
-        // Récupérer tous les messages de la boutique
-        // groupés par (client_id - product_id)
         $clientMessages = ShopMessage::where('shop_id', $shopId)
             ->with(['sender', 'receiver', 'product'])
             ->orderBy('created_at')
             ->get()
             ->groupBy(function ($m) {
-                // Le client = celui dont le role est 'client'
                 $clientId = optional($m->sender)->role === 'client'
                     ? $m->sender_id
                     : $m->receiver_id;
@@ -44,7 +68,8 @@ class OrderController extends Controller
             });
 
         return view('employe.orders.index', compact(
-            'orders', 'livreurs', 'devise', 'shop', 'clientMessages'
+            'orders', 'livreurs', 'devise', 'shop', 'clientMessages',
+            'search', 'status', 'dateFilter', 'dateFrom', 'dateTo'
         ));
     }
 

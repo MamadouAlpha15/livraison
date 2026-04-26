@@ -1,16 +1,106 @@
 <x-guest-layout>
 
-    <div class="ab-title">Créer un compte 🚀</div>
-    <p class="ab-sub">Rejoignez des milliers d'utilisateurs sur Shopio</p>
+@php
+$hasStep2Error = $errors->hasAny(['country','phone','address']);
+$startStep     = ($errors->any() && !$errors->hasAny(['name','email','password','role']) && $hasStep2Error) ? 2
+               : ($errors->any() ? 1 : 1);
+$countries = [
+    'BJ'=>['🇧🇯','Bénin'],'BF'=>['🇧🇫','Burkina Faso'],'CV'=>['🇨🇻','Cap-Vert'],
+    'CI'=>['🇨🇮',"Côte d'Ivoire"],'GM'=>['🇬🇲','Gambie'],'GH'=>['🇬🇭','Ghana'],
+    'GN'=>['🇬🇳','Guinée'],'GW'=>['🇬🇼','Guinée-Bissau'],'GQ'=>['🇬🇶','Guinée équatoriale'],
+    'LR'=>['🇱🇷','Libéria'],'ML'=>['🇲🇱','Mali'],'MR'=>['🇲🇷','Mauritanie'],
+    'NE'=>['🇳🇪','Niger'],'NG'=>['🇳🇬','Nigeria'],'SN'=>['🇸🇳','Sénégal'],
+    'SL'=>['🇸🇱','Sierra Leone'],'TG'=>['🇹🇬','Togo'],
+    'AO'=>['🇦🇴','Angola'],'CM'=>['🇨🇲','Cameroun'],'CF'=>['🇨🇫','Centrafrique'],
+    'TD'=>['🇹🇩','Tchad'],'CG'=>['🇨🇬','Congo'],'CD'=>['🇨🇩','RD Congo'],
+    'GA'=>['🇬🇦','Gabon'],'ST'=>['🇸🇹','São Tomé-et-Príncipe'],
+    'BI'=>['🇧🇮','Burundi'],'KM'=>['🇰🇲','Comores'],'DJ'=>['🇩🇯','Djibouti'],
+    'ER'=>['🇪🇷','Érythrée'],'ET'=>['🇪🇹','Éthiopie'],'KE'=>['🇰🇪','Kenya'],
+    'MG'=>['🇲🇬','Madagascar'],'MW'=>['🇲🇼','Malawi'],'MU'=>['🇲🇺','Maurice'],
+    'MZ'=>['🇲🇿','Mozambique'],'RW'=>['🇷🇼','Rwanda'],'SC'=>['🇸🇨','Seychelles'],
+    'SO'=>['🇸🇴','Somalie'],'SS'=>['🇸🇸','Soudan du Sud'],'SD'=>['🇸🇩','Soudan'],
+    'TZ'=>['🇹🇿','Tanzanie'],'UG'=>['🇺🇬','Ouganda'],'ZM'=>['🇿🇲','Zambie'],'ZW'=>['🇿🇼','Zimbabwe'],
+    'BW'=>['🇧🇼','Botswana'],'LS'=>['🇱🇸','Lesotho'],'NA'=>['🇳🇦','Namibie'],
+    'ZA'=>['🇿🇦','Afrique du Sud'],'SZ'=>['🇸🇿','Eswatini'],
+    'DZ'=>['🇩🇿','Algérie'],'EG'=>['🇪🇬','Égypte'],'LY'=>['🇱🇾','Libye'],
+    'MA'=>['🇲🇦','Maroc'],'TN'=>['🇹🇳','Tunisie'],
+    'AL'=>['🇦🇱','Albanie'],'DE'=>['🇩🇪','Allemagne'],'AT'=>['🇦🇹','Autriche'],
+    'BE'=>['🇧🇪','Belgique'],'FR'=>['🇫🇷','France'],'GB'=>['🇬🇧','Royaume-Uni'],
+    'IT'=>['🇮🇹','Italie'],'ES'=>['🇪🇸','Espagne'],'PT'=>['🇵🇹','Portugal'],
+    'NL'=>['🇳🇱','Pays-Bas'],'CH'=>['🇨🇭','Suisse'],'BE'=>['🇧🇪','Belgique'],
+    'CA'=>['🇨🇦','Canada'],'US'=>['🇺🇸','États-Unis'],'BR'=>['🇧🇷','Brésil'],
+    'AR'=>['🇦🇷','Argentine'],'MX'=>['🇲🇽','Mexique'],
+    'CN'=>['🇨🇳','Chine'],'JP'=>['🇯🇵','Japon'],'IN'=>['🇮🇳','Inde'],
+    'AU'=>['🇦🇺','Australie'],'NZ'=>['🇳🇿','Nouvelle-Zélande'],
+];
+@endphp
 
-    @if ($errors->any())
-        <div class="f-alert" style="background:#fef2f2;color:#991b1b;border:1px solid #fecaca;margin-bottom:18px">
-            {{ $errors->first() }}
-        </div>
-    @endif
+<style>
+/* ── Stepper ── */
+.ms-stepper{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:28px}
+.ms-step{display:flex;flex-direction:column;align-items:center;gap:5px;position:relative}
+.ms-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;transition:all .3s;border:2px solid #e5e7eb;background:#f9fafb;color:#9ca3af}
+.ms-dot.done{background:#10b981;border-color:#10b981;color:#fff}
+.ms-dot.active{background:#6366f1;border-color:#6366f1;color:#fff;box-shadow:0 0 0 4px rgba(99,102,241,.15)}
+.ms-label{font-size:10.5px;font-weight:600;color:#9ca3af;letter-spacing:.3px;white-space:nowrap}
+.ms-label.active{color:#6366f1}
+.ms-label.done{color:#10b981}
+.ms-line{width:60px;height:2px;background:#e5e7eb;margin:0 4px;margin-bottom:18px;transition:background .3s;flex-shrink:0}
+.ms-line.done{background:#10b981}
 
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+/* ── Steps ── */
+.reg-step{display:none;animation:fadeSlide .25s ease}
+.reg-step.active{display:block}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Nav buttons ── */
+.step-nav{display:flex;gap:10px;margin-top:6px}
+.btn-back{flex:0 0 auto;padding:0 20px;height:46px;border-radius:10px;border:1.5px solid #e5e7eb;background:#fff;color:#374151;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
+.btn-back:hover{border-color:#6366f1;color:#6366f1}
+.btn-next{flex:1;height:46px;border-radius:10px;border:none;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.2px}
+.btn-next:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(99,102,241,.35)}
+.btn-submit{width:100%;height:46px;border-radius:10px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.2px;margin-top:6px}
+.btn-submit:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(16,185,129,.35)}
+
+/* ── Inline errors ── */
+.f-input-err{border-color:#f87171!important;background:#fff5f5!important}
+.f-inline-err{font-size:11.5px;color:#ef4444;margin-top:4px;display:none}
+.f-inline-err.show{display:block}
+.f-input.valid{border-color:#10b981!important}
+
+/* ── Hint ── */
+.f-hint{font-size:11.5px;color:#9ca3af;margin-top:5px}
+</style>
+
+{{-- Titre --}}
+<div class="ab-title">Créer un compte 🚀</div>
+<p class="ab-sub">Rejoignez des milliers d'utilisateurs sur Shopio</p>
+
+{{-- Erreur serveur globale --}}
+@if ($errors->any())
+<div class="f-alert" style="background:#fef2f2;color:#991b1b;border:1px solid #fecaca;margin-bottom:18px;padding:10px 14px;border-radius:8px;font-size:13px">
+    {{ $errors->first() }}
+</div>
+@endif
+
+{{-- Stepper visuel --}}
+<div class="ms-stepper" id="stepper">
+    <div class="ms-step">
+        <div class="ms-dot active" id="dot1">1</div>
+        <span class="ms-label active" id="lbl1">Identité</span>
+    </div>
+    <div class="ms-line" id="line1"></div>
+    <div class="ms-step">
+        <div class="ms-dot" id="dot2">2</div>
+        <span class="ms-label" id="lbl2">Coordonnées</span>
+    </div>
+</div>
+
+<form method="POST" action="{{ route('register') }}" id="regForm" novalidate>
+    @csrf
+
+    {{-- ══════════════ ÉTAPE 1 ══════════════ --}}
+    <div class="reg-step active" id="step1">
 
         {{-- Rôle --}}
         <div class="f-group">
@@ -20,13 +110,13 @@
                 <div class="role-card {{ old('role','client') === 'client'  ? 'active':'' }}" onclick="setRole('client',this)">
                     <span class="rc-ico">🛒</span>Client
                 </div>
-                <div class="role-card {{ old('role') === 'admin'            ? 'active':'' }}" onclick="setRole('admin',this)">
+                <div class="role-card {{ old('role') === 'admin'   ? 'active':'' }}" onclick="setRole('admin',this)">
                     <span class="rc-ico">🏪</span>Admin boutique
                 </div>
-                <div class="role-card {{ old('role') === 'company'          ? 'active':'' }}" onclick="setRole('company',this)">
+                <div class="role-card {{ old('role') === 'company' ? 'active':'' }}" onclick="setRole('company',this)">
                     <span class="rc-ico">🚚</span>Entreprise livraison
                 </div>
-                <div class="role-card {{ old('role') === 'livreur'          ? 'active':'' }}" onclick="setRole('livreur',this)">
+                <div class="role-card {{ old('role') === 'livreur' ? 'active':'' }}" onclick="setRole('livreur',this)">
                     <span class="rc-ico">🛵</span>Livreur
                 </div>
             </div>
@@ -40,9 +130,12 @@
                 <span class="f-ico">👤</span>
                 <input id="name" class="f-input {{ $errors->has('name') ? 'f-input-err':'' }}"
                        type="text" name="name" value="{{ old('name') }}"
-                       required autofocus autocomplete="name" placeholder="Votre nom complet">
+                       autocomplete="name" placeholder="Votre nom complet"
+                       oninput="liveCheck(this,'nameErr','name')">
             </div>
-            @error('name')<p class="f-error">{{ $message }}</p>@enderror
+            <p class="f-inline-err {{ $errors->has('name') ? 'show':'' }}" id="nameErr">
+                {{ $errors->first('name') ?? 'Ce champ est requis.' }}
+            </p>
         </div>
 
         {{-- Email --}}
@@ -52,89 +145,61 @@
                 <span class="f-ico">✉️</span>
                 <input id="email" class="f-input {{ $errors->has('email') ? 'f-input-err':'' }}"
                        type="email" name="email" value="{{ old('email') }}"
-                       required autocomplete="username" placeholder="exemple@email.com">
+                       autocomplete="username" placeholder="exemple@email.com"
+                       oninput="liveCheck(this,'emailErr','email')">
             </div>
-            @error('email')<p class="f-error">{{ $message }}</p>@enderror
+            <p class="f-inline-err {{ $errors->has('email') ? 'show':'' }}" id="emailErr">
+                {{ $errors->first('email') ?? 'Entrez une adresse email valide.' }}
+            </p>
         </div>
+
+        {{-- Mot de passe --}}
+        <div class="f-group">
+            <label class="f-label" for="password">Mot de passe</label>
+            <div class="f-icon-wrap f-pw-wrap">
+                <span class="f-ico">🔒</span>
+                <input id="password" class="f-input {{ $errors->has('password') ? 'f-input-err':'' }}"
+                       type="password" name="password" autocomplete="new-password" placeholder="Min. 8 caractères"
+                       oninput="liveCheck(this,'pwErr','password')">
+                <button type="button" class="f-pw-eye" onclick="togglePw('password',this)">👁️</button>
+            </div>
+            <p class="f-inline-err {{ $errors->has('password') ? 'show':'' }}" id="pwErr">
+                {{ $errors->first('password') ?? 'Minimum 8 caractères requis.' }}
+            </p>
+        </div>
+
+        {{-- Confirmation --}}
+        <div class="f-group">
+            <label class="f-label" for="password_confirmation">Confirmer le mot de passe</label>
+            <div class="f-icon-wrap f-pw-wrap">
+                <span class="f-ico">🔒</span>
+                <input id="password_confirmation" class="f-input"
+                       type="password" name="password_confirmation"
+                       autocomplete="new-password" placeholder="Répéter le mot de passe"
+                       oninput="checkConfirm()">
+                <button type="button" class="f-pw-eye" onclick="togglePw('password_confirmation',this)">👁️</button>
+            </div>
+            <p class="f-inline-err" id="confirmErr">Les mots de passe ne correspondent pas.</p>
+        </div>
+
+        <button type="button" class="btn-next" onclick="goStep2()">Suivant →</button>
+
+        <p style="text-align:center;margin-top:16px;font-size:13px;color:#6b7280">
+            Déjà inscrit ? <a href="{{ route('login') }}" class="auth-link">Se connecter</a>
+        </p>
+    </div>
+
+    {{-- ══════════════ ÉTAPE 2 ══════════════ --}}
+    <div class="reg-step" id="step2">
 
         {{-- Pays --}}
         <div class="f-group">
             <label class="f-label" for="country">🌍 Votre pays</label>
             <div class="f-flag-wrap">
                 <span class="f-flag-preview" id="flagPreview">🌍</span>
-                <select id="country" name="country" class="f-select" required onchange="updateFlag(this)">
+                <select id="country" name="country" class="f-select {{ $errors->has('country') ? 'f-input-err':'' }}"
+                        onchange="updateFlag(this)">
                     <option value="">-- Sélectionner votre pays --</option>
-                    @php
-                    $countries = [
-                        /* ── Afrique de l'Ouest ── */
-                        'BJ'=>['🇧🇯','Bénin'],'BF'=>['🇧🇫','Burkina Faso'],'CV'=>['🇨🇻','Cap-Vert'],
-                        'CI'=>['🇨🇮','Côte d\'Ivoire'],'GM'=>['🇬🇲','Gambie'],'GH'=>['🇬🇭','Ghana'],
-                        'GN'=>['🇬🇳','Guinée'],'GW'=>['🇬🇼','Guinée-Bissau'],'GQ'=>['🇬🇶','Guinée équatoriale'],
-                        'LR'=>['🇱🇷','Libéria'],'ML'=>['🇲🇱','Mali'],'MR'=>['🇲🇷','Mauritanie'],
-                        'NE'=>['🇳🇪','Niger'],'NG'=>['🇳🇬','Nigeria'],'SN'=>['🇸🇳','Sénégal'],
-                        'SL'=>['🇸🇱','Sierra Leone'],'TG'=>['🇹🇬','Togo'],
-                        /* ── Afrique Centrale ── */
-                        'AO'=>['🇦🇴','Angola'],'CM'=>['🇨🇲','Cameroun'],'CF'=>['🇨🇫','Centrafrique'],
-                        'TD'=>['🇹🇩','Tchad'],'CG'=>['🇨🇬','Congo'],'CD'=>['🇨🇩','RD Congo'],
-                        'GA'=>['🇬🇦','Gabon'],'ST'=>['🇸🇹','São Tomé-et-Príncipe'],
-                        /* ── Afrique de l'Est ── */
-                        'BI'=>['🇧🇮','Burundi'],'KM'=>['🇰🇲','Comores'],'DJ'=>['🇩🇯','Djibouti'],
-                        'ER'=>['🇪🇷','Érythrée'],'ET'=>['🇪🇹','Éthiopie'],'KE'=>['🇰🇪','Kenya'],
-                        'MG'=>['🇲🇬','Madagascar'],'MW'=>['🇲🇼','Malawi'],'MU'=>['🇲🇺','Maurice'],
-                        'MZ'=>['🇲🇿','Mozambique'],'RW'=>['🇷🇼','Rwanda'],'SC'=>['🇸🇨','Seychelles'],
-                        'SO'=>['🇸🇴','Somalie'],'SS'=>['🇸🇸','Soudan du Sud'],'SD'=>['🇸🇩','Soudan'],
-                        'TZ'=>['🇹🇿','Tanzanie'],'UG'=>['🇺🇬','Ouganda'],'ZM'=>['🇿🇲','Zambie'],'ZW'=>['🇿🇼','Zimbabwe'],
-                        /* ── Afrique Australe ── */
-                        'BW'=>['🇧🇼','Botswana'],'LS'=>['🇱🇸','Lesotho'],'NA'=>['🇳🇦','Namibie'],
-                        'ZA'=>['🇿🇦','Afrique du Sud'],'SZ'=>['🇸🇿','Eswatini'],
-                        /* ── Afrique du Nord ── */
-                        'DZ'=>['🇩🇿','Algérie'],'EG'=>['🇪🇬','Égypte'],'LY'=>['🇱🇾','Libye'],
-                        'MA'=>['🇲🇦','Maroc'],'TN'=>['🇹🇳','Tunisie'],
-                        /* ── Europe ── */
-                        'AL'=>['🇦🇱','Albanie'],'DE'=>['🇩🇪','Allemagne'],'AT'=>['🇦🇹','Autriche'],
-                        'BE'=>['🇧🇪','Belgique'],'BY'=>['🇧🇾','Biélorussie'],'BA'=>['🇧🇦','Bosnie-Herzégovine'],
-                        'BG'=>['🇧🇬','Bulgarie'],'HR'=>['🇭🇷','Croatie'],'CY'=>['🇨🇾','Chypre'],
-                        'CZ'=>['🇨🇿','Tchéquie'],'DK'=>['🇩🇰','Danemark'],'ES'=>['🇪🇸','Espagne'],
-                        'EE'=>['🇪🇪','Estonie'],'FI'=>['🇫🇮','Finlande'],'FR'=>['🇫🇷','France'],
-                        'GR'=>['🇬🇷','Grèce'],'HU'=>['🇭🇺','Hongrie'],'IE'=>['🇮🇪','Irlande'],
-                        'IT'=>['🇮🇹','Italie'],'LV'=>['🇱🇻','Lettonie'],'LT'=>['🇱🇹','Lituanie'],
-                        'LU'=>['🇱🇺','Luxembourg'],'MK'=>['🇲🇰','Macédoine du Nord'],'MT'=>['🇲🇹','Malte'],
-                        'MD'=>['🇲🇩','Moldavie'],'ME'=>['🇲🇪','Monténégro'],'NL'=>['🇳🇱','Pays-Bas'],
-                        'NO'=>['🇳🇴','Norvège'],'PL'=>['🇵🇱','Pologne'],'PT'=>['🇵🇹','Portugal'],
-                        'RO'=>['🇷🇴','Roumanie'],'GB'=>['🇬🇧','Royaume-Uni'],'RU'=>['🇷🇺','Russie'],
-                        'RS'=>['🇷🇸','Serbie'],'SK'=>['🇸🇰','Slovaquie'],'SI'=>['🇸🇮','Slovénie'],
-                        'SE'=>['🇸🇪','Suède'],'CH'=>['🇨🇭','Suisse'],'UA'=>['🇺🇦','Ukraine'],
-                        /* ── Amériques ── */
-                        'AR'=>['🇦🇷','Argentine'],'BO'=>['🇧🇴','Bolivie'],'BR'=>['🇧🇷','Brésil'],
-                        'CA'=>['🇨🇦','Canada'],'CL'=>['🇨🇱','Chili'],'CO'=>['🇨🇴','Colombie'],
-                        'CR'=>['🇨🇷','Costa Rica'],'CU'=>['🇨🇺','Cuba'],'DO'=>['🇩🇴','Rép. Dominicaine'],
-                        'EC'=>['🇪🇨','Équateur'],'SV'=>['🇸🇻','Salvador'],'GT'=>['🇬🇹','Guatemala'],
-                        'HT'=>['🇭🇹','Haïti'],'HN'=>['🇭🇳','Honduras'],'JM'=>['🇯🇲','Jamaïque'],
-                        'MX'=>['🇲🇽','Mexique'],'NI'=>['🇳🇮','Nicaragua'],'PA'=>['🇵🇦','Panama'],
-                        'PY'=>['🇵🇾','Paraguay'],'PE'=>['🇵🇪','Pérou'],'PR'=>['🇵🇷','Porto Rico'],
-                        'TT'=>['🇹🇹','Trinité-et-Tobago'],'US'=>['🇺🇸','États-Unis'],
-                        'UY'=>['🇺🇾','Uruguay'],'VE'=>['🇻🇪','Venezuela'],
-                        /* ── Asie ── */
-                        'SA'=>['🇸🇦','Arabie Saoudite'],'AM'=>['🇦🇲','Arménie'],'AZ'=>['🇦🇿','Azerbaïdjan'],
-                        'BH'=>['🇧🇭','Bahreïn'],'BD'=>['🇧🇩','Bangladesh'],'KH'=>['🇰🇭','Cambodge'],
-                        'CN'=>['🇨🇳','Chine'],'KP'=>['🇰🇵','Corée du Nord'],'KR'=>['🇰🇷','Corée du Sud'],
-                        'AE'=>['🇦🇪','Émirats arabes unis'],'GE'=>['🇬🇪','Géorgie'],'IN'=>['🇮🇳','Inde'],
-                        'ID'=>['🇮🇩','Indonésie'],'IQ'=>['🇮🇶','Irak'],'IR'=>['🇮🇷','Iran'],
-                        'IL'=>['🇮🇱','Israël'],'JP'=>['🇯🇵','Japon'],'JO'=>['🇯🇴','Jordanie'],
-                        'KZ'=>['🇰🇿','Kazakhstan'],'KW'=>['🇰🇼','Koweït'],'KG'=>['🇰🇬','Kirghizistan'],
-                        'LA'=>['🇱🇦','Laos'],'LB'=>['🇱🇧','Liban'],'MY'=>['🇲🇾','Malaisie'],
-                        'MV'=>['🇲🇻','Maldives'],'MN'=>['🇲🇳','Mongolie'],'MM'=>['🇲🇲','Myanmar'],
-                        'NP'=>['🇳🇵','Népal'],'OM'=>['🇴🇲','Oman'],'UZ'=>['🇺🇿','Ouzbékistan'],
-                        'PK'=>['🇵🇰','Pakistan'],'PS'=>['🇵🇸','Palestine'],'PH'=>['🇵🇭','Philippines'],
-                        'QA'=>['🇶🇦','Qatar'],'SG'=>['🇸🇬','Singapour'],'LK'=>['🇱🇰','Sri Lanka'],
-                        'SY'=>['🇸🇾','Syrie'],'TJ'=>['🇹🇯','Tadjikistan'],'TW'=>['🇹🇼','Taïwan'],
-                        'TH'=>['🇹🇭','Thaïlande'],'TM'=>['🇹🇲','Turkménistan'],'TR'=>['🇹🇷','Turquie'],
-                        'VN'=>['🇻🇳','Vietnam'],'YE'=>['🇾🇪','Yémen'],
-                        /* ── Océanie ── */
-                        'AU'=>['🇦🇺','Australie'],'FJ'=>['🇫🇯','Fidji'],'NZ'=>['🇳🇿','Nouvelle-Zélande'],
-                        'PG'=>['🇵🇬','Papouasie-Nouvelle-Guinée'],'WS'=>['🇼🇸','Samoa'],'VU'=>['🇻🇺','Vanuatu'],
-                    ];
-                    @endphp
                     @foreach($countries as $code => $info)
                     <option value="{{ $code }}" data-flag="{{ $info[0] }}" {{ old('country') === $code ? 'selected':'' }}>
                         {{ $info[0] }} {{ $info[1] }}
@@ -168,67 +233,131 @@
             @error('address')<p class="f-error">{{ $message }}</p>@enderror
         </div>
 
-        {{-- Mot de passe --}}
-        <div class="f-group">
-            <label class="f-label" for="password">Mot de passe</label>
-            <div class="f-icon-wrap f-pw-wrap">
-                <span class="f-ico">🔒</span>
-                <input id="password" class="f-input {{ $errors->has('password') ? 'f-input-err':'' }}"
-                       type="password" name="password" required autocomplete="new-password" placeholder="Min. 8 caractères">
-                <button type="button" class="f-pw-eye" onclick="togglePw('password',this)">👁️</button>
-            </div>
-            @error('password')<p class="f-error">{{ $message }}</p>@enderror
+        <div class="step-nav">
+            <button type="button" class="btn-back" onclick="goStep1()">← Retour</button>
+            <button type="submit" class="btn-next">Créer mon compte ✓</button>
         </div>
 
-        {{-- Confirmation --}}
-        <div class="f-group">
-            <label class="f-label" for="password_confirmation">Confirmer le mot de passe</label>
-            <div class="f-icon-wrap f-pw-wrap">
-                <span class="f-ico">🔒</span>
-                <input id="password_confirmation" class="f-input"
-                       type="password" name="password_confirmation"
-                       required autocomplete="new-password" placeholder="Répéter le mot de passe">
-                <button type="button" class="f-pw-eye" onclick="togglePw('password_confirmation',this)">👁️</button>
-            </div>
-        </div>
-
-        <button type="submit" class="btn-auth">Créer mon compte →</button>
-
-        <p style="text-align:center;margin-top:18px;font-size:13px;color:#6b7280">
-            Déjà inscrit ?
-            <a href="{{ route('login') }}" class="auth-link">Se connecter</a>
+        <p style="text-align:center;margin-top:16px;font-size:13px;color:#6b7280">
+            Déjà inscrit ? <a href="{{ route('login') }}" class="auth-link">Se connecter</a>
         </p>
-    </form>
+    </div>
 
-    <script>
-        function setRole(val, el) {
-            document.getElementById('roleInput').value = val;
-            document.querySelectorAll('.role-card').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-            var hide = val === 'admin' || val === 'company';
-            document.getElementById('phoneField').style.display   = hide ? 'none' : 'block';
-            document.getElementById('addressField').style.display = hide ? 'none' : 'block';
-        }
-        function updateFlag(select) {
-            var opt  = select.options[select.selectedIndex];
-            var flag = opt.getAttribute('data-flag') || '🌍';
-            document.getElementById('flagPreview').textContent = flag;
-        }
-        function togglePw(id, btn) {
-            var inp = document.getElementById(id);
-            if (inp.type === 'password') { inp.type = 'text';     btn.textContent = '🙈'; }
-            else                         { inp.type = 'password'; btn.textContent = '👁️'; }
-        }
-        document.addEventListener('DOMContentLoaded', function () {
-            var cs = document.getElementById('country');
-            if (cs && cs.value) updateFlag(cs);
-            // Restore toggle fields based on old role
-            var cur = document.getElementById('roleInput').value;
-            if (cur === 'admin' || cur === 'company') {
-                document.getElementById('phoneField').style.display   = 'none';
-                document.getElementById('addressField').style.display = 'none';
-            }
-        });
-    </script>
+</form>
+
+<script>
+var currentStep = {{ $startStep }};
+
+function setStep(n) {
+    currentStep = n;
+    document.getElementById('step1').classList.toggle('active', n === 1);
+    document.getElementById('step2').classList.toggle('active', n === 2);
+
+    // Stepper dots
+    var dot1 = document.getElementById('dot1'), lbl1 = document.getElementById('lbl1');
+    var dot2 = document.getElementById('dot2'), lbl2 = document.getElementById('lbl2');
+    var line1 = document.getElementById('line1');
+
+    dot1.className = 'ms-dot ' + (n === 1 ? 'active' : 'done');
+    dot1.textContent = n === 1 ? '1' : '✓';
+    lbl1.className   = 'ms-label ' + (n === 1 ? 'active' : 'done');
+    dot2.className   = 'ms-dot ' + (n === 2 ? 'active' : '');
+    lbl2.className   = 'ms-label ' + (n === 2 ? 'active' : '');
+    line1.className  = 'ms-line ' + (n === 2 ? 'done' : '');
+}
+
+function goStep2() {
+    var ok = true;
+
+    var name = document.getElementById('name');
+    if (!name.value.trim()) {
+        showErr('nameErr', 'Le nom est requis.'); markErr(name); ok = false;
+    } else { hideErr('nameErr'); markOk(name); }
+
+    var email = document.getElementById('email');
+    if (!email.value.trim() || !email.value.includes('@')) {
+        showErr('emailErr', 'Entrez une adresse email valide.'); markErr(email); ok = false;
+    } else { hideErr('emailErr'); markOk(email); }
+
+    var pw = document.getElementById('password');
+    if (pw.value.length < 8) {
+        showErr('pwErr', 'Minimum 8 caractères requis.'); markErr(pw); ok = false;
+    } else { hideErr('pwErr'); markOk(pw); }
+
+    var conf = document.getElementById('password_confirmation');
+    if (conf.value !== pw.value || conf.value === '') {
+        showErr('confirmErr', 'Les mots de passe ne correspondent pas.'); markErr(conf); ok = false;
+    } else { hideErr('confirmErr'); markOk(conf); }
+
+    if (ok) setStep(2);
+    else document.getElementById('name').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function goStep1() { setStep(1); }
+
+function liveCheck(inp, errId, type) {
+    if (type === 'name' && inp.value.trim()) { hideErr(errId); markOk(inp); }
+    if (type === 'email' && inp.value.includes('@') && inp.value.includes('.')) { hideErr(errId); markOk(inp); }
+    if (type === 'password' && inp.value.length >= 8) { hideErr(errId); markOk(inp); checkConfirm(); }
+}
+
+function checkConfirm() {
+    var pw   = document.getElementById('password').value;
+    var conf = document.getElementById('password_confirmation');
+    if (conf.value && conf.value === pw) { hideErr('confirmErr'); markOk(conf); }
+    else if (conf.value) { showErr('confirmErr', 'Les mots de passe ne correspondent pas.'); markErr(conf); }
+}
+
+function showErr(id, msg) {
+    var el = document.getElementById(id);
+    if (el) { if (msg) el.textContent = msg; el.classList.add('show'); }
+}
+function hideErr(id) {
+    var el = document.getElementById(id); if (el) el.classList.remove('show');
+}
+function markErr(inp) {
+    inp.classList.add('f-input-err'); inp.classList.remove('valid');
+}
+function markOk(inp) {
+    inp.classList.remove('f-input-err'); inp.classList.add('valid');
+}
+
+function setRole(val, el) {
+    document.getElementById('roleInput').value = val;
+    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    var hide = val === 'admin' || val === 'company';
+    document.getElementById('phoneField').style.display   = hide ? 'none' : 'block';
+    document.getElementById('addressField').style.display = hide ? 'none' : 'block';
+}
+
+function updateFlag(select) {
+    var opt  = select.options[select.selectedIndex];
+    var flag = opt.getAttribute('data-flag') || '🌍';
+    document.getElementById('flagPreview').textContent = flag;
+}
+
+function togglePw(id, btn) {
+    var inp = document.getElementById(id);
+    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+    else { inp.type = 'password'; btn.textContent = '👁️'; }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Init flag
+    var cs = document.getElementById('country');
+    if (cs && cs.value) updateFlag(cs);
+
+    // Restore role visibility
+    var cur = document.getElementById('roleInput').value;
+    if (cur === 'admin' || cur === 'company') {
+        document.getElementById('phoneField').style.display   = 'none';
+        document.getElementById('addressField').style.display = 'none';
+    }
+
+    // Si erreurs serveur → go bon step
+    setStep(currentStep);
+});
+</script>
 
 </x-guest-layout>

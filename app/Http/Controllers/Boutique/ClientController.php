@@ -43,41 +43,35 @@ class ClientController extends Controller
                 ->with('error', 'Aucune boutique trouvée.');
         }
 
-        $now    = Carbon::now();
-        $search = $request->input('search');
-        $sortBy = $request->input('sort', 'total_depense');
+        $now = Carbon::now();
 
-        /* ── VALIDATION DU TRI ────────────────────────────────────────
-         * On n'accepte que des colonnes connues pour éviter les injections.
-         * ──────────────────────────────────────────────────────────── */
+        // Normalisation : trim + null si vide
+        $search = trim((string) $request->input('search', ''));
+        $search = $search !== '' ? $search : null;
+
+        // Validation du tri (liste blanche)
+        $sortBy  = $request->input('sort', 'total_depense');
         $allowed = ['total_depense', 'nb_commandes', 'derniere_cmd'];
-        if (!in_array($sortBy, $allowed)) {
+        if (!in_array($sortBy, $allowed, true)) {
             $sortBy = 'total_depense';
         }
 
-        /* ── RECHERCHE : on récupère d'abord les user_id correspondants ──
-         * Problème : on ne peut pas faire whereHas() sur une requête
-         * groupée car MySQL interdit de filtrer sur des colonnes non
-         * agrégées dans un GROUP BY.
-         *
-         * Solution : on cherche d'abord les user_id dans la table users
-         * qui matchent la recherche, puis on filtre les orders par ces IDs.
+        /* ── RECHERCHE ────────────────────────────────────────────────
+         * On cherche d'abord les user_id dans la table users qui matchent,
+         * puis on filtre les orders par ces IDs (GROUP BY incompatible
+         * avec whereHas sur colonnes non agrégées).
          * ──────────────────────────────────────────────────────────── */
-        $userIds = null; // null = pas de filtre recherche
-        if ($search) {
-            $userIds = User::where(function ($q) use ($search) {
-                    $q->where('name',  'like', "%{$search}%")
-                      ->orWhere('phone', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
-                })
-                ->pluck('id')
-                ->toArray();
+        $filterUserIds = null; // null = pas de filtre actif
+
+        if ($search !== null) {
+            $filterUserIds = User::where(function ($q) use ($search) {
+                $q->where('name',  'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            })->pluck('id')->toArray();
         }
 
-        /* ── CALCUL DES TOP CLIENTS DU MOIS ──────────────────────────
-         * On les calcule ici pour afficher le badge "Top" sur chaque
-         * client qui figure dans le top 5 du mois en cours.
-         * ──────────────────────────────────────────────────────────── */
+        /* ── TOP 5 DU MOIS ────────────────────────────────────────── */
         $topClientIds = $shop->orders()
             ->whereMonth('created_at', $now->month)
             ->whereYear('created_at', $now->year)
@@ -88,38 +82,30 @@ class ClientController extends Controller
             ->pluck('user_id')
             ->toArray();
 
-        /* ── LISTE COMPLÈTE DES CLIENTS ───────────────────────────────
-         * On groupe les commandes par user_id et on calcule les stats.
-         * Si une recherche est active, on filtre sur les user_id trouvés.
-         * ──────────────────────────────────────────────────────────── */
+        /* ── LISTE CLIENTS (groupée par user_id) ─────────────────── */
         $query = $shop->orders()
             ->with('user')
             ->select(
                 'user_id',
-                DB::raw('SUM(total) as total_depense'),    // total dépensé tous les temps
-                DB::raw('COUNT(*) as nb_commandes'),        // nombre total de commandes
-                DB::raw('MAX(created_at) as derniere_cmd'), // date de la dernière commande
-                DB::raw('MIN(created_at) as premiere_cmd')  // date de la première commande
+                DB::raw('SUM(total)       as total_depense'),
+                DB::raw('COUNT(*)         as nb_commandes'),
+                DB::raw('MAX(created_at)  as derniere_cmd'),
+                DB::raw('MIN(created_at)  as premiere_cmd')
             )
             ->groupBy('user_id');
 
-        /* ── APPLICATION DU FILTRE RECHERCHE ─────────────────────────
-         * Si $userIds est un tableau vide → aucun résultat correspondant.
-         * Si $userIds est null → pas de filtre (afficher tout).
+        /* ── APPLICATION DU FILTRE ────────────────────────────────────
+         * $filterUserIds === null  → aucun filtre (afficher tous)
+         * $filterUserIds === []    → aucun user trouvé → résultat vide
+         *                           on passe [-1] car whereIn([]) = no-op en SQL
+         * $filterUserIds = [1,2,3] → filtrer sur ces IDs
          * ──────────────────────────────────────────────────────────── */
-        if ($userIds !== null) {
-            if (empty($userIds)) {
-                // Aucun user ne correspond → forcer un résultat vide
-                $query->whereRaw('1 = 0');
-            } else {
-                $query->whereIn('user_id', $userIds);
-            }
+        if ($filterUserIds !== null) {
+            $query->whereIn('user_id', empty($filterUserIds) ? [-1] : $filterUserIds);
         }
 
-        /* ── TRI ──────────────────────────────────────────────────────*/
         $query->orderByDesc($sortBy);
 
-        // Paginer avec 15 clients par page, conserver les paramètres GET
         $clients = $query->paginate(15)->withQueryString();
 
         /* ── KPI GLOBAUX ──────────────────────────────────────────────

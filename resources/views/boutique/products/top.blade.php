@@ -117,23 +117,54 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
 .tp-empty-title { font-size:16px; font-weight:700; color:var(--text); margin-bottom:6px; }
 
 /* RESPONSIVE */
+@media(max-width:1024px) {
+    .tp-kpi-val { font-size:18px; }
+    .tp-bar-wrap { max-width:140px; }
+}
 @media(max-width:768px) {
     .tp-hero { padding:18px 16px 72px; }
     .tp-hero-title { font-size:20px; }
-    .tp-kpi-row { padding:0 16px; gap:10px; }
+    .tp-kpi-row { padding:0 16px; gap:10px; flex-wrap:wrap; }
+    .tp-kpi { flex:0 0 calc(50% - 5px); min-width:0; }
     .tp-body { padding:20px 16px 40px; }
     .tp-podium { gap:8px; }
-    .tp-pod-item.rank-1 .tp-pod-img, .tp-pod-item.rank-1 .tp-pod-ph { width:72px; height:72px; }
+    .tp-pod-item.rank-1 .tp-pod-img,
+    .tp-pod-item.rank-1 .tp-pod-ph { width:72px; height:72px; }
     .tp-pod-img, .tp-pod-ph { width:60px!important; height:60px!important; }
     .tp-bar-wrap { display:none; }
     .tp-row { gap:10px; padding:12px 16px; }
+    .tp-list-hd { flex-wrap:wrap; gap:4px; }
+    .tp-list-title { font-size:13px; }
 }
 @media(max-width:480px) {
-    .tp-kpi { min-width:120px; padding:12px 14px; }
+    .tp-hero { padding:16px 12px 68px; }
+    .tp-hero-top { gap:8px; }
+    .tp-back { padding:7px 11px; font-size:12px; }
+    .tp-hero-title { font-size:17px; }
+    .tp-hero-sub { font-size:12px; }
+    .tp-kpi-row { padding:0 12px; gap:8px; margin-top:-40px; }
+    .tp-kpi { flex:0 0 calc(50% - 4px); min-width:0; padding:12px 14px; gap:10px; }
     .tp-kpi-ico { width:36px; height:36px; font-size:16px; }
-    .tp-kpi-val { font-size:17px; }
-    .tp-podium { flex-direction:column; align-items:center; }
+    .tp-kpi-val { font-size:16px; }
+    .tp-body { padding:16px 12px 40px; }
+    .tp-podium { flex-direction:column; align-items:center; gap:8px; }
     .tp-pod-bar { display:none; }
+    .tp-pod-item { max-width:280px; width:100%; }
+    .tp-pod-item.rank-1 .tp-pod-img,
+    .tp-pod-item.rank-1 .tp-pod-ph { width:64px!important; height:64px!important; }
+    .tp-prod-img, .tp-prod-ph { width:42px!important; height:42px!important; border-radius:8px!important; }
+    .tp-row { gap:8px; padding:10px 12px; }
+    .tp-revenue-col { display:none; }
+    .tp-list-hd { padding:12px 16px; }
+}
+@media(max-width:360px) {
+    .tp-hero-top { flex-direction:column; align-items:flex-start; }
+    .tp-kpi { flex:0 0 100%; }
+    .tp-kpi-val { font-size:15px; }
+    .tp-prod-name { font-size:12px; }
+    .tp-prod-img, .tp-prod-ph { width:36px!important; height:36px!important; }
+    .tp-rank-num { width:24px; height:24px; font-size:11px; }
+    .tp-back { font-size:11px; }
 }
 </style>
 @endpush
@@ -290,7 +321,7 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
 
             {{-- Revenu --}}
             @if($product->monthly_revenue)
-            <div style="text-align:right;flex-shrink:0;min-width:90px;">
+            <div class="tp-revenue-col" style="text-align:right;flex-shrink:0;min-width:90px;">
                 <div class="tp-revenue">{{ number_format($product->monthly_revenue, 0, ',', ' ') }}</div>
                 <div class="tp-sales-lbl">{{ $devise }}</div>
             </div>

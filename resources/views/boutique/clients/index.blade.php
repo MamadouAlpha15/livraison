@@ -668,35 +668,40 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     {{-- ════════════════════════════════════════════════════════════
          BARRE RECHERCHE + TRI
          ════════════════════════════════════════════════════════════ --}}
-    <form method="GET" action="{{ route('boutique.clients.index') }}">
+    <form method="GET" action="{{ route('boutique.clients.index') }}" id="searchForm">
         <div class="toolbar">
 
             {{-- Recherche par nom / email / téléphone --}}
-            <div class="search-box">
-                <span style="font-size:15px">🔍</span>
+            <div class="search-box" id="searchBoxWrap">
+                <span style="font-size:15px;flex-shrink:0">🔍</span>
                 <input type="text"
+                       id="searchInput"
                        name="search"
-                       value="{{ $search }}"
-                       placeholder="Rechercher par nom, email, téléphone…"
+                       value="{{ $search ?? '' }}"
+                       placeholder="Nom, email, téléphone…"
                        autocomplete="off">
+                <button type="button" id="btnClearInput"
+                    style="display:{{ $search ? 'flex' : 'none' }};background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:0;align-items:center;flex-shrink:0"
+                    title="Effacer">✕</button>
             </div>
 
             {{-- Tri --}}
-            <select name="sort" class="sort-select" onchange="this.form.submit()">
-                <option value="total_depense"  {{ $sortBy === 'total_depense'  ? 'selected' : '' }}>Trier : Plus dépensier</option>
-                <option value="nb_commandes"   {{ $sortBy === 'nb_commandes'   ? 'selected' : '' }}>Trier : Plus de commandes</option>
-                <option value="derniere_cmd"   {{ $sortBy === 'derniere_cmd'   ? 'selected' : '' }}>Trier : Dernière commande</option>
+            <select name="sort" id="sortSelect" class="sort-select">
+                <option value="total_depense" {{ $sortBy === 'total_depense' ? 'selected' : '' }}>💰 Plus dépensier</option>
+                <option value="nb_commandes"  {{ $sortBy === 'nb_commandes'  ? 'selected' : '' }}>📦 Plus de commandes</option>
+                <option value="derniere_cmd"  {{ $sortBy === 'derniere_cmd'  ? 'selected' : '' }}>🕐 Dernière commande</option>
             </select>
 
             {{-- Bouton recherche --}}
-            <button type="submit" style="padding:9px 18px;border-radius:var(--r-sm);background:var(--brand);color:#fff;border:none;font-size:12.5px;font-weight:600;font-family:var(--font);cursor:pointer">
+            <button type="submit" id="btnSearch"
+                style="padding:9px 18px;border-radius:var(--r-sm);background:var(--brand);color:#fff;border:none;font-size:12.5px;font-weight:700;font-family:var(--font);cursor:pointer;white-space:nowrap">
                 Rechercher
             </button>
 
-            {{-- Reset --}}
+            {{-- Reset complet --}}
             @if($search)
-            <a href="{{ route('boutique.clients.index') }}"
-               style="padding:9px 14px;border-radius:var(--r-sm);border:1px solid var(--border-dk);background:var(--surface);font-size:12px;font-weight:600;color:var(--text-2);text-decoration:none">
+            <a href="{{ route('boutique.clients.index') }}?sort={{ $sortBy }}"
+               style="padding:9px 14px;border-radius:var(--r-sm);border:1px solid var(--border-dk);background:var(--surface);font-size:12px;font-weight:600;color:var(--text-2);text-decoration:none;white-space:nowrap">
                 ✕ Effacer
             </a>
             @endif
@@ -778,11 +783,23 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     {{-- ════ TABLE DESKTOP (visible > 700px) ════ --}}
     <div class="clients-card clients-table">
         @if($clients->isEmpty())
-            <div style="padding:48px;text-align:center;font-size:14px;color:var(--muted)">
+            <div style="padding:56px 32px;text-align:center;">
                 @if($search)
-                    Aucun client trouvé pour « {{ $search }} »
+                    <div style="font-size:42px;margin-bottom:14px;opacity:.35">🔍</div>
+                    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">
+                        Aucun résultat pour « {{ $search }} »
+                    </div>
+                    <div style="font-size:13px;color:var(--muted);margin-bottom:20px">
+                        Aucun client ne correspond à cette recherche.
+                    </div>
+                    <a href="{{ route('boutique.clients.index') }}?sort={{ $sortBy }}"
+                       style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:var(--r-sm);background:var(--brand);color:#fff;font-size:12.5px;font-weight:700;text-decoration:none">
+                        ✕ Effacer la recherche
+                    </a>
                 @else
-                    Aucun client pour le moment.
+                    <div style="font-size:42px;margin-bottom:14px;opacity:.3">👥</div>
+                    <div style="font-size:15px;font-weight:700;color:var(--text)">Aucun client pour le moment.</div>
+                    <div style="font-size:13px;color:var(--muted);margin-top:6px">Les clients apparaîtront ici dès leur première commande.</div>
                 @endif
             </div>
         @else
@@ -912,11 +929,23 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             </div>
         </div>
         @empty
-        <div style="padding:40px 20px;text-align:center;font-size:14px;color:var(--muted)">
+        <div style="padding:44px 20px;text-align:center;">
             @if($search)
-                Aucun client trouvé pour « {{ $search }} »
+                <div style="font-size:38px;margin-bottom:12px;opacity:.35">🔍</div>
+                <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">
+                    Aucun résultat pour « {{ $search }} »
+                </div>
+                <div style="font-size:12px;color:var(--muted);margin-bottom:16px">
+                    Aucun client ne correspond à cette recherche.
+                </div>
+                <a href="{{ route('boutique.clients.index') }}?sort={{ $sortBy }}"
+                   style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r-sm);background:var(--brand);color:#fff;font-size:12px;font-weight:700;text-decoration:none">
+                    ✕ Effacer
+                </a>
             @else
-                Aucun client pour le moment.
+                <div style="font-size:38px;margin-bottom:12px;opacity:.3">👥</div>
+                <div style="font-size:14px;font-weight:700;color:var(--text)">Aucun client pour le moment.</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:5px">Les clients apparaîtront ici dès leur première commande.</div>
             @endif
         </div>
         @endforelse
@@ -985,6 +1014,33 @@ document.addEventListener('DOMContentLoaded', () => {
     /* Animation barres top clients */
     document.querySelectorAll('.top-bar-fill').forEach((el, i) => {
         setTimeout(() => { el.style.width = el.dataset.pct + '%'; }, 100 + i * 120);
+    });
+
+    /* ══ RECHERCHE & FILTRE ══ */
+    const searchForm  = document.getElementById('searchForm');
+    const searchInput = document.getElementById('searchInput');
+    const sortSelect  = document.getElementById('sortSelect');
+    const btnClear    = document.getElementById('btnClearInput');
+
+    /* Soumettre le formulaire sur changement du tri */
+    sortSelect?.addEventListener('change', () => searchForm.submit());
+
+    /* Soumettre sur touche Entrée dans le champ de recherche */
+    searchInput?.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); searchForm.submit(); }
+    });
+
+    /* Afficher/cacher le ✕ dans la barre de recherche selon la saisie */
+    searchInput?.addEventListener('input', () => {
+        if (btnClear) btnClear.style.display = searchInput.value ? 'flex' : 'none';
+    });
+
+    /* Vider le champ et soumettre */
+    btnClear?.addEventListener('click', () => {
+        searchInput.value = '';
+        btnClear.style.display = 'none';
+        searchInput.focus();
+        searchForm.submit();
     });
 });
 </script>

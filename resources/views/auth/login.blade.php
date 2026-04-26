@@ -18,33 +18,6 @@
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        {{-- Rôle en cards --}}
-        <div class="f-group">
-            <label class="f-label">Je me connecte en tant que</label>
-            <input type="hidden" name="role" id="roleInput" value="{{ old('role', 'client') }}">
-            <div class="role-cards">
-                <div class="role-card {{ old('role','client') === 'client'     ? 'active':'' }}" onclick="setRole('client')">
-                    <span class="rc-ico">🛒</span>Client
-                </div>
-                <div class="role-card {{ old('role') === 'admin'               ? 'active':'' }}" onclick="setRole('admin')">
-                    <span class="rc-ico">🏪</span>Admin boutique
-                </div>
-                <div class="role-card {{ old('role') === 'livreur'             ? 'active':'' }}" onclick="setRole('livreur')">
-                    <span class="rc-ico">🛵</span>Livreur
-                </div>
-                <div class="role-card {{ old('role') === 'employe'             ? 'active':'' }}" onclick="setRole('employe')">
-                    <span class="rc-ico">👷</span>Employé
-                </div>
-                <div class="role-card {{ old('role') === 'vendeur'             ? 'active':'' }}" onclick="setRole('vendeur')">
-                    <span class="rc-ico">🧑‍💼</span>Vendeur
-                </div>
-                <div class="role-card {{ old('role') === 'superAdmin'          ? 'active':'' }}" onclick="setRole('superAdmin')">
-                    <span class="rc-ico">⚙️</span>Super Admin
-                </div>
-            </div>
-            @error('role')<p class="f-error">{{ $message }}</p>@enderror
-        </div>
-
         {{-- Email --}}
         <div class="f-group">
             <label class="f-label" for="email">Adresse email</label>
@@ -92,11 +65,6 @@
     </form>
 
     <script>
-        function setRole(val) {
-            document.getElementById('roleInput').value = val;
-            document.querySelectorAll('.role-card').forEach(c => c.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-        }
         function togglePw(id, btn) {
             const inp = document.getElementById(id);
             if (inp.type === 'password') { inp.type = 'text';     btn.textContent = '🙈'; }

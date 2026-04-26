@@ -74,6 +74,21 @@ class OrderController extends Controller
     /**
      * Afficher la page d'assignation pour une commande (liste des livreurs)
      */
+    public function location(Order $order)
+    {
+        $user   = Auth::user();
+        $shop   = $user->shop ?: $user->assignedShop;
+        abort_unless($shop && $order->shop_id === $shop->id, 403);
+
+        return response()->json([
+            'lat'       => $order->current_lat,
+            'lng'       => $order->current_lng,
+            'ping'      => $order->last_ping_at?->diffForHumans(),
+            'livreur'   => $order->livreur?->name,
+            'status'    => $order->status,
+        ]);
+    }
+
     public function showAssign(Order $order)
     {
         $user   = Auth::user();

@@ -286,6 +286,25 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
 <script>
 const CSRF = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 const gpsWatchers = {};
+let wakeLock = null;
+
+/* Empêche la mise en veille du téléphone pendant la livraison (HTTPS requis) */
+async function requestWakeLock() {
+    if (!('wakeLock' in navigator)) return;
+    try {
+        wakeLock = await navigator.wakeLock.request('screen');
+        /* Réacquérir après retour en premier plan */
+        document.addEventListener('visibilitychange', async () => {
+            if (document.visibilityState === 'visible' && Object.keys(gpsWatchers).length > 0) {
+                try { wakeLock = await navigator.wakeLock.request('screen'); } catch(_) {}
+            }
+        });
+    } catch(_) {}
+}
+
+function releaseWakeLock() {
+    if (wakeLock) { wakeLock.release(); wakeLock = null; }
+}
 
 function toggleGps(orderId, btn) {
     if (gpsWatchers[orderId]) {
@@ -297,6 +316,7 @@ function toggleGps(orderId, btn) {
 
 function startGps(orderId, btn) {
     if (!('geolocation' in navigator)) { alert('GPS non supporté.'); return; }
+    requestWakeLock();
     const opts = { enableHighAccuracy:true, maximumAge:5000, timeout:15000 };
     const id = navigator.geolocation.watchPosition(async pos => {
         try {
@@ -318,6 +338,7 @@ function startGps(orderId, btn) {
 function stopGps(orderId, btn) {
     navigator.geolocation.clearWatch(gpsWatchers[orderId]);
     delete gpsWatchers[orderId];
+    if (Object.keys(gpsWatchers).length === 0) releaseWakeLock();
     btn.classList.remove('active');
     btn.title = 'Activer le GPS';
 }

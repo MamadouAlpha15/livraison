@@ -175,6 +175,28 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
     .stats-row{gap:5px;}
     .stat-chip{min-width:0;padding:7px 9px;flex:1;font-size:10px;}
 }
+/* ── Barre de filtres ── */
+.filter-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:14px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:10px;}
+.filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.filter-search-wrap{position:relative;flex:1;min-width:180px;}
+.filter-search-wrap .ico-search{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none;color:var(--muted);}
+.filter-input{width:100%;padding:8px 10px 8px 32px;border:1.5px solid var(--border-dk);border-radius:var(--r-sm);font-size:13px;font-family:var(--font);color:var(--text);background:var(--surface);outline:none;transition:border-color .15s;}
+.filter-input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(99,102,241,.1);}
+.filter-select{padding:8px 10px;border:1.5px solid var(--border-dk);border-radius:var(--r-sm);font-size:13px;font-family:var(--font);color:var(--text);background:var(--surface);outline:none;cursor:pointer;transition:border-color .15s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;background-size:14px;padding-right:28px;}
+.filter-select:focus{border-color:var(--brand);}
+.date-chips{display:flex;gap:5px;flex-wrap:wrap;}
+.date-chip{padding:6px 12px;border-radius:20px;font-size:11.5px;font-weight:600;border:1.5px solid var(--border-dk);background:var(--surface);color:var(--text-2);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.date-chip:hover{border-color:var(--brand);color:var(--brand);}
+.date-chip.active{background:var(--brand-mlt);border-color:var(--brand-lt);color:var(--brand-dk);}
+.custom-dates{display:none;align-items:center;gap:6px;flex-wrap:wrap;}
+.custom-dates.show{display:flex;}
+.custom-dates input[type=date]{padding:7px 10px;border:1.5px solid var(--border-dk);border-radius:var(--r-sm);font-size:12.5px;font-family:var(--font);color:var(--text);background:var(--surface);outline:none;transition:border-color .15s;}
+.custom-dates input[type=date]:focus{border-color:var(--brand);}
+.btn-filter-apply{padding:8px 16px;border-radius:var(--r-sm);font-size:13px;font-weight:700;font-family:var(--font);background:var(--brand);color:#fff;border:none;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.btn-filter-apply:hover{background:var(--brand-dk);}
+.btn-filter-reset{padding:8px 12px;border-radius:var(--r-sm);font-size:12.5px;font-weight:600;font-family:var(--font);background:var(--surface);color:var(--text-2);border:1.5px solid var(--border-dk);cursor:pointer;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;white-space:nowrap;}
+.btn-filter-reset:hover{border-color:var(--brand);color:var(--brand);}
+.filter-active-badge{display:inline-flex;align-items:center;gap:4px;background:#fef3c7;border:1px solid #fcd34d;color:#92400e;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
 .mobile-list{display:none;flex-direction:column;gap:12px;}
 .m-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);}
 .m-card-hd{padding:11px 14px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;}
@@ -325,6 +347,10 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                 <div class="tb-title">📦 Commandes</div>
                 <div class="tb-sub">{{ $shop->name ?? 'Boutique' }} &nbsp;·&nbsp; <span class="devise-badge" style="font-size:10px;padding:2px 8px">💱 {{ $devise }}</span></div>
             </div>
+            <div id="autoRefreshBadge" style="display:flex;align-items:center;gap:6px;background:#f0fdf4;border:1px solid #86efac;border-radius:20px;padding:4px 12px;font-size:11.5px;font-weight:600;color:#166534;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0" onclick="togglePause()" title="Cliquer pour mettre en pause">
+                <span id="refreshDot" style="width:7px;height:7px;border-radius:50%;background:#22c55e;animation:blink 2.2s ease-in-out infinite;flex-shrink:0"></span>
+                <span id="refreshLabel">Actu dans <strong id="refreshCount">30</strong>s</span>
+            </div>
         </div>
 
         <div class="content">
@@ -332,6 +358,66 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
             @foreach(['success','warning','danger'] as $type)
                 @if(session($type))<div class="flash flash-{{ $type }}"><span>{{ $type === 'success' ? '✓' : '⚠' }}</span>{{ session($type) }}</div>@endif
             @endforeach
+
+            {{-- ── BARRE DE FILTRES ── --}}
+            <form method="GET" action="{{ route('employe.orders.index') }}" id="filterForm">
+            <div class="filter-bar">
+
+                {{-- Ligne 1 : recherche + statut + boutons --}}
+                <div class="filter-row">
+                    <div class="filter-search-wrap">
+                        <span class="ico-search">🔍</span>
+                        <input type="text" name="search" class="filter-input"
+                               placeholder="Rechercher client ou #commande…"
+                               value="{{ $search ?? '' }}">
+                    </div>
+
+                    <select name="status" class="filter-select" onchange="document.getElementById('filterForm').submit()">
+                        <option value="">Tous les statuts</option>
+                        @foreach([
+                            'en_attente'   => 'En attente',
+                            'confirmée'    => 'Confirmée',
+                            'en_livraison' => 'En livraison',
+                            'livrée'       => 'Livrée',
+                            'annulée'      => 'Annulée',
+                        ] as $val => $label)
+                        <option value="{{ $val }}" {{ ($status ?? '') === $val ? 'selected' : '' }}>
+                            {{ $label }}
+                        </option>
+                        @endforeach
+                    </select>
+
+                    <button type="submit" class="btn-filter-apply">Filtrer</button>
+
+                    @if(($search ?? '') || ($status ?? '') || (($dateFilter ?? 'all') !== 'all'))
+                    <a href="{{ route('employe.orders.index') }}" class="btn-filter-reset">✕ Reset</a>
+                    <span class="filter-active-badge">⚡ Filtre actif</span>
+                    @endif
+                </div>
+
+                {{-- Ligne 2 : date chips --}}
+                <div class="filter-row">
+                    <span style="font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap">Période :</span>
+                    <div class="date-chips">
+                        @foreach(['all'=>'Tout','today'=>"Aujourd'hui",'week'=>'Cette semaine','month'=>'Ce mois','custom'=>'Personnalisé'] as $val=>$lbl)
+                        <button type="button" class="date-chip {{ ($dateFilter ?? 'all') === $val ? 'active' : '' }}"
+                                onclick="setDate('{{ $val }}')">{{ $lbl }}</button>
+                        @endforeach
+                    </div>
+                    <input type="hidden" name="date" id="dateInput" value="{{ $dateFilter ?? 'all' }}">
+                </div>
+
+                {{-- Dates personnalisées --}}
+                <div class="custom-dates {{ ($dateFilter ?? 'all') === 'custom' ? 'show' : '' }}" id="customDates">
+                    <span style="font-size:12px;color:var(--muted);font-weight:600">Du</span>
+                    <input type="date" name="from" value="{{ $dateFrom ?? '' }}">
+                    <span style="font-size:12px;color:var(--muted);font-weight:600">au</span>
+                    <input type="date" name="to" value="{{ $dateTo ?? '' }}">
+                    <button type="submit" class="btn-filter-apply" style="padding:7px 14px;font-size:12.5px">Appliquer</button>
+                </div>
+
+            </div>
+            </form>
 
             <div class="stats-row">
                 <div class="stat-chip"><span class="stat-dot" style="background:#f59e0b"></span><span>Non assignées</span><span class="val">{{ $nonAssignees }}</span></div>
@@ -485,6 +571,76 @@ function openRestoreModal(url, orderId, clientName) {
 function closeRestoreModal() { document.getElementById('restoreModal').classList.remove('open'); document.body.style.overflow = ''; }
 document.getElementById('restoreModal').addEventListener('click', function(e) { if (e.target === this) closeRestoreModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeRestoreModal(); } });
+
+function setDate(val) {
+    document.getElementById('dateInput').value = val;
+    document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    const custom = document.getElementById('customDates');
+    if (val === 'custom') {
+        custom.classList.add('show');
+    } else {
+        custom.classList.remove('show');
+        document.getElementById('filterForm').submit();
+    }
+}
+
+/* ── Auto-refresh ── */
+(function () {
+    const INTERVAL = 30;
+    let seconds    = INTERVAL;
+    let paused     = false;
+    let timer      = null;
+
+    const badge   = document.getElementById('autoRefreshBadge');
+    const dot     = document.getElementById('refreshDot');
+    const count   = document.getElementById('refreshCount');
+    const label   = document.getElementById('refreshLabel');
+
+    function isModalOpen() {
+        return document.getElementById('cancelModal').classList.contains('open') ||
+               document.getElementById('restoreModal').classList.contains('open');
+    }
+
+    function isUserTyping() {
+        const active = document.activeElement;
+        if (!active) return false;
+        return ['INPUT','TEXTAREA','SELECT'].includes(active.tagName);
+    }
+
+    function tick() {
+        if (paused || isModalOpen() || isUserTyping()) return;
+
+        seconds--;
+        count.textContent = seconds;
+
+        if (seconds <= 0) {
+            location.reload();
+        }
+    }
+
+    window.togglePause = function () {
+        paused = !paused;
+        if (paused) {
+            badge.style.background = '#fef9c3';
+            badge.style.borderColor = '#fde047';
+            badge.style.color = '#854d0e';
+            dot.style.background = '#eab308';
+            dot.style.animation = 'none';
+            label.innerHTML = '⏸ En pause';
+        } else {
+            seconds = INTERVAL;
+            badge.style.background = '#f0fdf4';
+            badge.style.borderColor = '#86efac';
+            badge.style.color = '#166534';
+            dot.style.background = '#22c55e';
+            dot.style.animation = 'blink 2.2s ease-in-out infinite';
+            label.innerHTML = 'Actu dans <strong id="refreshCount">' + seconds + '</strong>s';
+        }
+    };
+
+    timer = setInterval(tick, 1000);
+})();
 </script>
 @endpush
 

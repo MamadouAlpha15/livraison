@@ -7,348 +7,428 @@
       $stats     → object (total_depense, nb_commandes, derniere_cmd, premiere_cmd)
       $isTop     → bool
       $shop      → Shop
+      $devise    → string
 --}}
 
 @extends('layouts.app')
-<p>dfdfs</p>
-
-@section('title', 'Fiche · ' . $user->name)
-
+@section('title', 'Fiche client · ' . $user->name)
 @php $bodyClass = 'is-dashboard'; @endphp
 
 @push('styles')
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; }
+*,*::before,*::after { box-sizing:border-box; }
 
 :root {
-    --brand:     #6366f1; --brand-dk: #4f46e5; --brand-lt: #e0e7ff; --brand-mlt: #eef2ff;
-    --bg:        #f8fafc; --surface:  #ffffff; --border:   #e2e8f0; --border-dk: #cbd5e1;
-    --text:      #0f1c18; --text-2:   #4b5c56; --muted:    #8a9e98;
-    --font:      'Plus Jakarta Sans', sans-serif;
-    --mono:      'JetBrains Mono', monospace;
-    --r: 14px; --r-sm: 9px;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
-    --shadow:    0 4px 16px rgba(0,0,0,.07);
+    --brand:#6366f1; --brand-dk:#4f46e5; --brand-lt:#e0e7ff;
+    --navy:#0f172a;  --navy2:#1e3a5f;
+    --bg:#f1f5f9;    --surface:#fff;
+    --border:#e2e8f0; --muted:#64748b; --text:#0f172a;
+    --font:'Segoe UI',sans-serif; --mono:'JetBrains Mono',monospace;
+    --r:14px; --r-sm:9px;
 }
 
-html, body { font-family: var(--font); background: var(--bg); color: var(--text); margin: 0; -webkit-font-smoothing: antialiased; }
-.page-wrap { max-width: 900px; margin: 0 auto; padding: 28px 24px 60px; }
+body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text); }
 
-/* Back */
-.back-link {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 12.5px; font-weight: 600; color: var(--muted);
-    text-decoration: none; margin-bottom: 22px;
-    padding: 6px 10px 6px 6px; border-radius: var(--r-sm);
-    transition: background .15s, color .15s;
+/* ── HERO ── */
+.cl-hero {
+    background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 60%,#0d3b6e 100%);
+    padding:24px 28px 80px; position:relative; overflow:hidden;
 }
-.back-link:hover { background: var(--surface); color: var(--brand); }
+.cl-hero::before {
+    content:''; position:absolute; inset:0;
+    background:radial-gradient(circle at 75% 40%, rgba(99,102,241,.15) 0%, transparent 60%);
+    pointer-events:none;
+}
+.cl-back {
+    display:inline-flex; align-items:center; gap:7px;
+    padding:8px 16px; background:rgba(255,255,255,.12);
+    color:#fff; border:1.5px solid rgba(255,255,255,.2);
+    border-radius:10px; font-size:12.5px; font-weight:700;
+    text-decoration:none; transition:all .15s; position:relative;
+}
+.cl-back:hover { background:rgba(255,255,255,.22); transform:translateX(-2px); }
 
-/* ── Profil header ── */
-.profile-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--r);
-    padding: 24px 28px;
-    display: flex; align-items: flex-start; gap: 20px;
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 20px;
-    position: relative; overflow: hidden;
+.cl-hero-body {
+    display:flex; align-items:center; gap:20px;
+    margin-top:20px; position:relative; flex-wrap:wrap;
 }
-/* Bande de couleur en haut */
-.profile-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    background: linear-gradient(90deg, var(--brand), #4f46e5);
+.cl-avatar {
+    width:72px; height:72px; border-radius:50%; flex-shrink:0;
+    background:linear-gradient(135deg,#818cf8,#4f46e5);
+    display:flex; align-items:center; justify-content:center;
+    font-size:24px; font-weight:800; color:#fff; letter-spacing:-.5px;
+    box-shadow:0 0 0 4px rgba(255,255,255,.2);
 }
-
-/* Grand avatar */
-.profile-av {
-    width: 64px; height: 64px; border-radius: 50%;
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px; font-weight: 700; color: #fff; flex-shrink: 0;
-    box-shadow: 0 0 0 3px rgba(99,102,241,.25);
+.cl-hero-info { flex:1; min-width:0; }
+.cl-name {
+    font-size:22px; font-weight:900; color:#fff;
+    letter-spacing:-.4px; margin:0 0 8px;
 }
-
-.profile-info { flex: 1; min-width: 0; }
-.profile-name {
-    font-size: 20px; font-weight: 700; color: var(--text);
-    letter-spacing: -.3px; margin: 0 0 6px;
+.cl-contacts {
+    display:flex; flex-wrap:wrap; gap:14px;
+    font-size:12.5px; color:rgba(255,255,255,.65);
 }
-.profile-contacts {
-    display: flex; flex-wrap: wrap; gap: 12px;
-    font-size: 12.5px; color: var(--text-2);
-}
-.profile-contact-item { display: flex; align-items: center; gap: 5px; }
-
-/* Badge top client */
+.cl-contact { display:flex; align-items:center; gap:5px; }
 .top-badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    color: #92400e; border: 1px solid #fcd34d;
-    font-size: 11px; font-weight: 700;
-    padding: 4px 12px; border-radius: 20px;
-    margin-top: 8px;
+    display:inline-flex; align-items:center; gap:5px;
+    background:linear-gradient(135deg,#fef3c7,#fde68a);
+    color:#92400e; border:1px solid #fcd34d;
+    font-size:11px; font-weight:700;
+    padding:4px 12px; border-radius:20px; margin-top:10px;
 }
 
-/* ── Stats du client ── */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 22px;
+/* ── KPI FLOTTANTS ── */
+.cl-kpi-row {
+    display:flex; gap:14px;
+    padding:0 28px; margin-top:-52px;
+    position:relative; z-index:2; flex-wrap:wrap;
 }
-.stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--r);
-    padding: 14px 16px;
-    box-shadow: var(--shadow-sm);
-    text-align: center;
+.cl-kpi {
+    flex:1; min-width:160px;
+    background:#fff; border-radius:14px;
+    box-shadow:0 4px 20px rgba(0,0,0,.1);
+    padding:16px 20px;
+    display:flex; align-items:center; gap:14px;
 }
-.stat-ico   { font-size: 20px; margin-bottom: 6px; }
-.stat-val   { font-size: 20px; font-weight: 700; font-family: var(--mono); color: var(--text); letter-spacing: -.5px; }
-.stat-lbl   { font-size: 10.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .3px; margin-top: 3px; }
+.cl-kpi-ico {
+    width:46px; height:46px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px; flex-shrink:0;
+}
+.cl-kpi-lbl {
+    font-size:10.5px; font-weight:700; color:var(--muted);
+    text-transform:uppercase; letter-spacing:.4px; margin-bottom:4px;
+}
+.cl-kpi-val {
+    font-size:16px; font-weight:900; color:var(--text);
+    font-family:var(--mono); line-height:1.1; word-break:break-all;
+}
+.cl-kpi-dev {
+    display:inline-block; margin-top:3px;
+    font-size:10px; font-weight:700; color:var(--muted);
+    background:var(--bg); border-radius:4px;
+    padding:1px 6px; letter-spacing:.3px;
+}
 
-/* ── Table commandes ── */
+/* ── BODY ── */
+.cl-body { padding:28px 28px 60px; }
+
+/* ── CARTE COMMANDES ── */
 .orders-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--r);
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
+    background:#fff; border-radius:var(--r);
+    box-shadow:0 2px 12px rgba(0,0,0,.06); overflow:hidden;
 }
 .card-hd {
-    padding: 14px 18px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
+    padding:16px 22px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;
 }
-.card-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.card-title { font-size:14px; font-weight:800; color:var(--text); }
+.card-sub   { font-size:11.5px; color:var(--muted); }
 
-.tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+/* Table */
+.tbl { width:100%; border-collapse:collapse; font-size:13px; }
 .tbl th {
-    padding: 11px 16px; text-align: left;
-    font-size: 10px; font-weight: 700; color: var(--muted);
-    text-transform: uppercase; letter-spacing: .6px;
-    background: var(--bg); border-bottom: 1px solid var(--border);
+    padding:11px 18px; text-align:left;
+    font-size:10px; font-weight:700; color:var(--muted);
+    text-transform:uppercase; letter-spacing:.6px;
+    background:#f8fafc; border-bottom:1.5px solid var(--border);
+    white-space:nowrap;
 }
-.tbl td { padding: 12px 16px; border-bottom: 1px solid #f3f6f4; vertical-align: middle; }
-.tbl tbody tr:last-child td { border-bottom: none; }
-.tbl tbody tr:hover td { background: #fafcfb; }
+.tbl th.right, .tbl td.right { text-align:right; }
+.tbl td { padding:14px 18px; border-bottom:1px solid #f1f5f9; vertical-align:middle; }
+.tbl tbody tr:last-child td { border-bottom:none; }
+.tbl tbody tr:hover td { background:#fafcff; }
 
-.oid { font-family: var(--mono); font-size: 11px; color: var(--muted); }
-.oamt { font-family: var(--mono); font-weight: 700; color: var(--text); }
+/* Ref */
+.oid {
+    font-family:var(--mono); font-size:12px; font-weight:700;
+    color:var(--brand-dk); background:var(--brand-lt);
+    padding:3px 8px; border-radius:6px;
+}
+
+/* Produits */
+.prod-line { font-size:12.5px; font-weight:600; color:var(--text); line-height:1.4; }
+.prod-qty  { color:var(--muted); font-weight:400; }
+.prod-more { font-size:11px; color:var(--muted); margin-top:2px; }
+
+/* Montant */
+.amt-num {
+    font-family:var(--mono); font-size:14px; font-weight:800;
+    color:var(--text); white-space:nowrap;
+}
+.amt-dev {
+    font-size:10px; font-weight:700; color:var(--muted);
+    background:var(--bg); border-radius:4px;
+    padding:1px 5px; letter-spacing:.3px; margin-top:3px;
+    display:inline-block;
+}
 
 /* Pills statut */
-.pill { display: inline-block; font-size: 10.5px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
-.p-success { background: #e0e7ff; color: #3730a3; }
-.p-warning { background: #fef3c7; color: #92400e; }
-.p-info    { background: #dbeafe; color: #1e40af; }
-.p-danger  { background: #fee2e2; color: #991b1b; }
-.p-muted   { background: #f3f6f4; color: #6b7280; }
+.pill { display:inline-block; font-size:10.5px; font-weight:700; padding:4px 10px; border-radius:20px; white-space:nowrap; }
+.p-success { background:#dcfce7; color:#15803d; }
+.p-warning { background:#fef3c7; color:#92400e; }
+.p-info    { background:#dbeafe; color:#1e40af; }
+.p-danger  { background:#fee2e2; color:#991b1b; }
+.p-muted   { background:#f1f5f9; color:#64748b; }
+
+/* Date */
+.dt-main { font-size:12.5px; font-weight:600; color:var(--text); }
+.dt-hour { font-size:11px; color:var(--muted); margin-top:2px; }
+
+/* Vide */
+.tbl-empty { padding:40px; text-align:center; font-size:13px; color:var(--muted); }
 
 /* Pagination */
-.pagination-wrap { display: flex; justify-content: center; padding: 16px; }
+.pagination-wrap { display:flex; justify-content:center; padding:16px; }
 
-@media (max-width: 640px) {
-    .stats-grid { grid-template-columns: repeat(2,1fr); }
-    .profile-card { flex-direction: column; }
-    .tbl th:nth-child(4), .tbl td:nth-child(4) { display: none; }
+/* ── RESPONSIVE ── */
+
+/* Tablette large */
+@media(max-width:1024px) {
+    .cl-kpi-val { font-size:15px; }
+    .tbl th, .tbl td { padding:12px 14px; }
+}
+
+/* Tablette */
+@media(max-width:768px) {
+    .cl-hero    { padding:18px 16px 76px; }
+    .cl-kpi-row { padding:0 16px; gap:10px; }
+    .cl-kpi     { flex:0 0 calc(50% - 5px); min-width:0; }
+    .cl-body    { padding:20px 16px 40px; }
+    .tbl th, .tbl td { padding:11px 12px; font-size:12px; }
+    .card-hd    { padding:12px 16px; }
+}
+
+/* Mobile */
+@media(max-width:480px) {
+    .cl-hero        { padding:14px 12px 70px; }
+    .cl-hero-body   { gap:14px; }
+    .cl-avatar      { width:56px; height:56px; font-size:18px; }
+    .cl-name        { font-size:17px; }
+    .cl-contacts    { font-size:11.5px; gap:6px; }
+    .cl-back        { font-size:12px; padding:7px 12px; }
+
+    .cl-kpi-row { padding:0 12px; gap:8px; margin-top:-44px; }
+    .cl-kpi     { flex:0 0 calc(50% - 4px); min-width:0; padding:12px 14px; gap:10px; }
+    .cl-kpi-ico { width:38px; height:38px; font-size:16px; border-radius:10px; }
+    .cl-kpi-val { font-size:14px; }
+    .cl-kpi-lbl { font-size:10px; }
+
+    .cl-body    { padding:14px 0 40px; }
+
+    /* La carte commandes prend toute la largeur */
+    .orders-card { border-radius:0; box-shadow:none; }
+    .card-hd     { padding:12px 16px; }
+
+    /* Table → liste de cartes verticales */
+    .tbl, .tbl tbody { display:block; width:100%; }
+    .tbl thead { display:none; }
+
+    .tbl tbody tr {
+        display:block;
+        padding:12px 16px;
+        border-bottom:1px solid var(--border);
+    }
+    .tbl tbody tr:last-child { border-bottom:none; }
+    .tbl tbody tr:hover { background:#fafcff; }
+
+    .tbl td {
+        display:flex; align-items:flex-start;
+        justify-content:space-between;
+        padding:5px 0; border:none; font-size:12.5px;
+    }
+    /* Labels auto générés par nth-child */
+    .tbl td::before {
+        font-size:10px; font-weight:700; color:var(--muted);
+        text-transform:uppercase; letter-spacing:.4px;
+        flex-shrink:0; margin-right:10px;
+        padding-top:3px; min-width:62px;
+    }
+    .tbl td:nth-child(1)::before { content:'Réf'; }
+    .tbl td:nth-child(2)::before { content:'Produits'; }
+    .tbl td:nth-child(3)::before { content:'Montant'; }
+    .tbl td:nth-child(4)::before { content:'Statut'; }
+    .tbl td:nth-child(5)::before { content:'Date'; }
+    .tbl td.right { text-align:right; }
+
+    .amt-num  { font-size:13px; }
+    .oid      { font-size:11px; }
+}
+
+/* Petit mobile */
+@media(max-width:360px) {
+    .cl-avatar  { width:48px; height:48px; font-size:15px; }
+    .cl-name    { font-size:15px; }
+    .cl-contacts { font-size:11px; }
+    .cl-kpi     { flex:0 0 100%; }
+    .cl-kpi-val { font-size:13px; }
+    .cl-kpi-ico { width:34px; height:34px; font-size:14px; }
 }
 </style>
 @endpush
 
 @section('content')
-<div class="page-wrap">
+@php
+    $fmt = fn($n) => number_format($n ?? 0, 0, ',', ' ');
+    $nameParts = explode(' ', $user->name ?? 'C L');
+    $initials  = strtoupper(substr($nameParts[0],0,1)) . strtoupper(substr($nameParts[1] ?? 'X',0,1));
+    $panierMoyen = ($stats->nb_commandes > 0)
+        ? round($stats->total_depense / $stats->nb_commandes)
+        : 0;
+    $statusMap = [
+        'livrée'       => ['label'=>'Livré',        'cls'=>'p-success'],
+        'pending'      => ['label'=>'En attente',   'cls'=>'p-warning'],
+        'en attente'   => ['label'=>'En attente',   'cls'=>'p-warning'],
+        'confirmée'    => ['label'=>'Confirmée',    'cls'=>'p-info'],
+        'en_livraison' => ['label'=>'En livraison', 'cls'=>'p-info'],
+        'annulée'      => ['label'=>'Annulée',      'cls'=>'p-danger'],
+    ];
+@endphp
 
-    {{-- ── Retour à la liste ── --}}
-    <a href="{{ route('boutique.clients.index') }}" class="back-link">
-        ← Retour aux clients
-    </a>
+{{-- ═══════════ HERO ═══════════ --}}
+<div class="cl-hero">
+    <a href="{{ route('boutique.clients.index') }}" class="cl-back">← Retour aux clients</a>
 
-    {{-- ════════════════════════════════════════════════════════════
-         PROFIL DU CLIENT
-         Avatar grand format, infos de contact, badge top si applicable
-         ════════════════════════════════════════════════════════════ --}}
-    <div class="profile-card">
-        @php
-            $nameParts = explode(' ', $user->name ?? 'C L');
-            $initials  = strtoupper(substr($nameParts[0],0,1)) . strtoupper(substr($nameParts[1] ?? 'X',0,1));
-        @endphp
-
-        {{-- Grand avatar --}}
-        <div class="profile-av">{{ $initials }}</div>
-
-        {{-- Infos --}}
-        <div class="profile-info">
-            <h1 class="profile-name">{{ $user->name }}</h1>
-
-            {{-- Contacts --}}
-            <div class="profile-contacts">
+    <div class="cl-hero-body">
+        <div class="cl-avatar">{{ $initials }}</div>
+        <div class="cl-hero-info">
+            <h1 class="cl-name">{{ $user->name }}</h1>
+            <div class="cl-contacts">
                 @if($user->email)
-                <span class="profile-contact-item">✉️ {{ $user->email }}</span>
+                    <span class="cl-contact">✉️ {{ $user->email }}</span>
                 @endif
                 @if($user->phone)
-                <span class="profile-contact-item">📞 {{ $user->phone }}</span>
+                    <span class="cl-contact">📞 {{ $user->phone }}</span>
                 @endif
                 @if($user->address)
-                <span class="profile-contact-item">📍 {{ $user->address }}</span>
+                    <span class="cl-contact">📍 {{ $user->address }}</span>
                 @endif
-                <span class="profile-contact-item">
-                    🗓️ Client depuis {{ \Carbon\Carbon::parse($stats->premiere_cmd ?? now())->format('M Y') }}
+                <span class="cl-contact">
+                    🗓️ Client depuis {{ \Carbon\Carbon::parse($stats->premiere_cmd ?? now())->translatedFormat('M Y') }}
                 </span>
             </div>
-
-            {{-- Badge top client ce mois --}}
             @if($isTop)
-            <div class="top-badge">
-                🏆 Top client ce mois
-            </div>
+            <div class="top-badge">🏆 Top client ce mois</div>
             @endif
         </div>
     </div>
+</div>
 
-    {{-- ════════════════════════════════════════════════════════════
-         STATISTIQUES DU CLIENT
-         4 chiffres clés : total dépensé, nb commandes, panier moyen, fidélité
-         ════════════════════════════════════════════════════════════ --}}
-    <div class="stats-grid">
+{{-- ═══════════ KPI FLOTTANTS ═══════════ --}}
+<div class="cl-kpi-row">
 
-        {{-- Total dépensé --}}
-        <div class="stat-card" style="border-top:3px solid #6366f1">
-            <div class="stat-ico">💰</div>
-            <div class="stat-val">{{ number_format(($stats->total_depense ?? 0)/1000, 0) }}k</div>
-            <div class="stat-lbl">GNF dépensés</div>
+    {{-- Total dépensé --}}
+    <div class="cl-kpi">
+        <div class="cl-kpi-ico" style="background:#eef2ff;">💰</div>
+        <div>
+            <div class="cl-kpi-lbl">Total dépensé</div>
+            <div class="cl-kpi-val">{{ $fmt($stats->total_depense ?? 0) }}</div>
+            <span class="cl-kpi-dev">{{ $devise }}</span>
         </div>
-
-        {{-- Nombre de commandes --}}
-        <div class="stat-card" style="border-top:3px solid #3b82f6">
-            <div class="stat-ico">📦</div>
-            <div class="stat-val">{{ $stats->nb_commandes ?? 0 }}</div>
-            <div class="stat-lbl">Commandes</div>
-        </div>
-
-        {{-- Panier moyen --}}
-        <div class="stat-card" style="border-top:3px solid #f59e0b">
-            <div class="stat-ico">🛒</div>
-            <div class="stat-val">
-                @php
-                    $panierMoyen = ($stats->nb_commandes > 0)
-                        ? round(($stats->total_depense / $stats->nb_commandes) / 1000)
-                        : 0;
-                @endphp
-                {{ $panierMoyen }}k
-            </div>
-            <div class="stat-lbl">Panier moyen</div>
-        </div>
-
-        {{-- Dernière commande --}}
-        <div class="stat-card" style="border-top:3px solid #8b5cf6">
-            <div class="stat-ico">🕐</div>
-            <div class="stat-val" style="font-size:13px">
-                {{ $stats->derniere_cmd ? \Carbon\Carbon::parse($stats->derniere_cmd)->diffForHumans() : '—' }}
-            </div>
-            <div class="stat-lbl">Dernière commande</div>
-        </div>
-
     </div>
 
-    {{-- ════════════════════════════════════════════════════════════
-         HISTORIQUE DES COMMANDES
-         Toutes les commandes de ce client dans cette boutique
-         ════════════════════════════════════════════════════════════ --}}
+    {{-- Nb commandes --}}
+    <div class="cl-kpi">
+        <div class="cl-kpi-ico" style="background:#eff6ff;">📦</div>
+        <div>
+            <div class="cl-kpi-lbl">Commandes</div>
+            <div class="cl-kpi-val">{{ $stats->nb_commandes ?? 0 }}</div>
+            <span class="cl-kpi-dev">au total</span>
+        </div>
+    </div>
+
+    {{-- Panier moyen --}}
+    <div class="cl-kpi">
+        <div class="cl-kpi-ico" style="background:#fef3c7;">🛒</div>
+        <div>
+            <div class="cl-kpi-lbl">Panier moyen</div>
+            <div class="cl-kpi-val">{{ $fmt($panierMoyen) }}</div>
+            <span class="cl-kpi-dev">{{ $devise }}</span>
+        </div>
+    </div>
+
+    {{-- Dernière commande --}}
+    <div class="cl-kpi">
+        <div class="cl-kpi-ico" style="background:#f3e8ff;">🕐</div>
+        <div>
+            <div class="cl-kpi-lbl">Dernière commande</div>
+            <div class="cl-kpi-val" style="font-size:13px;letter-spacing:0;line-height:1.3;">
+                {{ $stats->derniere_cmd ? \Carbon\Carbon::parse($stats->derniere_cmd)->diffForHumans() : '—' }}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{{-- ═══════════ HISTORIQUE ═══════════ --}}
+<div class="cl-body">
     <div class="orders-card">
         <div class="card-hd">
             <span class="card-title">📋 Historique des commandes</span>
-            <span style="font-size:11px;color:var(--muted)">{{ $stats->nb_commandes ?? 0 }} commande(s) au total</span>
+            <span class="card-sub">{{ $stats->nb_commandes ?? 0 }} commande(s) · {{ $shop->name }}</span>
         </div>
 
         @if($commandes->isEmpty())
-            <div style="padding:32px;text-align:center;font-size:13px;color:var(--muted)">
-                Aucune commande trouvée.
-            </div>
+            <div class="tbl-empty">Aucune commande trouvée pour ce client.</div>
         @else
         <table class="tbl">
             <thead>
                 <tr>
                     <th>Réf</th>
                     <th>Produits</th>
-                    <th>Montant</th>
+                    <th class="right">Montant</th>
                     <th>Statut</th>
                     <th>Date</th>
                 </tr>
             </thead>
             <tbody>
-                @php
-                /* Map des statuts → labels et couleurs */
-                $statusMap = [
-                    'livrée'       => ['label'=>'Livré',       'cls'=>'p-success'],
-                    'pending'      => ['label'=>'En attente',  'cls'=>'p-warning'],
-                    'en attente'   => ['label'=>'En attente',  'cls'=>'p-warning'],
-                    'confirmée'    => ['label'=>'Confirmée',   'cls'=>'p-info'],
-                    'en_livraison' => ['label'=>'En livraison','cls'=>'p-info'],
-                    'annulée'      => ['label'=>'Annulée',     'cls'=>'p-danger'],
-                ];
-                @endphp
-
                 @foreach($commandes as $order)
                 @php $st = $statusMap[$order->status] ?? ['label'=>ucfirst($order->status),'cls'=>'p-muted']; @endphp
                 <tr>
                     {{-- Référence --}}
                     <td><span class="oid">#{{ $order->id }}</span></td>
 
-                    {{-- Produits de la commande --}}
+                    {{-- Produits --}}
                     <td>
                         @if($order->items && $order->items->count() > 0)
                             @foreach($order->items->take(2) as $item)
-                            <div style="font-size:12px;font-weight:500;color:var(--text)">
+                            <div class="prod-line">
                                 {{ $item->product->name ?? 'Produit supprimé' }}
-                                <span style="color:var(--muted)">×{{ $item->quantity }}</span>
+                                <span class="prod-qty">×{{ $item->quantity }}</span>
                             </div>
                             @endforeach
                             @if($order->items->count() > 2)
-                            <div style="font-size:11px;color:var(--muted)">
-                                +{{ $order->items->count()-2 }} autre(s)
-                            </div>
+                            <div class="prod-more">+{{ $order->items->count()-2 }} autre(s)</div>
                             @endif
                         @else
-                            <span style="color:var(--muted);font-size:12px">—</span>
+                            <span style="color:var(--muted)">—</span>
                         @endif
                     </td>
 
                     {{-- Montant --}}
-                    <td>
-                        <span class="oamt">{{ number_format($order->total, 0, ',', ' ') }}</span>
-                        <span style="font-size:10px;color:var(--muted)"> GNF</span>
+                    <td class="right">
+                        <div class="amt-num">{{ $fmt($order->total) }}</div>
+                        <span class="amt-dev">{{ $devise }}</span>
                     </td>
 
                     {{-- Statut --}}
                     <td><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span></td>
 
                     {{-- Date --}}
-                    <td style="font-size:12px;color:var(--text-2)">
-                        {{ $order->created_at->format('d/m/Y') }}
-                        <div style="font-size:10px;color:var(--muted)">
-                            {{ $order->created_at->format('H:i') }}
-                        </div>
+                    <td>
+                        <div class="dt-main">{{ $order->created_at->format('d/m/Y') }}</div>
+                        <div class="dt-hour">{{ $order->created_at->format('H:i') }}</div>
                     </td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
 
-        {{-- Pagination --}}
         @if($commandes->hasPages())
-        <div class="pagination-wrap">
-            {{ $commandes->links() }}
-        </div>
+        <div class="pagination-wrap">{{ $commandes->links() }}</div>
         @endif
         @endif
-
     </div>
-
 </div>
+
 @endsection

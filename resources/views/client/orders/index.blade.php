@@ -747,7 +747,7 @@ $devise = $orders->first()?->shop?->currency ?? 'GNF';
                 </div>
                 <div style="display:flex;gap:7px;flex-wrap:wrap">
                     {{-- Suivre ── --}}
-                    <a href="{{ route('orders.show', $order) }}" class="btn-action btn-track">
+                    <a href="{{ route('suivi.show', $order) }}" class="btn-action btn-track">
                         🔍 Suivre
                     </a>
                     {{-- Avis (si livrée et pas encore d'avis) ── --}}

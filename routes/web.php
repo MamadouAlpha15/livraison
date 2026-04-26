@@ -103,6 +103,7 @@ use App\Http\Controllers\Client\ShopMessageController;
 use App\Http\Controllers\Boutique\BoutiqueMessageController;
 use App\Http\Controllers\Client\ProductController as ClientProductController;
 
+
 /* ══════════════════════════════════════════════════════════════════════════
 |  2. ROUTES PUBLIQUES
 |  Accessibles sans authentification
@@ -120,8 +121,16 @@ Route::get('/shops/{shop}/products', [PublicShopController::class, 'products'])
     ->name('public.shops.products');
 
 /* Suivi de commande (public — lien partageable) */
-Route::get('/orders/{order}', [SuiviController::class, 'show'])
-    ->name('orders.show');
+Route::get('/suivi/{order}', [SuiviController::class, 'show'])
+    ->name('suivi.show');
+
+/* Position GPS publique pour le suivi (pas d'auth requise) */
+Route::get('/suivi/{order}/position', [SuiviController::class, 'position'])
+    ->name('suivi.position');
+
+/* Données complètes pour le rafraîchissement auto (statut + GPS + livreur) */
+Route::get('/suivi/{order}/data', [SuiviController::class, 'data'])
+    ->name('suivi.data');
 
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -227,6 +236,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/orders/{order}/position', [OrderTrackingController::class, 'update'])
         ->middleware('throttle:30,1')
         ->name('orders.position.update');
+
+    /* Simuler un déplacement GPS (dev/test uniquement) */
+    Route::post('/orders/{order}/simulate-gps', [OrderTrackingTestController::class, 'simulate'])
+        ->name('orders.simulate.gps');
 
 }); // fin middleware('auth')
 
@@ -399,6 +412,7 @@ Route::middleware(['auth', 'role:vendeur,admin'])->group(function () {
     Route::get('orders/{order}',                 [VendeurOrderController::class, 'show'])      ->name('orders.show');
     Route::put('orders/{order}/confirm',         [VendeurOrderController::class, 'confirm'])   ->name('orders.confirm');
     Route::put('orders/{order}/cancel',          [VendeurOrderController::class, 'cancel'])    ->name('orders.cancel');
+    Route::get('orders/{order}/location',        [VendeurOrderController::class, 'location'])  ->name('orders.location');
     Route::get('orders/{order}/assign',          [VendeurOrderController::class, 'showAssign'])->name('orders.assign.show');
     Route::put('orders/{order}/assign',          [VendeurOrderController::class, 'assign'])    ->name('orders.assign');
 
@@ -499,6 +513,8 @@ Route::middleware(['auth', 'role:client'])
 
         /* Commandes classiques */
         Route::resource('orders', OrderController::class)->only(['index', 'store', 'create']);
+       
+        
 
         /* Commander depuis un produit spécifique */
         Route::get('/orders/create-from-product/{product}', [ClientOrderController::class, 'createFromProduct'])->name('orders.createFromProduct');
