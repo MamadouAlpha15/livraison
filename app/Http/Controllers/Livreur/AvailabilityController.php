@@ -1,9 +1,10 @@
 <?php
 
-// app/Http/Controllers/Livreur/AvailabilityController.php
 namespace App\Http\Controllers\Livreur;
 
 use App\Http\Controllers\Controller;
+use App\Models\Driver;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class AvailabilityController extends Controller
@@ -12,18 +13,33 @@ class AvailabilityController extends Controller
     {
         $user = Auth::user();
 
-        // Vérifie que c’est bien un livreur
         if (!in_array($user->role, ['livreur']) && $user->role_in_shop !== 'livreur') {
-            abort(403, 'Accès réservé aux livreurs');
+            abort(403);
         }
 
-        // Inverse le statut
-        $user->is_available = !$user->is_available;
+        $goingOnline = ! $user->is_available;
+
+        // Mettre a jour is_available sur le User
+        $user->is_available = $goingOnline;
         $user->save();
 
-        $message = $user->is_available
-            ? '🟢 Vous êtes maintenant EN LIGNE et disponible pour les livraisons.'
-            : '🔴 Vous êtes maintenant HORS LIGNE.';
+        // Synchroniser le Driver lie (via user_id)
+        $driver = Driver::where('user_id', $user->id)->first();
+        if ($driver) {
+            if ($goingOnline) {
+                // En ligne -> disponible (sauf si deja en mission)
+                if ($driver->status !== 'busy') {
+                    $driver->update(['status' => 'available']);
+                }
+            } else {
+                // Hors ligne -> offline
+                $driver->update(['status' => 'offline']);
+            }
+        }
+
+        $message = $goingOnline
+            ? 'Vous etes maintenant EN LIGNE et disponible pour les livraisons.'
+            : 'Vous etes maintenant HORS LIGNE.';
 
         return back()->with('success', $message);
     }

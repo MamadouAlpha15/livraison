@@ -12,7 +12,7 @@ class Order extends Model
 
     // Ajoute 'livreur_id' si tu fais des fill/update dessus
     protected $fillable = ['user_id','shop_id','total','status','ordonnance','livreur_id','current_lat','current_lng','last_ping_at',
-    'image','delivery_fee','delivery_destination'];
+    'image','delivery_fee','delivery_destination','delivery_company_id','driver_id'];
 
     /* Relations */
 
@@ -103,5 +103,17 @@ protected $casts = [
     public function commission()
     {
         return $this->hasOne(CourierCommission::class);
+    }
+
+    // Entreprise de livraison externe assignée
+    public function deliveryCompany()
+    {
+        return $this->belongsTo(DeliveryCompany::class);
+    }
+
+    // Chauffeur de l'entreprise de livraison assigné
+    public function driver()
+    {
+        return $this->belongsTo(Driver::class);
     }
 }

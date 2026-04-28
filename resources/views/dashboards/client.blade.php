@@ -1085,6 +1085,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     'en_livraison','en livraison' => ['🚴', 'background:#dbeafe'],
                     'annulée','cancelled'          => ['✕',  'background:#fee2e2'],
                     default                       => ['📦', 'background:#fef3c7'],
+                    
                 };
             @endphp
             <a href="{{ route('client.orders.index') }}" class="order-row" data-order-id="{{ $order->id }}" data-order-status="{{ $order->status }}">

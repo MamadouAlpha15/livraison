@@ -71,6 +71,7 @@ use App\Http\Controllers\Client\ReviewController;
 use App\Http\Controllers\DeliveryCompanyController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\DeliveryChatController;
+use App\Http\Controllers\Company\OrderController as CompanyOrderController;
 
 /* ── Contrôleurs : Export (Excel / PDF) ── */
 use App\Http\Controllers\Boutique\ExportController;
@@ -177,26 +178,42 @@ Route::middleware('auth')->group(function () {
 
     /* ════════════════════════════════════════════════════════════════════
     |  11. ENTREPRISES DE LIVRAISON
-    |  Requiert : auth (toutes les routes de cette section)
+    |  Requiert : auth
     ════════════════════════════════════════════════════════════════════ */
 
-    /* Listing public des entreprises + contact */
-    Route::get('/delivery-companies',         [DeliveryCompanyController::class, 'index'])->name('delivery.companies.index');
+    /* Listing public des entreprises (tout utilisateur connecté) */
+    Route::get('/delivery-companies',          [DeliveryCompanyController::class, 'index'])->name('delivery.companies.index');
     Route::get('/delivery-companies/{company}',[DeliveryCompanyController::class, 'show']) ->name('delivery.companies.show');
 
-    /* Chat entre une boutique et une entreprise de livraison */
-    Route::get('/company/{company}/chat',              [DeliveryChatController::class, 'show'])    ->name('company.chat.show');
-    Route::post('/company/{company}/chat/send',        [DeliveryChatController::class, 'send'])    ->name('company.chat.send');
-    Route::get('/company/{company}/chat/messages',     [DeliveryChatController::class, 'messages'])->name('company.chat.messages');
-
-    /* Espace propriétaire d'entreprise de livraison */
+    /* Espace company + admin boutique */
     Route::middleware('role:admin,company')->prefix('company')->group(function () {
+
+        /* Dashboard */
         Route::get('/', [DeliveryCompanyController::class, 'dashboard'])->name('company.dashboard');
 
+        /* Inbox company — toutes les conversations entrants (avant /{company} pour éviter conflit) */
+        Route::get('/chat/inbox',         [DeliveryChatController::class, 'inbox'])        ->name('company.chat.inbox');
+        Route::get('/chat/conversations', [DeliveryChatController::class, 'conversations'])->name('company.chat.conversations');
+        Route::post('/chat/mark-read',    [DeliveryChatController::class, 'markRead'])     ->name('company.chat.markRead');
+
+        /* Chat boutique → company (page de conversation) */
+        Route::get('/{company}/chat',          [DeliveryChatController::class, 'show'])    ->name('company.chat.show');
+        Route::post('/{company}/chat/send',    [DeliveryChatController::class, 'send'])    ->name('company.chat.send');
+        Route::get('/{company}/chat/messages', [DeliveryChatController::class, 'messages'])->name('company.chat.messages');
+
         /* Gestion des chauffeurs */
-        Route::post('/drivers',           [DriverController::class, 'store'])  ->name('company.drivers.store');
-        Route::put('/drivers/{driver}',   [DriverController::class, 'update']) ->name('company.drivers.update');
-        Route::delete('/drivers/{driver}',[DriverController::class, 'destroy'])->name('company.drivers.destroy');
+        Route::get('/drivers',                       [DriverController::class, 'index'])        ->name('company.drivers.index');
+        Route::get('/drivers/create',                [DriverController::class, 'create'])       ->name('company.drivers.create');
+        Route::post('/drivers',                      [DriverController::class, 'store'])        ->name('company.drivers.store');
+        Route::get('/drivers/{driver}/edit',         [DriverController::class, 'edit'])         ->name('company.drivers.edit');
+        Route::put('/drivers/{driver}',              [DriverController::class, 'update'])       ->name('company.drivers.update');
+        Route::patch('/drivers/{driver}/status',     [DriverController::class, 'updateStatus']) ->name('company.drivers.status');
+        Route::delete('/drivers/{driver}',           [DriverController::class, 'destroy'])      ->name('company.drivers.destroy');
+
+        /* Commandes (vue globale entreprise de livraison) */
+        Route::get('/orders',                           [CompanyOrderController::class, 'index'])       ->name('company.orders.index');
+        Route::post('/orders/{order}/assign',           [CompanyOrderController::class, 'assign'])      ->name('company.orders.assign');
+        Route::post('/orders/{order}/status',           [CompanyOrderController::class, 'updateStatus'])->name('company.orders.status');
 
         /* Création de l'entreprise */
         Route::get('/delivery-company/create', [DeliveryCompanyController::class, 'create'])->name('delivery.company.create');
@@ -408,13 +425,14 @@ Route::middleware(['auth', 'role:vendeur,admin'])->group(function () {
     Route::post('products/upload-image', [ProductController::class, 'uploadImage'])->name('products.upload.image');
 
     /* ── Commandes (vendeur) ── */
-    Route::get('orders',                         [VendeurOrderController::class, 'index'])     ->name('orders.index');
-    Route::get('orders/{order}',                 [VendeurOrderController::class, 'show'])      ->name('orders.show');
-    Route::put('orders/{order}/confirm',         [VendeurOrderController::class, 'confirm'])   ->name('orders.confirm');
-    Route::put('orders/{order}/cancel',          [VendeurOrderController::class, 'cancel'])    ->name('orders.cancel');
-    Route::get('orders/{order}/location',        [VendeurOrderController::class, 'location'])  ->name('orders.location');
-    Route::get('orders/{order}/assign',          [VendeurOrderController::class, 'showAssign'])->name('orders.assign.show');
-    Route::put('orders/{order}/assign',          [VendeurOrderController::class, 'assign'])    ->name('orders.assign');
+    Route::get('orders',                              [VendeurOrderController::class, 'index'])          ->name('orders.index');
+    Route::get('orders/{order}',                      [VendeurOrderController::class, 'show'])           ->name('orders.show');
+    Route::put('orders/{order}/confirm',              [VendeurOrderController::class, 'confirm'])        ->name('orders.confirm');
+    Route::put('orders/{order}/cancel',               [VendeurOrderController::class, 'cancel'])         ->name('orders.cancel');
+    Route::get('orders/{order}/location',             [VendeurOrderController::class, 'location'])       ->name('orders.location');
+    Route::get('orders/{order}/assign',               [VendeurOrderController::class, 'showAssign'])     ->name('orders.assign.show');
+    Route::put('orders/{order}/assign',               [VendeurOrderController::class, 'assign'])         ->name('orders.assign');
+    Route::put('orders/{order}/send-to-company',      [VendeurOrderController::class, 'sendToCompany'])  ->name('orders.sendToCompany');
 
     /* ── Avis / Reviews ── */
     Route::get('reviews', [VendeurReviewController::class, 'index'])->name('reviews.index');
@@ -439,10 +457,11 @@ Route::middleware(['auth', 'role:employe,superadmin,admin,vendeur'])
         Route::get('/dashboard', [EmployeDashboard::class, 'index'])->name('dashboard');
 
         /* Commandes */
-        Route::get('orders',                    [EmployeOrderController::class, 'index']) ->name('orders.index');
-        Route::put('orders/{order}/assign',     [EmployeOrderController::class, 'assign'])->name('orders.assign');
-        Route::put('orders/{order}/cancel',     [EmployeOrderController::class, 'cancel'])->name('orders.cancel');
-        Route::put('orders/{order}/restore',    [EmployeOrderController::class, 'restore'])->name('orders.restore');
+        Route::get('orders',                              [EmployeOrderController::class, 'index'])         ->name('orders.index');
+        Route::put('orders/{order}/assign',               [EmployeOrderController::class, 'assign'])        ->name('orders.assign');
+        Route::put('orders/{order}/send-to-company',      [EmployeOrderController::class, 'sendToCompany']) ->name('orders.sendToCompany');
+        Route::put('orders/{order}/cancel',               [EmployeOrderController::class, 'cancel'])        ->name('orders.cancel');
+        Route::put('orders/{order}/restore',              [EmployeOrderController::class, 'restore'])       ->name('orders.restore');
 
         /* Paiements */
         Route::get('payments', [AdminPaymentController::class, 'index'])->name('payments.index');

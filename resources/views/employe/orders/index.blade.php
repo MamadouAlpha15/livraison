@@ -239,6 +239,53 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
     }
 @endphp
 
+{{-- ══ MODAL ENTREPRISE DE LIVRAISON ══ --}}
+<div class="modal-overlay" id="companyModal">
+    <div class="modal-box" style="max-width:460px;">
+        <div class="modal-icon">🏢</div>
+        <div class="modal-title">Confier à une entreprise</div>
+        <div class="modal-sub" style="margin-bottom:14px;">Sélectionnez l'entreprise qui prendra en charge cette livraison.</div>
+
+        <form id="companyForm" method="POST" action="">
+            @csrf @method('PUT')
+            <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px;max-height:260px;overflow-y:auto;">
+                @forelse($deliveryCompanies as $dc)
+                <label style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;transition:border-color .14s;background:var(--bg);"
+                       onclick="this.style.borderColor='#6366f1'"
+                       onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='var(--border)'">
+                    <input type="radio" name="delivery_company_id" value="{{ $dc->id }}"
+                           style="accent-color:#6366f1;width:16px;height:16px;flex-shrink:0;"
+                           onchange="document.querySelectorAll('#companyModal label').forEach(l=>l.style.borderColor='var(--border)'); this.closest('label').style.borderColor='#6366f1';">
+                    <div style="width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;">
+                        @if($dc->image)
+                            <img src="{{ asset('storage/'.$dc->image) }}" style="width:100%;height:100%;object-fit:cover;" alt="">
+                        @else
+                            <span style="font-size:16px;">🚚</span>
+                        @endif
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:13.5px;font-weight:700;color:var(--text);">{{ $dc->name }}</div>
+                        <div style="font-size:11px;color:var(--muted);">
+                            {{ $dc->phone ?? '' }}
+                            @if($dc->commission_percent) · Commission {{ number_format($dc->commission_percent,0) }}% @endif
+                        </div>
+                    </div>
+                </label>
+                @empty
+                <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">
+                    Aucune entreprise de livraison approuvée disponible.
+                </div>
+                @endforelse
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn" onclick="closeCompanyModal()">← Annuler</button>
+                <button type="submit" class="btn btn-primary" style="flex:1;">🏢 Confier la livraison</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 {{-- MODALS --}}
 <div class="modal-overlay" id="cancelModal">
     <div class="modal-box">
@@ -436,7 +483,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                 <div class="empty-state"><span class="ico">📭</span><p>Aucune commande.</p></div>
                 @else
                 <table class="tbl">
-                    <thead><tr><th>#</th><th>Client</th><th>Produit</th><th>Montant</th><th>Statut</th><th>Livreur</th><th>Assigner</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>#</th><th>Client</th><th>Produit</th><th>Montant</th><th>Statut</th><th>Livreur / Entreprise</th><th>Assigner</th><th>Actions</th></tr></thead>
                     <tbody>
                     @foreach($orders as $order)
                     @php
@@ -456,14 +503,43 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         </td>
                         <td><div class="amount">{{ number_format($order->total,0,',',' ') }} <small>{{ $devise }}</small></div></td>
                         <td><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span></td>
-                        <td>@if($order->livreur)<div class="lv-chip"><div class="lv-chip-av">{{ initiales($order->livreur->name) }}</div>{{ Str::limit($order->livreur->name,14) }}</div>@else<span class="pill p-warning">Aucun</span>@endif</td>
                         <td>
-                            @if(!$order->livreur)
-                            <form action="{{ route('employe.orders.assign',$order) }}" method="POST" class="assign-form">@csrf @method('PUT')
-                                <select name="livreur_id" class="assign-select" required><option value="">— Choisir —</option>@foreach($livreurs as $lv)<option value="{{ $lv->id }}">{{ $lv->name }} {{ $lv->is_available ? '🟢' : '🟡' }}</option>@endforeach</select>
-                                <button type="submit" class="btn btn-primary btn-sm">✅</button>
-                            </form>
-                            @else<span class="btn btn-assigned btn-sm">✔ Assignée</span>@endif
+                            @if($order->livreur)
+                                <div class="lv-chip"><div class="lv-chip-av">{{ initiales($order->livreur->name) }}</div>{{ Str::limit($order->livreur->name,14) }}</div>
+                            @elseif($order->deliveryCompany)
+                                <div class="lv-chip" style="background:#eef2ff;border-color:#c7d2fe;color:#4f46e5;">
+                                    <div class="lv-chip-av" style="background:#6366f1;">🏢</div>
+                                    {{ Str::limit($order->deliveryCompany->name,14) }}
+                                </div>
+                            @else
+                                <span class="pill p-warning">Aucun</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if(!$order->livreur && !$order->deliveryCompany)
+                            <div class="assign-form" style="gap:4px;">
+                                {{-- Livreur interne --}}
+                                <form action="{{ route('employe.orders.assign',$order) }}" method="POST" style="display:flex;gap:4px;align-items:center;">
+                                    @csrf @method('PUT')
+                                    <select name="livreur_id" class="assign-select" required>
+                                        <option value="">🚴 Livreur…</option>
+                                        @foreach($livreurs as $lv)
+                                        <option value="{{ $lv->id }}">{{ $lv->name }} {{ $lv->is_available ? '🟢' : '🟡' }}</option>
+                                        @endforeach
+                                    </select>
+                                    <button type="submit" class="btn btn-primary btn-sm" title="Assigner ce livreur">✅</button>
+                                </form>
+                                {{-- Entreprise externe --}}
+                                <button type="button"
+                                        class="btn btn-sm"
+                                        style="background:#eef2ff;border-color:#c7d2fe;color:#4f46e5;white-space:nowrap;"
+                                        onclick="openCompanyModal({{ $order->id }})">
+                                    🏢
+                                </button>
+                            </div>
+                            @elseif($order->livreur || $order->deliveryCompany)
+                                <span class="btn btn-assigned btn-sm">✔ Assignée</span>
+                            @endif
                         </td>
                         <td><div style="display:flex;align-items:center;gap:5px;flex-wrap:nowrap">
                             <a href="{{ route('orders.show',$order) }}" class="btn btn-info btn-sm">🔍</a>
@@ -520,6 +596,24 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 
 @push('scripts')
 <script>
+/* ── Modal entreprise de livraison ── */
+function openCompanyModal(orderId) {
+    const url = `/employe/orders/${orderId}/send-to-company`;
+    document.getElementById('companyForm').action = url;
+    // reset sélection
+    document.querySelectorAll('#companyModal input[type=radio]').forEach(r => r.checked = false);
+    document.querySelectorAll('#companyModal label').forEach(l => l.style.borderColor = 'var(--border)');
+    document.getElementById('companyModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closeCompanyModal() {
+    document.getElementById('companyModal').classList.remove('open');
+    document.body.style.overflow = '';
+}
+document.getElementById('companyModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeCompanyModal();
+});
+
 function toggleGroup(btn) {
     const sub = btn.nextElementSibling;
     const isOpen = sub.classList.contains('open');

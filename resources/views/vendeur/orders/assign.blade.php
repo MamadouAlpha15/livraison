@@ -181,11 +181,26 @@ body{font-family:var(--font);background:var(--bg);color:var(--text)}
 
     </div>
 
-    {{-- COLONNE DROITE : Livreurs --}}
-    <div class="as-card" style="align-self:start;">
+    {{-- COLONNE DROITE : Onglets Livreur / Entreprise --}}
+    <div style="align-self:start;display:flex;flex-direction:column;gap:14px;">
+
+    {{-- Tabs --}}
+    <div style="display:flex;gap:0;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;">
+        <button id="tabLivreur" type="button" onclick="switchTab('livreur')"
+            style="flex:1;padding:11px;font-size:13px;font-weight:800;font-family:var(--font);border:none;cursor:pointer;transition:all .15s;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;">
+            🚴 Mon livreur
+        </button>
+        <button id="tabCompany" type="button" onclick="switchTab('company')"
+            style="flex:1;padding:11px;font-size:13px;font-weight:800;font-family:var(--font);border:none;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted);">
+            🏢 Entreprise externe
+        </button>
+    </div>
+
+    {{-- PANEL : Livreurs internes --}}
+    <div id="panelLivreur" class="as-card">
         <div class="as-card-hd">
             <span style="font-size:18px">🚴</span>
-            <span class="as-card-hd-title">Choisir un livreur</span>
+            <span class="as-card-hd-title">Choisir un livreur interne</span>
         </div>
 
         @if(session('success'))
@@ -254,7 +269,80 @@ body{font-family:var(--font);background:var(--bg);color:var(--text)}
             <a href="{{ route('boutique.employees.create') }}" style="display:inline-block;margin-top:12px;padding:9px 16px;background:var(--brand);color:#fff;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;">+ Ajouter un livreur</a>
         </div>
         @endforelse
-    </div>
+    </div>{{-- /panelLivreur --}}
+
+    {{-- PANEL : Entreprises de livraison externes --}}
+    <div id="panelCompany" class="as-card" style="display:none;">
+        <div class="as-card-hd">
+            <span style="font-size:18px">🏢</span>
+            <span class="as-card-hd-title">Confier à une entreprise</span>
+        </div>
+
+        @if($order->delivery_company_id)
+        <div class="as-alert success" style="margin:12px 16px;">
+            ✅ Déjà confiée à une entreprise de livraison. Vous pouvez en changer ci-dessous.
+        </div>
+        @endif
+
+        <form action="{{ route('orders.sendToCompany', $order) }}" method="POST" id="companyForm">
+            @csrf @method('PUT')
+            <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
+                @forelse($deliveryCompanies as $dc)
+                @php $isSelected = $order->delivery_company_id == $dc->id; @endphp
+                <label class="as-livreur-card {{ $isSelected ? 'assigned' : '' }}" id="dc_{{ $dc->id }}"
+                       style="{{ $isSelected ? '' : 'cursor:pointer;' }}"
+                       onclick="{{ $isSelected ? '' : 'selectCompany('.$dc->id.')' }}">
+                    <input type="radio" name="delivery_company_id" value="{{ $dc->id }}"
+                           id="dc_radio_{{ $dc->id }}" style="display:none"
+                           {{ $isSelected ? 'checked' : '' }}>
+                    <div class="as-lv-top">
+                        <div class="as-lv-av" style="border-radius:10px;background:linear-gradient(135deg,#4f46e5,#7c3aed);">
+                            @if($dc->image)
+                                <img src="{{ asset('storage/'.$dc->image) }}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;" alt="">
+                            @else
+                                🚚
+                            @endif
+                        </div>
+                        <div style="flex:1;min-width:0;">
+                            <div class="as-lv-name">{{ $dc->name }}</div>
+                            <div class="as-lv-phone">
+                                {{ $dc->phone ?? '' }}
+                                @if($dc->commission_percent) · Commission {{ number_format($dc->commission_percent,0) }}% @endif
+                            </div>
+                        </div>
+                        @if($isSelected)
+                            <span class="as-lv-status online">✅ Assignée</span>
+                        @else
+                            <span class="as-lv-status" style="background:#eef2ff;color:#4f46e5;">Choisir</span>
+                        @endif
+                    </div>
+                    @if($isSelected)
+                    <div class="as-assigned-badge" style="margin-top:10px;">
+                        ✅ Cette entreprise gère actuellement la livraison
+                    </div>
+                    @endif
+                </label>
+                @empty
+                <div style="padding:24px;text-align:center;color:var(--muted);">
+                    <div style="font-size:32px;margin-bottom:8px;opacity:.3">🏢</div>
+                    <div style="font-size:13px;font-weight:600;">Aucune entreprise de livraison disponible.</div>
+                </div>
+                @endforelse
+            </div>
+
+            @if($deliveryCompanies->count() > 0)
+            <div style="padding:0 16px 16px;">
+                <button type="submit" id="companySubmitBtn"
+                        style="width:100%;padding:13px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(99,102,241,.35);transition:all .2s;"
+                        disabled>
+                    🏢 Confier cette livraison
+                </button>
+            </div>
+            @endif
+        </form>
+    </div>{{-- /panelCompany --}}
+
+    </div>{{-- /colonne droite --}}
 
 </div>
 @endsection
@@ -262,6 +350,43 @@ body{font-family:var(--font);background:var(--bg);color:var(--text)}
 @push('scripts')
 <script>
 const CSRF = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+
+/* ── Onglets Livreur / Entreprise ── */
+function switchTab(tab) {
+    const isLivreur = tab === 'livreur';
+    document.getElementById('panelLivreur').style.display = isLivreur ? '' : 'none';
+    document.getElementById('panelCompany').style.display = isLivreur ? 'none' : '';
+
+    const tL = document.getElementById('tabLivreur');
+    const tC = document.getElementById('tabCompany');
+    if (isLivreur) {
+        tL.style.background = 'linear-gradient(135deg,var(--navy),var(--navy2))';
+        tL.style.color = '#fff';
+        tC.style.background = 'transparent';
+        tC.style.color = 'var(--muted)';
+    } else {
+        tC.style.background = 'linear-gradient(135deg,#4f46e5,#7c3aed)';
+        tC.style.color = '#fff';
+        tL.style.background = 'transparent';
+        tL.style.color = 'var(--muted)';
+    }
+}
+
+/* ── Sélection entreprise ── */
+function selectCompany(id) {
+    document.querySelectorAll('#panelCompany .as-livreur-card:not(.assigned)').forEach(c => c.classList.remove('selected'));
+    const card = document.getElementById('dc_' + id);
+    if (card) card.classList.add('selected');
+    const radio = document.getElementById('dc_radio_' + id);
+    if (radio) radio.checked = true;
+    const btn = document.getElementById('companySubmitBtn');
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+}
+
+// Si commande déjà confiée → ouvrir l'onglet entreprise automatiquement
+@if($order->delivery_company_id)
+document.addEventListener('DOMContentLoaded', () => switchTab('company'));
+@endif
 
 function selectLivreur(id) {
     // Fermer tous les panels et désélectionner

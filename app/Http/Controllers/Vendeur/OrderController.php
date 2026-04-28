@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Vendeur;
 
 use App\Http\Controllers\Controller;
+use App\Models\DeliveryCompany;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -102,11 +103,16 @@ class OrderController extends Controller
         $livreurs = User::query()
             ->where('role', 'livreur')
             ->where('shop_id', $shopId)
-            ->orderByDesc('is_available') // disponibles en haut
+            ->orderByDesc('is_available')
             ->orderBy('name')
             ->get();
 
-        return view('vendeur.orders.assign', compact('order', 'livreurs'));
+        $deliveryCompanies = DeliveryCompany::where('approved', true)
+            ->where('active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'phone', 'image', 'commission_percent', 'address']);
+
+        return view('vendeur.orders.assign', compact('order', 'livreurs', 'deliveryCompanies'));
     }
 
     /**
@@ -174,6 +180,37 @@ class OrderController extends Controller
         ->with('success', 'Commande assignée à ' . $livreur->name . ' · Frais : ' . number_format($data['delivery_fee'], 0, ',', ' ') . ' ' . ($shop?->currency ?? 'GNF') . '.');
 }
 
+
+    /**
+     * Confier la livraison à une entreprise de livraison externe
+     */
+    public function sendToCompany(Request $request, Order $order)
+    {
+        $user   = Auth::user();
+        $shop   = $user->shop ?: $user->assignedShop;
+        $shopId = $shop?->id;
+
+        abort_unless($shopId && $order->shop_id === $shopId, 403, 'Action non autorisée.');
+
+        $data = $request->validate([
+            'delivery_company_id' => ['required', 'exists:delivery_companies,id'],
+        ]);
+
+        $company = DeliveryCompany::where('id', $data['delivery_company_id'])
+            ->where('approved', true)
+            ->where('active', true)
+            ->firstOrFail();
+
+        $order->update([
+            'delivery_company_id' => $company->id,
+            'livreur_id'          => null,
+            'driver_id'           => null,
+            'status'              => Order::STATUS_CONFIRMEE,
+        ]);
+
+        return redirect()->route('orders.assign.show', $order->id)
+            ->with('success', "Commande confiée à {$company->name}. Leur équipe assignera un chauffeur.");
+    }
 
     /**
      * Annuler une commande de MA boutique

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Employe;
 
 use App\Http\Controllers\Controller;
+use App\Models\DeliveryCompany;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\ShopMessage;
@@ -20,7 +21,7 @@ class OrderController extends Controller
                 ->with('error', 'Aucune boutique rattachée à votre compte.');
         }
 
-        $q = Order::with(['client', 'shop', 'livreur', 'items.product'])
+        $q = Order::with(['client', 'shop', 'livreur', 'driver', 'deliveryCompany', 'items.product'])
             ->inShop($shopId)
             ->latest();
 
@@ -52,9 +53,10 @@ class OrderController extends Controller
 
         $orders = $q->paginate(15)->withQueryString();
 
-        $livreurs = User::livreurs()->inShop($shopId)->orderBy('name')->get();
-        $shop     = Auth::user()->shop ?? Auth::user()->assignedShop;
-        $devise   = $shop?->currency ?? 'GNF';
+        $livreurs          = User::livreurs()->inShop($shopId)->orderBy('name')->get();
+        $deliveryCompanies = DeliveryCompany::where('approved', true)->where('active', true)->orderBy('name')->get(['id','name','phone','image','commission_percent']);
+        $shop              = Auth::user()->shop ?? Auth::user()->assignedShop;
+        $devise            = $shop?->currency ?? 'GNF';
 
         $clientMessages = ShopMessage::where('shop_id', $shopId)
             ->with(['sender', 'receiver', 'product'])
@@ -68,7 +70,7 @@ class OrderController extends Controller
             });
 
         return view('employe.orders.index', compact(
-            'orders', 'livreurs', 'devise', 'shop', 'clientMessages',
+            'orders', 'livreurs', 'deliveryCompanies', 'devise', 'shop', 'clientMessages',
             'search', 'status', 'dateFilter', 'dateFrom', 'dateTo'
         ));
     }
@@ -92,6 +94,30 @@ class OrderController extends Controller
         }
 
         return back()->with('success', 'Commande assignée au livreur.');
+    }
+
+    public function sendToCompany(Request $request, Order $order)
+    {
+        $shopId = Auth::user()->currentShopId();
+        abort_unless($shopId && $order->shop_id === $shopId, 403, 'Commande hors de votre boutique.');
+
+        $data = $request->validate([
+            'delivery_company_id' => ['required', 'exists:delivery_companies,id'],
+        ]);
+
+        $company = DeliveryCompany::where('id', $data['delivery_company_id'])
+            ->where('approved', true)
+            ->where('active', true)
+            ->firstOrFail();
+
+        $order->update([
+            'delivery_company_id' => $company->id,
+            'livreur_id'          => null,
+            'driver_id'           => null,
+            'status'              => 'confirmée',
+        ]);
+
+        return back()->with('success', "Commande #$order->id confiée à {$company->name}.");
     }
 
     public function cancel(Order $order)
