@@ -182,15 +182,19 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
     $fmt = fn($n) => number_format($n ?? 0, 0, ',', ' ') . ' ' . $devise;
 
     $statusMap = [
-        'delivering'   => ['label'=>'En livraison','cls'=>'s-delivering'],
-        'en_livraison' => ['label'=>'En livraison','cls'=>'s-delivering'],
-        'shipped'      => ['label'=>'Expédiée','cls'=>'s-delivering'],
-        'delivered'    => ['label'=>'Livrée','cls'=>'s-delivered'],
-        'livrée'       => ['label'=>'Livrée','cls'=>'s-delivered'],
-        'completed'    => ['label'=>'Terminée','cls'=>'s-delivered'],
-        'ready'        => ['label'=>'Prête','cls'=>'s-ready'],
-        'prête'        => ['label'=>'Prête','cls'=>'s-ready'],
-        'assigned'     => ['label'=>'Assignée','cls'=>'s-ready'],
+        'en_attente'   => ['label'=>'En attente',   'cls'=>'s-ready'],
+        'confirmée'    => ['label'=>'À récupérer',  'cls'=>'s-ready'],
+        'confirmed'    => ['label'=>'À récupérer',  'cls'=>'s-ready'],
+        'delivering'   => ['label'=>'En livraison', 'cls'=>'s-delivering'],
+        'en_livraison' => ['label'=>'En livraison', 'cls'=>'s-delivering'],
+        'shipped'      => ['label'=>'Expédiée',     'cls'=>'s-delivering'],
+        'delivered'    => ['label'=>'Livrée',        'cls'=>'s-delivered'],
+        'livrée'       => ['label'=>'Livrée',        'cls'=>'s-delivered'],
+        'completed'    => ['label'=>'Terminée',      'cls'=>'s-delivered'],
+        'ready'        => ['label'=>'Prête',          'cls'=>'s-ready'],
+        'prête'        => ['label'=>'Prête',          'cls'=>'s-ready'],
+        'assigned'     => ['label'=>'Assignée',      'cls'=>'s-ready'],
+        'annulée'      => ['label'=>'Annulée',       'cls'=>'s-other'],
     ];
 @endphp
 
@@ -269,8 +273,8 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
         <div class="lv-order-row">
             <div class="lv-order-ico">📦</div>
             <div style="flex:1;min-width:0">
-                <div class="lv-order-num">Commande #{{ $order->id }}</div>
-                <div class="lv-order-client">{{ $order->user?->name ?? 'Client' }}</div>
+                <div class="lv-order-num">Commande #{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</div>
+                <div class="lv-order-client">{{ $order->client?->name ?? $order->user?->name ?? 'Client' }}</div>
             </div>
             <div class="lv-order-amount">{{ $fmt($order->total) }}</div>
             <span class="lv-order-status {{ $st['cls'] }}">{{ $st['label'] }}</span>

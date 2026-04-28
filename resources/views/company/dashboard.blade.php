@@ -37,8 +37,8 @@ html.cx-prelight body { background:#F5F7FA !important; }
     --cx-blue:      #3b82f6;
     --cx-orange:    #f59e0b;
     --cx-red:       #ef4444;
-    --cx-sb-w:      260px;
-    --sb-w:         260px;
+    --cx-sb-w:      220px;
+    --sb-w:         220px;
     --cx-top-h:     60px;
     --r:            12px;
     --r-sm:         8px;
@@ -57,6 +57,14 @@ body.cx-dashboard > nav,
 body.cx-dashboard > header,
 body.cx-dashboard .navbar,
 body.cx-dashboard > .topbar-global { display:none !important; }
+
+/* Neutraliser le container Bootstrap du layout (container-xxl) */
+body.cx-dashboard > main.app-main {
+    padding: 0 !important;
+    margin:  0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+}
 
 /* ══ STRUCTURE PRINCIPALE ══ */
 .cx-wrap { display:flex; min-height:100vh; padding-left:var(--cx-sb-w); }

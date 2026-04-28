@@ -84,26 +84,23 @@ class OrderController extends Controller
             ->where('delivery_company_id', $company->id)
             ->firstOrFail();
 
+        // Statut → confirmée : c'est le livreur qui déclenche "en_livraison" depuis son dashboard
         $order->update([
             'driver_id'            => $driver->id,
             'delivery_fee'         => $data['delivery_fee'],
             'delivery_destination' => $data['delivery_destination'] ?? $order->delivery_destination,
-            'status'               => Order::STATUS_EN_LIVRAISON,
+            'status'               => Order::STATUS_CONFIRMEE,
         ]);
 
-        $driver->update(['status' => 'busy']);
-
-        // Synchroniser User.is_available → false (en mission)
-        if ($driver->user_id) {
-            \App\Models\User::where('id', $driver->user_id)->update(['is_available' => false]);
-        }
+        // Le statut du chauffeur et son is_available ne changent PAS ici.
+        // C'est le livreur qui passe "en_livraison" depuis son propre dashboard.
 
         return response()->json([
             'success'      => true,
             'driver_name'  => $driver->name,
             'driver_phone' => $driver->phone,
             'delivery_fee' => number_format($data['delivery_fee'], 0, ',', ' '),
-            'status'       => Order::STATUS_EN_LIVRAISON,
+            'status'       => Order::STATUS_CONFIRMEE,
         ]);
     }
 
@@ -125,14 +122,19 @@ class OrderController extends Controller
 
         $order->update(['status' => $data['status']]);
 
-        // Libérer le chauffeur si livraison terminée
-        if (in_array($data['status'], [Order::STATUS_LIVREE, Order::STATUS_ANNULEE], true) && $order->driver_id) {
+        if ($order->driver_id) {
             $freedDriver = Driver::find($order->driver_id);
             if ($freedDriver) {
-                $freedDriver->update(['status' => 'available']);
-                // Synchroniser User.is_available → true (de nouveau disponible)
-                if ($freedDriver->user_id) {
-                    \App\Models\User::where('id', $freedDriver->user_id)->update(['is_available' => true]);
+                if (in_array($data['status'], [Order::STATUS_LIVREE, Order::STATUS_ANNULEE], true)) {
+                    // Libérer le chauffeur : statut selon son is_available (ne pas forcer is_available)
+                    $driverIsOnline = $freedDriver->user_id
+                        ? (bool) \App\Models\User::where('id', $freedDriver->user_id)->value('is_available')
+                        : false;
+                    $freedDriver->update(['status' => $driverIsOnline ? 'available' : 'offline']);
+
+                } elseif ($data['status'] === Order::STATUS_EN_LIVRAISON) {
+                    // L'entreprise force manuellement en_livraison → marquer le chauffeur busy
+                    $freedDriver->update(['status' => 'busy']);
                 }
             }
         }

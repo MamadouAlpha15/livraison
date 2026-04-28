@@ -2,6 +2,7 @@
 @section('title', 'Mes commandes · ' . $company->name)
 @php $bodyClass = 'is-dashboard'; @endphp
 
+
 @push('styles')
 <style>
 *,*::before,*::after{box-sizing:border-box}
@@ -251,65 +252,98 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle;}
 
 /* ── MODAL ── */
 .modal-overlay{
-    position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:900;
-    display:flex;align-items:center;justify-content:center;padding:20px;
-    backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .2s;
+    display:none;
+    position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1500;
+    align-items:center;justify-content:center;padding:20px;
 }
-.modal-overlay.open{opacity:1;pointer-events:all;}
-.modal{
+.modal-overlay.open{ display:flex; }
+.cx-modal{
     background:var(--cx-card);border:1px solid var(--cx-border2);
     border-radius:var(--r);width:100%;max-width:520px;max-height:90vh;
     overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.5);
     transform:translateY(16px);transition:transform .2s;
 }
-.modal-overlay.open .modal{transform:translateY(0);}
-.modal-hd{
+.modal-overlay.open .cx-modal{transform:translateY(0);}
+.cx-modal-hd{
     padding:18px 22px;border-bottom:1px solid var(--cx-border);
-    display:flex;align-items:center;justify-content:space-between;
+    display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
     position:sticky;top:0;background:var(--cx-card);z-index:1;
 }
-.modal-title{font-size:15px;font-weight:800;color:var(--cx-text);}
-.modal-close{
+.cx-modal-title{font-size:15px;font-weight:800;color:var(--cx-text);}
+.cx-modal-sub{font-size:12px;color:var(--cx-muted);margin-top:3px;}
+.cx-modal-close{
     background:var(--cx-card2);border:1px solid var(--cx-border);border-radius:var(--r-xs);
-    width:30px;height:30px;display:flex;align-items:center;justify-content:center;
+    width:30px;height:30px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
     color:var(--cx-text2);cursor:pointer;font-size:16px;transition:all .14s;
 }
-.modal-close:hover{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.25);color:#dc2626;}
-.modal-body{padding:20px 22px;}
+.cx-modal-close:hover{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.25);color:#dc2626;}
+.cx-modal-body{padding:20px 22px;}
 
-.driver-radio{display:flex;flex-direction:column;gap:8px;margin-bottom:18px;}
+.driver-radio{display:flex;flex-direction:column;gap:8px;max-height:280px;overflow-y:auto;
+    scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.25) transparent;margin-bottom:4px;}
+.driver-radio::-webkit-scrollbar{width:3px;}
+.driver-radio::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3);border-radius:3px;}
 .driver-opt{
     display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--r-sm);
     border:1.5px solid var(--cx-border);cursor:pointer;transition:all .14s;background:var(--cx-card2);
 }
-.driver-opt:hover{border-color:rgba(124,58,237,.4);}
+.driver-opt:hover{border-color:rgba(124,58,237,.4);background:rgba(124,58,237,.04);}
 .driver-opt input[type=radio]{display:none;}
-.driver-opt.selected{border-color:var(--cx-brand);background:rgba(124,58,237,.1);}
+.driver-opt.selected{border-color:var(--cx-brand);background:rgba(124,58,237,.08);
+    box-shadow:0 0 0 3px rgba(124,58,237,.1);}
+.driver-opt.not-avail{opacity:.5;cursor:default;}
+.driver-opt.not-avail:hover{border-color:var(--cx-border);background:var(--cx-card2);}
 .d-av-lg{
-    width:38px;height:38px;border-radius:var(--r-xs);flex-shrink:0;overflow:hidden;
+    width:40px;height:40px;border-radius:var(--r-xs);flex-shrink:0;overflow:hidden;
     background:linear-gradient(135deg,var(--cx-brand),var(--cx-brand2));
     display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;
 }
 .d-av-lg img{width:100%;height:100%;object-fit:cover;}
 .d-name{font-size:13px;font-weight:700;color:var(--cx-text);}
-.d-phone{font-size:11.5px;color:var(--cx-muted);}
-.d-status-badge{margin-left:auto;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
-.ds-avail{background:rgba(16,185,129,.1);color:#065f46;border:1px solid rgba(16,185,129,.25);}
+.d-phone{font-size:11.5px;color:var(--cx-muted);margin-top:1px;}
+.d-status-badge{margin-left:auto;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+.ds-avail{background:rgba(16,185,129,.12);color:#065f46;border:1px solid rgba(16,185,129,.3);}
 .ds-busy {background:rgba(245,158,11,.1);color:#92400e;border:1px solid rgba(245,158,11,.25);}
 .ds-off  {background:rgba(100,116,139,.08);color:#6b7280;border:1px solid rgba(0,0,0,.1);}
+.avail-section-lbl{
+    font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;
+    color:var(--cx-muted);padding:8px 2px 4px;
+}
+.no-avail-warn{
+    padding:11px 14px;border-radius:var(--r-sm);margin-bottom:14px;
+    background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.22);
+    color:#92400e;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:8px;
+}
+.selected-summary{
+    display:none;padding:11px 14px;border-radius:var(--r-sm);margin-bottom:14px;
+    background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.25);
+    color:#065f46;font-size:12.5px;font-weight:700;align-items:center;gap:8px;
+}
+.selected-summary.show{display:flex;}
 
+/* ── Blocs adresses dans le modal ── */
+.addr-flow{display:flex;align-items:stretch;gap:10px;margin-bottom:18px;}
+.addr-box{flex:1;padding:12px 14px;border-radius:var(--r-sm);border:1.5px solid;min-width:0;}
+.addr-pickup {background:rgba(59,130,246,.06);border-color:rgba(59,130,246,.3);}
+.addr-delivery{background:rgba(16,185,129,.06);border-color:rgba(16,185,129,.3);}
+.addr-arrow{display:flex;align-items:center;color:var(--cx-muted);font-size:20px;flex-shrink:0;padding-top:4px;}
+.addr-lbl{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.9px;margin-bottom:5px;}
+.addr-pickup  .addr-lbl{color:#1d4ed8;}
+.addr-delivery .addr-lbl{color:#065f46;}
+.addr-val{font-size:12.5px;font-weight:600;color:var(--cx-text);line-height:1.45;word-break:break-word;}
+.addr-val.addr-empty{color:var(--cx-muted);font-style:italic;font-weight:400;}
 .form-group{margin-bottom:14px;}
 .form-label{display:block;font-size:11.5px;font-weight:700;color:var(--cx-text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
 .form-input{
     width:100%;padding:10px 14px;background:var(--cx-card2);border:1.5px solid var(--cx-border);
     border-radius:var(--r-sm);color:var(--cx-text);font-size:13.5px;font-family:inherit;outline:none;transition:border-color .15s;
 }
-.form-input:focus{border-color:var(--cx-brand);box-shadow:0 0 0 3px rgba(124,58,237,.15);}
+.form-input:focus{border-color:var(--cx-brand);box-shadow:0 0 0 3px rgba(124,58,237,.12);}
 .form-input::placeholder{color:var(--cx-muted);}
 .btn-primary{
     width:100%;padding:13px;background:linear-gradient(135deg,var(--cx-brand),var(--cx-brand2));
     color:#fff;border:none;border-radius:var(--r-sm);font-size:14px;font-weight:800;font-family:inherit;
-    cursor:pointer;box-shadow:0 4px 14px rgba(124,58,237,.4);transition:all .18s;
+    cursor:pointer;box-shadow:0 4px 14px rgba(124,58,237,.35);transition:all .18s;
     display:flex;align-items:center;justify-content:center;gap:8px;
 }
 .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(124,58,237,.5);}
@@ -582,7 +616,14 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle;}
                         <div class="client-phone">{{ $order->client->phone ?? '' }}</div>
                     </td>
                     <td><span class="shop-badge">🏪 {{ $order->shop->name ?? '—' }}</span></td>
-                    <td style="color:var(--cx-text2);font-size:12.5px;max-width:140px;">{{ $order->delivery_destination ?? '—' }}</td>
+                    <td style="color:var(--cx-text2);font-size:12.5px;max-width:160px;">
+                        @php $dest = $order->delivery_destination ?: ($order->client->address ?? null); @endphp
+                        @if($dest)
+                            <div style="font-size:12px;line-height:1.4;">{{ $dest }}</div>
+                        @else
+                            <span style="color:var(--cx-muted);font-style:italic;font-size:11.5px;">Non renseignée</span>
+                        @endif
+                    </td>
                     <td>
                         @if($order->driver)
                             <div class="driver-cell">
@@ -612,15 +653,27 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle;}
                         <div style="display:flex;gap:6px;flex-wrap:wrap;">
                             @if(in_array($order->status, ['en_attente','confirmée']))
                             <button class="btn-action btn-assign"
-                                    onclick="openAssign({{ $order->id }}, {{ $order->delivery_fee ?? 'null' }}, '{{ e($order->delivery_destination ?? '') }}')">
+                                    data-id="{{ $order->id }}"
+                                    data-fee="{{ $order->delivery_fee ?? '' }}"
+                                    data-dest="{{ $order->delivery_destination ?? '' }}"
+                                    data-num="{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
+                                    data-shop="{{ $order->shop->name ?? '' }}"
+                                    data-shop-addr="{{ $order->shop->address ?? '' }}"
+                                    data-client-addr="{{ $order->client->address ?? '' }}"
+                                    onclick="openAssign(this)">
                                 🚴 Assigner
                             </button>
                             @endif
                             @if($order->status === 'en_livraison')
-                            <button class="btn-action btn-done" onclick="markDone({{ $order->id }})">✅ Livrée</button>
+                            <button class="btn-action btn-done"
+                                    data-id="{{ $order->id }}"
+                                    onclick="markDone(this)">✅ Livrée</button>
                             @endif
                             @if(!in_array($order->status, ['livrée','annulée']))
-                            <button class="btn-action btn-status" onclick="openStatus({{ $order->id }}, '{{ $order->status }}')">✏️ Statut</button>
+                            <button class="btn-action btn-status"
+                                    data-id="{{ $order->id }}"
+                                    data-status="{{ $order->status }}"
+                                    onclick="openStatus(this)">✏️ Statut</button>
                             @endif
                         </div>
                     </td>
@@ -644,76 +697,140 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle;}
 </div>
 
 {{-- ═══ MODAL ASSIGNER CHAUFFEUR ═══ --}}
+@php
+    $availCount  = $drivers->where('status','available')->count();
+    $availDrivers = $drivers->where('status','available');
+    $otherDrivers = $drivers->where('status','!=','available');
+@endphp
 <div class="modal-overlay" id="assignModal">
-    <div class="modal">
-        <div class="modal-hd">
-            <div class="modal-title">🚴 Assigner un chauffeur</div>
-            <button class="modal-close" onclick="closeModal('assignModal')">✕</button>
+    <div class="cx-modal">
+        <div class="cx-modal-hd">
+            <div>
+                <div class="cx-modal-title">🚴 Assigner un chauffeur</div>
+                <div class="cx-modal-sub" id="assignModalSub">Sélectionnez un chauffeur disponible</div>
+            </div>
+            <button class="cx-modal-close" data-close="assignModal">✕</button>
         </div>
-        <div class="modal-body">
-            <div class="form-group">
-                <div class="form-label">Choisir un chauffeur</div>
-                <div class="driver-radio" id="driverList">
-                    @forelse($drivers as $driver)
-                    @php
-                        $dCls = match($driver->status){ 'available'=>'ds-avail','busy'=>'ds-busy',default=>'ds-off' };
-                        $dLbl = match($driver->status){ 'available'=>'● Disponible','busy'=>'● En mission',default=>'● Hors ligne' };
-                    @endphp
-                    <label class="driver-opt" onclick="selectDriver(this, {{ $driver->id }})">
-                        <input type="radio" name="driver_id" value="{{ $driver->id }}">
-                        <div class="d-av-lg">
-                            @if($driver->photo)
-                                <img src="{{ asset('storage/'.$driver->photo) }}" alt="">
-                            @else
-                                {{ strtoupper(substr($driver->name,0,2)) }}
-                            @endif
-                        </div>
-                        <div style="flex:1;min-width:0;">
-                            <div class="d-name">{{ $driver->name }}</div>
-                            <div class="d-phone">{{ $driver->phone ?? 'Aucun numéro' }}</div>
-                        </div>
-                        <span class="d-status-badge {{ $dCls }}">{{ $dLbl }}</span>
-                    </label>
-                    @empty
-                    <div style="text-align:center;padding:24px;color:var(--cx-muted);font-size:13px;">
-                        Aucun chauffeur. Ajoutez-en depuis votre dashboard.
-                    </div>
-                    @endforelse
+        <div class="cx-modal-body">
+
+            {{-- ── Blocs adresses ── --}}
+            <div class="addr-flow">
+                <div class="addr-box addr-pickup">
+                    <div class="addr-lbl">📦 Retrait — Boutique</div>
+                    <div class="addr-val" id="shopAddrVal">—</div>
+                </div>
+                <div class="addr-arrow">→</div>
+                <div class="addr-box addr-delivery">
+                    <div class="addr-lbl">📍 Livraison — Client</div>
+                    <div class="addr-val" id="clientAddrVal">—</div>
                 </div>
             </div>
+
+            {{-- Avertissement si aucun chauffeur disponible --}}
+            @if($availCount === 0)
+            <div class="no-avail-warn">
+                ⚠️ Aucun chauffeur disponible en ce moment
+            </div>
+            @endif
+
+            {{-- Liste chauffeurs --}}
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <div class="form-label" style="margin:0">Chauffeur</div>
+                @if($availCount > 0)
+                <span class="d-status-badge ds-avail">● {{ $availCount }} disponible{{ $availCount>1?'s':'' }}</span>
+                @endif
+            </div>
+
+            <div class="driver-radio" id="driverList">
+                {{-- Disponibles en premier --}}
+                @foreach($availDrivers as $driver)
+                <label class="driver-opt" data-driver-id="{{ $driver->id }}" data-driver-name="{{ $driver->name }}" onclick="selectDriver(this, {{ $driver->id }})">
+                    <input type="radio" name="driver_id" value="{{ $driver->id }}">
+                    <div class="d-av-lg">
+                        @if($driver->photo)<img src="{{ asset('storage/'.$driver->photo) }}" alt="">
+                        @else{{ strtoupper(substr($driver->name,0,2)) }}@endif
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                        <div class="d-name">{{ $driver->name }}</div>
+                        <div class="d-phone">{{ $driver->phone ?? 'Aucun numéro' }}</div>
+                    </div>
+                    <span class="d-status-badge ds-avail">● Disponible</span>
+                </label>
+                @endforeach
+
+                {{-- Séparateur si d'autres chauffeurs existent --}}
+                @if($availCount > 0 && $otherDrivers->count() > 0)
+                <div class="avail-section-lbl">— Non disponibles</div>
+                @endif
+
+                {{-- Busy + offline (non sélectionnables) --}}
+                @foreach($otherDrivers as $driver)
+                @php
+                    $dCls = $driver->status === 'busy' ? 'ds-busy' : 'ds-off';
+                    $dLbl = $driver->status === 'busy' ? '◉ En mission' : '○ Hors ligne';
+                @endphp
+                <label class="driver-opt not-avail" title="{{ $driver->status === 'busy' ? 'En mission' : 'Hors ligne' }}">
+                    <input type="radio" name="driver_id" value="{{ $driver->id }}" disabled>
+                    <div class="d-av-lg" style="filter:grayscale(.4)">
+                        @if($driver->photo)<img src="{{ asset('storage/'.$driver->photo) }}" alt="">
+                        @else{{ strtoupper(substr($driver->name,0,2)) }}@endif
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                        <div class="d-name">{{ $driver->name }}</div>
+                        <div class="d-phone">{{ $driver->phone ?? 'Aucun numéro' }}</div>
+                    </div>
+                    <span class="d-status-badge {{ $dCls }}">{{ $dLbl }}</span>
+                </label>
+                @endforeach
+
+                @if($drivers->isEmpty())
+                <div style="text-align:center;padding:24px;color:var(--cx-muted);font-size:13px;">
+                    Aucun chauffeur. Ajoutez-en depuis le dashboard.
+                </div>
+                @endif
+            </div>
+
+            {{-- Résumé chauffeur sélectionné --}}
+            <div class="selected-summary" id="selectedSummary">
+                ✓ <span id="selectedDriverName"></span> sélectionné
+            </div>
+
             <div class="form-group">
-                <label class="form-label">💰 Frais de livraison</label>
-                <input type="number" class="form-input" id="assignFee" placeholder="Ex: 50000" min="0" step="500">
+                <label class="form-label">💰 Frais de livraison (GNF)</label>
+                <input type="number" class="form-input" id="assignFee" placeholder="Ex: 50 000" min="0" step="500">
             </div>
             <div class="form-group">
-                <label class="form-label">📍 Destination (optionnel)</label>
-                <input type="text" class="form-input" id="assignDest" placeholder="Kaloum, Ratoma…">
+                <label class="form-label">📍 Adresse de livraison (modifiable)</label>
+                <input type="text" class="form-input" id="assignDest" placeholder="Adresse du client…">
+                <div style="font-size:11px;color:var(--cx-muted);margin-top:4px;">Pré-remplie avec l'adresse du client. Modifiez si besoin.</div>
             </div>
-            <button class="btn-primary" id="assignBtn" onclick="submitAssign()">🚴 Confirmer l'assignation</button>
+            <button class="btn-primary" id="assignBtn" onclick="submitAssign()">
+                🚴 Confirmer l'assignation
+            </button>
         </div>
     </div>
 </div>
 
 {{-- ═══ MODAL STATUT ═══ --}}
 <div class="modal-overlay" id="statusModal">
-    <div class="modal">
-        <div class="modal-hd">
-            <div class="modal-title">✏️ Changer le statut</div>
-            <button class="modal-close" onclick="closeModal('statusModal')">✕</button>
+    <div class="cx-modal">
+        <div class="cx-modal-hd">
+            <div class="cx-modal-title">✏️ Changer le statut</div>
+            <button class="cx-modal-close" data-close="statusModal">✕</button>
         </div>
-        <div class="modal-body">
+        <div class="cx-modal-body">
             <div class="form-group">
                 <div class="form-label">Nouveau statut</div>
                 <div class="status-radio" id="statusList">
                     @foreach(['en_livraison'=>['🚴','En livraison','badge-deliv'],'livrée'=>['✅','Livrée','badge-done'],'annulée'=>['❌','Annulée','badge-cancel']] as $val=>[$ico,$lbl,$cls])
-                    <label class="status-opt" onclick="selectStatus(this,'{{ $val }}')">
+                    <label class="status-opt">
                         <input type="radio" name="status_val" value="{{ $val }}">
                         <span class="badge {{ $cls }}">{{ $ico }} {{ $lbl }}</span>
                     </label>
                     @endforeach
                 </div>
             </div>
-            <button class="btn-primary" id="statusBtn" onclick="submitStatus()" style="margin-top:8px;">Enregistrer</button>
+            <button class="btn-primary" id="statusBtn" onclick="submitStatus()">Enregistrer</button>
         </div>
     </div>
 </div>
@@ -738,114 +855,183 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle;}
     document.addEventListener('keydown', e => { if(e.key==='Escape') close(); });
 })();
 
-const CSRF = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 
-function setStatus(val){
-    document.getElementById('statusInput').value = val;
-    document.getElementById('filterForm').submit();
-}
-let _st;
-document.getElementById('searchInput')?.addEventListener('input',function(){
-    clearTimeout(_st);
-    _st = setTimeout(()=>document.getElementById('filterForm').submit(),500);
-});
+/* ── Filtre ── */
+function setStatus(v){ document.getElementById('statusInput').value=v; document.getElementById('filterForm').submit(); }
+var _st;
+document.getElementById('searchInput').addEventListener('input',function(){ clearTimeout(_st); _st=setTimeout(function(){ document.getElementById('filterForm').submit(); },500); });
 
+/* ── État global ── */
+var currentOrderId=null, selectedDriverId=null, selectedStatusVal=null;
+
+/* ── Modals ── */
 function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){
     document.getElementById(id).classList.remove('open');
     currentOrderId=null; selectedDriverId=null; selectedStatusVal=null;
-    document.querySelectorAll('.driver-opt,.status-opt').forEach(e=>e.classList.remove('selected'));
+    document.querySelectorAll('.driver-opt,.status-opt').forEach(function(el){ el.classList.remove('selected'); });
+    var s=document.getElementById('selectedSummary'); if(s) s.classList.remove('show');
 }
-document.querySelectorAll('.modal-overlay').forEach(el=>
-    el.addEventListener('click',e=>{ if(e.target===el) closeModal(el.id); })
-);
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeModal('assignModal'); closeModal('statusModal'); } });
+document.querySelectorAll('.modal-overlay').forEach(function(el){
+    el.addEventListener('click',function(e){ if(e.target===el) closeModal(el.id); });
+});
+document.querySelectorAll('[data-close]').forEach(function(btn){
+    btn.addEventListener('click',function(){ closeModal(btn.getAttribute('data-close')); });
+});
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ closeModal('assignModal'); closeModal('statusModal'); } });
 
-let currentOrderId=null, selectedDriverId=null;
+/* ── Assigner : ouverture du modal ── */
+function openAssign(btn){
+    var orderId    = btn.getAttribute('data-id');
+    var fee        = btn.getAttribute('data-fee');
+    var dest       = btn.getAttribute('data-dest');
+    var orderNum   = btn.getAttribute('data-num');
+    var shopName   = btn.getAttribute('data-shop');
+    var shopAddr   = btn.getAttribute('data-shop-addr');
+    var clientAddr = btn.getAttribute('data-client-addr');
 
-function openAssign(orderId, fee, dest){
-    currentOrderId=orderId; selectedDriverId=null;
-    document.querySelectorAll('.driver-opt').forEach(e=>e.classList.remove('selected'));
-    document.getElementById('assignFee').value = fee ?? '';
-    document.getElementById('assignDest').value = dest ?? '';
+    currentOrderId=orderId;
+    selectedDriverId=null;
+    document.querySelectorAll('.driver-opt').forEach(function(el){ el.classList.remove('selected'); });
+
+    /* Blocs adresses */
+    var shopEl   = document.getElementById('shopAddrVal');
+    var clientEl = document.getElementById('clientAddrVal');
+    if(shopAddr){
+        shopEl.textContent = shopAddr;
+        shopEl.className = 'addr-val';
+    } else {
+        shopEl.textContent = 'Adresse boutique non renseignée';
+        shopEl.className = 'addr-val addr-empty';
+    }
+    /* Adresse de livraison = destination déjà sauvegardée, sinon adresse du client */
+    var deliveryAddr = dest || clientAddr || '';
+    if(deliveryAddr){
+        clientEl.textContent = deliveryAddr;
+        clientEl.className = 'addr-val';
+    } else {
+        clientEl.textContent = 'Adresse client non renseignée';
+        clientEl.className = 'addr-val addr-empty';
+    }
+
+    /* Champ destination pré-rempli */
+    document.getElementById('assignFee').value = (fee && parseFloat(fee) > 0) ? fee : '';
+    document.getElementById('assignDest').value = deliveryAddr;
+
+    var s=document.getElementById('selectedSummary'); s.classList.remove('show');
+    document.getElementById('selectedDriverName').textContent='';
+
+    var sub = orderNum ? 'Commande #'+orderNum : '';
+    if(shopName) sub += (sub?' · ':'')+shopName;
+    document.getElementById('assignModalSub').textContent = sub || 'Sélectionnez un chauffeur disponible';
+
+    /* Auto-sélectionner le 1er disponible */
+    var first=document.querySelector('#driverList .driver-opt:not(.not-avail)');
+    if(first) selectDriver(first, first.getAttribute('data-driver-id'));
     openModal('assignModal');
 }
+
+/* ── Sélection d'un chauffeur ── */
 function selectDriver(el, id){
-    document.querySelectorAll('.driver-opt').forEach(e=>e.classList.remove('selected'));
+    document.querySelectorAll('.driver-opt').forEach(function(e){ e.classList.remove('selected'); });
     el.classList.add('selected');
     selectedDriverId=id;
-    el.querySelector('input').checked=true;
-}
-async function submitAssign(){
-    if(!currentOrderId)   { toast('Aucune commande.','error'); return; }
-    if(!selectedDriverId) { toast('Choisissez un chauffeur.','error'); return; }
-    const fee = document.getElementById('assignFee').value;
-    if(!fee||parseFloat(fee)<0){ toast('Frais invalide.','error'); return; }
-    const btn=document.getElementById('assignBtn');
-    btn.disabled=true; btn.innerHTML='⏳ En cours…';
-    try{
-        const fd=new FormData();
-        fd.append('_token',CSRF);
-        fd.append('driver_id',selectedDriverId);
-        fd.append('delivery_fee',fee);
-        fd.append('delivery_destination',document.getElementById('assignDest').value);
-        const res=await fetch(`/company/orders/${currentOrderId}/assign`,{method:'POST',body:fd});
-        const data=await res.json();
-        if(data.success){
-            toast(`✅ ${data.driver_name} assigné · Frais : ${data.delivery_fee} GNF`,'success');
-            closeModal('assignModal');
-            setTimeout(()=>location.reload(),1200);
-        } else throw new Error(data.message??'Erreur');
-    }catch(e){ toast('Erreur : '+e.message,'error'); }
-    btn.disabled=false; btn.innerHTML='🚴 Confirmer l\'assignation';
+    var radio=el.querySelector('input[type=radio]'); if(radio) radio.checked=true;
+    var name=el.getAttribute('data-driver-name') || (el.querySelector('.d-name')||{}).textContent || '';
+    document.getElementById('selectedDriverName').textContent=name.trim();
+    document.getElementById('selectedSummary').classList.add('show');
 }
 
-let selectedStatusVal=null;
-function openStatus(orderId,current){
+/* Clic sur un chauffeur dans le modal */
+document.querySelectorAll('#driverList .driver-opt:not(.not-avail)').forEach(function(opt){
+    opt.addEventListener('click',function(){ selectDriver(this, this.getAttribute('data-driver-id')); });
+});
+
+/* ── Soumettre l'assignation ── */
+function submitAssign(){
+    if(!currentOrderId){ toast('Aucune commande.','error'); return; }
+    if(!selectedDriverId){ toast('Choisissez un chauffeur disponible.','error'); return; }
+    var fee=document.getElementById('assignFee').value.trim();
+    if(fee===''||isNaN(Number(fee))||Number(fee)<0){ toast('Entrez des frais valides (0 ou plus).','error'); return; }
+    var btn=document.getElementById('assignBtn');
+    btn.disabled=true; btn.textContent='⏳ En cours…';
+    var fd=new FormData();
+    fd.append('_token',CSRF);
+    fd.append('driver_id',selectedDriverId);
+    fd.append('delivery_fee',fee);
+    fd.append('delivery_destination',document.getElementById('assignDest').value);
+    fetch('/company/orders/'+currentOrderId+'/assign',{method:'POST',body:fd})
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+            if(data.success){
+                toast('✅ '+data.driver_name+' assigné · '+data.delivery_fee+' GNF','success');
+                closeModal('assignModal');
+                setTimeout(function(){ location.reload(); },1200);
+            } else {
+                toast('Erreur : '+(data.message||'inconnue'),'error');
+                btn.disabled=false; btn.textContent='🚴 Confirmer l\'assignation';
+            }
+        })
+        .catch(function(err){
+            toast('Erreur réseau : '+err.message,'error');
+            btn.disabled=false; btn.textContent='🚴 Confirmer l\'assignation';
+        });
+}
+
+/* ── Statut ── */
+function openStatus(btn){
+    var orderId = btn.getAttribute('data-id');
+    var current = btn.getAttribute('data-status');
     currentOrderId=orderId; selectedStatusVal=null;
-    document.querySelectorAll('.status-opt').forEach(el=>{
+    document.querySelectorAll('.status-opt').forEach(function(el){
         el.classList.remove('selected');
-        if(el.querySelector('input').value===current){
-            el.classList.add('selected');
-            selectedStatusVal=current;
-            el.querySelector('input').checked=true;
-        }
+        var input=el.querySelector('input');
+        if(input.value===current){ el.classList.add('selected'); selectedStatusVal=current; input.checked=true; }
     });
     openModal('statusModal');
 }
-function selectStatus(el,val){
-    document.querySelectorAll('.status-opt').forEach(e=>e.classList.remove('selected'));
-    el.classList.add('selected'); selectedStatusVal=val;
-    el.querySelector('input').checked=true;
-}
-async function submitStatus(){
+document.querySelectorAll('.status-opt').forEach(function(opt){
+    opt.addEventListener('click',function(){
+        document.querySelectorAll('.status-opt').forEach(function(e){ e.classList.remove('selected'); });
+        this.classList.add('selected');
+        var input=this.querySelector('input'); selectedStatusVal=input.value; input.checked=true;
+    });
+});
+function submitStatus(){
     if(!currentOrderId||!selectedStatusVal){ toast('Choisissez un statut.','error'); return; }
-    const btn=document.getElementById('statusBtn');
-    btn.disabled=true; btn.innerHTML='⏳ En cours…';
-    try{
-        const fd=new FormData();
-        fd.append('_token',CSRF);
-        fd.append('status',selectedStatusVal);
-        const res=await fetch(`/company/orders/${currentOrderId}/status`,{method:'POST',body:fd});
-        const data=await res.json();
-        if(data.success){
-            toast('✅ Statut mis à jour.','success');
-            closeModal('statusModal');
-            setTimeout(()=>location.reload(),1000);
-        } else throw new Error(data.message??'Erreur');
-    }catch(e){ toast('Erreur : '+e.message,'error'); }
-    btn.disabled=false; btn.innerHTML='Enregistrer';
+    var btn=document.getElementById('statusBtn');
+    btn.disabled=true; btn.textContent='⏳ En cours…';
+    var fd=new FormData();
+    fd.append('_token',CSRF); fd.append('status',selectedStatusVal);
+    fetch('/company/orders/'+currentOrderId+'/status',{method:'POST',body:fd})
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+            if(data.success){
+                toast('✅ Statut mis à jour.','success');
+                closeModal('statusModal');
+                setTimeout(function(){ location.reload(); },1000);
+            } else {
+                toast('Erreur : '+(data.message||'inconnue'),'error');
+                btn.disabled=false; btn.textContent='Enregistrer';
+            }
+        })
+        .catch(function(err){
+            toast('Erreur réseau.','error');
+            btn.disabled=false; btn.textContent='Enregistrer';
+        });
 }
-async function markDone(orderId){
-    if(!confirm('Marquer comme livrée ?')) return;
-    currentOrderId=orderId; selectedStatusVal='livrée';
-    await submitStatus();
+function markDone(btn){
+    if(!confirm('Marquer cette commande comme livrée ?')) return;
+    currentOrderId=btn.getAttribute('data-id'); selectedStatusVal='livrée'; submitStatus();
 }
-function toast(msg,type='success'){
-    const el=document.getElementById('toast');
-    el.textContent=msg;
-    el.className=`toast toast-${type} show`;
-    setTimeout(()=>el.classList.remove('show'),3500);
+
+/* ── Toast ── */
+function toast(msg,type){
+    type=type||'success';
+    var el=document.getElementById('toast');
+    el.textContent=msg; el.className='toast toast-'+type+' show';
+    setTimeout(function(){ el.classList.remove('show'); },3500);
 }
 </script>
 @endpush

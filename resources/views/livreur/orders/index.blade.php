@@ -90,6 +90,66 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
 .ord-action-gps:hover { background:var(--blue); color:#fff; }
 .ord-action-gps.active { background:var(--blue); color:#fff; border-color:var(--blue); }
 
+/* ── ROUTE RETRAIT → LIVRAISON (commandes entreprise) ── */
+.ord-route {
+    display:flex; flex-direction:column; gap:0;
+    margin:0 18px 0; border-radius:14px; overflow:hidden;
+    border:1.5px solid var(--border);
+}
+.ord-step {
+    display:flex; align-items:flex-start; gap:12px;
+    padding:14px 16px;
+}
+.ord-step-pickup  { background:#eff6ff; border-bottom:1.5px solid #bfdbfe; }
+.ord-step-delivery{ background:#f0fdf4; }
+.ord-step-ico {
+    width:38px; height:38px; border-radius:10px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:18px;
+}
+.ord-step-pickup  .ord-step-ico { background:#dbeafe; }
+.ord-step-delivery .ord-step-ico { background:#dcfce7; }
+.ord-step-content { flex:1; min-width:0; }
+.ord-step-tag {
+    font-size:9.5px; font-weight:800; text-transform:uppercase; letter-spacing:1px;
+    margin-bottom:5px; display:flex; align-items:center; gap:5px;
+}
+.ord-step-pickup  .ord-step-tag { color:#1d4ed8; }
+.ord-step-delivery .ord-step-tag { color:#15803d; }
+.ord-step-name { font-size:14px; font-weight:800; color:var(--text); line-height:1.2; }
+.ord-step-addr { font-size:12px; color:var(--muted); margin-top:3px; line-height:1.4; }
+.ord-step-links { display:flex; align-items:center; gap:10px; margin-top:7px; flex-wrap:wrap; }
+.ord-step-call {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:5px 12px; border-radius:20px; font-size:12px; font-weight:700;
+    text-decoration:none; transition:all .15s; white-space:nowrap;
+}
+.ord-step-pickup  .ord-step-call { background:#dbeafe; color:#1d4ed8; }
+.ord-step-pickup  .ord-step-call:hover { background:#bfdbfe; }
+.ord-step-delivery .ord-step-call { background:#dcfce7; color:#15803d; }
+.ord-step-delivery .ord-step-call:hover { background:#bbf7d0; }
+.ord-step-wa {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:5px 12px; border-radius:20px; font-size:12px; font-weight:700;
+    background:#dcfce7; color:#15803d; text-decoration:none; transition:all .15s;
+}
+.ord-step-wa:hover { background:#25d366; color:#fff; }
+.ord-arrow-sep {
+    display:flex; align-items:center; justify-content:center;
+    padding:7px 0; background:#f8fafc; border-top:1px solid var(--border);
+    border-bottom:1px solid var(--border);
+    font-size:11px; font-weight:700; color:var(--muted); gap:6px;
+    letter-spacing:.4px;
+}
+
+/* Info complémentaires (produit, montant, commission) */
+.ord-meta { padding:12px 18px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; border-top:1px solid #f3f4f6; }
+.ord-meta-chip {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600;
+    background:#f8fafc; color:var(--text); border:1px solid var(--border);
+}
+.ord-meta-chip.commission { background:#fef3c7; border-color:#fcd34d; color:#92400e; font-weight:800; font-size:13px; }
+
 /* ── EMPTY ── */
 .ord-empty { padding:60px 24px; text-align:center; color:var(--muted); }
 .ord-empty-ico { font-size:52px; display:block; margin-bottom:14px; opacity:.3; }
@@ -170,34 +230,115 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
 
     @forelse($orders as $order)
     @php
-        $s       = strtolower($order->status ?? '');
-        $st      = $statusMap[$s] ?? ['label'=>ucfirst($order->status),'cls'=>'other'];
-        $client  = $order->client ?? $order->user;
-        $item    = $order->items->first();
-        $waNum   = preg_replace('/\D/', '', $client?->phone ?? '');
+        $s          = strtolower($order->status ?? '');
+        $st         = $statusMap[$s] ?? ['label'=>ucfirst($order->status),'cls'=>'other'];
+        $client     = $order->client ?? $order->user;
+        $shop       = $order->shop;
+        $item       = $order->items->first();
+        $waNum      = preg_replace('/\D/', '', $client?->phone ?? '');
+        $shopWaNum  = preg_replace('/\D/', '', $shop?->phone ?? '');
+        $isCompany  = (bool) $order->driver_id;
+        $destAddr   = $order->delivery_destination ?: $client?->address;
     @endphp
 
     <div class="ord-card {{ $st['cls'] }}" data-order-id="{{ $order->id }}">
 
-        {{-- Header --}}
+        {{-- ── HEADER ── --}}
         <div class="ord-card-head">
             <div>
-                <div class="ord-card-num">Commande #{{ $order->id }}</div>
+                <div class="ord-card-num">Commande #{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}</div>
                 <div class="ord-card-date">{{ $order->created_at->format('d/m/Y à H:i') }}</div>
             </div>
             <span class="ord-badge {{ $st['cls'] }}">{{ $st['label'] }}</span>
         </div>
 
-        {{-- Body --}}
+        @if($isCompany)
+        {{-- ══ BLOC RETRAIT → LIVRAISON (livreur entreprise) ══ --}}
+        <div class="ord-route" style="margin:14px 18px;">
+
+            {{-- ÉTAPE 1 : Retrait boutique --}}
+            <div class="ord-step ord-step-pickup">
+                <div class="ord-step-ico">🏪</div>
+                <div class="ord-step-content">
+                    <div class="ord-step-tag">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        ÉTAPE 1 · RETRAIT PRODUIT
+                    </div>
+                    <div class="ord-step-name">{{ $shop?->name ?? 'Boutique' }}</div>
+                    @if($shop?->address)
+                    <div class="ord-step-addr">📍 {{ $shop->address }}</div>
+                    @else
+                    <div class="ord-step-addr" style="font-style:italic">Adresse non renseignée</div>
+                    @endif
+                    <div class="ord-step-links">
+                        @if($shop?->phone)
+                        <a href="tel:{{ $shop->phone }}" class="ord-step-call">📞 {{ $shop->phone }}</a>
+                        @endif
+                        @if($shopWaNum)
+                        <a href="https://wa.me/{{ $shopWaNum }}" target="_blank" class="ord-step-wa">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                            WhatsApp
+                        </a>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            {{-- Séparateur flèche --}}
+            <div class="ord-arrow-sep">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+                PUIS LIVRER AU CLIENT
+            </div>
+
+            {{-- ÉTAPE 2 : Livraison client --}}
+            <div class="ord-step ord-step-delivery">
+                <div class="ord-step-ico">🏠</div>
+                <div class="ord-step-content">
+                    <div class="ord-step-tag">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        ÉTAPE 2 · LIVRAISON CLIENT
+                    </div>
+                    <div class="ord-step-name">{{ $client?->name ?? 'Client inconnu' }}</div>
+                    @if($destAddr)
+                    <div class="ord-step-addr">📍 {{ $destAddr }}</div>
+                    @else
+                    <div class="ord-step-addr" style="font-style:italic">Adresse de livraison non renseignée</div>
+                    @endif
+                    <div class="ord-step-links">
+                        @if($client?->phone)
+                        <a href="tel:{{ $client->phone }}" class="ord-step-call">📞 {{ $client->phone }}</a>
+                        @endif
+                        @if($waNum)
+                        <a href="https://wa.me/{{ $waNum }}" target="_blank" class="ord-step-wa">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                            WhatsApp
+                        </a>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Infos produit + commission --}}
+        <div class="ord-meta">
+            @if($item?->product?->name)
+            <span class="ord-meta-chip">📦 {{ $item->product->name }}{{ $item->quantity > 1 ? ' ×'.$item->quantity : '' }}</span>
+            @endif
+            <span class="ord-meta-chip">💰 {{ $fmt($order->total) }}</span>
+            @if($order->delivery_fee)
+            <span class="ord-meta-chip commission">🏆 Commission : {{ number_format($order->delivery_fee, 0, ',', ' ') }} {{ $devise }}</span>
+            @endif
+        </div>
+
+        @else
+        {{-- ══ ANCIEN SYSTÈME BOUTIQUE (livreur_id) ══ --}}
         <div class="ord-card-body">
-            {{-- Image produit --}}
             @if($item?->product?->image)
                 <img src="{{ \App\Services\ImageOptimizer::url($item->product->image, 'thumb') ?? asset('storage/'.$item->product->image) }}"
                      alt="{{ $item->product->name }}" class="ord-prod-img" loading="lazy">
             @else
                 <div class="ord-prod-ph">📦</div>
             @endif
-
             <div class="ord-info">
                 <div class="ord-info-block">
                     <div class="lbl">Client</div>
@@ -212,23 +353,19 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
                     @endif
                     @endif
                 </div>
-
                 <div class="ord-info-block">
                     <div class="lbl">Montant</div>
                     <div class="val amount">{{ $fmt($order->total) }}</div>
                 </div>
-
                 <div class="ord-info-block">
                     <div class="lbl">Produit</div>
                     <div class="val" style="font-size:12px">{{ $item?->product?->name ?? 'N/A' }}</div>
                     @if($item)<div style="font-size:11px;color:var(--muted)">Qté : {{ $item->quantity }}</div>@endif
                 </div>
-
                 <div class="ord-info-block">
                     <div class="lbl">Destination</div>
-                    <div class="val" style="font-size:12px;color:var(--muted)">📍 {{ $order->delivery_destination ?? $client?->address ?? 'Non renseignée' }}</div>
+                    <div class="val" style="font-size:12px;color:var(--muted)">📍 {{ $destAddr ?? 'Non renseignée' }}</div>
                 </div>
-
                 @if($order->delivery_fee)
                 <div class="ord-info-block" style="grid-column:1/-1">
                     <div class="lbl">Ma commission</div>
@@ -239,8 +376,9 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
                 @endif
             </div>
         </div>
+        @endif
 
-        {{-- Footer actions --}}
+        {{-- ── FOOTER ACTIONS ── --}}
         @if(in_array($s, $startStatuses) || in_array($s, $deliverStatuses))
         <div class="ord-card-foot">
             @if(in_array($s, $startStatuses))
@@ -250,7 +388,6 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
                         🚴 Commencer la livraison
                     </button>
                 </form>
-
             @elseif(in_array($s, $deliverStatuses))
                 <button type="button" class="ord-action-gps" id="gpsBtn_{{ $order->id }}"
                         onclick="toggleGps({{ $order->id }}, this)" title="GPS tracking">📡</button>

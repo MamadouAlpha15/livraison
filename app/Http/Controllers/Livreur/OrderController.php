@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Livreur;
 
 use App\Http\Controllers\Controller;
+use App\Models\Driver;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\CourierCommission;
@@ -15,40 +16,76 @@ use App\Notifications\OrderStatusNotification;
 class OrderController extends Controller
 {
     /**
-     * Liste des commandes assignées au livreur connecté
+     * Retourne le Driver lié au compte connecté (null si livreur boutique).
+     */
+    private function myDriver(): ?Driver
+    {
+        return Driver::where('user_id', Auth::id())->first();
+    }
+
+    /**
+     * Vérifie que l'utilisateur est autorisé à agir sur cette commande.
+     * Retourne le Driver si c'est un livreur d'entreprise, null si livreur boutique.
+     */
+    private function authorizeOrder(Order $order): ?Driver
+    {
+        $user = Auth::user();
+
+        // Livreur boutique (ancien système via livreur_id)
+        if ($order->livreur_id === $user->id) {
+            return null;
+        }
+
+        // Livreur entreprise (nouveau système via driver_id)
+        $driver = $this->myDriver();
+        if ($driver && (int) $order->driver_id === $driver->id) {
+            return $driver;
+        }
+
+        abort(403, 'Accès interdit');
+    }
+
+    /**
+     * Liste des commandes assignées au livreur connecté.
+     * Inclut les commandes via livreur_id (boutique) ET via driver_id (entreprise).
      */
     public function index()
     {
-        $livreur = Auth::user();
-        $shop    = $livreur->shop ?? $livreur->assignedShop;
-        $devise  = $shop?->currency ?? 'GNF';
+        $user   = Auth::user();
+        $shop   = $user->shop ?? $user->assignedShop;
+        $devise = $shop?->currency ?? 'GNF';
 
-        $orders = Order::where('livreur_id', $livreur->id)
-            ->with(['items.product', 'client', 'shop'])
-            ->latest()
-            ->paginate(15);
+        $driver = $this->myDriver();
+
+        $query = Order::with(['items.product', 'client', 'shop'])
+            ->where(function ($q) use ($user, $driver) {
+                $q->where('livreur_id', $user->id);
+                if ($driver) {
+                    $q->orWhere('driver_id', $driver->id);
+                }
+            })
+            ->latest();
+
+        $orders = $query->paginate(15);
 
         return view('livreur.orders.index', compact('orders', 'devise'));
     }
 
     /**
-     * Marque la commande comme "en cours de livraison" (start tracking / commencer)
-     *
-     * @param  \App\Models\Order  $order
-     * @return \Illuminate\Http\RedirectResponse
+     * Livreur démarre la livraison → statut "en_livraison", chauffeur → busy.
      */
     public function start(Order $order)
     {
-        // Sécurité : vérifier que le livreur actuel est bien assigné à la commande
-        if ($order->livreur_id !== Auth::id()) {
-            abort(403, 'Accès interdit');
-        }
+        $driver = $this->authorizeOrder($order);
 
-        // Change le statut de la commande à "en_livraison"
-        $order->status = 'en_livraison';
+        $order->status = Order::STATUS_EN_LIVRAISON;
         $order->save();
 
-        // Notification optionnelle au client pour l'informer
+        // Si livreur d'entreprise : passer le driver à busy (is_available reste true — il est toujours en ligne)
+        if ($driver) {
+            $driver->update(['status' => 'busy']);
+        }
+
         try {
             if ($order->client) {
                 $order->client->notify(new OrderStatusNotification(
@@ -57,71 +94,53 @@ class OrderController extends Controller
                 ));
             }
         } catch (\Throwable $e) {
-            // On n'interrompt pas le flux si la notification échoue, mais on logge l'erreur.
             Log::warning('Notification start order failed: ' . $e->getMessage());
         }
 
-        // Indicateur de session pour auto-démarrer le GPS côté front si nécessaire
         session()->flash('autostart_gps_order_id', $order->id);
 
-        return redirect()->route('livreur.orders.index')->with('success', 'Commande démarrée : suivi actif.');
+        return redirect()->route('livreur.orders.index')->with('success', 'Livraison démarrée !');
     }
 
     /**
-     * Marque la commande comme "livrée" et crée la commission livreur + met à jour le paiement.
-     *
-     * Utilise une transaction pour s'assurer que les étapes critiques (paiement, commission)
-     * soient atomiques.
-     *
-     * @param  \App\Models\Order  $order
-     * @return \Illuminate\Http\RedirectResponse
+     * Livreur termine la livraison → statut "livrée", chauffeur → available.
      */
     public function complete(Order $order)
     {
-        // Sécurité : vérifier que le livreur actuel est bien assigné à la commande
-        if ($order->livreur_id !== Auth::id()) {
-            abort(403, 'Accès interdit');
-        }
+        $driver = $this->authorizeOrder($order);
 
-        // Commence la transaction DB
         DB::beginTransaction();
 
         try {
-            // 1) Mettre à jour le statut de la commande
-            // NOTE: la valeur 'livrée' doit exister/être acceptée par ta colonne status
-            $order->status = 'livrée';
+            $order->status = Order::STATUS_LIVREE;
             $order->save();
 
-            // 2) Mettre à jour le paiement associé (si présent)
-            // On suppose une relation one-to-one $order->payment
             if ($order->payment) {
-                // Utiliser la valeur de statut attendue par la colonne payments.status
                 $order->payment->status = 'payé';
                 $order->payment->save();
             }
 
-            // 3) Créer la commission du livreur si elle n'existe pas encore
             $exists = CourierCommission::where('order_id', $order->id)->exists();
-
             if (! $exists) {
-                // Montant fixe défini par le vendeur lors de l'assignation
-                $amount = $order->delivery_fee ?? 0;
-
                 CourierCommission::create([
                     'order_id'    => $order->id,
-                    'livreur_id'  => $order->livreur_id,
+                    'livreur_id'  => $order->livreur_id ?? Auth::id(),
                     'shop_id'     => $order->shop_id,
                     'order_total' => $order->total,
                     'rate'        => 0,
-                    'amount'      => $amount,
+                    'amount'      => $order->delivery_fee ?? 0,
                     'status'      => 'en_attente',
                 ]);
             }
 
-            // Commit si tout s'est bien passé
+            // Libérer le chauffeur entreprise (is_available reste tel quel — le livreur reste en ligne)
+            if ($driver) {
+                $user = Auth::user();
+                $driver->update(['status' => $user->is_available ? 'available' : 'offline']);
+            }
+
             DB::commit();
 
-            // 4) Notification finale au client (hors transaction de préférence)
             try {
                 if ($order->client) {
                     $order->client->notify(new OrderStatusNotification(
@@ -136,16 +155,13 @@ class OrderController extends Controller
             return redirect()->route('livreur.orders.index')->with('success', 'Commande livrée avec succès.');
 
         } catch (\Throwable $e) {
-            // Rollback en cas d'erreur et loguer pour debug
             DB::rollBack();
-            Log::error('Erreur lors du marquage commande comme livrée : ' . $e->getMessage(), [
-                'order_id' => $order->id,
+            Log::error('Erreur livraison : ' . $e->getMessage(), [
+                'order_id'   => $order->id,
                 'livreur_id' => Auth::id(),
             ]);
 
-            // Si l'erreur vient d'une valeur non acceptée par la colonne status (ENUM),
-            // le message renvoyé aide à diagnostiquer, mais n'affiche pas la stack trace en prod.
-            return back()->with('error', "Impossible de marquer la commande comme livrée. Erreur : " . $e->getMessage());
+            return back()->with('error', "Impossible de marquer la commande comme livrée : " . $e->getMessage());
         }
     }
 }
