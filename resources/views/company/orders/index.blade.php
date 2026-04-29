@@ -4,6 +4,16 @@
 
 
 @push('styles')
+{{-- Anti-flash : applique le fond sombre avant le premier paint si thème dark --}}
+<script>
+(function(){
+    if(localStorage.getItem('cx-theme')==='dark')
+        document.documentElement.classList.add('cx-preorders-dark');
+})();
+</script>
+<style>
+html.cx-preorders-dark body{background:#0b0d22!important}
+</style>
 <style>
 *,*::before,*::after{box-sizing:border-box}
 
@@ -392,6 +402,88 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle;}
     .stats-bar{grid-template-columns:1fr 1fr;}
     .cx-topbar-title span{display:none;}
 }
+
+/* ══ TOGGLE MODE SOMBRE ══ */
+.cx-dark-row{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;cursor:pointer;border-radius:var(--r-sm);transition:background .14s;}
+.cx-dark-row:hover{background:rgba(255,255,255,.04);}
+.cx-dark-lbl{font-size:11.5px;color:rgba(255,255,255,.45);}
+.cx-toggle{width:34px;height:18px;background:#475569;border-radius:9px;position:relative;transition:background .25s;flex-shrink:0;}
+.cx-toggle::after{content:'';position:absolute;top:3px;left:3px;width:12px;height:12px;background:#fff;border-radius:50%;transition:left .25s;}
+.cx-toggle.on{background:var(--cx-brand);}
+.cx-toggle.on::after{left:19px;}
+
+/* ══ MODE SOMBRE ══ */
+body.cx-dark{
+    --cx-bg:     #0b0d22;
+    --cx-card:   #0d1226;
+    --cx-card2:  #111930;
+    --cx-border: rgba(255,255,255,.07);
+    --cx-border2:rgba(255,255,255,.12);
+    --cx-text:   #e2e8f0;
+    --cx-text2:  #94a3b8;
+    --cx-muted:  #475569;
+    background:var(--cx-bg)!important;
+}
+body.cx-dark .cx-main{background:var(--cx-bg);}
+body.cx-dark .cx-topbar{background:var(--cx-card);border-bottom-color:var(--cx-border);box-shadow:none;}
+body.cx-dark .cx-topbar-title{color:var(--cx-text);}
+body.cx-dark .cx-tb-user:hover{background:rgba(255,255,255,.06);}
+body.cx-dark .cx-tb-uname{color:var(--cx-text);}
+body.cx-dark .cx-tb-urole{color:var(--cx-text2);}
+body.cx-dark .cx-tb-btn{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.08);color:var(--cx-text2);}
+body.cx-dark .cx-tb-btn:hover{background:rgba(255,255,255,.1);color:#fff;}
+/* Filter bar */
+body.cx-dark .filter-bar{background:var(--cx-card);border-color:var(--cx-border);}
+body.cx-dark .tab-btn{color:var(--cx-text2);}
+body.cx-dark .tab-btn:hover{background:var(--cx-card2);color:var(--cx-text);}
+body.cx-dark .tab-sep{background:var(--cx-border);}
+body.cx-dark .search-input{background:var(--cx-card2);border-color:var(--cx-border);color:var(--cx-text);}
+body.cx-dark .search-input::placeholder{color:var(--cx-muted);}
+body.cx-dark .date-input{background:var(--cx-card2);border-color:var(--cx-border);color:var(--cx-text);}
+/* Table */
+body.cx-dark .table-card{background:var(--cx-card);border-color:var(--cx-border);}
+body.cx-dark thead th{background:var(--cx-card2);border-bottom-color:var(--cx-border);color:var(--cx-muted);}
+body.cx-dark tbody tr{border-bottom-color:var(--cx-border);}
+body.cx-dark tbody tr:hover{background:rgba(124,58,237,.08);}
+body.cx-dark tbody tr:nth-child(even){background:rgba(255,255,255,.018);}
+body.cx-dark tbody tr:nth-child(even):hover{background:rgba(124,58,237,.08);}
+body.cx-dark .order-id{color:var(--cx-text);}
+body.cx-dark .client-name{color:var(--cx-text);}
+body.cx-dark .driver-name{color:var(--cx-text);}
+body.cx-dark .amount-val{color:var(--cx-text);}
+body.cx-dark .fee-val{color:#34d399;}
+body.cx-dark .shop-badge{background:rgba(124,58,237,.18);color:#a78bfa;border-color:rgba(124,58,237,.35);}
+body.cx-dark .badge-wait   {color:#fbbf24;border-color:rgba(245,158,11,.3);}
+body.cx-dark .badge-confirm{color:#60a5fa;border-color:rgba(59,130,246,.3);}
+body.cx-dark .badge-deliv  {color:#a78bfa;border-color:rgba(124,58,237,.3);}
+body.cx-dark .badge-done   {color:#34d399;border-color:rgba(16,185,129,.3);}
+body.cx-dark .badge-cancel {color:#f87171;border-color:rgba(239,68,68,.25);}
+body.cx-dark .no-driver{color:var(--cx-muted);}
+/* Boutons actions */
+body.cx-dark .btn-status{color:var(--cx-text2);border-color:var(--cx-border);}
+body.cx-dark .btn-status:hover{background:var(--cx-card2);color:var(--cx-text);}
+/* Pagination */
+body.cx-dark .pagination-wrap{border-top-color:var(--cx-border);}
+body.cx-dark .pagination-wrap .page-item .page-link{background:var(--cx-card2);border-color:var(--cx-border);color:var(--cx-text2);}
+body.cx-dark .pagination-wrap .page-item.active .page-link{background:var(--cx-brand);border-color:var(--cx-brand);color:#fff;}
+/* Modal */
+body.cx-dark .modal-overlay{background:rgba(0,0,0,.75);}
+body.cx-dark .cx-modal{background:var(--cx-card);border-color:var(--cx-border2);}
+body.cx-dark .cx-modal-hd{background:var(--cx-card);border-bottom-color:var(--cx-border);}
+body.cx-dark .cx-modal-title{color:var(--cx-text);}
+body.cx-dark .cx-modal-sub{color:var(--cx-muted);}
+body.cx-dark .cx-modal-close{background:var(--cx-card2);border-color:var(--cx-border);color:var(--cx-text2);}
+body.cx-dark .driver-opt{background:var(--cx-card2);border-color:var(--cx-border);}
+body.cx-dark .d-name{color:var(--cx-text);}
+body.cx-dark .d-phone{color:var(--cx-muted);}
+body.cx-dark .status-opt{background:var(--cx-card2);border-color:var(--cx-border);}
+body.cx-dark .form-label{color:var(--cx-text2);}
+body.cx-dark .form-input{background:var(--cx-card2);border-color:var(--cx-border);color:var(--cx-text);}
+body.cx-dark .form-input::placeholder{color:var(--cx-muted);}
+body.cx-dark .avail-section-lbl{color:var(--cx-muted);}
+body.cx-dark .no-avail-warn{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.2);color:#fbbf24;}
+body.cx-dark .selected-summary{background:rgba(16,185,129,.07);border-color:rgba(16,185,129,.2);color:#34d399;}
+body.cx-dark .addr-val{color:var(--cx-text);}
 </style>
 @endpush
 
@@ -421,8 +513,8 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle;}
     <div class="cx-brand-hd">
         <div class="cx-brand-top">
             <a href="{{ route('company.dashboard') }}" class="cx-logo">
-                <div class="cx-logo-icon">🚚</div>
-                ShipXpress
+                 <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
+                <span class="sb-shop-name">{{ $company->name }}</span>
             </a>
             <button class="cx-close-btn" id="cxClose">✕</button>
         </div>
@@ -501,6 +593,10 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle;}
                     </svg>
                 </button>
             </form>
+        </div>
+        <div class="cx-dark-row" id="cxDarkToggle">
+            <span class="cx-dark-lbl">Mode sombre</span>
+            <div class="cx-toggle" id="cxDarkSwitch"></div>
         </div>
     </div>
 </aside>
@@ -843,6 +939,36 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle;}
 
 @push('scripts')
 <script>
+/* ── Mode sombre ── */
+(function initTheme(){
+    const sw   = document.getElementById('cxDarkSwitch');
+    const row  = document.getElementById('cxDarkToggle');
+    const lbl  = row?.querySelector('.cx-dark-lbl');
+    const body = document.body;
+
+    const saved = localStorage.getItem('cx-theme') || 'light';
+    const apply = (theme) => {
+        if(theme === 'dark'){
+            body.classList.add('cx-dark');
+            sw?.classList.add('on');
+            if(lbl) lbl.textContent = 'Mode sombre';
+        } else {
+            body.classList.remove('cx-dark');
+            sw?.classList.remove('on');
+            if(lbl) lbl.textContent = 'Mode clair';
+        }
+    };
+    apply(saved);
+    document.documentElement.classList.remove('cx-preorders-dark');
+
+    row?.addEventListener('click', () => {
+        const isDark = body.classList.toggle('cx-dark');
+        sw?.classList.toggle('on', isDark);
+        if(lbl) lbl.textContent = isDark ? 'Mode sombre' : 'Mode clair';
+        localStorage.setItem('cx-theme', isDark ? 'dark' : 'light');
+    });
+})();
+
 /* ── Sidebar toggle ── */
 (function(){
     const sidebar  = document.getElementById('cxSidebar');

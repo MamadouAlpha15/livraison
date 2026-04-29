@@ -25,6 +25,9 @@ html.cx-prelight body{background:#eef1f7!important}
 html,body{margin:0;font-family:'Segoe UI',sans-serif;background:var(--cx-bg)!important;color:var(--cx-text)}
 a{text-decoration:none;color:inherit}
 body.cx-dashboard>nav,body.cx-dashboard>header,body.cx-dashboard .navbar{display:none!important}
+body.cx-dashboard .app-footer{display:none!important}
+body.cx-dashboard .app-flash{display:none!important}
+body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width:100%!important;width:100%!important}
 
 /* ══ MODE CLAIR — inbox ══ */
 body.cx-light{
@@ -34,8 +37,6 @@ body.cx-light{
     --cx-brand-mlt:rgba(124,58,237,.07);
     background:var(--cx-bg)!important;
 }
-
-/* Sidebar : reste sombre dans les deux modes */
 
 /* Zone principale */
 body.cx-light .ic-main{background:var(--cx-bg)}
@@ -77,12 +78,37 @@ body.cx-light .ic-textarea{color:#111827}
 body.cx-light .ic-textarea::placeholder{color:#9ca3af}
 body.cx-light .ic-input-hint{color:#9ca3af}
 
+/* ── Mode clair — sidebar ── */
+body.cx-light .ic-sidebar{
+    background:var(--cx-surface);
+    border-right-color:rgba(0,0,0,.1);
+}
+body.cx-light .ic-sb-hd{border-bottom-color:rgba(0,0,0,.08)}
+body.cx-light .ic-sb-title{color:var(--cx-text)}
+body.cx-light .ic-sb-sub{color:var(--cx-text2)}
+body.cx-light .ic-back{
+    background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.08);color:var(--cx-text2);
+}
+body.cx-light .ic-back:hover{background:rgba(0,0,0,.1);color:var(--cx-text)}
+body.cx-light .ic-search-wrap{border-bottom-color:rgba(0,0,0,.08)}
+body.cx-light .ic-search-wrap input{
+    background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.1);color:var(--cx-text);
+}
+body.cx-light .ic-search-wrap input::placeholder{color:var(--cx-muted)}
+body.cx-light .ic-conv{border-bottom-color:rgba(0,0,0,.06)}
+body.cx-light .ic-conv:hover{background:rgba(0,0,0,.04)}
+body.cx-light .ic-conv.active{background:var(--cx-brand-mlt)}
+body.cx-light .ic-conv-name{color:var(--cx-text)}
+body.cx-light .ic-conv-preview{color:var(--cx-text2)}
+body.cx-light .ic-conv-time{color:var(--cx-muted)}
+body.cx-light .ic-empty-conv{color:var(--cx-text2)}
+
 /* ── Layout ── */
-.ic-wrap{display:flex;height:100vh;overflow:hidden}
+.ic-wrap{display:flex;height:100vh;height:100dvh;overflow:hidden}
 
 /* ── Sidebar conversations ── */
 .ic-sidebar{
-    width:310px;flex-shrink:0;background:#06070f;
+    width:310px;flex-shrink:0;background:var(--cx-surface);
     border-right:1px solid var(--cx-border);
     display:flex;flex-direction:column;
 }
@@ -238,24 +264,81 @@ body.cx-light .ic-input-hint{color:#9ca3af}
 .ic-send:disabled{opacity:.4;cursor:not-allowed}
 .ic-input-hint{margin-top:6px;text-align:center;font-size:10.5px;color:var(--cx-muted)}
 
-/* Responsive */
+/* Barre mobile (hamburger) quand aucune conv sélectionnée */
+.ic-mob-topbar{
+    display:none; /* cachée sur desktop */
+}
+body.cx-light .ic-mob-topbar{background:var(--cx-surface);border-bottom-color:rgba(0,0,0,.08)}
+.ic-mob-topbar-title{font-size:14px;font-weight:700;color:var(--cx-text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── Responsive ── */
+
+/* Tablette (769 – 1080px) : sidebar rétrécie */
+@media(min-width:769px) and (max-width:1080px){
+    .ic-sidebar{width:260px}
+    .ic-sb-title{font-size:13.5px}
+    .ic-conv-av{width:38px;height:38px;font-size:12px}
+    .ic-conv{padding:10px 12px;gap:9px}
+}
+
+/* Desktop : cacher éléments mobiles */
+@media(min-width:769px){
+    .ic-mob-btn,.ic-overlay{display:none!important}
+}
+
+/* Mobile (≤768px) : sidebar en overlay */
 @media(max-width:768px){
     .ic-sidebar{
-        width:100%;position:fixed;top:0;left:0;bottom:0;z-index:40;
-        transform:translateX(-100%);transition:transform .25s cubic-bezier(.23,1,.32,1);
+        width:min(320px,100%);position:fixed;top:0;left:0;bottom:0;z-index:40;
+        transform:translateX(-100%);transition:transform .28s cubic-bezier(.23,1,.32,1);
+        box-shadow:4px 0 30px rgba(0,0,0,.4);
     }
     .ic-sidebar.open{transform:translateX(0)}
-    .ic-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:39}
+    .ic-overlay{
+        display:none;position:fixed;inset:0;
+        background:rgba(0,0,0,.55);z-index:39;
+        backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+    }
     .ic-overlay.open{display:block}
     .ic-mob-btn{
         display:flex;align-items:center;justify-content:center;
-        width:34px;height:34px;border-radius:8px;
-        background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);
-        font-size:18px;cursor:pointer;flex-shrink:0;
+        width:36px;height:36px;border-radius:9px;flex-shrink:0;
+        background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+        font-size:19px;cursor:pointer;color:var(--cx-text);
     }
+    body.cx-light .ic-mob-btn{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.1)}
+    .ic-mob-topbar{
+        display:flex;align-items:center;gap:12px;
+        height:56px;padding:0 14px;flex-shrink:0;
+        background:var(--cx-surface);border-bottom:1px solid var(--cx-border);
+    }
+    .ic-main-hd{padding:0 14px;gap:10px;height:56px}
+    .ic-messages{padding:14px 14px;gap:3px}
+    .msg-row{max-width:88%}
+    .ic-input-area{padding:10px 12px}
+    .ic-input-hint{display:none}
+    .ic-welcome .wico{font-size:44px}
+    .ic-welcome h3{font-size:17px}
+    .ic-welcome p{font-size:12px}
 }
-@media(min-width:769px){
-    .ic-mob-btn,.ic-overlay{display:none!important}
+
+/* Petit mobile (≤480px) */
+@media(max-width:480px){
+    .ic-sidebar{width:100%}
+    .msg-row{max-width:94%}
+    .msg-bubble{font-size:13px;padding:9px 12px}
+    .msg-av{width:26px;height:26px;font-size:9px}
+    .ic-main-hd{padding:0 10px;gap:8px;height:52px}
+    .ic-main-name{font-size:13.5px}
+    .ic-main-av{width:34px;height:34px;font-size:12px}
+    .ic-messages{padding:12px 10px}
+    .ic-input-area{padding:8px 10px}
+    .ic-input-row{padding:8px 12px;border-radius:14px}
+    .ic-textarea{font-size:13px}
+    .ic-send{width:36px;height:36px;font-size:15px}
+    .ic-conv-av{width:40px;height:40px;font-size:12px;border-radius:10px}
+    .ic-conv{padding:10px 12px;gap:8px}
+    .ic-sb-hd{padding:12px 14px}
 }
 </style>
 @endpush
@@ -340,6 +423,12 @@ body.cx-light .ic-input-hint{color:#9ca3af}
 
 {{-- ── MAIN ── --}}
 <div class="ic-main">
+
+    {{-- Barre mobile quand aucune conv sélectionnée (hamburger toujours accessible) --}}
+    <div class="ic-mob-topbar" id="icMobTopbar" style="{{ $activeShopId ? 'display:none' : '' }}">
+        <div class="ic-mob-btn" onclick="document.getElementById('icSidebar').classList.add('open');document.getElementById('icOverlay').classList.add('open')">☰</div>
+        <span class="ic-mob-topbar-title">💬 {{ $company->name }}</span>
+    </div>
 
     {{-- Header conversation --}}
     <div class="ic-main-hd" id="icMainHd" style="{{ $activeShopId ? '' : 'display:none' }}">
@@ -478,6 +567,8 @@ window.selectConv = function(el) {
     welcome.style.display   = 'none';
     messages.style.display  = '';
     inputArea.style.display = '';
+    const mobTopbar = document.getElementById('icMobTopbar');
+    if (mobTopbar) mobTopbar.style.display = 'none';
 
     messages.innerHTML = '';
     lastAt       = null;
@@ -494,7 +585,7 @@ window.selectConv = function(el) {
 
     if (pollTimer) clearInterval(pollTimer);
     loadMessages(true);
-    pollTimer = setInterval(() => loadMessages(false), 3000);
+    pollTimer = setInterval(() => loadMessages(false), 2000);
 
     icInput.focus();
 };
@@ -574,10 +665,25 @@ async function sendMsg() {
             const prev = document.querySelector(`.ic-conv[data-shop="${activeShopId}"] .ic-conv-preview`);
             if (prev) prev.textContent = txt.length > 50 ? txt.slice(0,47)+'…' : txt;
         } else {
-            alert(data.error || 'Erreur lors de l\'envoi.');
+            showToast(data.error || 'Erreur lors de l\'envoi.', 'error');
         }
-    } catch(e) { console.error(e); alert('Erreur réseau.'); }
+    } catch(e) { console.error(e); showToast('Erreur réseau.', 'error'); }
     finally { icSend.disabled = false; icInput.focus(); }
+}
+
+function showToast(msg, type) {
+    const t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = [
+        'position:fixed;bottom:80px;left:50%;transform:translateX(-50%)',
+        'padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600',
+        'z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.3)',
+        type === 'error'
+            ? 'background:#ef4444;color:#fff'
+            : 'background:#10b981;color:#fff'
+    ].join(';');
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
 }
 
 icSend.addEventListener('click', sendMsg);
@@ -677,7 +783,7 @@ if (activeShopId) {
     messages.scrollTop = messages.scrollHeight;
     // L'utilisateur a navigué vers cette conversation : marquer comme lus
     markRead(activeShopId);
-    pollTimer = setInterval(() => loadMessages(false), 3000);
+    pollTimer = setInterval(() => loadMessages(false), 2000);
 }
 
 })();

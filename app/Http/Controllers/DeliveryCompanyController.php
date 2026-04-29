@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\DeliveryCompany;
+use App\Models\Order;
+use App\Models\CourierCommission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -82,7 +84,72 @@ class DeliveryCompanyController extends Controller
 
     // 3) Entreprise approuvée -> dashboard complet
     $drivers = $company->drivers()->paginate(20);
-    return view('company.dashboard', compact('company', 'drivers'));
+
+    $today     = now()->toDateString();
+    $yesterday = now()->subDay()->toDateString();
+
+    $baseOrders = fn() => Order::where('delivery_company_id', $company->id);
+
+    // ── Stats KPI ──
+    $pendingOrders      = $baseOrders()->where('status', Order::STATUS_EN_ATTENTE)->count();
+    $pendingOrdersYday  = $baseOrders()->where('status', Order::STATUS_EN_ATTENTE)->whereDate('created_at', $yesterday)->count();
+    $pendingOrdersToday = $baseOrders()->where('status', Order::STATUS_EN_ATTENTE)->whereDate('created_at', $today)->count();
+
+    $availableDrivers = $company->drivers()->where('status', 'available')->count();
+    $totalDrivers     = $company->drivers()->count();
+
+    $inDelivery      = $baseOrders()->where('status', Order::STATUS_EN_LIVRAISON)->count();
+    $inDeliveryYday  = $baseOrders()->where('status', Order::STATUS_EN_LIVRAISON)->whereDate('updated_at', $yesterday)->count();
+
+    $delivered      = $baseOrders()->where('status', Order::STATUS_LIVREE)->count();
+    $deliveredToday = $baseOrders()->where('status', Order::STATUS_LIVREE)->whereDate('updated_at', $today)->count();
+    $deliveredYday  = $baseOrders()->where('status', Order::STATUS_LIVREE)->whereDate('updated_at', $yesterday)->count();
+
+    // ── Revenus : commissions payées par les boutiques à cette entreprise ──
+    $baseComm = fn() => CourierCommission::whereHas('order', fn($q) => $q->where('delivery_company_id', $company->id))
+                        ->where('status', CourierCommission::STATUS_PAYEE);
+
+    $revenus      = $baseComm()->sum('amount');
+    $revenusToday = $baseComm()->whereDate('paid_at', $today)->sum('amount');
+    $revenusYday  = $baseComm()->whereDate('paid_at', $yesterday)->sum('amount');
+
+    // ── Pipeline ──
+    $totalOrders = max($baseOrders()->count(), 1);
+    $pipeData = [
+        ['En attente de chauffeur', $baseOrders()->where('status', Order::STATUS_EN_ATTENTE)->count(),  '#eab308'],
+        ['Assignées',               $baseOrders()->where('status', Order::STATUS_CONFIRMEE)->count(),   '#3b82f6'],
+        ['En livraison',            $baseOrders()->where('status', Order::STATUS_EN_LIVRAISON)->count(),'#f59e0b'],
+        ['Livrées',                 $baseOrders()->where('status', Order::STATUS_LIVREE)->count(),      '#10b981'],
+        ['Annulées',                $baseOrders()->where('status', Order::STATUS_ANNULEE)->count(),     '#ef4444'],
+    ];
+
+    // ── Chauffeurs actifs (5 premiers) ──
+    $activeDrivers = $company->drivers()->orderByRaw("FIELD(status,'available','busy','offline')")->limit(5)->get();
+
+    // ── Graphique commandes : 7 derniers jours ──
+    $ordersChart = collect(range(6, 0))->map(
+        fn($d) => $baseOrders()->whereDate('created_at', now()->subDays($d)->toDateString())->count()
+    )->values();
+
+    // ── Graphique revenus : 30 derniers jours ──
+    $revenueChart = collect(range(29, 0))->map(
+        fn($d) => $baseComm()->whereDate('paid_at', now()->subDays($d)->toDateString())->sum('amount')
+    )->values();
+
+    $devise = $company->currency ?? 'GNF';
+
+    return view('company.dashboard', compact(
+        'company', 'drivers',
+        'pendingOrders', 'pendingOrdersToday', 'pendingOrdersYday',
+        'availableDrivers', 'totalDrivers',
+        'inDelivery', 'inDeliveryYday',
+        'delivered', 'deliveredToday', 'deliveredYday',
+        'revenus', 'revenusToday', 'revenusYday',
+        'pipeData', 'totalOrders',
+        'activeDrivers',
+        'ordersChart', 'revenueChart',
+        'devise'
+    ));
 }
 
 

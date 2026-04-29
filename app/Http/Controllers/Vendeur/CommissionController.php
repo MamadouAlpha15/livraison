@@ -19,29 +19,58 @@ class CommissionController extends Controller
         abort_unless($shop, 403);
 
         $status = $request->get('status', CourierCommission::STATUS_EN_ATTENTE);
+        $type   = in_array($request->get('type'), ['shop', 'company']) ? $request->get('type') : 'shop';
 
         $query = CourierCommission::where('shop_id', $shop->id)
-            ->with(['livreur', 'order.client', 'order.items.product'])
+            ->with(['livreur', 'order.client', 'order.driver.user', 'order.deliveryCompany'])
             ->orderByDesc('id');
 
         if (in_array($status, [CourierCommission::STATUS_EN_ATTENTE, CourierCommission::STATUS_PAYEE])) {
             $query->where('status', $status);
         }
 
-        $commissions = $query->paginate(15);
+        if ($type === 'shop') {
+            $query->whereHas('order', fn($q) => $q->whereNull('driver_id'));
+        } else {
+            $query->whereHas('order', fn($q) => $q->whereNotNull('driver_id'));
+        }
 
-        $totalPending = CourierCommission::where('shop_id', $shop->id)
+        $commissions = $query->paginate(20);
+
+        /* KPI globaux */
+        $base = fn() => CourierCommission::where('shop_id', $shop->id);
+
+        $totalPending = $base()->where('status', CourierCommission::STATUS_EN_ATTENTE)->sum('amount');
+        $totalPaid    = $base()->where('status', CourierCommission::STATUS_PAYEE)->sum('amount');
+
+        /* KPI par type */
+        $shopPending = $base()
             ->where('status', CourierCommission::STATUS_EN_ATTENTE)
+            ->whereHas('order', fn($q) => $q->whereNull('driver_id'))
             ->sum('amount');
 
-        $totalPaid = CourierCommission::where('shop_id', $shop->id)
+        $companyPending = $base()
+            ->where('status', CourierCommission::STATUS_EN_ATTENTE)
+            ->whereHas('order', fn($q) => $q->whereNotNull('driver_id'))
+            ->sum('amount');
+
+        $shopPaid = $base()
             ->where('status', CourierCommission::STATUS_PAYEE)
+            ->whereHas('order', fn($q) => $q->whereNull('driver_id'))
             ->sum('amount');
-            $devise = $shop->currency ?? 'GNF';
 
+        $companyPaid = $base()
+            ->where('status', CourierCommission::STATUS_PAYEE)
+            ->whereHas('order', fn($q) => $q->whereNotNull('driver_id'))
+            ->sum('amount');
+
+        $devise = $shop->currency ?? 'GNF';
 
         return view('boutique.commissions.index', compact(
-            'commissions', 'status', 'totalPending', 'totalPaid', 'devise','shop'
+            'commissions', 'type', 'status',
+            'totalPending', 'totalPaid',
+            'shopPending', 'companyPending', 'shopPaid', 'companyPaid',
+            'devise', 'shop'
         ));
     }
 
@@ -97,45 +126,79 @@ class CommissionController extends Controller
         return back()->with('success', 'Les commissions sélectionnées ont été marquées comme PAYÉES.');
     }
 
-    public function export(): StreamedResponse
+    public function export(Request $request): StreamedResponse
     {
         $user = Auth::user();
         $shop = $user->shop ?: $user->assignedShop;
         abort_unless($shop, 403);
 
-        $commissions = CourierCommission::where('shop_id', $shop->id)
+        $type = in_array($request->get('type'), ['shop', 'company']) ? $request->get('type') : 'shop';
+
+        $query = CourierCommission::where('shop_id', $shop->id)
             ->where('status', CourierCommission::STATUS_PAYEE)
-            ->with(['livreur', 'order.client'])
-            ->orderByDesc('paid_at')
-            ->get();
+            ->with(['livreur', 'order.client', 'order.driver.user', 'order.deliveryCompany'])
+            ->orderByDesc('paid_at');
 
-        $devise = $shop->currency ?? 'GNF';
-        $filename = 'commissions_payees_' . now()->format('Ymd_His') . '.csv';
+        if ($type === 'shop') {
+            $query->whereHas('order', fn($q) => $q->whereNull('driver_id'));
+        } else {
+            $query->whereHas('order', fn($q) => $q->whereNotNull('driver_id'));
+        }
 
-        return response()->streamDownload(function () use ($commissions, $devise) {
+        $commissions = $query->get();
+        $devise   = $shop->currency ?? 'GNF';
+        $typeSlug = $type === 'company' ? 'entreprises' : 'livreurs';
+        $filename = 'commissions_' . $typeSlug . '_payees_' . now()->format('Ymd_His') . '.csv';
+
+        return response()->streamDownload(function () use ($commissions, $devise, $type) {
             $out = fopen('php://output', 'w');
-            // BOM UTF-8 pour Excel
             fputs($out, "\xEF\xBB\xBF");
-            fputcsv($out, [
-                'Réf commande', 'Livreur', 'Téléphone livreur',
-                'Destination livraison',
-                'Montant commande (' . $devise . ')',
-                'Commission payée (' . $devise . ')',
-                'Référence paiement', 'Note interne', 'Payée le',
-            ], ';');
 
-            foreach ($commissions as $c) {
+            if ($type === 'shop') {
                 fputcsv($out, [
-                    $c->order_id ? '#' . $c->order_id : '—',
-                    $c->livreur?->name ?? '—',
-                    $c->livreur?->phone ?? '—',
-                    $c->order?->delivery_destination ?: ($c->order?->client?->address ?? '—'),
-                    $c->order?->total ?? '—',
-                    number_format($c->amount, 0, ',', ' '),
-                    $c->payout_ref  ?? '—',
-                    $c->payout_note ?? '—',
-                    optional($c->paid_at)->format('d/m/Y H:i') ?? '—',
+                    'Réf commande', 'Livreur', 'Téléphone livreur',
+                    'Destination livraison',
+                    'Montant commande (' . $devise . ')',
+                    'Commission payée (' . $devise . ')',
+                    'Référence paiement', 'Note interne', 'Payée le',
                 ], ';');
+                foreach ($commissions as $c) {
+                    fputcsv($out, [
+                        $c->order_id ? '#' . $c->order_id : '—',
+                        $c->livreur?->name ?? '—',
+                        $c->livreur?->phone ?? '—',
+                        $c->order?->delivery_destination ?: ($c->order?->client?->address ?? '—'),
+                        $c->order?->total ?? '—',
+                        number_format($c->amount, 0, ',', ' '),
+                        $c->payout_ref  ?? '—',
+                        $c->payout_note ?? '—',
+                        optional($c->paid_at)->format('d/m/Y H:i') ?? '—',
+                    ], ';');
+                }
+            } else {
+                fputcsv($out, [
+                    'Réf commande', 'Entreprise partenaire', 'Téléphone entreprise',
+                    'Chauffeur', 'Destination livraison',
+                    'Montant commande (' . $devise . ')',
+                    'Commission payée (' . $devise . ')',
+                    'Référence paiement', 'Note interne', 'Payée le',
+                ], ';');
+                foreach ($commissions as $c) {
+                    $company = $c->order?->deliveryCompany;
+                    $driver  = $c->order?->driver?->user;
+                    fputcsv($out, [
+                        $c->order_id ? '#' . $c->order_id : '—',
+                        $company?->name ?? '—',
+                        $company?->phone ?? '—',
+                        $driver?->name ?? '—',
+                        $c->order?->delivery_destination ?: ($c->order?->client?->address ?? '—'),
+                        $c->order?->total ?? '—',
+                        number_format($c->amount, 0, ',', ' '),
+                        $c->payout_ref  ?? '—',
+                        $c->payout_note ?? '—',
+                        optional($c->paid_at)->format('d/m/Y H:i') ?? '—',
+                    ], ';');
+                }
             }
             fclose($out);
         }, $filename, [

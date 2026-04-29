@@ -157,6 +157,91 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .modal-actions .btn{flex:1;justify-content:center;}
 .btn-cancel-confirm{background:#dc2626;border-color:#b91c1c;color:#fff;font-weight:700;}
 .btn-cancel-confirm:hover{background:#b91c1c;color:#fff;}
+
+/* ── CHAT MODAL ── */
+.chat-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;align-items:center;justify-content:center;padding:16px;}
+.chat-overlay.open{display:flex;}
+.chat-panel{
+    background:#fff;border-radius:16px;width:100%;max-width:520px;
+    display:flex;flex-direction:column;height:90vh;max-height:680px;
+    box-shadow:0 28px 80px rgba(0,0,0,.22);overflow:hidden;animation:modalIn .2s ease;
+}
+.chat-hd{
+    padding:14px 18px;border-bottom:1px solid var(--border);flex-shrink:0;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;
+}
+.chat-hd-info{display:flex;align-items:center;gap:10px;}
+.chat-hd-av{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;}
+.chat-hd-av img{width:100%;height:100%;object-fit:cover;}
+.chat-hd-name{font-size:14px;font-weight:800;color:#fff;line-height:1.2;}
+.chat-hd-sub{font-size:11px;color:rgba(255,255,255,.7);margin-top:1px;}
+.chat-close{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;font-size:16px;flex-shrink:0;transition:background .14s;}
+.chat-close:hover{background:rgba(255,255,255,.3);}
+
+/* Bloc contexte commande */
+.chat-order-ctx{
+    padding:10px 14px;flex-shrink:0;
+    background:#eff6ff;border-bottom:1px solid #bfdbfe;
+    display:flex;align-items:flex-start;gap:12px;
+}
+.chat-order-num{font-size:11px;font-weight:800;color:#1d4ed8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+.chat-order-client{font-size:13px;font-weight:700;color:#1e40af;}
+.chat-order-meta{font-size:11.5px;color:#3b82f6;margin-top:2px;}
+.chat-ctx-ico{width:34px;height:34px;border-radius:9px;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+
+/* Messages */
+.chat-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:8px;background:#f8fafc;scrollbar-width:thin;scrollbar-color:#c7d2fe transparent;}
+.chat-msgs::-webkit-scrollbar{width:3px;}
+.chat-msgs::-webkit-scrollbar-thumb{background:#c7d2fe;border-radius:3px;}
+.msg-row{display:flex;flex-direction:column;max-width:80%;}
+.msg-row.mine{align-self:flex-end;align-items:flex-end;}
+.msg-row.theirs{align-self:flex-start;align-items:flex-start;}
+.msg-bubble{padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.5;word-break:break-word;white-space:pre-wrap;}
+.msg-row.mine .msg-bubble{background:#4f46e5;color:#fff;border-bottom-right-radius:4px;}
+.msg-row.theirs .msg-bubble{background:#fff;color:#1e293b;border-bottom-left-radius:4px;border:1px solid #e2e8f0;}
+.msg-bubble.system{background:#fef9c3;color:#92400e;border:1px solid #fde68a;font-size:12px;font-style:italic;border-radius:10px;}
+.msg-meta{font-size:10px;color:#94a3b8;margin-top:2px;padding:0 2px;}
+.chat-empty{text-align:center;padding:32px 16px;color:#94a3b8;font-size:13px;}
+
+/* Bouton confier */
+.chat-confier-zone{padding:10px 14px;flex-shrink:0;background:#f0fdf4;border-top:1.5px solid #bbf7d0;}
+.btn-confier{
+    width:100%;padding:12px;border-radius:10px;border:none;cursor:pointer;
+    background:linear-gradient(135deg,#059669,#10b981);color:#fff;
+    font-size:14px;font-weight:800;font-family:var(--font);
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    box-shadow:0 4px 14px rgba(16,185,129,.35);transition:all .16s;
+}
+.btn-confier:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(16,185,129,.5);}
+.btn-confier:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.btn-confier.done{background:linear-gradient(135deg,#6b7280,#9ca3af);box-shadow:none;}
+
+/* Zone saisie */
+.chat-input-zone{padding:10px 14px;flex-shrink:0;border-top:1px solid var(--border);background:#fff;display:flex;gap:8px;align-items:flex-end;}
+.chat-textarea{
+    flex:1;resize:none;border:1.5px solid var(--border);border-radius:10px;
+    padding:9px 12px;font-size:13px;font-family:var(--font);color:var(--text);
+    outline:none;line-height:1.4;max-height:120px;min-height:40px;
+    transition:border-color .14s;scrollbar-width:thin;
+}
+.chat-textarea:focus{border-color:var(--brand);}
+.chat-send-btn{
+    width:38px;height:38px;border-radius:10px;border:none;cursor:pointer;
+    background:var(--brand);color:#fff;font-size:17px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;transition:background .14s;
+}
+.chat-send-btn:hover{background:var(--brand-dk);}
+.chat-send-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+/* Bouton message sur chaque entreprise */
+.btn-msg-company{
+    width:32px;height:32px;border-radius:8px;border:1.5px solid #c7d2fe;
+    background:#eef2ff;color:#4f46e5;cursor:pointer;font-size:15px;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    transition:all .14s;
+}
+.btn-msg-company:hover{background:#4f46e5;color:#fff;border-color:#4f46e5;}
 .btn-restore-confirm{background:#2563eb;border-color:#1d4ed8;color:#fff;font-weight:700;}
 .btn-restore-confirm:hover{background:#1d4ed8;color:#fff;}
 @media(max-width:900px){
@@ -241,48 +326,111 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 
 {{-- ══ MODAL ENTREPRISE DE LIVRAISON ══ --}}
 <div class="modal-overlay" id="companyModal">
-    <div class="modal-box" style="max-width:460px;">
-        <div class="modal-icon">🏢</div>
-        <div class="modal-title">Confier à une entreprise</div>
-        <div class="modal-sub" style="margin-bottom:14px;">Sélectionnez l'entreprise qui prendra en charge cette livraison.</div>
+    <div class="modal-box" style="max-width:480px;padding:22px 20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div>
+                <div style="font-size:15px;font-weight:800;color:var(--text);">🏢 Choisir une entreprise</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:2px;">Discutez et confiez la livraison</div>
+            </div>
+            <button onclick="closeCompanyModal()" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--muted);">✕</button>
+        </div>
 
-        <form id="companyForm" method="POST" action="">
-            @csrf @method('PUT')
-            <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px;max-height:260px;overflow-y:auto;">
-                @forelse($deliveryCompanies as $dc)
-                <label style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;transition:border-color .14s;background:var(--bg);"
-                       onclick="this.style.borderColor='#6366f1'"
-                       onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='var(--border)'">
-                    <input type="radio" name="delivery_company_id" value="{{ $dc->id }}"
-                           style="accent-color:#6366f1;width:16px;height:16px;flex-shrink:0;"
-                           onchange="document.querySelectorAll('#companyModal label').forEach(l=>l.style.borderColor='var(--border)'); this.closest('label').style.borderColor='#6366f1';">
-                    <div style="width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;">
-                        @if($dc->image)
-                            <img src="{{ asset('storage/'.$dc->image) }}" style="width:100%;height:100%;object-fit:cover;" alt="">
-                        @else
-                            <span style="font-size:16px;">🚚</span>
-                        @endif
-                    </div>
-                    <div style="flex:1;min-width:0;">
-                        <div style="font-size:13.5px;font-weight:700;color:var(--text);">{{ $dc->name }}</div>
-                        <div style="font-size:11px;color:var(--muted);">
-                            {{ $dc->phone ?? '' }}
-                            @if($dc->commission_percent) · Commission {{ number_format($dc->commission_percent,0) }}% @endif
-                        </div>
-                    </div>
-                </label>
-                @empty
-                <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">
-                    Aucune entreprise de livraison approuvée disponible.
+        {{-- Contexte commande --}}
+        <div id="companyModalCtx" style="padding:10px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;margin-bottom:14px;font-size:12px;color:#1d4ed8;display:none;">
+            <div style="font-weight:800;margin-bottom:2px;" id="ctxOrderNum"></div>
+            <div id="ctxClientName" style="font-weight:700;font-size:13px;color:#1e40af;"></div>
+            <div id="ctxClientPhone" style="margin-top:2px;"></div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px;max-height:280px;overflow-y:auto;padding-right:2px;">
+            @forelse($deliveryCompanies as $dc)
+            <div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);">
+                {{-- Logo --}}
+                <div style="width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;">
+                    @if($dc->image)
+                        <img src="{{ asset('storage/'.$dc->image) }}" style="width:100%;height:100%;object-fit:cover;" alt="" id="dc-img-{{ $dc->id }}">
+                    @else
+                        <span style="font-size:17px;">🚚</span>
+                    @endif
                 </div>
-                @endforelse
+                {{-- Infos --}}
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:13.5px;font-weight:700;color:var(--text);">{{ $dc->name }}</div>
+                    <div style="font-size:11px;color:var(--muted);">
+                        {{ $dc->phone ?? 'Aucun numéro' }}
+                        @if($dc->commission_percent) · {{ number_format($dc->commission_percent,0) }}% commission @endif
+                    </div>
+                </div>
+                {{-- Bouton Message --}}
+                <button class="btn-msg-company"
+                        title="Discuter avec {{ $dc->name }}"
+                        data-company-id="{{ $dc->id }}"
+                        data-company-name="{{ $dc->name }}"
+                        data-company-img="{{ $dc->image ? asset('storage/'.$dc->image) : '' }}"
+                        onclick="openChatFromCompany(this)">
+                    💬
+                </button>
             </div>
+            @empty
+            <div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">
+                Aucune entreprise de livraison approuvée disponible.
+            </div>
+            @endforelse
+        </div>
 
-            <div class="modal-actions">
-                <button type="button" class="btn" onclick="closeCompanyModal()">← Annuler</button>
-                <button type="submit" class="btn btn-primary" style="flex:1;">🏢 Confier la livraison</button>
+        <div style="margin-top:16px;">
+            <button type="button" class="btn" style="width:100%;justify-content:center;" onclick="closeCompanyModal()">← Fermer</button>
+        </div>
+    </div>
+</div>
+
+{{-- ══ MODAL CHAT BOUTIQUE ↔ ENTREPRISE ══ --}}
+<div class="chat-overlay" id="chatModal">
+    <div class="chat-panel">
+
+        {{-- Header --}}
+        <div class="chat-hd">
+            <div class="chat-hd-info">
+                <div class="chat-hd-av" id="chatCompanyAv">🏢</div>
+                <div>
+                    <div class="chat-hd-name" id="chatCompanyName">Entreprise</div>
+                    <div class="chat-hd-sub">Livraison · Discussion en cours</div>
+                </div>
             </div>
-        </form>
+            <button class="chat-close" onclick="closeChatModal()">✕</button>
+        </div>
+
+        {{-- Contexte commande --}}
+        <div class="chat-order-ctx">
+            <div class="chat-ctx-ico">📦</div>
+            <div>
+                <div class="chat-order-num" id="chatOrderNum">Commande #—</div>
+                <div class="chat-order-client" id="chatClientName">Client —</div>
+                <div class="chat-order-meta" id="chatClientMeta"></div>
+            </div>
+        </div>
+
+        {{-- Messages --}}
+        <div class="chat-msgs" id="chatMsgList">
+            <div class="chat-empty" id="chatEmpty">Aucun message. Commencez la discussion !</div>
+        </div>
+
+        {{-- Bouton Confier --}}
+        <div class="chat-confier-zone" id="chatConfierZone">
+            <button class="btn-confier" id="btnConfier" onclick="confierLivraison()">
+                📦 Confier la livraison à cette entreprise
+            </button>
+        </div>
+
+        {{-- Saisie --}}
+        <div class="chat-input-zone">
+            <textarea class="chat-textarea" id="chatInput" placeholder="Votre message…" rows="1"
+                      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"></textarea>
+            <button class="chat-send-btn" id="chatSendBtn" onclick="sendMsg()" title="Envoyer">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+        </div>
+
     </div>
 </div>
 
@@ -533,7 +681,13 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                                 <button type="button"
                                         class="btn btn-sm"
                                         style="background:#eef2ff;border-color:#c7d2fe;color:#4f46e5;white-space:nowrap;"
-                                        onclick="openCompanyModal({{ $order->id }})">
+                                        data-order-id="{{ $order->id }}"
+                                        data-order-num="#{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
+                                        data-client="{{ addslashes($client->name ?? 'Inconnu') }}"
+                                        data-phone="{{ $client->phone ?? '' }}"
+                                        data-dest="{{ addslashes($order->delivery_destination ?: ($client->address ?? '')) }}"
+                                        data-shop-id="{{ $shop->id ?? '' }}"
+                                        onclick="openCompanyModal(this)">
                                     🏢
                                 </button>
                             </div>
@@ -575,7 +729,19 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         @if($product)<div style="display:flex;align-items:center;gap:9px">@if($product->image)<img src="{{ asset('storage/'.$product->image) }}" class="prod-img" alt="{{ $product->name }}">@else<div class="prod-ph">🏷️</div>@endif<div><div style="font-size:13px;font-weight:600">{{ $product->name }}</div><div style="font-size:11px;color:var(--muted)">Qté : {{ $order->items->first()->quantity ?? 1 }}</div></div></div>@endif
                         <div class="m-row"><span class="m-lbl">Montant</span><span class="amount">{{ number_format($order->total,0,',',' ') }} <small>{{ $devise }}</small></span></div>
                         <div class="m-row"><span class="m-lbl">Livreur</span>@if($order->livreur)<div class="lv-chip"><div class="lv-chip-av">{{ initiales($order->livreur->name) }}</div>{{ $order->livreur->name }}</div>@else<span class="pill p-warning">Non assigné</span>@endif</div>
-                        @if(!$order->livreur && $livreurs->isNotEmpty())<form action="{{ route('employe.orders.assign',$order) }}" method="POST" style="display:flex;gap:8px;align-items:center">@csrf @method('PUT')<select name="livreur_id" class="assign-select" style="flex:1" required><option value="">— Choisir —</option>@foreach($livreurs as $lv)<option value="{{ $lv->id }}">{{ $lv->name }} {{ $lv->is_available ? '🟢' : '🟡' }}</option>@endforeach</select><button type="submit" class="btn btn-primary btn-sm">✅</button></form>@endif
+                        @if(!$order->livreur && !$order->deliveryCompany)
+                        <div style="display:flex;flex-direction:column;gap:6px;">
+                            @if($livreurs->isNotEmpty())<form action="{{ route('employe.orders.assign',$order) }}" method="POST" style="display:flex;gap:8px;align-items:center">@csrf @method('PUT')<select name="livreur_id" class="assign-select" style="flex:1" required><option value="">— Choisir —</option>@foreach($livreurs as $lv)<option value="{{ $lv->id }}">{{ $lv->name }} {{ $lv->is_available ? '🟢' : '🟡' }}</option>@endforeach</select><button type="submit" class="btn btn-primary btn-sm">✅</button></form>@endif
+                            <button type="button" class="btn btn-sm" style="background:#eef2ff;border-color:#c7d2fe;color:#4f46e5;width:100%;justify-content:center;"
+                                    data-order-id="{{ $order->id }}"
+                                    data-order-num="#{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
+                                    data-client="{{ addslashes($client->name ?? 'Inconnu') }}"
+                                    data-phone="{{ $client->phone ?? '' }}"
+                                    data-dest="{{ addslashes($order->delivery_destination ?: ($client->address ?? '')) }}"
+                                    data-shop-id="{{ $shop->id ?? '' }}"
+                                    onclick="openCompanyModal(this)">🏢 Confier à une entreprise</button>
+                        </div>
+                        @endif
                     </div>
                     <div class="m-card-foot">
                         <a href="{{ route('orders.show',$order) }}" class="btn btn-info btn-sm">🔍 Détails</a>
@@ -596,13 +762,39 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 
 @push('scripts')
 <script>
-/* ── Modal entreprise de livraison ── */
-function openCompanyModal(orderId) {
-    const url = `/employe/orders/${orderId}/send-to-company`;
-    document.getElementById('companyForm').action = url;
-    // reset sélection
-    document.querySelectorAll('#companyModal input[type=radio]').forEach(r => r.checked = false);
-    document.querySelectorAll('#companyModal label').forEach(l => l.style.borderColor = 'var(--border)');
+/* ════════════════════════════════════════════════
+   MODAL ENTREPRISE + CHAT BOUTIQUE ↔ ENTREPRISE
+   ════════════════════════════════════════════════ */
+
+/* Contexte de la commande courante */
+let _orderId   = null;
+let _orderNum  = '';
+let _clientName= '';
+let _clientPhone= '';
+let _dest      = '';
+let _shopId    = '';
+
+/* Polling */
+let _chatInterval  = null;
+let _lastMsgTime   = null;
+let _currentCompanyId = null;
+let _confierDone   = false;
+
+/* ── Ouvre le modal de sélection d'entreprise ── */
+function openCompanyModal(btn) {
+    _orderId    = btn.dataset.orderId;
+    _orderNum   = btn.dataset.orderNum  || ('#' + _orderId);
+    _clientName = btn.dataset.client    || 'Client';
+    _clientPhone= btn.dataset.phone     || '';
+    _dest       = btn.dataset.dest      || '';
+    _shopId     = btn.dataset.shopId    || '';
+
+    /* Remplir le bloc contexte */
+    document.getElementById('ctxOrderNum').textContent   = 'Commande ' + _orderNum;
+    document.getElementById('ctxClientName').textContent = _clientName;
+    document.getElementById('ctxClientPhone').textContent= _clientPhone ? '📞 ' + _clientPhone : '';
+    document.getElementById('companyModalCtx').style.display = 'block';
+
     document.getElementById('companyModal').classList.add('open');
     document.body.style.overflow = 'hidden';
 }
@@ -613,6 +805,235 @@ function closeCompanyModal() {
 document.getElementById('companyModal')?.addEventListener('click', function(e) {
     if (e.target === this) closeCompanyModal();
 });
+
+/* ── Ouvre le chat avec une entreprise spécifique ── */
+function openChatFromCompany(btn) {
+    const companyId   = btn.dataset.companyId;
+    const companyName = btn.dataset.companyName || 'Entreprise';
+    const companyImg  = btn.dataset.companyImg  || '';
+
+    _currentCompanyId = companyId;
+    _lastMsgTime      = null;
+    _confierDone      = false;
+
+    /* Mise à jour header */
+    const av = document.getElementById('chatCompanyAv');
+    if (companyImg) {
+        av.innerHTML = `<img src="${companyImg}" style="width:100%;height:100%;object-fit:cover;" alt="">`;
+    } else {
+        av.textContent = '🏢';
+    }
+    document.getElementById('chatCompanyName').textContent = companyName;
+
+    /* Bloc contexte commande */
+    document.getElementById('chatOrderNum').textContent   = 'Commande ' + _orderNum;
+    document.getElementById('chatClientName').textContent = _clientName;
+    let meta = '';
+    if (_clientPhone) meta += '📞 ' + _clientPhone;
+    if (_dest)        meta += (meta ? '  ·  ' : '') + '📍 ' + _dest;
+    document.getElementById('chatClientMeta').textContent = meta;
+
+    /* Reset bouton confier */
+    const btnC = document.getElementById('btnConfier');
+    btnC.disabled  = false;
+    btnC.classList.remove('done');
+    btnC.textContent = '📦 Confier la livraison à cette entreprise';
+
+    /* Vider messages */
+    const list = document.getElementById('chatMsgList');
+    list.innerHTML = '<div class="chat-empty" id="chatEmpty">Chargement…</div>';
+
+    /* Fermer le modal entreprise, ouvrir le chat */
+    closeCompanyModal();
+    document.getElementById('chatModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('chatInput').focus();
+
+    /* Charger messages + démarrer polling */
+    loadMessages(true);
+    _chatInterval = setInterval(() => loadMessages(false), 3000);
+}
+
+/* ── Ferme le chat ── */
+function closeChatModal() {
+    clearInterval(_chatInterval);
+    _chatInterval = null;
+    document.getElementById('chatModal').classList.remove('open');
+    document.body.style.overflow = '';
+}
+document.getElementById('chatModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeChatModal();
+});
+
+/* ── Charge (ou poll) les messages ── */
+function loadMessages(initial) {
+    if (!_currentCompanyId || !_orderId) return;
+
+    const url = new URL(`/employe/companies/${_currentCompanyId}/chat/messages`, location.origin);
+    url.searchParams.set('shop_id', _shopId || '');
+    if (_lastMsgTime && !initial) url.searchParams.set('after', _lastMsgTime);
+
+    fetch(url.toString(), {
+        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        const msgs = data.messages || data || [];
+        if (msgs.length) {
+            if (initial) {
+                renderMessages(msgs, true);
+            } else {
+                renderMessages(msgs, false);
+            }
+            _lastMsgTime = msgs[msgs.length - 1].created_at || null;
+        } else if (initial) {
+            document.getElementById('chatMsgList').innerHTML =
+                '<div class="chat-empty" id="chatEmpty">Aucun message. Commencez la discussion !</div>';
+        }
+    })
+    .catch(() => {
+        if (initial) {
+            document.getElementById('chatMsgList').innerHTML =
+                '<div class="chat-empty" id="chatEmpty">Aucun message. Commencez la discussion !</div>';
+        }
+    });
+}
+
+/* ── Affiche les messages ── */
+function renderMessages(msgs, replace) {
+    const list = document.getElementById('chatMsgList');
+
+    if (replace) list.innerHTML = '';
+
+    /* Supprimer l'état vide s'il est encore là */
+    const empty = list.querySelector('.chat-empty');
+    if (empty) empty.remove();
+
+    msgs.forEach(m => {
+        /* Évite les doublons lors du polling */
+        if (document.getElementById('msg-' + m.id)) return;
+
+        /* API retourne from_type (ou sender_role pour les locaux) */
+        const role    = m.from_type || m.sender_role || 'shop';
+        const isMine  = role === 'shop';
+        const isSystem= role === 'system';
+
+        const row = document.createElement('div');
+        row.className = isSystem ? 'msg-row mine' : ('msg-row ' + (isMine ? 'mine' : 'theirs'));
+        row.id = 'msg-' + m.id;
+
+        const bubbleCls = isSystem ? 'msg-bubble system' : 'msg-bubble';
+        /* API retourne body ; messages locaux utilisent message */
+        const text    = m.body || m.message || '';
+        const timeStr = m.created_at
+            ? new Date(m.created_at).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})
+            : '';
+        const label   = isSystem ? 'Système' : (isMine ? 'Vous' : 'Entreprise');
+
+        row.innerHTML = `<div class="${bubbleCls}">${escapeHtml(text)}</div>`
+                      + `<div class="msg-meta">${label} · ${timeStr}</div>`;
+        list.appendChild(row);
+    });
+
+    /* Scroll bas */
+    list.scrollTop = list.scrollHeight;
+}
+
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;');
+}
+
+/* ── Envoie un message ── */
+function sendMsg() {
+    const input = document.getElementById('chatInput');
+    const msg   = input.value.trim();
+    if (!msg || !_currentCompanyId) return;
+
+    const sendBtn = document.getElementById('chatSendBtn');
+    sendBtn.disabled = true;
+
+    fetch(`/employe/companies/${_currentCompanyId}/chat/send`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            message: msg,
+            shop_id: _shopId
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        input.value = '';
+        input.style.height = '';
+        sendBtn.disabled = false;
+        /* Le contrôleur retourne { ok:true, message: { id, body, from_type, created_at } } */
+        if (data.ok && data.message) {
+            renderMessages([data.message], false);
+            _lastMsgTime = data.message.created_at || null;
+        } else {
+            loadMessages(false);
+        }
+    })
+    .catch(() => { sendBtn.disabled = false; });
+}
+
+/* ── Confie la livraison à l'entreprise ── */
+function confierLivraison() {
+    if (!_orderId || !_currentCompanyId || _confierDone) return;
+
+    const btn = document.getElementById('btnConfier');
+    btn.disabled = true;
+    btn.textContent = '⏳ Envoi en cours…';
+
+    /* FormData + _method=PUT pour le method spoofing Laravel */
+    const formData = new FormData();
+    formData.append('_method', 'PUT');
+    formData.append('delivery_company_id', _currentCompanyId);
+
+    fetch(`/employe/orders/${_orderId}/send-to-company`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
+        body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            _confierDone = true;
+            btn.classList.add('done');
+            btn.textContent = '✅ Livraison confiée ! Statut : En attente';
+
+            /* Message de confirmation local */
+            renderMessages([{
+                id: 'local-' + Date.now(),
+                sender_role: 'system',
+                message: '✅ Commande ' + _orderNum + ' confiée à cette entreprise. Statut : En attente.',
+                created_at: new Date().toISOString()
+            }], false);
+
+            /* Recharger la page après 2s pour refléter le nouveau statut */
+            setTimeout(() => location.reload(), 2000);
+        } else {
+            btn.disabled = false;
+            btn.textContent = '📦 Confier la livraison à cette entreprise';
+            alert(data.message || 'Erreur lors de la soumission.');
+        }
+    })
+    .catch(() => {
+        btn.disabled = false;
+        btn.textContent = '📦 Confier la livraison à cette entreprise';
+        alert('Erreur réseau. Veuillez réessayer.');
+    });
+}
 
 function toggleGroup(btn) {
     const sub = btn.nextElementSibling;
@@ -664,7 +1085,14 @@ function openRestoreModal(url, orderId, clientName) {
 }
 function closeRestoreModal() { document.getElementById('restoreModal').classList.remove('open'); document.body.style.overflow = ''; }
 document.getElementById('restoreModal').addEventListener('click', function(e) { if (e.target === this) closeRestoreModal(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeRestoreModal(); } });
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        closeModal();
+        closeRestoreModal();
+        closeChatModal();
+        closeCompanyModal();
+    }
+});
 
 function setDate(val) {
     document.getElementById('dateInput').value = val;
@@ -693,7 +1121,9 @@ function setDate(val) {
 
     function isModalOpen() {
         return document.getElementById('cancelModal').classList.contains('open') ||
-               document.getElementById('restoreModal').classList.contains('open');
+               document.getElementById('restoreModal').classList.contains('open') ||
+               document.getElementById('companyModal').classList.contains('open') ||
+               document.getElementById('chatModal').classList.contains('open');
     }
 
     function isUserTyping() {

@@ -17,9 +17,10 @@ namespace App\Http\Controllers\Boutique;
 use App\Http\Controllers\Controller;
 
 // Modèles nécessaires
-use App\Models\ShopMessage;  // Messages entre clients et vendeurs
-use App\Models\User;         // Utilisateurs (clients, vendeurs...)
-use App\Models\Product;      // Produits de la boutique
+use App\Models\ShopMessage;      // Messages entre clients et vendeurs
+use App\Models\DeliveryMessage;  // Messages boutique ↔ entreprise de livraison
+use App\Models\User;             // Utilisateurs (clients, vendeurs...)
+use App\Models\Product;          // Produits de la boutique
 use App\Services\ImageOptimizer;
 use App\Jobs\ProcessImageJob;
 use Illuminate\Support\Facades\Storage;
@@ -588,12 +589,35 @@ class BoutiqueMessageController extends Controller
             ->where('shop_id', $shop->id)
             ->count();
 
+        /* ── Messages d'entreprises de livraison non lus (company → shop) ── */
+        $companyMessagesUnread = DeliveryMessage::where('shop_id', $shop->id)
+            ->where('sender_role', 'company')
+            ->whereNull('read_at')
+            ->count();
+
+        $latestCompanyMessages = DeliveryMessage::where('shop_id', $shop->id)
+            ->where('sender_role', 'company')
+            ->whereNull('read_at')
+            ->with('company:id,name')
+            ->orderByDesc('id')
+            ->limit(5)
+            ->get()
+            ->map(fn($m) => [
+                'id'           => $m->id,
+                'company_id'   => $m->delivery_company_id,
+                'company_name' => $m->company?->name ?? 'Entreprise',
+                'body'         => \Illuminate\Support\Str::limit($m->message ?? '', 60),
+                'time'         => $m->created_at->format('H:i'),
+            ]);
+
         return response()->json([
-            'messages_unread'    => $messagesUnread,
-            'orders_pending'     => $ordersPending,
-            'livreurs_available' => $livreursAvailable,
-            'total'              => $messagesUnread + $ordersPending,
-            'latest_messages'    => $latestMessages,
+            'messages_unread'          => $messagesUnread,
+            'orders_pending'           => $ordersPending,
+            'livreurs_available'       => $livreursAvailable,
+            'total'                    => $messagesUnread + $ordersPending,
+            'latest_messages'          => $latestMessages,
+            'company_messages_unread'  => $companyMessagesUnread,
+            'latest_company_messages'  => $latestCompanyMessages,
         ]);
     }
 }

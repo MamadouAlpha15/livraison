@@ -117,22 +117,92 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .devise-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--brand-mlt); color: var(--brand-dk); border: 1px solid var(--brand-lt); font-size: 11px; font-weight: 700; font-family: var(--mono); padding: 4px 10px; border-radius: 20px; }
 
 /* ══ KPI ══ */
-.kpi-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
-.kpi-card { border-radius: var(--r); padding: 22px 24px; display: flex; align-items: center; gap: 16px; position: relative; overflow: hidden; box-shadow: var(--shadow-sm); }
+.kpi-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 10px; }
+.kpi-card { border-radius: var(--r); padding: 18px 20px; display: flex; align-items: center; gap: 14px; position: relative; overflow: hidden; box-shadow: var(--shadow-sm); }
 .kpi-card.pending { background: linear-gradient(135deg, #451a03, #78350f); border: 1px solid rgba(245,158,11,.25); }
 .kpi-card.paid    { background: linear-gradient(135deg, #161021, #4F46E5); border: 1px solid rgba(99,102,241,.25); }
 .kpi-card::after  { content: ''; position: absolute; right: -30px; top: -30px; width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,.04); pointer-events: none; }
-.kpi-ico { width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+.kpi-ico { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
 .kpi-card.pending .kpi-ico { background: rgba(245,158,11,.15); border: 1px solid rgba(245,158,11,.25); }
 .kpi-card.paid    .kpi-ico { background: rgba(99,102,241,.15); border: 1px solid rgba(99,102,241,.25); }
-.kpi-lbl  { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 5px; }
-.kpi-val  { font-size: 28px; font-weight: 800; font-family: var(--mono); letter-spacing: -1px; line-height: 1; }
+.kpi-lbl  { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+.kpi-val  { font-size: 24px; font-weight: 800; font-family: var(--mono); letter-spacing: -1px; line-height: 1; }
 .kpi-card.pending .kpi-val { color: #fcd34d; }
 .kpi-card.paid    .kpi-val { color: #a5b4fc; }
 .kpi-unit { font-size: 11px; color: rgba(255,255,255,.35); margin-top: 3px; }
-.kpi-sub  { font-size: 11px; color: rgba(255,255,255,.3); margin-top: 6px; }
+.kpi-sub  { font-size: 11px; color: rgba(255,255,255,.3); margin-top: 4px; }
 
-/* ══ TABS STATUT ══ */
+/* ══ KPI DÉTAIL PAR TYPE ══ */
+.kpi-detail-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
+.kpi-detail { border-radius: var(--r-sm); padding: 12px 16px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-sm); }
+.kpi-detail.shop    { background: #f0fdf4; border: 1.5px solid #86efac; }
+.kpi-detail.company { background: #eef2ff; border: 1.5px solid #c7d2fe; }
+.kpi-detail-ico { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.kpi-detail.shop    .kpi-detail-ico { background: #dcfce7; border: 1px solid #86efac; }
+.kpi-detail.company .kpi-detail-ico { background: #e0e7ff; border: 1px solid #c7d2fe; }
+.kpi-detail-lbl { font-size: 10.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 2px; }
+.kpi-detail.shop    .kpi-detail-lbl { color: #15803d; }
+.kpi-detail.company .kpi-detail-lbl { color: #4338ca; }
+.kpi-detail-val { font-size: 16px; font-weight: 800; font-family: var(--mono); }
+.kpi-detail.shop    .kpi-detail-val { color: #166534; }
+.kpi-detail.company .kpi-detail-val { color: #3730a3; }
+.kpi-detail-unit { font-size: 10px; color: var(--muted); font-weight: 500; margin-top: 1px; }
+
+/* ══ SECTION SÉPARATEUR ══ */
+.section-sep {
+    display: flex; align-items: center; gap: 14px;
+    margin: 28px 0 16px; font-size: 13.5px; font-weight: 800;
+    color: var(--text); letter-spacing: -.2px;
+}
+.section-sep::before, .section-sep::after {
+    content: ''; flex: 1; height: 1.5px;
+}
+.section-sep.shop::before, .section-sep.shop::after    { background: #86efac; }
+.section-sep.company::before, .section-sep.company::after { background: #c7d2fe; }
+.section-sep .sep-pill {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 6px 16px; border-radius: 20px; white-space: nowrap;
+    font-size: 13px; font-weight: 800;
+}
+.section-sep.shop    .sep-pill { background: #f0fdf4; border: 1.5px solid #86efac; color: #15803d; }
+.section-sep.company .sep-pill { background: #eef2ff; border: 1.5px solid #c7d2fe; color: #4338ca; }
+
+/* ══ COMPANY INFO BOX ══ */
+.company-info-box {
+    background: #eef2ff; border: 1.5px solid #c7d2fe;
+    border-radius: var(--r-sm); padding: 10px 14px;
+    font-size: 12.5px; color: #4338ca; font-weight: 600;
+    margin-bottom: 12px; display: flex; align-items: flex-start; gap: 8px;
+}
+.company-info-box .ico { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.company-ro-note {
+    font-size: 11px; color: #4f46e5; font-weight: 600;
+    background: #eef2ff; border: 1px solid #c7d2fe;
+    border-radius: 6px; padding: 3px 8px; display: inline-block; margin-top: 4px;
+}
+
+/* ══ ONGLETS TYPE (niveau 1) ══ */
+.type-tabs { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.type-tab {
+    display: flex; align-items: center; gap: 8px;
+    padding: 11px 20px; border-radius: var(--r); font-size: 13.5px; font-weight: 700;
+    text-decoration: none; border: 2px solid var(--border); background: var(--surface);
+    color: var(--muted); cursor: pointer; transition: all .18s; font-family: var(--font);
+    box-shadow: var(--shadow-sm);
+}
+.type-tab:hover { border-color: var(--brand-lt); color: var(--brand-dk); background: var(--brand-mlt); }
+.type-tab.active.shop    { background: #f0fdf4; border-color: #86efac; color: #15803d; }
+.type-tab.active.company { background: #eef2ff; border-color: #c7d2fe; color: #4338ca; }
+.type-tab .type-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 800; border-radius: 20px;
+    padding: 1px 7px; font-family: var(--mono); min-width: 20px;
+}
+.type-tab:not(.active) .type-badge { background: var(--border); color: var(--muted); }
+.type-tab.active.shop    .type-badge { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+.type-tab.active.company .type-badge { background: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe; }
+
+/* ══ TABS STATUT (niveau 2) ══ */
 .status-tabs { display: flex; gap: 0; margin-bottom: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow-sm); }
 .status-tab {
     flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -542,62 +612,103 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
         </div>
     </div>
 
-    {{-- ── KPI ── --}}
+    {{-- ── KPI selon l'onglet actif ── --}}
+    @if($type === 'shop')
+    <div class="kpi-row" style="grid-template-columns:1fr">
+        <div class="kpi-card paid">
+            <div class="kpi-ico">✅</div>
+            <div>
+                <div class="kpi-lbl">Total déjà payé — mes livreurs</div>
+                <div class="kpi-val">{{ number_format($shopPaid, 0, ',', ' ') }}</div>
+                <div class="kpi-unit">{{ $devise }}</div>
+                <div class="kpi-sub">Paiements confirmés à vos livreurs boutique</div>
+            </div>
+        </div>
+    </div>
+    @else
     <div class="kpi-row">
         <div class="kpi-card pending">
             <div class="kpi-ico">⏳</div>
             <div>
-                <div class="kpi-lbl">Total en attente</div>
-                <div class="kpi-val">{{ number_format($totalPending, 0, ',', ' ') }}</div>
+                <div class="kpi-lbl">Total en attente — entreprises</div>
+                <div class="kpi-val">{{ number_format($companyPending, 0, ',', ' ') }}</div>
                 <div class="kpi-unit">{{ $devise }}</div>
-                <div class="kpi-sub">Commissions non encore payées</div>
+                <div class="kpi-sub">Frais à régler aux entreprises partenaires</div>
             </div>
         </div>
         <div class="kpi-card paid">
             <div class="kpi-ico">✅</div>
             <div>
-                <div class="kpi-lbl">Total déjà payé</div>
-                <div class="kpi-val">{{ number_format($totalPaid, 0, ',', ' ') }}</div>
+                <div class="kpi-lbl">Total déjà payé — entreprises</div>
+                <div class="kpi-val">{{ number_format($companyPaid, 0, ',', ' ') }}</div>
                 <div class="kpi-unit">{{ $devise }}</div>
-                <div class="kpi-sub">Paiements confirmés aux livreurs</div>
+                <div class="kpi-sub">Paiements confirmés aux entreprises</div>
             </div>
         </div>
     </div>
+    @endif
 
     {{-- Flash --}}
-    @foreach(['success','danger'] as $type)
-        @if(session($type))
-        <div class="flash flash-{{ $type }}">
-            <span>{{ $type === 'success' ? '✓' : '✕' }}</span>
-            {{ session($type) }}
+    @foreach(['success','danger'] as $flashType)
+        @if(session($flashType))
+        <div class="flash flash-{{ $flashType }}">
+            <span>{{ $flashType === 'success' ? '✓' : '✕' }}</span>
+            {{ session($flashType) }}
         </div>
         @endif
     @endforeach
 
-    {{-- ── TABS STATUT ── --}}
+    {{-- ── ONGLETS TYPE (niveau 1) ── --}}
+    @php
+        $shopPendingCount   = \App\Models\CourierCommission::where('shop_id',$shop->id)->where('status','en_attente')->whereHas('order',fn($q)=>$q->whereNull('driver_id'))->count();
+        $companyPendingCount= \App\Models\CourierCommission::where('shop_id',$shop->id)->where('status','en_attente')->whereHas('order',fn($q)=>$q->whereNotNull('driver_id'))->count();
+    @endphp
+    <div class="type-tabs">
+        <a href="{{ route('boutique.commissions.index', ['type' => 'shop', 'status' => $status]) }}"
+           class="type-tab {{ $type === 'shop' ? 'active shop' : '' }}">
+            🚴 Commissions de mes livreurs
+            @if($shopPendingCount > 0)
+            <span class="type-badge">{{ $shopPendingCount }}</span>
+            @endif
+        </a>
+        <a href="{{ route('boutique.commissions.index', ['type' => 'company', 'status' => $status]) }}"
+           class="type-tab {{ $type === 'company' ? 'active company' : '' }}">
+            🏢 Commissions entreprises
+            @if($companyPendingCount > 0)
+            <span class="type-badge">{{ $companyPendingCount }}</span>
+            @endif
+        </a>
+    </div>
+
+    {{-- ── SOUS-ONGLETS STATUT (niveau 2) ── --}}
     <div class="status-tabs">
-        <a href="{{ route('boutique.commissions.index', ['status' => 'en_attente']) }}"
+        <a href="{{ route('boutique.commissions.index', ['type' => $type, 'status' => 'en_attente']) }}"
            class="status-tab {{ $status === 'en_attente' ? 'active' : '' }}">
             ⏳ <span class="tab-label">En attente</span>
             <span class="tab-count">{{ $status === 'en_attente' ? $commissions->total() : '—' }}</span>
         </a>
-        <a href="{{ route('boutique.commissions.index', ['status' => 'payée']) }}"
+        <a href="{{ route('boutique.commissions.index', ['type' => $type, 'status' => 'payée']) }}"
            class="status-tab {{ $status !== 'en_attente' ? 'active' : '' }}">
             ✅ <span class="tab-label">Payées</span>
             <span class="tab-count">{{ $status !== 'en_attente' ? $commissions->total() : '—' }}</span>
         </a>
+        @if($status !== 'en_attente' && $commissions->isNotEmpty())
+        <a href="{{ route('boutique.commissions.export', ['type' => $type]) }}" class="status-tab" style="flex:0;padding:13px 18px;color:#065f46;background:#ecfdf5;border-left:1px solid var(--border)">
+            ⬇️ <span class="tab-label">Exporter CSV</span>
+        </a>
+        @endif
     </div>
 
-    {{-- ════════════════════════════════════════
-         CAS A : EN ATTENTE → paiement
-    ════════════════════════════════════════ --}}
-    @if($status === 'en_attente' && $commissions->count())
+    @if($status === 'en_attente')
+    {{-- ════════════════════════
+         EN ATTENTE → formulaire paiement
+    ════════════════════════ --}}
 
-    {{-- Guide étapes --}}
+    @if($type === 'shop')
     <div class="how-to">
         <div style="font-size:20px;flex-shrink:0;margin-top:2px">💡</div>
         <div style="flex:1;min-width:0">
-            <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:10px">Comment payer un livreur ?</div>
+            <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:10px">Comment payer un livreur de votre boutique ?</div>
             <div class="how-to-steps">
                 <div class="how-to-step"><span class="step-num">1</span>Cochez les lignes à payer</div>
                 <div class="how-to-step"><span class="step-num">2</span>Saisissez le montant dans chaque ligne</div>
@@ -606,21 +717,40 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
             </div>
         </div>
     </div>
+    @else
+    <div class="company-info-box">
+        <span class="ico">ℹ️</span>
+        <div>
+            Ces frais correspondent aux livraisons effectuées par les chauffeurs de vos <strong>entreprises partenaires</strong>.
+            Cochez les lignes, saisissez le montant convenu et marquez-les comme payées.
+        </div>
+    </div>
+    <div class="how-to">
+        <div style="font-size:20px;flex-shrink:0;margin-top:2px">💡</div>
+        <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:10px">Comment payer une commission entreprise ?</div>
+            <div class="how-to-steps">
+                <div class="how-to-step"><span class="step-num">1</span>Cochez les livraisons à régler</div>
+                <div class="how-to-step"><span class="step-num">2</span>Saisissez le montant convenu avec l'entreprise</div>
+                <div class="how-to-step"><span class="step-num">3</span>Ajoutez une référence paiement</div>
+                <div class="how-to-step final"><span class="step-num">4</span>Cliquez "Marquer comme payées"</div>
+            </div>
+        </div>
+    </div>
+    @endif
 
+    @if($commissions->count())
     <form id="payForm" action="{{ route('boutique.commissions.pay') }}" method="POST">
         @csrf
 
-        {{-- Barre de paiement HAUT --}}
         <div class="payout-bar" id="payoutBar">
             <span class="payout-count" id="selectionCount">0 sélectionné</span>
 
-            {{-- Total live --}}
             <div style="display:flex;flex-direction:column;">
                 <span class="payout-total-lbl">Total à payer</span>
                 <div class="payout-total zero" id="payoutTotal">0 <span style="font-size:10px;font-weight:600;font-family:var(--font)">{{ $devise }}</span></div>
             </div>
 
-            {{-- Référence paiement avec tooltip --}}
             <div style="flex:1;min-width:160px;display:flex;flex-direction:column;gap:3px;">
                 <label style="font-size:11px;font-weight:700;color:var(--text-2);display:flex;align-items:center;">
                     📎 Référence paiement
@@ -632,41 +762,47 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                 <input type="text" name="payout_ref" class="payout-input" placeholder="Ex: Orange Money 001, Wave...">
             </div>
 
-            {{-- Note interne avec tooltip --}}
             <div style="flex:2;min-width:160px;display:flex;flex-direction:column;gap:3px;">
                 <label style="font-size:11px;font-weight:700;color:var(--text-2);display:flex;align-items:center;">
                     📝 Note interne
                     <div class="tooltip-wrap">
                         <span class="tooltip-icon">?</span>
-                        <div class="tooltip-box">Visible uniquement par vous et vos admins. Le livreur ne la voit pas.</div>
+                        <div class="tooltip-box">Visible uniquement par vous et vos admins.</div>
                     </div>
                 </label>
                 <input type="text" name="payout_note" class="payout-input" placeholder="Ex: Paiement semaine 17 - vérifié">
             </div>
 
-            <button type="button" id="markPaidBtn" class="btn btn-primary" disabled
-                    onclick="openConfirmModal()"
-                    style="flex-shrink:0;padding:10px 20px;font-size:13.5px;align-self:flex-end">
+            <button type="button" id="markPaidBtn" class="btn btn-primary"
+                    style="flex-shrink:0;padding:10px 20px;font-size:13.5px;align-self:flex-end;opacity:.4;cursor:not-allowed"
+                    data-disabled="1">
                 ✅ Marquer comme payées
             </button>
         </div>
 
-        {{-- Table --}}
         <div class="comm-card">
             <div class="comm-card-hd">
-                <span class="comm-card-title">⏳ Commissions en attente — <span style="color:var(--brand);font-family:var(--mono)">{{ $commissions->total() }}</span> au total</span>
+                @if($type === 'shop')
+                <span class="comm-card-title" style="color:#15803d">🚴 {{ $commissions->total() }} commission{{ $commissions->total() > 1 ? 's' : '' }} livreur boutique en attente</span>
+                @else
+                <span class="comm-card-title" style="color:#4338ca">🏢 {{ $commissions->total() }} commission{{ $commissions->total() > 1 ? 's' : '' }} entreprise en attente</span>
+                @endif
                 <label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer">
                     <input type="checkbox" id="checkAll"> Tout sélectionner
                 </label>
             </div>
-
             <div class="tbl-wrap">
             <table class="tbl">
                 <thead>
                     <tr>
                         <th style="width:36px"></th>
                         <th>Réf commande</th>
+                        @if($type === 'shop')
                         <th>Livreur</th>
+                        @else
+                        <th>Entreprise partenaire</th>
+                        <th>Chauffeur</th>
+                        @endif
                         <th>📍 Destination</th>
                         <th class="col-montant">Montant commande</th>
                         <th style="background:#fef9ec;color:#92400e;">💰 Commission à payer</th>
@@ -676,38 +812,71 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                 <tbody>
                     @foreach($commissions as $c)
                     @php
-                        $lv    = $c->livreur;
-                        $linit = $lv ? $init($lv->name) : 'LV';
                         $orderTotal = $c->order?->total ?? null;
-                        $dest  = $c->order?->delivery_destination
-                              ?: $c->order?->client?->address;
+                        $dest       = $c->order?->delivery_destination ?: $c->order?->client?->address;
+                        if ($type === 'shop') {
+                            $lv    = $c->livreur;
+                            $linit = $lv ? $init($lv->name) : 'LV';
+                        } else {
+                            $company = $c->order?->deliveryCompany;
+                            $driver  = $c->order?->driver?->user;
+                            $dInit   = $driver ? $init($driver->name) : 'CH';
+                        }
                     @endphp
                     <tr class="comm-row" data-id="{{ $c->id }}">
-
                         <td data-label="">
                             <input type="checkbox" name="ids[]" value="{{ $c->id }}" class="rowCheckbox">
                         </td>
-
                         <td data-label="Réf commande">
                             @if($c->order_id)
-                                <a href="{{ route('orders.show', $c->order_id) }}" class="ref-link" title="Voir la commande">#{{ $c->order_id }}</a>
+                                <a href="{{ route('orders.show', $c->order_id) }}" class="ref-link">#{{ $c->order_id }}</a>
                             @else
                                 <span class="ref-cell">—</span>
                             @endif
                         </td>
-
+                        @if($type === 'shop')
                         <td data-label="Livreur">
                             <div style="text-align:right">
                                 <div class="lv-chip">
                                     <div class="lv-av">{{ $linit }}</div>
                                     {{ $lv?->name ?? '—' }}
                                 </div>
-                                @if($lv?->phone)
+                                @if($lv?->phone ?? false)
                                 <div style="font-size:10.5px;color:var(--muted);margin-top:3px">📞 {{ $lv->phone }}</div>
                                 @endif
                             </div>
                         </td>
-
+                        @else
+                        <td data-label="Entreprise">
+                            @if($company ?? false)
+                            <div style="display:flex;align-items:center;gap:6px">
+                                @if($company->image)
+                                <img src="{{ asset('storage/' . $company->image) }}" alt="" style="width:22px;height:22px;border-radius:6px;object-fit:cover;flex-shrink:0">
+                                @else
+                                <div style="width:22px;height:22px;border-radius:6px;background:#e0e7ff;display:flex;align-items:center;justify-content:center;font-size:10px;color:#4338ca;flex-shrink:0">🏢</div>
+                                @endif
+                                <div>
+                                    <div style="font-size:12.5px;font-weight:700;color:#3730a3">{{ $company->name }}</div>
+                                    @if($company->phone)
+                                    <div style="font-size:10px;color:var(--muted)">📞 {{ $company->phone }}</div>
+                                    @endif
+                                </div>
+                            </div>
+                            @else
+                            <span style="color:var(--muted);font-size:12px">—</span>
+                            @endif
+                        </td>
+                        <td data-label="Chauffeur">
+                            @if($driver ?? false)
+                            <div class="lv-chip" style="background:#eef2ff;border-color:#c7d2fe">
+                                <div class="lv-av" style="background:linear-gradient(135deg,#6366f1,#4338ca)">{{ $dInit }}</div>
+                                {{ $driver->name }}
+                            </div>
+                            @else
+                            <span style="color:var(--muted);font-size:12px">—</span>
+                            @endif
+                        </td>
+                        @endif
                         <td data-label="Destination">
                             @if($dest)
                                 <div class="dest-cell" style="text-align:right">
@@ -718,7 +887,6 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                                 <span class="dest-empty">Non renseignée</span>
                             @endif
                         </td>
-
                         <td data-label="Montant cmd" class="col-montant">
                             @if($orderTotal)
                                 <div class="order-amount" style="text-align:right">
@@ -728,8 +896,14 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                             @else
                                 <span style="color:var(--muted);font-size:12px">—</span>
                             @endif
+                            @if($type === 'company' && $c->amount)
+                                <div style="text-align:right;margin-top:5px;padding-top:5px;border-top:1px dashed #c7d2fe">
+                                    <span style="font-size:13px;font-weight:700;color:#4338ca">{{ number_format($c->amount, 0, ',', ' ') }}</span>
+                                    <span style="font-size:10px;color:#6366f1;font-weight:600"> {{ $devise }}</span>
+                                    <br><small style="color:#6366f1;font-size:10px">Commission fixée</small>
+                                </div>
+                            @endif
                         </td>
-
                         <td data-label="Commission à payer" class="td-comm">
                             <div style="display:flex;align-items:center;gap:6px;width:100%">
                                 <input type="number"
@@ -743,7 +917,6 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                             </div>
                             <div class="row-alert" id="alert-{{ $c->id }}">⚠️ Entrez un montant avant de payer</div>
                         </td>
-
                         <td data-label="Date" class="col-date">
                             <div class="date-cell" style="text-align:right">
                                 {{ $c->created_at->format('d/m/Y') }}
@@ -754,43 +927,54 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                     @endforeach
                 </tbody>
             </table>
-            </div>{{-- /tbl-wrap --}}
-
-            <div class="pagination-wrap">{{ $commissions->withQueryString()->links() }}</div>
+            </div>
         </div>
 
     </form>
 
-    {{-- ════════════════════════════════════════
-         CAS B : PAYÉES → lecture seule
-    ════════════════════════════════════════ --}}
     @else
+    <div class="comm-card">
+        <div class="empty-state">
+            <span class="ico">{{ $type === 'shop' ? '🚴' : '🏢' }}</span>
+            <h3>Aucune commission en attente</h3>
+            <p>{{ $type === 'shop' ? 'Tous vos livreurs boutique ont été payés.' : 'Toutes les commissions entreprise ont été réglées.' }}</p>
+        </div>
+    </div>
+    @endif
 
+    @else
+    {{-- ════════════════════════
+         PAYÉES → lecture seule
+    ════════════════════════ --}}
+
+    @if($commissions->isEmpty())
+    <div class="comm-card">
+        <div class="empty-state">
+            <span class="ico">{{ $type === 'shop' ? '🚴' : '🏢' }}</span>
+            <h3>Aucune commission payée</h3>
+            <p>{{ $type === 'shop' ? 'Aucun paiement enregistré pour vos livreurs boutique.' : 'Aucun paiement enregistré pour les entreprises partenaires.' }}</p>
+        </div>
+    </div>
+    @else
     <div class="comm-card">
         <div class="comm-card-hd">
-            <span class="comm-card-title">
-                {{ $status === 'en_attente' ? '⏳ Commissions en attente' : '✅ Commissions payées' }}
-            </span>
-            @if($status !== 'en_attente' && $commissions->count())
-            <a href="{{ route('boutique.commissions.export') }}" class="btn btn-sm btn-export">
-                ⬇️ Exporter CSV
-            </a>
+            @if($type === 'shop')
+            <span class="comm-card-title" style="color:#15803d">🚴 {{ $commissions->total() }} commission{{ $commissions->total() > 1 ? 's' : '' }} livreur boutique payée{{ $commissions->total() > 1 ? 's' : '' }}</span>
+            @else
+            <span class="comm-card-title" style="color:#4338ca">🏢 {{ $commissions->total() }} commission{{ $commissions->total() > 1 ? 's' : '' }} entreprise payée{{ $commissions->total() > 1 ? 's' : '' }}</span>
             @endif
         </div>
-
-        @if($commissions->isEmpty())
-        <div class="empty-state">
-            <span class="ico">💸</span>
-            <h3>Aucune commission {{ $status !== 'en_attente' ? 'payée' : 'en attente' }}</h3>
-            <p>{{ $status === 'en_attente' ? 'Tous vos livreurs ont été payés.' : 'Vous n\'avez pas encore effectué de paiement.' }}</p>
-        </div>
-        @else
         <div class="tbl-wrap">
         <table class="tbl">
             <thead>
                 <tr>
                     <th>Réf commande</th>
+                    @if($type === 'shop')
                     <th>Livreur</th>
+                    @else
+                    <th>Entreprise partenaire</th>
+                    <th>Chauffeur</th>
+                    @endif
                     <th>📍 Destination</th>
                     <th class="col-montant">Montant commande</th>
                     <th>Commission payée</th>
@@ -802,11 +986,16 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
             <tbody>
                 @foreach($commissions as $c)
                 @php
-                    $lv        = $c->livreur;
-                    $linit     = $lv ? $init($lv->name) : 'LV';
-                    $orderTotal= $c->order?->total ?? null;
-                    $dest      = $c->order?->delivery_destination
-                              ?: $c->order?->client?->address;
+                    $orderTotal = $c->order?->total ?? null;
+                    $dest       = $c->order?->delivery_destination ?: $c->order?->client?->address;
+                    if ($type === 'shop') {
+                        $lv    = $c->livreur;
+                        $linit = $lv ? $init($lv->name) : 'LV';
+                    } else {
+                        $company = $c->order?->deliveryCompany;
+                        $driver  = $c->order?->driver?->user;
+                        $dInit   = $driver ? $init($driver->name) : 'CH';
+                    }
                 @endphp
                 <tr>
                     <td data-label="Réf">
@@ -816,12 +1005,44 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                             <span class="ref-cell">—</span>
                         @endif
                     </td>
+                    @if($type === 'shop')
                     <td data-label="Livreur">
                         <div class="lv-chip">
                             <div class="lv-av">{{ $linit }}</div>
                             {{ $lv?->name ?? '—' }}
                         </div>
                     </td>
+                    @else
+                    <td data-label="Entreprise">
+                        @if($company ?? false)
+                        <div style="display:flex;align-items:center;gap:6px">
+                            @if($company->image)
+                            <img src="{{ asset('storage/' . $company->image) }}" alt="" style="width:22px;height:22px;border-radius:6px;object-fit:cover;flex-shrink:0">
+                            @else
+                            <div style="width:22px;height:22px;border-radius:6px;background:#e0e7ff;display:flex;align-items:center;justify-content:center;font-size:10px;color:#4338ca;flex-shrink:0">🏢</div>
+                            @endif
+                            <div>
+                                <div style="font-size:12.5px;font-weight:700;color:#3730a3">{{ $company->name }}</div>
+                                @if($company->phone)
+                                <div style="font-size:10px;color:var(--muted)">📞 {{ $company->phone }}</div>
+                                @endif
+                            </div>
+                        </div>
+                        @else
+                        <span style="color:var(--muted);font-size:12px">—</span>
+                        @endif
+                    </td>
+                    <td data-label="Chauffeur">
+                        @if($driver ?? false)
+                        <div class="lv-chip" style="background:#eef2ff;border-color:#c7d2fe">
+                            <div class="lv-av" style="background:linear-gradient(135deg,#6366f1,#4338ca)">{{ $dInit }}</div>
+                            {{ $driver->name }}
+                        </div>
+                        @else
+                        <span style="color:var(--muted);font-size:12px">—</span>
+                        @endif
+                    </td>
+                    @endif
                     <td data-label="Destination">
                         @if($dest)
                             <div class="dest-cell" style="text-align:right">📍 {{ $dest }}</div>
@@ -838,20 +1059,26 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                         @else
                             <span style="color:var(--muted);font-size:12px">—</span>
                         @endif
+                        @if($type === 'company' && $c->amount)
+                            <div style="text-align:right;margin-top:5px;padding-top:5px;border-top:1px dashed #c7d2fe">
+                                <span style="font-size:13px;font-weight:700;color:#4338ca">{{ number_format($c->amount, 0, ',', ' ') }}</span>
+                                <span style="font-size:10px;color:#6366f1;font-weight:600"> {{ $devise }}</span>
+                                <br><small style="color:#6366f1;font-size:10px">Commission payée</small>
+                            </div>
+                        @endif
                     </td>
                     <td data-label="Commission">
-                        <div class="amount">{{ number_format($c->amount, 0, ',', ' ') }} <small>{{ $devise }}</small></div>
+                        <div class="amount" style="{{ $type === 'company' ? 'color:#4338ca' : '' }}">
+                            {{ number_format($c->amount, 0, ',', ' ') }}
+                            <small style="{{ $type === 'company' ? 'color:#6366f1' : '' }}">{{ $devise }}</small>
+                        </div>
                     </td>
                     <td data-label="Statut">
-                        @if($c->status === 'en_attente')
-                            <span class="pill p-warning">⏳ En attente</span>
-                        @else
-                            <span class="pill p-success">✓ Payée</span>
-                        @endif
+                        <span class="pill p-success">✓ Payée</span>
                     </td>
                     <td data-label="Réf paiement">
                         @if($c->payout_ref)
-                            <span class="ref-cell" style="text-align:right">{{ $c->payout_ref }}</span>
+                            <span class="ref-cell">{{ $c->payout_ref }}</span>
                         @else
                             <span style="color:var(--muted);font-size:12px">—</span>
                         @endif
@@ -866,12 +1093,14 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                 @endforeach
             </tbody>
         </table>
-        </div>{{-- /tbl-wrap --}}
-        </table>
-        <div class="pagination-wrap">{{ $commissions->withQueryString()->links() }}</div>
-        @endif
+        </div>
     </div>
+    @endif
 
+    @endif
+
+    @if($commissions->hasPages())
+    <div class="pagination-wrap">{{ $commissions->withQueryString()->links() }}</div>
     @endif
 
 </div>{{-- /page-wrap --}}
@@ -891,7 +1120,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
         <div class="modal-body">
             <div class="modal-summary">
                 <div class="modal-row">
-                    <span class="lbl">Livreurs sélectionnés</span>
+                    <span class="lbl">{{ $type === 'company' ? 'Commissions sélectionnées' : 'Livreurs sélectionnés' }}</span>
                     <span class="val" id="modalCount">—</span>
                 </div>
                 <div class="modal-row">
@@ -944,116 +1173,147 @@ function toggleGroup(btn) {
 })();
 
 /* ══ LOGIQUE PAIEMENT ══ */
-document.addEventListener('DOMContentLoaded', () => {
+(function initPayment() {
+    var payForm = document.getElementById('payForm');
+    if (!payForm) return;
 
-    const checkAll      = document.getElementById('checkAll');
-    const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
-    const markPaidBtn   = document.getElementById('markPaidBtn');
-    const payoutBar     = document.getElementById('payoutBar');
-    const selCount      = document.getElementById('selectionCount');
-    const totalEl       = document.getElementById('payoutTotal');
-    const payForm       = document.getElementById('payForm');
+    var checkAll    = document.getElementById('checkAll');
+    var markPaidBtn = document.getElementById('markPaidBtn');
+    var payoutBar   = document.getElementById('payoutBar');
+    var selCount    = document.getElementById('selectionCount');
+    var totalEl     = document.getElementById('payoutTotal');
 
-    if (!payForm) return; /* Vue "payées" : pas de formulaire */
+    function getCheckboxes() {
+        return Array.from(payForm.querySelectorAll('input.rowCheckbox'));
+    }
 
-    /* ── Calcul du total en live ── */
     function calcTotal() {
-        let sum = 0;
-        document.querySelectorAll('.comm-row').forEach(row => {
-            const cb  = row.querySelector('.rowCheckbox');
-            const inp = row.querySelector('.comm-amount-input');
-            if (cb?.checked && inp) {
-                const v = parseFloat(inp.value) || 0;
-                sum += v;
+        var sum = 0;
+        payForm.querySelectorAll('tr.comm-row').forEach(function(row) {
+            var cb  = row.querySelector('input.rowCheckbox');
+            var inp = row.querySelector('input.comm-amount-input');
+            if (cb && cb.checked && inp) {
+                sum += parseFloat(inp.value) || 0;
             }
         });
         return sum;
     }
 
-    /* ── Mise à jour globale ── */
     function updateState() {
-        const checked = Array.from(rowCheckboxes).filter(cb => cb.checked);
-        const n       = checked.length;
-        const total   = calcTotal();
+        var boxes   = getCheckboxes();
+        var checked = boxes.filter(function(cb) { return cb.checked; });
+        var n       = checked.length;
+        var total   = calcTotal();
 
-        /* Bouton */
-        if (markPaidBtn) markPaidBtn.disabled = n === 0;
+        /* activer/désactiver le bouton via data-disabled + style */
+        if (markPaidBtn) {
+            if (n === 0) {
+                markPaidBtn.setAttribute('data-disabled', '1');
+                markPaidBtn.style.opacity = '0.4';
+                markPaidBtn.style.cursor  = 'not-allowed';
+            } else {
+                markPaidBtn.removeAttribute('data-disabled');
+                markPaidBtn.style.opacity = '1';
+                markPaidBtn.style.cursor  = 'pointer';
+            }
+        }
 
-        /* Compteur */
         if (selCount) {
-            selCount.textContent = n > 0 ? `${n} sélectionné${n > 1 ? 's' : ''}` : '0 sélectionné';
+            selCount.textContent = n > 0 ? (n + ' sélectionné' + (n > 1 ? 's' : '')) : '0 sélectionné';
             selCount.className   = 'payout-count' + (n > 0 ? ' active' : '');
         }
 
-        /* Total live */
         if (totalEl) {
-            const fmt = new Intl.NumberFormat('fr-FR').format(total);
-            totalEl.innerHTML = `${fmt} <span style="font-size:10px;font-weight:600;font-family:var(--font)">{{ $devise }}</span>`;
+            var fmt = new Intl.NumberFormat('fr-FR').format(total);
+            totalEl.innerHTML = fmt + ' <span style="font-size:10px;font-weight:600;font-family:var(--font)">{{ $devise }}</span>';
             totalEl.classList.toggle('zero', total === 0);
         }
 
-        /* Surlignage lignes */
-        document.querySelectorAll('.comm-row').forEach(row => {
-            const cb = row.querySelector('.rowCheckbox');
-            row.classList.toggle('selected', cb?.checked ?? false);
+        payForm.querySelectorAll('tr.comm-row').forEach(function(row) {
+            var cb = row.querySelector('input.rowCheckbox');
+            row.classList.toggle('selected', !!(cb && cb.checked));
         });
 
-        /* Bordure barre */
         if (payoutBar) payoutBar.classList.toggle('has-selection', n > 0);
     }
 
-    /* ── Tout sélectionner ── */
-    checkAll?.addEventListener('change', e => {
-        rowCheckboxes.forEach(cb => cb.checked = e.target.checked);
-        updateState();
-    });
-
-    /* ── Chaque checkbox ── */
-    rowCheckboxes.forEach(cb => cb.addEventListener('change', () => {
-        if (checkAll) checkAll.checked = Array.from(rowCheckboxes).every(c => c.checked);
-        updateState();
-    }));
-
-    /* ── Chaque input montant → recalcul live ── */
-    document.querySelectorAll('.comm-amount-input').forEach(inp => {
-        inp.addEventListener('input', () => {
-            const rowId = inp.dataset.row;
-            const alert = document.getElementById('alert-' + rowId);
-            /* Retirer l'alerte dès qu'on saisit */
-            if (parseFloat(inp.value) > 0) {
-                inp.classList.remove('warn');
-                if (alert) alert.classList.remove('visible');
+    /* ── Délégation sur le formulaire (capture change sur checkboxes + input sur montants) ── */
+    payForm.addEventListener('change', function(e) {
+        var t = e.target;
+        if (t === checkAll) {
+            /* Tout sélectionner */
+            getCheckboxes().forEach(function(cb) { cb.checked = t.checked; });
+            updateState();
+        } else if (t.classList.contains('rowCheckbox')) {
+            /* Checkbox individuelle */
+            if (checkAll) {
+                var boxes = getCheckboxes();
+                checkAll.checked = boxes.length > 0 && boxes.every(function(c) { return c.checked; });
             }
             updateState();
-        });
+        }
     });
 
-    /* ── Init ── */
+    payForm.addEventListener('input', function(e) {
+        var t = e.target;
+        if (t.classList.contains('comm-amount-input')) {
+            var rowId   = t.dataset.row;
+            var alertEl = document.getElementById('alert-' + rowId);
+            if (parseFloat(t.value) > 0) {
+                t.classList.remove('warn');
+                if (alertEl) alertEl.classList.remove('visible');
+            }
+            updateState();
+        }
+    });
+
+    /* ── Bouton payer → listener direct ── */
+    if (markPaidBtn) {
+        markPaidBtn.addEventListener('click', function() {
+            if (markPaidBtn.getAttribute('data-disabled') === '1') return;
+            openConfirmModal();
+        });
+    }
+
+    /* init */
     updateState();
-});
+})();
 
 /* ══ MODAL CONFIRMATION ══ */
 function openConfirmModal() {
-    const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
-    const checked       = Array.from(rowCheckboxes).filter(cb => cb.checked);
+    var payForm2     = document.getElementById('payForm');
+    if (!payForm2) return;
+    var rowCheckboxes = Array.from(payForm2.querySelectorAll('input.rowCheckbox'));
+    var checked       = rowCheckboxes.filter(function(cb) { return cb.checked; });
+
+    if (checked.length === 0) return;
 
     /* Validation : vérifier montants */
-    let hasError = false;
-    checked.forEach(cb => {
-        const row   = cb.closest('.comm-row');
-        const rowId = row?.dataset.id;
-        const inp   = row?.querySelector('.comm-amount-input');
-        const alert = document.getElementById('alert-' + rowId);
+    var hasError = false;
+    checked.forEach(function(cb) {
+        var row    = cb.closest('.comm-row');
+        var rowId  = row ? row.dataset.id : null;
+        var inp    = row ? row.querySelector('input.comm-amount-input') : null;
+        var alertEl = rowId ? document.getElementById('alert-' + rowId) : null;
         if (!inp || !(parseFloat(inp.value) > 0)) {
-            inp?.classList.add('warn');
-            if (alert) alert.classList.add('visible');
+            if (inp) inp.classList.add('warn');
+            if (alertEl) alertEl.classList.add('visible');
             hasError = true;
         }
     });
     if (hasError) {
-        /* Scroller vers la première erreur */
-        const firstWarn = document.querySelector('.comm-input.warn');
-        firstWarn?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        var firstWarn = payForm2.querySelector('input.comm-input.warn');
+        if (firstWarn) firstWarn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        /* Afficher une alerte globale visible */
+        var existing = document.getElementById('globalAmountAlert');
+        if (!existing) {
+            var msg = document.createElement('div');
+            msg.id = 'globalAmountAlert';
+            msg.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#ef4444;color:#fff;padding:12px 24px;border-radius:10px;font-weight:700;font-size:14px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.3)';
+            msg.textContent = '⚠️ Saisissez le montant dans chaque ligne cochée avant de payer';
+            document.body.appendChild(msg);
+            setTimeout(function() { msg.remove(); }, 3500);
+        }
         return;
     }
 
@@ -1067,7 +1327,8 @@ function openConfirmModal() {
     const ref    = document.querySelector('input[name="payout_ref"]')?.value || '(aucune)';
     const fmt    = new Intl.NumberFormat('fr-FR').format(total);
 
-    document.getElementById('modalCount').textContent = checked.length + ' livreur' + (checked.length > 1 ? 's' : '');
+    var unitLabel = '{{ $type === "company" ? "commission" : "livreur" }}';
+    document.getElementById('modalCount').textContent = checked.length + ' ' + unitLabel + (checked.length > 1 ? 's' : '');
     document.getElementById('modalRef').textContent   = ref;
     document.getElementById('modalTotal').textContent = fmt + ' {{ $devise }}';
 
@@ -1078,7 +1339,7 @@ function openConfirmModal() {
     document.getElementById('modalConfirmBtn').onclick = function() {
         this.textContent = '⏳ Traitement…';
         this.disabled = true;
-        document.getElementById('payForm').submit();
+        payForm2.submit();
     };
 }
 

@@ -104,6 +104,28 @@ class OrderController extends Controller
         ]);
     }
 
+    public function notifications()
+    {
+        $company = $this->company();
+
+        $orders = Order::with(['shop', 'client'])
+            ->where('delivery_company_id', $company->id)
+            ->where('status', Order::STATUS_EN_ATTENTE)
+            ->latest()
+            ->limit(10)
+            ->get()
+            ->map(fn($o) => [
+                'id'         => $o->id,
+                'shop_name'  => optional($o->shop)->name ?? '—',
+                'client'     => optional($o->client)->name ?? '—',
+                'address'    => $o->delivery_destination ?? '—',
+                'created_at' => $o->created_at->diffForHumans(),
+                'created_ts' => $o->created_at->timestamp,
+            ]);
+
+        return response()->json(['ok' => true, 'orders' => $orders]);
+    }
+
     public function updateStatus(Request $request, Order $order)
     {
         $company = $this->company();

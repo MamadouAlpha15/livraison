@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Employe;
 
 use App\Http\Controllers\Controller;
 use App\Models\DeliveryCompany;
+use App\Models\DeliveryMessage;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\ShopMessage;
@@ -75,6 +76,29 @@ class OrderController extends Controller
         ));
     }
 
+    public function pendingJson(Request $request)
+    {
+        $shopId = Auth::user()->currentShopId();
+        if (!$shopId) return response()->json([]);
+
+        $orders = Order::with('client')
+            ->inShop($shopId)
+            ->whereIn('status', ['en_attente', 'pending', 'en attente'])
+            ->whereNull('livreur_id')
+            ->whereNull('delivery_company_id')
+            ->latest()
+            ->limit(30)
+            ->get()
+            ->map(fn($o) => [
+                'id'     => $o->id,
+                'num'    => '#' . str_pad($o->id, 5, '0', STR_PAD_LEFT),
+                'client' => $o->client->name ?? 'Client',
+                'total'  => number_format($o->total, 0, ',', ' '),
+            ]);
+
+        return response()->json($orders);
+    }
+
     public function assign(Request $request, Order $order)
     {
         $shopId = Auth::user()->currentShopId();
@@ -114,8 +138,26 @@ class OrderController extends Controller
             'delivery_company_id' => $company->id,
             'livreur_id'          => null,
             'driver_id'           => null,
-            'status'              => 'confirmée',
+            'status'              => Order::STATUS_EN_ATTENTE,
         ]);
+
+        // Message automatique dans le chat pour notifier l'entreprise
+        \App\Models\DeliveryMessage::create([
+            'delivery_company_id' => $company->id,
+            'shop_id'             => $shopId,
+            'sender_id'           => Auth::id(),
+            'sender_role'         => 'shop',
+            'message'             => "📦 Nouvelle commande #" . str_pad($order->id, 5, '0', STR_PAD_LEFT)
+                . " confiée à votre entreprise.\n"
+                . "Client : " . ($order->client->name ?? '—')
+                . " · " . ($order->client->phone ?? '')
+                . "\nDestination : " . ($order->delivery_destination ?: ($order->client->address ?? 'Non renseignée'))
+                . "\nMontant : " . number_format($order->total, 0, ',', ' ') . " GNF",
+        ]);
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => "Commande #$order->id confiée à {$company->name}."]);
+        }
 
         return back()->with('success', "Commande #$order->id confiée à {$company->name}.");
     }

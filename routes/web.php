@@ -211,9 +211,10 @@ Route::middleware('auth')->group(function () {
         Route::delete('/drivers/{driver}',           [DriverController::class, 'destroy'])      ->name('company.drivers.destroy');
 
         /* Commandes (vue globale entreprise de livraison) */
-        Route::get('/orders',                           [CompanyOrderController::class, 'index'])       ->name('company.orders.index');
-        Route::post('/orders/{order}/assign',           [CompanyOrderController::class, 'assign'])      ->name('company.orders.assign');
-        Route::post('/orders/{order}/status',           [CompanyOrderController::class, 'updateStatus'])->name('company.orders.status');
+        Route::get('/orders',                           [CompanyOrderController::class, 'index'])            ->name('company.orders.index');
+        Route::get('/orders/notifications',             [CompanyOrderController::class, 'notifications'])    ->name('company.orders.notifications');
+        Route::post('/orders/{order}/assign',           [CompanyOrderController::class, 'assign'])           ->name('company.orders.assign');
+        Route::post('/orders/{order}/status',           [CompanyOrderController::class, 'updateStatus'])     ->name('company.orders.status');
 
         /* Création de l'entreprise */
         Route::get('/delivery-company/create', [DeliveryCompanyController::class, 'create'])->name('delivery.company.create');
@@ -458,10 +459,15 @@ Route::middleware(['auth', 'role:employe,superadmin,admin,vendeur'])
 
         /* Commandes */
         Route::get('orders',                              [EmployeOrderController::class, 'index'])         ->name('orders.index');
+        Route::get('orders/pending-json',                 [EmployeOrderController::class, 'pendingJson'])   ->name('orders.pending-json');
         Route::put('orders/{order}/assign',               [EmployeOrderController::class, 'assign'])        ->name('orders.assign');
         Route::put('orders/{order}/send-to-company',      [EmployeOrderController::class, 'sendToCompany']) ->name('orders.sendToCompany');
         Route::put('orders/{order}/cancel',               [EmployeOrderController::class, 'cancel'])        ->name('orders.cancel');
         Route::put('orders/{order}/restore',              [EmployeOrderController::class, 'restore'])       ->name('orders.restore');
+
+        /* Chat boutique ↔ entreprise de livraison */
+        Route::post('companies/{company}/chat/send',     [\App\Http\Controllers\DeliveryChatController::class, 'send'])    ->name('delivery.chat.send');
+        Route::get('companies/{company}/chat/messages',  [\App\Http\Controllers\DeliveryChatController::class, 'messages'])->name('delivery.chat.messages');
 
         /* Paiements */
         Route::get('payments', [AdminPaymentController::class, 'index'])->name('payments.index');

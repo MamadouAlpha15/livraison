@@ -577,6 +577,47 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .resume-item-ico { width:36px; height:36px; border-radius:9px; background:var(--surface); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
 .resume-item-val { font-size:19px; font-weight:800; font-family:var(--mono); color:var(--text); letter-spacing:-.5px; line-height:1; }
 .resume-item-lbl { font-size:10.5px; color:var(--muted); margin-top:2px; font-weight:600; }
+
+/* ── Chat boutique ↔ entreprise (modal depuis cloche) ── */
+.bq-chat-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;padding:16px;}
+.bq-chat-overlay.open{display:flex;}
+.bq-chat-panel{background:#fff;border-radius:16px;width:100%;max-width:520px;display:flex;flex-direction:column;height:88vh;max-height:660px;box-shadow:0 28px 80px rgba(0,0,0,.22);overflow:hidden;animation:bqModalIn .2s ease;}
+@keyframes bqModalIn{from{opacity:0;transform:scale(.95) translateY(-8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.bq-chat-hd{padding:14px 18px;border-bottom:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;}
+.bq-chat-hd-info{display:flex;align-items:center;gap:10px;}
+.bq-chat-hd-av{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;}
+.bq-chat-hd-av img{width:100%;height:100%;object-fit:cover;}
+.bq-chat-hd-name{font-size:14px;font-weight:800;color:#fff;line-height:1.2;}
+.bq-chat-hd-sub{font-size:11px;color:rgba(255,255,255,.7);margin-top:1px;}
+.bq-chat-close{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;font-size:16px;flex-shrink:0;transition:background .14s;}
+.bq-chat-close:hover{background:rgba(255,255,255,.3);}
+.bq-chat-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:8px;background:#f8fafc;scrollbar-width:thin;scrollbar-color:#c7d2fe transparent;}
+.bq-chat-msgs::-webkit-scrollbar{width:3px;}
+.bq-chat-msgs::-webkit-scrollbar-thumb{background:#c7d2fe;border-radius:3px;}
+.bq-msg-row{display:flex;flex-direction:column;max-width:80%;}
+.bq-msg-row.mine{align-self:flex-end;align-items:flex-end;}
+.bq-msg-row.theirs{align-self:flex-start;align-items:flex-start;}
+.bq-msg-bubble{padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.5;word-break:break-word;white-space:pre-wrap;}
+.bq-msg-row.mine .bq-msg-bubble{background:#4f46e5;color:#fff;border-bottom-right-radius:4px;}
+.bq-msg-row.theirs .bq-msg-bubble{background:#fff;color:#1e293b;border-bottom-left-radius:4px;border:1px solid #e2e8f0;}
+.bq-msg-bubble.system{background:#fef9c3;color:#92400e;border:1px solid #fde68a;font-size:12px;font-style:italic;border-radius:10px;}
+.bq-msg-meta{font-size:10px;color:#94a3b8;margin-top:2px;padding:0 2px;}
+.bq-chat-empty{text-align:center;padding:32px 16px;color:#94a3b8;font-size:13px;}
+.bq-chat-input-zone{padding:10px 14px;flex-shrink:0;border-top:1px solid #e2e8f0;background:#fff;display:flex;gap:8px;align-items:flex-end;}
+.bq-chat-textarea{flex:1;resize:none;border:1.5px solid #e2e8f0;border-radius:10px;padding:9px 12px;font-size:13px;font-family:var(--font);color:var(--text);outline:none;line-height:1.4;max-height:120px;min-height:40px;transition:border-color .14s;scrollbar-width:thin;}
+.bq-chat-textarea:focus{border-color:#6366f1;}
+.bq-chat-send-btn{width:38px;height:38px;border-radius:10px;border:none;cursor:pointer;background:#6366f1;color:#fff;font-size:17px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .14s;}
+.bq-chat-send-btn:hover{background:#4f46e5;}
+.bq-chat-send-btn:disabled{opacity:.5;cursor:not-allowed;}
+.bq-confier-zone{padding:10px 14px;flex-shrink:0;background:#f0fdf4;border-top:1.5px solid #bbf7d0;}
+.bq-confier-row{display:flex;gap:8px;align-items:center;}
+.bq-order-select{flex:1;padding:8px 10px;border:1.5px solid #86efac;border-radius:9px;font-size:12.5px;font-family:var(--font);color:var(--text);background:#fff;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;background-size:14px;padding-right:28px;transition:border-color .14s;}
+.bq-order-select:focus{border-color:#059669;}
+.bq-btn-confier{padding:8px 14px;border-radius:9px;border:none;cursor:pointer;background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-size:13px;font-weight:800;font-family:var(--font);display:flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 3px 10px rgba(16,185,129,.3);transition:all .15s;flex-shrink:0;}
+.bq-btn-confier:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(16,185,129,.45);}
+.bq-btn-confier:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.bq-btn-confier.done{background:linear-gradient(135deg,#6b7280,#9ca3af);box-shadow:none;}
+.bq-confier-hint{font-size:11px;color:#059669;font-weight:600;margin-bottom:6px;}
 </style>
 @endpush
 
@@ -670,6 +711,46 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     })->values();
     $maxCmd7 = $cmdDays7->max('count') ?: 1;
 @endphp
+
+{{-- ══ MODAL CHAT BOUTIQUE ↔ ENTREPRISE (depuis la cloche) ══ --}}
+<div class="bq-chat-overlay" id="bqChatModal">
+    <div class="bq-chat-panel">
+        <div class="bq-chat-hd">
+            <div class="bq-chat-hd-info">
+                <div class="bq-chat-hd-av" id="bqChatAv">🏢</div>
+                <div>
+                    <div class="bq-chat-hd-name" id="bqChatName">Entreprise</div>
+                    <div class="bq-chat-hd-sub">Discussion en cours</div>
+                </div>
+            </div>
+            <button class="bq-chat-close" onclick="bqCloseChatModal()">✕</button>
+        </div>
+        <div class="bq-chat-msgs" id="bqChatMsgList">
+            <div class="bq-chat-empty" id="bqChatEmpty">Chargement…</div>
+        </div>
+
+        {{-- Zone confier la livraison --}}
+        <div class="bq-confier-zone" id="bqConfierZone" style="display:none;">
+            <div class="bq-confier-hint">📦 Confier une commande à cette entreprise</div>
+            <div class="bq-confier-row">
+                <select class="bq-order-select" id="bqOrderSelect">
+                    <option value="">— Choisir une commande —</option>
+                </select>
+                <button class="bq-btn-confier" id="bqBtnConfier" onclick="bqConfierLivraison()">
+                    ✅ Confier
+                </button>
+            </div>
+        </div>
+
+        <div class="bq-chat-input-zone">
+            <textarea class="bq-chat-textarea" id="bqChatInput" placeholder="Votre message…" rows="1"
+                      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();bqSendMsg();}"></textarea>
+            <button class="bq-chat-send-btn" id="bqChatSendBtn" onclick="bqSendMsg()" title="Envoyer">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+        </div>
+    </div>
+</div>
 
 <div class="dash-wrap" id="dashWrap">
 
@@ -1625,11 +1706,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const CSRF = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
     /* ── État local ── */
-    let _prevMsg       = -1;
-    let _prevOrders    = -1;
-    let _notifOpen     = false;
+    let _prevMsg            = -1;
+    let _prevOrders         = -1;
+    let _prevCompanyMsg     = -1;
+    let _notifOpen          = false;
     /* Persiste entre navigations pour éviter de re-notifier les mêmes messages */
-    let _lastSeenMsgId = parseInt(sessionStorage.getItem('bq_last_msg_id') || '0', 10);
+    let _lastSeenMsgId        = parseInt(sessionStorage.getItem('bq_last_msg_id') || '0', 10);
+    let _lastSeenCompanyMsgId = parseInt(sessionStorage.getItem('bq_last_company_msg_id') || '0', 10);
 
     /* Restaurer les alertes depuis sessionStorage (persiste entre navigations) */
     let _alerts = [];
@@ -1659,7 +1742,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const t = document.createElement('div');
         t.style.cssText = `
             position:fixed;bottom:${20 + document.querySelectorAll('.rt-toast').length * 60}px;
-            right:20px;background:${type==='order'?'#111118':type==='msg'?'#1e40af':'#1f2937'};
+            right:20px;background:${type==='order'?'#111118':type==='msg'?'#1e40af':type==='company'?'#4f46e5':'#1f2937'};
             color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:600;
             z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,.25);
             animation:slideInRight .3s cubic-bezier(.23,1,.32,1);
@@ -1684,12 +1767,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         list.innerHTML = _alerts.slice(0, 20).map(a => {
-            const isOrder = a.type === 'order';
-            /* Badge "En cours" pour les commandes non livrées */
+            const isOrder      = a.type === 'order';
+            const isCompanyMsg = a.type === 'company_msg';
+            /* Badge contextuel */
             const badge = isOrder
                 ? `<span style="font-size:9px;font-weight:700;background:#fef3c7;color:#92400e;border:1px solid #fde68a;border-radius:20px;padding:1px 6px;white-space:nowrap;flex-shrink:0">En cours</span>`
+                : isCompanyMsg
+                ? `<span style="font-size:9px;font-weight:700;background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe;border-radius:20px;padding:1px 6px;white-space:nowrap;flex-shrink:0">Entreprise</span>`
                 : '';
-            /* Bouton × uniquement pour les messages (pas pour les commandes) */
+            /* Bouton × pour messages uniquement */
             const closeBtn = !isOrder
                 ? `<button onclick="event.stopPropagation();_dismissAlert(${a.id})"
                            title="Supprimer"
@@ -1700,16 +1786,29 @@ document.addEventListener('DOMContentLoaded', () => {
                            onmouseover="this.style.background='#fee2e2';this.style.color='#dc2626'"
                            onmouseout="this.style.background='none';this.style.color='#9ca3af'">×</button>`
                 : '';
-            /* onclick : dismiss seulement pour les messages, pas pour les commandes */
-            const clickHandler = isOrder ? '' : `onclick="_dismissAlert(${a.id})"`;
-            const rowBg = isOrder ? '#fffbeb' : '#fff';
-            const rowHover = isOrder ? '#fef9ec' : '#f9fafb';
+            /* onclick : pour entreprise → ouvrir chat, pour messages → dismiss, commandes → rien */
+            let rowClickHandler = '';
+            let rowHref = a.url || '#';
+            let rowTag = 'a';
+            if (isCompanyMsg && a.companyId) {
+                rowTag = 'div';
+                const _safeName = encodeURIComponent(a.companyName || '');
+                rowClickHandler = `onclick="bqOpenCompanyChat(${a.companyId},decodeURIComponent('${_safeName}'));_dismissAlert(${a.id})"`;
+            } else if (!isOrder) {
+                rowClickHandler = `onclick="_dismissAlert(${a.id})"`;
+            }
+            const rowBg    = isOrder ? '#fffbeb' : isCompanyMsg ? '#f5f3ff' : '#fff';
+            const rowHover = isOrder ? '#fef9ec' : isCompanyMsg ? '#ede9fe' : '#f9fafb';
+
+            const innerRow = isCompanyMsg && a.companyId
+                ? `<div ${rowClickHandler} style="display:flex;align-items:center;gap:10px;flex:1;padding:10px 12px;cursor:pointer;min-width:0">`
+                : `<a href="${rowHref}" ${rowClickHandler} style="display:flex;align-items:center;gap:10px;flex:1;padding:10px 12px;text-decoration:none;min-width:0">`;
+            const innerClose = isCompanyMsg && a.companyId ? `</div>` : `</a>`;
 
             return `
             <div style="display:flex;align-items:center;border-bottom:1px solid #f3f6f4;background:${rowBg};transition:background .12s"
                  onmouseover="this.style.background='${rowHover}'" onmouseout="this.style.background='${rowBg}'">
-                <a href="${a.url}" ${clickHandler}
-                   style="display:flex;align-items:center;gap:10px;flex:1;padding:10px 12px;text-decoration:none;min-width:0">
+                ${innerRow}
                     <span style="font-size:18px;flex-shrink:0">${a.ico}</span>
                     <div style="flex:1;min-width:0">
                         <div style="font-size:12.5px;font-weight:600;color:#111;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.msg}</div>
@@ -1719,7 +1818,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                     <span style="font-size:13px;color:#d1d5db;flex-shrink:0;margin-left:4px">›</span>
-                </a>
+                ${innerClose}
                 ${closeBtn}
             </div>`;
         }).join('');
@@ -1750,12 +1849,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /* ── Push alerte dans la file ── */
-    function pushAlert(ico, msg, url, type, body, time) {
+    function pushAlert(ico, msg, url, type, body, time, companyId, companyName) {
         if (!time) {
             const now = new Date();
             time = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
         }
-        _alerts.unshift({ id: ++_alertIdSeq, ico, msg, url, time, type: type || 'msg', body: body || '' });
+        _alerts.unshift({
+            id: ++_alertIdSeq, ico, msg, url, time,
+            type: type || 'msg', body: body || '',
+            companyId: companyId || null,
+            companyName: companyName || ''
+        });
         if (_alerts.length > 30) _alerts.pop();
         _saveAlerts();
     }
@@ -1797,6 +1901,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             _prevMsg = d.messages_unread;
 
+            /* ── Messages des entreprises de livraison ── */
+            if (Array.isArray(d.latest_company_messages) && d.latest_company_messages.length > 0) {
+                const newCMsgs = d.latest_company_messages.filter(m => m.id > _lastSeenCompanyMsgId);
+                if (newCMsgs.length > 0) {
+                    if (_prevCompanyMsg >= 0) {
+                        const n = newCMsgs.length;
+                        showToast(`🏢 <div>${n} nouveau${n>1?'x':''} message${n>1?'s':''} d'entreprise${n>1?'s':''}</div>`, 'company');
+                    }
+                    [...newCMsgs].reverse().forEach(m => {
+                        pushAlert('🏢', `${m.company_name} — ${m.body}`, null, 'company_msg', '', m.time, m.company_id, m.company_name);
+                    });
+                    _lastSeenCompanyMsgId = newCMsgs[0].id;
+                    try { sessionStorage.setItem('bq_last_company_msg_id', _lastSeenCompanyMsgId); } catch(e) {}
+                }
+            }
+            _prevCompanyMsg = d.company_messages_unread ?? 0;
+
             /* Commandes — une seule entrée dans _alerts, compteur mis à jour */
             setBadge('sbOrdersBadge', d.orders_pending);
             if (d.orders_pending > 0) {
@@ -1829,8 +1950,9 @@ document.addEventListener('DOMContentLoaded', () => {
             /* Livreurs */
             setBadge('sbLivreursBadge', d.livreurs_available);
 
-            /* Cloche totale */
-            const total = d.messages_unread + d.orders_pending;
+            /* Cloche totale : messages clients + commandes + alertes entreprises non dismissées */
+            const companyAlertCount = _alerts.filter(a => a.type === 'company_msg').length;
+            const total = d.messages_unread + d.orders_pending + companyAlertCount;
             setBadge('notifBellCount', total);
             const totalEl = document.getElementById('notifDropdownTotal');
             if (totalEl) totalEl.textContent = _alerts.length;
@@ -1853,6 +1975,255 @@ document.addEventListener('DOMContentLoaded', () => {
         #notifList::-webkit-scrollbar-thumb:hover{background:#9ca3af;}
     `;
     document.head.appendChild(s);
+})();
+
+/* ════════════════════════════════════════════════════════
+   CHAT BOUTIQUE ↔ ENTREPRISE — depuis la cloche de notif
+   ════════════════════════════════════════════════════════ */
+(function () {
+    const SHOP_ID = {{ $shop->id ?? 0 }};
+    const CSRF    = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+
+    let _bqCompanyId   = null;
+    let _bqCompanyName = '';
+    let _bqLastMsgTime = null;
+    let _bqInterval    = null;
+
+    let _bqConfierDone = false;
+
+    /* ── Ouvre le chat pour une entreprise donnée ── */
+    window.bqOpenCompanyChat = function(companyId, companyName) {
+        _bqCompanyId   = companyId;
+        _bqCompanyName = companyName || 'Entreprise';
+        _bqLastMsgTime = null;
+        _bqConfierDone = false;
+
+        /* Ferme le dropdown notif */
+        const dd = document.getElementById('notifDropdown');
+        if (dd) dd.style.display = 'none';
+
+        /* Header */
+        document.getElementById('bqChatAv').textContent   = '🏢';
+        document.getElementById('bqChatName').textContent = _bqCompanyName;
+
+        /* Vider messages */
+        document.getElementById('bqChatMsgList').innerHTML =
+            '<div class="bq-chat-empty" id="bqChatEmpty">Chargement…</div>';
+
+        /* Reset zone confier */
+        const confierZone = document.getElementById('bqConfierZone');
+        const btnC        = document.getElementById('bqBtnConfier');
+        const sel         = document.getElementById('bqOrderSelect');
+        confierZone.style.display = 'none';
+        btnC.disabled  = false;
+        btnC.classList.remove('done');
+        btnC.innerHTML = '✅ Confier';
+        sel.innerHTML  = '<option value="">— Choisir une commande —</option>';
+
+        /* Ouvrir */
+        document.getElementById('bqChatModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+        document.getElementById('bqChatInput').focus();
+
+        /* Charger messages + commandes en attente */
+        bqLoadMessages(true);
+        bqLoadPendingOrders();
+        _bqInterval = setInterval(() => bqLoadMessages(false), 3000);
+    };
+
+    /* ── Charge les commandes non assignées ── */
+    function bqLoadPendingOrders() {
+        fetch('/employe/orders/pending-json', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+        })
+        .then(r => r.json())
+        .then(orders => {
+            const sel   = document.getElementById('bqOrderSelect');
+            const zone  = document.getElementById('bqConfierZone');
+            sel.innerHTML = '<option value="">— Choisir une commande —</option>';
+            if (orders.length) {
+                orders.forEach(o => {
+                    const opt = document.createElement('option');
+                    opt.value       = o.id;
+                    opt.textContent = `${o.num} · ${o.client} · ${o.total} GNF`;
+                    sel.appendChild(opt);
+                });
+                zone.style.display = 'block';
+            } else {
+                zone.style.display = 'none';
+            }
+        })
+        .catch(() => {
+            document.getElementById('bqConfierZone').style.display = 'none';
+        });
+    }
+
+    /* ── Confie la commande sélectionnée à l'entreprise ── */
+    window.bqConfierLivraison = function() {
+        if (_bqConfierDone) return;
+        const sel     = document.getElementById('bqOrderSelect');
+        const orderId = sel.value;
+        if (!orderId) { sel.focus(); return; }
+
+        const btn = document.getElementById('bqBtnConfier');
+        btn.disabled  = true;
+        btn.innerHTML = '⏳ Envoi…';
+
+        const formData = new FormData();
+        formData.append('_method', 'PUT');
+        formData.append('delivery_company_id', _bqCompanyId);
+
+        fetch(`/employe/orders/${orderId}/send-to-company`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': CSRF,
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            },
+            body: formData
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                _bqConfierDone = true;
+                btn.classList.add('done');
+                btn.innerHTML = '✅ Confiée !';
+                document.getElementById('bqConfierZone').style.display = 'none';
+
+                /* Message de confirmation visible dans le chat */
+                const numTxt = sel.options[sel.selectedIndex]?.text?.split('·')[0]?.trim() || ('#' + orderId);
+                bqRenderMessages([{
+                    id: 'local-' + Date.now(),
+                    from_type: 'system',
+                    body: `✅ Commande ${numTxt} confiée à ${_bqCompanyName}. Statut : En attente.`,
+                    created_at: new Date().toISOString()
+                }], false);
+
+                /* Rechargement après 2s pour actualiser les statuts */
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                btn.disabled  = false;
+                btn.innerHTML = '✅ Confier';
+                alert(data.message || 'Erreur lors de la soumission.');
+            }
+        })
+        .catch(() => {
+            btn.disabled  = false;
+            btn.innerHTML = '✅ Confier';
+            alert('Erreur réseau. Veuillez réessayer.');
+        });
+    };
+
+    /* ── Ferme le chat ── */
+    window.bqCloseChatModal = function() {
+        clearInterval(_bqInterval);
+        _bqInterval = null;
+        document.getElementById('bqChatModal').classList.remove('open');
+        document.body.style.overflow = '';
+    };
+
+    /* Clic en dehors + Escape */
+    document.getElementById('bqChatModal')?.addEventListener('click', function(e) {
+        if (e.target === this) window.bqCloseChatModal();
+    });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') window.bqCloseChatModal();
+    });
+
+    /* ── Charge les messages ── */
+    function bqLoadMessages(initial) {
+        if (!_bqCompanyId) return;
+        const url = new URL(`/employe/companies/${_bqCompanyId}/chat/messages`, location.origin);
+        url.searchParams.set('shop_id', SHOP_ID);
+        if (_bqLastMsgTime && !initial) url.searchParams.set('after', _bqLastMsgTime);
+
+        fetch(url.toString(), {
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+        })
+        .then(r => r.json())
+        .then(data => {
+            const msgs = data.messages || [];
+            if (msgs.length) {
+                bqRenderMessages(msgs, initial);
+                _bqLastMsgTime = msgs[msgs.length - 1].created_at || null;
+            } else if (initial) {
+                document.getElementById('bqChatMsgList').innerHTML =
+                    '<div class="bq-chat-empty" id="bqChatEmpty">Aucun message. Commencez la discussion !</div>';
+            }
+        })
+        .catch(() => {
+            if (initial)
+                document.getElementById('bqChatMsgList').innerHTML =
+                    '<div class="bq-chat-empty" id="bqChatEmpty">Aucun message. Commencez la discussion !</div>';
+        });
+    }
+
+    /* ── Rend les messages ── */
+    function bqRenderMessages(msgs, replace) {
+        const list = document.getElementById('bqChatMsgList');
+        if (replace) list.innerHTML = '';
+        const empty = list.querySelector('.bq-chat-empty');
+        if (empty) empty.remove();
+
+        msgs.forEach(m => {
+            if (document.getElementById('bqmsg-' + m.id)) return;
+            const role     = m.from_type || m.sender_role || 'shop';
+            const isMine   = role === 'shop';
+            const isSystem = role === 'system';
+            const row      = document.createElement('div');
+            row.className  = 'bq-msg-row ' + (isSystem ? 'mine' : isMine ? 'mine' : 'theirs');
+            row.id         = 'bqmsg-' + m.id;
+            const cls      = isSystem ? 'bq-msg-bubble system' : 'bq-msg-bubble';
+            const text     = m.body || m.message || '';
+            const timeStr  = m.created_at
+                ? new Date(m.created_at).toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'})
+                : '';
+            const label    = isSystem ? 'Système' : isMine ? 'Vous' : _bqCompanyName;
+            row.innerHTML  = `<div class="${cls}">${bqEsc(text)}</div>`
+                           + `<div class="bq-msg-meta">${label} · ${timeStr}</div>`;
+            list.appendChild(row);
+        });
+        list.scrollTop = list.scrollHeight;
+    }
+
+    function bqEsc(str) {
+        return String(str)
+            .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    /* ── Envoie un message ── */
+    window.bqSendMsg = function() {
+        const input   = document.getElementById('bqChatInput');
+        const msg     = input.value.trim();
+        if (!msg || !_bqCompanyId) return;
+
+        const sendBtn = document.getElementById('bqChatSendBtn');
+        sendBtn.disabled = true;
+
+        fetch(`/employe/companies/${_bqCompanyId}/chat/send`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': CSRF,
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ message: msg, shop_id: SHOP_ID })
+        })
+        .then(r => r.json())
+        .then(data => {
+            input.value = '';
+            sendBtn.disabled = false;
+            if (data.ok && data.message) {
+                bqRenderMessages([data.message], false);
+                _bqLastMsgTime = data.message.created_at || null;
+            } else {
+                bqLoadMessages(false);
+            }
+        })
+        .catch(() => { sendBtn.disabled = false; });
+    };
 })();
 </script>
 @endpush

@@ -829,8 +829,8 @@ body.cx-light .cx-main { background:#F5F7FA; }
     <div class="cx-brand-hd">
         <div class="cx-brand-top">
             <a href="{{ route('company.dashboard') }}" class="cx-logo">
-                <div class="cx-logo-icon">🚚</div>
-                ShipXpress
+               <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
+                <span class="sb-shop-name">{{ $company->name }}</span>
             </a>
             <button class="cx-close-btn" id="cxClose">✕</button>
         </div>
@@ -957,8 +957,9 @@ body.cx-light .cx-main { background:#F5F7FA; }
                     </div>
                 </div>
             </div>
-            <a href="{{ route('company.chat.inbox') }}" class="cx-tb-btn" title="Messages" style="text-decoration:none">
+            <a href="{{ route('company.chat.inbox') }}" class="cx-tb-btn" title="Messages" style="text-decoration:none;position:relative">
                 💬
+                <span class="cx-notif-dot" id="topbarChatBadge" style="display:none"></span>
             </a>
             <div class="cx-tb-user">
                 <div class="cx-tb-av">{{ $ini }}</div>
@@ -978,45 +979,60 @@ body.cx-light .cx-main { background:#F5F7FA; }
     <div class="cx-content">
 
         {{-- ══ STATS ══ --}}
+        @php
+            function cxTrend(int|float $today, int|float $yesterday): string {
+                if ($yesterday == 0) return $today > 0 ? '↑ +100% vs hier' : '— vs hier';
+                $pct = round(($today - $yesterday) / $yesterday * 100);
+                return ($pct >= 0 ? '↑ +' : '↓ ') . $pct . '% vs hier';
+            }
+        @endphp
         <div class="cx-stats">
             <div class="cx-stat" style="--s-color:#f59e0b;--s-ico-bg:rgba(245,158,11,.12)">
                 <div class="cx-stat-ico">📋</div>
                 <div>
                     <div class="cx-stat-lbl">Commandes en attente</div>
-                    <div class="cx-stat-val">24</div>
-                    <div class="cx-stat-trend">↑ +18% vs hier</div>
+                    <div class="cx-stat-val">{{ $pendingOrders }}</div>
+                    <div class="cx-stat-trend">{{ cxTrend($pendingOrdersToday, $pendingOrdersYday) }}</div>
                 </div>
             </div>
             <div class="cx-stat" style="--s-color:#8b5cf6;--s-ico-bg:rgba(139,92,246,.12)">
                 <div class="cx-stat-ico">🚴</div>
                 <div>
-                    <div class="cx-stat-lbl">Livreurs disponibles</div>
-                    <div class="cx-stat-val">32</div>
-                    <div class="cx-stat-trend">↑ +12% vs hier</div>
+                    <div class="cx-stat-lbl">Chauffeurs disponibles</div>
+                    <div class="cx-stat-val">{{ $availableDrivers }}</div>
+                    <div class="cx-stat-trend" style="{{ $availableDrivers == 0 ? 'color:var(--cx-red)' : '' }}">
+                        {{ $availableDrivers }}/{{ $totalDrivers }} actifs
+                    </div>
                 </div>
             </div>
             <div class="cx-stat" style="--s-color:#3b82f6;--s-ico-bg:rgba(59,130,246,.12)">
                 <div class="cx-stat-ico">🚚</div>
                 <div>
                     <div class="cx-stat-lbl">Livraisons en cours</div>
-                    <div class="cx-stat-val">56</div>
-                    <div class="cx-stat-trend">↑ +8% vs hier</div>
+                    <div class="cx-stat-val">{{ $inDelivery }}</div>
+                    <div class="cx-stat-trend">{{ cxTrend($inDelivery, $inDeliveryYday) }}</div>
                 </div>
             </div>
             <div class="cx-stat" style="--s-color:#10b981;--s-ico-bg:rgba(16,185,129,.12)">
                 <div class="cx-stat-ico">✅</div>
                 <div>
                     <div class="cx-stat-lbl">Livraisons terminées</div>
-                    <div class="cx-stat-val">152</div>
-                    <div class="cx-stat-trend">↑ +15% vs hier</div>
+                    <div class="cx-stat-val">{{ $delivered }}</div>
+                    <div class="cx-stat-trend">{{ cxTrend($deliveredToday, $deliveredYday) }}</div>
                 </div>
             </div>
             <div class="cx-stat" style="--s-color:#7c3aed;--s-ico-bg:rgba(124,58,237,.12)">
                 <div class="cx-stat-ico">💳</div>
                 <div>
                     <div class="cx-stat-lbl">Revenus livraison</div>
-                    <div class="cx-stat-val sm">2 350 000</div>
-                    <div class="cx-stat-trend">↑ +22% vs hier · FCFA</div>
+                    <div class="cx-stat-val sm">{{ number_format($revenus, 0, ',', ' ') }}</div>
+                    <div class="cx-stat-trend">
+                        @if($revenusToday > 0)
+                            +{{ number_format($revenusToday, 0, ',', ' ') }} aujourd'hui · {{ $devise }}
+                        @else
+                            {{ $devise }} · Total commissions reçues
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
@@ -1067,16 +1083,8 @@ body.cx-light .cx-main { background:#F5F7FA; }
                         <a href="{{ route('company.orders.index') }}" class="cx-panel-link">Commandes</a>
                     </div>
                     <div class="cx-pipe-list">
-                        @php
-                        $pipe = [
-                            ['En attente de livreur', 24,  15.8, '#eab308'],
-                            ['Assignees',             18,  11.8, '#3b82f6'],
-                            ['En livraison',          56,  36.8, '#f59e0b'],
-                            ['Livrees',              152, 100.0, '#10b981'],
-                            ['Annulees',               6,   3.9, '#ef4444'],
-                        ];
-                        @endphp
-                        @foreach($pipe as [$lbl,$val,$pct,$color])
+                        @foreach($pipeData as [$lbl, $val, $color])
+                        @php $pct = $totalOrders > 0 ? round($val / $totalOrders * 100, 1) : 0; @endphp
                         <div class="cx-pipe-item">
                             <div class="cx-pipe-row">
                                 <span class="cx-pipe-lbl">{{ $lbl }}</span>
@@ -1090,38 +1098,59 @@ body.cx-light .cx-main { background:#F5F7FA; }
                     </div>
                 </div>
 
-                {{-- Livreurs actifs --}}
+                {{-- Chauffeurs actifs --}}
                 <div class="cx-panel">
                     <div class="cx-panel-hd">
-                        <div class="cx-panel-title">🚴 Livreurs actifs</div>
-                        <a href="{{ route('company.drivers.index') }}" class="cx-panel-link">Gerer</a>
+                        <div class="cx-panel-title">🚴 Chauffeurs ({{ $totalDrivers }})</div>
+                        <a href="{{ route('company.drivers.index') }}" class="cx-panel-link">Gérer</a>
                     </div>
                     @php
-                    $driversDemo = [
-                        ['JD','Jean Dupont',   'Plateau, Abidjan',  '4.8','Disponible',  'ok','linear-gradient(135deg,#6366f1,#4338ca)'],
-                        ['MD','Mariam Diarra', 'Cocody, Abidjan',   '4.7','En livraison','go','linear-gradient(135deg,#10b981,#059669)'],
-                        ['IK','Ibrahim Kone',  'Yopougon, Abidjan', '4.6','Disponible',  'ok','linear-gradient(135deg,#f59e0b,#d97706)'],
-                        ['AT','Awa Traore',    'Marcory, Abidjan',  '4.9','En livraison','go','linear-gradient(135deg,#ec4899,#be185d)'],
-                        ['MS','Mohamed Sy',    'Bingerville',        '4.5','Disponible',  'ok','linear-gradient(135deg,#8b5cf6,#7c3aed)'],
+                    $driverPalette = [
+                        'linear-gradient(135deg,#6366f1,#4338ca)',
+                        'linear-gradient(135deg,#10b981,#059669)',
+                        'linear-gradient(135deg,#f59e0b,#d97706)',
+                        'linear-gradient(135deg,#ec4899,#be185d)',
+                        'linear-gradient(135deg,#8b5cf6,#7c3aed)',
+                    ];
+                    $statusMap = [
+                        'available' => ['label' => 'Disponible',   'class' => 'ds-ok', 'dot' => '#10b981'],
+                        'busy'      => ['label' => 'En livraison', 'class' => 'ds-go', 'dot' => '#f59e0b'],
+                        'offline'   => ['label' => 'Hors ligne',   'class' => 'ds-go', 'dot' => '#ef4444'],
                     ];
                     @endphp
-                    @foreach($driversDemo as [$ini2,$name,$loc,$rate,$stat,$type,$bg])
+                    @forelse($activeDrivers as $idx => $drv)
+                    @php
+                        $dParts = explode(' ', $drv->name ?? 'C H');
+                        $dIni   = strtoupper(substr($dParts[0],0,1)) . strtoupper(substr($dParts[1]??'',0,1));
+                        $dBg    = $driverPalette[$idx % count($driverPalette)];
+                        $dStat  = $statusMap[$drv->status] ?? $statusMap['offline'];
+                    @endphp
                     <div class="cx-driver">
-                        <div class="cx-driv-av" style="background:{{ $bg }}">
-                            {{ $ini2 }}
-                            <span class="cx-driv-dot" style="background:{{ $type==='ok'?'#10b981':'#f59e0b' }}"></span>
+                        <div class="cx-driv-av" style="background:{{ $dBg }}">
+                            {{ $dIni }}
+                            <span class="cx-driv-dot" style="background:{{ $dStat['dot'] }}"></span>
                         </div>
                         <div class="cx-driv-info">
-                            <div class="cx-driv-name">{{ $name }}</div>
-                            <div class="cx-driv-loc">📍 {{ $loc }}</div>
+                            <div class="cx-driv-name">{{ $drv->name }}</div>
+                            @if($drv->phone)
+                            <div class="cx-driv-loc">📞 {{ $drv->phone }}</div>
+                            @endif
                         </div>
                         <div class="cx-driv-right">
-                            <span class="cx-driv-rating">★ {{ $rate }}</span>
-                            <span class="cx-driv-status {{ $type==='ok'?'ds-ok':'ds-go' }}">● {{ $stat }}</span>
+                            <span class="cx-driv-status {{ $dStat['class'] }}">● {{ $dStat['label'] }}</span>
                         </div>
-                        <div class="cx-driv-phone">📞</div>
+                        @if($drv->phone)
+                        <a href="tel:{{ $drv->phone }}" class="cx-driv-phone" title="Appeler">📞</a>
+                        @else
+                        <div class="cx-driv-phone" style="opacity:.35;cursor:default">📞</div>
+                        @endif
                     </div>
-                    @endforeach
+                    @empty
+                    <div style="padding:28px 16px;text-align:center;color:var(--cx-muted);font-size:12.5px">
+                        Aucun chauffeur enregistré.<br>
+                        <a href="{{ route('company.drivers.index') }}" style="color:var(--cx-brand-lt);font-weight:600">Ajouter un chauffeur →</a>
+                    </div>
+                    @endforelse
                 </div>
 
             </div>{{-- /cx-right-stack --}}
@@ -1154,8 +1183,16 @@ body.cx-light .cx-main { background:#F5F7FA; }
                             <option>7 derniers jours</option>
                         </select>
                     </div>
-                    <div class="cx-rev-big">2 350 000 <span style="font-size:14px;font-weight:600;color:var(--cx-text2)">FCFA</span></div>
-                    <div class="cx-rev-sub">↑ +22% vs periode precedente</div>
+                    <div class="cx-rev-big">{{ number_format($revenus, 0, ',', ' ') }} <span style="font-size:14px;font-weight:600;color:var(--cx-text2)">{{ $devise }}</span></div>
+                    <div class="cx-rev-sub">
+                        @if($revenusToday > 0)
+                            +{{ number_format($revenusToday, 0, ',', ' ') }} {{ $devise }} aujourd'hui
+                        @elseif($revenus > 0)
+                            Total commissions reçues
+                        @else
+                            Aucun revenu encore — en attente de paiement
+                        @endif
+                    </div>
                     <canvas id="chartRevenue" height="110"></canvas>
                 </div>
             </div>
@@ -1307,9 +1344,9 @@ document.addEventListener('DOMContentLoaded', () => {
     new Chart(document.getElementById('chartOrders'), {
         type: 'line',
         data: {
-            labels: ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'],
+            labels: @json(collect(range(6,0))->map(fn($d) => now()->subDays($d)->translatedFormat('D'))->values()),
             datasets: [{
-                data: [45,62,58,80,72,95,68],
+                data: @json($ordersChart),
                 borderColor: '#8b5cf6',
                 backgroundColor: 'rgba(139,92,246,.08)',
                 borderWidth: 2, pointRadius: 4,
@@ -1328,9 +1365,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /* ── Chart Revenus ── */
-    const revData = [120,95,180,210,160,240,195,175,220,260,200,185,
-                     230,215,190,245,205,170,235,255,180,210,195,225,
-                     240,215,260,285,240,310];
+    const revData = @json($revenueChart);
     new Chart(document.getElementById('chartRevenue'), {
         type: 'bar',
         data: {
@@ -1359,12 +1394,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 300);
 
     /* ══════════════════════════════════════════════════════
-       NOTIFICATIONS CHAT EN TEMPS RÉEL
-       Polling /company/chat/conversations toutes les 5s.
-       Badge sidebar + topbar + cloche dropdown + panel chat.
+       NOTIFICATIONS EN TEMPS RÉEL
+       - Chat : polling /company/chat/conversations toutes les 5s
+       - Commandes : polling /company/orders/notifications toutes les 5s
+       Badge topbar = chat non-lus + commandes en attente nouvelles.
     ══════════════════════════════════════════════════════ */
-    let prevConvMap = {};
-    let firstPoll   = true;
+    let prevConvMap   = {};
+    let firstPoll     = true;
+
+    // Commandes en attente — suivi par ID
+    let prevOrderIds   = new Set();
+    let firstOrderPoll = true;
+    // État partagé pour le rendu du panneau
+    let latestOrders   = [];
+    let latestConvs    = [];
 
     const AV_COLORS = [
         'linear-gradient(135deg,#7c3aed,#5b21b6)',
@@ -1411,35 +1454,116 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /* ── Rendu panneau cloche ── */
-    function renderNotifPanel(convs) {
+    /* ── Son alerte commande ── */
+    function playOrderSound() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            // Deux bips courts descendants
+            [[880, 0], [660, 0.18]].forEach(([freq, delay]) => {
+                const osc = ctx.createOscillator(), gain = ctx.createGain();
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+                osc.frequency.exponentialRampToValueAtTime(freq * 0.8, ctx.currentTime + delay + 0.15);
+                gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+                gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + delay + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.22);
+                osc.start(ctx.currentTime + delay);
+                osc.stop(ctx.currentTime + delay + 0.25);
+            });
+        } catch(e) {}
+    }
+
+    /* ── Toast commande ── */
+    function showOrderToast(order) {
+        const container = document.getElementById('cxToasts');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = 'cx-toast';
+        toast.innerHTML = `
+            <div class="cx-toast-ico">📦</div>
+            <div class="cx-toast-body">
+                <div class="cx-toast-shop">Nouvelle commande #${esc(String(order.id))}</div>
+                <div class="cx-toast-msg">${esc(order.shop_name)} · ${esc(order.client)}</div>
+                <div class="cx-toast-time">${esc(order.created_at)} · Cliquez pour gérer</div>
+            </div>
+            <div class="cx-toast-close" title="Fermer">✕</div>
+        `;
+        const url = '{{ route('company.orders.index') }}';
+        toast.addEventListener('click', () => { window.location.href = url; });
+        toast.querySelector('.cx-toast-close').addEventListener('click', e => {
+            e.stopPropagation(); dismissToast(toast);
+        });
+        container.appendChild(toast);
+        setTimeout(() => dismissToast(toast), 7000);
+    }
+
+    /* ── Rendu panneau cloche (chat + commandes) ── */
+    function renderNotifPanel() {
         const list = document.getElementById('cxNotifList');
         const cnt  = document.getElementById('notifPanelCnt');
         if (!list) return;
 
-        const unread = convs.filter(c => (c.unread || 0) > 0);
-        const shown  = unread.length ? unread : convs.slice(0, 6);
-        const total  = unread.length;
+        const convs      = latestConvs;
+        const chatUnread = convs.filter(c => (c.unread || 0) > 0);
+        const orderItems = latestOrders.slice(0, 5);
+        const total      = chatUnread.length + orderItems.length;
 
         if (cnt) { cnt.textContent = total; cnt.style.display = total > 0 ? '' : 'none'; }
 
-        if (!shown.length) {
+        let html = '';
+
+        // Section commandes en attente — groupées par boutique
+        if (orderItems.length) {
+            // Une entrée par boutique unique
+            const byShop = {};
+            orderItems.forEach(o => {
+                const key = o.shop_name || '—';
+                if (!byShop[key]) byShop[key] = { shop_name: key, count: 0, created_at: o.created_at };
+                byShop[key].count++;
+            });
+            const shopGroups = Object.values(byShop);
+
+            html += `<div style="padding:6px 12px 2px;font-size:9.5px;font-weight:800;letter-spacing:1.2px;color:var(--cx-muted);text-transform:uppercase">📦 Commandes en attente</div>`;
+            html += shopGroups.map(g => `
+                <div class="cx-notif-item" onclick="window.location.href='{{ route('company.orders.index') }}'">
+                    <div class="cx-notif-av" style="background:linear-gradient(135deg,#f59e0b,#d97706)">${esc(getIni(g.shop_name))}</div>
+                    <div class="cx-notif-body">
+                        <div class="cx-notif-name">${esc(g.shop_name)}</div>
+                        <div class="cx-notif-msg">${g.count > 1 ? g.count + ' commandes en attente' : '1 commande en attente'}</div>
+                        <div class="cx-notif-meta">
+                            <span class="cx-notif-time">${esc(g.created_at)}</span>
+                            <span class="cx-notif-unread" style="background:#f59e0b">${g.count > 99 ? '99+' : g.count}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Section messages chat non-lus
+        const shownChat = chatUnread.length ? chatUnread : (orderItems.length ? [] : convs.slice(0, 4));
+        if (shownChat.length) {
+            html += `<div style="padding:6px 12px 2px;font-size:9.5px;font-weight:800;letter-spacing:1.2px;color:var(--cx-muted);text-transform:uppercase">💬 Messages non lus</div>`;
+            html += shownChat.map((c, i) => `
+                <div class="cx-notif-item" onclick="window.location.href='{{ route('company.chat.inbox') }}?shop_id=${encodeURIComponent(c.shop_id)}'">
+                    <div class="cx-notif-av" style="background:${AV_COLORS[i % AV_COLORS.length]}">${esc(getIni(c.shop_name))}</div>
+                    <div class="cx-notif-body">
+                        <div class="cx-notif-name">${esc(c.shop_name)}</div>
+                        <div class="cx-notif-msg">${esc(c.last_message || '')}</div>
+                        <div class="cx-notif-meta">
+                            <span class="cx-notif-time">${fmtTime(c.last_at)}</span>
+                            ${(c.unread || 0) > 0 ? `<span class="cx-notif-unread">${c.unread > 99 ? '99+' : c.unread} non lu${c.unread > 1 ? 's' : ''}</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        if (!html) {
             list.innerHTML = '<div class="cx-notif-empty">Aucune notification pour le moment</div>';
             return;
         }
-        list.innerHTML = shown.map((c, i) => `
-            <div class="cx-notif-item" onclick="window.location.href='{{ route('company.chat.inbox') }}?shop_id=${encodeURIComponent(c.shop_id)}'">
-                <div class="cx-notif-av" style="background:${AV_COLORS[i % AV_COLORS.length]}">${esc(getIni(c.shop_name))}</div>
-                <div class="cx-notif-body">
-                    <div class="cx-notif-name">${esc(c.shop_name)}</div>
-                    <div class="cx-notif-msg">${esc(c.last_message || '')}</div>
-                    <div class="cx-notif-meta">
-                        <span class="cx-notif-time">${fmtTime(c.last_at)}</span>
-                        ${(c.unread || 0) > 0 ? `<span class="cx-notif-unread">${c.unread > 99 ? '99+' : c.unread} non lu${c.unread > 1 ? 's' : ''}</span>` : ''}
-                    </div>
-                </div>
-            </div>
-        `).join('');
+        list.innerHTML = html;
     }
 
     /* ── Rendu panel chat dashboard ── */
@@ -1511,7 +1635,20 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => toast.remove(), 320);
     }
 
-    /* ── Polling principal ── */
+    /* compteur global partagé entre les deux pollings */
+    let _chatUnreadCount  = 0;
+    let _orderPendingCount = 0;
+
+    function updateGlobalBadge() {
+        const total = _chatUnreadCount + _orderPendingCount;
+        setBadge('navChatBadge',     _chatUnreadCount);
+        setBadge('navOrderBadge',    _orderPendingCount);
+        setBadge('topbarChatBadge',  _chatUnreadCount);
+        setBadge('topbarNotifBadge', total);
+        setBadge('chatPanelBadge',   _chatUnreadCount);
+    }
+
+    /* ── Polling chat ── */
     async function pollChatNotifs() {
         try {
             const res = await fetch('{{ route('company.chat.conversations') }}', {
@@ -1523,15 +1660,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!data.ok || !Array.isArray(data.conversations)) return;
 
             const convs = data.conversations;
-            const totalUnread = convs.reduce((s, c) => s + (c.unread || 0), 0);
-
-            // Badges — même compteur partout
-            setBadge('navChatBadge',     totalUnread);
-            setBadge('topbarNotifBadge', totalUnread);
-            setBadge('chatPanelBadge',   totalUnread);
+            latestConvs      = convs;
+            _chatUnreadCount = convs.reduce((s, c) => s + (c.unread || 0), 0);
+            updateGlobalBadge();
 
             // Rendu live
-            renderNotifPanel(convs);
+            renderNotifPanel();
             renderChatPanel(convs);
 
             // Toasts uniquement pour les nouveaux messages (pas au 1er chargement)
@@ -1547,6 +1681,43 @@ document.addEventListener('DOMContentLoaded', () => {
             prevConvMap = {};
             convs.forEach(c => { prevConvMap[c.shop_id] = c.unread || 0; });
             firstPoll = false;
+
+        } catch(e) { /* silencieux */ }
+    }
+
+    /* ── Polling commandes en attente ── */
+    async function pollOrderNotifs() {
+        try {
+            const res = await fetch('{{ route('company.orders.notifications') }}', {
+                credentials: 'same-origin',
+                headers: { 'Accept': 'application/json' }
+            });
+            if (!res.ok) return;
+            const data = await res.json();
+            if (!data.ok || !Array.isArray(data.orders)) return;
+
+            const orders = data.orders;
+            latestOrders = orders;
+
+            const currentIds = new Set(orders.map(o => o.id));
+            // Badge = nombre total de commandes en attente (pas boutiques uniques)
+            _orderPendingCount = orders.length;
+            updateGlobalBadge();
+
+            // Détecter les nouvelles commandes (IDs qui n'étaient pas là avant)
+            if (!firstOrderPoll) {
+                const newOrders = orders.filter(o => !prevOrderIds.has(o.id));
+                if (newOrders.length) {
+                    playOrderSound();
+                    newOrders.forEach(o => showOrderToast(o));
+                }
+            }
+
+            prevOrderIds   = currentIds;
+            firstOrderPoll = false;
+
+            // Mettre à jour le panneau (fusion commandes + chat via globals)
+            renderNotifPanel();
 
         } catch(e) { /* silencieux */ }
     }
@@ -1567,9 +1738,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Lancer immédiatement puis toutes les 5 secondes
+    // Commandes d'abord pour remplir latestOrders avant le 1er rendu chat
+    pollOrderNotifs();
     pollChatNotifs();
-    setInterval(pollChatNotifs, 5000);
+    setInterval(pollChatNotifs,  5000);
+    setInterval(pollOrderNotifs, 5000);
 });
 </script>
 @endpush

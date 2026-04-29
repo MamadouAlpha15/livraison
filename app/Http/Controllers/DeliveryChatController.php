@@ -164,6 +164,8 @@ class DeliveryChatController extends Controller
                 $isShopOwner = true;
             } elseif (method_exists($user, 'shop') && optional($user->shop()->first())->id == $shopId) {
                 $isShopOwner = true;
+            } elseif (method_exists($user, 'currentShopId') && $user->currentShopId() == $shopId) {
+                $isShopOwner = true;
             }
         }
 
@@ -220,6 +222,8 @@ class DeliveryChatController extends Controller
             if (isset($user->shop_id) && $user->shop_id == $shopId) {
                 $isShopOwner = true;
             } elseif (method_exists($user, 'shop') && optional($user->shop()->first())->id == $shopId) {
+                $isShopOwner = true;
+            } elseif (method_exists($user, 'currentShopId') && $user->currentShopId() == $shopId) {
                 $isShopOwner = true;
             }
         }
