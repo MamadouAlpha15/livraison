@@ -216,6 +216,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/orders/{order}/assign',           [CompanyOrderController::class, 'assign'])           ->name('company.orders.assign');
         Route::post('/orders/{order}/status',           [CompanyOrderController::class, 'updateStatus'])     ->name('company.orders.status');
 
+        /* Livraisons en cours */
+        Route::get('/livraisons',      [CompanyOrderController::class, 'inProgress'])    ->name('company.livraisons.index');
+        Route::get('/livraisons/data', [CompanyOrderController::class, 'inProgressData'])->name('company.livraisons.data');
+
+        /* Carte en direct */
+        Route::get('/carte',      [CompanyOrderController::class, 'mapView']) ->name('company.carte.index');
+        Route::get('/carte/data', [CompanyOrderController::class, 'mapData']) ->name('company.carte.data');
+
         /* Création de l'entreprise */
         Route::get('/delivery-company/create', [DeliveryCompanyController::class, 'create'])->name('delivery.company.create');
         Route::post('/delivery-company',        [DeliveryCompanyController::class, 'store']) ->name('delivery.company.store');

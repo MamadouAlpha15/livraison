@@ -537,7 +537,7 @@ body.cx-dark .addr-val{color:var(--cx-text);}
         <a href="#" class="cx-nav-item">
             <span class="cx-nav-ico">🚚</span> Livraisons
         </a>
-        <a href="#" class="cx-nav-item">
+        <a href="{{ route('company.carte.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">🗺️</span> Carte en direct
         </a>
         <a href="{{ route('company.drivers.index') }}" class="cx-nav-item">

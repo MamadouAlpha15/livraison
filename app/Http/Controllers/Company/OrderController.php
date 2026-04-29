@@ -104,6 +104,82 @@ class OrderController extends Controller
         ]);
     }
 
+    public function mapView()
+    {
+        $company = $this->company();
+        return view('company.carte.index', compact('company'));
+    }
+
+    public function mapData()
+    {
+        $company = $this->company();
+
+        $orders = Order::with(['shop', 'client', 'driver'])
+            ->where('delivery_company_id', $company->id)
+            ->whereIn('status', [Order::STATUS_CONFIRMEE, Order::STATUS_EN_LIVRAISON])
+            ->get()
+            ->map(fn($o) => [
+                'id'           => $o->id,
+                'shop'         => optional($o->shop)->name    ?? '—',
+                'client'       => optional($o->client)->name  ?? '—',
+                'destination'  => $o->delivery_destination    ?? '',
+                'driver'       => optional($o->driver)->name  ?? 'Non assigné',
+                'driver_phone' => optional($o->driver)->phone ?? '',
+                'status'       => $o->status,
+                'lat'          => $o->current_lat,
+                'lng'          => $o->current_lng,
+                'ping'         => $o->last_ping_at?->toIso8601String(),
+                'ping_ago'     => $o->last_ping_at?->diffForHumans() ?? 'jamais',
+                'fee'          => $o->delivery_fee ?? 0,
+            ]);
+
+        return response()->json(['ok' => true, 'orders' => $orders]);
+    }
+
+    public function inProgress()
+    {
+        $company = $this->company();
+
+        $orders = Order::with(['shop', 'client', 'driver'])
+            ->where('delivery_company_id', $company->id)
+            ->whereIn('status', [Order::STATUS_CONFIRMEE, Order::STATUS_EN_LIVRAISON])
+            ->latest('updated_at')
+            ->get();
+
+        $stats = [
+            'total'        => $orders->count(),
+            'confirmees'   => $orders->where('status', Order::STATUS_CONFIRMEE)->count(),
+            'en_livraison' => $orders->where('status', Order::STATUS_EN_LIVRAISON)->count(),
+        ];
+
+        return view('company.livraisons.index', compact('orders', 'stats', 'company'));
+    }
+
+    public function inProgressData()
+    {
+        $company = $this->company();
+
+        $orders = Order::with(['shop', 'client', 'driver'])
+            ->where('delivery_company_id', $company->id)
+            ->whereIn('status', [Order::STATUS_CONFIRMEE, Order::STATUS_EN_LIVRAISON])
+            ->latest('updated_at')
+            ->get()
+            ->map(fn($o) => [
+                'id'          => $o->id,
+                'shop'        => optional($o->shop)->name    ?? '—',
+                'client'      => optional($o->client)->name  ?? '—',
+                'destination' => $o->delivery_destination    ?? '—',
+                'driver'      => optional($o->driver)->name  ?? 'Non assigné',
+                'driver_phone'=> optional($o->driver)->phone ?? '',
+                'status'      => $o->status,
+                'fee'         => $o->delivery_fee            ?? 0,
+                'updated_at'  => $o->updated_at->diffForHumans(),
+                'updated_ts'  => $o->updated_at->timestamp,
+            ]);
+
+        return response()->json(['ok' => true, 'orders' => $orders]);
+    }
+
     public function notifications()
     {
         $company = $this->company();

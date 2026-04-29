@@ -44,13 +44,26 @@ class SuiviController extends Controller
 
         $livreur = null;
         if ($order->livreur) {
-            $name   = $order->livreur->name;
-            $parts  = explode(' ', $name);
+            // Livreur boutique (livreur_id → User)
+            $name    = $order->livreur->name;
+            $parts   = explode(' ', $name);
             $livreur = [
                 'name'     => $name,
                 'initials' => strtoupper(substr($parts[0], 0, 1)).strtoupper(substr($parts[1] ?? substr($name, 1, 1), 0, 1)),
                 'phone'    => $order->livreur->phone,
             ];
+        } elseif ($order->driver_id) {
+            // Chauffeur entreprise (driver_id → Driver)
+            $driver = \App\Models\Driver::find($order->driver_id);
+            if ($driver) {
+                $name    = $driver->name;
+                $parts   = explode(' ', $name);
+                $livreur = [
+                    'name'     => $name,
+                    'initials' => strtoupper(substr($parts[0], 0, 1)).strtoupper(substr($parts[1] ?? substr($name, 1, 1), 0, 1)),
+                    'phone'    => $driver->phone,
+                ];
+            }
         }
 
         return response()->json([

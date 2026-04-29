@@ -852,10 +852,10 @@ body.cx-light .cx-main { background:#F5F7FA; }
             <span class="cx-nav-ico">📦</span> Commandes
             <span class="cx-nav-badge" id="navOrderBadge" style="display:none"></span>
         </a>
-        <a href="#" class="cx-nav-item">
+        <a href="{{ route('company.livraisons.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">🚚</span> Livraisons
         </a>
-        <a href="#" class="cx-nav-item">
+        <a href="{{ route('company.carte.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">🗺️</span> Carte en direct
         </a>
         <a href="{{ route('company.drivers.index') }}" class="cx-nav-item">

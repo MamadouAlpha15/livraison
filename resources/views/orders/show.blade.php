@@ -338,6 +338,13 @@ $isDelivered = $s === Order::STATUS_LIVREE;
 $isOngoing   = $s === Order::STATUS_EN_LIVRAISON;
 $hasGPS      = !is_null($order->current_lat) && !is_null($order->current_lng);
 $devise      = $order->shop?->currency ?? 'GNF';
+// Nom du livreur/chauffeur quel que soit le système
+$gpsDriverName = $order->livreur?->name
+    ?? ($order->driver_id ? optional(\App\Models\Driver::find($order->driver_id))->name : null);
+$gpsDriverPhone = $order->livreur?->phone
+    ?? ($order->driver_id ? optional(\App\Models\Driver::find($order->driver_id))->phone : null);
+$hasAnyDriver      = (bool)($order->livreur_id || $order->driver_id);
+$isCompanyDriver   = (bool)$order->driver_id;
 
 $statusMap = [
     Order::STATUS_EN_ATTENTE   => ['label'=>'En attente',   'ico'=>'⏳', 'badge'=>'badge-attente',  'step'=>0],
@@ -444,11 +451,11 @@ $init = fn(string $n): string =>
             <div id="gpsMap" style="height:440px;width:100%;display:block;background:#e8e0d8"></div>
 
             {{-- Overlay livreur flottant au bas de la carte --}}
-            @if($order->livreur)
+            @if($hasAnyDriver && $gpsDriverName)
             <div class="map-livreur-overlay" id="livreurOverlay">
-                <div class="mlo-av">{{ $init($order->livreur->name) }}</div>
+                <div class="mlo-av">{{ $init($gpsDriverName) }}</div>
                 <div>
-                    <div class="mlo-name">{{ $order->livreur->name }}</div>
+                    <div class="mlo-name">{{ $gpsDriverName }}</div>
                     <div class="mlo-status">
                         @if($isOngoing)
                             <span class="mlo-dot"></span> En route vers vous
@@ -505,26 +512,26 @@ $init = fn(string $n): string =>
 
     {{-- ── Livreur (mis à jour automatiquement) ── --}}
     <div id="uiLivreurWrap">
-    @if($order->livreur)
+    @if($hasAnyDriver && $gpsDriverName)
     <div class="livreur-card">
         <div class="lc-header">
             <span style="font-size:16px">🛵</span>
             <span class="lc-title">Votre livreur</span>
         </div>
         <div class="lc-body">
-            <div class="lc-av">{{ $init($order->livreur->name) }}</div>
+            <div class="lc-av">{{ $init($gpsDriverName) }}</div>
             <div style="flex:1;min-width:0">
-                <div class="lc-name">{{ $order->livreur->name }}</div>
+                <div class="lc-name">{{ $gpsDriverName }}</div>
                 <div class="lc-info">
-                    @if($order->livreur->phone)
-                    <a href="tel:{{ $order->livreur->phone }}" style="color:var(--orange);font-weight:700;text-decoration:none">📞 {{ $order->livreur->phone }}</a>
+                    @if($gpsDriverPhone)
+                    <a href="tel:{{ $gpsDriverPhone }}" style="color:var(--orange);font-weight:700;text-decoration:none">📞 {{ $gpsDriverPhone }}</a>
                     @endif
                     <span class="lc-status">
                         @if($isDelivered) ✅ Terminé @elseif($isOngoing) 🟢 En route @else 🟡 Assigné @endif
                     </span>
                 </div>
             </div>
-            @if($order->delivery_fee)
+            @if($order->delivery_fee && !$isCompanyDriver)
             <div style="text-align:right;flex-shrink:0">
                 <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px">Livraison</div>
                 <div style="font-size:16px;font-weight:800;color:var(--orange);font-family:var(--mono)">{{ number_format($order->delivery_fee,0,',',' ') }}</div>
@@ -614,15 +621,16 @@ $init = fn(string $n): string =>
     const IS_CANCELLED = {{ $isCancelled ? 'true' : 'false' }};
     const HAS_GPS      = {{ $hasGPS ? 'true' : 'false' }};
     const REVIEW_URL   = {!! json_encode($order->review ? null : route('client.reviews.create', $order)) !!};
-    const DEV_FEE      = {{ $order->delivery_fee ?? 0 }};
-    const DEVISE       = {!! json_encode($devise) !!};
+    const DEV_FEE          = {{ $order->delivery_fee ?? 0 }};
+    const DEVISE           = {!! json_encode($devise) !!};
+    const IS_COMPANY_DRIVER = {{ $isCompanyDriver ? 'true' : 'false' }};
 
     /* ── État mutable ── */
     let lat           = {{ $lat0 }};
     let lng           = {{ $lng0 }};
     let gpsFound      = HAS_GPS;
     let currentStatus = {!! json_encode($order->status) !!};
-    let lname         = {!! json_encode($order->livreur?->name ?? '') !!};
+    let lname         = {!! json_encode($gpsDriverName ?? '') !!};
     let pollId        = null;
 
     /* ── Carte Leaflet ── */
@@ -780,7 +788,7 @@ $init = fn(string $n): string =>
                         <span class="lc-status">${statusTxt}</span>
                     </div>
                 </div>
-                ${DEV_FEE > 0 ? `
+                ${DEV_FEE > 0 && !IS_COMPANY_DRIVER ? `
                 <div style="text-align:right;flex-shrink:0">
                     <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px">Livraison</div>
                     <div style="font-size:16px;font-weight:800;color:var(--orange);font-family:var(--mono)">${Number(DEV_FEE).toLocaleString('fr-FR')}</div>

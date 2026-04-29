@@ -32,10 +32,20 @@ class OrderTrackingController extends Controller
     public function update(Request $request, Order $order)
     {
         $user = $request->user();
-        abort_unless($user && $order->livreur_id === $user->id, 403, 'Réservé au livreur assigné'); // Seul le livreur assigné peut mettre à jour la position
+        abort_unless($user, 401);
+
+        // Livreur boutique (livreur_id) OU chauffeur entreprise (driver_id)
+        $authorized = $order->livreur_id === $user->id;
+        if (! $authorized) {
+            $driver = \App\Models\Driver::where('user_id', $user->id)->first();
+            if ($driver && (int) $order->driver_id === $driver->id) {
+                $authorized = true;
+            }
+        }
+        abort_unless($authorized, 403, 'Réservé au livreur assigné');
 
         $data = $request->validate([
-            'lat' => ['required','numeric','between:-90,90'], // latitude entre -90 et 90
+            'lat' => ['required','numeric','between:-90,90'],
             'lng' => ['required','numeric','between:-180,180'],
         ]);
 

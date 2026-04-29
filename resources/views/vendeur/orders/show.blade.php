@@ -226,6 +226,9 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
 .gps-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--bg); }
 .gps-live { display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: #15803d; }
 .gps-live-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; animation: blink 2s ease-in-out infinite; box-shadow: 0 0 6px #22c55e; flex-shrink: 0; }
+.gps-done { display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:700; padding:4px 12px; border-radius:20px; }
+.gps-done-ok   { background:#f0fdf4; color:#166534; border:1px solid #86efac; }
+.gps-done-ko   { background:#fef2f2; color:#991b1b; border:1px solid #fca5a5; }
 .gps-ping { font-size: 11px; color: var(--muted); font-weight: 600; }
 .gps-empty { padding: 40px 20px; text-align: center; }
 .gps-empty-ico { font-size: 42px; display: block; margin-bottom: 12px; opacity: .25; }
@@ -678,18 +681,36 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
         </div>{{-- /detail-grid --}}
 
         {{-- ═══ GPS PLEINE LARGEUR ═══ --}}
+        @php
+            $gpsDriverName = $order->livreur?->name
+                ?? ($order->driver_id ? optional(\App\Models\Driver::find($order->driver_id))->name : null);
+            $hasAnyDriver  = $order->livreur_id || $order->driver_id;
+            $isFinished    = in_array($order->status, ['livrée', 'annulée']);
+            $isLivrée      = $order->status === 'livrée';
+        @endphp
         <div class="card" style="margin-top:20px;overflow:hidden">
             <div class="card-head">
                 <span class="card-title" style="font-size:14.5px">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
                     Suivi GPS du livreur
-                    @if($order->livreur)
-                    — <span id="uiGpsLivreurName" style="font-weight:500;color:var(--text-2)">{{ $order->livreur->name }}</span>
+                    @if($gpsDriverName)
+                    — <span id="uiGpsLivreurName" style="font-weight:500;color:var(--text-2)">{{ $gpsDriverName }}</span>
                     @endif
                 </span>
                 <div id="uiGpsLiveArea" style="display:flex;align-items:center;gap:10px">
                     @if($order->current_lat && $order->current_lng)
-                    <div class="gps-live" id="uiGpsLivePill"><span class="gps-live-dot"></span> En direct · <span id="lastPingLabel" style="font-weight:500">{{ $order->last_ping_at?->diffForHumans() ?? '—' }}</span></div>
+                        @if($isFinished)
+                            {{-- Livraison terminée : pill statique, pas de "En direct" --}}
+                            <div class="gps-done {{ $isLivrée ? 'gps-done-ok' : 'gps-done-ko' }}" id="uiGpsLivePill">
+                                {{ $isLivrée ? '✅ Livraison terminée' : '❌ Annulée' }}
+                                <span id="lastPingLabel" style="font-weight:400;opacity:.75">· {{ $order->last_ping_at?->format('d/m H:i') ?? '' }}</span>
+                            </div>
+                        @else
+                            <div class="gps-live" id="uiGpsLivePill">
+                                <span class="gps-live-dot"></span> En direct ·
+                                <span id="lastPingLabel" style="font-weight:500">{{ $order->last_ping_at?->diffForHumans() ?? '—' }}</span>
+                            </div>
+                        @endif
                     @endif
                 </div>
             </div>
@@ -699,26 +720,30 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
                 <div id="gpsMap" class="gps-map-wrap"></div>
                 <div class="gps-footer" style="padding:13px 20px">
                     <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+                        @if(!$isFinished)
                         <span style="font-size:12px;color:var(--muted)">🔄 Actualisation automatique toutes les 5 secondes</span>
+                        @endif
                         <span id="uiGpsCoords" style="font-size:12px;color:var(--muted);font-family:var(--mono)">
                             {{ number_format((float)$order->current_lat, 5) }}, {{ number_format((float)$order->current_lng, 5) }}
                         </span>
                     </div>
+                    @if(!$isFinished)
                     <a href="#" data-recenter style="font-size:11.5px;color:var(--brand);font-weight:600;text-decoration:none">⊕ Centrer</a>
+                    @endif
                 </div>
-            @elseif($order->livreur && $order->status === 'en_livraison')
+            @elseif($hasAnyDriver && $order->status === 'en_livraison')
                 <div class="gps-empty" id="uiGpsEmptySignal" style="padding:60px 20px">
                     <span class="gps-empty-ico" style="font-size:52px">📡</span>
                     <div class="gps-empty-txt" style="font-size:14px">
-                        En attente du signal GPS de <strong style="color:var(--text-2)">{{ $order->livreur->name }}</strong>…<br>
+                        En attente du signal GPS{{ $gpsDriverName ? ' de <strong style="color:var(--text-2)">'.$gpsDriverName.'</strong>' : '' }}…<br>
                         <span style="font-size:12px">La position s'affichera dès que le livreur active l'application.</span>
                     </div>
                 </div>
-            @elseif($order->livreur)
+            @elseif($hasAnyDriver)
                 <div class="gps-empty" id="uiGpsEmptyWait" style="padding:60px 20px">
                     <span class="gps-empty-ico" style="font-size:52px">🗺️</span>
                     <div class="gps-empty-txt" style="font-size:14px">
-                        Livreur assigné, en attente du démarrage.<br>
+                        Livreur assigné{{ $gpsDriverName ? ' (<strong>'.$gpsDriverName.'</strong>)' : '' }}, en attente du démarrage.<br>
                         <span style="font-size:12px">Le GPS s'activera quand le livreur sera en route.</span>
                     </div>
                 </div>
@@ -775,7 +800,7 @@ function toggleGroup(btn) {
     const IS_CANCELLED = {{ ($order->status === 'annulée') ? 'true' : 'false' }};
 
     let currentStatus = {!! json_encode($order->status) !!};
-    let lname         = {!! json_encode($order->livreur?->name ?? '') !!};
+    let lname         = {!! json_encode($gpsDriverName ?? '') !!};
     let pollId        = null;
 
     /* ── Map state ── */
@@ -969,8 +994,19 @@ function toggleGroup(btn) {
                             radius:9, color:'#fff', weight:2.5, fillColor:'#10b981', fillOpacity:1
                         }).addTo(map).bindTooltip('✅ Livré ici', { permanent:true, direction:'top' });
                     }
-                    const pl = document.getElementById('lastPingLabel');
-                    if (pl) pl.textContent = d.is_delivered ? '✅ Livraison terminée' : '❌ Annulée';
+                    // Remplacer la pill "En direct" par un badge statique
+                    const pill = document.getElementById('uiGpsLivePill');
+                    if (pill) {
+                        pill.className = 'gps-done ' + (d.is_delivered ? 'gps-done-ok' : 'gps-done-ko');
+                        pill.innerHTML = d.is_delivered
+                            ? '✅ Livraison terminée'
+                            : '❌ Annulée';
+                    }
+                    // Masquer le footer "Actualisation automatique"
+                    document.querySelectorAll('.gps-footer span').forEach(el => {
+                        if (el.textContent.includes('Actualisation')) el.style.display = 'none';
+                    });
+                    document.querySelector('[data-recenter]')?.style.setProperty('display','none');
                     return;
                 }
             } else if (d.livreur && d.livreur.name !== lname) {

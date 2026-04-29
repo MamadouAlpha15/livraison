@@ -1909,9 +1909,26 @@ document.addEventListener('DOMContentLoaded', () => {
                         const n = newCMsgs.length;
                         showToast(`🏢 <div>${n} nouveau${n>1?'x':''} message${n>1?'s':''} d'entreprise${n>1?'s':''}</div>`, 'company');
                     }
-                    [...newCMsgs].reverse().forEach(m => {
-                        pushAlert('🏢', `${m.company_name} — ${m.body}`, null, 'company_msg', '', m.time, m.company_id, m.company_name);
+                    /* Grouper par entreprise — une seule alerte par entreprise */
+                    const byCompany = {};
+                    newCMsgs.forEach(m => {
+                        const cid = m.company_id;
+                        if (!byCompany[cid]) byCompany[cid] = { company_id: cid, company_name: m.company_name, count: 0, time: m.time, body: m.body };
+                        byCompany[cid].count++;
                     });
+                    Object.values(byCompany).forEach(g => {
+                        const label = g.count > 1
+                            ? `${g.company_name} — ${g.count} nouveaux messages`
+                            : `${g.company_name} — ${g.body}`;
+                        const existing = _alerts.find(a => a.type === 'company_msg' && a.companyId === g.company_id);
+                        if (existing) {
+                            existing.msg  = label;
+                            existing.time = g.time;
+                        } else {
+                            pushAlert('🏢', label, null, 'company_msg', '', g.time, g.company_id, g.company_name);
+                        }
+                    });
+                    _saveAlerts();
                     _lastSeenCompanyMsgId = newCMsgs[0].id;
                     try { sessionStorage.setItem('bq_last_company_msg_id', _lastSeenCompanyMsgId); } catch(e) {}
                 }
