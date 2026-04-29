@@ -560,7 +560,7 @@ body.cx-light .cx-main { background:#F5F7FA; }
 /* Leaflet popup override */
 .leaflet-popup-content-wrapper { background:transparent!important; box-shadow:none!important; border:none!important; padding:0!important; }
 .leaflet-popup-tip-container { display:none; }
-.leaflet-container { background:#0d1424!important; }
+.leaflet-container { background:var(--cx-surface)!important; }
 
 /* Pipeline */
 .cx-pipe-list { padding:12px 16px; display:flex; flex-direction:column; gap:10px; }
@@ -1051,10 +1051,8 @@ body.cx-light .cx-main { background:#F5F7FA; }
                 </div>
                 <div id="cxMap"></div>
                 <div class="cx-map-legend">
-                    <span class="cx-legend-item"><span class="cx-legend-dot" style="background:#10b981"></span>Disponibles</span>
-                    <span class="cx-legend-item"><span class="cx-legend-dot" style="background:#f59e0b"></span>En livraison</span>
-                    <span class="cx-legend-item"><span class="cx-legend-dot" style="background:#3b82f6"></span>Boutiques</span>
-                    <span class="cx-legend-item"><span class="cx-legend-dot" style="background:#ef4444"></span>Clients</span>
+                    <span class="cx-legend-item">🚴 Chaque marqueur = un chauffeur en mission</span>
+                    <span class="cx-legend-item" style="margin-left:auto;color:var(--cx-muted)">Cliquer sur un marqueur pour les détails</span>
                 </div>
             </div>
 
@@ -1301,44 +1299,93 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    /* ── Carte Leaflet (dark tile, Abidjan) ── */
-    const map = L.map('cxMap', { zoomControl:false }).setView([5.3599,-4.0082], 13);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution:'&copy; CartoDB', maxZoom:19, subdomains:'abcd'
-    }).addTo(map);
+    /* ── Carte Leaflet temps réel ── */
+    const map = L.map('cxMap', { zoomControl:false }).setView([9.537,-13.677], 13);
+
+    const tilesDark  = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',  {attribution:'© CartoDB',       maxZoom:19, subdomains:'abcd'});
+    const tilesLight = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',              {attribution:'© OpenStreetMap', maxZoom:19});
+
+    function applyMapTheme() {
+        const isLight = document.body.classList.contains('cx-light');
+        if (isLight) { map.removeLayer(tilesDark);  tilesLight.addTo(map); }
+        else          { map.removeLayer(tilesLight); tilesDark.addTo(map);  }
+        setTimeout(() => map.invalidateSize(), 60);
+    }
+    new MutationObserver(applyMapTheme).observe(document.body, {attributes:true, attributeFilter:['class']});
+    applyMapTheme();
     L.control.zoom({ position:'bottomright' }).addTo(map);
 
-    const pin = (color, icon) => L.divIcon({
-        html:`<div style="width:28px;height:28px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:13px;border:2px solid rgba(255,255,255,.25);box-shadow:0 2px 8px rgba(0,0,0,.5)">${icon}</div>`,
-        className:'', iconSize:[28,28], iconAnchor:[14,14]
-    });
+    const DASH_COLORS = ['#10b981','#f59e0b','#3b82f6','#ec4899','#8b5cf6','#06b6d4','#f97316','#ef4444','#a78bfa','#84cc16'];
+    let dashColorMap = {}, dashColorIdx = 0;
+    function getDashColor(id) {
+        if (dashColorMap[id] === undefined) dashColorMap[id] = dashColorIdx++;
+        return DASH_COLORS[dashColorMap[id] % DASH_COLORS.length];
+    }
 
-    [[5.3530,-4.0010],[5.3680,-4.0180],[5.3450,-4.0250]].forEach(p =>
-        L.marker(p, {icon:pin('#10b981','🚴')}).addTo(map));
-    [[5.3600,-4.0082],[5.3720,-3.9950],[5.3480,-4.0120]].forEach(p =>
-        L.marker(p, {icon:pin('#f59e0b','🚚')}).addTo(map));
-    [[5.3550,-4.0050],[5.3650,-4.0200]].forEach(p =>
-        L.marker(p, {icon:pin('#3b82f6','🏪')}).addTo(map));
-    [[5.3490,-4.0150],[5.3750,-3.9980]].forEach(p =>
-        L.marker(p, {icon:pin('#ef4444','📍')}).addTo(map));
+    function makePin(color) {
+        return L.divIcon({
+            html:`<div style="width:28px;height:28px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:13px;border:2px solid rgba(255,255,255,.3);box-shadow:0 2px 10px rgba(0,0,0,.5)">🚴</div>`,
+            className:'', iconSize:[28,28], iconAnchor:[14,14]
+        });
+    }
 
-    const isLightNow = () => document.documentElement.classList.contains('cx-light');
-    const popupBg  = () => isLightNow() ? '#ffffff' : '#0d1424';
-    const popupBdr = () => isLightNow() ? 'rgba(0,0,0,.1)' : 'rgba(99,102,241,.22)';
-    const popupTxt = () => isLightNow() ? '#111827'  : '#e2e8f0';
-    const popupSub = () => isLightNow() ? '#6b7280'  : '#94a3b8';
-
-    const buildPopup = () =>
-        `<div style="background:${popupBg()};border:1px solid ${popupBdr()};border-radius:9px;padding:10px 14px;color:${popupTxt()};font-size:12px;min-width:185px;box-shadow:0 6px 20px rgba(0,0,0,.18)">
-            <div style="font-weight:800;margin-bottom:4px">🚚 Jean Dupont</div>
-            <div style="color:${popupSub()};font-size:11px">Commande #CMD-2156</div>
-            <div style="color:#10b981;margin-top:5px;font-weight:700;font-size:11.5px">⏱ Arrivee dans 15 min</div>
+    function buildMapPopup(o) {
+        const isLight = document.body.classList.contains('cx-light');
+        const bg  = isLight ? '#fff'            : '#0d1226';
+        const bdr = isLight ? 'rgba(0,0,0,.1)'  : 'rgba(99,102,241,.22)';
+        const txt = isLight ? '#111827'         : '#e2e8f0';
+        const sub = isLight ? '#6b7280'         : '#94a3b8';
+        return `<div style="background:${bg};border:1px solid ${bdr};border-radius:9px;padding:10px 14px;color:${txt};font-size:12px;min-width:185px;box-shadow:0 6px 20px rgba(0,0,0,.18)">
+            <div style="font-weight:800;margin-bottom:4px">🚴 ${esc(o.driver)}</div>
+            <div style="color:${sub};font-size:11px">Commande #${o.id} · ${esc(o.shop)}</div>
+            ${o.destination ? `<div style="color:${sub};font-size:11px;margin-top:2px">📍 ${esc(o.destination)}</div>` : ''}
+            ${o.ping_ago && o.ping_ago !== 'jamais' ? `<div style="color:#10b981;margin-top:5px;font-weight:700;font-size:11.5px">📡 ${esc(o.ping_ago)}</div>` : ''}
         </div>`;
+    }
 
-    L.popup({className:'cx-map-popup', closeButton:false, offset:[0,-8]})
-        .setLatLng([5.3600,-4.0082])
-        .setContent(buildPopup())
-        .openOn(map);
+    const dashMarkers = {};
+    let mapInitialized = false;
+
+    function updateDashMap(orders) {
+        const activeIds = new Set(orders.map(o => o.id));
+        Object.keys(dashMarkers).forEach(id => {
+            if (!activeIds.has(parseInt(id))) { map.removeLayer(dashMarkers[id]); delete dashMarkers[id]; }
+        });
+
+        const bounds = [];
+        orders.forEach(o => {
+            if (!o.lat || !o.lng) return;
+            const color = getDashColor(o.id);
+            const pos   = [parseFloat(o.lat), parseFloat(o.lng)];
+            if (dashMarkers[o.id]) {
+                dashMarkers[o.id].setLatLng(pos);
+                if (dashMarkers[o.id].isPopupOpen()) dashMarkers[o.id].setPopupContent(buildMapPopup(o));
+            } else {
+                dashMarkers[o.id] = L.marker(pos, {icon: makePin(color)})
+                    .addTo(map)
+                    .bindPopup(() => buildMapPopup(o));
+            }
+            bounds.push(pos);
+        });
+
+        if (bounds.length > 0 && !mapInitialized) {
+            bounds.length === 1
+                ? map.setView(bounds[0], 15)
+                : map.fitBounds(bounds, {padding:[30,30], maxZoom:16});
+            mapInitialized = true;
+        }
+    }
+
+    async function pollMap() {
+        try {
+            const r = await fetch('{{ route('company.carte.data') }}', {credentials:'same-origin', headers:{'Accept':'application/json'}});
+            if (!r.ok) return;
+            const d = await r.json();
+            if (d.ok) updateDashMap(d.orders);
+        } catch(e) { /* silencieux */ }
+    }
+    pollMap();
+    setInterval(pollMap, 5000);
 
     /* ── Chart Commandes ── */
     new Chart(document.getElementById('chartOrders'), {

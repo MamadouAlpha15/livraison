@@ -250,7 +250,7 @@ body.cx-light .cx-panel-toggle{background:rgba(124,58,237,.08);border-color:rgba
     }
     .map-panel.show{transform:translateX(0)}
     .map-panel-close{display:flex}
-    .map-fab{display:none!important}
+    .map-fab{display:none}
 }
 
 /* ── Mobile : ≤ 640px ── */
@@ -468,7 +468,14 @@ if (drag) {
 }
 
 /* ── Couleurs par chauffeur ── */
-const COLORS = ['#f59e0b','#3b82f6','#10b981','#ec4899','#8b5cf6','#06b6d4','#f97316','#84cc16','#ef4444','#a78bfa'];
+const COLORS = [
+    '#f59e0b','#3b82f6','#10b981','#ec4899','#8b5cf6',
+    '#06b6d4','#f97316','#84cc16','#ef4444','#a78bfa',
+    '#14b8a6','#f43f5e','#6366f1','#eab308','#0ea5e9',
+    '#d946ef','#22c55e','#fb923c','#38bdf8','#c084fc',
+    '#4ade80','#fbbf24','#e879f9','#34d399','#f87171',
+    '#60a5fa','#a3e635','#fb7185','#2dd4bf','#818cf8',
+];
 function getColor(idx){ return COLORS[idx % COLORS.length]; }
 
 /* ── Icône chauffeur SVG ── */

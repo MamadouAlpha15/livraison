@@ -190,8 +190,8 @@ a{text-decoration:none;color:inherit;}
 .table-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;}
 thead th{
-    padding:11px 16px;text-align:left;
-    font-size:10.5px;font-weight:700;color:var(--cx-muted);
+    padding:12px 16px;text-align:left;
+    font-size:12px;font-weight:700;color:var(--cx-muted);
     text-transform:uppercase;letter-spacing:.6px;
     background:var(--cx-card2);border-bottom:2px solid var(--cx-border);white-space:nowrap;
     position:sticky;top:0;z-index:10;
@@ -201,31 +201,34 @@ tbody tr:last-child{border-bottom:none;}
 tbody tr:hover{background:rgba(124,58,237,.05);}
 tbody tr:nth-child(even){background:rgba(0,0,0,.018);}
 tbody tr:nth-child(even):hover{background:rgba(124,58,237,.05);}
-td{padding:13px 16px;font-size:13px;vertical-align:middle;}
+td{padding:14px 16px;font-size:14.5px;vertical-align:middle;}
+.td-dest{max-width:160px;}
+.td-date{white-space:nowrap;}
 
-.order-id{font-size:13px;font-weight:800;color:var(--cx-text);font-family:monospace;}
-.order-items{font-size:11px;color:var(--cx-muted);margin-top:2px;}
-.client-name{font-weight:700;color:var(--cx-text);}
-.client-phone{font-size:11px;color:var(--cx-muted);}
+.order-id{font-size:15px;font-weight:800;color:var(--cx-text);font-family:monospace;}
+.order-items{font-size:12.5px;color:var(--cx-muted);margin-top:3px;}
+.client-name{font-size:14.5px;font-weight:700;color:var(--cx-text);}
+.client-phone{font-size:12.5px;color:var(--cx-muted);}
 .shop-badge{
     display:inline-flex;align-items:center;gap:5px;
     background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);
-    color:#6d28d9;font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:20px;
+    color:#6d28d9;font-size:13px;font-weight:600;padding:4px 12px;border-radius:20px;
 }
+.shop-addr{font-size:12.5px;color:var(--cx-muted);margin-top:5px;line-height:1.35;}
 .driver-cell{display:flex;align-items:center;gap:8px;}
 .driver-av{
-    width:30px;height:30px;border-radius:7px;flex-shrink:0;overflow:hidden;
+    width:34px;height:34px;border-radius:7px;flex-shrink:0;overflow:hidden;
     background:linear-gradient(135deg,var(--cx-brand),var(--cx-brand2));
-    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;
 }
 .driver-av img{width:100%;height:100%;object-fit:cover;}
-.driver-name{font-weight:700;color:var(--cx-text);font-size:12.5px;}
-.driver-phone{font-size:11px;color:var(--cx-muted);}
-.no-driver{color:var(--cx-muted);font-size:12px;font-style:italic;}
-.amount-val{font-weight:800;color:var(--cx-text);font-family:monospace;font-size:13px;}
-.fee-val{font-size:11px;color:#059669;font-weight:700;}
+.driver-name{font-weight:700;color:var(--cx-text);font-size:14px;}
+.driver-phone{font-size:12.5px;color:var(--cx-muted);}
+.no-driver{color:var(--cx-muted);font-size:13.5px;font-style:italic;}
+.amount-val{font-weight:800;color:var(--cx-text);font-family:monospace;font-size:15px;}
+.fee-val{font-size:13px;color:#059669;font-weight:700;}
 
-.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:700;padding:4px 12px;border-radius:20px;white-space:nowrap;}
 .badge-wait   {background:rgba(245,158,11,.1); color:#b45309;border:1px solid rgba(245,158,11,.25);}
 .badge-confirm{background:rgba(59,130,246,.1); color:#1d4ed8;border:1px solid rgba(59,130,246,.25);}
 .badge-deliv  {background:rgba(124,58,237,.1); color:#6d28d9;border:1px solid rgba(124,58,237,.25);}
@@ -234,7 +237,7 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle;}
 
 .btn-action{
     display:inline-flex;align-items:center;gap:5px;
-    padding:6px 12px;border-radius:var(--r-xs);font-size:12px;font-weight:700;
+    padding:8px 14px;border-radius:var(--r-xs);font-size:13px;font-weight:700;
     border:1px solid;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;background:transparent;
 }
 .btn-assign{color:#a78bfa;border-color:rgba(139,92,246,.3);}
@@ -396,11 +399,54 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle;}
     .pw{padding:12px 12px 60px;}
     .stats-bar{grid-template-columns:1fr 1fr;}
     .page-banner{padding:18px 14px 16px;}
-    .filter-bar{flex-direction:column;align-items:stretch;}
+    .banner-title{font-size:17px;}
+    .banner-sub{font-size:11.5px;}
+    /* Filter bar: tabs wrap as pills, search+date full-width */
+    .filter-bar{flex-wrap:wrap;gap:6px;padding:10px 12px;}
+    .tab-btn{padding:5px 10px;font-size:11px;}
+    .tab-sep{display:none;}
+    .search-wrap{flex:1 1 100%;min-width:unset;}
+    .date-input{flex:1 1 100%;}
+    /* Table → card layout */
+    .table-wrap{overflow-x:unset;}
+    .table-wrap table,.table-wrap tbody{display:block;}
+    .table-wrap thead{display:none;}
+    .table-wrap tbody tr{
+        display:block;border:1px solid var(--cx-border);
+        border-radius:var(--r-sm);margin-bottom:10px;
+        padding:12px 14px;background:var(--cx-card);
+        box-shadow:0 1px 4px rgba(0,0,0,.06);
+    }
+    .table-wrap td{
+        display:flex;align-items:flex-start;
+        padding:6px 0;border:none;font-size:14px;gap:10px;
+    }
+    .table-wrap td::before{
+        content:attr(data-label);
+        font-size:11px;font-weight:800;color:var(--cx-muted);
+        text-transform:uppercase;letter-spacing:.6px;
+        min-width:86px;flex-shrink:0;padding-top:2px;
+    }
+    .table-wrap td[data-label="Actions"]{
+        margin-top:8px;border-top:1px solid var(--cx-border);padding-top:12px;
+    }
+    .table-wrap td[data-label="Actions"]::before{display:none;}
+    .td-dest{max-width:none;}
+    .td-date{white-space:normal;}
+    /* Modal → bottom sheet */
+    .modal-overlay{padding:0;align-items:flex-end;}
+    .cx-modal{max-width:100%;border-radius:var(--r) var(--r) 0 0;max-height:92vh;}
+    /* Addr-flow stack vertically */
+    .addr-flow{flex-direction:column;}
+    .addr-arrow{transform:rotate(90deg);align-self:center;}
 }
 @media(max-width:480px){
     .stats-bar{grid-template-columns:1fr 1fr;}
     .cx-topbar-title span{display:none;}
+}
+@media(max-width:360px){
+    .stats-bar{grid-template-columns:1fr;}
+    .stat-pill-val{font-size:18px;}
 }
 
 /* ══ TOGGLE MODE SOMBRE ══ */
@@ -484,6 +530,8 @@ body.cx-dark .avail-section-lbl{color:var(--cx-muted);}
 body.cx-dark .no-avail-warn{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.2);color:#fbbf24;}
 body.cx-dark .selected-summary{background:rgba(16,185,129,.07);border-color:rgba(16,185,129,.2);color:#34d399;}
 body.cx-dark .addr-val{color:var(--cx-text);}
+/* Dark mode card rows on mobile */
+body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--cx-border);}
 </style>
 @endpush
 
@@ -534,7 +582,7 @@ body.cx-dark .addr-val{color:var(--cx-text);}
         <a href="{{ route('company.orders.index') }}" class="cx-nav-item active">
             <span class="cx-nav-ico">📦</span> Commandes
         </a>
-        <a href="#" class="cx-nav-item">
+        <a href="{{ route('company.livraisons.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">🚚</span> Livraisons
         </a>
         <a href="{{ route('company.carte.index') }}" class="cx-nav-item">
@@ -703,16 +751,27 @@ body.cx-dark .addr-val{color:var(--cx-text);}
                 @forelse($orders as $order)
                 @php $st = $statusMap[$order->status] ?? ['lbl'=>$order->status,'cls'=>'badge-wait']; @endphp
                 <tr>
-                    <td>
-                        <div class="order-id">#{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</div>
-                        <div class="order-items">{{ $order->items->count() }} article(s)</div>
+                    <td data-label="Commande">
+                        <div>
+                            <div class="order-id">#{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</div>
+                            <div class="order-items">{{ $order->items->count() }} article(s)</div>
+                        </div>
                     </td>
-                    <td>
-                        <div class="client-name">{{ $order->client->name ?? '—' }}</div>
-                        <div class="client-phone">{{ $order->client->phone ?? '' }}</div>
+                    <td data-label="Client">
+                        <div>
+                            <div class="client-name">{{ $order->client->name ?? '—' }}</div>
+                            <div class="client-phone">{{ $order->client->phone ?? '' }}</div>
+                        </div>
                     </td>
-                    <td><span class="shop-badge">🏪 {{ $order->shop->name ?? '—' }}</span></td>
-                    <td style="color:var(--cx-text2);font-size:12.5px;max-width:160px;">
+                    <td data-label="Boutique">
+                        <div>
+                            <span class="shop-badge">🏪 {{ $order->shop->name ?? '—' }}</span>
+                            @if($order->shop?->address)
+                            <div class="shop-addr">📍 {{ $order->shop->address }}</div>
+                            @endif
+                        </div>
+                    </td>
+                    <td data-label="Destination" style="color:var(--cx-text2);font-size:12.5px;" class="td-dest">
                         @php $dest = $order->delivery_destination ?: ($order->client->address ?? null); @endphp
                         @if($dest)
                             <div style="font-size:12px;line-height:1.4;">{{ $dest }}</div>
@@ -720,7 +779,7 @@ body.cx-dark .addr-val{color:var(--cx-text);}
                             <span style="color:var(--cx-muted);font-style:italic;font-size:11.5px;">Non renseignée</span>
                         @endif
                     </td>
-                    <td>
+                    <td data-label="Chauffeur">
                         @if($order->driver)
                             <div class="driver-cell">
                                 <div class="driver-av">
@@ -739,13 +798,13 @@ body.cx-dark .addr-val{color:var(--cx-text);}
                             <span class="no-driver">Non assigné</span>
                         @endif
                     </td>
-                    <td><div class="fee-val">{{ $order->delivery_fee ? $fmt($order->delivery_fee) : '—' }}</div></td>
-                    <td><div class="amount-val">{{ $fmt($order->total) }}</div></td>
-                    <td><span class="badge {{ $st['cls'] }}">{{ $st['lbl'] }}</span></td>
-                    <td style="color:var(--cx-muted);font-size:12px;white-space:nowrap;">
+                    <td data-label="Frais"><div class="fee-val">{{ $order->delivery_fee ? $fmt($order->delivery_fee) : '—' }}</div></td>
+                    <td data-label="Montant"><div class="amount-val">{{ $fmt($order->total) }}</div></td>
+                    <td data-label="Statut"><span class="badge {{ $st['cls'] }}">{{ $st['lbl'] }}</span></td>
+                    <td data-label="Date" style="color:var(--cx-muted);font-size:12px;" class="td-date">
                         {{ \Carbon\Carbon::parse($order->created_at)->format('d/m/y H:i') }}
                     </td>
-                    <td>
+                    <td data-label="Actions">
                         <div style="display:flex;gap:6px;flex-wrap:wrap;">
                             @if(in_array($order->status, ['en_attente','confirmée']))
                             <button class="btn-action btn-assign"
@@ -760,17 +819,7 @@ body.cx-dark .addr-val{color:var(--cx-text);}
                                 🚴 Assigner
                             </button>
                             @endif
-                            @if($order->status === 'en_livraison')
-                            <button class="btn-action btn-done"
-                                    data-id="{{ $order->id }}"
-                                    onclick="markDone(this)">✅ Livrée</button>
-                            @endif
-                            @if(!in_array($order->status, ['livrée','annulée']))
-                            <button class="btn-action btn-status"
-                                    data-id="{{ $order->id }}"
-                                    data-status="{{ $order->status }}"
-                                    onclick="openStatus(this)">✏️ Statut</button>
-                            @endif
+                           
                         </div>
                     </td>
                 </tr>
