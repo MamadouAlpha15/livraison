@@ -290,6 +290,20 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .m-lbl{font-size:10.5px;color:var(--muted);font-weight:600;text-transform:uppercase;}
 .m-card-foot{padding:10px 14px;border-top:1px solid var(--border);display:flex;gap:7px;flex-wrap:wrap;}
 .m-card-foot .btn{flex:1;justify-content:center;}
+/* ── MODAL NOTATION ENTREPRISE ── */
+.rate-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:center;justify-content:center;padding:16px;}
+.rate-overlay.open{display:flex;}
+.rate-box{background:#fff;border-radius:16px;padding:28px 24px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.22);animation:modalIn .2s ease;}
+.rate-stars{display:flex;gap:8px;justify-content:center;margin:16px 0 10px;}
+.star-btn{font-size:30px;cursor:pointer;background:none;border:none;padding:4px;transition:transform .12s;line-height:1;outline:none;}
+.star-btn:hover,.star-btn.lit{transform:scale(1.18);}
+.rate-comment{width:100%;padding:10px 12px;border:1.5px solid var(--border-dk);border-radius:10px;font-size:13px;font-family:var(--font);resize:vertical;min-height:76px;outline:none;transition:border-color .15s;margin-top:4px;box-sizing:border-box;}
+.rate-comment:focus{border-color:var(--brand);}
+.btn-rate-submit{width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:14px;font-weight:800;font-family:var(--font);cursor:pointer;transition:all .15s;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-rate-submit:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 18px rgba(245,158,11,.4);}
+.btn-rate-submit:disabled{opacity:.5;cursor:not-allowed;}
+.btn-noter{background:#fffbeb;border:1.5px solid #fcd34d;color:#92400e;padding:5px 10px;font-size:11.5px;font-weight:700;border-radius:var(--r-sm);cursor:pointer;font-family:var(--font);display:inline-flex;align-items:center;gap:4px;transition:all .14s;white-space:nowrap;}
+.btn-noter:hover{background:#fef3c7;border-color:#fbbf24;color:#78350f;}
 </style>
 @endpush
 
@@ -318,6 +332,9 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
     $assignees    = $col->filter(fn($o) => $o->livreur)->count();
     $caPage       = $col->where('status','livrée')->sum('total');
     $pendingCount = $col->filter(fn($o) => in_array($o->status,['pending','en attente','en_attente','confirmée','processing']))->count();
+    $reviewsByOrderId = \App\Models\Review::whereIn('order_id', $orders->pluck('id'))
+        ->where('user_id', auth()->id())
+        ->get()->keyBy('order_id');
     function initiales(string $name): string {
         $p = explode(' ',$name);
         return strtoupper(substr($p[0],0,1)).strtoupper(substr($p[1] ?? 'X',0,1));
@@ -462,6 +479,29 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                 <button type="submit" class="btn btn-restore-confirm" style="flex:1">🔄 Confirmer</button>
             </form>
         </div>
+    </div>
+</div>
+
+{{-- ══ MODAL NOTATION ENTREPRISE ══ --}}
+<div class="rate-overlay" id="rateModal">
+    <div class="rate-box">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <div style="font-size:15px;font-weight:800;color:var(--text);">⭐ Noter l'entreprise</div>
+            <button onclick="closeRateModal()" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--muted);">✕</button>
+        </div>
+        <div id="rateCompanyName" style="font-size:13px;font-weight:700;color:var(--text-2);margin-bottom:2px;"></div>
+        <div id="rateOrderNum" style="font-size:11px;color:var(--brand);font-weight:700;"></div>
+        <div class="rate-stars" id="rateStars">
+            <button class="star-btn" data-v="1" onclick="setStar(1)">☆</button>
+            <button class="star-btn" data-v="2" onclick="setStar(2)">☆</button>
+            <button class="star-btn" data-v="3" onclick="setStar(3)">☆</button>
+            <button class="star-btn" data-v="4" onclick="setStar(4)">☆</button>
+            <button class="star-btn" data-v="5" onclick="setStar(5)">☆</button>
+        </div>
+        <div id="rateLabel" style="text-align:center;font-size:13.5px;font-weight:600;color:#d97706;min-height:22px;margin-bottom:10px;"></div>
+        <label style="font-size:12px;font-weight:600;color:var(--muted);">Commentaire <span style="font-weight:400">(optionnel)</span></label>
+        <textarea class="rate-comment" id="rateComment" placeholder="Dites-nous ce que vous avez pensé de ce service…"></textarea>
+        <button class="btn-rate-submit" id="rateSubmitBtn" onclick="submitRating()" disabled>⭐ Envoyer l'avis</button>
     </div>
 </div>
 
@@ -700,6 +740,18 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                             @if($peutAnnuler)<button type="button" class="btn-cancel" onclick="openCancelModal('{{ route('employe.orders.cancel',$order) }}','#{{ $order->id }}','{{ addslashes($client->name ?? 'Inconnu') }}')">✕ Annuler</button>
                             @elseif($dejaAnnulee)<button type="button" class="btn-restore" onclick="openRestoreModal('{{ route('employe.orders.restore',$order) }}','#{{ $order->id }}','{{ addslashes($client->name ?? 'Inconnu') }}')">🔄 Restaurer</button>
                             @else<button type="button" class="btn-cancel disabled" disabled>✕</button>@endif
+                            @if($order->status === 'livrée' && $order->deliveryCompany)
+                                @if(!isset($reviewsByOrderId[$order->id]))
+                                <button type="button" class="btn-noter"
+                                    data-order-id="{{ $order->id }}"
+                                    data-order-num="#{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
+                                    data-company="{{ addslashes($order->deliveryCompany->name) }}"
+                                    data-rate-url="{{ route('employe.orders.rate-company',$order) }}"
+                                    onclick="openRateModal(this)">⭐ Noter</button>
+                                @else
+                                <span class="pill p-success" title="Noté {{ $reviewsByOrderId[$order->id]->rating }}/5">{{ $reviewsByOrderId[$order->id]->rating }}⭐</span>
+                                @endif
+                            @endif
                         </div></td>
                     </tr>
                     @endforeach
@@ -748,6 +800,18 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         @if($order->livreur)<span class="btn btn-assigned btn-sm">✔ Assignée</span>@endif
                         @if($peutAnnuler)<button type="button" class="btn-cancel" style="flex:1;justify-content:center" onclick="openCancelModal('{{ route('employe.orders.cancel',$order) }}','#{{ $order->id }}','{{ addslashes($client->name ?? 'Inconnu') }}')">✕ Annuler</button>
                         @elseif($dejaAnnulee)<button type="button" class="btn-restore" style="flex:1;justify-content:center" onclick="openRestoreModal('{{ route('employe.orders.restore',$order) }}','#{{ $order->id }}','{{ addslashes($client->name ?? 'Inconnu') }}')">🔄 Restaurer</button>@endif
+                        @if($order->status === 'livrée' && $order->deliveryCompany)
+                            @if(!isset($reviewsByOrderId[$order->id]))
+                            <button type="button" class="btn-noter" style="flex:1;justify-content:center;"
+                                data-order-id="{{ $order->id }}"
+                                data-order-num="#{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
+                                data-company="{{ addslashes($order->deliveryCompany->name) }}"
+                                data-rate-url="{{ route('employe.orders.rate-company',$order) }}"
+                                onclick="openRateModal(this)">⭐ Noter l'entreprise</button>
+                            @else
+                            <span class="pill p-success" style="flex:1;justify-content:center;" title="Noté {{ $reviewsByOrderId[$order->id]->rating }}/5">{{ $reviewsByOrderId[$order->id]->rating }}⭐ Noté</span>
+                            @endif
+                        @endif
                     </div>
                 </div>
                 @empty
@@ -1091,6 +1155,7 @@ document.addEventListener('keydown', e => {
         closeRestoreModal();
         closeChatModal();
         closeCompanyModal();
+        if (typeof closeRateModal === 'function') closeRateModal();
     }
 });
 
@@ -1123,7 +1188,8 @@ function setDate(val) {
         return document.getElementById('cancelModal').classList.contains('open') ||
                document.getElementById('restoreModal').classList.contains('open') ||
                document.getElementById('companyModal').classList.contains('open') ||
-               document.getElementById('chatModal').classList.contains('open');
+               document.getElementById('chatModal').classList.contains('open') ||
+               document.getElementById('rateModal').classList.contains('open');
     }
 
     function isUserTyping() {
@@ -1164,6 +1230,95 @@ function setDate(val) {
     };
 
     timer = setInterval(tick, 1000);
+})();
+
+/* ════════════════════════════════════════
+   MODAL NOTATION ENTREPRISE
+   ════════════════════════════════════════ */
+(function () {
+    let _rateOrderId = null;
+    let _rateUrl     = null;
+    let _rateStar    = 0;
+    const labels = ['','😞 Très mauvais','😕 Mauvais','😐 Correct','😊 Bien','🤩 Excellent !'];
+
+    window.openRateModal = function(btn) {
+        _rateOrderId = btn.dataset.orderId;
+        _rateUrl     = btn.dataset.rateUrl;
+        _rateStar    = 0;
+        document.getElementById('rateCompanyName').textContent = '🏢 ' + (btn.dataset.company || 'Entreprise');
+        document.getElementById('rateOrderNum').textContent    = 'Commande ' + (btn.dataset.orderNum || ('#' + _rateOrderId));
+        document.getElementById('rateComment').value = '';
+        document.getElementById('rateLabel').textContent = '';
+        const submitBtn = document.getElementById('rateSubmitBtn');
+        submitBtn.disabled  = true;
+        submitBtn.textContent = '⭐ Envoyer l\'avis';
+        setStar(0);
+        document.getElementById('rateModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeRateModal = function() {
+        document.getElementById('rateModal').classList.remove('open');
+        document.body.style.overflow = '';
+    };
+
+    document.getElementById('rateModal')?.addEventListener('click', function(e) {
+        if (e.target === this) window.closeRateModal();
+    });
+
+    window.setStar = function(n) {
+        _rateStar = n;
+        document.querySelectorAll('#rateStars .star-btn').forEach(b => {
+            const v = parseInt(b.dataset.v);
+            b.textContent = v <= n ? '⭐' : '☆';
+            b.classList.toggle('lit', v <= n);
+        });
+        document.getElementById('rateLabel').textContent = labels[n] || '';
+        document.getElementById('rateSubmitBtn').disabled = n === 0;
+    };
+
+    window.submitRating = async function() {
+        if (!_rateStar || !_rateUrl) return;
+        const btn = document.getElementById('rateSubmitBtn');
+        btn.disabled    = true;
+        btn.textContent = '⏳ Envoi…';
+
+        try {
+            const resp = await fetch(_rateUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    rating:  _rateStar,
+                    comment: document.getElementById('rateComment').value.trim() || null
+                })
+            });
+            const data = await resp.json();
+            if (data.success) {
+                window.closeRateModal();
+                /* Remplace tous les boutons de notation pour cette commande */
+                document.querySelectorAll(`[data-rate-url][data-order-id="${_rateOrderId}"]`).forEach(b => {
+                    const pill = document.createElement('span');
+                    pill.className = 'pill p-success';
+                    pill.title     = 'Noté ' + _rateStar + '/5';
+                    pill.textContent = _rateStar + '⭐';
+                    b.replaceWith(pill);
+                });
+            } else {
+                btn.disabled    = false;
+                btn.textContent = '⭐ Envoyer l\'avis';
+                alert(data.error || 'Erreur lors de l\'envoi.');
+            }
+        } catch (e) {
+            btn.disabled    = false;
+            btn.textContent = '⭐ Envoyer l\'avis';
+            alert('Erreur réseau. Veuillez réessayer.');
+        }
+    };
 })();
 </script>
 @endpush

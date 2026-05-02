@@ -81,18 +81,6 @@ body.cx-dashboard > main.app-main {
     transition:transform .25s cubic-bezier(.23,1,.32,1);
 }
 
-.cx-sidebar a {
-     color: #c7d2fe;
-    transition: all .2s ease;
-}
-.cx-sidebar a:hover {
-     background: rgba(99,102,241,.15);
-    color: #fff;
-}
-.cx-sidebar  a.active{
-     background: linear-gradient(90deg, #6366f1, #4f46e5);
-    color: #fff;
-}
 .cx-sidebar::-webkit-scrollbar { width:3px; }
 .cx-sidebar::-webkit-scrollbar-thumb { background:rgba(124,58,237,.3); border-radius:3px; }
 
@@ -137,33 +125,37 @@ body.cx-dashboard > main.app-main {
 /* Navigation */
 .cx-nav { padding:8px 8px 12px; flex:1; }
 .cx-nav-sec {
-    font-size:9px; font-weight:800; letter-spacing:1.8px;
-    color:rgba(255,255,255,.3); padding:14px 10px 4px;
+    font-size:10px; font-weight:800; letter-spacing:1.6px;
+    color:rgba(255,255,255,.58); padding:14px 10px 5px;
     text-transform:uppercase;
 }
 .cx-nav-item {
-    display:flex; align-items:center; gap:9px;
-    padding:7px 10px; border-radius:var(--r-sm);
-    color:rgba(255,255,255,.68); font-size:13px; font-weight:500;
-    transition:background .14s, color .14s; position:relative;
-    cursor:pointer; margin-bottom:1px;
+    display:flex; align-items:center; gap:10px;
+    padding:8px 11px; border-radius:var(--r-sm);
+    color:rgba(255,255,255,.85); font-size:13.5px; font-weight:600;
+    transition:all .22s cubic-bezier(.23,1,.32,1); position:relative;
+    cursor:pointer; margin-bottom:2px; border:1px solid transparent;
 }
-.cx-nav-item:hover { background:rgba(255,255,255,.06); color:#fff; }
+.cx-nav-item:hover { background:rgba(124,58,237,.18); color:#fff; border-color:rgba(124,58,237,.25); box-shadow:0 2px 12px rgba(124,58,237,.2),inset 0 1px 0 rgba(255,255,255,.06); }
+.cx-nav-item:hover .cx-nav-ico { background:rgba(139,92,246,.25); box-shadow:0 0 8px rgba(139,92,246,.3); }
 .cx-nav-item.active {
-    background:rgba(124,58,237,.22); color:#fff; font-weight:700;
+    background:linear-gradient(90deg,rgba(124,58,237,.35) 0%,rgba(99,102,241,.2) 100%);
+    color:#fff; font-weight:700; border-color:rgba(139,92,246,.3);
+    box-shadow:0 4px 16px rgba(124,58,237,.25),inset 0 1px 0 rgba(255,255,255,.08);
 }
 .cx-nav-item.active::before {
     content:''; position:absolute; left:0; top:50%; transform:translateY(-50%);
-    width:3px; height:18px; background:#8b5cf6; border-radius:0 3px 3px 0;
-    box-shadow:2px 0 8px rgba(139,92,246,.5);
+    width:3px; height:22px; background:linear-gradient(180deg,#a78bfa,#7c3aed);
+    border-radius:0 3px 3px 0; box-shadow:2px 0 12px rgba(167,139,250,.7);
 }
 .cx-nav-ico {
-    width:24px; height:24px; border-radius:6px;
-    background:rgba(255,255,255,.05);
+    width:26px; height:26px; border-radius:7px;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.07);
     display:flex; align-items:center; justify-content:center;
-    font-size:12px; flex-shrink:0;
+    font-size:13px; flex-shrink:0; transition:all .22s cubic-bezier(.23,1,.32,1);
 }
-.cx-nav-item.active .cx-nav-ico { background:rgba(139,92,246,.18); }
+.cx-nav-item.active .cx-nav-ico { background:rgba(139,92,246,.3); border-color:rgba(139,92,246,.4); box-shadow:0 0 10px rgba(139,92,246,.4); }
+.cx-nav-item.active:hover { background:linear-gradient(90deg,rgba(124,58,237,.45) 0%,rgba(99,102,241,.3) 100%); box-shadow:0 4px 20px rgba(124,58,237,.35),inset 0 1px 0 rgba(255,255,255,.1); }
 .cx-nav-badge {
     margin-left:auto; background:var(--cx-brand); color:#fff;
     font-size:9.5px; font-weight:700; padding:1px 6px;
@@ -811,6 +803,29 @@ body.cx-light .cx-main { background:#F5F7FA; }
     line-height:1; align-self:flex-start;
 }
 .cx-toast-close:hover { color:#fff; }
+
+/* ══ CHARTS PREMIUM ══ */
+.cx-chart-hd2 { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:14px; }
+.cx-chart-title2 { font-size:13px; font-weight:800; color:#fff; }
+.cx-chart-sub2 { font-size:11px; color:var(--cx-muted); margin-top:2px; }
+.cx-period-toggle { display:flex; gap:3px; background:rgba(255,255,255,.05); border:1px solid var(--cx-border); border-radius:20px; padding:3px; }
+.cx-period-btn {
+    padding:3px 12px; border-radius:20px; font-size:11px; font-weight:700;
+    border:none; background:transparent; color:var(--cx-text2);
+    font-family:inherit; cursor:pointer; transition:all .18s; white-space:nowrap;
+}
+.cx-period-btn:hover { color:#fff; }
+.cx-period-btn.active { background:var(--cx-brand); color:#fff; box-shadow:0 2px 8px rgba(124,58,237,.4); }
+.cx-chart-summary { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:14px; }
+.cx-chart-sum-block { }
+.cx-chart-big { font-size:26px; font-weight:900; color:#fff; letter-spacing:-.5px; line-height:1; }
+.cx-chart-big-lbl { font-size:10.5px; color:var(--cx-text2); margin-top:3px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
+.cx-chart-accent { color:#34d399 !important; }
+.cx-chart-area { position:relative; }
+body.cx-light .cx-period-toggle { background:rgba(0,0,0,.04); border-color:rgba(0,0,0,.08); }
+body.cx-light .cx-period-btn { color:#6b7280; }
+body.cx-light .cx-chart-title2 { color:#111827; }
+body.cx-light .cx-chart-big { color:#111827; }
 </style>
 @endpush
 
@@ -861,7 +876,7 @@ body.cx-light .cx-main { background:#F5F7FA; }
         <a href="{{ route('company.drivers.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">🚴</span> Chauffeurs
         </a>
-        <a href="#" class="cx-nav-item">
+        <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">🏪</span> Boutiques
         </a>
         <a href="#" class="cx-nav-item">
@@ -878,8 +893,8 @@ body.cx-light .cx-main { background:#F5F7FA; }
         <a href="#" class="cx-nav-item">
             <span class="cx-nav-ico">🔔</span> Notifications
         </a>
-        <a href="#" class="cx-nav-item">
-            <span class="cx-nav-ico">📊</span> Rapports
+        <a href="{{ route('company.historique.index') }}" class="cx-nav-item">
+            <span class="cx-nav-ico">📊</span> Historique
         </a>
 
         <div class="cx-nav-sec">Configuration</div>
@@ -1160,71 +1175,145 @@ body.cx-light .cx-main { background:#F5F7FA; }
             {{-- Commandes par jour --}}
             <div class="cx-panel">
                 <div class="cx-chart-body">
-                    <div class="cx-chart-hd">
-                        <span class="cx-chart-title">📈 Commandes par jour</span>
-                        <select class="cx-chart-sel">
-                            <option>7 derniers jours</option>
-                            <option>30 derniers jours</option>
-                        </select>
+                    <div class="cx-chart-hd2">
+                        <div>
+                            <div class="cx-chart-title2">📈 Commandes</div>
+                            <div class="cx-chart-sub2" id="ordersChartSub">7 derniers jours</div>
+                        </div>
+                        <div class="cx-period-toggle">
+                            <button class="cx-period-btn orders-period-btn active" onclick="switchOrdersPeriod(7,this)">7j</button>
+                            <button class="cx-period-btn orders-period-btn" onclick="switchOrdersPeriod(30,this)">30j</button>
+                        </div>
                     </div>
-                    <canvas id="chartOrders" height="150"></canvas>
+                    <div class="cx-chart-summary">
+                        <div class="cx-chart-sum-block">
+                            <div class="cx-chart-big" id="ordersTotalVal">{{ $ordersChart->sum() }}</div>
+                            <div class="cx-chart-big-lbl">sur la période</div>
+                        </div>
+                        <div class="cx-chart-sum-block" style="text-align:right">
+                            <div class="cx-chart-big cx-chart-accent" id="ordersTodayVal">{{ $ordersChart->last() }}</div>
+                            <div class="cx-chart-big-lbl">aujourd'hui</div>
+                        </div>
+                    </div>
+                    <div class="cx-chart-area">
+                        <canvas id="chartOrders"></canvas>
+                    </div>
                 </div>
             </div>
 
             {{-- Revenus --}}
             <div class="cx-panel">
                 <div class="cx-chart-body">
-                    <div class="cx-chart-hd">
-                        <span class="cx-chart-title">💰 Revenus (Livraison)</span>
-                        <select class="cx-chart-sel">
-                            <option>30 derniers jours</option>
-                            <option>7 derniers jours</option>
-                        </select>
+                    <div class="cx-chart-hd2">
+                        <div>
+                            <div class="cx-chart-title2">💰 Revenus livraison</div>
+                            <div class="cx-chart-sub2" id="revenueChartSub">30 derniers jours</div>
+                        </div>
+                        <div class="cx-period-toggle">
+                            <button class="cx-period-btn revenue-period-btn" onclick="switchRevenuePeriod(7,this)">7j</button>
+                            <button class="cx-period-btn revenue-period-btn active" onclick="switchRevenuePeriod(30,this)">30j</button>
+                        </div>
                     </div>
-                    <div class="cx-rev-big">{{ number_format($revenus, 0, ',', ' ') }} <span style="font-size:14px;font-weight:600;color:var(--cx-text2)">{{ $devise }}</span></div>
-                    <div class="cx-rev-sub">
-                        @if($revenusToday > 0)
-                            +{{ number_format($revenusToday, 0, ',', ' ') }} {{ $devise }} aujourd'hui
-                        @elseif($revenus > 0)
-                            Total commissions reçues
-                        @else
-                            Aucun revenu encore — en attente de paiement
-                        @endif
+                    <div class="cx-chart-summary">
+                        <div class="cx-chart-sum-block">
+                            <div class="cx-chart-big" style="font-size:18px">{{ number_format($revenus,0,',',' ') }} <span style="font-size:12px;font-weight:600;color:var(--cx-text2)">{{ $devise }}</span></div>
+                            <div class="cx-chart-big-lbl">total encaissé</div>
+                        </div>
+                        <div class="cx-chart-sum-block" style="text-align:right">
+                            <div class="cx-chart-big cx-chart-accent" style="font-size:18px">{{ number_format($revenusToday,0,',',' ') }}</div>
+                            <div class="cx-chart-big-lbl">aujourd'hui · {{ $devise }}</div>
+                        </div>
                     </div>
-                    <canvas id="chartRevenue" height="110"></canvas>
+                    <div class="cx-chart-area">
+                        <canvas id="chartRevenue"></canvas>
+                    </div>
                 </div>
             </div>
 
             {{-- Performance --}}
+            @php
+                // Tendance temps moyen
+                $minsTrend = null;
+                if ($avgMins !== null && $avgMinsPrev !== null && $avgMinsPrev > 0) {
+                    $minsDiff = $avgMins - $avgMinsPrev;
+                    $minsTrend = ($minsDiff <= 0 ? '↓ ' : '↑ +') . abs($minsDiff) . ' min vs mois dernier';
+                    $minsTrendClass = $minsDiff <= 0 ? 'trend-up' : 'trend-down';
+                } else {
+                    $minsTrendClass = 'trend-up';
+                }
+
+                // Tendance taux de réussite
+                $tauxTrend = null;
+                if ($tauxReussite !== null && $tauxReussitePrev !== null) {
+                    $tauxDiff = round($tauxReussite - $tauxReussitePrev, 1);
+                    $tauxTrend = ($tauxDiff >= 0 ? '↑ +' : '↓ ') . abs($tauxDiff) . '% vs mois dernier';
+                    $tauxTrendClass = $tauxDiff >= 0 ? 'trend-up' : 'trend-down';
+                } else {
+                    $tauxTrendClass = 'trend-up';
+                }
+            @endphp
             <div class="cx-panel">
                 <div class="cx-panel-hd">
-                    <div class="cx-panel-title">⚡ Performance moyenne</div>
+                    <div class="cx-panel-title">⚡ Performance réelle</div>
                 </div>
                 <div class="cx-perf-list">
+
+                    {{-- Temps moyen traitement --}}
                     <div class="cx-perf-card">
                         <div class="cx-perf-ico">🏍️</div>
                         <div>
-                            <div class="cx-perf-lbl">Temps moyen livraison</div>
-                            <div class="cx-perf-val">28<span> min</span></div>
-                            <div class="cx-perf-trend trend-down">↓ -5% vs mois dernier</div>
+                            <div class="cx-perf-lbl">Temps moyen traitement</div>
+                            @if($avgMins !== null)
+                                <div class="cx-perf-val">{{ $avgMins }}<span> min</span></div>
+                                @if($minsTrend)
+                                    <div class="cx-perf-trend {{ $minsTrendClass }}">{{ $minsTrend }}</div>
+                                @else
+                                    <div class="cx-perf-trend" style="color:var(--cx-muted)">30 derniers jours</div>
+                                @endif
+                            @else
+                                <div class="cx-perf-val" style="font-size:15px;color:var(--cx-muted)">—</div>
+                                <div class="cx-perf-trend" style="color:var(--cx-muted)">Aucune livraison terminée</div>
+                            @endif
                         </div>
                     </div>
+
+                    {{-- Taux de réussite --}}
                     <div class="cx-perf-card">
                         <div class="cx-perf-ico">✅</div>
                         <div>
-                            <div class="cx-perf-lbl">Taux de reussite</div>
-                            <div class="cx-perf-val">96.5<span>%</span></div>
-                            <div class="cx-perf-trend trend-up">↑ +2% vs mois dernier</div>
+                            <div class="cx-perf-lbl">Taux de réussite</div>
+                            @if($tauxReussite !== null)
+                                <div class="cx-perf-val">{{ $tauxReussite }}<span>%</span></div>
+                                @if($tauxTrend)
+                                    <div class="cx-perf-trend {{ $tauxTrendClass }}">{{ $tauxTrend }}</div>
+                                @else
+                                    <div class="cx-perf-trend" style="color:var(--cx-muted)">{{ $totalLivrees }} livrées / {{ $totalAnnulees }} annulées</div>
+                                @endif
+                            @else
+                                <div class="cx-perf-val" style="font-size:15px;color:var(--cx-muted)">—</div>
+                                <div class="cx-perf-trend" style="color:var(--cx-muted)">Aucune donnée encore</div>
+                            @endif
                         </div>
                     </div>
+
+                    {{-- Note moyenne --}}
                     <div class="cx-perf-card">
                         <div class="cx-perf-ico">⭐</div>
                         <div>
-                            <div class="cx-perf-lbl">Note moyenne</div>
-                            <div class="cx-perf-val">4.7<span>/5</span></div>
-                            <div class="cx-perf-trend trend-up">↑ +0.3 vs mois dernier</div>
+                            <div class="cx-perf-lbl">Note moyenne clients</div>
+                            @if($avgRating !== null && $ratingCount > 0)
+                                <div class="cx-perf-val">{{ $avgRating }}<span>/5</span></div>
+                                <div class="cx-perf-trend trend-up">
+                                    @php $stars = str_repeat('★', (int) $avgRating) . str_repeat('☆', 5 - (int) $avgRating); @endphp
+                                    {{ $stars }} · {{ $ratingCount }} avis
+                                </div>
+                            @else
+                                <div class="cx-perf-val" style="font-size:15px;color:var(--cx-muted)">—</div>
+                                <div class="cx-perf-trend" style="color:var(--cx-muted)">Aucun avis reçu</div>
+                            @endif
                         </div>
                     </div>
+
                 </div>
             </div>
 
@@ -1387,51 +1476,207 @@ document.addEventListener('DOMContentLoaded', () => {
     pollMap();
     setInterval(pollMap, 5000);
 
-    /* ── Chart Commandes ── */
-    new Chart(document.getElementById('chartOrders'), {
-        type: 'line',
-        data: {
-            labels: @json(collect(range(6,0))->map(fn($d) => now()->subDays($d)->translatedFormat('D'))->values()),
-            datasets: [{
-                data: @json($ordersChart),
-                borderColor: '#8b5cf6',
-                backgroundColor: 'rgba(139,92,246,.08)',
-                borderWidth: 2, pointRadius: 4,
-                pointBackgroundColor: '#8b5cf6',
-                fill: true, tension: .4
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend:{display:false} },
-            scales: {
-                x: { grid:{color:'rgba(255,255,255,.05)'}, ticks:{color:'#64748b',font:{size:11}} },
-                y: { grid:{color:'rgba(255,255,255,.05)'}, ticks:{color:'#64748b',font:{size:11}}, beginAtZero:true }
-            }
-        }
-    });
+    /* ══ CHARTS PREMIUM ══ */
+    (function() {
+        const O7   = @json($ordersChart);
+        const O30  = @json($ordersChart30);
+        const R30  = @json($revenueChart);
+        const R7   = @json($revenueChart7);
+        const DEV  = @json($devise);
 
-    /* ── Chart Revenus ── */
-    const revData = @json($revenueChart);
-    new Chart(document.getElementById('chartRevenue'), {
-        type: 'bar',
-        data: {
-            labels: Array.from({length:30},(_,i)=>`${i+1}`),
-            datasets: [{
-                data: revData,
-                backgroundColor: revData.map((_,i)=> i===29 ? '#8b5cf6' : 'rgba(139,92,246,.35)'),
-                borderRadius: 3, borderSkipped: false
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend:{display:false} },
-            scales: {
-                x: { display:false },
-                y: { grid:{color:'rgba(255,255,255,.04)'}, ticks:{color:'#64748b',font:{size:10}}, beginAtZero:true }
-            }
+        const L7  = @json(collect(range(6,0))->map(fn($d)  => now()->locale('fr')->subDays($d)->isoFormat('ddd D/M'))->values());
+        const L30 = @json(collect(range(29,0))->map(fn($d) => now()->subDays($d)->format('d/m'))->values());
+
+        const sum = a => a.reduce((s,v)=>s+(+v),0);
+
+        const isDark   = () => !document.body.classList.contains('cx-light');
+        const gridCol  = () => isDark() ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.06)';
+        const tickCol  = () => isDark() ? '#64748b' : '#9ca3af';
+        const tipBg    = () => isDark() ? '#0d1226' : '#ffffff';
+        const tipTitle = () => isDark() ? '#e2e8f0' : '#111827';
+        const tipBody  = () => isDark() ? '#94a3b8' : '#4b5563';
+        const ptBg     = () => isDark() ? '#0d1226' : '#ffffff';
+
+        function lineGrad(ctx, chartArea) {
+            const g = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+            g.addColorStop(0, 'rgba(139,92,246,.45)');
+            g.addColorStop(0.6, 'rgba(139,92,246,.12)');
+            g.addColorStop(1,   'rgba(139,92,246,.0)');
+            return g;
         }
-    });
+
+        function barGrad(ctx, chartArea, isLast) {
+            const g = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+            if (isLast) {
+                g.addColorStop(0, 'rgba(192,162,251,1)');
+                g.addColorStop(1, 'rgba(124,58,237,.75)');
+            } else {
+                g.addColorStop(0, 'rgba(139,92,246,.65)');
+                g.addColorStop(1, 'rgba(99,102,241,.22)');
+            }
+            return g;
+        }
+
+        const commonTooltip = () => ({
+            backgroundColor: tipBg(),
+            borderColor: 'rgba(124,58,237,.35)',
+            borderWidth: 1,
+            padding: { x:14, y:10 },
+            titleColor: tipTitle(),
+            bodyColor: tipBody(),
+            titleFont: { size:12, weight:'700' },
+            bodyFont: { size:12.5 },
+            cornerRadius: 10,
+            displayColors: false,
+        });
+
+        /* ─ Chart Commandes ─ */
+        const oCtx = document.getElementById('chartOrders').getContext('2d');
+        const ordersChart = new Chart(oCtx, {
+            type: 'line',
+            data: {
+                labels: L7,
+                datasets: [{
+                    data: O7,
+                    borderColor: '#8b5cf6',
+                    backgroundColor: ctx => {
+                        const {ctx:c, chartArea} = ctx.chart;
+                        return chartArea ? lineGrad(c, chartArea) : 'rgba(139,92,246,.1)';
+                    },
+                    borderWidth: 2.5,
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: ptBg(),
+                    pointBorderColor: '#8b5cf6',
+                    pointBorderWidth: 2.5,
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#a78bfa',
+                    fill: true,
+                    tension: .42,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                animation: { duration:900, easing:'easeInOutQuart' },
+                interaction: { intersect:false, mode:'index' },
+                plugins: {
+                    legend: { display:false },
+                    tooltip: {
+                        ...commonTooltip(),
+                        callbacks: {
+                            title: items => items[0].label,
+                            label: c => ` ${c.parsed.y} commande${c.parsed.y!==1?'s':''}`,
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color:gridCol(), drawBorder:false },
+                        border: { display:false },
+                        ticks: { color:tickCol(), font:{size:11}, maxRotation:0, maxTicksLimit:7 }
+                    },
+                    y: {
+                        grid: { color:gridCol(), drawBorder:false },
+                        border: { display:false },
+                        ticks: { color:tickCol(), font:{size:11}, precision:0 },
+                        beginAtZero: true,
+                    }
+                }
+            }
+        });
+
+        window.switchOrdersPeriod = (period, btn) => {
+            document.querySelectorAll('.orders-period-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('ordersChartSub').textContent = period===7 ? '7 derniers jours' : '30 derniers jours';
+            const data = period===7 ? O7 : O30;
+            const lbls = period===7 ? L7 : L30;
+            document.getElementById('ordersTotalVal').textContent = sum(data);
+            document.getElementById('ordersTodayVal').textContent = data[data.length-1] ?? 0;
+            ordersChart.data.labels = lbls;
+            ordersChart.data.datasets[0].data = data;
+            ordersChart.data.datasets[0].pointRadius      = period===7 ? 5 : 3;
+            ordersChart.data.datasets[0].pointHoverRadius = period===7 ? 8 : 5;
+            ordersChart.update('active');
+        };
+
+        /* ─ Chart Revenus ─ */
+        const rCtx = document.getElementById('chartRevenue').getContext('2d');
+        const revenueChart = new Chart(rCtx, {
+            type: 'bar',
+            data: {
+                labels: L30,
+                datasets: [{
+                    data: R30,
+                    backgroundColor: ctx => {
+                        const {ctx:c, chartArea} = ctx.chart;
+                        if (!chartArea) return 'rgba(139,92,246,.5)';
+                        return barGrad(c, chartArea, ctx.dataIndex === ctx.dataset.data.length-1);
+                    },
+                    hoverBackgroundColor: 'rgba(192,162,251,.9)',
+                    borderRadius: 5,
+                    borderSkipped: 'start',
+                    borderWidth: 0,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                animation: { duration:900, easing:'easeInOutQuart' },
+                interaction: { intersect:false, mode:'index' },
+                plugins: {
+                    legend: { display:false },
+                    tooltip: {
+                        ...commonTooltip(),
+                        callbacks: {
+                            title: items => items[0].label,
+                            label: c => ` ${(+c.parsed.y).toLocaleString('fr-FR')} ${DEV}`,
+                        }
+                    }
+                },
+                scales: {
+                    x: { display:false },
+                    y: {
+                        grid: { color:gridCol(), drawBorder:false },
+                        border: { display:false },
+                        ticks: { color:tickCol(), font:{size:10} },
+                        beginAtZero: true,
+                    }
+                }
+            }
+        });
+
+        window.switchRevenuePeriod = (period, btn) => {
+            document.querySelectorAll('.revenue-period-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('revenueChartSub').textContent = period===7 ? '7 derniers jours' : '30 derniers jours';
+            const data = period===7 ? R7 : R30;
+            const lbls = period===7 ? L7 : L30;
+            revenueChart.data.labels = lbls;
+            revenueChart.data.datasets[0].data = data;
+            revenueChart.update('active');
+        };
+
+        /* ─ Sync couleurs au changement de thème ─ */
+        new MutationObserver(() => {
+            [ordersChart, revenueChart].forEach(ch => {
+                ch.options.scales.y.grid.color        = gridCol();
+                ch.options.scales.y.ticks.color       = tickCol();
+                ch.options.plugins.tooltip.backgroundColor = tipBg();
+                ch.options.plugins.tooltip.titleColor  = tipTitle();
+                ch.options.plugins.tooltip.bodyColor   = tipBody();
+                ch.update('none');
+            });
+            if (ordersChart.options.scales.x) {
+                ordersChart.options.scales.x.grid.color  = gridCol();
+                ordersChart.options.scales.x.ticks.color = tickCol();
+            }
+            ordersChart.data.datasets[0].pointBackgroundColor = ptBg();
+            ordersChart.update('none');
+        }).observe(document.body, {attributes:true, attributeFilter:['class']});
+
+    })();
 
     /* ── Pipeline bars animation ── */
     setTimeout(() => {

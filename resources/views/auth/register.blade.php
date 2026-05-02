@@ -159,7 +159,7 @@ $countries = [
             <div class="f-icon-wrap f-pw-wrap">
                 <span class="f-ico">🔒</span>
                 <input id="password" class="f-input {{ $errors->has('password') ? 'f-input-err':'' }}"
-                       type="password" name="password" autocomplete="new-password" placeholder="Min. 8 caractères"
+                       type="password" autocomplete="new-password" placeholder="Min. 8 caractères"
                        oninput="liveCheck(this,'pwErr','password')">
                 <button type="button" class="f-pw-eye" onclick="togglePw('password',this)">👁️</button>
             </div>
@@ -174,8 +174,7 @@ $countries = [
             <div class="f-icon-wrap f-pw-wrap">
                 <span class="f-ico">🔒</span>
                 <input id="password_confirmation" class="f-input"
-                       type="password" name="password_confirmation"
-                       autocomplete="new-password" placeholder="Répéter le mot de passe"
+                       type="password" autocomplete="new-password" placeholder="Répéter le mot de passe"
                        oninput="checkConfirm()">
                 <button type="button" class="f-pw-eye" onclick="togglePw('password_confirmation',this)">👁️</button>
             </div>
@@ -191,6 +190,10 @@ $countries = [
 
     {{-- ══════════════ ÉTAPE 2 ══════════════ --}}
     <div class="reg-step" id="step2">
+
+        {{-- Champs cachés pour transmettre le mot de passe (Chrome vide les inputs password masqués) --}}
+        <input type="hidden" id="pw_submit" name="password">
+        <input type="hidden" id="pw_conf_submit" name="password_confirmation">
 
         {{-- Pays --}}
         <div class="f-group">
@@ -289,8 +292,12 @@ function goStep2() {
         showErr('confirmErr', 'Les mots de passe ne correspondent pas.'); markErr(conf); ok = false;
     } else { hideErr('confirmErr'); markOk(conf); }
 
-    if (ok) setStep(2);
-    else document.getElementById('name').scrollIntoView({behavior:'smooth', block:'start'});
+    if (ok) {
+        // Copier les mots de passe dans les inputs cachés avant de masquer l'étape 1
+        document.getElementById('pw_submit').value      = pw.value;
+        document.getElementById('pw_conf_submit').value = conf.value;
+        setStep(2);
+    } else document.getElementById('name').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 function goStep1() { setStep(1); }
@@ -357,6 +364,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Si erreurs serveur → go bon step
     setStep(currentStep);
+
+    // Intercepter la soumission du formulaire
+    // (cas : appui sur Entrée depuis step 1 → ne pas soumettre, aller step 2)
+    document.getElementById('regForm').addEventListener('submit', function(e) {
+        if (currentStep === 1) {
+            e.preventDefault();
+            goStep2();
+            return;
+        }
+        // Step 2 : re-copier le mot de passe juste avant l'envoi
+        // (sécurité supplémentaire si le navigateur avait vidé le champ)
+        var pw   = document.getElementById('password');
+        var conf = document.getElementById('password_confirmation');
+        var pws  = document.getElementById('pw_submit');
+        var pcs  = document.getElementById('pw_conf_submit');
+        if (pw && pw.value)   pws.value = pw.value;
+        if (conf && conf.value) pcs.value = conf.value;
+        // Si les champs visibles sont vides (Chrome les a effacés) mais les cachés ont déjà
+        // une valeur copiée par goStep2(), on garde la valeur déjà là
+    });
 });
 </script>
 

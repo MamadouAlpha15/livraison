@@ -220,6 +220,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/livraisons',      [CompanyOrderController::class, 'inProgress'])    ->name('company.livraisons.index');
         Route::get('/livraisons/data', [CompanyOrderController::class, 'inProgressData'])->name('company.livraisons.data');
 
+        /* Historique des livraisons */
+        Route::get('/historique', [CompanyOrderController::class, 'historique'])->name('company.historique.index');
+
+        /* Boutiques partenaires */
+        Route::get('/boutiques', [CompanyOrderController::class, 'boutiques'])->name('company.boutiques.index');
+
         /* Carte en direct */
         Route::get('/carte',      [CompanyOrderController::class, 'mapView']) ->name('company.carte.index');
         Route::get('/carte/data', [CompanyOrderController::class, 'mapData']) ->name('company.carte.data');
@@ -472,6 +478,7 @@ Route::middleware(['auth', 'role:employe,superadmin,admin,vendeur'])
         Route::put('orders/{order}/send-to-company',      [EmployeOrderController::class, 'sendToCompany']) ->name('orders.sendToCompany');
         Route::put('orders/{order}/cancel',               [EmployeOrderController::class, 'cancel'])        ->name('orders.cancel');
         Route::put('orders/{order}/restore',              [EmployeOrderController::class, 'restore'])       ->name('orders.restore');
+        Route::post('orders/{order}/rate-company',        [EmployeOrderController::class, 'rateCompany'])   ->name('orders.rate-company');
 
         /* Chat boutique ↔ entreprise de livraison */
         Route::post('companies/{company}/chat/send',     [\App\Http\Controllers\DeliveryChatController::class, 'send'])    ->name('delivery.chat.send');

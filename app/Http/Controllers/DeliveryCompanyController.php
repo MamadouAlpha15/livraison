@@ -136,6 +136,58 @@ class DeliveryCompanyController extends Controller
         fn($d) => $baseComm()->whereDate('paid_at', now()->subDays($d)->toDateString())->sum('amount')
     )->values();
 
+    // ── Graphique commandes : 30 derniers jours (sélecteur de période) ──
+    $ordersChart30 = collect(range(29, 0))->map(
+        fn($d) => $baseOrders()->whereDate('created_at', now()->subDays($d)->toDateString())->count()
+    )->values();
+
+    // ── Graphique revenus : 7 derniers jours (sélecteur de période) ──
+    $revenueChart7 = collect(range(6, 0))->map(
+        fn($d) => $baseComm()->whereDate('paid_at', now()->subDays($d)->toDateString())->sum('amount')
+    )->values();
+
+    // ── Performance réelle ──
+    $prevM = now()->subMonth();
+
+    // Taux de réussite
+    $totalLivrees  = $baseOrders()->where('status', Order::STATUS_LIVREE)->count();
+    $totalAnnulees = $baseOrders()->where('status', Order::STATUS_ANNULEE)->count();
+    $tauxReussite  = ($totalLivrees + $totalAnnulees) > 0
+        ? round($totalLivrees / ($totalLivrees + $totalAnnulees) * 100, 1)
+        : null;
+
+    $prevLivrees  = $baseOrders()->where('status', Order::STATUS_LIVREE)
+        ->whereMonth('updated_at', $prevM->month)->whereYear('updated_at', $prevM->year)->count();
+    $prevAnnulees = $baseOrders()->where('status', Order::STATUS_ANNULEE)
+        ->whereMonth('updated_at', $prevM->month)->whereYear('updated_at', $prevM->year)->count();
+    $tauxReussitePrev = ($prevLivrees + $prevAnnulees) > 0
+        ? round($prevLivrees / ($prevLivrees + $prevAnnulees) * 100, 1)
+        : null;
+
+    // Temps moyen de traitement commande→livrée (30 derniers jours)
+    $avgMins = $baseOrders()->where('status', Order::STATUS_LIVREE)
+        ->whereDate('updated_at', '>=', now()->subDays(30))
+        ->selectRaw('AVG(TIMESTAMPDIFF(MINUTE, created_at, updated_at)) as m')
+        ->value('m');
+    $avgMins = $avgMins ? (int) round($avgMins) : null;
+
+    $avgMinsPrev = $baseOrders()->where('status', Order::STATUS_LIVREE)
+        ->whereMonth('updated_at', $prevM->month)->whereYear('updated_at', $prevM->year)
+        ->selectRaw('AVG(TIMESTAMPDIFF(MINUTE, created_at, updated_at)) as m')
+        ->value('m');
+    $avgMinsPrev = $avgMinsPrev ? (int) round($avgMinsPrev) : null;
+
+    // Note moyenne (reviews des commandes livrées par cette entreprise)
+    $ratingBase = \App\Models\Review::whereHas('order', fn($q) =>
+        $q->where('delivery_company_id', $company->id)
+          ->where('status', Order::STATUS_LIVREE)
+    )->whereNotNull('rating')->where('rating', '>', 0);
+
+    $ratingCount = $ratingBase->count();
+    $avgRating   = $ratingCount > 0
+        ? round((float) $ratingBase->avg('rating'), 1)
+        : null;
+
     $devise = $company->currency ?? 'GNF';
 
     return view('company.dashboard', compact(
@@ -148,6 +200,11 @@ class DeliveryCompanyController extends Controller
         'pipeData', 'totalOrders',
         'activeDrivers',
         'ordersChart', 'revenueChart',
+        'ordersChart30', 'revenueChart7',
+        'tauxReussite', 'tauxReussitePrev',
+        'totalLivrees', 'totalAnnulees',
+        'avgMins', 'avgMinsPrev',
+        'avgRating', 'ratingCount',
         'devise'
     ));
 }

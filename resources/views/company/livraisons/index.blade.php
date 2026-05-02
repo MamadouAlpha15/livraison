@@ -42,9 +42,6 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 }
 .cx-sidebar::-webkit-scrollbar{width:3px}
 .cx-sidebar::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3);border-radius:3px}
-.cx-sidebar a{color:#c7d2fe;transition:all .2s}
-.cx-sidebar a:hover{background:rgba(99,102,241,.15);color:#fff}
-.cx-sidebar a.active{background:linear-gradient(90deg,#6366f1,#4f46e5);color:#fff}
 .cx-brand-hd{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0}
 .cx-brand-top{display:flex;align-items:center;justify-content:space-between}
 .cx-logo{display:flex;align-items:center;gap:9px;color:#fff;font-size:16px;font-weight:800}
@@ -55,13 +52,15 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .cx-close-btn{display:none;background:none;border:none;color:rgba(255,255,255,.45);font-size:18px;cursor:pointer;padding:2px 6px;border-radius:6px;line-height:1}
 .cx-close-btn:hover{color:#fff}
 .cx-nav{padding:8px 8px 12px;flex:1}
-.cx-nav-sec{font-size:9px;font-weight:800;letter-spacing:1.8px;color:rgba(255,255,255,.3);padding:14px 10px 4px;text-transform:uppercase}
-.cx-nav-item{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:var(--r-xs);color:rgba(255,255,255,.68);font-size:13px;font-weight:500;transition:background .14s,color .14s;position:relative;cursor:pointer;margin-bottom:1px}
-.cx-nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
-.cx-nav-item.active{background:rgba(124,58,237,.22);color:#fff;font-weight:700}
-.cx-nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:#8b5cf6;border-radius:0 3px 3px 0;box-shadow:2px 0 8px rgba(139,92,246,.5)}
-.cx-nav-ico{width:24px;height:24px;border-radius:6px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
-.cx-nav-item.active .cx-nav-ico{background:rgba(139,92,246,.18)}
+.cx-nav-sec{font-size:10px;font-weight:800;letter-spacing:1.6px;color:rgba(255,255,255,.58);padding:14px 10px 5px;text-transform:uppercase}
+.cx-nav-item{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:var(--r-xs);color:rgba(255,255,255,.85);font-size:13.5px;font-weight:600;transition:all .22s cubic-bezier(.23,1,.32,1);position:relative;cursor:pointer;margin-bottom:2px;border:1px solid transparent}
+.cx-nav-item:hover{background:rgba(124,58,237,.18);color:#fff;border-color:rgba(124,58,237,.25);box-shadow:0 2px 12px rgba(124,58,237,.2),inset 0 1px 0 rgba(255,255,255,.06)}
+.cx-nav-item:hover .cx-nav-ico{background:rgba(139,92,246,.25);box-shadow:0 0 8px rgba(139,92,246,.3)}
+.cx-nav-item.active{background:linear-gradient(90deg,rgba(124,58,237,.35) 0%,rgba(99,102,241,.2) 100%);color:#fff;font-weight:700;border-color:rgba(139,92,246,.3);box-shadow:0 4px 16px rgba(124,58,237,.25),inset 0 1px 0 rgba(255,255,255,.08)}
+.cx-nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:linear-gradient(180deg,#a78bfa,#7c3aed);border-radius:0 3px 3px 0;box-shadow:2px 0 12px rgba(167,139,250,.7)}
+.cx-nav-ico{width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .22s cubic-bezier(.23,1,.32,1)}
+.cx-nav-item.active .cx-nav-ico{background:rgba(139,92,246,.3);border-color:rgba(139,92,246,.4);box-shadow:0 0 10px rgba(139,92,246,.4)}
+.cx-nav-item.active:hover{background:linear-gradient(90deg,rgba(124,58,237,.45) 0%,rgba(99,102,241,.3) 100%);box-shadow:0 4px 20px rgba(124,58,237,.35),inset 0 1px 0 rgba(255,255,255,.1)}
 .cx-nav-badge{margin-left:auto;background:var(--cx-brand);color:#fff;font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:20px;min-width:18px;text-align:center}
 .cx-user-foot{padding:10px 10px 12px;border-top:1px solid rgba(255,255,255,.07);flex-shrink:0}
 .cx-user-row{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:var(--r-xs);background:rgba(255,255,255,.04);cursor:pointer;transition:background .15s;margin-bottom:6px}
@@ -205,14 +204,14 @@ body.cx-light .lv-act-btn{background:#f3f4f6;border-color:rgba(0,0,0,.08)}
         <a href="{{ route('company.drivers.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🚴</span> Chauffeurs</a>
         <a href="{{ route('company.livraisons.index') }}" class="cx-nav-item active"><span class="cx-nav-ico">🚚</span> Livraisons</a>
         <a href="{{ route('company.carte.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🗺️</span> Carte en direct</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">🏪</span> Boutiques</a>
+        <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🏪</span> Boutiques</a>
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">👥</span> Clients</a>
 
         <div class="cx-nav-sec">Gestion</div>
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">📍</span> Zone de livraison</a>
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">💲</span> Tarification</a>
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">🔔</span> Notifications</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">📊</span> Rapports</a>
+        <a href="{{ route('company.historique.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📊</span> Historique</a>
 
         <div class="cx-nav-sec">Configuration</div>
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">⚙️</span> Paramètres</a>

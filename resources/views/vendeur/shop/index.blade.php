@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
 @if($shop)
     <div class="card">
         <div class="card-header">🏪 Ma boutique</div>

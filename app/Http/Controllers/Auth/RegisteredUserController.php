@@ -42,6 +42,20 @@ class RegisteredUserController extends Controller
             'address'  => ['nullable', 'string', 'max:255'],
             'country'  => ['required', 'string', 'size:2'],
             'shop_id'  => ['nullable', 'exists:shops,id'],
+        ], [
+            'name.required'      => 'Le nom complet est obligatoire.',
+            'name.max'           => 'Le nom ne peut pas dépasser 255 caractères.',
+            'email.required'     => 'L\'adresse email est obligatoire.',
+            'email.email'        => 'Veuillez entrer une adresse email valide.',
+            'email.unique'       => 'Cette adresse email est déjà utilisée.',
+            'email.lowercase'    => 'L\'adresse email doit être en minuscules.',
+            'password.required'  => 'Le mot de passe est obligatoire.',
+            'password.confirmed' => 'La confirmation du mot de passe ne correspond pas.',
+            'password.min'       => 'Le mot de passe doit contenir au moins 8 caractères.',
+            'role.required'      => 'Veuillez choisir un type de compte.',
+            'role.in'            => 'Le type de compte sélectionné est invalide.',
+            'country.required'   => 'Veuillez sélectionner votre pays.',
+            'country.size'       => 'Le pays sélectionné est invalide.',
         ]);
 
         // Création du compte utilisateur

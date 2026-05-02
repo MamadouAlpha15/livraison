@@ -180,6 +180,111 @@ class OrderController extends Controller
         return response()->json(['ok' => true, 'orders' => $orders]);
     }
 
+    public function historique(Request $request)
+    {
+        $company = $this->company();
+
+        $query = Order::with(['client', 'shop', 'driver'])
+            ->where('delivery_company_id', $company->id)
+            ->whereIn('status', [Order::STATUS_LIVREE, Order::STATUS_ANNULEE])
+            ->latest('updated_at');
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function ($q) use ($s) {
+                $q->where('id', 'like', "%{$s}%")
+                  ->orWhere('delivery_destination', 'like', "%{$s}%")
+                  ->orWhereHas('client', fn($u) => $u->where('name', 'like', "%{$s}%")->orWhere('phone', 'like', "%{$s}%"))
+                  ->orWhereHas('shop',   fn($sh) => $sh->where('name', 'like', "%{$s}%"))
+                  ->orWhereHas('driver', fn($d)  => $d->where('name', 'like', "%{$s}%"));
+            });
+        }
+
+        if ($request->filled('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('shop_id')) {
+            $query->where('shop_id', $request->shop_id);
+        }
+
+        if ($request->filled('driver_id')) {
+            $query->where('driver_id', $request->driver_id);
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('updated_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('updated_at', '<=', $request->date_to);
+        }
+
+        if ($request->filled('period')) {
+            match($request->period) {
+                'today' => $query->whereDate('updated_at', today()),
+                'week'  => $query->whereBetween('updated_at', [now()->startOfWeek(), now()->endOfWeek()]),
+                'month' => $query->whereMonth('updated_at', now()->month)->whereYear('updated_at', now()->year),
+                default => null,
+            };
+        }
+
+        $orders = $query->paginate(25)->withQueryString();
+
+        $base = fn() => Order::where('delivery_company_id', $company->id);
+
+        $stats = [
+            'total_livrees'  => $base()->where('status', Order::STATUS_LIVREE)->count(),
+            'total_annulees' => $base()->where('status', Order::STATUS_ANNULEE)->count(),
+            'revenus_total'  => $base()->where('status', Order::STATUS_LIVREE)->sum('delivery_fee'),
+            'revenus_month'  => $base()->where('status', Order::STATUS_LIVREE)
+                                    ->whereMonth('updated_at', now()->month)
+                                    ->whereYear('updated_at', now()->year)
+                                    ->sum('delivery_fee'),
+            'livrees_today'  => $base()->where('status', Order::STATUS_LIVREE)->whereDate('updated_at', today())->count(),
+        ];
+
+        $drivers = $company->drivers()->orderBy('name')->get();
+
+        return view('company.historique.index', compact('orders', 'stats', 'drivers', 'company'));
+    }
+
+    public function boutiques(Request $request)
+    {
+        $company = $this->company();
+
+        $search = $request->input('search');
+
+        // Boutiques ayant passé des commandes via cette entreprise
+        $shopsQuery = \App\Models\Shop::whereHas('orders', fn($q) =>
+            $q->where('delivery_company_id', $company->id)
+        )->withCount([
+            'orders as total_orders'     => fn($q) => $q->where('delivery_company_id', $company->id),
+            'orders as livrees'          => fn($q) => $q->where('delivery_company_id', $company->id)->where('status', Order::STATUS_LIVREE),
+            'orders as en_cours'         => fn($q) => $q->where('delivery_company_id', $company->id)->whereIn('status', [Order::STATUS_CONFIRMEE, Order::STATUS_EN_LIVRAISON]),
+            'orders as annulees'         => fn($q) => $q->where('delivery_company_id', $company->id)->where('status', Order::STATUS_ANNULEE),
+        ])->withSum(['orders as revenus' => fn($q) =>
+            $q->where('delivery_company_id', $company->id)->where('status', Order::STATUS_LIVREE)
+        ], 'delivery_fee');
+
+        if ($search) {
+            $shopsQuery->where(fn($q) =>
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('address', 'like', "%{$search}%")
+                  ->orWhere('type', 'like', "%{$search}%")
+            );
+        }
+
+        $shops = $shopsQuery->orderByDesc('total_orders')->paginate(12)->withQueryString();
+
+        $stats = [
+            'total_boutiques' => \App\Models\Shop::whereHas('orders', fn($q) => $q->where('delivery_company_id', $company->id))->count(),
+            'total_livrees'   => Order::where('delivery_company_id', $company->id)->where('status', Order::STATUS_LIVREE)->count(),
+            'total_revenus'   => Order::where('delivery_company_id', $company->id)->where('status', Order::STATUS_LIVREE)->sum('delivery_fee'),
+        ];
+
+        return view('company.boutiques.index', compact('shops', 'stats', 'company', 'search'));
+    }
+
     public function notifications()
     {
         $company = $this->company();

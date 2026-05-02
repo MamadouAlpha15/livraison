@@ -77,10 +77,6 @@ body.cx-dashboard > main.app-main {
 }
 .cx-sidebar::-webkit-scrollbar { width:3px; }
 .cx-sidebar::-webkit-scrollbar-thumb { background:rgba(124,58,237,.3); border-radius:3px; }
-.cx-sidebar a { color:#c7d2fe; transition:all .2s; }
-.cx-sidebar a:hover { background:rgba(99,102,241,.15); color:#fff; }
-.cx-sidebar a.active { background:linear-gradient(90deg,#6366f1,#4f46e5); color:#fff; }
-
 /* Brand */
 .cx-brand-hd { padding:14px 14px 10px; border-bottom:1px solid rgba(255,255,255,.06); flex-shrink:0; }
 .cx-brand-top { display:flex; align-items:center; justify-content:space-between; }
@@ -105,28 +101,30 @@ body.cx-dashboard > main.app-main {
 
 /* Nav */
 .cx-nav { padding:8px 8px 12px; flex:1; }
-.cx-nav-sec { font-size:9px; font-weight:800; letter-spacing:1.8px; color:rgba(255,255,255,.3); padding:14px 10px 4px; text-transform:uppercase; }
+.cx-nav-sec { font-size:10px; font-weight:800; letter-spacing:1.6px; color:rgba(255,255,255,.58); padding:14px 10px 5px; text-transform:uppercase; }
 .cx-nav-item {
-    display:flex; align-items:center; gap:9px;
-    padding:7px 10px; border-radius:var(--r-xs);
-    color:rgba(255,255,255,.68); font-size:13px; font-weight:500;
-    transition:background .14s,color .14s; position:relative;
-    cursor:pointer; margin-bottom:1px;
+    display:flex; align-items:center; gap:10px;
+    padding:8px 11px; border-radius:var(--r-xs);
+    color:rgba(255,255,255,.85); font-size:13.5px; font-weight:600;
+    transition:all .22s cubic-bezier(.23,1,.32,1); position:relative;
+    cursor:pointer; margin-bottom:2px; border:1px solid transparent;
 }
-.cx-nav-item:hover { background:rgba(255,255,255,.06); color:#fff; }
-.cx-nav-item.active { background:rgba(124,58,237,.22); color:#fff; font-weight:700; }
+.cx-nav-item:hover { background:rgba(124,58,237,.18); color:#fff; border-color:rgba(124,58,237,.25); box-shadow:0 2px 12px rgba(124,58,237,.2),inset 0 1px 0 rgba(255,255,255,.06); }
+.cx-nav-item:hover .cx-nav-ico { background:rgba(139,92,246,.25); box-shadow:0 0 8px rgba(139,92,246,.3); }
+.cx-nav-item.active { background:linear-gradient(90deg,rgba(124,58,237,.35) 0%,rgba(99,102,241,.2) 100%); color:#fff; font-weight:700; border-color:rgba(139,92,246,.3); box-shadow:0 4px 16px rgba(124,58,237,.25),inset 0 1px 0 rgba(255,255,255,.08); }
 .cx-nav-item.active::before {
     content:''; position:absolute; left:0; top:50%; transform:translateY(-50%);
-    width:3px; height:18px; background:#8b5cf6; border-radius:0 3px 3px 0;
-    box-shadow:2px 0 8px rgba(139,92,246,.5);
+    width:3px; height:22px; background:linear-gradient(180deg,#a78bfa,#7c3aed);
+    border-radius:0 3px 3px 0; box-shadow:2px 0 12px rgba(167,139,250,.7);
 }
 .cx-nav-ico {
-    width:24px; height:24px; border-radius:6px;
-    background:rgba(255,255,255,.05);
+    width:26px; height:26px; border-radius:7px;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.07);
     display:flex; align-items:center; justify-content:center;
-    font-size:12px; flex-shrink:0;
+    font-size:13px; flex-shrink:0; transition:all .22s cubic-bezier(.23,1,.32,1);
 }
-.cx-nav-item.active .cx-nav-ico { background:rgba(139,92,246,.18); }
+.cx-nav-item.active .cx-nav-ico { background:rgba(139,92,246,.3); border-color:rgba(139,92,246,.4); box-shadow:0 0 10px rgba(139,92,246,.4); }
+.cx-nav-item.active:hover { background:linear-gradient(90deg,rgba(124,58,237,.45) 0%,rgba(99,102,241,.3) 100%); box-shadow:0 4px 20px rgba(124,58,237,.35),inset 0 1px 0 rgba(255,255,255,.1); }
 .cx-nav-badge {
     margin-left:auto; background:var(--cx-brand); color:#fff;
     font-size:9.5px; font-weight:700; padding:1px 6px;
@@ -192,6 +190,11 @@ body.cx-dashboard > main.app-main {
     position:relative;
 }
 .cx-tb-btn:hover { background:rgba(255,255,255,.1); color:#fff; }
+.cx-tb-user { display:flex; align-items:center; gap:8px; cursor:pointer; padding:5px 10px; border-radius:8px; transition:background .14s; flex-shrink:0; min-width:0; }
+.cx-tb-user:hover { background:rgba(255,255,255,.06); }
+.cx-tb-av { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#7c3aed,#4338ca); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#fff; flex-shrink:0; }
+.cx-tb-uname { font-size:12.5px; font-weight:700; color:var(--cx-text); line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:120px; }
+.cx-tb-urole { font-size:10px; color:var(--cx-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:120px; }
 
 /* ══ MODE CLAIR ══ */
 body.cx-light {
@@ -397,6 +400,12 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
     .stats-bar { grid-template-columns:1fr 1fr; }
     .drivers-grid { grid-template-columns:1fr; }
     .form-grid { grid-template-columns:1fr; }
+    .cx-tb-info { display:none; }
+    .cx-topbar { padding:0 14px; gap:10px; }
+    .tb-page-title { display:none; }
+}
+@media(max-width:480px) {
+    .cx-tb-user { padding:4px 6px; }
 }
 </style>
 @endpush
@@ -433,14 +442,14 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
         </a>
         <a href="{{ route('company.livraisons.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🚚</span> Livraisons</a>
         <a href="{{ route('company.carte.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🗺️</span> Carte en direct</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">🏪</span> Boutiques</a>
+        <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🏪</span> Boutiques</a>
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">👥</span> Clients</a>
 
         <div class="cx-nav-sec">Gestion</div>
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">📍</span> Zone de livraison</a>
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">💲</span> Tarification</a>
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">🔔</span> Notifications</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">📊</span> Rapports</a>
+        <a href="{{ route('company.historique.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📊</span> Historique</a>
 
         <div class="cx-nav-sec">Configuration</div>
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">⚙️</span> Paramètres</a>
@@ -473,7 +482,20 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
 <div class="cx-wrap">
 <main class="cx-main">
 
-  
+    {{-- Topbar mobile --}}
+    <div class="cx-topbar">
+        <button class="cx-hamburger" id="cxHamburger">☰</button>
+        <div class="cx-topbar-title">🚴 <span class="tb-page-title">Chauffeurs</span></div>
+        <div class="cx-tb-right">
+            <div class="cx-tb-user">
+                <div class="cx-tb-av">{{ $ini }}</div>
+                <div class="cx-tb-info">
+                    <div class="cx-tb-uname">{{ Str::limit($u->name ?? 'Admin', 16) }}</div>
+                    <div class="cx-tb-urole">{{ $company->name }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="cx-content">
 

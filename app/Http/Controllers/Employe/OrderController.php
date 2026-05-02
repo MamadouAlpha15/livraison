@@ -176,4 +176,30 @@ class OrderController extends Controller
         $order->update(['status' => 'pending', 'livreur_id' => null]);
         return back()->with('success', 'Commande #' . $order->id . ' restaurée — prête à réassigner.');
     }
+
+    public function rateCompany(Request $request, Order $order)
+    {
+        $shopId = Auth::user()->currentShopId();
+        abort_unless($shopId && $order->shop_id === $shopId, 403, 'Commande hors de votre boutique.');
+        abort_unless($order->status === 'livrée' && $order->delivery_company_id, 422, 'Cette commande ne peut pas être notée.');
+
+        $existing = \App\Models\Review::where('order_id', $order->id)->where('user_id', Auth::id())->first();
+        if ($existing) {
+            return response()->json(['error' => 'Vous avez déjà noté cette commande.'], 422);
+        }
+
+        $data = $request->validate([
+            'rating'  => ['required', 'integer', 'between:1,5'],
+            'comment' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        \App\Models\Review::create([
+            'order_id' => $order->id,
+            'user_id'  => Auth::id(),
+            'rating'   => $data['rating'],
+            'comment'  => $data['comment'] ?? null,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Avis enregistré !']);
+    }
 }
