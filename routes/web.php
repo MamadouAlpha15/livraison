@@ -226,6 +226,9 @@ Route::middleware('auth')->group(function () {
         /* Boutiques partenaires */
         Route::get('/boutiques', [CompanyOrderController::class, 'boutiques'])->name('company.boutiques.index');
 
+        /* Clients livrés */
+        Route::get('/clients', [CompanyOrderController::class, 'clients'])->name('company.clients.index');
+
         /* Carte en direct */
         Route::get('/carte',      [CompanyOrderController::class, 'mapView']) ->name('company.carte.index');
         Route::get('/carte/data', [CompanyOrderController::class, 'mapData']) ->name('company.carte.data');

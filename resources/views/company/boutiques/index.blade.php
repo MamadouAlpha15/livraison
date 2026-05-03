@@ -245,6 +245,9 @@ body.cx-light .toolbar .search-box{background:#fff;}
         <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item active">
             <span class="cx-nav-ico">🏪</span> Boutiques
         </a>
+        <a href="{{ route('company.clients.index') }}" class="cx-nav-item">
+            <span class="cx-nav-ico">👥</span> Clients
+        </a>
         <div class="cx-nav-sec">Gestion</div>
         <a href="{{ route('company.historique.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">📊</span> Historique

@@ -307,7 +307,7 @@ body.cx-light .cx-panel-toggle{background:rgba(124,58,237,.08);border-color:rgba
         <a href="{{ route('company.livraisons.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🚚</span> Livraisons</a>
         <a href="{{ route('company.carte.index') }}"      class="cx-nav-item active"><span class="cx-nav-ico">🗺️</span> Carte en direct</a>
         <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🏪</span> Boutiques</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">👥</span> Clients</a>
+        <a href="{{ route('company.clients.index') }}" class="cx-nav-item"><span class="cx-nav-ico">👥</span> Clients</a>
         <div class="cx-nav-sec">Gestion</div>
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">📍</span> Zone de livraison</a>
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">💲</span> Tarification</a>

@@ -879,7 +879,7 @@ body.cx-light .cx-chart-big { color:#111827; }
         <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">🏪</span> Boutiques
         </a>
-        <a href="#" class="cx-nav-item">
+        <a href="{{ route('company.clients.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">👥</span> Clients
         </a>
 

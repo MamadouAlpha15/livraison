@@ -248,6 +248,47 @@ class OrderController extends Controller
         return view('company.historique.index', compact('orders', 'stats', 'drivers', 'company'));
     }
 
+    public function clients(Request $request)
+    {
+        $company = $this->company();
+
+        $search = $request->input('search');
+
+        $clientsQuery = \App\Models\User::whereHas('orders', fn($q) =>
+            $q->where('delivery_company_id', $company->id)
+        )->withCount([
+            'orders as total_orders' => fn($q) => $q->where('delivery_company_id', $company->id),
+            'orders as livrees'      => fn($q) => $q->where('delivery_company_id', $company->id)->where('status', Order::STATUS_LIVREE),
+            'orders as en_cours'     => fn($q) => $q->where('delivery_company_id', $company->id)->whereIn('status', [Order::STATUS_CONFIRMEE, Order::STATUS_EN_LIVRAISON]),
+            'orders as annulees'     => fn($q) => $q->where('delivery_company_id', $company->id)->where('status', Order::STATUS_ANNULEE),
+        ])->withSum(['orders as total_montant' => fn($q) =>
+            $q->where('delivery_company_id', $company->id)->where('status', Order::STATUS_LIVREE)
+        ], 'total')
+        ->withMax(['orders as derniere_commande' => fn($q) =>
+            $q->where('delivery_company_id', $company->id)
+        ], 'created_at');
+
+        if ($search) {
+            $clientsQuery->where(fn($q) =>
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+            );
+        }
+
+        $clients = $clientsQuery->orderByDesc('total_orders')->paginate(18)->withQueryString();
+
+        $stats = [
+            'total_clients' => \App\Models\User::whereHas('orders', fn($q) => $q->where('delivery_company_id', $company->id))->count(),
+            'total_livrees' => Order::where('delivery_company_id', $company->id)->where('status', Order::STATUS_LIVREE)->count(),
+            'top_client'    => \App\Models\User::whereHas('orders', fn($q) => $q->where('delivery_company_id', $company->id))
+                                ->withCount(['orders as total_orders' => fn($q) => $q->where('delivery_company_id', $company->id)])
+                                ->orderByDesc('total_orders')->first(),
+        ];
+
+        return view('company.clients.index', compact('clients', 'stats', 'company', 'search'));
+    }
+
     public function boutiques(Request $request)
     {
         $company = $this->company();
