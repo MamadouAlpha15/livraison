@@ -98,23 +98,30 @@ class DriverController extends Controller
     {
         $company = $this->resolveCompany();
 
-        $drivers = $company->drivers()
+        /* Stats sur tous les chauffeurs (avant pagination) */
+        $allDrivers = $company->drivers()
             ->withCount([
-                'orders',
-                'orders as livrees_count'   => fn($q) => $q->where('status', 'livrée'),
-                'orders as en_cours_count'  => fn($q) => $q->where('status', 'en_livraison'),
+                'orders as livrees_count' => fn($q) => $q->where('status', 'livrée'),
             ])
-            ->orderByRaw("FIELD(status,'available','busy','offline')")
-            ->orderBy('name')
             ->get();
 
         $stats = [
-            'total'     => $drivers->count(),
-            'available' => $drivers->where('status', 'available')->count(),
-            'busy'      => $drivers->where('status', 'busy')->count(),
-            'offline'   => $drivers->where('status', 'offline')->count(),
-            'livrees'   => $drivers->sum('livrees_count'),
+            'total'     => $allDrivers->count(),
+            'available' => $allDrivers->where('status', 'available')->count(),
+            'busy'      => $allDrivers->where('status', 'busy')->count(),
+            'offline'   => $allDrivers->where('status', 'offline')->count(),
+            'livrees'   => $allDrivers->sum('livrees_count'),
         ];
+
+        /* Liste paginée : plus récent en premier */
+        $drivers = $company->drivers()
+            ->withCount([
+                'orders',
+                'orders as livrees_count'  => fn($q) => $q->where('status', 'livrée'),
+                'orders as en_cours_count' => fn($q) => $q->where('status', 'en_livraison'),
+            ])
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
 
         return view('company.drivers.index', compact('company', 'drivers', 'stats'));
     }

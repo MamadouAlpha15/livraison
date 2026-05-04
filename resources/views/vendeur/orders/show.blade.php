@@ -5,6 +5,7 @@
 
 
 
+
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -639,6 +640,27 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
                                     </div>
                                 </div>
                             </div>
+                            @elseif($order->deliveryCompany)
+                            <div class="info-row" style="align-items:center">
+                                <span class="lbl">Livreur</span>
+                                <div class="livreur-inline">
+                                    <div class="l-av" style="background:linear-gradient(135deg,#6366f1,#4f46e5);">🏢</div>
+                                    <div>
+                                        <div class="l-name">{{ $order->deliveryCompany->name }}</div>
+                                        <div class="l-avail">
+                                            @if($order->driver)
+                                                <span class="l-dot" style="background:#6366f1"></span> {{ $order->driver->name }}
+                                            @elseif($order->status === 'livrée')
+                                                <span class="l-dot" style="background:#22c55e"></span> Livraison terminée
+                                            @elseif($order->status === 'en_livraison')
+                                                <span class="l-dot" style="background:#f59e0b"></span> En livraison
+                                            @else
+                                                <span class="l-dot" style="background:#94a3b8"></span> En attente d'un chauffeur
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             @elseif($canAssign)
                             <div class="info-row">
                                 <span class="lbl">Livreur</span>
@@ -669,8 +691,9 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
         {{-- ═══ GPS PLEINE LARGEUR ═══ --}}
         @php
             $gpsDriverName = $order->livreur?->name
-                ?? ($order->driver_id ? optional(\App\Models\Driver::find($order->driver_id))->name : null);
-            $hasAnyDriver  = $order->livreur_id || $order->driver_id;
+                ?? $order->driver?->name
+                ?? ($order->deliveryCompany ? $order->deliveryCompany->name : null);
+            $hasAnyDriver  = $order->livreur_id || $order->driver_id || $order->delivery_company_id;
             $isFinished    = in_array($order->status, ['livrée', 'annulée']);
             $isLivrée      = $order->status === 'livrée';
         @endphp
@@ -729,7 +752,7 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
                 <div class="gps-empty" id="uiGpsEmptyWait" style="padding:60px 20px">
                     <span class="gps-empty-ico" style="font-size:52px">🗺️</span>
                     <div class="gps-empty-txt" style="font-size:14px">
-                        Livreur assigné{{ $gpsDriverName ? ' (<strong>'.$gpsDriverName.'</strong>)' : '' }}, en attente du démarrage.<br>
+                        Livreur assigné{{ $gpsDriverName ? ' ()' : '' }}, en attente du démarrage.<br>
                         <span style="font-size:12px">Le GPS s'activera quand le livreur sera en route.</span>
                     </div>
                 </div>

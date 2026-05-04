@@ -185,6 +185,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/delivery-companies',                       [DeliveryCompanyController::class, 'index'])      ->name('delivery.companies.index');
     Route::get('/delivery-companies/{company}',             [DeliveryCompanyController::class, 'show'])       ->name('delivery.companies.show');
     Route::post('/delivery-companies/{company}/reviews',    [DeliveryCompanyController::class, 'storeReview'])->name('delivery.companies.review');
+    Route::get('/company-zones/{company}',                  [DeliveryCompanyController::class, 'zonesJson'])  ->name('company.zones.json');
 
     /* Espace company + admin boutique */
     Route::middleware('role:admin,company')->prefix('company')->group(function () {
@@ -196,11 +197,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/chat/inbox',         [DeliveryChatController::class, 'inbox'])        ->name('company.chat.inbox');
         Route::get('/chat/conversations', [DeliveryChatController::class, 'conversations'])->name('company.chat.conversations');
         Route::post('/chat/mark-read',    [DeliveryChatController::class, 'markRead'])     ->name('company.chat.markRead');
-
-        /* Chat boutique → company (page de conversation) */
-        Route::get('/{company}/chat',          [DeliveryChatController::class, 'show'])    ->name('company.chat.show');
-        Route::post('/{company}/chat/send',    [DeliveryChatController::class, 'send'])    ->name('company.chat.send');
-        Route::get('/{company}/chat/messages', [DeliveryChatController::class, 'messages'])->name('company.chat.messages');
 
         /* Gestion des chauffeurs */
         Route::get('/drivers',                       [DriverController::class, 'index'])        ->name('company.drivers.index');
@@ -249,6 +245,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/company/waiting', function () {
             return view('company.waiting_approval');
         })->name('company.waiting');
+    });
+
+    /* Chat boutique → company : accessible aux vendeurs, employés, admins et company */
+    Route::middleware('role:admin,company,vendeur,employe,superadmin')
+        ->prefix('company')
+        ->group(function () {
+        Route::get('/{company}/chat',          [DeliveryChatController::class, 'show'])    ->name('company.chat.show');
+        Route::post('/{company}/chat/send',    [DeliveryChatController::class, 'send'])    ->name('company.chat.send');
+        Route::get('/{company}/chat/messages', [DeliveryChatController::class, 'messages'])->name('company.chat.messages');
     });
 
 
@@ -362,6 +367,10 @@ Route::middleware(['auth', 'role:admin'])
         /* Analyse par période (AJAX) */
         Route::get('period-stats', \App\Http\Controllers\Boutique\PeriodStatsController::class)
             ->name('period.stats');
+
+        /* KPI temps réel (AJAX polling 30s) */
+        Route::get('kpi-live', \App\Http\Controllers\Boutique\KpiLiveController::class)
+            ->name('kpi.live');
 
         /* Exports Excel */
         Route::get('export/orders/excel',   [ExportController::class, 'exportOrdersExcel'])  ->name('export.orders.excel');

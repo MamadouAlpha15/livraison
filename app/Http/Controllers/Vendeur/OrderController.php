@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Vendeur;
 
 use App\Http\Controllers\Controller;
 use App\Models\DeliveryCompany;
+use App\Models\DeliveryZone;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;

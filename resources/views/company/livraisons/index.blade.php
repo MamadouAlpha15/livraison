@@ -301,7 +301,7 @@ body.cx-light .lv-act-btn{background:#f3f4f6;border-color:rgba(0,0,0,.08)}
                     <th>Statut</th>
                     <th>Mis à jour</th>
                     <th>Frais</th>
-                    <th></th>
+                    
                 </tr>
             </thead>
             <tbody id="lvBody">
@@ -347,7 +347,7 @@ body.cx-light .lv-act-btn{background:#f3f4f6;border-color:rgba(0,0,0,.08)}
                 </td>
                 <td>
                     <div style="display:flex;gap:5px">
-                        <button class="lv-act-btn done" title="Marquer livrée"
+                        <button class="lv-act-btn done" title="Marquer livré"
                             onclick="updateStatus({{ $order->id }},'livrée')">✓</button>
                         <button class="lv-act-btn cancel" title="Annuler"
                             onclick="updateStatus({{ $order->id }},'annulée')">✕</button>

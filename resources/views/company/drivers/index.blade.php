@@ -654,6 +654,11 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
                 </div>
                 @endforelse
             </div>
+            @if($drivers->hasPages())
+            <div style="display:flex;justify-content:center;padding:20px 0 8px;">
+                {{ $drivers->links() }}
+            </div>
+            @endif
         </div>
     </div>
 </main>

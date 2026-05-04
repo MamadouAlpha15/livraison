@@ -618,6 +618,123 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .bq-btn-confier:disabled{opacity:.6;cursor:not-allowed;transform:none;}
 .bq-btn-confier.done{background:linear-gradient(135deg,#6b7280,#9ca3af);box-shadow:none;}
 .bq-confier-hint{font-size:11px;color:#059669;font-weight:600;margin-bottom:6px;}
+
+/* ══════════════════════════════════════════════════
+   CORRECTIFS RESPONSIVE COMPLÉMENTAIRES
+══════════════════════════════════════════════════ */
+
+/* Table scrollable horizontalement sur mobile */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.tbl-wrap .tbl{min-width:420px;}
+
+/* Notification dropdown : ne déborde pas sur petits écrans */
+@media(max-width:400px){
+    #notifDropdown{width:calc(100vw - 24px);right:auto;left:50%;transform:translateX(-50%);}
+}
+
+/* co-row (liste entreprises partenaires) : bouton passe en dessous sur très petit écran */
+@media(max-width:400px){
+    .co-row{flex-wrap:wrap;gap:8px;}
+    .co-info{min-width:0;flex:1 1 calc(100% - 50px);}
+    .co-commission{margin-left:auto;}
+    .co-row .btn{width:100%;justify-content:center;font-size:11px;}
+}
+
+/* Period stats : 1 colonne sous 400px */
+@media(max-width:400px){
+    .period-stats{grid-template-columns:1fr !important;}
+    .period-stat{border-right:none !important;border-top:1px solid var(--border);}
+    .period-stat:first-child{border-top:none;}
+}
+
+/* risk-row : 1 par ligne sur très petit écran */
+@media(max-width:400px){
+    .risk-row{min-width:100% !important;border-right:none !important;}
+}
+
+/* Topbar : compresse les actions sur très petit écran */
+@media(max-width:360px){
+    .tb-actions{gap:4px;}
+    .tb-icon-btn{width:30px;height:30px;font-size:13px;}
+    .btn-hamburger{padding:4px;}
+    .topbar{padding:0 8px;}
+}
+
+/* KPI : 1 colonne sous 340px */
+@media(max-width:340px){
+    .kpi-grid{grid-template-columns:1fr !important;}
+}
+
+/* Kanban : 2 colonnes sous 400px */
+@media(max-width:400px){
+    .kanban-grid{grid-template-columns:repeat(2,1fr) !important;gap:8px;}
+    .kanban-count{font-size:24px;}
+    .kanban-ico-wrap{width:38px;height:38px;font-size:17px;margin-bottom:8px;}
+}
+
+/* Quick actions : 2 colonnes, moins de padding sur mobile */
+@media(max-width:400px){
+    .quick-btn{padding:14px 8px 12px;}
+    .quick-btn-ico{width:36px;height:36px;font-size:18px;}
+    .quick-btn-lbl{font-size:11px;}
+    .quick-btn-sub{display:none;}
+}
+
+/* Charts : hauteur adaptée sur mobile */
+@media(max-width:520px){
+    .mini-bars-wrap{height:80px;padding:12px 14px 4px;}
+    .mini-chart-hd{padding:12px 14px 10px;}
+    .mini-chart-val{font-size:22px;}
+    .rc-svg-wrap{padding:10px 14px 2px;}
+}
+
+/* Today cards : empilées sur mobile */
+@media(max-width:520px){
+    .today-grid{grid-template-columns:1fr !important;}
+    .today-card{padding:16px;}
+    .today-val{font-size:22px;}
+    .today-wave{opacity:.5;}
+}
+
+/* perf-grid : 1 colonne sur mobile */
+@media(max-width:700px){
+    .perf-grid{grid-template-columns:1fr !important;}
+}
+
+/* Bq chat panel : plein écran sur mobile */
+@media(max-width:560px){
+    .bq-chat-overlay{padding:0;align-items:flex-end;}
+    .bq-chat-panel{border-radius:20px 20px 0 0;max-height:90vh;max-width:100%;}
+    .bq-confier-row{flex-wrap:wrap;}
+    .bq-btn-confier{width:100%;justify-content:center;}
+}
+
+/* Résumé rapide : compact sur mobile */
+@media(max-width:520px){
+    .resume-item{padding:10px 12px;}
+    .resume-item-val{font-size:16px;}
+    .resume-item-ico{width:30px;height:30px;font-size:15px;}
+}
+
+/* Card header : texte tronqué sur mobile */
+@media(max-width:520px){
+    .card-hd{flex-wrap:wrap;gap:6px;padding:12px 14px;}
+    .card-title{font-size:12px;}
+    .card-bd{padding:12px 14px;}
+    .card-hd .btn-ghost{font-size:11px;padding:4px 6px;}
+}
+
+/* lv-row compact sur mobile */
+@media(max-width:400px){
+    .lv-row{padding:8px 12px;gap:8px;}
+    .lv-av{width:34px;height:34px;font-size:11px;}
+    .lv-nm{font-size:12px;}
+}
+
+/* Scrollbar globale fine */
+*{scrollbar-width:thin;scrollbar-color:rgba(99,102,241,.2) transparent;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:rgba(99,102,241,.2);border-radius:4px;}
 </style>
 @endpush
 
@@ -679,16 +796,16 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     $alerts = collect();
     $cmdEnRetard = $shop->orders()->whereIn('status', ['pending', 'en attente', 'en_attente'])->where('created_at', '<', now()->subHours(2))->count();
     if ($cmdEnRetard > 0) $alerts->push(['type'=>'danger','ico'=>'🚨','msg'=>"{$cmdEnRetard} commande(s) en attente depuis plus de 2h — à traiter urgemment",'link'=>route('boutique.orders.index'),'cta'=>'Voir les commandes']);
-    $cmdALivrer = $shop->orders()->whereIn('status', ['confirmée', 'confirmed', 'processing'])->count();
+    $cmdALivrer = $shop->orders()->whereIn('status', ['confirmée', 'confirmed', 'processing'])->whereNull('driver_id')->whereNull('delivery_company_id')->count();
     if ($cmdALivrer > 0 && $livreursDisponibles->isEmpty()) $alerts->push(['type'=>'warning','ico'=>'⚠️','msg'=>"{$cmdALivrer} commande(s) prête(s) à livrer mais aucun livreur disponible",'link'=>route('delivery.companies.index'),'cta'=>'Trouver un livreur']);
     if (!$shop->is_approved) $alerts->push(['type'=>'warning','ico'=>'⏳','msg'=>"Votre boutique est en attente de validation par l'administrateur",'link'=>null,'cta'=>null]);
     if ($caTodayDelta >= 20 && $caToday > 0) $alerts->push(['type'=>'success','ico'=>'🎉','msg'=>"Excellente journée ! Vos revenus d'aujourd'hui sont en hausse de {$caTodayDelta}% vs hier",'link'=>null,'cta'=>null]);
     $kanban = [
-        ['label'=>'En attente','count'=>$shop->orders()->whereIn('status',['pending','en attente','en_attente'])->count(),'color'=>'#f59e0b','bg'=>'#fffbeb','ico'=>'⏰'],
-        ['label'=>'Confirmées','count'=>$shop->orders()->whereIn('status',['confirmed','confirmée','processing'])->count(),'color'=>'#10b981','bg'=>'#ecfdf5','ico'=>'✅'],
-        ['label'=>'En livraison','count'=>$shop->orders()->whereIn('status',['en_livraison','delivering','shipped'])->count(),'color'=>'#6366f1','bg'=>'#eef2ff','ico'=>'🚚'],
-        ['label'=>'Terminées','count'=>$shop->orders()->whereMonth('created_at',$now->month)->where('status','livrée')->count(),'color'=>'#22c55e','bg'=>'#dcfce7','ico'=>'✅'],
-        ['label'=>'Annulées','count'=>$shop->orders()->whereMonth('created_at',$now->month)->whereIn('status',['annulée','cancelled'])->count(),'color'=>'#ef4444','bg'=>'#fef2f2','ico'=>'❌'],
+        ['key'=>'en_attente',  'label'=>'En attente','count'=>$shop->orders()->whereIn('status',['pending','en attente','en_attente'])->count(),'color'=>'#f59e0b','bg'=>'#fffbeb','ico'=>'⏰'],
+        ['key'=>'confirmees',  'label'=>'Confirmées','count'=>$shop->orders()->whereIn('status',['confirmed','confirmée','processing'])->count(),'color'=>'#10b981','bg'=>'#ecfdf5','ico'=>'✅'],
+        ['key'=>'en_livraison','label'=>'En livraison','count'=>$shop->orders()->whereIn('status',['en_livraison','delivering','shipped'])->count(),'color'=>'#6366f1','bg'=>'#eef2ff','ico'=>'🚚'],
+        ['key'=>'terminees',   'label'=>'Terminées','count'=>$shop->orders()->whereMonth('created_at',$now->month)->where('status','livrée')->count(),'color'=>'#22c55e','bg'=>'#dcfce7','ico'=>'✅'],
+        ['key'=>'annulees',    'label'=>'Annulées','count'=>$shop->orders()->whereMonth('created_at',$now->month)->whereIn('status',['annulée','cancelled'])->count(),'color'=>'#ef4444','bg'=>'#fef2f2','ico'=>'❌'],
     ];
     $hasLivreurs  = $livreursDisponibles->isNotEmpty();
     $hasCompanies = isset($deliveryCompanies) && $deliveryCompanies->isNotEmpty();
@@ -896,9 +1013,9 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 <div class="kpi"  style="--kpi-color:#8b5cf6;--kpi-bg:#f5f3ff">
                     <div class="kpi-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);border-color:rgba(139,92,246,.3);box-shadow:0 0 0 3px rgba(139,92,246,.12),0 4px 14px rgba(139,92,246,.4)">💰</div>
                     <div class="kpi-lbl">Revenu net</div>
-                    <div class="kpi-val">{{ number_format($caMonth,0,',',' ') }}</div>
+                    <div class="kpi-val" id="kpiCaVal">{{ number_format($caMonth,0,',',' ') }}</div>
                     <div class="kpi-unit">{{ $devise }} · {{ $now->translatedFormat('F Y') }}</div>
-                    <div class="kpi-delta {{ $caDelta >= 0 ? 'up':'down' }}">{{ $caDelta >= 0 ? '↑':'↓' }} {{ abs($caDelta) }}% vs mois précédent</div>
+                    <div class="kpi-delta {{ $caDelta >= 0 ? 'up':'down' }}" id="kpiCaDelta">{{ $caDelta >= 0 ? '↑':'↓' }} {{ abs($caDelta) }}% vs mois précédent</div>
                     @if($commissionsPaieesMonth > 0)
                     <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:3px">
                         <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted)"><span>CA brut</span><span style="font-family:var(--mono);color:var(--text-2)">{{ number_format($caGrossMonth,0,',',' ') }}</span></div>
@@ -910,23 +1027,23 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 <div class="kpi" style="--kpi-color:#8b5cf6;--kpi-bg:#f5f3ff">
                     <div class="kpi-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);border-color:rgba(139,92,246,.3);box-shadow:0 0 0 3px rgba(139,92,246,.12),0 4px 14px rgba(139,92,246,.4)">📦</div>
                     <div class="kpi-lbl">Commandes ce mois</div>
-                    <div class="kpi-val">{{ $cmdMonth }}</div>
+                    <div class="kpi-val" id="kpiCmdVal">{{ $cmdMonth }}</div>
                     <div class="kpi-unit">commandes</div>
-                    <div class="kpi-delta {{ $cmdToday >= $cmdYest ? 'up':'down' }}">{{ $cmdToday >= $cmdYest ? '↑':'↓' }} {{ $cmdToday }} aujourd'hui</div>
+                    <div class="kpi-delta {{ $cmdToday >= $cmdYest ? 'up':'down' }}" id="kpiCmdDelta">{{ $cmdToday >= $cmdYest ? '↑':'↓' }} {{ $cmdToday }} aujourd'hui</div>
                 </div>
                 <div class="kpi" style="--kpi-color:#d97706;--kpi-bg:#fffbeb">
                     <div class="kpi-icon" style="background:linear-gradient(135deg,#f59e0b,#b45309);border-color:rgba(169, 141, 110, 0.3);box-shadow:0 0 0 3px rgba(217,119,6,.12),0 4px 14px rgba(147, 94, 33, 0.4)">🛒</div>
                     <div class="kpi-lbl">Panier moyen</div>
-                    <div class="kpi-val">{{ number_format($panier,0,',',' ') }}</div>
+                    <div class="kpi-val" id="kpiPanierVal">{{ number_format($panier,0,',',' ') }}</div>
                     <div class="kpi-unit">{{ $devise }} / commande</div>
-                    <div class="kpi-delta {{ $caDelta >= 0 ? 'up':'down' }}">{{ $caDelta >= 0 ? '↑':'↓' }} {{ abs($caDelta) }}%</div>
+                    <div class="kpi-delta {{ $caDelta >= 0 ? 'up':'down' }}" id="kpiPanierDelta">{{ $caDelta >= 0 ? '↑':'↓' }} {{ abs($caDelta) }}%</div>
                 </div>
                 <div class="kpi" style="--kpi-color:#d97706;--kpi-bg:#fffbeb">
                     <div class="kpi-icon" style="background:linear-gradient(135deg,#f59e0b,#b45309);border-color:rgba(217,119,6,.3);box-shadow:0 0 0 3px rgba(217,119,6,.12),0 4px 14px rgba(217,119,6,.4)">🚴</div>
                     <div class="kpi-lbl">Taux de livraison</div>
-                    <div class="kpi-val">{{ $tauxLiv }}%</div>
-                    <div class="kpi-unit">{{ $livres }} / {{ $totalCmdMonth }} livrées</div>
-                    <div class="kpi-delta {{ $tauxLiv >= 90 ? 'up':'down' }}">{{ $tauxLiv >= 90 ? '✓ Excellent':'⚠ À améliorer' }}</div>
+                    <div class="kpi-val" id="kpiTauxVal">{{ $tauxLiv }}%</div>
+                    <div class="kpi-unit" id="kpiTauxUnit">{{ $livres }} / {{ $totalCmdMonth }} livrées</div>
+                    <div class="kpi-delta {{ $tauxLiv >= 90 ? 'up':'down' }}" id="kpiTauxDelta">{{ $tauxLiv >= 90 ? '✓ Excellent':'⚠ À améliorer' }}</div>
                 </div>
             </div>
 
@@ -937,9 +1054,9 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     <div class="today-icon">💵</div>
                     <div style="flex:1;min-width:0">
                         <div class="today-lbl">Revenu net aujourd'hui</div>
-                        <div class="today-val">{{ number_format($caToday, 0, ',', ' ') }}</div>
+                        <div class="today-val" id="todayCaVal">{{ number_format($caToday, 0, ',', ' ') }}</div>
                         <div class="today-unit">{{ $devise }}</div>
-                        <div class="today-delta {{ $caTodayDelta > 0 ? 'up' : ($caTodayDelta < 0 ? 'down' : 'flat') }}">
+                        <div class="today-delta {{ $caTodayDelta > 0 ? 'up' : ($caTodayDelta < 0 ? 'down' : 'flat') }}" id="todayCaDelta">
                             @if($caTodayDelta > 0) ↑ +{{ $caTodayDelta }}% vs hier
                             @elseif($caTodayDelta < 0) ↓ {{ $caTodayDelta }}% vs hier
                             @else — Même niveau qu'hier @endif
@@ -965,9 +1082,9 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     <div class="today-icon">📦</div>
                     <div>
                         <div class="today-lbl">Commandes aujourd'hui</div>
-                        <div class="today-val">{{ $cmdToday }}</div>
+                        <div class="today-val" id="todayCmdVal">{{ $cmdToday }}</div>
                         <div class="today-unit">commandes reçues</div>
-                        <div class="today-delta {{ $cmdToday >= $cmdYest ? 'up' : 'down' }}">
+                        <div class="today-delta {{ $cmdToday >= $cmdYest ? 'up' : 'down' }}" id="todayCmdDelta">
                             @if($cmdToday > $cmdYest) ↑ +{{ $cmdToday - $cmdYest }} vs hier
                             @elseif($cmdToday < $cmdYest) ↓ {{ $cmdYest - $cmdToday }} de moins vs hier
                             @else — Même niveau qu'hier @endif
@@ -1007,7 +1124,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     @foreach($kanban as $col)
                     <div class="kanban-col {{ $col['count'] > 0 ? 'has-items' : '' }}" style="--k-color:{{ $col['color'] }};--k-bg:{{ $col['bg'] }}">
                         <div class="kanban-ico-wrap">{{ $col['ico'] }}</div>
-                        <div class="kanban-count">{{ $col['count'] }}</div>
+                        <div class="kanban-count" id="kb-{{ $col['key'] }}">{{ $col['count'] }}</div>
                         <div class="kanban-lbl">{{ $col['label'] }}</div>
                         @if($col['label'] === 'Terminées')<div style="font-size:9px;color:var(--muted);margin-top:3px;font-weight:600">ce mois</div>@endif
                     </div>
@@ -1200,7 +1317,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <div class="content-grid">
                 <div class="card">
                     <div class="card-hd"><span class="card-title">Commandes récentes</span><a href="{{ route('boutique.orders.index') }}" class="btn-ghost btn btn-sm">Voir tout →</a></div>
-                    <div style="padding:0 18px">
+                    <div class="tbl-wrap" style="padding:0 18px">
                         @if($recentOrders->isEmpty())<div style="padding:28px 0;text-align:center;font-size:13px;color:var(--muted)">Aucune commande pour le moment.</div>
                         @else
                         <table class="tbl">
@@ -2241,6 +2358,93 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(() => { sendBtn.disabled = false; });
     };
+})();
+
+/* ════════════════════════════════════════════════════════
+   KPI TEMPS RÉEL — polling 30s
+   ════════════════════════════════════════════════════════ */
+(function () {
+    const KPI_URL = '{{ route("boutique.kpi.live") }}';
+    const CSRF    = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+
+    function fmt(n) {
+        return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    }
+
+    function set(id, val) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+    }
+
+    function setClass(id, cls) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.remove('up', 'down', 'flat');
+        el.classList.add(cls);
+    }
+
+    function pollKpi() {
+        fetch(KPI_URL, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': CSRF }
+        })
+        .then(r => r.ok ? r.json() : null)
+        .then(d => {
+            if (!d) return;
+
+            /* KPI Revenu net */
+            set('kpiCaVal', d.ca_month);
+            const caCls = d.ca_delta >= 0 ? 'up' : 'down';
+            setClass('kpiCaDelta', caCls);
+            set('kpiCaDelta', (d.ca_delta >= 0 ? '↑' : '↓') + ' ' + Math.abs(d.ca_delta) + '% vs mois précédent');
+
+            /* KPI Commandes */
+            set('kpiCmdVal', d.cmd_month);
+            const cmdCls = d.cmd_today >= d.cmd_yest ? 'up' : 'down';
+            setClass('kpiCmdDelta', cmdCls);
+            set('kpiCmdDelta', (d.cmd_today >= d.cmd_yest ? '↑' : '↓') + ' ' + d.cmd_today + ' aujourd\'hui');
+
+            /* KPI Panier moyen */
+            set('kpiPanierVal', d.panier);
+            setClass('kpiPanierDelta', d.ca_delta >= 0 ? 'up' : 'down');
+            set('kpiPanierDelta', (d.ca_delta >= 0 ? '↑' : '↓') + ' ' + Math.abs(d.ca_delta) + '%');
+
+            /* KPI Taux livraison */
+            set('kpiTauxVal', d.taux_liv + '%');
+            set('kpiTauxUnit', d.livres + ' / ' + d.total_cmd_month + ' livrées');
+            const tauxOk = d.taux_liv >= 90;
+            setClass('kpiTauxDelta', tauxOk ? 'up' : 'down');
+            set('kpiTauxDelta', tauxOk ? '✓ Excellent' : '⚠ À améliorer');
+
+            /* Today CA */
+            set('todayCaVal', d.ca_today);
+            const todayCaCls = d.ca_today_delta > 0 ? 'up' : (d.ca_today_delta < 0 ? 'down' : 'flat');
+            setClass('todayCaDelta', todayCaCls);
+            if (d.ca_today_delta > 0)      set('todayCaDelta', '↑ +' + d.ca_today_delta + '% vs hier');
+            else if (d.ca_today_delta < 0) set('todayCaDelta', '↓ ' + d.ca_today_delta + '% vs hier');
+            else                           set('todayCaDelta', '— Même niveau qu\'hier');
+
+            /* Today commandes */
+            set('todayCmdVal', d.cmd_today);
+            const todayCmdCls = d.cmd_today >= d.cmd_yest ? 'up' : 'down';
+            setClass('todayCmdDelta', todayCmdCls);
+            const diff = Math.abs(d.cmd_today - d.cmd_yest);
+            if (d.cmd_today > d.cmd_yest)      set('todayCmdDelta', '↑ +' + diff + ' vs hier');
+            else if (d.cmd_today < d.cmd_yest) set('todayCmdDelta', '↓ ' + diff + ' de moins vs hier');
+            else                               set('todayCmdDelta', '— Même niveau qu\'hier');
+
+            /* Kanban */
+            if (d.kanban) {
+                Object.entries(d.kanban).forEach(([key, cnt]) => {
+                    const el = document.getElementById('kb-' + key);
+                    if (el) el.textContent = cnt;
+                });
+            }
+        })
+        .catch(() => {});
+    }
+
+    /* Premier appel après 30s puis toutes les 30s */
+    setInterval(pollKpi, 30000);
 })();
 </script>
 @endpush

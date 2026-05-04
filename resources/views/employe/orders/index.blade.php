@@ -107,8 +107,18 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .c-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--brand),#4f46e5);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
 .c-name{font-size:13px;font-weight:600;color:var(--text);}
 .c-sub{font-size:11px;color:var(--muted);}
-.prod-img{width:36px;height:36px;border-radius:var(--r-sm);object-fit:cover;border:1px solid var(--border);flex-shrink:0;}
-.prod-ph{width:36px;height:36px;border-radius:var(--r-sm);background:#f3f6f4;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.prod-img{width:58px;height:58px;border-radius:var(--r-sm);object-fit:cover;border:2px solid var(--border);flex-shrink:0;cursor:pointer;transition:transform .15s,box-shadow .15s;}
+.prod-img:hover{transform:scale(1.07);box-shadow:0 4px 16px rgba(0,0,0,.18);}
+.prod-ph{width:58px;height:58px;border-radius:var(--r-sm);background:#f3f6f4;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.addr-cell{font-size:11.5px;color:var(--text-2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.addr-empty{color:var(--muted);font-size:11px;}
+/* ── LIGHTBOX PHOTO ── */
+.lb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:500;align-items:center;justify-content:center;padding:16px;cursor:zoom-out;}
+.lb-overlay.open{display:flex;}
+.lb-img{max-width:92vw;max-height:88vh;border-radius:12px;box-shadow:0 24px 72px rgba(0,0,0,.5);object-fit:contain;}
+.lb-caption{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.8);font-size:13px;font-weight:600;background:rgba(0,0,0,.4);padding:6px 16px;border-radius:20px;pointer-events:none;white-space:nowrap;}
+.lb-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .14s;}
+.lb-close:hover{background:rgba(255,255,255,.3);}
 .amount{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--text);white-space:nowrap;}
 .amount small{font-size:10px;color:var(--muted);font-weight:500;}
 .pill{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;}
@@ -255,11 +265,37 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
     .mobile-list{display:flex !important;}
     .content{padding:14px;}
 }
-@media(max-width:520px){
+@media(max-width:640px){
     .content{padding:10px;}
-    .stats-row{gap:5px;}
-    .stat-chip{min-width:0;padding:7px 9px;flex:1;font-size:10px;}
+    .stats-row{gap:5px;flex-wrap:wrap;}
+    .stat-chip{min-width:calc(50% - 5px);padding:7px 9px;flex:1 1 calc(50% - 5px);font-size:10px;}
+    .filter-bar{padding:10px 12px;}
+    .filter-row{gap:6px;}
+    .date-chips{gap:4px;}
+    .date-chip{padding:5px 9px;font-size:10.5px;}
+    .topbar{padding:0 12px;gap:8px;}
+    #autoRefreshBadge{padding:3px 8px;font-size:10.5px;}
 }
+@media(max-width:480px){
+    .content{padding:8px;}
+    .stats-row{gap:4px;}
+    .stat-chip{font-size:9.5px;padding:6px 7px;}
+    .m-card-hd,.m-card-body,.m-card-foot{padding-left:10px;padding-right:10px;}
+    .m-card-foot .btn,.m-card-foot .btn-cancel,.m-card-foot .btn-restore,.m-card-foot .btn-noter{font-size:11px;padding:6px 8px;}
+    .assign-select{min-width:90px;}
+    .filter-search-wrap{min-width:0;width:100%;}
+    .filter-row{flex-wrap:wrap;}
+    .btn-filter-apply,.btn-filter-reset{width:100%;justify-content:center;}
+    .chat-panel{border-radius:16px 16px 0 0;}
+    .chat-overlay{padding:0;align-items:flex-end;}
+}
+@media(max-width:360px){
+    .topbar{padding:0 8px;}
+    .m-card-hd{flex-wrap:wrap;gap:6px;}
+    .stat-chip .val{font-size:14px;}
+    #autoRefreshBadge{display:none !important;}
+}
+*{scrollbar-width:thin;scrollbar-color:rgba(99,102,241,.2) transparent;}
 /* ── Barre de filtres ── */
 .filter-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:14px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:10px;}
 .filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
@@ -328,8 +364,8 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
     $annulables   = ['pending','en attente','en_attente','confirmée','confirmed'];
     $restaurables = ['annulée','cancelled'];
     $col          = $orders->getCollection();
-    $nonAssignees = $col->filter(fn($o) => !$o->livreur)->count();
-    $assignees    = $col->filter(fn($o) => $o->livreur)->count();
+    $nonAssignees = $col->filter(fn($o) => !$o->livreur && !$o->deliveryCompany)->count();
+    $assignees    = $col->filter(fn($o) => $o->livreur || $o->deliveryCompany)->count();
     $caPage       = $col->where('status','livrée')->sum('total');
     $pendingCount = $col->filter(fn($o) => in_array($o->status,['pending','en attente','en_attente','confirmée','processing']))->count();
     $reviewsByOrderId = \App\Models\Review::whereIn('order_id', $orders->pluck('id'))
@@ -432,8 +468,22 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
             <div class="chat-empty" id="chatEmpty">Aucun message. Commencez la discussion !</div>
         </div>
 
-        {{-- Bouton Confier --}}
+        {{-- Zone selector + Bouton Confier --}}
         <div class="chat-confier-zone" id="chatConfierZone">
+
+            {{-- Sélecteur de zone (affiché si l'entreprise a des zones) --}}
+            <div id="zonePickerWrap" style="display:none;margin-bottom:8px;">
+                <label style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">📍 Zone de livraison</label>
+                <select id="zonePicker"
+                    style="width:100%;padding:9px 12px;border:1.5px solid #bbf7d0;border-radius:9px;font-size:13px;font-family:inherit;background:#fff;color:#0f172a;outline:none;cursor:pointer;"
+                    onchange="onZonePick(this)">
+                    <option value="">— Choisir une zone —</option>
+                </select>
+                <div id="zonePriceHint" style="display:none;margin-top:5px;padding:7px 10px;background:#f0fdf4;border-radius:7px;font-size:12px;font-weight:700;color:#065f46;">
+                    💰 Prix : <span id="zonePriceVal"></span> · ⏱ <span id="zoneDelayVal"></span> min
+                </div>
+            </div>
+
             <button class="btn-confier" id="btnConfier" onclick="confierLivraison()">
                 📦 Confier la livraison à cette entreprise
             </button>
@@ -503,6 +553,13 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
         <textarea class="rate-comment" id="rateComment" placeholder="Dites-nous ce que vous avez pensé de ce service…"></textarea>
         <button class="btn-rate-submit" id="rateSubmitBtn" onclick="submitRating()" disabled>⭐ Envoyer l'avis</button>
     </div>
+</div>
+
+{{-- ══ LIGHTBOX PHOTO PRODUIT ══ --}}
+<div class="lb-overlay" id="lbOverlay" onclick="closeLightbox()">
+    <button class="lb-close" onclick="closeLightbox()">✕</button>
+    <img class="lb-img" id="lbImg" src="" alt="">
+    <div class="lb-caption" id="lbCaption"></div>
 </div>
 
 <div class="dash-wrap">
@@ -670,8 +727,9 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                 @if($orders->isEmpty())
                 <div class="empty-state"><span class="ico">📭</span><p>Aucune commande.</p></div>
                 @else
-                <table class="tbl">
-                    <thead><tr><th>#</th><th>Client</th><th>Produit</th><th>Montant</th><th>Statut</th><th>Livreur / Entreprise</th><th>Assigner</th><th>Actions</th></tr></thead>
+                <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+                <table class="tbl" style="min-width:860px;">
+                    <thead><tr><th>#</th><th>Client</th><th>Produit</th><th>Adresse</th><th>Montant</th><th>Statut</th><th>Livreur / Entreprise</th><th>Assigner</th><th>Actions</th></tr></thead>
                     <tbody>
                     @foreach($orders as $order)
                     @php
@@ -686,8 +744,12 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         <td><span style="font-family:var(--mono);font-size:11px;color:var(--muted)">#{{ $order->id }}</span></td>
                         <td><div style="display:flex;align-items:center;gap:9px"><div class="c-av">{{ $init }}</div><div><div class="c-name">{{ $client->name ?? 'Inconnu' }}</div>@if($client?->phone)<div class="c-sub">📞 {{ $client->phone }}</div>@endif</div></div></td>
                         <td>
-                            @if($product)<div style="display:flex;align-items:center;gap:8px">@if($product->image)<img src="{{ asset('storage/'.$product->image) }}" class="prod-img" alt="{{ $product->name }}">@else<div class="prod-ph">🏷️</div>@endif<div><div style="font-size:12.5px;font-weight:600;color:var(--text)">{{ Str::limit($product->name,22) }}</div><div style="font-size:11px;color:var(--muted)">Qté : {{ $order->items->first()->quantity ?? 1 }}</div></div></div>
+                            @if($product)<div style="display:flex;align-items:center;gap:8px">@if($product->image)<img src="{{ asset('storage/'.$product->image) }}" class="prod-img" alt="{{ $product->name }}" onclick="openLightbox('{{ asset('storage/'.$product->image) }}','{{ addslashes($product->name) }}')">@else<div class="prod-ph">🏷️</div>@endif<div><div style="font-size:12.5px;font-weight:600;color:var(--text)">{{ Str::limit($product->name,22) }}</div><div style="font-size:11px;color:var(--muted)">Qté : {{ $order->items->first()->quantity ?? 1 }}</div></div></div>
                             @else<span style="color:var(--muted);font-size:12px">—</span>@endif
+                        </td>
+                        <td>
+                            @php $addr = $order->delivery_destination ?: ($client?->address ?? ''); @endphp
+                            @if($addr)<div class="addr-cell" title="{{ $addr }}">📍 {{ $addr }}</div>@else<span class="addr-empty">—</span>@endif
                         </td>
                         <td><div class="amount">{{ number_format($order->total,0,',',' ') }} <small>{{ $devise }}</small></div></td>
                         <td><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span></td>
@@ -757,6 +819,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                     @endforeach
                     </tbody>
                 </table>
+                </div>{{-- /overflow-x --}}
                 <div class="pagination-wrap">{{ $orders->links() }}</div>
                 @endif
             </div>
@@ -778,7 +841,9 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span><span style="font-family:var(--mono);font-size:10px;color:var(--muted)">#{{ $order->id }}</span></div>
                     </div>
                     <div class="m-card-body">
-                        @if($product)<div style="display:flex;align-items:center;gap:9px">@if($product->image)<img src="{{ asset('storage/'.$product->image) }}" class="prod-img" alt="{{ $product->name }}">@else<div class="prod-ph">🏷️</div>@endif<div><div style="font-size:13px;font-weight:600">{{ $product->name }}</div><div style="font-size:11px;color:var(--muted)">Qté : {{ $order->items->first()->quantity ?? 1 }}</div></div></div>@endif
+                        @if($product)<div style="display:flex;align-items:center;gap:9px">@if($product->image)<img src="{{ asset('storage/'.$product->image) }}" class="prod-img" alt="{{ $product->name }}" onclick="openLightbox('{{ asset('storage/'.$product->image) }}','{{ addslashes($product->name) }}')">@else<div class="prod-ph">🏷️</div>@endif<div><div style="font-size:13px;font-weight:600">{{ $product->name }}</div><div style="font-size:11px;color:var(--muted)">Qté : {{ $order->items->first()->quantity ?? 1 }}</div></div></div>@endif
+                        @php $mAddr = $order->delivery_destination ?: ($client?->address ?? ''); @endphp
+                        @if($mAddr)<div class="m-row"><span class="m-lbl">Adresse</span><span style="font-size:12px;color:var(--text-2);text-align:right;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{{ $mAddr }}">📍 {{ $mAddr }}</span></div>@endif
                         <div class="m-row"><span class="m-lbl">Montant</span><span class="amount">{{ number_format($order->total,0,',',' ') }} <small>{{ $devise }}</small></span></div>
                         <div class="m-row"><span class="m-lbl">Livreur</span>@if($order->livreur)<div class="lv-chip"><div class="lv-chip-av">{{ initiales($order->livreur->name) }}</div>{{ $order->livreur->name }}</div>@else<span class="pill p-warning">Non assigné</span>@endif</div>
                         @if(!$order->livreur && !$order->deliveryCompany)
@@ -879,6 +944,7 @@ function openChatFromCompany(btn) {
     _currentCompanyId = companyId;
     _lastMsgTime      = null;
     _confierDone      = false;
+    loadCompanyZones(companyId);
 
     /* Mise à jour header */
     const av = document.getElementById('chatCompanyAv');
@@ -1047,9 +1113,55 @@ function sendMsg() {
     .catch(() => { sendBtn.disabled = false; });
 }
 
+/* ── Charge les zones d'une entreprise ── */
+function loadCompanyZones(companyId) {
+    const wrap    = document.getElementById('zonePickerWrap');
+    const picker  = document.getElementById('zonePicker');
+    const hint    = document.getElementById('zonePriceHint');
+
+    wrap.style.display  = 'none';
+    hint.style.display  = 'none';
+    picker.innerHTML    = '<option value="">— Choisir une zone —</option>';
+
+    if (!companyId) return;
+
+    fetch(`/company-zones/${companyId}`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+    })
+    .then(r => r.json())
+    .then(zones => {
+        if (!zones.length) return;
+        zones.forEach(z => {
+            const opt = document.createElement('option');
+            opt.value        = z.id;
+            opt.textContent  = z.name + ' — ' + new Intl.NumberFormat('fr-FR').format(z.price) + ' GNF';
+            opt.dataset.price   = z.price;
+            opt.dataset.minutes = z.estimated_minutes;
+            picker.appendChild(opt);
+        });
+        wrap.style.display = 'block';
+    })
+    .catch(() => {});
+}
+
+function onZonePick(sel) {
+    const hint     = document.getElementById('zonePriceHint');
+    const priceEl  = document.getElementById('zonePriceVal');
+    const delayEl  = document.getElementById('zoneDelayVal');
+    const opt      = sel.options[sel.selectedIndex];
+    if (!sel.value) { hint.style.display = 'none'; return; }
+    priceEl.textContent = new Intl.NumberFormat('fr-FR').format(opt.dataset.price) + ' GNF';
+    delayEl.textContent = opt.dataset.minutes;
+    hint.style.display  = 'block';
+}
+
 /* ── Confie la livraison à l'entreprise ── */
 function confierLivraison() {
     if (!_orderId || !_currentCompanyId || _confierDone) return;
+
+    const picker = document.getElementById('zonePicker');
+    const zoneId = picker?.value || null;
+    const zoneOpt = zoneId ? picker.options[picker.selectedIndex] : null;
 
     const btn = document.getElementById('btnConfier');
     btn.disabled = true;
@@ -1059,6 +1171,8 @@ function confierLivraison() {
     const formData = new FormData();
     formData.append('_method', 'PUT');
     formData.append('delivery_company_id', _currentCompanyId);
+    if (zoneId)                         formData.append('delivery_zone_id', zoneId);
+    if (zoneOpt?.dataset?.price)        formData.append('delivery_fee', zoneOpt.dataset.price);
 
     fetch(`/employe/orders/${_orderId}/send-to-company`, {
         method: 'POST',
@@ -1320,6 +1434,22 @@ function setDate(val) {
         }
     };
 })();
+
+/* ── LIGHTBOX PHOTO PRODUIT ── */
+function openLightbox(src, name) {
+    document.getElementById('lbImg').src       = src;
+    document.getElementById('lbCaption').textContent = name || '';
+    document.getElementById('lbOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+    document.getElementById('lbOverlay').classList.remove('open');
+    document.getElementById('lbImg').src = '';
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeLightbox();
+});
 </script>
 @endpush
 

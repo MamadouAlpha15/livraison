@@ -79,6 +79,16 @@ class DeliveryCompanyController extends Controller
         return view('delivery.show', compact('company', 'zones', 'reviews', 'avgRating', 'userReview'));
     }
 
+    public function zonesJson(DeliveryCompany $company)
+    {
+        $zones = $company->zones()
+            ->where('active', true)
+            ->orderBy('price')
+            ->get(['id', 'name', 'price', 'estimated_minutes', 'color']);
+
+        return response()->json($zones);
+    }
+
     public function storeReview(Request $request, DeliveryCompany $company)
     {
         abort_unless(auth()->check(), 403);

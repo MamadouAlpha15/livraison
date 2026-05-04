@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DeliveryCompany;
 use App\Models\DeliveryMessage;
+use App\Models\Order;
 use App\Models\Shop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -126,11 +127,27 @@ class DeliveryChatController extends Controller
             ->orderBy('created_at')
             ->get();
 
+        $zones = $company->zones()->where('active', true)->orderBy('price')->get();
+
+        $pendingOrders = collect();
+        if ($shopId) {
+            $pendingOrders = Order::with(['client', 'items.product'])
+                ->where('shop_id', $shopId)
+                ->whereNull('delivery_company_id')
+                ->whereNull('livreur_id')
+                ->whereIn('status', ['en_attente', 'confirmée', 'confirmee', 'pending'])
+                ->latest()
+                ->limit(20)
+                ->get();
+        }
+
         return view('company.chat', [
-            'company'  => $company,
-            'shopId'   => $shopId,
-            'init'     => $init,
-            'messages' => $messages,
+            'company'       => $company,
+            'shopId'        => $shopId,
+            'init'          => $init,
+            'messages'      => $messages,
+            'zones'         => $zones,
+            'pendingOrders' => $pendingOrders,
         ]);
     }
 

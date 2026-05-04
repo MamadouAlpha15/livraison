@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Employe;
 
 use App\Http\Controllers\Controller;
 use App\Models\DeliveryCompany;
+use App\Models\DeliveryZone;
 use App\Models\DeliveryMessage;
 use App\Models\Order;
 use App\Models\User;
@@ -127,6 +128,8 @@ class OrderController extends Controller
 
         $data = $request->validate([
             'delivery_company_id' => ['required', 'exists:delivery_companies,id'],
+            'delivery_zone_id'    => ['nullable', 'exists:delivery_zones,id'],
+            'delivery_fee'        => ['nullable', 'numeric', 'min:0'],
         ]);
 
         $company = DeliveryCompany::where('id', $data['delivery_company_id'])
@@ -134,8 +137,15 @@ class OrderController extends Controller
             ->where('active', true)
             ->firstOrFail();
 
+        $fee = $data['delivery_fee'] ?? null;
+        if (!$fee && !empty($data['delivery_zone_id'])) {
+            $fee = DeliveryZone::find($data['delivery_zone_id'])?->price;
+        }
+
         $order->update([
             'delivery_company_id' => $company->id,
+            'delivery_zone_id'    => $data['delivery_zone_id'] ?? null,
+            'delivery_fee'        => $fee,
             'livreur_id'          => null,
             'driver_id'           => null,
             'status'              => Order::STATUS_EN_ATTENTE,
@@ -152,7 +162,9 @@ class OrderController extends Controller
                 . "Client : " . ($order->client->name ?? '—')
                 . " · " . ($order->client->phone ?? '')
                 . "\nDestination : " . ($order->delivery_destination ?: ($order->client->address ?? 'Non renseignée'))
-                . "\nMontant : " . number_format($order->total, 0, ',', ' ') . " GNF",
+                . (!empty($data['delivery_zone_id']) ? "\nZone : " . (DeliveryZone::find($data['delivery_zone_id'])?->name ?? '—') : '')
+                . ($fee ? "\nFrais de livraison : " . number_format($fee, 0, ',', ' ') . " GNF" : '')
+                . "\nMontant commande : " . number_format($order->total, 0, ',', ' ') . " GNF",
         ]);
 
         if ($request->expectsJson()) {
