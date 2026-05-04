@@ -317,7 +317,7 @@ body.cx-light .cx-tb-btn:hover { background:rgba(0,0,0,.1); color:#111; }
 /* ── MODAL ── */
 .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:2000; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(5px); opacity:0; pointer-events:none; transition:opacity .22s; }
 .modal-overlay.open { opacity:1; pointer-events:all; }
-.modal { background:var(--cx-surface); border:1px solid rgba(255,255,255,.13); border-radius:var(--r); width:100%; max-width:480px; max-height:92vh; overflow-y:auto; box-shadow:0 32px 80px rgba(0,0,0,.6); transform:translateY(18px) scale(.98); transition:transform .22s; }
+.modal { display:block !important; background:var(--cx-surface); border:1px solid rgba(255,255,255,.13); border-radius:var(--r); width:100%; max-width:480px; max-height:92vh; overflow-y:auto; box-shadow:0 32px 80px rgba(0,0,0,.6); transform:translateY(18px) scale(.98); transition:transform .22s; }
 .modal-overlay.open .modal { transform:translateY(0) scale(1); }
 .modal-hd { padding:20px 24px; border-bottom:1px solid var(--cx-border); display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; background:var(--cx-surface); z-index:1; }
 .modal-title { font-size:15px; font-weight:900; color:var(--cx-text); display:flex; align-items:center; gap:9px; }
@@ -446,7 +446,7 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">👥</span> Clients</a>
 
         <div class="cx-nav-sec">Gestion</div>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">📍</span> Zone de livraison</a>
+        <a href="{{ route('company.zones.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📍</span> Zone de livraison</a>
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">💲</span> Tarification</a>
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">🔔</span> Notifications</a>
         <a href="{{ route('company.historique.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📊</span> Historique</a>

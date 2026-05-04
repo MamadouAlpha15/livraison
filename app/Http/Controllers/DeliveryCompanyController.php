@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DeliveryCompany;
+use App\Models\DeliveryCompanyReview;
 use App\Models\Order;
 use App\Models\CourierCommission;
 use Illuminate\Http\Request;
@@ -14,7 +15,11 @@ class DeliveryCompanyController extends Controller
 {  // liste des entreprises de livraison
     public function index()
     {
-        $companies = DeliveryCompany::where('active', true)->where('approved', true)->paginate(12);
+        $companies = DeliveryCompany::where('active', true)
+            ->where('approved', true)
+            ->withAvg('reviews', 'rating')
+            ->withCount(['reviews', 'drivers'])
+            ->paginate(12);
         return view('delivery.index', compact('companies'));
     }
 
@@ -60,7 +65,35 @@ class DeliveryCompanyController extends Controller
      public function show(DeliveryCompany $company)
     {
         abort_unless($company->approved, 403, 'Entreprise non approuvée');
-        return view('delivery.show', compact('company'));
+        $company->load([
+            'drivers',
+            'zones'    => fn($q) => $q->where('active', true)->orderBy('price'),
+            'reviews'  => fn($q) => $q->with('user')->latest(),
+        ]);
+        $zones      = $company->zones;
+        $reviews    = $company->reviews;
+        $avgRating  = $reviews->avg('rating') ?? 0;
+        $userReview = auth()->check()
+            ? $reviews->firstWhere('user_id', auth()->id())
+            : null;
+        return view('delivery.show', compact('company', 'zones', 'reviews', 'avgRating', 'userReview'));
+    }
+
+    public function storeReview(Request $request, DeliveryCompany $company)
+    {
+        abort_unless(auth()->check(), 403);
+
+        $data = $request->validate([
+            'rating'  => ['required', 'integer', 'min:1', 'max:5'],
+            'comment' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        DeliveryCompanyReview::updateOrCreate(
+            ['delivery_company_id' => $company->id, 'user_id' => auth()->id()],
+            $data
+        );
+
+        return back()->with('success', 'Votre avis a été enregistré.');
     }
 
     // tableau de bord de l'entreprise de livraison

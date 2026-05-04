@@ -384,21 +384,7 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
             <div class="tb-title">Commande #{{ $order->id }}</div>
             <div class="tb-sub">{{ $order->created_at->format('d M Y à H:i') }}</div>
         </div>
-        <div class="tb-right" id="uiActionBtns">
-            @if($canConfirm)
-            <form method="POST" action="{{ route('orders.confirm',$order) }}">@csrf @method('PUT')
-                <button class="btn btn-success btn-sm">✓ Confirmer</button>
-            </form>
-            @endif
-            @if($canAssign)
-            <a href="{{ route('orders.assign.show',$order) }}" class="btn btn-primary btn-sm">🚴 Assigner</a>
-            @endif
-            @if($canCancel)
-            <form method="POST" action="{{ route('orders.cancel',$order) }}" onsubmit="return confirm('Annuler cette commande ?')">@csrf @method('PUT')
-                <button class="btn btn-danger btn-sm">✕ Annuler</button>
-            </form>
-            @endif
-        </div>
+       
     </div>
 
     <div class="page">

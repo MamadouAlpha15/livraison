@@ -182,8 +182,9 @@ Route::middleware('auth')->group(function () {
     ════════════════════════════════════════════════════════════════════ */
 
     /* Listing public des entreprises (tout utilisateur connecté) */
-    Route::get('/delivery-companies',          [DeliveryCompanyController::class, 'index'])->name('delivery.companies.index');
-    Route::get('/delivery-companies/{company}',[DeliveryCompanyController::class, 'show']) ->name('delivery.companies.show');
+    Route::get('/delivery-companies',                       [DeliveryCompanyController::class, 'index'])      ->name('delivery.companies.index');
+    Route::get('/delivery-companies/{company}',             [DeliveryCompanyController::class, 'show'])       ->name('delivery.companies.show');
+    Route::post('/delivery-companies/{company}/reviews',    [DeliveryCompanyController::class, 'storeReview'])->name('delivery.companies.review');
 
     /* Espace company + admin boutique */
     Route::middleware('role:admin,company')->prefix('company')->group(function () {
@@ -232,6 +233,13 @@ Route::middleware('auth')->group(function () {
         /* Carte en direct */
         Route::get('/carte',      [CompanyOrderController::class, 'mapView']) ->name('company.carte.index');
         Route::get('/carte/data', [CompanyOrderController::class, 'mapData']) ->name('company.carte.data');
+
+        /* Zones de livraison */
+        Route::get('/zones',                    [\App\Http\Controllers\Company\ZoneController::class, 'index'])  ->name('company.zones.index');
+        Route::post('/zones',                   [\App\Http\Controllers\Company\ZoneController::class, 'store'])  ->name('company.zones.store');
+        Route::put('/zones/{zone}',             [\App\Http\Controllers\Company\ZoneController::class, 'update']) ->name('company.zones.update');
+        Route::patch('/zones/{zone}/toggle',    [\App\Http\Controllers\Company\ZoneController::class, 'toggle']) ->name('company.zones.toggle');
+        Route::delete('/zones/{zone}',          [\App\Http\Controllers\Company\ZoneController::class, 'destroy'])->name('company.zones.destroy');
 
         /* Création de l'entreprise */
         Route::get('/delivery-company/create', [DeliveryCompanyController::class, 'create'])->name('delivery.company.create');

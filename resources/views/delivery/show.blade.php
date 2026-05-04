@@ -436,9 +436,7 @@ a{text-decoration:none;color:inherit;}
                         <span class="b-chip">
                             🚴 {{ $company->drivers()->count() }} livreur{{ $company->drivers()->count() > 1 ? 's' : '' }}
                         </span>
-                        @if($company->commission_percent)
-                        <span class="b-chip">💰 Commission {{ number_format($company->commission_percent, 0) }}%</span>
-                        @endif
+                       
                         @if($company->email)
                         <span class="b-chip">✉️ {{ $company->email }}</span>
                         @endif
@@ -449,7 +447,7 @@ a{text-decoration:none;color:inherit;}
             {{-- Rating + CTA --}}
             <div class="banner-rating">
                 @php
-                    $rating = round($company->reviews_avg_rating ?? 0, 1);
+                    $rating = round($avgRating, 1);
                     $fullS  = (int) floor($rating);
                 @endphp
                 <div class="rating-big">
@@ -532,11 +530,7 @@ a{text-decoration:none;color:inherit;}
                             <div class="stat-box-val">{{ number_format($rating, 1) }}</div>
                             <div class="stat-box-lbl">Note /5</div>
                         </div>
-                        <div class="stat-box" style="--s-color:#10b981">
-                            <div class="stat-box-ico">💰</div>
-                            <div class="stat-box-val">{{ $company->commission_percent ? number_format($company->commission_percent, 0).'%' : '—' }}</div>
-                            <div class="stat-box-lbl">Commission</div>
-                        </div>
+                       
                     </div>
                 </div>
             </div>
@@ -614,6 +608,93 @@ a{text-decoration:none;color:inherit;}
                     <div class="drivers-empty-sub">Cette entreprise n'a pas encore publié son équipe.</div>
                 </div>
                 @endforelse
+            </div>
+
+            {{-- ════ AVIS DES VENDEURS ════ --}}
+            <div class="card">
+                <div class="card-hd">
+                    <div class="card-title">
+                        <div class="card-title-ico">⭐</div>
+                        Avis des vendeurs
+                        @if($reviews->count() > 0)
+                        <span style="font-size:11px;font-weight:700;background:var(--brand-mlt);color:var(--brand-dk);border:1px solid var(--brand-lt);padding:2px 9px;border-radius:20px;margin-left:4px;">
+                            {{ $reviews->count() }} avis
+                        </span>
+                        @endif
+                    </div>
+                    @if($reviews->count() > 0)
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <span style="font-size:22px;font-weight:900;color:var(--brand);">{{ number_format($avgRating,1) }}</span>
+                        <div>
+                            @for($s=1;$s<=5;$s++)<span style="color:{{ $s<=round($avgRating)?'#f59e0b':'#e2e8f0' }};font-size:14px;">★</span>@endfor
+                        </div>
+                    </div>
+                    @endif
+                </div>
+                <div class="card-body" style="padding:0;">
+
+                    {{-- Formulaire laisser un avis --}}
+                    @auth
+                        @if(in_array(auth()->user()->role, ['vendeur','admin']))
+                        <div style="padding:20px 22px;border-bottom:1px solid var(--border);background:var(--surface2);">
+                            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;">
+                                {{ $userReview ? '✏️ Modifier votre avis' : '✍️ Laisser un avis' }}
+                            </div>
+                            <form method="POST" action="{{ route('delivery.companies.review', $company) }}">
+                                @csrf
+                                {{-- Étoiles cliquables --}}
+                                <div style="display:flex;gap:6px;margin-bottom:14px;" id="starPicker">
+                                    @for($s=1;$s<=5;$s++)
+                                    <label style="cursor:pointer;font-size:28px;color:{{ ($userReview && $userReview->rating>=$s)?'#f59e0b':'#cbd5e1' }};transition:color .15s;" data-star="{{ $s }}">
+                                        ★
+                                        <input type="radio" name="rating" value="{{ $s }}" style="display:none;" {{ ($userReview && $userReview->rating==$s)?'checked':'' }} required>
+                                    </label>
+                                    @endfor
+                                </div>
+                                <textarea name="comment" rows="3" placeholder="Décrivez votre expérience avec cette entreprise…"
+                                    style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:13px;font-family:inherit;resize:vertical;background:var(--surface);color:var(--text);outline:none;transition:border-color .15s;"
+                                    onfocus="this.style.borderColor='var(--brand)'" onblur="this.style.borderColor='var(--border)'">{{ $userReview?->comment }}</textarea>
+                                <button type="submit"
+                                    style="margin-top:10px;padding:10px 22px;background:linear-gradient(135deg,var(--brand-dk),var(--brand));color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 4px 14px rgba(99,102,241,.35);">
+                                    {{ $userReview ? 'Mettre à jour' : 'Publier mon avis' }}
+                                </button>
+                            </form>
+                        </div>
+                        @endif
+                    @else
+                    <div style="padding:16px 22px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:13px;color:var(--text2);">
+                        <a href="{{ route('login') }}" style="color:var(--brand);font-weight:700;">Connectez-vous</a> pour laisser un avis.
+                    </div>
+                    @endauth
+
+                    {{-- Liste des avis --}}
+                    @forelse($reviews as $review)
+                    <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;gap:14px;align-items:flex-start;">
+                        <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand-dkk));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0;">
+                            {{ strtoupper(substr($review->user->name??'?',0,1)) }}
+                        </div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+                                <span style="font-size:13px;font-weight:700;color:var(--text);">{{ $review->user->name ?? 'Vendeur' }}</span>
+                                <span style="font-size:11px;color:var(--muted);">{{ $review->created_at->diffForHumans() }}</span>
+                            </div>
+                            <div style="margin-bottom:6px;">
+                                @for($s=1;$s<=5;$s++)<span style="color:{{ $s<=$review->rating?'#f59e0b':'#e2e8f0' }};font-size:13px;">★</span>@endfor
+                            </div>
+                            @if($review->comment)
+                            <p style="font-size:13px;color:var(--text2);margin:0;line-height:1.65;">{{ $review->comment }}</p>
+                            @endif
+                        </div>
+                    </div>
+                    @empty
+                    <div style="padding:36px 22px;text-align:center;">
+                        <div style="font-size:36px;margin-bottom:10px;">⭐</div>
+                        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">Aucun avis pour le moment</div>
+                        <div style="font-size:12px;color:var(--muted);">Soyez le premier à noter cette entreprise.</div>
+                    </div>
+                    @endforelse
+
+                </div>
             </div>
 
         </div>{{-- /main-col --}}
@@ -702,13 +783,7 @@ a{text-decoration:none;color:inherit;}
                         </div>
                     </div>
                     @endif
-                    <div class="info-row">
-                        <div class="info-ico">💰</div>
-                        <div>
-                            <div class="info-lbl">Taux de commission</div>
-                            <div class="info-val">{{ $company->commission_percent ? number_format($company->commission_percent, 2).' %' : '—' }}</div>
-                        </div>
-                    </div>
+                   
                     <div class="info-row">
                         <div class="info-ico">🚴</div>
                         <div>
@@ -718,6 +793,33 @@ a{text-decoration:none;color:inherit;}
                     </div>
                 </div>
             </div>
+
+            {{-- Zones & Tarifs --}}
+            @if($zones->isNotEmpty())
+            <div class="info-card">
+                <div class="info-card-hd">
+                    <div class="info-card-ico-wrap">📍</div>
+                    Zones & Tarifs de livraison
+                </div>
+                <div class="info-list">
+                    @foreach($zones as $zone)
+                    <div class="info-row" style="gap:12px;padding:12px 18px;">
+                        <div style="width:10px;height:10px;border-radius:50%;background:{{ $zone->color }};flex-shrink:0;box-shadow:0 0 6px {{ $zone->color }}88;"></div>
+                        <div style="flex:1;min-width:0;">
+                            <div class="info-val" style="font-size:13px;">{{ $zone->name }}</div>
+                            @if($zone->description)
+                            <div class="info-lbl" style="text-transform:none;letter-spacing:0;font-size:11px;margin-top:1px;">{{ $zone->description }}</div>
+                            @endif
+                        </div>
+                        <div style="text-align:right;flex-shrink:0;">
+                            <div style="font-size:14px;font-weight:900;color:var(--brand);">{{ number_format($zone->price, 0, ',', ' ') }} <span style="font-size:10px;font-weight:600;color:var(--muted);">GNF</span></div>
+                            <div style="font-size:10px;color:var(--muted);margin-top:1px;">~{{ $zone->estimated_minutes }} min</div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
 
             {{-- Retour liste --}}
             <a href="{{ route('delivery.companies.index') }}"
@@ -734,3 +836,28 @@ a{text-decoration:none;color:inherit;}
 </div>{{-- /pw --}}
 
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    const picker = document.getElementById('starPicker');
+    if (!picker) return;
+    const labels = picker.querySelectorAll('label');
+
+    function highlight(n) {
+        labels.forEach((l, i) => {
+            l.style.color = i < n ? '#f59e0b' : '#cbd5e1';
+        });
+    }
+
+    labels.forEach((label, idx) => {
+        label.addEventListener('mouseenter', () => highlight(idx + 1));
+        label.addEventListener('mouseleave', () => {
+            const checked = picker.querySelector('input:checked');
+            highlight(checked ? parseInt(checked.value) : 0);
+        });
+        label.addEventListener('click', () => highlight(idx + 1));
+    });
+})();
+</script>
+@endpush

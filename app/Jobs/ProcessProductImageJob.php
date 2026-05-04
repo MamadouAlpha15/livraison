@@ -54,7 +54,7 @@ class ProcessProductImageJob implements ShouldQueue
         $sizes = ['thumb' => 300, 'medium' => 800, 'large' => 1600];
 
         foreach ($sizes as $key => $width) {
-            $img     = $manager->decode($absPath);
+            $img     = $manager->read($absPath);
             $img->scaleDown(width: $width);
             $encoded = $img->encode(new \Intervention\Image\Encoders\WebpEncoder(quality: 82));
             $disk->put("{$this->folder}/{$key}/{$this->filename}.webp", (string) $encoded);

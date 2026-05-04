@@ -53,7 +53,7 @@ class ImageOptimizer
             $paths = [];
 
             foreach ($sizes as $key => $width) {
-                $img     = $manager->decode($rawPath);
+                $img     = $manager->read($rawPath);
                 $img->scaleDown(width: $width);
                 $encoded = $img->encode(new WebpEncoder(quality: 82));
 

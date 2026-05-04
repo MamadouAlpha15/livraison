@@ -268,7 +268,7 @@ body.cx-light .hx-fee{color:#059669}
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">👥</span> Clients</a>
 
         <div class="cx-nav-sec">Configuration</div>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">📍</span> Zone de livraison</a>
+        <a href="{{ route('company.zones.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📍</span> Zone de livraison</a>
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">💲</span> Tarification</a>
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">⚙️</span> Paramètres</a>
     </nav>

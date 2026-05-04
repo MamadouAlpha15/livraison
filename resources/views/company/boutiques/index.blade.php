@@ -249,8 +249,28 @@ body.cx-light .toolbar .search-box{background:#fff;}
             <span class="cx-nav-ico">👥</span> Clients
         </a>
         <div class="cx-nav-sec">Gestion</div>
+        <a href="{{route('company.zones.index') }}" class="cx-nav-item">
+            <span class="cx-nav-ico">📍</span> Zone de livraison
+        </a>
+        <a href="#" class="cx-nav-item">
+            <span class="cx-nav-ico">💲</span> Tarification
+        </a>
+        <a href="#" class="cx-nav-item">
+            <span class="cx-nav-ico">🔔</span> Notifications
+        </a>
         <a href="{{ route('company.historique.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">📊</span> Historique
+        </a>
+
+        <div class="cx-nav-sec">Configuration</div>
+        <a href="#" class="cx-nav-item">
+            <span class="cx-nav-ico">⚙️</span> Paramètres
+        </a>
+        <a href="#" class="cx-nav-item">
+            <span class="cx-nav-ico">👤</span> Utilisateurs
+        </a>
+        <a href="#" class="cx-nav-item">
+            <span class="cx-nav-ico">🔌</span> Intégrations
         </a>
         <div class="cx-nav-sec">Configuration</div>
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">⚙️</span> Paramètres</a>

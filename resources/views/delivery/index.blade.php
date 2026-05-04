@@ -439,8 +439,9 @@ a{text-decoration:none;color:inherit;}
             $rating      = round($company->reviews_avg_rating ?? 0, 1);
             $fullStars   = (int) floor($rating);
             $halfStar    = ($rating - $fullStars) >= 0.4;
+            $reviewCount = $company->reviews_count ?? 0;
             $commission  = $company->commission_percent ?? ($company->commission_rate ? $company->commission_rate * 100 : null);
-            $driverCount = $company->drivers()->count();
+            $driverCount = $company->drivers_count ?? $company->drivers()->count();
         @endphp
 
         <div class="card" data-name="{{ strtolower($company->name.' '.($company->address ?? '').' '.($company->description ?? '')) }}">
@@ -462,9 +463,7 @@ a{text-decoration:none;color:inherit;}
                         <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                         Approuvée
                     </span>
-                    @if($commission)
-                    <span class="badge-commission">Commission&nbsp;<em>{{ number_format($commission, 0) }}%</em></span>
-                    @endif
+                   
                 </div>
 
                 @if($driverCount > 0)
@@ -497,8 +496,12 @@ a{text-decoration:none;color:inherit;}
                             @endif
                         @endfor
                     </div>
-                    <span class="r-val">{{ number_format($rating, 1) }}</span>
-                    <span class="r-cnt">/ 5</span>
+                    @if($reviewCount > 0)
+                        <span class="r-val">{{ number_format($rating, 1) }}</span>
+                        <span class="r-cnt">({{ $reviewCount }} avis)</span>
+                    @else
+                        <span class="r-cnt" style="font-size:11.5px;">Aucun avis</span>
+                    @endif
                 </div>
 
                 {{-- Meta --}}

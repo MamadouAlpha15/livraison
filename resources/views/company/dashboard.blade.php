@@ -884,7 +884,7 @@ body.cx-light .cx-chart-big { color:#111827; }
         </a>
 
         <div class="cx-nav-sec">Gestion</div>
-        <a href="#" class="cx-nav-item">
+        <a href="{{ route('company.zones.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">📍</span> Zone de livraison
         </a>
         <a href="#" class="cx-nav-item">

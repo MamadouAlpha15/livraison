@@ -26,7 +26,7 @@
         <tr>
             <td>{{ $loop->iteration }}</td>
             <td>{{ $shop->name }}</td>
-            <td>{{ $shop->owner->name }} ({{ $shop->owner->email }})</td>
+            <td>{{ $shop->owner?->name ?? 'Utilisateur supprimé' }} ({{ $shop->owner?->email ?? 'N/A' }})</td>
             <td>{{ $shop->phone }}</td>
             <td>{{ $shop->address }}</td>
             <td>

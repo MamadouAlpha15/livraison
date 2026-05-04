@@ -593,12 +593,12 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
         <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">🏪</span> Boutiques
         </a>
-        <a href="#" class="cx-nav-item">
+        <a href="{{route('company.clients.index')}}" class="cx-nav-item">
             <span class="cx-nav-ico">👥</span> Clients
         </a>
 
         <div class="cx-nav-sec">Gestion</div>
-        <a href="#" class="cx-nav-item">
+        <a href="{{route('company.zones.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">📍</span> Zone de livraison
         </a>
         <a href="#" class="cx-nav-item">
