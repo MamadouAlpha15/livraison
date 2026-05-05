@@ -128,6 +128,35 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .p-danger{background:#fee2e2;color:#991b1b;}
 .p-purple{background:#f5f3ff;color:#5b21b6;}
 .p-muted{background:#f3f6f4;color:#6b7280;}
+/* ── BULK SELECTION ── */
+.order-cb{width:15px;height:15px;cursor:pointer;accent-color:var(--brand);flex-shrink:0;}
+#selectAll{width:15px;height:15px;cursor:pointer;accent-color:var(--brand);}
+.tbl tbody tr.row-selected td{background:#eef2ff!important;}
+.bulk-bar{display:none;align-items:center;gap:10px;flex-wrap:wrap;background:linear-gradient(135deg,#4f46e5,#6366f1);border-radius:var(--r-sm);padding:10px 16px;margin-bottom:12px;box-shadow:0 4px 20px rgba(99,102,241,.28);animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.bulk-bar.visible{display:flex;}
+.bulk-count{font-size:13px;font-weight:800;color:#fff;flex-shrink:0;font-family:var(--mono);}
+.bulk-btn{padding:7px 14px;border-radius:7px;border:none;cursor:pointer;font-size:12.5px;font-weight:700;font-family:var(--font);display:inline-flex;align-items:center;gap:6px;transition:all .14s;white-space:nowrap;}
+.bulk-btn-driver{background:#fff;color:#4f46e5;}
+.bulk-btn-driver:hover{background:#e0e7ff;}
+.bulk-btn-company{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.35);}
+.bulk-btn-company:hover{background:rgba(255,255,255,.28);}
+.bulk-btn-clear{margin-left:auto;background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.18);padding:5px 10px;border-radius:6px;font-size:11.5px;}
+.bulk-btn-clear:hover{background:rgba(255,255,255,.22);color:#fff;}
+/* ── BULK LIVREUR MODAL ── */
+.blv-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:800;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px);}
+.blv-modal.open{display:flex;}
+.blv-box{background:var(--surface);border-radius:var(--r);padding:24px 22px;width:100%;max-width:430px;box-shadow:0 20px 60px rgba(0,0,0,.18);animation:fadeIn .2s ease;}
+.blv-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
+.blv-title{font-size:15px;font-weight:800;color:var(--text);}
+.blv-sub{font-size:12px;color:var(--muted);margin-top:3px;}
+.blv-close{background:var(--bg);border:1px solid var(--border);border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--muted);flex-shrink:0;}
+.blv-list{display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;margin-bottom:16px;}
+.blv-item{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;transition:border-color .14s,background .14s;user-select:none;}
+.blv-item:hover{border-color:var(--brand);background:var(--brand-mlt);}
+.blv-item input[type=radio]{width:15px;height:15px;accent-color:var(--brand);cursor:pointer;flex-shrink:0;}
+.blv-item.checked{border-color:var(--brand-dk);background:#eef2ff;}
+.blv-footer{display:flex;gap:8px;}
 .assign-form{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;}
 .assign-select{padding:6px 10px;border-radius:var(--r-sm);border:1.5px solid var(--border-dk);font-size:12px;font-family:var(--font);color:var(--text);background:var(--surface);outline:none;min-width:110px;max-width:150px;transition:border-color .15s;}
 .assign-select:focus{border-color:var(--brand);}
@@ -254,6 +283,16 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .btn-msg-company:hover{background:#4f46e5;color:#fff;border-color:#4f46e5;}
 .btn-restore-confirm{background:#2563eb;border-color:#1d4ed8;color:#fff;font-weight:700;}
 .btn-restore-confirm:hover{background:#1d4ed8;color:#fff;}
+/* ── Desktop medium (sidebar visible, écrans 900–1200px) ── */
+@media(max-width:1200px) and (min-width:901px){
+    table.tbl{min-width:720px !important;}
+    .tbl thead th,.tbl tbody td{padding:8px 9px;font-size:12px;}
+    .tbl thead th:nth-child(5),.tbl tbody td:nth-child(5){display:none;} /* masque Adresse */
+    .assign-select{min-width:82px;max-width:115px;font-size:11.5px;padding:5px 8px;}
+    .prod-img,.prod-ph{width:44px;height:44px;}
+    .lv-chip{font-size:11px;}
+    .amount{font-size:12.5px;}
+}
 @media(max-width:900px){
     :root{--sb-w:230px;}
     .dash-wrap .main{margin-left:0;}
@@ -261,11 +300,25 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
     .sidebar.open{transform:translateX(0);}
     .sb-overlay.open{display:block;}
     .btn-hamburger{display:flex;}
-    .desktop-table{display:none !important;}
-    .mobile-list{display:flex !important;}
     .content{padding:14px;}
+    /* Table compacte — sidebar masquée donc pleine largeur disponible */
+    table.tbl{min-width:660px !important;}
+    .tbl thead th,.tbl tbody td{padding:7px 9px;font-size:11.5px;}
+    .tbl thead th:nth-child(5),.tbl tbody td:nth-child(5){display:none;} /* masque Adresse */
+    .prod-img,.prod-ph{width:40px;height:40px;font-size:18px;}
+    .assign-select{min-width:78px;max-width:110px;font-size:11px;padding:5px 6px;}
+    .lv-chip{font-size:10.5px;padding:3px 8px 3px 3px;}
+    .c-name{font-size:12px;}
+    .c-sub{font-size:10px;}
+    .amount{font-size:12px;}
+}
+@media(max-width:750px){
+    table.tbl{min-width:540px !important;}
+    .tbl thead th:nth-child(4),.tbl tbody td:nth-child(4){display:none;} /* masque Produit */
 }
 @media(max-width:640px){
+    .desktop-table{display:none !important;}
+    .mobile-list{display:flex !important;}
     .content{padding:10px;}
     .stats-row{gap:5px;flex-wrap:wrap;}
     .stat-chip{min-width:calc(50% - 5px);padding:7px 9px;flex:1 1 calc(50% - 5px);font-size:10px;}
@@ -319,7 +372,9 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .btn-filter-reset:hover{border-color:var(--brand);color:var(--brand);}
 .filter-active-badge{display:inline-flex;align-items:center;gap:4px;background:#fef3c7;border:1px solid #fcd34d;color:#92400e;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
 .mobile-list{display:none;flex-direction:column;gap:12px;}
-.m-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);}
+.m-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);transition:border-color .15s,background .15s;}
+.m-card.row-selected{border-color:var(--brand) !important;background:#eef2ff;}
+.m-card.row-selected .m-card-hd{background:#e0e7ff;}
 .m-card-hd{padding:11px 14px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .m-card-body{padding:12px 14px;display:flex;flex-direction:column;gap:9px;}
 .m-row{display:flex;align-items:center;justify-content:space-between;gap:8px;}
@@ -414,15 +469,25 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         @if($dc->commission_percent) · {{ number_format($dc->commission_percent,0) }}% commission @endif
                     </div>
                 </div>
-                {{-- Bouton Message --}}
-                <button class="btn-msg-company"
-                        title="Discuter avec {{ $dc->name }}"
-                        data-company-id="{{ $dc->id }}"
-                        data-company-name="{{ $dc->name }}"
-                        data-company-img="{{ $dc->image ? asset('storage/'.$dc->image) : '' }}"
-                        onclick="openChatFromCompany(this)">
-                    💬
-                </button>
+                {{-- Boutons --}}
+                <div style="display:flex;gap:5px;flex-shrink:0;">
+                    <button class="btn-msg-company bulk-hide"
+                            title="Discuter avec {{ $dc->name }}"
+                            data-company-id="{{ $dc->id }}"
+                            data-company-name="{{ $dc->name }}"
+                            data-company-img="{{ $dc->image ? asset('storage/'.$dc->image) : '' }}"
+                            onclick="openChatFromCompany(this)">
+                        💬
+                    </button>
+                    <button class="btn btn-sm bulk-assign-company bulk-show"
+                            style="display:none;background:#eef2ff;border-color:#c7d2fe;color:#4f46e5;font-weight:700;"
+                            data-company-id="{{ $dc->id }}"
+                            data-company-name="{{ addslashes($dc->name) }}"
+                            onclick="submitBulkCompany(this)"
+                            title="Confier les commandes sélectionnées à cette entreprise">
+                        ✅ Confier
+                    </button>
+                </div>
             </div>
             @empty
             <div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">
@@ -433,6 +498,40 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 
         <div style="margin-top:16px;">
             <button type="button" class="btn" style="width:100%;justify-content:center;" onclick="closeCompanyModal()">← Fermer</button>
+        </div>
+    </div>
+</div>
+
+{{-- ══ MODAL BULK LIVREUR ══ --}}
+<div class="blv-modal" id="bulkDriverModal">
+    <div class="blv-box">
+        <div class="blv-hd">
+            <div>
+                <div class="blv-title">🚴 Assigner à un livreur</div>
+                <div class="blv-sub"><span id="bulkDriverCount">0</span> commande(s) sélectionnée(s) seront assignées</div>
+            </div>
+            <button class="blv-close" onclick="closeBulkDriverModal()">✕</button>
+        </div>
+        @if($livreurs->isEmpty())
+        <div style="text-align:center;padding:28px;color:var(--muted);font-size:13px;">Aucun livreur disponible.</div>
+        @else
+        <div class="blv-list" id="blvList">
+            @foreach($livreurs as $lv)
+            <label class="blv-item" for="blv-{{ $lv->id }}">
+                <input type="radio" name="bulk_livreur" id="blv-{{ $lv->id }}" value="{{ $lv->id }}"
+                       onchange="document.querySelectorAll('.blv-item').forEach(el=>el.classList.remove('checked'));this.closest('.blv-item').classList.add('checked')">
+                <div class="c-av" style="flex-shrink:0;">{{ initiales($lv->name) }}</div>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:13px;font-weight:700;color:var(--text);">{{ $lv->name }}</div>
+                    <div style="font-size:11px;color:var(--muted);">{{ $lv->is_available ? '🟢 Disponible' : '🟡 Occupé' }}@if($lv->phone) · {{ $lv->phone }}@endif</div>
+                </div>
+            </label>
+            @endforeach
+        </div>
+        @endif
+        <div class="blv-footer">
+            <button class="btn" style="flex:0 0 auto;" onclick="closeBulkDriverModal()">Annuler</button>
+            <button class="btn btn-primary" style="flex:1;justify-content:center;" id="bulkDriverSubmit" onclick="submitBulkDriver()">✅ Assigner les commandes</button>
         </div>
     </div>
 </div>
@@ -718,6 +817,14 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                 <div class="stat-chip"><span>Total</span><span class="val">{{ $orders->total() }}</span></div>
             </div>
 
+            {{-- ── BARRE D'ACTIONS GROUPÉES ── --}}
+            <div class="bulk-bar" id="bulkBar">
+                <span class="bulk-count" id="bulkCount">0 sélectionnée(s)</span>
+                <button class="bulk-btn bulk-btn-driver" onclick="openBulkDriverModal()">🚴 Assigner à mes livreurs</button>
+                <button class="bulk-btn bulk-btn-company" onclick="openBulkCompanyModalMode()">🏢 Assigner à une entreprise</button>
+                <button class="bulk-btn bulk-btn-clear" onclick="clearBulkSelection()">✕ Effacer</button>
+            </div>
+
             {{-- TABLE DESKTOP --}}
             <div class="orders-card desktop-table">
                 <div class="orders-card-hd">
@@ -728,8 +835,8 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                 <div class="empty-state"><span class="ico">📭</span><p>Aucune commande.</p></div>
                 @else
                 <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-                <table class="tbl" style="min-width:860px;">
-                    <thead><tr><th>#</th><th>Client</th><th>Produit</th><th>Adresse</th><th>Montant</th><th>Statut</th><th>Livreur / Entreprise</th><th>Assigner</th><th>Actions</th></tr></thead>
+                <table class="tbl" style="min-width:720px;">
+                    <thead><tr><th style="width:36px;"><input type="checkbox" id="selectAll" title="Tout sélectionner / désélectionner"></th><th>#</th><th>Client</th><th>Produit</th><th>Adresse</th><th>Montant</th><th>Statut</th><th>Livreur / Entreprise</th><th>Assigner</th><th>Actions</th></tr></thead>
                     <tbody>
                     @foreach($orders as $order)
                     @php
@@ -740,7 +847,8 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         $peutAnnuler=in_array($order->status,$annulables);
                         $dejaAnnulee=in_array($order->status,$restaurables);
                     @endphp
-                    <tr>
+                    <tr data-order-id="{{ $order->id }}">
+                        <td style="width:36px;"><input type="checkbox" class="order-cb" value="{{ $order->id }}" onchange="onCbChange(this)"></td>
                         <td><span style="font-family:var(--mono);font-size:11px;color:var(--muted)">#{{ $order->id }}</span></td>
                         <td><div style="display:flex;align-items:center;gap:9px"><div class="c-av">{{ $init }}</div><div><div class="c-name">{{ $client->name ?? 'Inconnu' }}</div>@if($client?->phone)<div class="c-sub">📞 {{ $client->phone }}</div>@endif</div></div></td>
                         <td>
@@ -826,6 +934,18 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 
             {{-- CARTES MOBILE --}}
             <div class="mobile-list">
+                {{-- Barre Tout sélectionner (mobile uniquement) --}}
+                @if($orders->isNotEmpty())
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 4px 4px;">
+                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;">
+                        <input type="checkbox" id="selectAllMobile"
+                               style="width:16px;height:16px;accent-color:var(--brand);cursor:pointer;flex-shrink:0;"
+                               onchange="onSelectAllMobile(this)">
+                        <span style="font-size:12.5px;font-weight:700;color:var(--text-2);">Tout sélectionner</span>
+                    </label>
+                    <span style="font-size:11px;color:var(--muted);">{{ $orders->count() }} commande(s)</span>
+                </div>
+                @endif
                 @forelse($orders as $order)
                 @php
                     $st=$statusMap[$order->status]??['label'=>ucfirst($order->status),'cls'=>'p-muted'];
@@ -835,9 +955,9 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                     $peutAnnuler=in_array($order->status,$annulables);
                     $dejaAnnulee=in_array($order->status,$restaurables);
                 @endphp
-                <div class="m-card">
+                <div class="m-card" data-order-id="{{ $order->id }}">
                     <div class="m-card-hd">
-                        <div style="display:flex;align-items:center;gap:9px"><div class="c-av">{{ $init }}</div><div><div class="c-name">{{ $client->name ?? 'Inconnu' }}</div>@if($client?->phone)<div class="c-sub">📞 {{ $client->phone }}</div>@endif</div></div>
+                        <div style="display:flex;align-items:center;gap:9px"><input type="checkbox" class="order-cb" value="{{ $order->id }}" onchange="onCbChange(this)" style="flex-shrink:0;"><div class="c-av">{{ $init }}</div><div><div class="c-name">{{ $client->name ?? 'Inconnu' }}</div>@if($client?->phone)<div class="c-sub">📞 {{ $client->phone }}</div>@endif</div></div>
                         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span><span style="font-family:var(--mono);font-size:10px;color:var(--muted)">#{{ $order->id }}</span></div>
                     </div>
                     <div class="m-card-body">
@@ -845,7 +965,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         @php $mAddr = $order->delivery_destination ?: ($client?->address ?? ''); @endphp
                         @if($mAddr)<div class="m-row"><span class="m-lbl">Adresse</span><span style="font-size:12px;color:var(--text-2);text-align:right;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{{ $mAddr }}">📍 {{ $mAddr }}</span></div>@endif
                         <div class="m-row"><span class="m-lbl">Montant</span><span class="amount">{{ number_format($order->total,0,',',' ') }} <small>{{ $devise }}</small></span></div>
-                        <div class="m-row"><span class="m-lbl">Livreur</span>@if($order->livreur)<div class="lv-chip"><div class="lv-chip-av">{{ initiales($order->livreur->name) }}</div>{{ $order->livreur->name }}</div>@else<span class="pill p-warning">Non assigné</span>@endif</div>
+                        <div class="m-row"><span class="m-lbl">Assignation</span>@if($order->livreur)<div class="lv-chip"><div class="lv-chip-av">{{ initiales($order->livreur->name) }}</div>{{ $order->livreur->name }}</div>@elseif($order->deliveryCompany)<div class="lv-chip" style="background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8;"><div class="lv-chip-av" style="background:#3b82f6;font-size:10px;">🏢</div>{{ $order->deliveryCompany->name }}</div>@else<span class="pill p-warning">Non assigné</span>@endif</div>
                         @if(!$order->livreur && !$order->deliveryCompany)
                         <div style="display:flex;flex-direction:column;gap:6px;">
                             @if($livreurs->isNotEmpty())<form action="{{ route('employe.orders.assign',$order) }}" method="POST" style="display:flex;gap:8px;align-items:center">@csrf @method('PUT')<select name="livreur_id" class="assign-select" style="flex:1" required><option value="">— Choisir —</option>@foreach($livreurs as $lv)<option value="{{ $lv->id }}">{{ $lv->name }} {{ $lv->is_available ? '🟢' : '🟡' }}</option>@endforeach</select><button type="submit" class="btn btn-primary btn-sm">✅</button></form>@endif
@@ -862,7 +982,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                     </div>
                     <div class="m-card-foot">
                         <a href="{{ route('orders.show',$order) }}" class="btn btn-info btn-sm">🔍 Détails</a>
-                        @if($order->livreur)<span class="btn btn-assigned btn-sm">✔ Assignée</span>@endif
+                        @if($order->livreur || $order->deliveryCompany)<span class="btn btn-assigned btn-sm">✔ Assignée</span>@endif
                         @if($peutAnnuler)<button type="button" class="btn-cancel" style="flex:1;justify-content:center" onclick="openCancelModal('{{ route('employe.orders.cancel',$order) }}','#{{ $order->id }}','{{ addslashes($client->name ?? 'Inconnu') }}')">✕ Annuler</button>
                         @elseif($dejaAnnulee)<button type="button" class="btn-restore" style="flex:1;justify-content:center" onclick="openRestoreModal('{{ route('employe.orders.restore',$order) }}','#{{ $order->id }}','{{ addslashes($client->name ?? 'Inconnu') }}')">🔄 Restaurer</button>@endif
                         @if($order->status === 'livrée' && $order->deliveryCompany)
@@ -1016,6 +1136,13 @@ function loadMessages(initial) {
                 renderMessages(msgs, false);
             }
             _lastMsgTime = msgs[msgs.length - 1].created_at || null;
+                    /* Marque les messages vus pour ce fil — évite double notif sur dashboard */
+                    try {
+                        const lastId = msgs[msgs.length - 1].id;
+                        const seen   = JSON.parse(sessionStorage.getItem('bq_co_seen') || '{}');
+                        seen[String(_currentCompanyId)] = lastId;
+                        sessionStorage.setItem('bq_co_seen', JSON.stringify(seen));
+                    } catch(e) {}
         } else if (initial) {
             document.getElementById('chatMsgList').innerHTML =
                 '<div class="chat-empty" id="chatEmpty">Aucun message. Commencez la discussion !</div>';
@@ -1448,8 +1575,202 @@ function closeLightbox() {
     document.body.style.overflow = '';
 }
 document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'Escape') { closeLightbox(); closeBulkDriverModal(); }
 });
+
+/* ═══════════════════════════════════════
+   SÉLECTION GROUPÉE — BULK ASSIGN
+═══════════════════════════════════════ */
+const BULK_ASSIGN_URL = '{{ route('employe.orders.bulk-assign') }}';
+const CSRF = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+let _bulkIds = new Set();
+let _bulkCompanyMode = false;
+
+/* Met à jour la barre d'actions et les compteurs */
+function updateBulkBar() {
+    const n   = _bulkIds.size;
+    const bar = document.getElementById('bulkBar');
+    if (n > 0) {
+        bar.classList.add('visible');
+        document.getElementById('bulkCount').textContent =
+            n + ' commande' + (n > 1 ? 's' : '') + ' sélectionnée' + (n > 1 ? 's' : '');
+    } else {
+        bar.classList.remove('visible');
+    }
+    const el = document.getElementById('bulkDriverCount');
+    if (el) el.textContent = n;
+
+    /* Sync indeterminate des deux selectAll (desktop + mobile) */
+    const all     = document.querySelectorAll('.order-cb');
+    const checked = document.querySelectorAll('.order-cb:checked');
+    const indet   = checked.length > 0 && checked.length < all.length;
+    const allChk  = all.length > 0 && checked.length === all.length;
+    const sa  = document.getElementById('selectAll');
+    const sam = document.getElementById('selectAllMobile');
+    if (sa)  { sa.indeterminate = indet; sa.checked = allChk; }
+    if (sam) { sam.indeterminate = indet; sam.checked = allChk; }
+}
+
+/* Callback sur chaque checkbox — fonctionne pour <tr> (desktop) et .m-card (mobile) */
+function onCbChange(cb) {
+    const row = cb.closest('tr') || cb.closest('.m-card');
+    if (cb.checked) { _bulkIds.add(cb.value); row?.classList.add('row-selected'); }
+    else            { _bulkIds.delete(cb.value); row?.classList.remove('row-selected'); }
+    updateBulkBar();
+}
+
+/* Helper commun sélection totale */
+function applySelectAll(checked) {
+    document.querySelectorAll('.order-cb').forEach(cb => {
+        cb.checked = checked;
+        const row  = cb.closest('tr') || cb.closest('.m-card');
+        if (checked) { _bulkIds.add(cb.value); row?.classList.add('row-selected'); }
+        else         { _bulkIds.delete(cb.value); row?.classList.remove('row-selected'); }
+    });
+    /* Synchroniser les deux checkboxes */
+    const sa  = document.getElementById('selectAll');
+    const sam = document.getElementById('selectAllMobile');
+    if (sa)  { sa.checked = checked; sa.indeterminate = false; }
+    if (sam) { sam.checked = checked; sam.indeterminate = false; }
+    updateBulkBar();
+}
+
+/* Tout sélectionner — table desktop */
+document.getElementById('selectAll')?.addEventListener('change', function() {
+    applySelectAll(this.checked);
+});
+
+/* Tout sélectionner — liste mobile */
+function onSelectAllMobile(el) {
+    applySelectAll(el.checked);
+}
+
+/* Effacer toute la sélection */
+function clearBulkSelection() {
+    document.querySelectorAll('.order-cb').forEach(cb => {
+        cb.checked = false;
+        (cb.closest('tr') || cb.closest('.m-card'))?.classList.remove('row-selected');
+    });
+    const sa  = document.getElementById('selectAll');
+    const sam = document.getElementById('selectAllMobile');
+    if (sa)  { sa.checked = false; sa.indeterminate = false; }
+    if (sam) { sam.checked = false; sam.indeterminate = false; }
+    _bulkIds.clear();
+    updateBulkBar();
+}
+
+/* ── Toast ── */
+function showBulkToast(msg, ok) {
+    const t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;bottom:22px;left:50%;transform:translateX(-50%);' +
+        'padding:11px 22px;border-radius:10px;font-size:13px;font-weight:700;' +
+        'z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.18);white-space:nowrap;' +
+        (ok ? 'background:#059669;color:#fff;' : 'background:#dc2626;color:#fff;');
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3200);
+}
+
+/* ── MODAL LIVREUR BULK ── */
+function openBulkDriverModal() {
+    if (!_bulkIds.size) return;
+    document.getElementById('bulkDriverCount').textContent = _bulkIds.size;
+    document.querySelectorAll('input[name="bulk_livreur"]').forEach(r => { r.checked = false; });
+    document.querySelectorAll('.blv-item').forEach(el => el.classList.remove('checked'));
+    document.getElementById('bulkDriverModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closeBulkDriverModal() {
+    document.getElementById('bulkDriverModal').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+async function submitBulkDriver() {
+    const radio = document.querySelector('input[name="bulk_livreur"]:checked');
+    if (!radio) { showBulkToast('Sélectionnez un livreur.', false); return; }
+
+    const btn = document.getElementById('bulkDriverSubmit');
+    btn.disabled = true; btn.textContent = '⏳ Assignation…';
+
+    try {
+        const res = await fetch(BULK_ASSIGN_URL, {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN':CSRF, 'Accept':'application/json' },
+            body: JSON.stringify({ order_ids: [..._bulkIds], livreur_id: radio.value })
+        });
+        const data = await res.json();
+        closeBulkDriverModal();
+        if (data.success) {
+            showBulkToast(`✅ ${data.assigned} commande(s) assignée(s) !`, true);
+            clearBulkSelection();
+            setTimeout(() => location.reload(), 1400);
+        } else {
+            showBulkToast(data.message || 'Erreur lors de l\'assignation.', false);
+            btn.disabled = false; btn.textContent = '✅ Assigner les commandes';
+        }
+    } catch(e) {
+        showBulkToast('Erreur réseau.', false);
+        btn.disabled = false; btn.textContent = '✅ Assigner les commandes';
+    }
+}
+
+/* ── MODE BULK dans le modal entreprise ── */
+function openBulkCompanyModalMode() {
+    if (!_bulkIds.size) return;
+    _bulkCompanyMode = true;
+
+    /* Contexte */
+    const n = _bulkIds.size;
+    document.getElementById('ctxOrderNum').textContent   = `📦 ${n} commande(s) sélectionnée(s)`;
+    document.getElementById('ctxClientName').textContent = 'Choisissez une entreprise puis cliquez ✅ Confier';
+    document.getElementById('ctxClientPhone').textContent = '';
+    document.getElementById('companyModalCtx').style.display = 'block';
+
+    /* Afficher boutons "Confier", cacher boutons chat */
+    document.querySelectorAll('.bulk-show').forEach(el => el.style.display = '');
+    document.querySelectorAll('.bulk-hide').forEach(el => el.style.display = 'none');
+
+    document.getElementById('companyModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+/* Quand on ferme le modal entreprise : restaurer mode normal */
+const _origCloseCompany = window.closeCompanyModal;
+window.closeCompanyModal = function() {
+    _bulkCompanyMode = false;
+    document.querySelectorAll('.bulk-show').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.bulk-hide').forEach(el => el.style.display = '');
+    _origCloseCompany?.();
+};
+
+async function submitBulkCompany(btn) {
+    const companyId   = btn.dataset.companyId;
+    const companyName = btn.dataset.companyName;
+    const origText = btn.textContent;
+    btn.disabled = true; btn.textContent = '⏳…';
+
+    try {
+        const res = await fetch(BULK_ASSIGN_URL, {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN':CSRF, 'Accept':'application/json' },
+            body: JSON.stringify({ order_ids: [..._bulkIds], delivery_company_id: companyId })
+        });
+        const data = await res.json();
+        window.closeCompanyModal();
+        if (data.success) {
+            showBulkToast(`✅ ${data.assigned} commande(s) confiée(s) à ${companyName} !`, true);
+            clearBulkSelection();
+            setTimeout(() => location.reload(), 1400);
+        } else {
+            showBulkToast(data.message || 'Erreur.', false);
+            btn.disabled = false; btn.textContent = origText;
+        }
+    } catch(e) {
+        showBulkToast('Erreur réseau.', false);
+        btn.disabled = false; btn.textContent = origText;
+    }
+}
 </script>
 @endpush
 

@@ -82,7 +82,7 @@ class OrderController extends Controller
         $shopId = Auth::user()->currentShopId();
         if (!$shopId) return response()->json([]);
 
-        $orders = Order::with('client')
+        $orders = Order::with(['client', 'items.product'])
             ->inShop($shopId)
             ->whereIn('status', ['en_attente', 'pending', 'en attente'])
             ->whereNull('livreur_id')
@@ -91,13 +91,53 @@ class OrderController extends Controller
             ->limit(30)
             ->get()
             ->map(fn($o) => [
-                'id'     => $o->id,
-                'num'    => '#' . str_pad($o->id, 5, '0', STR_PAD_LEFT),
-                'client' => $o->client->name ?? 'Client',
-                'total'  => number_format($o->total, 0, ',', ' '),
+                'id'      => $o->id,
+                'num'     => '#' . str_pad($o->id, 5, '0', STR_PAD_LEFT),
+                'client'  => $o->client->name ?? 'Client',
+                'total'   => number_format($o->total, 0, ',', ' '),
+                'address' => $o->delivery_destination ?? ($o->client?->address ?? ''),
+                'photo'   => ($img = $o->items->first()?->product?->image) ? asset('storage/' . $img) : null,
             ]);
 
         return response()->json($orders);
+    }
+
+    public function bulkAssign(Request $request)
+    {
+        $shopId = Auth::user()->currentShopId();
+        if (! $shopId) return response()->json(['success' => false, 'message' => 'Boutique introuvable.'], 403);
+
+        $data = $request->validate([
+            'order_ids'           => 'required|array|min:1|max:50',
+            'order_ids.*'         => 'integer',
+            'livreur_id'          => 'nullable|exists:users,id',
+            'delivery_company_id' => 'nullable|exists:delivery_companies,id',
+        ]);
+
+        if (empty($data['livreur_id']) && empty($data['delivery_company_id'])) {
+            return response()->json(['success' => false, 'message' => 'Aucun livreur ou entreprise sélectionné.'], 422);
+        }
+
+        $orders   = Order::whereIn('id', $data['order_ids'])->where('shop_id', $shopId)->get();
+        $assigned = 0;
+
+        foreach ($orders as $order) {
+            if ($order->livreur_id || $order->delivery_company_id) continue;
+
+            if (! empty($data['livreur_id'])) {
+                $order->livreur_id = $data['livreur_id'];
+                if (in_array($order->status, ['en_attente', 'pending'])) {
+                    $order->status = 'confirmée';
+                }
+            } else {
+                $order->delivery_company_id = $data['delivery_company_id'];
+                // Reste en_attente jusqu'à ce que l'entreprise assigne un chauffeur
+            }
+            $order->save();
+            $assigned++;
+        }
+
+        return response()->json(['success' => true, 'assigned' => $assigned]);
     }
 
     public function assign(Request $request, Order $order)
@@ -185,7 +225,14 @@ class OrderController extends Controller
         if (!in_array($order->status, ['annulée', 'cancelled'])) {
             return back()->with('warning', 'Cette commande ne peut pas être restaurée.');
         }
-        $order->update(['status' => 'pending', 'livreur_id' => null]);
+        $order->update([
+            'status'              => 'en_attente',
+            'livreur_id'          => null,
+            'delivery_company_id' => null,
+            'driver_id'           => null,
+            'delivery_zone_id'    => null,
+            'delivery_fee'        => null,
+        ]);
         return back()->with('success', 'Commande #' . $order->id . ' restaurée — prête à réassigner.');
     }
 

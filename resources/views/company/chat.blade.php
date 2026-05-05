@@ -388,6 +388,7 @@ main.app-main{
 @endphp
 
 <div class="chat-page">
+   
 
     {{-- ══ CHAT AREA ══ --}}
     <div class="chat-area">

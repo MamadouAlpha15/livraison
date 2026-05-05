@@ -1006,16 +1006,16 @@ body.cx-light .cx-chart-big { color:#111827; }
                 <div class="cx-stat-ico">📋</div>
                 <div>
                     <div class="cx-stat-lbl">Commandes en attente</div>
-                    <div class="cx-stat-val">{{ $pendingOrders }}</div>
-                    <div class="cx-stat-trend">{{ cxTrend($pendingOrdersToday, $pendingOrdersYday) }}</div>
+                    <div class="cx-stat-val" id="kpi-pending-val">{{ $pendingOrders }}</div>
+                    <div class="cx-stat-trend" id="kpi-pending-trend">{{ cxTrend($pendingOrdersToday, $pendingOrdersYday) }}</div>
                 </div>
             </div>
             <div class="cx-stat" style="--s-color:#8b5cf6;--s-ico-bg:rgba(139,92,246,.12)">
                 <div class="cx-stat-ico">🚴</div>
                 <div>
                     <div class="cx-stat-lbl">Chauffeurs disponibles</div>
-                    <div class="cx-stat-val">{{ $availableDrivers }}</div>
-                    <div class="cx-stat-trend" style="{{ $availableDrivers == 0 ? 'color:var(--cx-red)' : '' }}">
+                    <div class="cx-stat-val" id="kpi-avail-val">{{ $availableDrivers }}</div>
+                    <div class="cx-stat-trend" id="kpi-avail-trend" style="{{ $availableDrivers == 0 ? 'color:var(--cx-red)' : '' }}">
                         {{ $availableDrivers }}/{{ $totalDrivers }} actifs
                     </div>
                 </div>
@@ -1024,24 +1024,24 @@ body.cx-light .cx-chart-big { color:#111827; }
                 <div class="cx-stat-ico">🚚</div>
                 <div>
                     <div class="cx-stat-lbl">Livraisons en cours</div>
-                    <div class="cx-stat-val">{{ $inDelivery }}</div>
-                    <div class="cx-stat-trend">{{ cxTrend($inDelivery, $inDeliveryYday) }}</div>
+                    <div class="cx-stat-val" id="kpi-delivery-val">{{ $inDelivery }}</div>
+                    <div class="cx-stat-trend" id="kpi-delivery-trend">{{ cxTrend($inDelivery, $inDeliveryYday) }}</div>
                 </div>
             </div>
             <div class="cx-stat" style="--s-color:#10b981;--s-ico-bg:rgba(16,185,129,.12)">
                 <div class="cx-stat-ico">✅</div>
                 <div>
                     <div class="cx-stat-lbl">Livraisons terminées</div>
-                    <div class="cx-stat-val">{{ $delivered }}</div>
-                    <div class="cx-stat-trend">{{ cxTrend($deliveredToday, $deliveredYday) }}</div>
+                    <div class="cx-stat-val" id="kpi-done-val">{{ $delivered }}</div>
+                    <div class="cx-stat-trend" id="kpi-done-trend">{{ cxTrend($deliveredToday, $deliveredYday) }}</div>
                 </div>
             </div>
             <div class="cx-stat" style="--s-color:#7c3aed;--s-ico-bg:rgba(124,58,237,.12)">
                 <div class="cx-stat-ico">💳</div>
                 <div>
                     <div class="cx-stat-lbl">Revenus livraison</div>
-                    <div class="cx-stat-val sm">{{ number_format($revenus, 0, ',', ' ') }}</div>
-                    <div class="cx-stat-trend">
+                    <div class="cx-stat-val sm" id="kpi-rev-val">{{ number_format($revenus, 0, ',', ' ') }}</div>
+                    <div class="cx-stat-trend" id="kpi-rev-trend">
                         @if($revenusToday > 0)
                             +{{ number_format($revenusToday, 0, ',', ' ') }} aujourd'hui · {{ $devise }}
                         @else
@@ -1095,7 +1095,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                         <div class="cx-panel-title">📊 Pipeline des livraisons</div>
                         <a href="{{ route('company.orders.index') }}" class="cx-panel-link">Commandes</a>
                     </div>
-                    <div class="cx-pipe-list">
+                    <div class="cx-pipe-list" id="cx-pipe-list">
                         @foreach($pipeData as [$lbl, $val, $color])
                         @php $pct = $totalOrders > 0 ? round($val / $totalOrders * 100, 1) : 0; @endphp
                         <div class="cx-pipe-item">
@@ -1114,9 +1114,10 @@ body.cx-light .cx-chart-big { color:#111827; }
                 {{-- Chauffeurs actifs --}}
                 <div class="cx-panel">
                     <div class="cx-panel-hd">
-                        <div class="cx-panel-title">🚴 Chauffeurs ({{ $totalDrivers }})</div>
+                        <div class="cx-panel-title">🚴 Chauffeurs (<span id="kpi-total-drivers">{{ $totalDrivers }}</span>)</div>
                         <a href="{{ route('company.drivers.index') }}" class="cx-panel-link">Gérer</a>
                     </div>
+                    <div id="cx-drivers-list">
                     @php
                     $driverPalette = [
                         'linear-gradient(135deg,#6366f1,#4338ca)',
@@ -1164,6 +1165,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                         <a href="{{ route('company.drivers.index') }}" style="color:var(--cx-brand-lt);font-weight:600">Ajouter un chauffeur →</a>
                     </div>
                     @endforelse
+                    </div>{{-- /cx-drivers-list --}}
                 </div>
 
             </div>{{-- /cx-right-stack --}}
@@ -1478,10 +1480,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* ══ CHARTS PREMIUM ══ */
     (function() {
-        const O7   = @json($ordersChart);
-        const O30  = @json($ordersChart30);
-        const R30  = @json($revenueChart);
-        const R7   = @json($revenueChart7);
+        /* Données mutables — exposées sur window._cx pour le polling live */
+        window._cx = window._cx || {};
+        window._cx.O7  = @json($ordersChart);
+        window._cx.O30 = @json($ordersChart30);
+        window._cx.R30 = @json($revenueChart);
+        window._cx.R7  = @json($revenueChart7);
         const DEV  = @json($devise);
 
         const L7  = @json(collect(range(6,0))->map(fn($d)  => now()->locale('fr')->subDays($d)->isoFormat('ddd D/M'))->values());
@@ -1537,7 +1541,7 @@ document.addEventListener('DOMContentLoaded', () => {
             data: {
                 labels: L7,
                 datasets: [{
-                    data: O7,
+                    data: window._cx.O7,
                     borderColor: '#8b5cf6',
                     backgroundColor: ctx => {
                         const {ctx:c, chartArea} = ctx.chart;
@@ -1586,11 +1590,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        window._cx.ordersChart  = ordersChart;
+        window._cx.ordersPeriod = 7;
+
         window.switchOrdersPeriod = (period, btn) => {
+            window._cx.ordersPeriod = period;
             document.querySelectorAll('.orders-period-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById('ordersChartSub').textContent = period===7 ? '7 derniers jours' : '30 derniers jours';
-            const data = period===7 ? O7 : O30;
+            const data = period===7 ? window._cx.O7 : window._cx.O30;
             const lbls = period===7 ? L7 : L30;
             document.getElementById('ordersTotalVal').textContent = sum(data);
             document.getElementById('ordersTodayVal').textContent = data[data.length-1] ?? 0;
@@ -1608,7 +1616,7 @@ document.addEventListener('DOMContentLoaded', () => {
             data: {
                 labels: L30,
                 datasets: [{
-                    data: R30,
+                    data: window._cx.R30,
                     backgroundColor: ctx => {
                         const {ctx:c, chartArea} = ctx.chart;
                         if (!chartArea) return 'rgba(139,92,246,.5)';
@@ -1647,12 +1655,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        window._cx.revenueChart  = revenueChart;
+        window._cx.revenuePeriod = 30;
+        window._cx.L7  = L7;
+        window._cx.L30 = L30;
+
         window.switchRevenuePeriod = (period, btn) => {
+            window._cx.revenuePeriod = period;
             document.querySelectorAll('.revenue-period-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById('revenueChartSub').textContent = period===7 ? '7 derniers jours' : '30 derniers jours';
-            const data = period===7 ? R7 : R30;
-            const lbls = period===7 ? L7 : L30;
+            const data = period===7 ? window._cx.R7 : window._cx.R30;
+            const lbls = period===7 ? window._cx.L7 : window._cx.L30;
             revenueChart.data.labels = lbls;
             revenueChart.data.datasets[0].data = data;
             revenueChart.update('active');
@@ -2036,5 +2050,153 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(pollChatNotifs,  5000);
     setInterval(pollOrderNotifs, 5000);
 });
+
+/* ═══════════════════════════════════════════════════════
+   POLLING STATS LIVE — KPI + Pipeline + Chauffeurs
+   Endpoint : GET /company/live-stats  (toutes les 20s)
+═══════════════════════════════════════════════════════ */
+(function(){
+    const DRIVER_PALETTES = [
+        'linear-gradient(135deg,#6366f1,#4338ca)',
+        'linear-gradient(135deg,#10b981,#059669)',
+        'linear-gradient(135deg,#f59e0b,#d97706)',
+        'linear-gradient(135deg,#ec4899,#be185d)',
+        'linear-gradient(135deg,#8b5cf6,#7c3aed)',
+    ];
+    const STATUS_CFG = {
+        available: { label:'Disponible',   cls:'ds-ok', dot:'#10b981' },
+        busy:      { label:'En livraison', cls:'ds-go', dot:'#f59e0b' },
+        offline:   { label:'Hors ligne',   cls:'ds-go', dot:'#ef4444' },
+    };
+
+    function setText(id, val) {
+        const el = document.getElementById(id);
+        if (el && el.textContent !== String(val)) el.textContent = val;
+    }
+    function setHtml(id, html) {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = html;
+    }
+    function animPulse(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.transition = 'opacity .15s';
+        el.style.opacity = '0.3';
+        setTimeout(() => { el.style.opacity = '1'; }, 160);
+    }
+
+    function renderPipe(pipe) {
+        return pipe.map(p => `
+            <div class="cx-pipe-item">
+                <div class="cx-pipe-row">
+                    <span class="cx-pipe-lbl">${p.lbl}</span>
+                    <span class="cx-pipe-val">${p.val}</span>
+                </div>
+                <div class="cx-pipe-track">
+                    <div class="cx-pipe-fill" style="width:${p.pct}%;background:${p.color}"></div>
+                </div>
+            </div>`).join('');
+    }
+
+    function renderDrivers(drivers, total) {
+        setText('kpi-total-drivers', total);
+        if (!drivers.length) {
+            return `<div style="padding:28px 16px;text-align:center;color:var(--cx-muted);font-size:12.5px">
+                Aucun chauffeur enregistré.</div>`;
+        }
+        return drivers.map((d, i) => {
+            const bg  = DRIVER_PALETTES[i % DRIVER_PALETTES.length];
+            const cfg = STATUS_CFG[d.status] || STATUS_CFG.offline;
+            const phoneHtml = d.phone
+                ? `<a href="tel:${d.phone}" class="cx-driv-phone" title="Appeler">📞</a>`
+                : `<div class="cx-driv-phone" style="opacity:.35;cursor:default">📞</div>`;
+            return `<div class="cx-driver">
+                <div class="cx-driv-av" style="background:${bg}">
+                    ${d.ini}<span class="cx-driv-dot" style="background:${cfg.dot}"></span>
+                </div>
+                <div class="cx-driv-info">
+                    <div class="cx-driv-name">${d.name}</div>
+                    ${d.phone ? `<div class="cx-driv-loc">📞 ${d.phone}</div>` : ''}
+                </div>
+                <div class="cx-driv-right">
+                    <span class="cx-driv-status ${cfg.cls}">● ${cfg.label}</span>
+                </div>
+                ${phoneHtml}
+            </div>`;
+        }).join('');
+    }
+
+    async function pollLiveStats() {
+        try {
+            const res = await fetch('{{ route('company.live-stats') }}', {
+                credentials: 'same-origin',
+                headers: { 'Accept': 'application/json' }
+            });
+            if (!res.ok) return;
+            const d = await res.json();
+
+            /* ── KPI ── */
+            ['pending','avail','delivery','done'].forEach(k => animPulse(`kpi-${k}-val`));
+
+            setText('kpi-pending-val',   d.pending);
+            setText('kpi-pending-trend', d.pending_trend);
+            setText('kpi-avail-val',     d.available);
+            const availTrend = document.getElementById('kpi-avail-trend');
+            if (availTrend) {
+                availTrend.textContent = `${d.available}/${d.total_drivers} actifs`;
+                availTrend.style.color = d.available === 0 ? 'var(--cx-red)' : '';
+            }
+            setText('kpi-delivery-val',   d.in_delivery);
+            setText('kpi-delivery-trend', d.delivery_trend);
+            setText('kpi-done-val',       d.delivered);
+            setText('kpi-done-trend',     d.done_trend);
+            setText('kpi-rev-val',        d.revenus_fmt);
+            setText('kpi-rev-trend',      d.rev_trend);
+
+            /* ── Pipeline ── */
+            setHtml('cx-pipe-list', renderPipe(d.pipe));
+            /* Animer les barres après insertion */
+            requestAnimationFrame(() => {
+                document.querySelectorAll('#cx-pipe-list .cx-pipe-fill').forEach(el => {
+                    const w = parseFloat(el.style.width) || 0;
+                    el.style.width = '0';
+                    requestAnimationFrame(() => { el.style.transition = 'width .5s ease'; el.style.width = w + '%'; });
+                });
+            });
+
+            /* ── Chauffeurs ── */
+            setHtml('cx-drivers-list', renderDrivers(d.drivers, d.total_drivers));
+
+            /* ── Charts (si initialisés) ── */
+            if (d.orders_7 && window._cx?.ordersChart) {
+                window._cx.O7  = d.orders_7;
+                window._cx.O30 = d.orders_30;
+                window._cx.R7  = d.revenue_7;
+                window._cx.R30 = d.revenue_30;
+
+                /* Mettre à jour le chart commandes selon la période active */
+                const oData = window._cx.ordersPeriod === 7 ? d.orders_7 : d.orders_30;
+                const oLbls = window._cx.ordersPeriod === 7 ? window._cx.L7 : window._cx.L30;
+                window._cx.ordersChart.data.labels = oLbls;
+                window._cx.ordersChart.data.datasets[0].data = oData;
+                window._cx.ordersChart.update('none');
+                setText('ordersTotalVal', oData.reduce((s,v) => s + (+v), 0));
+                setText('ordersTodayVal', oData[oData.length - 1] ?? 0);
+
+                /* Mettre à jour le chart revenus selon la période active */
+                const rData = window._cx.revenuePeriod === 7 ? d.revenue_7 : d.revenue_30;
+                const rLbls = window._cx.revenuePeriod === 7 ? window._cx.L7 : window._cx.L30;
+                window._cx.revenueChart.data.labels = rLbls;
+                window._cx.revenueChart.data.datasets[0].data = rData;
+                window._cx.revenueChart.update('none');
+            }
+
+        } catch(e) { /* silencieux */ }
+    }
+
+    /* Première exécution immédiate + toutes les 20s */
+    pollLiveStats();
+    setInterval(pollLiveStats, 20000);
+})();
 </script>
 @endpush

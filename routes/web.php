@@ -192,6 +192,7 @@ Route::middleware('auth')->group(function () {
 
         /* Dashboard */
         Route::get('/', [DeliveryCompanyController::class, 'dashboard'])->name('company.dashboard');
+        Route::get('/live-stats', [DeliveryCompanyController::class, 'liveStats'])->name('company.live-stats');
 
         /* Inbox company — toutes les conversations entrants (avant /{company} pour éviter conflit) */
         Route::get('/chat/inbox',         [DeliveryChatController::class, 'inbox'])        ->name('company.chat.inbox');
@@ -495,6 +496,7 @@ Route::middleware(['auth', 'role:employe,superadmin,admin,vendeur'])
         Route::get('orders',                              [EmployeOrderController::class, 'index'])         ->name('orders.index');
         Route::get('orders/pending-json',                 [EmployeOrderController::class, 'pendingJson'])   ->name('orders.pending-json');
         Route::put('orders/{order}/assign',               [EmployeOrderController::class, 'assign'])        ->name('orders.assign');
+        Route::post('orders/bulk-assign',                 [EmployeOrderController::class, 'bulkAssign'])    ->name('orders.bulk-assign');
         Route::put('orders/{order}/send-to-company',      [EmployeOrderController::class, 'sendToCompany']) ->name('orders.sendToCompany');
         Route::put('orders/{order}/cancel',               [EmployeOrderController::class, 'cancel'])        ->name('orders.cancel');
         Route::put('orders/{order}/restore',              [EmployeOrderController::class, 'restore'])       ->name('orders.restore');

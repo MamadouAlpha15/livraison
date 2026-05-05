@@ -2,6 +2,7 @@
 @section('title', 'Messages · '.$company->name)
 @php $bodyClass = 'cx-dashboard'; @endphp
 
+
 @push('styles')
 {{-- Anti-flash : applique le fond avant le premier paint --}}
 <script>
@@ -340,6 +341,25 @@ body.cx-light .ic-mob-topbar{background:var(--cx-surface);border-bottom-color:rg
     .ic-conv{padding:10px 12px;gap:8px}
     .ic-sb-hd{padding:12px 14px}
 }
+
+/* ── Carte commande confiée ── */
+.order-bubble{padding:0!important;background:none!important;border:none!important;box-shadow:none!important;}
+.msg-order-card{min-width:260px;max-width:310px;border-radius:14px;overflow:hidden;border:1px solid rgba(124,58,237,.35);box-shadow:0 6px 24px rgba(0,0,0,.35);}
+.moc-hd{background:linear-gradient(135deg,#7c3aed,#4f46e5);padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.moc-badge{font-size:10px;font-weight:800;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:.6px;}
+.moc-num{font-size:15px;font-weight:800;color:#fff;font-family:monospace;background:rgba(255,255,255,.18);padding:2px 9px;border-radius:7px;letter-spacing:-.5px;}
+.moc-body{background:#0d1226;padding:11px 14px;display:flex;flex-direction:column;gap:0;}
+.moc-row{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.moc-row:last-child{border-bottom:none;}
+.moc-key{font-size:10.5px;color:rgba(255,255,255,.45);width:110px;flex-shrink:0;font-weight:500;padding-top:1px;line-height:1.4;}
+.moc-val{font-size:12.5px;color:#e2e8f0;font-weight:600;flex:1;word-break:break-word;line-height:1.4;}
+.moc-val.moc-amount{color:#34d399;font-size:13px;font-weight:800;}
+/* Mode clair */
+body.cx-light .msg-order-card{border-color:rgba(124,58,237,.25);box-shadow:0 4px 16px rgba(0,0,0,.1);}
+body.cx-light .moc-body{background:#f8fafc;}
+body.cx-light .moc-row{border-bottom-color:rgba(0,0,0,.07);}
+body.cx-light .moc-key{color:#9ca3af;}
+body.cx-light .moc-val{color:#1e293b;}
 </style>
 @endpush
 
@@ -456,7 +476,20 @@ body.cx-light .ic-mob-topbar{background:var(--cx-surface);border-bottom-color:rg
     {{-- Messages --}}
     <div class="ic-messages" id="icMessages" style="{{ $activeShopId ? '' : 'display:none' }}">
         @foreach($messages as $m)
-        @php $isMine = $m->sender_role === 'company'; @endphp
+        @php
+            $isMine   = $m->sender_role === 'company';
+            $msgText  = $m->message ?? '';
+            $isOrder  = str_contains($msgText, 'Nouvelle commande') && str_contains($msgText, 'confiée');
+            if ($isOrder) {
+                preg_match('/#(\d+)/', $msgText, $nm);
+                $mocNum    = isset($nm[1]) ? '#'.$nm[1] : '';
+                $mocClient = trim(preg_match('/Client\s*:\s*(.+?)(?:\s+Destination\s*:|$)/u', $msgText, $x) ? $x[1] : '');
+                $mocDest   = trim(preg_match('/Destination\s*:\s*(.+?)(?:\s+Zone\s*:|$)/u', $msgText, $x) ? $x[1] : '');
+                $mocZone   = trim(preg_match('/Zone\s*:\s*(.+?)(?:\s+Frais\s*de|$)/u', $msgText, $x) ? $x[1] : '');
+                $mocFrais  = trim(preg_match('/Frais de livraison\s*:\s*(.+?)(?:\s+Montant\s*c|$)/u', $msgText, $x) ? $x[1] : '');
+                $mocMont   = trim(preg_match('/Montant commande\s*:\s*(.+?)$/u', $msgText, $x) ? $x[1] : '');
+            }
+        @endphp
         <div class="msg-row {{ $isMine ? 'mine' : 'other' }}">
             <div class="msg-av" style="background:{{ $isMine
                 ? 'linear-gradient(135deg,#7c3aed,#5b21b6)'
@@ -464,7 +497,25 @@ body.cx-light .ic-mob-topbar{background:var(--cx-surface);border-bottom-color:rg
                 {{ $isMine ? $uIni : $activeConvIni }}
             </div>
             <div class="msg-body">
-                <div class="msg-bubble">{{ $m->message }}</div>
+                @if($isOrder)
+                <div class="msg-bubble order-bubble">
+                    <div class="msg-order-card">
+                        <div class="moc-hd">
+                            <span class="moc-badge">📦 Commande confiée</span>
+                            <span class="moc-num">{{ $mocNum }}</span>
+                        </div>
+                        <div class="moc-body">
+                            @if($mocClient)<div class="moc-row"><span class="moc-key">👤 Client</span><span class="moc-val">{{ $mocClient }}</span></div>@endif
+                            @if($mocDest)<div class="moc-row"><span class="moc-key">📍 Destination</span><span class="moc-val">{{ $mocDest }}</span></div>@endif
+                            @if($mocZone)<div class="moc-row"><span class="moc-key">🗺️ Zone</span><span class="moc-val">{{ $mocZone }}</span></div>@endif
+                            @if($mocFrais)<div class="moc-row"><span class="moc-key">🚚 Frais livraison</span><span class="moc-val">{{ $mocFrais }}</span></div>@endif
+                            @if($mocMont)<div class="moc-row"><span class="moc-key">💰 Montant total</span><span class="moc-val moc-amount">{{ $mocMont }}</span></div>@endif
+                        </div>
+                    </div>
+                </div>
+                @else
+                <div class="msg-bubble">{{ $msgText }}</div>
+                @endif
                 <div class="msg-time">{{ $m->created_at->format('H:i') }}</div>
             </div>
         </div>
@@ -606,6 +657,38 @@ function markRead(shopId) {
     }).catch(() => {});
 }
 
+/* ── Détection et parsing des messages commande ── */
+function isOrderMsg(text) {
+    return text.includes('Nouvelle commande') && text.includes('confiée');
+}
+function parseOrderMsg(text) {
+    const nmatch = text.match(/#(\d+)/);
+    const num    = nmatch ? '#' + nmatch[1] : '';
+    const get    = (re) => (text.match(re) || [])[1]?.trim() || '';
+    return {
+        num,
+        client : get(/Client\s*:\s*(.+?)(?:\s+Destination\s*:|$)/u),
+        dest   : get(/Destination\s*:\s*(.+?)(?:\s+Zone\s*:|$)/u),
+        zone   : get(/Zone\s*:\s*(.+?)(?:\s+Frais\s*de|$)/u),
+        frais  : get(/Frais de livraison\s*:\s*(.+?)(?:\s+Montant\s*c|$)/u),
+        montant: get(/Montant commande\s*:\s*(.+?)$/u),
+    };
+}
+function buildOrderCardHtml(p) {
+    const row = (icon, label, val, cls) => val
+        ? `<div class="moc-row"><span class="moc-key">${icon} ${label}</span><span class="moc-val${cls?' '+cls:''}">${esc(val)}</span></div>`
+        : '';
+    return `<div class="msg-order-card">` +
+        `<div class="moc-hd"><span class="moc-badge">📦 Commande confiée</span><span class="moc-num">${esc(p.num)}</span></div>` +
+        `<div class="moc-body">` +
+            row('👤','Client',    p.client,  '') +
+            row('📍','Destination',p.dest,   '') +
+            row('🗺️','Zone',      p.zone,    '') +
+            row('🚚','Frais livraison',p.frais,'') +
+            row('💰','Montant total',p.montant,'moc-amount') +
+        `</div></div>`;
+}
+
 // Render one message
 function renderMsg(m) {
     const mine = m.from_type === 'company';
@@ -618,8 +701,15 @@ function renderMsg(m) {
     av.textContent = mine ? uIni : (activeIni || '?');
 
     const body   = document.createElement('div'); body.className = 'msg-body';
-    const bubble = document.createElement('div'); bubble.className = 'msg-bubble';
-    bubble.textContent = m.body || '';
+    const bubble = document.createElement('div');
+    const text   = m.body || '';
+    if (isOrderMsg(text)) {
+        bubble.className = 'msg-bubble order-bubble';
+        bubble.innerHTML = buildOrderCardHtml(parseOrderMsg(text));
+    } else {
+        bubble.className = 'msg-bubble';
+        bubble.textContent = text;
+    }
     const time   = document.createElement('div'); time.className = 'msg-time';
     time.textContent = new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
 

@@ -253,6 +253,95 @@ class DeliveryCompanyController extends Controller
 }
 
 
+    /* ── Live stats JSON — polling 20s depuis le dashboard ── */
+    public function liveStats(Request $request)
+    {
+        $company = DeliveryCompany::where('user_id', $request->user()->id)->first();
+        if (! $company || ! $company->approved) {
+            return response()->json(['error' => 'unauthorized'], 403);
+        }
+
+        $today     = now()->toDateString();
+        $yesterday = now()->subDay()->toDateString();
+        $devise    = $company->currency ?? 'GNF';
+
+        $baseOrders = fn() => Order::where('delivery_company_id', $company->id);
+        $baseComm   = fn() => CourierCommission::whereHas('order', fn($q) => $q->where('delivery_company_id', $company->id))
+                              ->where('status', CourierCommission::STATUS_PAYEE);
+
+        $pending          = $baseOrders()->where('status', Order::STATUS_EN_ATTENTE)->count();
+        $pendingToday     = $baseOrders()->where('status', Order::STATUS_EN_ATTENTE)->whereDate('created_at', $today)->count();
+        $pendingYday      = $baseOrders()->where('status', Order::STATUS_EN_ATTENTE)->whereDate('created_at', $yesterday)->count();
+
+        $available        = $company->drivers()->where('status', 'available')->count();
+        $totalDrivers     = $company->drivers()->count();
+
+        $inDelivery       = $baseOrders()->where('status', Order::STATUS_EN_LIVRAISON)->count();
+        $inDeliveryYday   = $baseOrders()->where('status', Order::STATUS_EN_LIVRAISON)->whereDate('updated_at', $yesterday)->count();
+
+        $delivered        = $baseOrders()->where('status', Order::STATUS_LIVREE)->count();
+        $deliveredToday   = $baseOrders()->where('status', Order::STATUS_LIVREE)->whereDate('updated_at', $today)->count();
+        $deliveredYday    = $baseOrders()->where('status', Order::STATUS_LIVREE)->whereDate('updated_at', $yesterday)->count();
+
+        $revenus          = $baseComm()->sum('amount');
+        $revenusToday     = $baseComm()->whereDate('paid_at', $today)->sum('amount');
+
+        $totalOrders = max($baseOrders()->count(), 1);
+        $pipe = [
+            ['lbl' => 'En attente de chauffeur', 'val' => $baseOrders()->where('status', Order::STATUS_EN_ATTENTE)->count(),   'color' => '#eab308'],
+            ['lbl' => 'Assignées',                'val' => $baseOrders()->where('status', Order::STATUS_CONFIRMEE)->count(),    'color' => '#3b82f6'],
+            ['lbl' => 'En livraison',             'val' => $baseOrders()->where('status', Order::STATUS_EN_LIVRAISON)->count(), 'color' => '#f59e0b'],
+            ['lbl' => 'Livrées',                  'val' => $baseOrders()->where('status', Order::STATUS_LIVREE)->count(),       'color' => '#10b981'],
+            ['lbl' => 'Annulées',                 'val' => $baseOrders()->where('status', Order::STATUS_ANNULEE)->count(),      'color' => '#ef4444'],
+        ];
+        foreach ($pipe as &$p) {
+            $p['pct'] = round($p['val'] / $totalOrders * 100, 1);
+        }
+
+        $drivers = $company->drivers()
+            ->orderByRaw("FIELD(status,'available','busy','offline')")
+            ->limit(5)
+            ->get()
+            ->map(fn($d) => [
+                'name'   => $d->name,
+                'ini'    => strtoupper(substr($d->name ?? 'C', 0, 1)) . strtoupper(substr(explode(' ', $d->name ?? 'C H')[1] ?? '', 0, 1)),
+                'status' => $d->status ?? 'offline',
+                'phone'  => $d->phone,
+            ]);
+
+        $trend = function (int|float $today, int|float $yesterday): string {
+            if ($yesterday == 0) return $today > 0 ? '↑ +100% vs hier' : '— vs hier';
+            $pct = round(($today - $yesterday) / $yesterday * 100);
+            return ($pct >= 0 ? '↑ +' : '↓ ') . $pct . '% vs hier';
+        };
+
+        $orders7  = collect(range(6, 0))->map(fn($d) => $baseOrders()->whereDate('created_at', now()->subDays($d)->toDateString())->count())->values();
+        $orders30 = collect(range(29, 0))->map(fn($d) => $baseOrders()->whereDate('created_at', now()->subDays($d)->toDateString())->count())->values();
+        $revenue7  = collect(range(6, 0))->map(fn($d) => (int) $baseComm()->whereDate('paid_at', now()->subDays($d)->toDateString())->sum('amount'))->values();
+        $revenue30 = collect(range(29, 0))->map(fn($d) => (int) $baseComm()->whereDate('paid_at', now()->subDays($d)->toDateString())->sum('amount'))->values();
+
+        return response()->json([
+            'pending'        => $pending,
+            'pending_trend'  => $trend($pendingToday, $pendingYday),
+            'available'      => $available,
+            'total_drivers'  => $totalDrivers,
+            'in_delivery'    => $inDelivery,
+            'delivery_trend' => $trend($inDelivery, $inDeliveryYday),
+            'delivered'      => $delivered,
+            'done_trend'     => $trend($deliveredToday, $deliveredYday),
+            'revenus_fmt'    => number_format($revenus, 0, ',', ' '),
+            'rev_trend'      => $revenusToday > 0
+                ? '+' . number_format($revenusToday, 0, ',', ' ') . ' aujourd\'hui · ' . $devise
+                : $devise . ' · Total commissions reçues',
+            'pipe'           => $pipe,
+            'drivers'        => $drivers,
+            'orders_7'       => $orders7,
+            'orders_30'      => $orders30,
+            'revenue_7'      => $revenue7,
+            'revenue_30'     => $revenue30,
+        ]);
+    }
+
     // Validation par superadmin
     public function approve(DeliveryCompany $company)
     {

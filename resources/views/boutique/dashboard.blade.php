@@ -609,7 +609,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .bq-chat-send-btn{width:38px;height:38px;border-radius:10px;border:none;cursor:pointer;background:#6366f1;color:#fff;font-size:17px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .14s;}
 .bq-chat-send-btn:hover{background:#4f46e5;}
 .bq-chat-send-btn:disabled{opacity:.5;cursor:not-allowed;}
-.bq-confier-zone{padding:10px 14px;flex-shrink:0;background:#f0fdf4;border-top:1.5px solid #bbf7d0;}
+.bq-confier-zone{padding:10px 14px;flex-shrink:0;background:#f0fdf4;border-bottom:1.5px solid #bbf7d0;}
 .bq-confier-row{display:flex;gap:8px;align-items:center;}
 .bq-order-select{flex:1;padding:8px 10px;border:1.5px solid #86efac;border-radius:9px;font-size:12.5px;font-family:var(--font);color:var(--text);background:#fff;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;background-size:14px;padding-right:28px;transition:border-color .14s;}
 .bq-order-select:focus{border-color:#059669;}
@@ -617,6 +617,18 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .bq-btn-confier:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(16,185,129,.45);}
 .bq-btn-confier:disabled{opacity:.6;cursor:not-allowed;transform:none;}
 .bq-btn-confier.done{background:linear-gradient(135deg,#6b7280,#9ca3af);box-shadow:none;}
+.bq-order-card{padding:9px 12px;border-radius:9px;border:1.5px solid #e2e8f0;background:#fff;cursor:pointer;transition:all .14s;display:flex;align-items:center;gap:10px;}
+.bq-order-card:hover{border-color:#86efac;background:#f0fdf4;}
+.bq-order-card.selected{border-color:#059669;background:#f0fdf4;box-shadow:0 0 0 3px rgba(16,185,129,.12);}
+.bq-order-card-num{font-size:11px;font-weight:700;color:#6366f1;font-family:var(--mono);flex-shrink:0;}
+.bq-order-card-info{flex:1;min-width:0;}
+.bq-order-card-client{font-size:12.5px;font-weight:700;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bq-order-card-amount{font-size:11px;color:#6b7280;margin-top:1px;}
+.bq-order-card-check{width:20px;height:20px;border-radius:50%;border:2px solid #d1d5db;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .14s;color:transparent;}
+.bq-order-card.selected .bq-order-card-check{background:#059669;border-color:#059669;color:#fff;}
+.bq-order-card-thumb{width:40px;height:40px;border-radius:8px;flex-shrink:0;overflow:hidden;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid #e2e8f0;}
+.bq-order-card-thumb img{width:100%;height:100%;object-fit:cover;}
+.bq-order-card-address{font-size:10.5px;color:#6b7280;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px;}
 .bq-confier-hint{font-size:11px;color:#059669;font-weight:600;margin-bottom:6px;}
 
 /* ══════════════════════════════════════════════════
@@ -742,35 +754,54 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     $parts    = explode(' ', auth()->user()->name);
     $initials = strtoupper(substr($parts[0],0,1)) . (isset($parts[1]) ? strtoupper(substr($parts[1],0,1)) : strtoupper(substr($parts[0],1,1)));
     $now      = \Illuminate\Support\Carbon::now();
+    $_locale  = app()->getLocale();
+    $_dayAbbr = [
+        'fr' => ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+        'en' => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+    ];
+    $_months = [
+        'fr' => ['', 'Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'],
+        'en' => ['', 'January','February','March','April','May','June','July','August','September','October','November','December'],
+    ];
+    $_dayLabel  = fn($d) => ($_dayAbbr[$_locale] ?? $_dayAbbr['en'])[$d->dayOfWeek];
+    $_monthYear = fn($d) => ($_months[$_locale] ?? $_months['en'])[$d->month] . ' ' . $d->year;
 
     $commissionsPaieesMonth = (float) \App\Models\CourierCommission::where('shop_id', $shop->id)->where('status', 'payée')->whereMonth('created_at', $now->month)->whereYear('created_at', $now->year)->sum('amount');
     $caGrossMonth = (float) $shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->where('status','livrée')->sum('total');
     $caMonth = $caGrossMonth - $commissionsPaieesMonth;
     $commissionsPaieesPrev = (float) \App\Models\CourierCommission::where('shop_id', $shop->id)->where('status', 'payée')->whereMonth('created_at', $now->copy()->subMonth()->month)->whereYear('created_at', $now->copy()->subMonth()->year)->sum('amount');
     $caGrossPrev  = (float) $shop->orders()->whereMonth('created_at',$now->copy()->subMonth()->month)->whereYear('created_at',$now->copy()->subMonth()->year)->where('status','livrée')->sum('total');
-    $caPrev       = ($caGrossPrev - $commissionsPaieesPrev) ?: 1;
-    $caDelta  = round((($caMonth - $caPrev) / $caPrev) * 100, 1);
+    $caNetPrev    = $caGrossPrev - $commissionsPaieesPrev;
+    $caDelta      = $caNetPrev > 0 ? round((($caMonth - $caNetPrev) / $caNetPrev) * 100, 1) : ($caMonth > 0 ? 100 : 0);
     $cmdMonth = $shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->whereNotIn('status',['annulée','cancelled'])->count();
     $cmdToday = $shop->orders()->whereDate('created_at', today())->whereNotIn('status',['annulée','cancelled'])->count();
     $cmdYest  = $shop->orders()->whereDate('created_at', today()->subDay())->whereNotIn('status',['annulée','cancelled'])->count();
     $cmdLivreesMonth = $shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->where('status','livrée')->count();
-    $panier   = $cmdLivreesMonth > 0 ? round($caMonth / $cmdLivreesMonth) : 0;
-    $totalCmdMonth = $shop->orders()->whereMonth('created_at',$now->month)->whereNotIn('status',['annulée','cancelled'])->count();
-    $livres        = $shop->orders()->whereMonth('created_at',$now->month)->where('status','livrée')->count();
+    $panier          = $cmdLivreesMonth > 0 ? round($caMonth / $cmdLivreesMonth) : 0;
+    $cmdLivreesPrev  = $shop->orders()->whereMonth('created_at',$now->copy()->subMonth()->month)->whereYear('created_at',$now->copy()->subMonth()->year)->where('status','livrée')->count();
+    $panierPrev      = $cmdLivreesPrev > 0 ? round($caNetPrev / $cmdLivreesPrev) : 0;
+    $panierDelta     = $panierPrev > 0 ? round((($panier - $panierPrev) / $panierPrev) * 100, 1) : ($panier > 0 ? 100 : 0);
+    $totalCmdMonth = $shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->whereNotIn('status',['annulée','cancelled'])->count();
+    $livres        = $shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->where('status','livrée')->count();
     $tauxLiv       = $totalCmdMonth > 0 ? round(($livres / $totalCmdMonth) * 100, 1) : 0;
-    $days7 = collect(range(6,0))->map(function ($i) use ($shop, $now) {
-        $day        = $now->copy()->subDays($i)->toDateString();
-        $caJour     = (float) $shop->orders()->whereDate('created_at', $day)->where('status','livrée')->sum('total');
-        $commJour   = (float) \App\Models\CourierCommission::whereHas('order', function ($q) use ($shop, $day) {
+    $days7 = collect(range(6,0))->map(function ($i) use ($shop, $now, $_dayLabel) {
+        $day      = $now->copy()->subDays($i)->toDateString();
+        $caJour   = (float) $shop->orders()->whereDate('created_at', $day)->where('status','livrée')->sum('total');
+        $commJour = (float) \App\Models\CourierCommission::whereHas('order', function ($q) use ($shop, $day) {
             $q->where('shop_id', $shop->id)->whereDate('created_at', $day);
         })->where('status', 'payée')->sum('amount');
         $d = $now->copy()->subDays($i);
-        $d->locale('fr');
-        $label = ucfirst($d->isoFormat('ddd')); // Lun, Mar, Mer, Jeu, Ven, Sam, Dim
-        $dow = $d->dayOfWeek === 0 ? 7 : $d->dayOfWeek; // 1=Lun … 7=Dim
-        return ['label' => $label, 'value' => max(0, $caJour - $commJour), 'today' => $i === 0, 'dow' => $dow];
-    })->sortBy('dow')->values();
+        return ['label' => $_dayLabel($d), 'value' => max(0, $caJour - $commJour), 'today' => $i === 0];
+    })->values();
     $max7 = $days7->max('value') ?: 1;
+    $prev7Total = (float) collect(range(13,7))->sum(function ($i) use ($shop, $now) {
+        $day      = $now->copy()->subDays($i)->toDateString();
+        $caJ      = (float) $shop->orders()->whereDate('created_at', $day)->where('status','livrée')->sum('total');
+        $commJ    = (float) \App\Models\CourierCommission::whereHas('order', function ($q) use ($shop, $day) {
+            $q->where('shop_id', $shop->id)->whereDate('created_at', $day);
+        })->where('status', 'payée')->sum('amount');
+        return max(0, $caJ - $commJ);
+    });
     $recentOrders = $shop->orders()->with('user')->latest()->take(6)->get();
     $topProducts = $shop->products()->withCount('orderItems')->orderByDesc('order_items_count')->take(5)->get();
     $maxSales    = $topProducts->max('order_items_count') ?: 1;
@@ -804,8 +835,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         ['key'=>'en_attente',  'label'=>'En attente','count'=>$shop->orders()->whereIn('status',['pending','en attente','en_attente'])->count(),'color'=>'#f59e0b','bg'=>'#fffbeb','ico'=>'⏰'],
         ['key'=>'confirmees',  'label'=>'Confirmées','count'=>$shop->orders()->whereIn('status',['confirmed','confirmée','processing'])->count(),'color'=>'#10b981','bg'=>'#ecfdf5','ico'=>'✅'],
         ['key'=>'en_livraison','label'=>'En livraison','count'=>$shop->orders()->whereIn('status',['en_livraison','delivering','shipped'])->count(),'color'=>'#6366f1','bg'=>'#eef2ff','ico'=>'🚚'],
-        ['key'=>'terminees',   'label'=>'Terminées','count'=>$shop->orders()->whereMonth('created_at',$now->month)->where('status','livrée')->count(),'color'=>'#22c55e','bg'=>'#dcfce7','ico'=>'✅'],
-        ['key'=>'annulees',    'label'=>'Annulées','count'=>$shop->orders()->whereMonth('created_at',$now->month)->whereIn('status',['annulée','cancelled'])->count(),'color'=>'#ef4444','bg'=>'#fef2f2','ico'=>'❌'],
+        ['key'=>'terminees',   'label'=>'Terminées','count'=>$shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->where('status','livrée')->count(),'color'=>'#22c55e','bg'=>'#dcfce7','ico'=>'✅'],
+        ['key'=>'annulees',    'label'=>'Annulées','count'=>$shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->whereIn('status',['annulée','cancelled'])->count(),'color'=>'#ef4444','bg'=>'#fef2f2','ico'=>'❌'],
     ];
     $hasLivreurs  = $livreursDisponibles->isNotEmpty();
     $hasCompanies = isset($deliveryCompanies) && $deliveryCompanies->isNotEmpty();
@@ -820,11 +851,11 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     $livreursActifsCount = $livreursDisponibles->count();
     $partenairesCount = isset($deliveryCompanies) ? $deliveryCompanies->count() : 0;
     /* Mini bar chart commandes 7j */
-    $cmdDays7 = collect(range(6,0))->map(function($i) use ($shop, $now) {
+    $cmdDays7 = collect(range(6,0))->map(function($i) use ($shop, $now, $_dayLabel) {
         $day = $now->copy()->subDays($i)->toDateString();
         $cnt = $shop->orders()->whereDate('created_at', $day)->whereNotIn('status',['annulée','cancelled'])->count();
-        $d   = $now->copy()->subDays($i); $d->locale('fr');
-        return ['label' => ucfirst($d->isoFormat('ddd')), 'count' => $cnt, 'today' => $i === 0];
+        $d   = $now->copy()->subDays($i);
+        return ['label' => $_dayLabel($d), 'count' => $cnt, 'today' => $i === 0];
     })->values();
     $maxCmd7 = $cmdDays7->max('count') ?: 1;
 @endphp
@@ -842,21 +873,26 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             </div>
             <button class="bq-chat-close" onclick="bqCloseChatModal()">✕</button>
         </div>
-        <div class="bq-chat-msgs" id="bqChatMsgList">
-            <div class="bq-chat-empty" id="bqChatEmpty">Chargement…</div>
-        </div>
-
-        {{-- Zone confier la livraison --}}
+        {{-- Zone confier la livraison (au-dessus des messages pour ne pas masquer le dernier) --}}
         <div class="bq-confier-zone" id="bqConfierZone" style="display:none;">
             <div class="bq-confier-hint">📦 Confier une commande à cette entreprise</div>
-            <div class="bq-confier-row">
-                <select class="bq-order-select" id="bqOrderSelect">
-                    <option value="">— Choisir une commande —</option>
+            <div id="bqOrdersList" style="display:flex;flex-direction:column;gap:5px;max-height:150px;overflow-y:auto;margin-bottom:8px;scrollbar-width:thin;"></div>
+            <div id="bqZonePickerWrap" style="display:none;margin-bottom:8px;">
+                <label style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">📍 Zone de livraison</label>
+                <select id="bqZonePicker" style="width:100%;padding:9px 12px;border:1.5px solid #bbf7d0;border-radius:9px;font-size:13px;font-family:inherit;background:#fff;color:#0f172a;outline:none;cursor:pointer;" onchange="bqOnZonePick(this)">
+                    <option value="">— Choisir une zone —</option>
                 </select>
-                <button class="bq-btn-confier" id="bqBtnConfier" onclick="bqConfierLivraison()">
-                    ✅ Confier
-                </button>
+                <div id="bqZonePriceHint" style="display:none;margin-top:5px;padding:7px 10px;background:#f0fdf4;border-radius:7px;font-size:12px;font-weight:700;color:#065f46;">
+                    💰 Prix : <span id="bqZonePriceVal"></span> · ⏱ <span id="bqZoneDelayVal"></span> min
+                </div>
             </div>
+            <button class="bq-btn-confier" id="bqBtnConfier" onclick="bqConfierLivraison()">
+                📦 Confier la livraison à cette entreprise
+            </button>
+        </div>
+
+        <div class="bq-chat-msgs" id="bqChatMsgList">
+            <div class="bq-chat-empty" id="bqChatEmpty">Chargement…</div>
         </div>
 
         <div class="bq-chat-input-zone">
@@ -1014,7 +1050,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     <div class="kpi-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);border-color:rgba(139,92,246,.3);box-shadow:0 0 0 3px rgba(139,92,246,.12),0 4px 14px rgba(139,92,246,.4)">💰</div>
                     <div class="kpi-lbl">Revenu net</div>
                     <div class="kpi-val" id="kpiCaVal">{{ number_format($caMonth,0,',',' ') }}</div>
-                    <div class="kpi-unit">{{ $devise }} · {{ $now->translatedFormat('F Y') }}</div>
+                    <div class="kpi-unit">{{ $devise }} · {{ $_monthYear($now) }}</div>
                     <div class="kpi-delta {{ $caDelta >= 0 ? 'up':'down' }}" id="kpiCaDelta">{{ $caDelta >= 0 ? '↑':'↓' }} {{ abs($caDelta) }}% vs mois précédent</div>
                     @if($commissionsPaieesMonth > 0)
                     <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:3px">
@@ -1036,7 +1072,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     <div class="kpi-lbl">Panier moyen</div>
                     <div class="kpi-val" id="kpiPanierVal">{{ number_format($panier,0,',',' ') }}</div>
                     <div class="kpi-unit">{{ $devise }} / commande</div>
-                    <div class="kpi-delta {{ $caDelta >= 0 ? 'up':'down' }}" id="kpiPanierDelta">{{ $caDelta >= 0 ? '↑':'↓' }} {{ abs($caDelta) }}%</div>
+                    <div class="kpi-delta {{ $panierDelta >= 0 ? 'up':'down' }}" id="kpiPanierDelta">{{ $panierDelta >= 0 ? '↑':'↓' }} {{ abs($panierDelta) }}% vs mois précédent</div>
                 </div>
                 <div class="kpi" style="--kpi-color:#d97706;--kpi-bg:#fffbeb">
                     <div class="kpi-icon" style="background:linear-gradient(135deg,#f59e0b,#b45309);border-color:rgba(217,119,6,.3);box-shadow:0 0 0 3px rgba(217,119,6,.12),0 4px 14px rgba(217,119,6,.4)">🚴</div>
@@ -1188,13 +1224,14 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                             <sup>{{ $devise }} </sup>{{ number_format($week7Total, 0, ',', ' ') }}
                         </div>
                         @php
-                            $prevWeek = $days7->sum('value'); // placeholder — could add prev-week query
-                            // show today vs yesterday as delta proxy
-                            $todayVal = $days7->last()['value'];
-                            $yesterVal = $days7->count() >= 2 ? $days7->get($days7->count()-2)['value'] : 0;
-                            $rcDelta = $yesterVal > 0 ? round((($todayVal - $yesterVal)/$yesterVal)*100,1) : ($todayVal > 0 ? 100 : 0);
+                            $prevWeek  = $prev7Total;
+                            $todayEntry = $days7->firstWhere('today', true);
+                            $todayVal   = $todayEntry['value'] ?? 0;
+                            $n7c        = $days7->count();
+                            $yesterVal  = $n7c >= 2 ? $days7->get($n7c - 2)['value'] : 0;
+                            $rcDelta    = $yesterVal > 0 ? round((($todayVal - $yesterVal) / $yesterVal) * 100, 1) : ($todayVal > 0 ? 100 : 0);
                         @endphp
-                        <div class="rc-delta {{ $rcDelta > 0 ? 'up' : ($rcDelta < 0 ? 'down' : 'flat') }}">
+                        <div id="rcDeltaBadge" class="rc-delta {{ $rcDelta > 0 ? 'up' : ($rcDelta < 0 ? 'down' : 'flat') }}">
                             @if($rcDelta > 0) ↑ +{{ $rcDelta }}% aujourd'hui vs hier
                             @elseif($rcDelta < 0) ↓ {{ $rcDelta }}% aujourd'hui vs hier
                             @else → Stable aujourd'hui
@@ -1288,9 +1325,16 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                         <div class="mini-chart-lbl">Commandes</div>
                         <div class="mini-chart-val">{{ $cmdDays7->sum('count') }}</div>
                         <div class="mini-chart-sub">7 derniers jours</div>
-                        @php $cmdDelta7 = $cmdDays7->count() >= 2 ? ($cmdDays7->last()['count'] - $cmdDays7->get($cmdDays7->count()-2)['count']) : 0; @endphp
-                        <div class="mini-delta {{ $cmdDelta7 >= 0 ? 'up' : 'down' }}">
-                            {{ $cmdDelta7 >= 0 ? '↑ +'.$cmdDelta7 : '↓ '.$cmdDelta7 }} aujourd'hui
+                        @php
+                            $cmdToday7  = $cmdDays7->last()['count'] ?? 0;
+                            $cmdYest7   = $cmdDays7->count() >= 2 ? $cmdDays7->get($cmdDays7->count()-2)['count'] : 0;
+                            $cmdDelta7  = $cmdToday7 - $cmdYest7;
+                        @endphp
+                        <div id="cmdDeltaBadge" class="mini-delta {{ $cmdDelta7 > 0 ? 'up' : ($cmdDelta7 < 0 ? 'down' : 'flat') }}">
+                            @if($cmdDelta7 > 0) ↑ {{ $cmdToday7 }} aujourd'hui
+                            @elseif($cmdDelta7 < 0) ↓ {{ $cmdToday7 }} aujourd'hui
+                            @else → {{ $cmdToday7 }} aujourd'hui
+                            @endif
                         </div>
                     </div>
                     <span class="mini-period-badge">30 derniers jours ▾</span>
@@ -1950,6 +1994,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (totalEl) totalEl.textContent = _alerts.length;
     };
 
+    /* ── Retire toutes les alertes company_msg pour une entreprise donnée ── */
+    window._bqRemoveCompanyAlert = function(companyId) {
+        _alerts = _alerts.filter(a => !(a.type === 'company_msg' && String(a.companyId) === String(companyId)));
+        _saveAlerts();
+        if (_notifOpen) renderNotifList();
+        const companyAlertCount = _alerts.filter(a => a.type === 'company_msg').length;
+        const badge = document.getElementById('notifBellCount');
+        /* badge sera recalculé au prochain poll */
+    };
+
     window.toggleNotifDropdown = function() {
         _notifOpen = !_notifOpen;
         const dd = document.getElementById('notifDropdown');
@@ -2020,7 +2074,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             /* ── Messages des entreprises de livraison ── */
             if (Array.isArray(d.latest_company_messages) && d.latest_company_messages.length > 0) {
-                const newCMsgs = d.latest_company_messages.filter(m => m.id > _lastSeenCompanyMsgId);
+                const newCMsgs = d.latest_company_messages.filter(m => {
+                    if (m.id <= _lastSeenCompanyMsgId) return false;
+                    try {
+                        const seen = JSON.parse(sessionStorage.getItem('bq_co_seen') || '{}');
+                        if (seen[m.company_id] && m.id <= seen[m.company_id]) return false;
+                    } catch(e) {}
+                    return true;
+                });
                 if (newCMsgs.length > 0) {
                     if (_prevCompanyMsg >= 0) {
                         const n = newCMsgs.length;
@@ -2118,23 +2179,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const SHOP_ID = {{ $shop->id ?? 0 }};
     const CSRF    = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
-    let _bqCompanyId   = null;
-    let _bqCompanyName = '';
-    let _bqLastMsgTime = null;
-    let _bqInterval    = null;
-
-    let _bqConfierDone = false;
+    let _bqCompanyId      = null;
+    let _bqCompanyName    = '';
+    let _bqLastMsgTime    = null;
+    let _bqInterval       = null;
+    let _bqConfierDone    = false;
+    let _bqSelectedOrderId = null;
 
     /* ── Ouvre le chat pour une entreprise donnée ── */
     window.bqOpenCompanyChat = function(companyId, companyName) {
-        _bqCompanyId   = companyId;
-        _bqCompanyName = companyName || 'Entreprise';
-        _bqLastMsgTime = null;
-        _bqConfierDone = false;
+        _bqCompanyId      = companyId;
+        _bqCompanyName    = companyName || 'Entreprise';
+        _bqLastMsgTime    = null;
+        _bqConfierDone    = false;
+        _bqSelectedOrderId = null;
 
         /* Ferme le dropdown notif */
         const dd = document.getElementById('notifDropdown');
         if (dd) dd.style.display = 'none';
+
+        /* Dismiss la notification cloche pour cette entreprise */
+        if (typeof window._bqRemoveCompanyAlert === 'function') {
+            window._bqRemoveCompanyAlert(companyId);
+        }
 
         /* Header */
         document.getElementById('bqChatAv').textContent   = '🏢';
@@ -2145,21 +2212,22 @@ document.addEventListener('DOMContentLoaded', () => {
             '<div class="bq-chat-empty" id="bqChatEmpty">Chargement…</div>';
 
         /* Reset zone confier */
-        const confierZone = document.getElementById('bqConfierZone');
-        const btnC        = document.getElementById('bqBtnConfier');
-        const sel         = document.getElementById('bqOrderSelect');
-        confierZone.style.display = 'none';
+        document.getElementById('bqConfierZone').style.display  = 'none';
+        document.getElementById('bqOrdersList').innerHTML        = '';
+        document.getElementById('bqZonePickerWrap').style.display = 'none';
+        document.getElementById('bqZonePriceHint').style.display  = 'none';
+        document.getElementById('bqZonePicker').innerHTML         = '<option value="">— Choisir une zone —</option>';
+        const btnC = document.getElementById('bqBtnConfier');
         btnC.disabled  = false;
         btnC.classList.remove('done');
-        btnC.innerHTML = '✅ Confier';
-        sel.innerHTML  = '<option value="">— Choisir une commande —</option>';
+        btnC.innerHTML = '📦 Confier la livraison à cette entreprise';
 
         /* Ouvrir */
         document.getElementById('bqChatModal').classList.add('open');
         document.body.style.overflow = 'hidden';
         document.getElementById('bqChatInput').focus();
 
-        /* Charger messages + commandes en attente */
+        /* Charger messages + commandes */
         bqLoadMessages(true);
         bqLoadPendingOrders();
         _bqInterval = setInterval(() => bqLoadMessages(false), 3000);
@@ -2167,53 +2235,131 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* ── Charge les commandes non assignées ── */
     function bqLoadPendingOrders() {
+        const zone = document.getElementById('bqConfierZone');
+        const list = document.getElementById('bqOrdersList');
+
         fetch('/employe/orders/pending-json', {
             headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
         })
         .then(r => r.json())
         .then(orders => {
-            const sel   = document.getElementById('bqOrderSelect');
-            const zone  = document.getElementById('bqConfierZone');
-            sel.innerHTML = '<option value="">— Choisir une commande —</option>';
-            if (orders.length) {
-                orders.forEach(o => {
-                    const opt = document.createElement('option');
-                    opt.value       = o.id;
-                    opt.textContent = `${o.num} · ${o.client} · ${o.total} GNF`;
-                    sel.appendChild(opt);
-                });
-                zone.style.display = 'block';
-            } else {
-                zone.style.display = 'none';
-            }
+            list.innerHTML = '';
+            if (!orders.length) { zone.style.display = 'none'; return; }
+
+            orders.forEach(o => {
+                const card = document.createElement('div');
+                card.className = 'bq-order-card';
+                card.dataset.orderId = o.id;
+                const thumbHtml = o.photo
+                    ? `<div class="bq-order-card-thumb"><img src="${o.photo}" alt="" onerror="this.parentElement.innerHTML='🏷️'"></div>`
+                    : `<div class="bq-order-card-thumb">🏷️</div>`;
+                const addrHtml = o.address
+                    ? `<div class="bq-order-card-address">📍 ${bqEsc(o.address)}</div>`
+                    : '';
+                card.innerHTML =
+                    thumbHtml +
+                    `<div class="bq-order-card-info">` +
+                        `<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">` +
+                            `<span class="bq-order-card-num">${o.num}</span>` +
+                            `<span class="bq-order-card-client">${bqEsc(o.client)}</span>` +
+                        `</div>` +
+                        addrHtml +
+                        `<div class="bq-order-card-amount">${o.total} ${o.devise || 'GNF'}</div>` +
+                    `</div>` +
+                    `<div class="bq-order-card-check">✓</div>`;
+                card.addEventListener('click', () => bqSelectOrderCard(card, o.id));
+                list.appendChild(card);
+            });
+            zone.style.display = 'block';
+            /* La zone vient d'apparaître et a réduit la zone messages → re-scroller en bas */
+            requestAnimationFrame(() => {
+                const ml = document.getElementById('bqChatMsgList');
+                ml.scrollTop = ml.scrollHeight;
+            });
         })
-        .catch(() => {
-            document.getElementById('bqConfierZone').style.display = 'none';
-        });
+        .catch(() => { document.getElementById('bqConfierZone').style.display = 'none'; });
     }
 
-    /* ── Confie la commande sélectionnée à l'entreprise ── */
+    /* ── Sélectionne une commande et charge les zones ── */
+    function bqSelectOrderCard(card, orderId) {
+        document.querySelectorAll('#bqOrdersList .bq-order-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        _bqSelectedOrderId = orderId;
+        bqLoadZones();
+    }
+
+    /* ── Charge les zones de l'entreprise ── */
+    function bqLoadZones() {
+        const wrap   = document.getElementById('bqZonePickerWrap');
+        const picker = document.getElementById('bqZonePicker');
+        const hint   = document.getElementById('bqZonePriceHint');
+
+        wrap.style.display = 'none';
+        hint.style.display = 'none';
+        picker.innerHTML   = '<option value="">— Choisir une zone —</option>';
+
+        if (!_bqCompanyId) return;
+
+        fetch(`/company-zones/${_bqCompanyId}`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+        })
+        .then(r => r.json())
+        .then(zones => {
+            if (!zones || !zones.length) return;
+            zones.forEach(z => {
+                const opt = document.createElement('option');
+                opt.value           = z.id;
+                opt.textContent     = `${z.name} — ${new Intl.NumberFormat('fr-FR').format(z.price)} GNF`;
+                opt.dataset.price   = z.price;
+                opt.dataset.minutes = z.estimated_minutes;
+                picker.appendChild(opt);
+            });
+            wrap.style.display = 'block';
+        })
+        .catch(() => {});
+    }
+
+    /* ── Zone sélectionnée ── */
+    window.bqOnZonePick = function(sel) {
+        const hint    = document.getElementById('bqZonePriceHint');
+        const priceEl = document.getElementById('bqZonePriceVal');
+        const delayEl = document.getElementById('bqZoneDelayVal');
+        const opt     = sel.options[sel.selectedIndex];
+        if (!sel.value) { hint.style.display = 'none'; return; }
+        priceEl.textContent = new Intl.NumberFormat('fr-FR').format(opt.dataset.price) + ' GNF';
+        delayEl.textContent = opt.dataset.minutes;
+        hint.style.display  = 'block';
+    };
+
+    /* ── Confie la commande sélectionnée ── */
     window.bqConfierLivraison = function() {
         if (_bqConfierDone) return;
-        const sel     = document.getElementById('bqOrderSelect');
-        const orderId = sel.value;
-        if (!orderId) { sel.focus(); return; }
+        const orderId = _bqSelectedOrderId;
+        if (!orderId) {
+            const list = document.getElementById('bqOrdersList');
+            list.style.outline = '2px solid #f87171';
+            list.style.borderRadius = '9px';
+            setTimeout(() => { list.style.outline = ''; list.style.borderRadius = ''; }, 1200);
+            return;
+        }
 
-        const btn = document.getElementById('bqBtnConfier');
+        const btn     = document.getElementById('bqBtnConfier');
         btn.disabled  = true;
         btn.innerHTML = '⏳ Envoi…';
+
+        const picker  = document.getElementById('bqZonePicker');
+        const zoneId  = picker?.value || null;
+        const zoneOpt = zoneId ? picker.options[picker.selectedIndex] : null;
 
         const formData = new FormData();
         formData.append('_method', 'PUT');
         formData.append('delivery_company_id', _bqCompanyId);
+        if (zoneId)                  formData.append('delivery_zone_id', zoneId);
+        if (zoneOpt?.dataset?.price) formData.append('delivery_fee', zoneOpt.dataset.price);
 
         fetch(`/employe/orders/${orderId}/send-to-company`, {
             method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': CSRF,
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            },
+            headers: { 'X-CSRF-TOKEN': CSRF, 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
             body: formData
         })
         .then(r => r.json())
@@ -2224,8 +2370,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.innerHTML = '✅ Confiée !';
                 document.getElementById('bqConfierZone').style.display = 'none';
 
-                /* Message de confirmation visible dans le chat */
-                const numTxt = sel.options[sel.selectedIndex]?.text?.split('·')[0]?.trim() || ('#' + orderId);
+                const selCard = document.querySelector('#bqOrdersList .bq-order-card.selected');
+                const numTxt  = selCard ? (selCard.querySelector('.bq-order-card-num')?.textContent || ('#' + orderId)) : ('#' + orderId);
                 bqRenderMessages([{
                     id: 'local-' + Date.now(),
                     from_type: 'system',
@@ -2233,17 +2379,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     created_at: new Date().toISOString()
                 }], false);
 
-                /* Rechargement après 2s pour actualiser les statuts */
                 setTimeout(() => location.reload(), 2000);
             } else {
                 btn.disabled  = false;
-                btn.innerHTML = '✅ Confier';
+                btn.innerHTML = '📦 Confier la livraison à cette entreprise';
                 alert(data.message || 'Erreur lors de la soumission.');
             }
         })
         .catch(() => {
             btn.disabled  = false;
-            btn.innerHTML = '✅ Confier';
+            btn.innerHTML = '📦 Confier la livraison à cette entreprise';
             alert('Erreur réseau. Veuillez réessayer.');
         });
     };
@@ -2256,7 +2401,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.overflow = '';
     };
 
-    /* Clic en dehors + Escape */
     document.getElementById('bqChatModal')?.addEventListener('click', function(e) {
         if (e.target === this) window.bqCloseChatModal();
     });
@@ -2280,6 +2424,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (msgs.length) {
                 bqRenderMessages(msgs, initial);
                 _bqLastMsgTime = msgs[msgs.length - 1].created_at || null;
+                /* Mémoriser le dernier message vu pour ce fil — évite fausse notif au retour */
+                try {
+                    const lastId = msgs[msgs.length - 1].id;
+                    const seen   = JSON.parse(sessionStorage.getItem('bq_co_seen') || '{}');
+                    seen[String(_bqCompanyId)] = lastId;
+                    sessionStorage.setItem('bq_co_seen', JSON.stringify(seen));
+                } catch(e) {}
             } else if (initial) {
                 document.getElementById('bqChatMsgList').innerHTML =
                     '<div class="bq-chat-empty" id="bqChatEmpty">Aucun message. Commencez la discussion !</div>';
@@ -2313,11 +2464,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? new Date(m.created_at).toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'})
                 : '';
             const label    = isSystem ? 'Système' : isMine ? 'Vous' : _bqCompanyName;
-            row.innerHTML  = `<div class="${cls}">${bqEsc(text)}</div>`
-                           + `<div class="bq-msg-meta">${label} · ${timeStr}</div>`;
+            row.innerHTML  = `<div class="${cls}">${bqEsc(text)}</div>` +
+                             `<div class="bq-msg-meta">${label} · ${timeStr}</div>`;
             list.appendChild(row);
         });
-        list.scrollTop = list.scrollHeight;
+        /* Scroll bas garanti après rendu DOM */
+        requestAnimationFrame(() => { list.scrollTop = list.scrollHeight; });
     }
 
     function bqEsc(str) {
@@ -2405,8 +2557,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             /* KPI Panier moyen */
             set('kpiPanierVal', d.panier);
-            setClass('kpiPanierDelta', d.ca_delta >= 0 ? 'up' : 'down');
-            set('kpiPanierDelta', (d.ca_delta >= 0 ? '↑' : '↓') + ' ' + Math.abs(d.ca_delta) + '%');
+            setClass('kpiPanierDelta', d.panier_delta >= 0 ? 'up' : 'down');
+            set('kpiPanierDelta', (d.panier_delta >= 0 ? '↑' : '↓') + ' ' + Math.abs(d.panier_delta) + '% vs mois précédent');
 
             /* KPI Taux livraison */
             set('kpiTauxVal', d.taux_liv + '%');
@@ -2438,6 +2590,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     const el = document.getElementById('kb-' + key);
                     if (el) el.textContent = cnt;
                 });
+            }
+
+            /* Flèche chart Revenus 7j (today vs hier) */
+            const rcBadge = document.getElementById('rcDeltaBadge');
+            if (rcBadge) {
+                const v = d.ca_today_delta;
+                rcBadge.classList.remove('up','down','flat');
+                if (v > 0)      { rcBadge.classList.add('up');   rcBadge.textContent = '↑ +' + v + '% aujourd\'hui vs hier'; }
+                else if (v < 0) { rcBadge.classList.add('down'); rcBadge.textContent = '↓ ' + v + '% aujourd\'hui vs hier'; }
+                else            { rcBadge.classList.add('flat'); rcBadge.textContent = '→ Stable aujourd\'hui'; }
+            }
+
+            /* Flèche chart Commandes 7j (today vs hier) */
+            const cmdBadge = document.getElementById('cmdDeltaBadge');
+            if (cmdBadge) {
+                const diff = d.cmd_today - d.cmd_yest;
+                cmdBadge.classList.remove('up','down','flat');
+                if (diff > 0)      { cmdBadge.classList.add('up');   cmdBadge.textContent = '↑ ' + d.cmd_today + ' aujourd\'hui'; }
+                else if (diff < 0) { cmdBadge.classList.add('down'); cmdBadge.textContent = '↓ ' + d.cmd_today + ' aujourd\'hui'; }
+                else               { cmdBadge.classList.add('flat'); cmdBadge.textContent = '→ ' + d.cmd_today + ' aujourd\'hui'; }
             }
         })
         .catch(() => {});

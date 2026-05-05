@@ -1095,7 +1095,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     <div class="order-shop">{{ $order->shop?->name ?? 'Boutique' }}</div>
                 </div>
                 <span class="order-pill {{ $st[0] }}" id="oPill{{ $order->id }}">{{ $st[1] }}</span>
-                <div class="order-amount">{{ number_format($order->total, 0, ',', ' ') }} <span style="font-size:10px;font-weight:400;color:var(--muted)">GNF</span></div>
+                <div class="order-amount">{{ number_format($order->total, 0, ',', ' ') }} <span style="font-size:10px;font-weight:400;color:var(--muted)">{{ $order->shop?->currency ?? 'GNF' }}</span></div>
             </a>
             @endforeach
             </div>
