@@ -539,6 +539,11 @@ main.app-main{
                     @if($order->client?->phone)
                     <div class="order-client-phone">📞 {{ $order->client->phone }}</div>
                     @endif
+
+                     @if($order->client?->address)
+                    <div class="address-client-address">📍 {{ $order->client->address }}</div>
+                    @endif
+
                     @if($itemsNames)
                     <div class="order-items-txt">{{ Str::limit($itemsNames, 45) }}</div>
                     @endif
@@ -554,6 +559,10 @@ main.app-main{
             @if($zones->isNotEmpty())
             <div class="zone-select-wrap">
                 <label class="zone-select-lbl">📍 Zone de livraison</label>
+                <input type="text" id="zoneModalSearch" placeholder="🔍 Rechercher une zone…" autocomplete="off"
+                       oninput="filterZoneModal(this)"
+                       style="width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;margin-bottom:6px;box-sizing:border-box;transition:border-color .15s;"
+                       onfocus="this.style.borderColor='var(--brand)'" onblur="this.style.borderColor='var(--border)'">
                 <select class="zone-select" id="zoneSelectModal" onchange="onZoneChange(this)">
                     <option value="">— Choisir une zone (optionnel) —</option>
                     @foreach($zones as $zone)
@@ -721,6 +730,21 @@ window.selectOrder = function(el, orderId) {
     el.classList.add('selected');
     _selectedOrderId = orderId;
     document.getElementById('btnConfirmAssign').disabled = false;
+};
+
+window.filterZoneModal = function(input) {
+    const q   = input.value.toLowerCase().trim();
+    const sel = document.getElementById('zoneSelectModal');
+    if (!sel) return;
+    Array.from(sel.options).forEach(opt => {
+        if (!opt.value) return;
+        opt.hidden = q.length > 0 && !opt.text.toLowerCase().includes(q);
+    });
+    const cur = sel.options[sel.selectedIndex];
+    if (cur && cur.value && cur.hidden) {
+        sel.value = '';
+        sel.dispatchEvent(new Event('change'));
+    }
 };
 
 window.onZoneChange = function(sel) {

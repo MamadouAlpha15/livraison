@@ -35,6 +35,15 @@
     @if($zones->isNotEmpty())
     <div class="rp-section">
         <div class="rp-title">📍 Zones & Tarifs</div>
+        <input type="text"
+               placeholder="🔍 Rechercher une zone…"
+               autocomplete="off"
+               oninput="filterZonePills(this)"
+               style="width:100%;padding:6px 9px;border:1.5px solid var(--border,#e2e8f0);border-radius:7px;font-size:12px;font-family:inherit;background:var(--surface2,#f8fafc);color:var(--text,#0f172a);outline:none;margin-bottom:8px;box-sizing:border-box;transition:border-color .15s;"
+               onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='var(--border,#e2e8f0)'">
+        <div id="zonePillNoResult" style="display:none;font-size:11px;color:#94a3b8;text-align:center;padding:6px 0;">
+            Aucune zone trouvée.
+        </div>
         @foreach($zones as $zone)
         <div class="zone-pill">
             <span class="zone-dot" style="background:{{ $zone->color }};box-shadow:0 0 4px {{ $zone->color }}88;"></span>
@@ -47,6 +56,22 @@
         @endforeach
     </div>
     @endif
+
+<script>
+function filterZonePills(input) {
+    const q     = input.value.toLowerCase().trim();
+    const pills = input.closest('.rp-section').querySelectorAll('.zone-pill');
+    let   shown = 0;
+    pills.forEach(pill => {
+        const name = pill.querySelector('.zone-pill-name')?.textContent?.toLowerCase() || '';
+        const vis  = !q || name.includes(q);
+        pill.style.display = vis ? '' : 'none';
+        if (vis) shown++;
+    });
+    const noRes = input.closest('.rp-section').querySelector('#zonePillNoResult');
+    if (noRes) noRes.style.display = shown === 0 ? '' : 'none';
+}
+</script>
 
     {{-- Confier une commande --}}
     @if($shopId)

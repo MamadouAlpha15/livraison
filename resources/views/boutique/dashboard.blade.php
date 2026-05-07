@@ -754,17 +754,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     $parts    = explode(' ', auth()->user()->name);
     $initials = strtoupper(substr($parts[0],0,1)) . (isset($parts[1]) ? strtoupper(substr($parts[1],0,1)) : strtoupper(substr($parts[0],1,1)));
     $now      = \Illuminate\Support\Carbon::now();
-    $_locale  = app()->getLocale();
-    $_dayAbbr = [
-        'fr' => ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
-        'en' => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-    ];
-    $_months = [
-        'fr' => ['', 'Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'],
-        'en' => ['', 'January','February','March','April','May','June','July','August','September','October','November','December'],
-    ];
-    $_dayLabel  = fn($d) => ($_dayAbbr[$_locale] ?? $_dayAbbr['en'])[$d->dayOfWeek];
-    $_monthYear = fn($d) => ($_months[$_locale] ?? $_months['en'])[$d->month] . ' ' . $d->year;
+    $_dayLabel  = fn($d) => __('app.days')[$d->dayOfWeek];
+    $_monthYear = fn($d) => __('app.months')[$d->month] . ' ' . $d->year;
 
     $commissionsPaieesMonth = (float) \App\Models\CourierCommission::where('shop_id', $shop->id)->where('status', 'payée')->whereMonth('created_at', $now->month)->whereYear('created_at', $now->year)->sum('amount');
     $caGrossMonth = (float) $shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->where('status','livrée')->sum('total');
@@ -879,6 +870,9 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <div id="bqOrdersList" style="display:flex;flex-direction:column;gap:5px;max-height:150px;overflow-y:auto;margin-bottom:8px;scrollbar-width:thin;"></div>
             <div id="bqZonePickerWrap" style="display:none;margin-bottom:8px;">
                 <label style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">📍 Zone de livraison</label>
+                <input type="text" id="bqZoneSearch" placeholder="🔍 Rechercher une zone…" autocomplete="off"
+                       oninput="filterZoneSelect(this,'bqZonePicker')"
+                       style="width:100%;padding:7px 10px;border:1.5px solid #bbf7d0;border-radius:8px;font-size:12px;font-family:inherit;background:#fff;color:#0f172a;outline:none;margin-bottom:6px;box-sizing:border-box;">
                 <select id="bqZonePicker" style="width:100%;padding:9px 12px;border:1.5px solid #bbf7d0;border-radius:9px;font-size:13px;font-family:inherit;background:#fff;color:#0f172a;outline:none;cursor:pointer;" onchange="bqOnZonePick(this)">
                     <option value="">— Choisir une zone —</option>
                 </select>
@@ -956,6 +950,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <a href="{{ route('support.index') }}" class="sb-item"><span class="ico">🎧</span> Support</a>
         </nav>
         <div class="sb-footer">
+           
             <a href="{{ route('profile.edit') }}" class="sb-user">
                 <div class="sb-av">{{ $initials }}</div>
                 <div style="flex:1;min-width:0">
@@ -965,7 +960,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             </a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="sb-logout"><span class="ico">⎋</span> Se déconnecter</button>
+                <button type="submit" class="sb-logout"><span class="ico">⎋</span> {{ __('app.logout') }}</button>
             </form>
         </div>
     </aside>
@@ -1048,7 +1043,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <div class="kpi-grid" style="margin-bottom:22px">
                 <div class="kpi"  style="--kpi-color:#8b5cf6;--kpi-bg:#f5f3ff">
                     <div class="kpi-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);border-color:rgba(139,92,246,.3);box-shadow:0 0 0 3px rgba(139,92,246,.12),0 4px 14px rgba(139,92,246,.4)">💰</div>
-                    <div class="kpi-lbl">Revenu net</div>
+                    <div class="kpi-lbl">{{ __('app.net_revenue') }}</div>
                     <div class="kpi-val" id="kpiCaVal">{{ number_format($caMonth,0,',',' ') }}</div>
                     <div class="kpi-unit">{{ $devise }} · {{ $_monthYear($now) }}</div>
                     <div class="kpi-delta {{ $caDelta >= 0 ? 'up':'down' }}" id="kpiCaDelta">{{ $caDelta >= 0 ? '↑':'↓' }} {{ abs($caDelta) }}% vs mois précédent</div>
@@ -1062,21 +1057,21 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 </div>
                 <div class="kpi" style="--kpi-color:#8b5cf6;--kpi-bg:#f5f3ff">
                     <div class="kpi-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);border-color:rgba(139,92,246,.3);box-shadow:0 0 0 3px rgba(139,92,246,.12),0 4px 14px rgba(139,92,246,.4)">📦</div>
-                    <div class="kpi-lbl">Commandes ce mois</div>
+                    <div class="kpi-lbl">{{ __('app.orders_this_month') }}</div>
                     <div class="kpi-val" id="kpiCmdVal">{{ $cmdMonth }}</div>
                     <div class="kpi-unit">commandes</div>
                     <div class="kpi-delta {{ $cmdToday >= $cmdYest ? 'up':'down' }}" id="kpiCmdDelta">{{ $cmdToday >= $cmdYest ? '↑':'↓' }} {{ $cmdToday }} aujourd'hui</div>
                 </div>
                 <div class="kpi" style="--kpi-color:#d97706;--kpi-bg:#fffbeb">
                     <div class="kpi-icon" style="background:linear-gradient(135deg,#f59e0b,#b45309);border-color:rgba(169, 141, 110, 0.3);box-shadow:0 0 0 3px rgba(217,119,6,.12),0 4px 14px rgba(147, 94, 33, 0.4)">🛒</div>
-                    <div class="kpi-lbl">Panier moyen</div>
+                    <div class="kpi-lbl">{{ __('app.avg_basket') }}</div>
                     <div class="kpi-val" id="kpiPanierVal">{{ number_format($panier,0,',',' ') }}</div>
                     <div class="kpi-unit">{{ $devise }} / commande</div>
                     <div class="kpi-delta {{ $panierDelta >= 0 ? 'up':'down' }}" id="kpiPanierDelta">{{ $panierDelta >= 0 ? '↑':'↓' }} {{ abs($panierDelta) }}% vs mois précédent</div>
                 </div>
                 <div class="kpi" style="--kpi-color:#d97706;--kpi-bg:#fffbeb">
                     <div class="kpi-icon" style="background:linear-gradient(135deg,#f59e0b,#b45309);border-color:rgba(217,119,6,.3);box-shadow:0 0 0 3px rgba(217,119,6,.12),0 4px 14px rgba(217,119,6,.4)">🚴</div>
-                    <div class="kpi-lbl">Taux de livraison</div>
+                    <div class="kpi-lbl">{{ __('app.delivery_rate') }}</div>
                     <div class="kpi-val" id="kpiTauxVal">{{ $tauxLiv }}%</div>
                     <div class="kpi-unit" id="kpiTauxUnit">{{ $livres }} / {{ $totalCmdMonth }} livrées</div>
                     <div class="kpi-delta {{ $tauxLiv >= 90 ? 'up':'down' }}" id="kpiTauxDelta">{{ $tauxLiv >= 90 ? '✓ Excellent':'⚠ À améliorer' }}</div>
@@ -1089,7 +1084,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 <div class="today-card">
                     <div class="today-icon">💵</div>
                     <div style="flex:1;min-width:0">
-                        <div class="today-lbl">Revenu net aujourd'hui</div>
+                        <div class="today-lbl">{{ __('app.today_net_revenue') }}</div>
                         <div class="today-val" id="todayCaVal">{{ number_format($caToday, 0, ',', ' ') }}</div>
                         <div class="today-unit">{{ $devise }}</div>
                         <div class="today-delta {{ $caTodayDelta > 0 ? 'up' : ($caTodayDelta < 0 ? 'down' : 'flat') }}" id="todayCaDelta">
@@ -1117,7 +1112,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 <div class="today-card" style="background:linear-gradient(135deg, #0c1a35 0%, #0f2850 40%, #0d3060 100%); box-shadow:0 8px 32px rgba(15,40,80,.4), 0 2px 8px rgba(0,0,0,.25); border-color:rgba(59,130,246,.25)">
                     <div class="today-icon">📦</div>
                     <div>
-                        <div class="today-lbl">Commandes aujourd'hui</div>
+                        <div class="today-lbl">{{ __('app.today_orders') }}</div>
                         <div class="today-val" id="todayCmdVal">{{ $cmdToday }}</div>
                         <div class="today-unit">commandes reçues</div>
                         <div class="today-delta {{ $cmdToday >= $cmdYest ? 'up' : 'down' }}" id="todayCmdDelta">
@@ -1219,7 +1214,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 {{-- Header --}}
                 <div class="rc-header">
                     <div class="rc-header-left">
-                        <div class="rc-title">Revenus — 7 derniers jours</div>
+                        <div class="rc-title">{{ __('app.revenue_7days') }}</div>
                         <div class="rc-total">
                             <sup>{{ $devise }} </sup>{{ number_format($week7Total, 0, ',', ' ') }}
                         </div>
@@ -1239,9 +1234,9 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                         </div>
                     </div>
                     <div class="rc-header-right">
-                        <div style="margin-bottom:2px">Meilleure journée</div>
+                        <div style="margin-bottom:2px">{{ __('app.best_day') }}</div>
                         <div class="rc-best">{{ $bestDay['label'] }} — {{ number_format($bestDay['value'],0,',',' ') }} {{ $devise }}</div>
-                        <div style="margin-top:6px">Moy. / jour</div>
+                        <div style="margin-top:6px">{{ __('app.avg_per_day') }}</div>
                         <div style="font-weight:700;color:var(--text);font-size:12px">{{ number_format($week7Total/7,0,',',' ') }} {{ $devise }}</div>
                     </div>
                 </div>
@@ -1322,9 +1317,9 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <div class="card" style="margin-bottom:0">
                 <div class="mini-chart-hd">
                     <div>
-                        <div class="mini-chart-lbl">Commandes</div>
+                        <div class="mini-chart-lbl">{{ __('app.orders_chart') }}</div>
                         <div class="mini-chart-val">{{ $cmdDays7->sum('count') }}</div>
-                        <div class="mini-chart-sub">7 derniers jours</div>
+                        <div class="mini-chart-sub">{{ __('app.last_7_days') }}</div>
                         @php
                             $cmdToday7  = $cmdDays7->last()['count'] ?? 0;
                             $cmdYest7   = $cmdDays7->count() >= 2 ? $cmdDays7->get($cmdDays7->count()-2)['count'] : 0;
@@ -1360,7 +1355,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             {{-- CONTENT GRID --}}
             <div class="content-grid">
                 <div class="card">
-                    <div class="card-hd"><span class="card-title">Commandes récentes</span><a href="{{ route('boutique.orders.index') }}" class="btn-ghost btn btn-sm">Voir tout →</a></div>
+                    <div class="card-hd"><span class="card-title">{{ __('app.recent_orders') }}</span><a href="{{ route('boutique.orders.index') }}" class="btn-ghost btn btn-sm">{{ __('app.see_all') }}</a></div>
                     <div class="tbl-wrap" style="padding:0 18px">
                         @if($recentOrders->isEmpty())<div style="padding:28px 0;text-align:center;font-size:13px;color:var(--muted)">Aucune commande pour le moment.</div>
                         @else
@@ -2297,6 +2292,8 @@ document.addEventListener('DOMContentLoaded', () => {
         wrap.style.display = 'none';
         hint.style.display = 'none';
         picker.innerHTML   = '<option value="">— Choisir une zone —</option>';
+        const bqSrch = document.getElementById('bqZoneSearch');
+        if (bqSrch) bqSrch.value = '';
 
         if (!_bqCompanyId) return;
 
@@ -2318,6 +2315,22 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(() => {});
     }
+
+    /* ── Recherche dans un select de zones ── */
+    window.filterZoneSelect = function(input, selectId) {
+        const q   = input.value.toLowerCase().trim();
+        const sel = document.getElementById(selectId);
+        if (!sel) return;
+        Array.from(sel.options).forEach(opt => {
+            if (!opt.value) return;
+            opt.hidden = q.length > 0 && !opt.text.toLowerCase().includes(q);
+        });
+        const cur = sel.options[sel.selectedIndex];
+        if (cur && cur.value && cur.hidden) {
+            sel.value = '';
+            sel.dispatchEvent(new Event('change'));
+        }
+    };
 
     /* ── Zone sélectionnée ── */
     window.bqOnZonePick = function(sel) {

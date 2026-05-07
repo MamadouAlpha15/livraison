@@ -106,6 +106,13 @@ use App\Http\Controllers\Client\ProductController as ClientProductController;
 
 
 /* ══════════════════════════════════════════════════════════════════════════
+|  1b. LANGUE
+══════════════════════════════════════════════════════════════════════════ */
+Route::get('/language/{locale}', [\App\Http\Controllers\LanguageController::class, 'switch'])
+    ->name('language.switch')
+    ->where('locale', 'fr|en');
+
+/* ══════════════════════════════════════════════════════════════════════════
 |  2. ROUTES PUBLIQUES
 |  Accessibles sans authentification
 ══════════════════════════════════════════════════════════════════════════ */

@@ -573,6 +573,9 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
             {{-- Sélecteur de zone (affiché si l'entreprise a des zones) --}}
             <div id="zonePickerWrap" style="display:none;margin-bottom:8px;">
                 <label style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">📍 Zone de livraison</label>
+                <input type="text" id="zoneSearch" placeholder="🔍 Rechercher une zone…" autocomplete="off"
+                       oninput="filterZoneSelect(this,'zonePicker')"
+                       style="width:100%;padding:7px 10px;border:1.5px solid #bbf7d0;border-radius:8px;font-size:12px;font-family:inherit;background:#fff;color:#0f172a;outline:none;margin-bottom:6px;box-sizing:border-box;">
                 <select id="zonePicker"
                     style="width:100%;padding:9px 12px;border:1.5px solid #bbf7d0;border-radius:9px;font-size:13px;font-family:inherit;background:#fff;color:#0f172a;outline:none;cursor:pointer;"
                     onchange="onZonePick(this)">
@@ -1249,6 +1252,8 @@ function loadCompanyZones(companyId) {
     wrap.style.display  = 'none';
     hint.style.display  = 'none';
     picker.innerHTML    = '<option value="">— Choisir une zone —</option>';
+    const srch = document.getElementById('zoneSearch');
+    if (srch) srch.value = '';
 
     if (!companyId) return;
 
@@ -1269,6 +1274,21 @@ function loadCompanyZones(companyId) {
         wrap.style.display = 'block';
     })
     .catch(() => {});
+}
+
+function filterZoneSelect(input, selectId) {
+    const q   = input.value.toLowerCase().trim();
+    const sel = document.getElementById(selectId);
+    if (!sel) return;
+    Array.from(sel.options).forEach(opt => {
+        if (!opt.value) return;
+        opt.hidden = q.length > 0 && !opt.text.toLowerCase().includes(q);
+    });
+    const cur = sel.options[sel.selectedIndex];
+    if (cur && cur.value && cur.hidden) {
+        sel.value = '';
+        sel.dispatchEvent(new Event('change'));
+    }
 }
 
 function onZonePick(sel) {

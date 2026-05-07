@@ -55,6 +55,9 @@
         .navbar-brand { font-weight: 700; letter-spacing: .2px; }
         .nav-link { font-weight: 500; }
         .nav-link:hover { opacity: .95; }
+        .lang-btn { font-size: 11px; font-weight: 700; color: rgba(255,255,255,.65); text-decoration: none; padding: 2px 7px; border-radius: 5px; transition: all .15s; letter-spacing: .5px; }
+        .lang-btn:hover { color: #fff; background: rgba(255,255,255,.15); }
+        .lang-btn.active { color: #fff; background: rgba(255,255,255,.22); }
 
         /* ── Sur les pages "dashboard" : on cache navbar + footer + on neutralise le main ── */
         body.is-dashboard .app-navbar  { display: none !important; }
@@ -146,6 +149,16 @@
             <div id="topnav" class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto"></ul>
                 <ul class="navbar-nav ms-auto align-items-lg-center">
+                    {{-- Switcher FR / EN --}}
+                    <li class="nav-item d-flex align-items-center me-2" style="gap:4px">
+                        <a href="{{ route('language.switch', 'fr') }}"
+                           class="lang-btn {{ app()->getLocale() === 'fr' ? 'active' : '' }}"
+                           title="Français">FR</a>
+                        <span style="color:rgba(255,255,255,.4);font-size:11px">|</span>
+                        <a href="{{ route('language.switch', 'en') }}"
+                           class="lang-btn {{ app()->getLocale() === 'en' ? 'active' : '' }}"
+                           title="English">EN</a>
+                    </li>
                     @guest
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('login') }}">
