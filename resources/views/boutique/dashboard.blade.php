@@ -589,6 +589,9 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .bq-chat-hd-av img{width:100%;height:100%;object-fit:cover;}
 .bq-chat-hd-name{font-size:14px;font-weight:800;color:#fff;line-height:1.2;}
 .bq-chat-hd-sub{font-size:11px;color:rgba(255,255,255,.7);margin-top:1px;}
+.bq-msg-system{align-self:center;max-width:88%;margin:4px 0;}
+.bq-msg-system-pill{display:inline-block;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;font-size:11.5px;font-style:italic;padding:6px 14px;border-radius:20px;line-height:1.4;text-align:center;}
+.bq-msg-system-time{font-size:10px;color:#9ca3af;text-align:center;margin-top:2px;}
 .bq-chat-close{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;font-size:16px;flex-shrink:0;transition:background .14s;}
 .bq-chat-close:hover{background:rgba(255,255,255,.3);}
 .bq-chat-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:8px;background:#f8fafc;scrollbar-width:thin;scrollbar-color:#818cf8 #e0e7ff;}
@@ -866,14 +869,19 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 <div class="bq-chat-hd-av" id="bqChatAv">🏢</div>
                 <div>
                     <div class="bq-chat-hd-name" id="bqChatName">Entreprise</div>
-                    <div class="bq-chat-hd-sub">Discussion en cours</div>
+                    <div class="bq-chat-hd-sub" id="bqChatSub">Entreprise de livraison partenaire</div>
                 </div>
             </div>
             <button class="bq-chat-close" onclick="bqCloseChatModal()">✕</button>
         </div>
         {{-- Zone confier la livraison (au-dessus des messages pour ne pas masquer le dernier) --}}
         <div class="bq-confier-zone" id="bqConfierZone" style="display:none;">
-            <div class="bq-confier-hint">📦 Confier une commande à cette entreprise</div>
+            <div class="bq-confier-hint">
+                📦 <strong>Confier une livraison</strong>
+                <span style="display:block;font-size:10.5px;color:#047857;font-weight:400;margin-top:2px;">
+                    Cochez une ou plusieurs commandes → choisissez une zone → cliquez Confier
+                </span>
+            </div>
             <div id="bqOrdersList" style="display:flex;flex-direction:column;gap:5px;max-height:150px;overflow-y:auto;margin-bottom:8px;scrollbar-width:thin;scrollbar-color:#86efac #f0fdf4;"></div>
             <div id="bqZonePickerWrap" style="display:none;margin-bottom:8px;">
                 <label style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">📍 Zone de livraison</label>
@@ -2532,16 +2540,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const isMine   = role === 'shop';
             const isSystem = role === 'system';
             const row      = document.createElement('div');
-            row.className  = 'bq-msg-row ' + (isSystem ? 'mine' : isMine ? 'mine' : 'theirs');
             row.id         = 'bqmsg-' + m.id;
-            const cls      = isSystem ? 'bq-msg-bubble system' : 'bq-msg-bubble';
             const text     = m.body || m.message || '';
             const timeStr  = m.created_at
                 ? new Date(m.created_at).toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'})
                 : '';
-            const label    = isSystem ? 'Système' : isMine ? 'Vous' : _bqCompanyName;
-            row.innerHTML  = `<div class="${cls}">${bqEsc(text)}</div>` +
-                             `<div class="bq-msg-meta">${label} · ${timeStr}</div>`;
+
+            if (isSystem) {
+                row.className = 'bq-msg-system';
+                row.innerHTML = `<div class="bq-msg-system-pill">${bqEsc(text)}</div>` +
+                                (timeStr ? `<div class="bq-msg-system-time">${timeStr}</div>` : '');
+            } else {
+                row.className = 'bq-msg-row ' + (isMine ? 'mine' : 'theirs');
+                row.innerHTML = `<div class="bq-msg-bubble">${bqEsc(text)}</div>` +
+                                `<div class="bq-msg-meta">${isMine ? 'Vous' : _bqCompanyName} · ${timeStr}</div>`;
+            }
             list.appendChild(row);
         });
         /* Scroll bas garanti après rendu DOM */

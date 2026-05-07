@@ -25,7 +25,7 @@ class OrderController extends Controller
     {
         $company = $this->company();
 
-        $query = Order::with(['client', 'shop', 'driver', 'items'])
+        $query = Order::with(['client', 'shop', 'driver', 'items', 'deliveryZone'])
             ->where('delivery_company_id', $company->id)
             ->latest();
 

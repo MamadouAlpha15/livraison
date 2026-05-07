@@ -251,6 +251,56 @@ td{padding:14px 16px;font-size:14.5px;vertical-align:middle;}
 .empty-txt{font-size:15px;font-weight:700;color:var(--cx-text);}
 .empty-sub{font-size:13px;color:var(--cx-muted);}
 
+/* ── Barre sélection multiple ── */
+.sel-bar{
+    display:none;align-items:center;gap:12px;flex-wrap:wrap;
+    background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(99,102,241,.06));
+    border:1.5px solid rgba(124,58,237,.25);border-radius:var(--r-sm);
+    padding:12px 16px;margin-bottom:12px;
+}
+.sel-bar.show{display:flex;}
+.sel-count{font-size:13px;font-weight:800;color:var(--cx-brand);}
+.sel-bar-actions{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap;}
+.btn-sel-assign{
+    padding:9px 18px;border-radius:var(--r-xs);border:none;cursor:pointer;font-family:inherit;
+    background:linear-gradient(135deg,var(--cx-brand),var(--cx-brand2));
+    color:#fff;font-size:13px;font-weight:800;
+    display:flex;align-items:center;gap:6px;
+    box-shadow:0 3px 10px rgba(124,58,237,.3);transition:all .15s;
+}
+.btn-sel-assign:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(124,58,237,.45);}
+.btn-sel-cancel{
+    padding:9px 14px;border-radius:var(--r-xs);border:1px solid var(--cx-border);
+    background:var(--cx-card2);color:var(--cx-text2);font-size:13px;font-weight:700;
+    cursor:pointer;font-family:inherit;transition:all .15s;
+}
+.btn-sel-cancel:hover{background:var(--cx-card);color:var(--cx-text);}
+/* Checkbox cell */
+.chk-th{width:44px;padding:12px 8px 12px 16px!important;}
+.chk-td{padding:12px 8px 12px 16px!important;}
+/* Ligne sélectionnée */
+tbody tr.row-selected{background:rgba(124,58,237,.07)!important;}
+body.cx-dark tbody tr.row-selected{background:rgba(124,58,237,.13)!important;}
+/* Multi-mode : infos commandes dans le modal */
+.multi-orders-list{max-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;margin-bottom:14px;
+    scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.3) transparent;}
+.multi-orders-list::-webkit-scrollbar{width:4px;}
+.multi-orders-list::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3);border-radius:4px;}
+.multi-order-item{font-size:12px;font-weight:600;color:var(--cx-text2);padding:5px 10px;
+    background:var(--cx-card2);border:1px solid var(--cx-border);border-radius:var(--r-xs);}
+body.cx-dark .sel-bar{background:rgba(124,58,237,.12);border-color:rgba(124,58,237,.3);}
+body.cx-dark .btn-sel-cancel{background:var(--cx-card2);border-color:var(--cx-border);color:var(--cx-text2);}
+body.cx-dark .multi-order-item{background:var(--cx-card2);border-color:var(--cx-border);color:var(--cx-text2);}
+.multi-order-item-dest{font-size:10.5px;color:var(--cx-muted);font-weight:400;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.multi-common-dest{padding:9px 12px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:var(--r-xs);margin-bottom:10px;}
+.multi-common-dest-lbl{font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;}
+.multi-common-dest-val{font-size:12.5px;font-weight:700;color:#065f46;}
+.multi-common-dest-fee{font-size:11.5px;color:#047857;margin-top:3px;font-weight:600;}
+body.cx-dark .multi-common-dest{background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.2);}
+body.cx-dark .multi-common-dest-lbl{color:#34d399;}
+body.cx-dark .multi-common-dest-val{color:#6ee7b7;}
+body.cx-dark .multi-common-dest-fee{color:#34d399;}
+
 /* Pagination */
 .pagination-wrap{padding:16px 20px;border-top:1px solid var(--cx-border);}
 .pagination-wrap .pagination{display:flex;gap:4px;list-style:none;margin:0;padding:0;justify-content:center;}
@@ -728,12 +778,29 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
         </div>
     </form>
 
+    {{-- BARRE SÉLECTION MULTIPLE --}}
+    <div class="sel-bar" id="selBar">
+        <span class="sel-count" id="selCount">0 commande sélectionnée</span>
+        <div class="sel-bar-actions">
+            <button class="btn-sel-assign" onclick="openMultiAssign()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+                <span id="selBtnLabel">Assigner</span>
+            </button>
+            <button class="btn-sel-cancel" onclick="clearSelection()">✕ Annuler</button>
+        </div>
+    </div>
+
     {{-- TABLE --}}
     <div class="table-card">
         <div class="table-wrap">
             <table>
                 <thead>
                     <tr>
+                        <th class="chk-th">
+                            <input type="checkbox" id="chkAll" onclick="toggleAllRows(this)"
+                                   title="Tout sélectionner"
+                                   style="width:16px;height:16px;accent-color:var(--cx-brand);cursor:pointer;border-radius:4px;">
+                        </th>
                         <th>#</th>
                         <th>Client</th>
                         <th>Boutique</th>
@@ -749,7 +816,21 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                 <tbody>
                 @forelse($orders as $order)
                 @php $st = $statusMap[$order->status] ?? ['lbl'=>$order->status,'cls'=>'badge-wait']; @endphp
-                <tr>
+                <tr data-order-id="{{ $order->id }}">
+                    <td class="chk-td" data-label="">
+                        @if(in_array($order->status, ['en_attente','confirmée']))
+                        <input type="checkbox" class="row-chk"
+                               data-order-id="{{ $order->id }}"
+                               data-num="{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
+                               data-fee="{{ $order->delivery_fee ?? $order->deliveryZone?->price ?? '' }}"
+                               data-dest="{{ $order->delivery_destination ?? $order->client->address ?? '' }}"
+                               data-shop="{{ $order->shop->name ?? '' }}"
+                               data-shop-addr="{{ $order->shop->address ?? '' }}"
+                               data-client-addr="{{ $order->client->address ?? '' }}"
+                               onchange="toggleRow(this)"
+                               style="width:16px;height:16px;accent-color:var(--cx-brand);cursor:pointer;border-radius:4px;">
+                        @endif
+                    </td>
                     <td data-label="Commande">
                         <div>
                             <div class="order-id">#{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</div>
@@ -797,7 +878,13 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                             <span class="no-driver">Non assigné</span>
                         @endif
                     </td>
-                    <td data-label="Frais"><div class="fee-val">{{ $order->delivery_fee ? $fmt($order->delivery_fee) : '—' }}</div></td>
+                    @php $displayFee = $order->delivery_fee ?? $order->deliveryZone?->price ?? null; @endphp
+                    <td data-label="Frais">
+                        <div class="fee-val">{{ $displayFee ? $fmt($displayFee) : '—' }}</div>
+                        @if(!$order->delivery_fee && $order->deliveryZone)
+                        <div style="font-size:10px;color:var(--cx-muted);margin-top:2px;">📍 {{ $order->deliveryZone->name }}</div>
+                        @endif
+                    </td>
                     <td data-label="Montant"><div class="amount-val">{{ $fmt($order->total) }}</div></td>
                     <td data-label="Statut"><span class="badge {{ $st['cls'] }}">{{ $st['lbl'] }}</span></td>
                     <td data-label="Date" style="color:var(--cx-muted);font-size:12px;" class="td-date">
@@ -809,6 +896,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                             <button class="btn-action btn-assign"
                                     data-id="{{ $order->id }}"
                                     data-fee="{{ $order->delivery_fee ?? '' }}"
+                                    data-zone-price="{{ $order->deliveryZone?->price ?? '' }}"
                                     data-dest="{{ $order->delivery_destination ?? '' }}"
                                     data-num="{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
                                     data-shop="{{ $order->shop->name ?? '' }}"
@@ -823,7 +911,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="10">
+                <tr><td colspan="11">
                     <div class="empty-state">
                         <div class="empty-ico">📦</div>
                         <div class="empty-txt">Aucune commande assignée à votre entreprise</div>
@@ -857,8 +945,16 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
         </div>
         <div class="cx-modal-body">
 
-            {{-- ── Blocs adresses ── --}}
-            <div class="addr-flow">
+            {{-- ── Multi-commandes (visible en mode bulk) ── --}}
+            <div id="multiOrdersSection" style="display:none;margin-bottom:14px;">
+                <div class="form-label">📦 Commandes sélectionnées</div>
+                <div class="multi-orders-list" id="multiOrdersList"></div>
+                <div id="multiDestInfo"></div>
+                <div id="multiDestNote" style="font-size:11.5px;color:var(--cx-muted);">Les frais saisis s'appliqueront à chaque commande.</div>
+            </div>
+
+            {{-- ── Blocs adresses (visible en mode simple) ── --}}
+            <div class="addr-flow" id="addrFlow">
                 <div class="addr-box addr-pickup">
                     <div class="addr-lbl">📦 Retrait — Boutique</div>
                     <div class="addr-val" id="shopAddrVal">—</div>
@@ -943,7 +1039,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                 <label class="form-label">💰 Frais de livraison (GNF)</label>
                 <input type="number" class="form-input" id="assignFee" placeholder="Ex: 50 000" min="0" step="500">
             </div>
-            <div class="form-group">
+            <div class="form-group" id="destGroup">
                 <label class="form-label">📍 Adresse de livraison (modifiable)</label>
                 <input type="text" class="form-input" id="assignDest" placeholder="Adresse du client…">
                 <div style="font-size:11px;color:var(--cx-muted);margin-top:4px;">Pré-remplie avec l'adresse du client. Modifiez si besoin.</div>
@@ -1038,14 +1134,19 @@ document.getElementById('searchInput').addEventListener('input',function(){ clea
 
 /* ── État global ── */
 var currentOrderId=null, selectedDriverId=null, selectedStatusVal=null;
+var _bulkMode=false, _bulkOrderIds=new Set();
 
 /* ── Modals ── */
 function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){
     document.getElementById(id).classList.remove('open');
     currentOrderId=null; selectedDriverId=null; selectedStatusVal=null;
+    _bulkMode=false;
     document.querySelectorAll('.driver-opt,.status-opt').forEach(function(el){ el.classList.remove('selected'); });
     var s=document.getElementById('selectedSummary'); if(s) s.classList.remove('show');
+    /* Remettre le btn en état normal */
+    var btn=document.getElementById('assignBtn');
+    if(btn){ btn.disabled=false; btn.textContent='🚴 Confirmer l\'assignation'; }
 }
 document.querySelectorAll('.modal-overlay').forEach(function(el){
     el.addEventListener('click',function(e){ if(e.target===el) closeModal(el.id); });
@@ -1055,18 +1156,148 @@ document.querySelectorAll('[data-close]').forEach(function(btn){
 });
 document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ closeModal('assignModal'); closeModal('statusModal'); } });
 
+/* ── Sélection multiple ── */
+function toggleRow(chk){
+    var tr=chk.closest('tr');
+    if(chk.checked){ _bulkOrderIds.add(chk.dataset.orderId); tr.classList.add('row-selected'); }
+    else            { _bulkOrderIds.delete(chk.dataset.orderId); tr.classList.remove('row-selected'); }
+    updateSelBar();
+}
+function toggleAllRows(masterChk){
+    document.querySelectorAll('.row-chk').forEach(function(chk){
+        chk.checked=masterChk.checked;
+        var tr=chk.closest('tr');
+        if(masterChk.checked){ _bulkOrderIds.add(chk.dataset.orderId); tr.classList.add('row-selected'); }
+        else                  { _bulkOrderIds.delete(chk.dataset.orderId); tr.classList.remove('row-selected'); }
+    });
+    updateSelBar();
+}
+function updateSelBar(){
+    var n=_bulkOrderIds.size;
+    var bar=document.getElementById('selBar');
+    var cnt=document.getElementById('selCount');
+    var lbl=document.getElementById('selBtnLabel');
+    if(n>0){
+        bar.classList.add('show');
+        cnt.textContent=n+' commande'+(n>1?'s':'')+' sélectionné'+(n>1?'es':'e');
+        lbl.textContent='Assigner ('+n+')';
+    } else {
+        bar.classList.remove('show');
+    }
+    /* Maj checkbox "tout sélectionner" */
+    var total=document.querySelectorAll('.row-chk').length;
+    var chkAll=document.getElementById('chkAll');
+    if(chkAll){ chkAll.checked=n>0&&n===total; chkAll.indeterminate=n>0&&n<total; }
+}
+function clearSelection(){
+    _bulkOrderIds.clear();
+    document.querySelectorAll('.row-chk').forEach(function(chk){
+        chk.checked=false; chk.closest('tr').classList.remove('row-selected');
+    });
+    var chkAll=document.getElementById('chkAll');
+    if(chkAll){ chkAll.checked=false; chkAll.indeterminate=false; }
+    updateSelBar();
+}
+function openMultiAssign(){
+    if(_bulkOrderIds.size===0) return;
+    _bulkMode=true;
+
+    /* Collecter les infos de chaque commande sélectionnée */
+    var orders=[];
+    document.querySelectorAll('.row-chk:checked').forEach(function(chk){
+        orders.push({
+            num:  chk.dataset.num||chk.dataset.orderId,
+            dest: (chk.dataset.dest||'').trim(),
+            fee:  chk.dataset.fee ? parseFloat(chk.dataset.fee) : 0,
+            shop: chk.dataset.shop||''
+        });
+    });
+
+    /* Même destination pour toutes les commandes ? */
+    var destsNorm = orders.map(function(o){ return o.dest.toLowerCase(); });
+    var allSameDest = destsNorm[0]!=='' && destsNorm.every(function(d){ return d===destsNorm[0]; });
+
+    /* Même frais pour toutes les commandes ? */
+    var fees = orders.map(function(o){ return o.fee; }).filter(function(f){ return f>0; });
+    var allSameFee = fees.length===orders.length && fees.every(function(f){ return f===fees[0]; });
+
+    var listEl     = document.getElementById('multiOrdersList');
+    var destInfoEl = document.getElementById('multiDestInfo');
+    var destNoteEl = document.getElementById('multiDestNote');
+    listEl.innerHTML='';
+    destInfoEl.innerHTML='';
+
+    var fmt = function(n){ return new Intl.NumberFormat('fr').format(n); };
+
+    if(allSameDest){
+        /* ── Même destination : liste compacte + bloc destination commune ── */
+        orders.forEach(function(o){
+            var item=document.createElement('div');
+            item.className='multi-order-item';
+            item.textContent='#'+o.num+(o.shop?' · '+o.shop:'');
+            listEl.appendChild(item);
+        });
+        var feeHtml = (allSameFee && fees[0])
+            ? '<div class="multi-common-dest-fee">💰 Frais de livraison : '+fmt(fees[0])+' GNF</div>'
+            : '';
+        destInfoEl.innerHTML='<div class="multi-common-dest">'
+            +'<div class="multi-common-dest-lbl">📍 Destination commune</div>'
+            +'<div class="multi-common-dest-val">'+orders[0].dest+'</div>'
+            +feeHtml+'</div>';
+        document.getElementById('assignFee').value = (allSameFee && fees[0]) ? fees[0] : '';
+        destNoteEl.style.display='none';
+    } else {
+        /* ── Destinations différentes : chaque commande avec sa destination + frais ── */
+        orders.forEach(function(o){
+            var feeStr = o.fee>0 ? '💰 '+fmt(o.fee)+' GNF' : '';
+            var destStr = o.dest
+                ? '📍 '+o.dest
+                : '<span style="color:#ef4444;">📍 Destination non renseignée</span>';
+            var item=document.createElement('div');
+            item.className='multi-order-item';
+            item.innerHTML='<span style="font-weight:700;">#'+o.num+'</span>'
+                +(o.shop ? '<span style="color:var(--cx-muted);font-weight:400;"> · '+o.shop+'</span>' : '')
+                +'<div class="multi-order-item-dest">'+destStr+'</div>'
+                +(feeStr ? '<div class="multi-order-item-dest" style="color:#059669;font-weight:600;">'+feeStr+'</div>' : '');
+            listEl.appendChild(item);
+        });
+        document.getElementById('assignFee').value = (allSameFee && fees[0]) ? fees[0] : '';
+        destNoteEl.style.display='';
+    }
+
+    document.getElementById('multiOrdersSection').style.display='block';
+    document.getElementById('addrFlow').style.display='none';
+    document.getElementById('destGroup').style.display='none';
+    document.getElementById('assignModalSub').textContent=_bulkOrderIds.size+' commandes — choisissez un chauffeur';
+
+    selectedDriverId=null;
+    document.querySelectorAll('.driver-opt').forEach(function(el){ el.classList.remove('selected'); });
+    var s=document.getElementById('selectedSummary'); s.classList.remove('show');
+
+    var first=document.querySelector('#driverList .driver-opt:not(.not-avail)');
+    if(first) selectDriver(first, first.getAttribute('data-driver-id'));
+    openModal('assignModal');
+}
+
 /* ── Assigner : ouverture du modal ── */
 function openAssign(btn){
+    _bulkMode=false;
     var orderId    = btn.getAttribute('data-id');
     var fee        = btn.getAttribute('data-fee');
+    var zonePrice  = btn.getAttribute('data-zone-price');
     var dest       = btn.getAttribute('data-dest');
     var orderNum   = btn.getAttribute('data-num');
     var shopName   = btn.getAttribute('data-shop');
     var shopAddr   = btn.getAttribute('data-shop-addr');
     var clientAddr = btn.getAttribute('data-client-addr');
+    /* Fallback : si delivery_fee non encore défini, utiliser le prix de la zone */
+    if ((!fee || parseFloat(fee) <= 0) && zonePrice && parseFloat(zonePrice) > 0) fee = zonePrice;
 
     currentOrderId=orderId;
     selectedDriverId=null;
+    document.getElementById('multiOrdersSection').style.display='none';
+    document.getElementById('addrFlow').style.display='flex';
+    document.getElementById('destGroup').style.display='block';
     document.querySelectorAll('.driver-opt').forEach(function(el){ el.classList.remove('selected'); });
 
     /* Blocs adresses */
@@ -1123,34 +1354,65 @@ document.querySelectorAll('#driverList .driver-opt:not(.not-avail)').forEach(fun
 });
 
 /* ── Soumettre l'assignation ── */
-function submitAssign(){
-    if(!currentOrderId){ toast('Aucune commande.','error'); return; }
+async function submitAssign(){
     if(!selectedDriverId){ toast('Choisissez un chauffeur disponible.','error'); return; }
     var fee=document.getElementById('assignFee').value.trim();
     if(fee===''||isNaN(Number(fee))||Number(fee)<0){ toast('Entrez des frais valides (0 ou plus).','error'); return; }
+
     var btn=document.getElementById('assignBtn');
-    btn.disabled=true; btn.textContent='⏳ En cours…';
+    btn.disabled=true;
+
+    /* ── Mode multi (plusieurs commandes) ── */
+    if(_bulkMode){
+        var ids=Array.from(_bulkOrderIds);
+        btn.textContent='⏳ 0/'+ids.length+'…';
+        var ok=0;
+        for(var i=0;i<ids.length;i++){
+            btn.textContent='⏳ '+(i+1)+'/'+ids.length+'…';
+            var fd=new FormData();
+            fd.append('_token',CSRF);
+            fd.append('driver_id',selectedDriverId);
+            fd.append('delivery_fee',fee);
+            try{
+                var r=await fetch('/company/orders/'+ids[i]+'/assign',{method:'POST',body:fd});
+                var d=await r.json();
+                if(d.success) ok++;
+            }catch(e){}
+        }
+        closeModal('assignModal');
+        clearSelection();
+        if(ok>0){
+            toast('✅ '+ok+' commande'+(ok>1?'s':'')+' assignée'+(ok>1?'s':'')+' à '+document.getElementById('selectedDriverName').textContent,'success');
+            setTimeout(function(){ location.reload(); },1500);
+        } else {
+            toast('Erreur lors de l\'assignation.','error');
+        }
+        return;
+    }
+
+    /* ── Mode simple (une commande) ── */
+    if(!currentOrderId){ toast('Aucune commande.','error'); btn.disabled=false; return; }
+    btn.textContent='⏳ En cours…';
     var fd=new FormData();
     fd.append('_token',CSRF);
     fd.append('driver_id',selectedDriverId);
     fd.append('delivery_fee',fee);
     fd.append('delivery_destination',document.getElementById('assignDest').value);
-    fetch('/company/orders/'+currentOrderId+'/assign',{method:'POST',body:fd})
-        .then(function(r){ return r.json(); })
-        .then(function(data){
-            if(data.success){
-                toast('✅ '+data.driver_name+' assigné · '+data.delivery_fee+' GNF','success');
-                closeModal('assignModal');
-                setTimeout(function(){ location.reload(); },1200);
-            } else {
-                toast('Erreur : '+(data.message||'inconnue'),'error');
-                btn.disabled=false; btn.textContent='🚴 Confirmer l\'assignation';
-            }
-        })
-        .catch(function(err){
-            toast('Erreur réseau : '+err.message,'error');
+    try{
+        var r=await fetch('/company/orders/'+currentOrderId+'/assign',{method:'POST',body:fd});
+        var data=await r.json();
+        if(data.success){
+            toast('✅ '+data.driver_name+' assigné · '+data.delivery_fee+' GNF','success');
+            closeModal('assignModal');
+            setTimeout(function(){ location.reload(); },1200);
+        } else {
+            toast('Erreur : '+(data.message||'inconnue'),'error');
             btn.disabled=false; btn.textContent='🚴 Confirmer l\'assignation';
-        });
+        }
+    }catch(err){
+        toast('Erreur réseau : '+err.message,'error');
+        btn.disabled=false; btn.textContent='🚴 Confirmer l\'assignation';
+    }
 }
 
 /* ── Statut ── */

@@ -536,6 +536,34 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
     </div>
 </div>
 
+{{-- ══ MODAL BULK ZONE (sélection zone avant affectation groupée entreprise) ══ --}}
+<div class="blv-modal" id="bulkZoneModal">
+    <div class="blv-box">
+        <div class="blv-hd">
+            <div>
+                <div class="blv-title">📍 Zone de livraison</div>
+                <div class="blv-sub">
+                    <span id="bulkZoneOrderCount">0</span> commande(s) → <span id="bulkZoneCompanyName"></span>
+                </div>
+            </div>
+            <button class="blv-close" onclick="closeBulkZoneModal()">✕</button>
+        </div>
+        {{-- Résumé des commandes sélectionnées (mode zone simple) --}}
+        <div id="bulkZoneOrdersSummary" style="display:none;padding:8px 4px 10px;">
+            <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">📦 Commandes sélectionnées</div>
+            <div id="bulkZoneOrdersPills" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
+        </div>
+        <div class="blv-list" id="bulkZoneList" style="min-height:80px;">
+            <div style="text-align:center;padding:28px;color:var(--muted);font-size:13px;">Chargement des zones…</div>
+        </div>
+        <div class="blv-footer">
+            <button class="btn" style="flex:0 0 auto;" onclick="closeBulkZoneModal()">← Retour</button>
+            <button class="btn" id="bulkZoneSkip" style="flex:0 0 auto;background:#f8fafc;" onclick="confirmBulkZone(true)">Passer (sans zone)</button>
+            <button class="btn btn-primary" style="flex:1;justify-content:center;" id="bulkZoneConfirm" onclick="confirmBulkZone(false)">✅ Confirmer</button>
+        </div>
+    </div>
+</div>
+
 {{-- ══ MODAL CHAT BOUTIQUE ↔ ENTREPRISE ══ --}}
 <div class="chat-overlay" id="chatModal">
     <div class="chat-panel">
@@ -851,7 +879,13 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         $dejaAnnulee=in_array($order->status,$restaurables);
                     @endphp
                     <tr data-order-id="{{ $order->id }}">
-                        <td style="width:36px;"><input type="checkbox" class="order-cb" value="{{ $order->id }}" onchange="onCbChange(this)"></td>
+                        <td style="width:36px;"><input type="checkbox" class="order-cb" value="{{ $order->id }}"
+                            data-zone-id="{{ $order->delivery_zone_id ?? '' }}"
+                            data-zone-name="{{ addslashes($order->deliveryZone->name ?? '') }}"
+                            data-zone-price="{{ $order->deliveryZone->price ?? ($order->delivery_fee ?? '') }}"
+                            data-order-num="{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
+                            data-dest="{{ addslashes($order->delivery_destination ?: ($client?->address ?? '')) }}"
+                            onchange="onCbChange(this)"></td>
                         <td><span style="font-family:var(--mono);font-size:11px;color:var(--muted)">#{{ $order->id }}</span></td>
                         <td><div style="display:flex;align-items:center;gap:9px"><div class="c-av">{{ $init }}</div><div><div class="c-name">{{ $client->name ?? 'Inconnu' }}</div>@if($client?->phone)<div class="c-sub">📞 {{ $client->phone }}</div>@endif</div></div></td>
                         <td>
@@ -960,7 +994,13 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                 @endphp
                 <div class="m-card" data-order-id="{{ $order->id }}">
                     <div class="m-card-hd">
-                        <div style="display:flex;align-items:center;gap:9px"><input type="checkbox" class="order-cb" value="{{ $order->id }}" onchange="onCbChange(this)" style="flex-shrink:0;"><div class="c-av">{{ $init }}</div><div><div class="c-name">{{ $client->name ?? 'Inconnu' }}</div>@if($client?->phone)<div class="c-sub">📞 {{ $client->phone }}</div>@endif</div></div>
+                        <div style="display:flex;align-items:center;gap:9px"><input type="checkbox" class="order-cb" value="{{ $order->id }}"
+                            data-zone-id="{{ $order->delivery_zone_id ?? '' }}"
+                            data-zone-name="{{ addslashes($order->deliveryZone->name ?? '') }}"
+                            data-zone-price="{{ $order->deliveryZone->price ?? ($order->delivery_fee ?? '') }}"
+                            data-order-num="{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
+                            data-dest="{{ addslashes($order->delivery_destination ?: ($client?->address ?? '')) }}"
+                            onchange="onCbChange(this)" style="flex-shrink:0;"><div class="c-av">{{ $init }}</div><div><div class="c-name">{{ $client->name ?? 'Inconnu' }}</div>@if($client?->phone)<div class="c-sub">📞 {{ $client->phone }}</div>@endif</div></div>
                         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span><span style="font-family:var(--mono);font-size:10px;color:var(--muted)">#{{ $order->id }}</span></div>
                     </div>
                     <div class="m-card-body">
@@ -1764,31 +1804,297 @@ window.closeCompanyModal = function() {
     _origCloseCompany?.();
 };
 
-async function submitBulkCompany(btn) {
-    const companyId   = btn.dataset.companyId;
-    const companyName = btn.dataset.companyName;
-    const origText = btn.textContent;
-    btn.disabled = true; btn.textContent = '⏳…';
+/* ── BULK ZONE PICKER ──────────────────────────────────────── */
+let _bulkZoneCompanyId   = null;
+let _bulkZoneCompanyName = null;
+let _bulkZoneSelectedId  = null;
+let _bulkZoneSelectedFee = null;
+let _bulkZoneLots        = null;
 
+function _collectSelectedOrders() {
+    const orders = [];
+    document.querySelectorAll('.order-cb:checked').forEach(cb => {
+        orders.push({
+            id:        cb.value,
+            num:       cb.dataset.orderNum || String(cb.value).padStart(5,'0'),
+            zoneId:    cb.dataset.zoneId   || '',
+            zoneName:  cb.dataset.zoneName  || '',
+            zonePrice: cb.dataset.zonePrice ? parseFloat(cb.dataset.zonePrice) : 0,
+            dest:      (cb.dataset.dest    || '').trim(),
+        });
+    });
+    return orders;
+}
+
+function _groupByZone(orders) {
+    const map = {};
+    orders.forEach(o => {
+        /* Grouper par destination normalisée — même destination = même lot */
+        const key = o.dest ? _up(o.dest) : (o.zoneId || '__nozone__');
+        if (!map[key]) map[key] = { zoneId: '', zoneName: o.zoneName, zonePrice: o.zonePrice, dest: o.dest, orders: [] };
+        /* Conserver le premier zoneId non-vide du groupe (pour la recherche par ID) */
+        if (!map[key].zoneId && o.zoneId) map[key].zoneId = o.zoneId;
+        map[key].orders.push(o);
+    });
+    return Object.values(map);
+}
+
+function _up(s) { return (s||'').toUpperCase().replace(/\s+/g,' ').trim(); }
+
+function _findMatchingZone(zones, dest) {
+    if (!dest || !zones.length) return null;
+    const du = _up(dest);
+    /* 1. Le nom de la zone est présent dans la destination (ou vice-versa) */
+    const direct = zones.find(z => {
+        const zu = _up(z.name);
+        return du === zu || du.includes(zu) || zu.includes(du);
+    });
+    if (direct) return direct;
+    /* 2. Tous les mots significatifs (≥3 chars) du nom de zone se retrouvent dans la destination */
+    return zones.find(z => {
+        const words = _up(z.name).split(/[^A-Z0-9]+/).filter(w => w.length >= 3);
+        return words.length > 0 && words.every(w => du.includes(w));
+    }) || null;
+}
+
+function submitBulkCompany(btn) {
+    _bulkZoneCompanyId   = btn.dataset.companyId;
+    _bulkZoneCompanyName = btn.dataset.companyName;
+    _bulkZoneSelectedId  = null;
+    _bulkZoneSelectedFee = null;
+    _bulkZoneLots        = null;
+
+    const orders     = _collectSelectedOrders();
+    const listEl     = document.getElementById('bulkZoneList');
+    const skipBtn    = document.getElementById('bulkZoneSkip');
+    const confirmBtn = document.getElementById('bulkZoneConfirm');
+    const summaryEl  = document.getElementById('bulkZoneOrdersSummary');
+    const pillsEl    = document.getElementById('bulkZoneOrdersPills');
+
+    document.getElementById('bulkZoneOrderCount').textContent  = orders.length;
+    document.getElementById('bulkZoneCompanyName').textContent = _bulkZoneCompanyName;
+    listEl.innerHTML        = '<div style="text-align:center;padding:28px;color:var(--muted);font-size:13px;">Chargement des zones…</div>';
+    summaryEl.style.display = 'none';
+    skipBtn.style.display   = 'none';
+    confirmBtn.disabled     = false;
+    confirmBtn.textContent  = '✅ Confirmer';
+    document.getElementById('bulkZoneModal').classList.add('open');
+
+    /* Charger les zones puis décider du mode */
+    fetch(`/company-zones/${_bulkZoneCompanyId}`, { headers: { 'Accept':'application/json', 'X-CSRF-TOKEN':CSRF } })
+    .then(r => r.json())
+    .then(zones => {
+        if (!Array.isArray(zones)) zones = [];
+
+        /* ── Entreprise sans aucune zone configurée ── */
+        if (!zones.length) {
+            const numsList = orders.map(o =>
+                `<span style="display:inline-flex;align-items:center;background:#eef2ff;border:1.5px solid #c7d2fe;color:#4f46e5;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;">#${o.num}</span>`
+            ).join(' ');
+            listEl.innerHTML = `
+                <div style="padding:12px 14px;border-radius:9px;border:1.5px solid #fde68a;background:#fffbeb;margin-bottom:10px;">
+                    <div style="font-size:12.5px;font-weight:700;color:#92400e;margin-bottom:3px;">⚠️ Aucune zone de livraison configurée</div>
+                    <div style="font-size:11px;color:#78350f;line-height:1.5;"><b>${_bulkZoneCompanyName}</b> n'a pas encore configuré ses zones de livraison. Les frais de livraison ne seront pas pré-remplis.</div>
+                </div>
+                <div style="padding:10px 12px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);">
+                    <div style="font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:6px;">📦 ${orders.length} commande${orders.length>1?'s':''} à confier</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:4px;">${numsList}</div>
+                </div>`;
+            summaryEl.style.display  = 'none';
+            skipBtn.style.display    = 'none';
+            confirmBtn.disabled      = false;
+            confirmBtn.textContent   = '✅ Confier quand même';
+            _bulkZoneLots = null;
+            return;
+        }
+
+        const groups = _groupByZone(orders);
+
+        if (groups.length === 1) {
+            /* ── Cas simple : même destination/zone pour toutes les commandes ── */
+            _bulkZoneLots = null;
+            const g = groups[0];
+            skipBtn.style.display  = '';
+            confirmBtn.textContent = '✅ Confirmer';
+            pillsEl.innerHTML = orders.map(o =>
+                `<span style="display:inline-flex;align-items:center;background:#eef2ff;border:1.5px solid #c7d2fe;color:#4f46e5;border-radius:6px;padding:3px 9px;font-size:11.5px;font-weight:700;">#${o.num}</span>`
+            ).join('');
+            summaryEl.style.display = '';
+
+            listEl.innerHTML = zones.map(z => {
+                const pre = g.zoneId && String(z.id) === String(g.zoneId);
+                return `<label class="blv-item${pre?' checked':''}" id="bz-label-${z.id}" for="bz-${z.id}" style="cursor:pointer;" onclick="selectBulkZone(${z.id}, ${parseFloat(z.price)||0})">
+                    <input type="radio" name="bulk_zone" id="bz-${z.id}" value="${z.id}" style="display:none;">
+                    <div style="width:38px;height:38px;border-radius:9px;background:${z.color||'#4f46e5'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px;">📍</div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:13px;font-weight:700;color:var(--text);">${z.name}</div>
+                        <div style="font-size:11px;color:var(--muted);">${z.price?new Intl.NumberFormat('fr').format(z.price)+' GNF':'Prix libre'}${z.estimated_minutes?' · ~'+z.estimated_minutes+' min':''}</div>
+                    </div>
+                </label>`;
+            }).join('');
+            if (g.zoneId) {
+                const found = zones.find(z => String(z.id) === String(g.zoneId));
+                if (found) { _bulkZoneSelectedId = found.id; _bulkZoneSelectedFee = parseFloat(found.price)||0; }
+            }
+            return;
+        }
+
+        /* ── Cas lots : plusieurs groupes → vérifier chaque groupe contre les zones de l'entreprise ── */
+        const validLots     = [];
+        const skippedOrders = [];
+
+        groups.forEach(g => {
+            let matched = null;
+            if (zones.length) {
+                if (g.zoneId) matched = zones.find(z => String(z.id) === String(g.zoneId));
+                if (!matched && g.dest) matched = _findMatchingZone(zones, g.dest);
+            }
+
+            if (matched) {
+                /* Zone trouvée chez cette entreprise → lot valide avec frais pré-rempli */
+                validLots.push({ ...g,
+                    zoneId:    matched.id,
+                    zoneName:  matched.name,
+                    zonePrice: parseFloat(matched.price)||0,
+                });
+            } else {
+                /* Aucune zone correspondante chez cette entreprise → commandes ignorées */
+                g.orders.forEach(o => skippedOrders.push({ ...o, lotDest: g.dest || g.zoneName || '—' }));
+            }
+        });
+
+        _bulkZoneLots = validLots.length ? validLots : null;
+        summaryEl.style.display = 'none';
+        _renderBulkLotsWithSkipped(validLots, skippedOrders, listEl);
+
+        if (!validLots.length) {
+            confirmBtn.disabled = true; confirmBtn.textContent = '❌ Aucun lot valide';
+        } else {
+            confirmBtn.disabled    = false;
+            confirmBtn.textContent = validLots.length > 1 ? `✅ Confirmer ${validLots.length} lots` : '✅ Confirmer';
+        }
+    })
+    .catch(() => {
+        listEl.innerHTML = '<div style="text-align:center;padding:20px;color:#ef4444;font-size:13px;">Erreur chargement zones. Cliquez <b>Passer</b> pour continuer.</div>';
+        skipBtn.style.display = '';
+    });
+}
+
+function _renderBulkLotsWithSkipped(validLots, skippedOrders, listEl) {
+    const fmt = n => n ? new Intl.NumberFormat('fr').format(n) : '—';
+    let html = validLots.map((g, i) => {
+        const hasZone = g.zoneId && g.zoneName;
+        const label   = hasZone ? g.zoneName : (g.dest || null);
+        const price   = g.zonePrice;
+        let badge;
+        if (hasZone) {
+            badge = `<span style="background:#eef2ff;border:1.5px solid #c7d2fe;color:#4f46e5;border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;">📍 ${label}${price?' — '+fmt(price)+' GNF':''}</span>`;
+        } else if (label) {
+            badge = `<span style="background:#f0fdf4;border:1.5px solid #bbf7d0;color:#065f46;border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;">📍 ${label}</span>`;
+        } else {
+            badge = `<span style="background:#fef3c7;border:1.5px solid #fde68a;color:#92400e;border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;flex-shrink:0;">⚠️ Sans destination</span>`;
+        }
+        const numsList = g.orders.map(o => '#'+o.num).join(', ');
+        const lotTotal = price ? `<div style="font-size:11px;color:#059669;font-weight:600;margin-top:4px;">💰 Frais de livraison : ${fmt(price)} GNF${g.orders.length > 1 ? ' × ' + g.orders.length + ' = ' + fmt(price * g.orders.length) + ' GNF' : ''}</div>` : '';
+        return `<div style="padding:10px 12px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
+                <div style="font-size:12.5px;font-weight:700;color:var(--text);">Lot ${i+1} · ${g.orders.length} commande${g.orders.length>1?'s':''}</div>${badge}</div>
+            <div style="font-size:11.5px;color:var(--muted);">${numsList}</div>${lotTotal}</div>`;
+    }).join('<div style="height:6px;"></div>');
+
+    if (skippedOrders.length) {
+        const nums  = skippedOrders.map(o => '#'+o.num).join(', ');
+        const dests = [...new Set(skippedOrders.map(o => o.lotDest).filter(Boolean))].join(', ');
+        html += `${validLots.length ? '<div style="height:8px;"></div>' : ''}
+        <div style="padding:11px 13px;border-radius:9px;border:1.5px solid #fecaca;background:#fef2f2;">
+            <div style="font-size:12px;font-weight:700;color:#dc2626;margin-bottom:4px;">⚠️ ${skippedOrders.length} commande${skippedOrders.length>1?'s':''} ignorée${skippedOrders.length>1?'s':''}</div>
+            <div style="font-size:11.5px;color:#7f1d1d;font-weight:600;margin-bottom:3px;">${nums}</div>
+            <div style="font-size:10.5px;color:#b91c1c;">Zone${dests?' "'+dests+'"':''} non disponible chez <b>${_bulkZoneCompanyName}</b>. Confiez ces commandes séparément ou choisissez une autre entreprise.</div>
+        </div>`;
+    }
+    listEl.innerHTML = html || '<div style="text-align:center;padding:20px;color:var(--muted);">Aucune commande à traiter.</div>';
+}
+
+function selectBulkZone(zoneId, zonePrice) {
+    _bulkZoneSelectedId  = zoneId;
+    _bulkZoneSelectedFee = zonePrice;
+    document.querySelectorAll('#bulkZoneList .blv-item').forEach(el => el.classList.remove('checked'));
+    const label = document.getElementById('bz-label-' + zoneId);
+    if (label) label.classList.add('checked');
+}
+
+function closeBulkZoneModal() {
+    document.getElementById('bulkZoneModal').classList.remove('open');
+}
+
+async function confirmBulkZone(skipZone) {
+    const confirmBtn = document.getElementById('bulkZoneConfirm');
+    const origText   = confirmBtn.textContent;
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = '⏳…';
+
+    /* ── Mode lots : envoyer chaque lot séparément ── */
+    if (_bulkZoneLots) {
+        let totalAssigned = 0;
+        try {
+            for (const g of _bulkZoneLots) {
+                const payload = {
+                    order_ids:           g.orders.map(o => parseInt(o.id)),
+                    delivery_company_id: _bulkZoneCompanyId,
+                };
+                if (g.zoneId) {
+                    payload.delivery_zone_id = g.zoneId;
+                    payload.delivery_fee     = g.zonePrice || null;
+                }
+                const res  = await fetch(BULK_ASSIGN_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN':CSRF, 'Accept':'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) totalAssigned += data.assigned;
+            }
+            closeBulkZoneModal();
+            window.closeCompanyModal();
+            showBulkToast(`✅ ${totalAssigned} commande(s) réparties et confiées à ${_bulkZoneCompanyName} !`, true);
+            clearBulkSelection();
+            setTimeout(() => location.reload(), 1400);
+        } catch(e) {
+            showBulkToast('Erreur réseau.', false);
+            confirmBtn.disabled = false; confirmBtn.textContent = origText;
+        }
+        return;
+    }
+
+    /* ── Mode zone simple ── */
+    const payload = {
+        order_ids:           [..._bulkIds],
+        delivery_company_id: _bulkZoneCompanyId,
+    };
+    if (!skipZone && _bulkZoneSelectedId) {
+        payload.delivery_zone_id = _bulkZoneSelectedId;
+        payload.delivery_fee     = _bulkZoneSelectedFee;
+    }
     try {
-        const res = await fetch(BULK_ASSIGN_URL, {
+        const res  = await fetch(BULK_ASSIGN_URL, {
             method: 'POST',
             headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN':CSRF, 'Accept':'application/json' },
-            body: JSON.stringify({ order_ids: [..._bulkIds], delivery_company_id: companyId })
+            body: JSON.stringify(payload)
         });
         const data = await res.json();
+        closeBulkZoneModal();
         window.closeCompanyModal();
         if (data.success) {
-            showBulkToast(`✅ ${data.assigned} commande(s) confiée(s) à ${companyName} !`, true);
+            showBulkToast(`✅ ${data.assigned} commande(s) confiée(s) à ${_bulkZoneCompanyName} !`, true);
             clearBulkSelection();
             setTimeout(() => location.reload(), 1400);
         } else {
             showBulkToast(data.message || 'Erreur.', false);
-            btn.disabled = false; btn.textContent = origText;
+            confirmBtn.disabled = false; confirmBtn.textContent = origText;
         }
     } catch(e) {
         showBulkToast('Erreur réseau.', false);
-        btn.disabled = false; btn.textContent = origText;
+        confirmBtn.disabled = false; confirmBtn.textContent = origText;
     }
 }
 </script>

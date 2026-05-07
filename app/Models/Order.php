@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\CourierCommission;
+use App\Models\DeliveryZone;
 
 class Order extends Model
 {
@@ -115,5 +116,11 @@ protected $casts = [
     public function driver()
     {
         return $this->belongsTo(Driver::class);
+    }
+
+    // Zone de livraison assignée
+    public function deliveryZone()
+    {
+        return $this->belongsTo(DeliveryZone::class, 'delivery_zone_id');
     }
 }

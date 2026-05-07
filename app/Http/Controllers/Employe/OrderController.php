@@ -112,6 +112,8 @@ class OrderController extends Controller
             'order_ids.*'         => 'integer',
             'livreur_id'          => 'nullable|exists:users,id',
             'delivery_company_id' => 'nullable|exists:delivery_companies,id',
+            'delivery_zone_id'    => 'nullable|exists:delivery_zones,id',
+            'delivery_fee'        => 'nullable|numeric|min:0',
         ]);
 
         if (empty($data['livreur_id']) && empty($data['delivery_company_id'])) {
@@ -131,7 +133,12 @@ class OrderController extends Controller
                 }
             } else {
                 $order->delivery_company_id = $data['delivery_company_id'];
-                // Reste en_attente jusqu'à ce que l'entreprise assigne un chauffeur
+                if (!empty($data['delivery_zone_id']))  $order->delivery_zone_id = $data['delivery_zone_id'];
+                if (isset($data['delivery_fee']) && $data['delivery_fee'] !== null) {
+                    $order->delivery_fee = $data['delivery_fee'];
+                } elseif (!empty($data['delivery_zone_id'])) {
+                    $order->delivery_fee = \App\Models\DeliveryZone::find($data['delivery_zone_id'])?->price;
+                }
             }
             $order->save();
             $assigned++;
