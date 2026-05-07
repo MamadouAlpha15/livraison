@@ -2,6 +2,7 @@
 @section('title', 'Chat · '.$company->name)
 @php $bodyClass = 'is-dashboard'; @endphp
 
+
 @push('styles')
 <style>
 *,*::before,*::after{box-sizing:border-box}
@@ -86,10 +87,12 @@ main.app-main{
 .chat-msgs{
     flex:1;overflow-y:auto;padding:18px 16px;
     display:flex;flex-direction:column;gap:6px;
-    scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.12) transparent;
+    scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.4) rgba(0,0,0,.05);
 }
-.chat-msgs::-webkit-scrollbar{width:4px;}
-.chat-msgs::-webkit-scrollbar-thumb{background:rgba(0,0,0,.12);border-radius:4px;}
+.chat-msgs::-webkit-scrollbar{width:6px;}
+.chat-msgs::-webkit-scrollbar-track{background:rgba(0,0,0,.04);border-radius:6px;}
+.chat-msgs::-webkit-scrollbar-thumb{background:rgba(124,58,237,.4);border-radius:6px;}
+.chat-msgs::-webkit-scrollbar-thumb:hover{background:rgba(124,58,237,.7);}
 
 .msg-empty{
     flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -192,11 +195,13 @@ main.app-main{
     width:290px;flex-shrink:0;display:flex;flex-direction:column;
     background:var(--surface);border-left:1px solid var(--border);
     overflow-y:auto;
-    scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.1) transparent;
+    scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.35) rgba(0,0,0,.04);
     transition:transform .3s,width .3s;
 }
-.right-panel::-webkit-scrollbar{width:3px;}
-.right-panel::-webkit-scrollbar-thumb{background:rgba(0,0,0,.1);border-radius:3px;}
+.right-panel::-webkit-scrollbar{width:6px;}
+.right-panel::-webkit-scrollbar-track{background:rgba(0,0,0,.03);border-radius:6px;}
+.right-panel::-webkit-scrollbar-thumb{background:rgba(124,58,237,.35);border-radius:6px;}
+.right-panel::-webkit-scrollbar-thumb:hover{background:rgba(124,58,237,.65);}
 
 .rp-section{padding:16px;}
 .rp-section+.rp-section{border-top:1px solid var(--border);}
@@ -284,9 +289,11 @@ main.app-main{
     color:var(--text2);cursor:pointer;font-size:15px;transition:all .14s;
 }
 .om-close:hover{background:#fee2e2;border-color:#fca5a5;color:#dc2626;}
-.om-body{overflow-y:auto;flex:1;padding:14px;}
-.om-body::-webkit-scrollbar{width:3px;}
-.om-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,.1);border-radius:3px;}
+.om-body{overflow-y:auto;flex:1;padding:14px;scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.4) rgba(0,0,0,.04);}
+.om-body::-webkit-scrollbar{width:6px;}
+.om-body::-webkit-scrollbar-track{background:rgba(0,0,0,.03);border-radius:6px;}
+.om-body::-webkit-scrollbar-thumb{background:rgba(124,58,237,.4);border-radius:6px;}
+.om-body::-webkit-scrollbar-thumb:hover{background:rgba(124,58,237,.7);}
 
 /* Cartes commandes */
 .order-card{
@@ -297,7 +304,7 @@ main.app-main{
 .order-card:hover{border-color:rgba(124,58,237,.35);background:#faf5ff;}
 .order-card.selected{border-color:var(--brand);background:#faf5ff;box-shadow:0 0 0 3px rgba(124,58,237,.12);}
 .order-card-check{
-    width:19px;height:19px;border-radius:50%;border:2px solid var(--border);
+    width:19px;height:19px;border-radius:4px;border:2px solid var(--border);
     flex-shrink:0;margin-top:2px;
     display:flex;align-items:center;justify-content:center;transition:all .15s;
 }
@@ -507,8 +514,14 @@ main.app-main{
             </div>
             @else
             <p style="font-size:11.5px;color:var(--muted);margin:0 0 10px;">
-                Sélectionnez la commande à confier à <strong style="color:var(--brand);">{{ $company->name }}</strong>
+                Sélectionnez une ou plusieurs commandes à confier à <strong style="color:var(--brand);">{{ $company->name }}</strong>
             </p>
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 4px 10px;border-bottom:1px solid var(--border);margin-bottom:8px;">
+                <input type="checkbox" id="omSelectAll" onchange="omToggleAll(this)"
+                       style="width:16px;height:16px;accent-color:var(--brand);cursor:pointer;border-radius:4px;flex-shrink:0;">
+                <label for="omSelectAll" style="font-size:11.5px;font-weight:700;color:var(--text2);cursor:pointer;user-select:none;">Tout sélectionner</label>
+                <span id="omSelCount" style="margin-left:auto;font-size:11px;font-weight:700;color:var(--brand);"></span>
+            </div>
 
             @foreach($pendingOrders as $order)
             @php
@@ -580,7 +593,7 @@ main.app-main{
             @endif
             <button class="btn-confirm-assign" id="btnConfirmAssign" onclick="confirmAssign()" disabled>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                Confier cette commande
+                <span class="btn-label">Confier cette commande</span>
             </button>
         </div>
         @endif
@@ -599,7 +612,7 @@ const uIni      = @json($uIni);
 const cIni      = @json($cIni);
 
 let lastAt = null;
-let _selectedOrderId = null;
+let _selectedOrderIds = new Set();
 
 const box   = document.getElementById('bcMessages');
 const input = document.getElementById('bcInput');
@@ -720,16 +733,52 @@ window.openOrderModal = function() {
 window.closeOrderModal = function() {
     document.getElementById('orderModal').classList.remove('open');
     document.body.style.overflow = '';
+    _selectedOrderIds.clear();
+    const btn = document.getElementById('btnConfirmAssign');
+    if (btn) { btn.disabled = true; btn.querySelector('.btn-label').textContent = 'Confier cette commande'; }
+    const chk = document.getElementById('omSelectAll');
+    if (chk) { chk.checked = false; chk.indeterminate = false; }
+    const cnt = document.getElementById('omSelCount');
+    if (cnt) cnt.textContent = '';
 };
 document.getElementById('orderModal')?.addEventListener('click', e => {
     if (e.target === document.getElementById('orderModal')) closeOrderModal();
 });
 
+function omUpdateBtn() {
+    const n   = _selectedOrderIds.size;
+    const btn = document.getElementById('btnConfirmAssign');
+    if (!btn) return;
+    btn.disabled = n === 0;
+    btn.querySelector('.btn-label').textContent = n > 1 ? `Confier ${n} commandes` : 'Confier cette commande';
+    const cnt = document.getElementById('omSelCount');
+    if (cnt) cnt.textContent = n > 0 ? `${n} sélectionnée${n>1?'s':''}` : '';
+    const allCards = document.querySelectorAll('.order-card');
+    const chk = document.getElementById('omSelectAll');
+    if (chk) {
+        chk.checked       = allCards.length > 0 && n === allCards.length;
+        chk.indeterminate = n > 0 && n < allCards.length;
+    }
+}
+
+window.omToggleAll = function(chk) {
+    document.querySelectorAll('.order-card').forEach(card => {
+        const id = parseInt(card.dataset.orderId);
+        if (chk.checked) { _selectedOrderIds.add(id); card.classList.add('selected'); }
+        else             { _selectedOrderIds.delete(id); card.classList.remove('selected'); }
+    });
+    omUpdateBtn();
+};
+
 window.selectOrder = function(el, orderId) {
-    document.querySelectorAll('.order-card').forEach(c => c.classList.remove('selected'));
-    el.classList.add('selected');
-    _selectedOrderId = orderId;
-    document.getElementById('btnConfirmAssign').disabled = false;
+    if (_selectedOrderIds.has(orderId)) {
+        _selectedOrderIds.delete(orderId);
+        el.classList.remove('selected');
+    } else {
+        _selectedOrderIds.add(orderId);
+        el.classList.add('selected');
+    }
+    omUpdateBtn();
 };
 
 window.filterZoneModal = function(input) {
@@ -757,49 +806,52 @@ window.onZoneChange = function(sel) {
 };
 
 window.confirmAssign = async function() {
-    if (!_selectedOrderId) return;
+    if (_selectedOrderIds.size === 0) return;
     const btn     = document.getElementById('btnConfirmAssign');
     const zoneSel = document.getElementById('zoneSelectModal');
     const zoneId  = zoneSel?.value || null;
     const zoneOpt = zoneId ? zoneSel.options[zoneSel.selectedIndex] : null;
+    const token   = document.querySelector('meta[name="csrf-token"]').content;
 
     btn.disabled = true;
-    btn.innerHTML = '⏳ Assignation…';
+    btn.querySelector('.btn-label').textContent = '⏳ Assignation…';
 
-    const fd = new FormData();
-    fd.append('_method', 'PUT');
-    fd.append('delivery_company_id', companyId);
-    if (zoneId)                    fd.append('delivery_zone_id', zoneId);
-    if (zoneOpt?.dataset?.price)   fd.append('delivery_fee', zoneOpt.dataset.price);
+    const ids = Array.from(_selectedOrderIds);
+    let successCount = 0;
+    const successNums = [];
 
-    try {
-        const token = document.querySelector('meta[name="csrf-token"]').content;
-        const res   = await fetch(`/employe/orders/${_selectedOrderId}/send-to-company`, {
-            method:'POST',
-            headers:{'X-CSRF-TOKEN':token,'X-Requested-With':'XMLHttpRequest','Accept':'application/json'},
-            body: fd
-        });
-        const data = await res.json();
-        if (data.success) {
-            closeOrderModal();
-            renderMsg({
-                sender_role:'system',
-                body:'✅ Commande #' + String(_selectedOrderId).padStart(5,'0')
-                    + ' confiée à {{ $company->name }}.'
-                    + (zoneOpt ? '\nZone : ' + zoneOpt.textContent.split('—')[0].trim() : ''),
-                created_at: new Date().toISOString()
+    for (const orderId of ids) {
+        const fd = new FormData();
+        fd.append('_method', 'PUT');
+        fd.append('delivery_company_id', companyId);
+        if (zoneId)                  fd.append('delivery_zone_id', zoneId);
+        if (zoneOpt?.dataset?.price) fd.append('delivery_fee', zoneOpt.dataset.price);
+        try {
+            const res  = await fetch(`/employe/orders/${orderId}/send-to-company`, {
+                method:'POST',
+                headers:{'X-CSRF-TOKEN':token,'X-Requested-With':'XMLHttpRequest','Accept':'application/json'},
+                body: fd
             });
-            scrollBottom();
-            _selectedOrderId = null;
-        } else {
-            btn.disabled = false;
-            btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg> Confier cette commande';
-            alert(data.message || 'Erreur lors de l\'assignation.');
-        }
-    } catch(e) {
+            const data = await res.json();
+            if (data.success) { successCount++; successNums.push('#' + String(orderId).padStart(5,'0')); }
+        } catch(e) {}
+    }
+
+    if (successCount > 0) {
+        closeOrderModal();
+        const zoneSuffix = zoneOpt ? '\nZone : ' + zoneOpt.textContent.split('—')[0].trim() : '';
+        renderMsg({
+            sender_role:'system',
+            body: successCount === 1
+                ? '✅ Commande ' + successNums[0] + ' confiée à {{ $company->name }}.' + zoneSuffix
+                : `✅ ${successCount} commandes confiées à {{ $company->name }}.` + zoneSuffix,
+            created_at: new Date().toISOString()
+        });
+        scrollBottom();
+    } else {
         btn.disabled = false;
-        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg> Confier cette commande';
-        alert('Erreur réseau.');
+        btn.querySelector('.btn-label').textContent = 'Confier cette commande';
+        alert('Erreur lors de l\'assignation.');
     }
 };
 

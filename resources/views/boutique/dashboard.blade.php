@@ -591,9 +591,11 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .bq-chat-hd-sub{font-size:11px;color:rgba(255,255,255,.7);margin-top:1px;}
 .bq-chat-close{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;font-size:16px;flex-shrink:0;transition:background .14s;}
 .bq-chat-close:hover{background:rgba(255,255,255,.3);}
-.bq-chat-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:8px;background:#f8fafc;scrollbar-width:thin;scrollbar-color:#c7d2fe transparent;}
-.bq-chat-msgs::-webkit-scrollbar{width:3px;}
-.bq-chat-msgs::-webkit-scrollbar-thumb{background:#c7d2fe;border-radius:3px;}
+.bq-chat-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:8px;background:#f8fafc;scrollbar-width:thin;scrollbar-color:#818cf8 #e0e7ff;}
+.bq-chat-msgs::-webkit-scrollbar{width:6px;}
+.bq-chat-msgs::-webkit-scrollbar-track{background:#e0e7ff;border-radius:6px;}
+.bq-chat-msgs::-webkit-scrollbar-thumb{background:#818cf8;border-radius:6px;}
+.bq-chat-msgs::-webkit-scrollbar-thumb:hover{background:#6366f1;}
 .bq-msg-row{display:flex;flex-direction:column;max-width:80%;}
 .bq-msg-row.mine{align-self:flex-end;align-items:flex-end;}
 .bq-msg-row.theirs{align-self:flex-start;align-items:flex-start;}
@@ -624,11 +626,15 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .bq-order-card-info{flex:1;min-width:0;}
 .bq-order-card-client{font-size:12.5px;font-weight:700;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .bq-order-card-amount{font-size:11px;color:#6b7280;margin-top:1px;}
-.bq-order-card-check{width:20px;height:20px;border-radius:50%;border:2px solid #d1d5db;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .14s;color:transparent;}
+.bq-order-card-check{width:20px;height:20px;border-radius:4px;border:2px solid #d1d5db;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .14s;color:transparent;}
 .bq-order-card.selected .bq-order-card-check{background:#059669;border-color:#059669;color:#fff;}
 .bq-order-card-thumb{width:40px;height:40px;border-radius:8px;flex-shrink:0;overflow:hidden;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid #e2e8f0;}
 .bq-order-card-thumb img{width:100%;height:100%;object-fit:cover;}
 .bq-order-card-address{font-size:10.5px;color:#6b7280;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px;}
+#bqOrdersList::-webkit-scrollbar{width:6px;}
+#bqOrdersList::-webkit-scrollbar-track{background:#f0fdf4;border-radius:6px;}
+#bqOrdersList::-webkit-scrollbar-thumb{background:#86efac;border-radius:6px;}
+#bqOrdersList::-webkit-scrollbar-thumb:hover{background:#4ade80;}
 .bq-confier-hint{font-size:11px;color:#059669;font-weight:600;margin-bottom:6px;}
 
 /* ══════════════════════════════════════════════════
@@ -743,10 +749,11 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     .lv-nm{font-size:12px;}
 }
 
-/* Scrollbar globale fine */
-*{scrollbar-width:thin;scrollbar-color:rgba(99,102,241,.2) transparent;}
-::-webkit-scrollbar{width:4px;height:4px;}
-::-webkit-scrollbar-thumb{background:rgba(99,102,241,.2);border-radius:4px;}
+/* Scrollbar globale fine (fallback pour éléments sans règle spécifique) */
+*{scrollbar-width:thin;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-thumb{background:rgba(99,102,241,.25);border-radius:5px;}
+::-webkit-scrollbar-thumb:hover{background:rgba(99,102,241,.5);}
 </style>
 @endpush
 
@@ -867,7 +874,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         {{-- Zone confier la livraison (au-dessus des messages pour ne pas masquer le dernier) --}}
         <div class="bq-confier-zone" id="bqConfierZone" style="display:none;">
             <div class="bq-confier-hint">📦 Confier une commande à cette entreprise</div>
-            <div id="bqOrdersList" style="display:flex;flex-direction:column;gap:5px;max-height:150px;overflow-y:auto;margin-bottom:8px;scrollbar-width:thin;"></div>
+            <div id="bqOrdersList" style="display:flex;flex-direction:column;gap:5px;max-height:150px;overflow-y:auto;margin-bottom:8px;scrollbar-width:thin;scrollbar-color:#86efac #f0fdf4;"></div>
             <div id="bqZonePickerWrap" style="display:none;margin-bottom:8px;">
                 <label style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">📍 Zone de livraison</label>
                 <input type="text" id="bqZoneSearch" placeholder="🔍 Rechercher une zone…" autocomplete="off"
@@ -2179,7 +2186,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let _bqLastMsgTime    = null;
     let _bqInterval       = null;
     let _bqConfierDone    = false;
-    let _bqSelectedOrderId = null;
+    let _bqSelectedOrderIds = new Set();
 
     /* ── Ouvre le chat pour une entreprise donnée ── */
     window.bqOpenCompanyChat = function(companyId, companyName) {
@@ -2187,7 +2194,7 @@ document.addEventListener('DOMContentLoaded', () => {
         _bqCompanyName    = companyName || 'Entreprise';
         _bqLastMsgTime    = null;
         _bqConfierDone    = false;
-        _bqSelectedOrderId = null;
+        _bqSelectedOrderIds = new Set();
 
         /* Ferme le dropdown notif */
         const dd = document.getElementById('notifDropdown');
@@ -2239,7 +2246,16 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(r => r.json())
         .then(orders => {
             list.innerHTML = '';
+            _bqSelectedOrderIds = new Set();
             if (!orders.length) { zone.style.display = 'none'; return; }
+
+            /* ── "Tout sélectionner" bar (only when >1 orders) ── */
+            if (orders.length > 1) {
+                const bar = document.createElement('div');
+                bar.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 4px 8px;border-bottom:1px solid #e2e8f0;margin-bottom:6px;';
+                bar.innerHTML = `<input type="checkbox" id="bqSelectAll" onchange="bqToggleAll(this)" style="width:15px;height:15px;accent-color:#059669;cursor:pointer;border-radius:3px;flex-shrink:0;"><label for="bqSelectAll" style="font-size:11px;font-weight:700;color:#6b7280;cursor:pointer;user-select:none;">Tout sélectionner</label><span id="bqSelCount" style="margin-left:auto;font-size:11px;font-weight:700;color:#059669;"></span>`;
+                list.appendChild(bar);
+            }
 
             orders.forEach(o => {
                 const card = document.createElement('div');
@@ -2275,12 +2291,54 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(() => { document.getElementById('bqConfierZone').style.display = 'none'; });
     }
 
-    /* ── Sélectionne une commande et charge les zones ── */
+    /* ── Met à jour le bouton confier ── */
+    function bqUpdateConfierBtn() {
+        const n   = _bqSelectedOrderIds.size;
+        const btn = document.getElementById('bqBtnConfier');
+        if (!btn) return;
+        btn.disabled  = n === 0 || _bqConfierDone;
+        btn.innerHTML = n > 1 ? `📦 Confier ${n} commandes` : '📦 Confier la livraison à cette entreprise';
+        const cnt = document.getElementById('bqSelCount');
+        if (cnt) cnt.textContent = n > 0 ? `${n} sélectionnée${n>1?'s':''}` : '';
+        const allCards = document.querySelectorAll('#bqOrdersList .bq-order-card');
+        const chk = document.getElementById('bqSelectAll');
+        if (chk) { chk.checked = allCards.length > 0 && n === allCards.length; chk.indeterminate = n > 0 && n < allCards.length; }
+    }
+
+    /* ── Tout sélectionner / désélectionner ── */
+    window.bqToggleAll = function(chk) {
+        document.querySelectorAll('#bqOrdersList .bq-order-card').forEach(card => {
+            const id = parseInt(card.dataset.orderId);
+            if (chk.checked) { _bqSelectedOrderIds.add(id); card.classList.add('selected'); }
+            else             { _bqSelectedOrderIds.delete(id); card.classList.remove('selected'); }
+        });
+        bqUpdateConfierBtn();
+        if (_bqSelectedOrderIds.size > 0) {
+            if (document.getElementById('bqZonePickerWrap').style.display === 'none') bqLoadZones();
+        } else {
+            document.getElementById('bqZonePickerWrap').style.display = 'none';
+            document.getElementById('bqZonePriceHint').style.display  = 'none';
+        }
+    };
+
+    /* ── Sélectionne / désélectionne une commande ── */
     function bqSelectOrderCard(card, orderId) {
-        document.querySelectorAll('#bqOrdersList .bq-order-card').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        _bqSelectedOrderId = orderId;
-        bqLoadZones();
+        const wasEmpty = _bqSelectedOrderIds.size === 0;
+        if (_bqSelectedOrderIds.has(orderId)) {
+            _bqSelectedOrderIds.delete(orderId);
+            card.classList.remove('selected');
+        } else {
+            _bqSelectedOrderIds.add(orderId);
+            card.classList.add('selected');
+        }
+        bqUpdateConfierBtn();
+        const nowEmpty = _bqSelectedOrderIds.size === 0;
+        if (!wasEmpty && nowEmpty) {
+            document.getElementById('bqZonePickerWrap').style.display = 'none';
+            document.getElementById('bqZonePriceHint').style.display  = 'none';
+        } else if (wasEmpty && !nowEmpty) {
+            bqLoadZones();
+        }
     }
 
     /* ── Charge les zones de l'entreprise ── */
@@ -2344,11 +2402,10 @@ document.addEventListener('DOMContentLoaded', () => {
         hint.style.display  = 'block';
     };
 
-    /* ── Confie la commande sélectionnée ── */
-    window.bqConfierLivraison = function() {
+    /* ── Confie les commandes sélectionnées ── */
+    window.bqConfierLivraison = async function() {
         if (_bqConfierDone) return;
-        const orderId = _bqSelectedOrderId;
-        if (!orderId) {
+        if (_bqSelectedOrderIds.size === 0) {
             const list = document.getElementById('bqOrdersList');
             list.style.outline = '2px solid #f87171';
             list.style.borderRadius = '9px';
@@ -2364,46 +2421,52 @@ document.addEventListener('DOMContentLoaded', () => {
         const zoneId  = picker?.value || null;
         const zoneOpt = zoneId ? picker.options[picker.selectedIndex] : null;
 
-        const formData = new FormData();
-        formData.append('_method', 'PUT');
-        formData.append('delivery_company_id', _bqCompanyId);
-        if (zoneId)                  formData.append('delivery_zone_id', zoneId);
-        if (zoneOpt?.dataset?.price) formData.append('delivery_fee', zoneOpt.dataset.price);
+        const ids = Array.from(_bqSelectedOrderIds);
+        let successCount = 0;
+        const successNums = [];
 
-        fetch(`/employe/orders/${orderId}/send-to-company`, {
-            method: 'POST',
-            headers: { 'X-CSRF-TOKEN': CSRF, 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
-            body: formData
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                _bqConfierDone = true;
-                btn.classList.add('done');
-                btn.innerHTML = '✅ Confiée !';
-                document.getElementById('bqConfierZone').style.display = 'none';
+        for (const orderId of ids) {
+            const formData = new FormData();
+            formData.append('_method', 'PUT');
+            formData.append('delivery_company_id', _bqCompanyId);
+            if (zoneId)                  formData.append('delivery_zone_id', zoneId);
+            if (zoneOpt?.dataset?.price) formData.append('delivery_fee', zoneOpt.dataset.price);
+            try {
+                const r    = await fetch(`/employe/orders/${orderId}/send-to-company`, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': CSRF, 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+                    body: formData
+                });
+                const data = await r.json();
+                if (data.success) {
+                    successCount++;
+                    const card = document.querySelector(`#bqOrdersList .bq-order-card[data-order-id="${orderId}"]`);
+                    successNums.push(card?.querySelector('.bq-order-card-num')?.textContent || ('#' + orderId));
+                }
+            } catch(e) {}
+        }
 
-                const selCard = document.querySelector('#bqOrdersList .bq-order-card.selected');
-                const numTxt  = selCard ? (selCard.querySelector('.bq-order-card-num')?.textContent || ('#' + orderId)) : ('#' + orderId);
-                bqRenderMessages([{
-                    id: 'local-' + Date.now(),
-                    from_type: 'system',
-                    body: `✅ Commande ${numTxt} confiée à ${_bqCompanyName}. Statut : En attente.`,
-                    created_at: new Date().toISOString()
-                }], false);
+        if (successCount > 0) {
+            _bqConfierDone = true;
+            btn.classList.add('done');
+            btn.innerHTML = '✅ Confiée !';
+            document.getElementById('bqConfierZone').style.display = 'none';
 
-                setTimeout(() => location.reload(), 2000);
-            } else {
-                btn.disabled  = false;
-                btn.innerHTML = '📦 Confier la livraison à cette entreprise';
-                alert(data.message || 'Erreur lors de la soumission.');
-            }
-        })
-        .catch(() => {
+            bqRenderMessages([{
+                id: 'local-' + Date.now(),
+                from_type: 'system',
+                body: successCount === 1
+                    ? `✅ Commande ${successNums[0]} confiée à ${_bqCompanyName}. Statut : En attente.`
+                    : `✅ ${successCount} commandes confiées à ${_bqCompanyName}. Statut : En attente.`,
+                created_at: new Date().toISOString()
+            }], false);
+
+            setTimeout(() => location.reload(), 2000);
+        } else {
             btn.disabled  = false;
             btn.innerHTML = '📦 Confier la livraison à cette entreprise';
-            alert('Erreur réseau. Veuillez réessayer.');
-        });
+            alert('Erreur lors de la soumission. Veuillez réessayer.');
+        }
     };
 
     /* ── Ferme le chat ── */
