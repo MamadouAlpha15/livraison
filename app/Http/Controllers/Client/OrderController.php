@@ -48,9 +48,9 @@ class OrderController extends Controller
         // ->latest() = trie du plus récent au plus ancien (ORDER BY created_at DESC)
         // ->paginate(10) = affiche 10 commandes par page avec pagination automatique
         $orders = Auth::user()->orders()
-            ->with(['shop', 'items.product'])
+            ->with(['shop', 'items.product', 'review'])
             ->latest()
-            ->paginate(10);
+            ->paginate(15);
 
         // On retourne la vue "resources/views/client/orders/index.blade.php"
         // compact('orders') = passe la variable $orders à la vue (raccourci de ['orders' => $orders])

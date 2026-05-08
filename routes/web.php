@@ -501,6 +501,8 @@ Route::middleware(['auth', 'role:employe,superadmin,admin,vendeur'])
 
         /* Commandes */
         Route::get('orders',                              [EmployeOrderController::class, 'index'])         ->name('orders.index');
+        Route::get('orders/carte',                        [EmployeOrderController::class, 'carte'])         ->name('orders.carte');
+        Route::get('orders/carte/data',                   [EmployeOrderController::class, 'carteData'])     ->name('orders.carte.data');
         Route::get('orders/pending-json',                 [EmployeOrderController::class, 'pendingJson'])   ->name('orders.pending-json');
         Route::put('orders/{order}/assign',               [EmployeOrderController::class, 'assign'])        ->name('orders.assign');
         Route::post('orders/bulk-assign',                 [EmployeOrderController::class, 'bulkAssign'])    ->name('orders.bulk-assign');
@@ -537,9 +539,11 @@ Route::middleware(['auth', 'role:livreur'])
         Route::get('/dashboard', [LivreurDashboard::class, 'index'])->name('dashboard');
 
         /* Commandes */
-        Route::get('orders',                        [LivreurOrderController::class, 'index'])   ->name('orders.index');
-        Route::put('orders/{order}/start',          [LivreurOrderController::class, 'start'])   ->name('orders.start');
-        Route::put('orders/{order}/complete',       [LivreurOrderController::class, 'complete'])->name('orders.complete');
+        Route::get('orders',                        [LivreurOrderController::class, 'index'])        ->name('orders.index');
+        Route::put('orders/{order}/start',          [LivreurOrderController::class, 'start'])        ->name('orders.start');
+        Route::put('orders/{order}/complete',       [LivreurOrderController::class, 'complete'])     ->name('orders.complete');
+        Route::post('orders/start-bulk',            [LivreurOrderController::class, 'startBulk'])    ->name('orders.startBulk');
+        Route::post('orders/complete-bulk',         [LivreurOrderController::class, 'completeBulk']) ->name('orders.completeBulk');
 
         /* Disponibilité */
         Route::put('/availability/toggle', [AvailabilityController::class, 'toggle'])->name('availability.toggle');

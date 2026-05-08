@@ -518,19 +518,19 @@ let   colorMap = {};
 let   colorIdx = 0;
 let   selectedId = null;
 
-function getOrderColor(id) {
-    if (colorMap[id] === undefined) { colorMap[id] = colorIdx++; }
-    return getColor(colorMap[id]);
+function getDriverColor(driverId) {
+    if (colorMap[driverId] === undefined) { colorMap[driverId] = colorIdx++; }
+    return getColor(colorMap[driverId]);
 }
 
 /* ── Rendu panneau ── */
-function renderPanel(orders) {
+function renderPanel(drivers) {
     const list = document.getElementById('mapPanelList');
     const sub  = document.getElementById('panelSub');
     const cnt  = document.getElementById('mapCount');
     const fab  = document.getElementById('fabCount');
     const fabL = document.getElementById('fabLabel');
-    const n = orders.length;
+    const n = drivers.length;
     if (cnt) cnt.textContent = n + ' en cours';
     if (fab) fab.textContent = n;
     if (fabL) fabL.textContent = n ? n + ' chauffeur' + (n>1?'s':'') : 'Aucun actif';
@@ -540,10 +540,10 @@ function renderPanel(orders) {
         if (sub) sub.textContent = 'Aucune livraison active';
         return;
     }
-    if (sub) sub.textContent = n + ' livraison' + (n>1?'s':'') + ' active' + (n>1?'s':'');
+    if (sub) sub.textContent = n + ' chauffeur' + (n>1?'s':'') + ' actif' + (n>1?'s':'');
 
-    list.innerHTML = orders.map(o => {
-        const color   = getOrderColor(o.id);
+    list.innerHTML = drivers.map(o => {
+        const color   = getDriverColor(o.driver_id);
         const isLiv   = o.status === 'en_livraison';
         const badge   = isLiv
             ? `<span class="mp-badge mp-badge-liv">En route</span>`
@@ -554,11 +554,14 @@ function renderPanel(orders) {
         const gpsLine = hasGps
             ? `<div class="mp-ping"><span class="${pingCls}">📡 ${o.ping_ago}</span></div>`
             : `<div class="mp-no-gps">📡 GPS non encore reçu</div>`;
-        const sel = selectedId === o.id ? ' selected' : '';
-        return `<div class="mp-card${sel}" onclick="focusOrder(${o.id})" data-id="${o.id}">
+        const sel = selectedId === o.driver_id ? ' selected' : '';
+        const orderLabel = o.order_count > 1
+            ? `<span class="mp-id">${o.order_count} cdes</span>`
+            : `<span class="mp-id">#${(o.orders[0]||{}).id||'—'}</span>`;
+        return `<div class="mp-card${sel}" onclick="focusOrder(${o.driver_id})" data-id="${o.driver_id}">
             <div class="mp-card-top">
                 <span class="mp-color" style="background:${color}"></span>
-                <span class="mp-id">#${o.id}</span>
+                ${orderLabel}
                 <span class="mp-shop">${esc(o.shop)}</span>
                 ${badge}
             </div>
@@ -570,8 +573,8 @@ function renderPanel(orders) {
 }
 
 /* ── Mise à jour carte ── */
-function updateMap(orders) {
-    const activeIds = new Set(orders.map(o => o.id));
+function updateMap(drivers) {
+    const activeIds = new Set(drivers.map(o => o.driver_id));
     Object.keys(markers).forEach(id => {
         if (!activeIds.has(parseInt(id))) {
             map.removeLayer(markers[id]); delete markers[id];
@@ -583,34 +586,35 @@ function updateMap(orders) {
     let hasGps = false;
     const bounds = [];
 
-    orders.forEach(o => {
+    drivers.forEach(o => {
         if (!o.lat || !o.lng) return;
         hasGps = true;
-        const color    = getOrderColor(o.id);
+        const color    = getDriverColor(o.driver_id);
         const isMoving = o.status === 'en_livraison';
         const pos      = [o.lat, o.lng];
+        const did      = o.driver_id;
 
-        if (!traces[o.id]) traces[o.id] = [];
-        const last = traces[o.id].at(-1);
-        if (!last || last[0] !== pos[0] || last[1] !== pos[1]) traces[o.id].push(pos);
+        if (!traces[did]) traces[did] = [];
+        const last = traces[did].at(-1);
+        if (!last || last[0] !== pos[0] || last[1] !== pos[1]) traces[did].push(pos);
 
-        if (traces[o.id].length > 1) {
-            if (polylines[o.id]) { polylines[o.id].setLatLngs(traces[o.id]); }
-            else { polylines[o.id] = L.polyline(traces[o.id], {color, weight:3, opacity:.75, dashArray:isMoving?null:'6,6'}).addTo(map); }
+        if (traces[did].length > 1) {
+            if (polylines[did]) { polylines[did].setLatLngs(traces[did]); }
+            else { polylines[did] = L.polyline(traces[did], {color, weight:3, opacity:.75, dashArray:isMoving?null:'6,6'}).addTo(map); }
         }
 
-        if (markers[o.id]) {
-            markers[o.id].setLatLng(pos);
-            markers[o.id].setIcon(driverIcon(color, isMoving));
+        if (markers[did]) {
+            markers[did].setLatLng(pos);
+            markers[did].setIcon(driverIcon(color, isMoving));
         } else {
-            markers[o.id] = L.marker(pos, {icon:driverIcon(color, isMoving)}).addTo(map).bindPopup(()=>buildPopup(o));
+            markers[did] = L.marker(pos, {icon:driverIcon(color, isMoving)}).addTo(map).bindPopup(()=>buildPopup(o));
         }
-        if (markers[o.id].isPopupOpen()) markers[o.id].setPopupContent(buildPopup(o));
+        if (markers[did].isPopupOpen()) markers[did].setPopupContent(buildPopup(o));
         bounds.push(pos);
     });
 
     const noSig = document.getElementById('mapNoSignal');
-    if (noSig) noSig.classList.toggle('show', !hasGps && orders.length > 0);
+    if (noSig) noSig.classList.toggle('show', !hasGps && drivers.length > 0);
 
     if (bounds.length > 0 && selectedId === null) {
         bounds.length === 1
@@ -620,17 +624,26 @@ function updateMap(orders) {
 }
 
 function buildPopup(o) {
-    const color = getOrderColor(o.id);
+    const color = getDriverColor(o.driver_id);
+    let ordersHtml = '';
+    if (o.orders && o.orders.length > 1) {
+        ordersHtml = o.orders.map(ord =>
+            `<div class="lp-row"><span>Cde&nbsp;</span><strong>#${ord.id} · ${esc(ord.shop)} · ${esc(ord.client)}</strong></div>`
+        ).join('');
+    } else if (o.orders && o.orders.length === 1) {
+        const ord = o.orders[0];
+        ordersHtml = `<div class="lp-row"><span>Commande&nbsp;</span><strong>#${ord.id} · ${esc(ord.shop)}</strong></div>
+            <div class="lp-row"><span>Client&nbsp;</span><strong>${esc(ord.client)}</strong></div>`;
+    }
     return `<div class="lp-title" style="color:${color}">🚴 ${esc(o.driver)}</div>
-        <div class="lp-row"><span>Commande&nbsp;</span><strong>#${o.id} · ${esc(o.shop)}</strong></div>
-        <div class="lp-row"><span>Client&nbsp;</span><strong>${esc(o.client)}</strong></div>
+        ${ordersHtml}
         ${o.destination ? `<div class="lp-row"><span>Destination&nbsp;</span><strong>${esc(o.destination)}</strong></div>` : ''}
         <div class="lp-row"><span>GPS&nbsp;</span><strong>${esc(o.ping_ago)}</strong></div>`;
 }
 
-/* ── Focus commande ── */
-function focusOrder(id) {
-    selectedId = (selectedId === id) ? null : id;
+/* ── Focus chauffeur ── */
+function focusOrder(driverId) {
+    selectedId = (selectedId === driverId) ? null : driverId;
     document.querySelectorAll('.mp-card').forEach(c => c.classList.toggle('selected', parseInt(c.dataset.id) === selectedId));
     if (selectedId && markers[selectedId]) {
         map.setView(markers[selectedId].getLatLng(), 16, {animate:true});

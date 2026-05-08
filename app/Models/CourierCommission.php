@@ -12,7 +12,7 @@ class CourierCommission extends Model
 
     // --- Fillable / casts ---
     protected $fillable = [
-        'order_id', 'livreur_id', 'shop_id',
+        'order_id', 'livreur_id', 'shop_id', 'delivery_batch_id',
         'order_total', 'rate', 'amount',
         'status', 'paid_at', 'payout_ref', 'payout_note'
     ];

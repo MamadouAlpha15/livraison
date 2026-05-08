@@ -10,7 +10,23 @@ class SuiviController extends Controller
     public function show(Order $order)
     {
         $order->load(['livreur', 'shop', 'items.product', 'review']);
-        return view('orders.show', compact('order'));
+
+        // Trouver les commandes du même groupe (batch_id commun = bulk-assignées ensemble)
+        $groupOrders = collect([$order]);
+
+        if ($order->delivery_batch_id) {
+            // Commandes du même lot : toutes celles avec le même batch_id
+            $siblings = Order::with(['items.product'])
+                ->where('delivery_batch_id', $order->delivery_batch_id)
+                ->where('id', '!=', $order->id)
+                ->get();
+
+            if ($siblings->isNotEmpty()) {
+                $groupOrders = collect([$order])->concat($siblings);
+            }
+        }
+
+        return view('orders.show', compact('order', 'groupOrders'));
     }
 
     public function gps(Order $order){

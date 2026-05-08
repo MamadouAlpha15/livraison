@@ -1,6 +1,7 @@
 {{-- resources/views/orders/show.blade.php --}}
 @extends('layouts.app')
 @section('title', 'Suivi · Commande #' . str_pad($order->id, 5, '0', STR_PAD_LEFT))
+@php $groupOrders ??= collect([$order]); @endphp
 @php $bodyClass = 'is-dashboard'; @endphp
 
 
@@ -338,6 +339,8 @@ $isDelivered = $s === Order::STATUS_LIVREE;
 $isOngoing   = $s === Order::STATUS_EN_LIVRAISON;
 $hasGPS      = !is_null($order->current_lat) && !is_null($order->current_lng);
 $devise      = $order->shop?->currency ?? 'GNF';
+$isGroup     = isset($groupOrders) && $groupOrders->count() > 1;
+$groupTotal  = $isGroup ? $groupOrders->sum('total') : $order->total;
 // Nom du livreur/chauffeur quel que soit le système
 $gpsDriverName = $order->livreur?->name
     ?? ($order->driver_id ? optional(\App\Models\Driver::find($order->driver_id))->name : null);
@@ -377,8 +380,13 @@ $init = fn(string $n): string =>
             Mes commandes
         </a>
         <div class="topbar-info">
+            @if($isGroup)
+            <h1>{{ $groupOrders->count() }} commandes · 1 trajet</h1>
+            <p>{{ $order->shop?->name ?? '—' }} · #{{ $groupOrders->pluck('id')->map(fn($id)=>str_pad($id,5,'0',STR_PAD_LEFT))->implode(' · #') }}</p>
+            @else
             <h1>Commande #{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</h1>
             <p>{{ $order->shop?->name ?? '—' }} · {{ $order->created_at->format('d/m/Y à H:i') }}</p>
+            @endif
         </div>
         <span class="topbar-badge" id="uiBadgeTop">{{ $sInfo['ico'] }} {{ $sInfo['label'] }}</span>
     </div>
@@ -442,7 +450,13 @@ $init = fn(string $n): string =>
                 <span class="map-title">📍 Suivi GPS du livreur</span>
             </div>
             <span class="last-update-txt" id="lastUpdate">
-                @if($hasGPS) {{ $order->last_ping_at?->diffForHumans() ?? '—' }} @else En attente… @endif
+                @if($hasGPS)
+                    {{ $order->last_ping_at?->diffForHumans() ?? '—' }}
+                @elseif($isOngoing)
+                    GPS en chargement…
+                @else
+                    En attente…
+                @endif
             </span>
         </div>
 
@@ -497,8 +511,9 @@ $init = fn(string $n): string =>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 Total à payer
             </div>
-            <div class="ic-main">{{ number_format($order->total, 0, ',', ' ') }}</div>
-            <div class="ic-sub">{{ $devise }} · {{ $order->items->count() }} article{{ $order->items->count() > 1 ? 's' : '' }}</div>
+            <div class="ic-main">{{ number_format($groupTotal, 0, ',', ' ') }}</div>
+            @php $totalItems = $isGroup ? $groupOrders->sum(fn($o) => $o->items->count()) : $order->items->count(); @endphp
+            <div class="ic-sub">{{ $devise }} · {{ $totalItems }} article{{ $totalItems > 1 ? 's' : '' }}</div>
         </div>
         <div class="info-card">
             <div class="ic-label">
@@ -553,7 +568,15 @@ $init = fn(string $n): string =>
         </div>
         <div class="omc-row">
             <span class="omc-lbl">N°</span>
-            <span class="omc-val mono">#{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</span>
+            <span class="omc-val mono">
+                @if($isGroup)
+                    @foreach($groupOrders as $go)
+                    <div>#{{ str_pad($go->id, 5, '0', STR_PAD_LEFT) }}</div>
+                    @endforeach
+                @else
+                    #{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}
+                @endif
+            </span>
         </div>
         <div class="omc-row">
             <span class="omc-lbl">Boutique</span>
@@ -568,17 +591,24 @@ $init = fn(string $n): string =>
         <div class="omc-row">
             <span class="omc-lbl">Articles</span>
             <span class="omc-val">
-                @foreach($order->items->take(3) as $item)
+                @php
+                    $allItems = $isGroup
+                        ? $groupOrders->flatMap(fn($o) => $o->items->all())
+                        : $order->items;
+                    $shownItems = $allItems->take(4);
+                    $remaining  = $allItems->count() - $shownItems->count();
+                @endphp
+                @foreach($shownItems as $item)
                 <div style="font-size:12.5px;margin-bottom:2px">· {{ $item->product?->name ?? 'Produit' }} <span style="color:var(--muted)">×{{ $item->quantity }}</span></div>
                 @endforeach
-                @if($order->items->count() > 3)
-                <div style="font-size:12px;color:var(--muted)">+ {{ $order->items->count() - 3 }} autre(s)</div>
+                @if($remaining > 0)
+                <div style="font-size:12px;color:var(--muted)">+ {{ $remaining }} autre(s)</div>
                 @endif
             </span>
         </div>
         <div class="omc-row">
             <span class="omc-lbl">Total</span>
-            <span class="omc-val mono" style="color:var(--orange);font-size:15px;font-weight:800">{{ number_format($order->total,0,',',' ') }} {{ $devise }}</span>
+            <span class="omc-val mono" style="color:var(--orange);font-size:15px;font-weight:800">{{ number_format($groupTotal,0,',',' ') }} {{ $devise }}</span>
         </div>
     </div>
 
@@ -931,6 +961,12 @@ $init = fn(string $n): string =>
                 if (lastUpdateEl) lastUpdateEl.textContent =
                     diffS < 60 ? `Mis à jour il y a ${diffS}s`
                                : dt.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+            } else if (d.is_ongoing) {
+                /* Livreur a commencé mais n'a pas encore envoyé sa position GPS — ne pas marquer hors ligne */
+                liveDotEl?.classList.remove('offline');
+                livePillEl?.classList.remove('offline');
+                if (liveLabelEl) liveLabelEl.textContent = 'En route…';
+                if (lastUpdateEl) lastUpdateEl.textContent = 'GPS en chargement…';
             } else {
                 setOnline(false);
                 if (lastUpdateEl) lastUpdateEl.textContent = 'En attente du signal…';

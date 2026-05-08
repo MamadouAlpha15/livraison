@@ -215,10 +215,10 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
 
 {{-- FILTRES --}}
 <div class="ord-filters">
-    <a href="{{ route('livreur.orders.index') }}" class="ord-filter-btn {{ !request('status') ? 'active' : '' }}">Toutes</a>
+    <a href="{{ route('livreur.orders.index') }}" class="ord-filter-btn {{ !request('status') ? 'active' : '' }}">⚡ En cours</a>
     <a href="{{ route('livreur.orders.index', ['status'=>'confirmed']) }}" class="ord-filter-btn {{ request('status')==='confirmed' ? 'active' : '' }}">📦 À récupérer</a>
-    <a href="{{ route('livreur.orders.index', ['status'=>'delivering']) }}" class="ord-filter-btn {{ request('status')==='delivering' ? 'active' : '' }}">🚴 En cours</a>
-    <a href="{{ route('livreur.orders.index', ['status'=>'delivered']) }}" class="ord-filter-btn {{ request('status')==='delivered' ? 'active' : '' }}">✅ Livrées</a>
+    <a href="{{ route('livreur.orders.index', ['status'=>'delivering']) }}" class="ord-filter-btn {{ request('status')==='delivering' ? 'active' : '' }}">🚴 En livraison</a>
+    <a href="{{ route('livreur.orders.index', ['status'=>'delivered']) }}" class="ord-filter-btn {{ request('status')==='delivered' ? 'active' : '' }}">✅ Historique</a>
 </div>
 
 {{-- BODY --}}
@@ -228,17 +228,25 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
     <div class="ord-toast">✅ {{ session('success') }}</div>
     @endif
 
-    @forelse($orders as $order)
+    @forelse($groups as $group)
     @php
-        $s          = strtolower($order->status ?? '');
-        $st         = $statusMap[$s] ?? ['label'=>ucfirst($order->status),'cls'=>'other'];
-        $client     = $order->client ?? $order->user;
-        $shop       = $order->shop;
-        $item       = $order->items->first();
-        $waNum      = preg_replace('/\D/', '', $client?->phone ?? '');
-        $shopWaNum  = preg_replace('/\D/', '', $shop?->phone ?? '');
-        $isCompany  = (bool) $order->driver_id;
-        $destAddr   = $order->delivery_destination ?: $client?->address;
+        $isGroup   = $group['is_group'];
+        $grpOrders = $group['orders'];          // tableau d'Order (1 ou plusieurs)
+        $order     = $grpOrders[0];             // ordre représentatif (pour GPS, id, etc.)
+        $client    = $group['client'];
+        $shop      = $group['shop'];
+        $destAddr  = $group['destination'];
+        $s         = strtolower($group['status'] ?? '');
+        $st        = $statusMap[$s] ?? ['label'=>ucfirst($group['status']),'cls'=>'other'];
+        $waNum     = preg_replace('/\D/', '', $client?->phone ?? '');
+        $shopWaNum = preg_replace('/\D/', '', $shop?->phone ?? '');
+        $isCompany = $isGroup || (bool)$order->driver_id;
+        // Collecter tous les items du groupe
+        $allItems  = collect($grpOrders)->flatMap(fn($o) => $o->items)->values();
+        $item      = $allItems->first();
+        $orderIds  = collect($grpOrders)->pluck('id')->toArray();
+        $orderNums = collect($grpOrders)->map(fn($o) => '#'.str_pad($o->id,5,'0',STR_PAD_LEFT))->join(', ');
+        $isBulk    = count($grpOrders) > 1;
     @endphp
 
     <div class="ord-card {{ $st['cls'] }}" data-order-id="{{ $order->id }}">
@@ -246,8 +254,13 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
         {{-- ── HEADER ── --}}
         <div class="ord-card-head">
             <div>
+                @if($isBulk)
+                <div class="ord-card-num">{{ count($grpOrders) }} commandes · {{ $client?->name ?? 'Client' }}</div>
+                <div class="ord-card-date" style="font-size:10.5px;color:var(--muted)">{{ $orderNums }}</div>
+                @else
                 <div class="ord-card-num">Commande #{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}</div>
                 <div class="ord-card-date">{{ $order->created_at->format('d/m/Y à H:i') }}</div>
+                @endif
             </div>
             <span class="ord-badge {{ $st['cls'] }}">{{ $st['label'] }}</span>
         </div>
@@ -319,14 +332,16 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
             </div>
         </div>
 
-        {{-- Infos produit + commission --}}
+        {{-- Infos produits (tous les articles du groupe) + commission unique --}}
         <div class="ord-meta">
-            @if($item?->product?->name)
-            <span class="ord-meta-chip">📦 {{ $item->product->name }}{{ $item->quantity > 1 ? ' ×'.$item->quantity : '' }}</span>
-            @endif
-            <span class="ord-meta-chip">💰 {{ $fmt($order->total) }}</span>
-            @if($order->delivery_fee)
-            <span class="ord-meta-chip commission">🏆 Commission : {{ number_format($order->delivery_fee, 0, ',', ' ') }} {{ $devise }}</span>
+            @foreach($allItems->unique(fn($i) => $i->product_id) as $it)
+                @if($it->product?->name)
+                <span class="ord-meta-chip">📦 {{ $it->product->name }}{{ $it->quantity > 1 ? ' ×'.$it->quantity : '' }}</span>
+                @endif
+            @endforeach
+            <span class="ord-meta-chip">💰 {{ $fmt($group['total']) }}</span>
+            @if($group['delivery_fee'])
+            <span class="ord-meta-chip commission">🏆 Commission : {{ number_format($group['delivery_fee'], 0, ',', ' ') }} {{ $devise }}{{ $isBulk ? ' (1 trajet)' : '' }}</span>
             @endif
         </div>
 
@@ -382,15 +397,35 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
         @if(in_array($s, $startStatuses) || in_array($s, $deliverStatuses))
         <div class="ord-card-foot">
             @if(in_array($s, $startStatuses))
+                @if($isBulk)
+                <form action="{{ route('livreur.orders.startBulk') }}" method="POST" style="flex:1">
+                    @csrf
+                    @foreach($orderIds as $oid)<input type="hidden" name="order_ids[]" value="{{ $oid }}">@endforeach
+                    <button type="submit" class="ord-action-btn start" style="width:100%">
+                        🚴 Commencer la livraison ({{ count($grpOrders) }})
+                    </button>
+                </form>
+                @else
                 <form action="{{ route('livreur.orders.start', $order) }}" method="POST" style="flex:1">
                     @csrf @method('PUT')
                     <button type="submit" class="ord-action-btn start" style="width:100%">
                         🚴 Commencer la livraison
                     </button>
                 </form>
+                @endif
             @elseif(in_array($s, $deliverStatuses))
                 <button type="button" class="ord-action-gps" id="gpsBtn_{{ $order->id }}"
                         onclick="toggleGps({{ $order->id }}, this)" title="GPS tracking">📡</button>
+                @if($isBulk)
+                <form action="{{ route('livreur.orders.completeBulk') }}" method="POST" style="flex:1"
+                      onsubmit="return confirm('Confirmer la livraison des {{ count($grpOrders) }} commandes ?')">
+                    @csrf
+                    @foreach($orderIds as $oid)<input type="hidden" name="order_ids[]" value="{{ $oid }}">@endforeach
+                    <button type="submit" class="ord-action-btn complete" style="width:100%">
+                        ✅ Tout livré ({{ count($grpOrders) }})
+                    </button>
+                </form>
+                @else
                 <form action="{{ route('livreur.orders.complete', $order) }}" method="POST" style="flex:1"
                       onsubmit="return confirm('Confirmer la livraison de cette commande ?')">
                     @csrf @method('PUT')
@@ -398,6 +433,7 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
                         ✅ Marquer comme livrée
                     </button>
                 </form>
+                @endif
             @endif
         </div>
         @endif

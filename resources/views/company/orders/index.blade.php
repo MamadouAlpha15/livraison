@@ -825,6 +825,8 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                                data-fee="{{ $order->delivery_fee ?? $order->deliveryZone?->price ?? '' }}"
                                data-dest="{{ $order->delivery_destination ?? $order->client->address ?? '' }}"
                                data-shop="{{ $order->shop->name ?? '' }}"
+                               data-client="{{ $order->client->name ?? '' }}"
+                               data-client-id="{{ $order->user_id }}"
                                data-shop-addr="{{ $order->shop->address ?? '' }}"
                                data-client-addr="{{ $order->client->address ?? '' }}"
                                onchange="toggleRow(this)"
@@ -951,6 +953,8 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                 <div class="multi-orders-list" id="multiOrdersList"></div>
                 <div id="multiDestInfo"></div>
                 <div id="multiDestNote" style="font-size:11.5px;color:var(--cx-muted);">Les frais saisis s'appliqueront à chaque commande.</div>
+                {{-- Groupes par client (multi-clients) --}}
+                <div id="groupedFeesList" style="display:none;margin-top:10px;display:flex;flex-direction:column;gap:8px;"></div>
             </div>
 
             {{-- ── Blocs adresses (visible en mode simple) ── --}}
@@ -1035,7 +1039,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                 ✓ <span id="selectedDriverName"></span> sélectionné
             </div>
 
-            <div class="form-group">
+            <div class="form-group" id="assignFeeGroup">
                 <label class="form-label">💰 Frais de livraison (GNF)</label>
                 <input type="number" class="form-input" id="assignFee" placeholder="Ex: 50 000" min="0" step="500">
             </div>
@@ -1141,12 +1145,14 @@ function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){
     document.getElementById(id).classList.remove('open');
     currentOrderId=null; selectedDriverId=null; selectedStatusVal=null;
-    _bulkMode=false;
+    _bulkMode=false; _isMultiClientBulk=false; _assignGroups=[];
     document.querySelectorAll('.driver-opt,.status-opt').forEach(function(el){ el.classList.remove('selected'); });
     var s=document.getElementById('selectedSummary'); if(s) s.classList.remove('show');
-    /* Remettre le btn en état normal */
+    /* Remettre le btn + champs en état normal */
     var btn=document.getElementById('assignBtn');
     if(btn){ btn.disabled=false; btn.textContent='🚴 Confirmer l\'assignation'; }
+    var afg=document.getElementById('assignFeeGroup'); if(afg) afg.style.display='';
+    var gfl=document.getElementById('groupedFeesList'); if(gfl){ gfl.style.display='none'; gfl.innerHTML=''; }
 }
 document.querySelectorAll('.modal-overlay').forEach(function(el){
     el.addEventListener('click',function(e){ if(e.target===el) closeModal(el.id); });
@@ -1198,6 +1204,10 @@ function clearSelection(){
     if(chkAll){ chkAll.checked=false; chkAll.indeterminate=false; }
     updateSelBar();
 }
+/* Groupes de clients pour l'assignation bulk multi-clients */
+var _assignGroups = [];
+var _isMultiClientBulk = false;
+
 function openMultiAssign(){
     if(_bulkOrderIds.size===0) return;
     _bulkMode=true;
@@ -1206,69 +1216,124 @@ function openMultiAssign(){
     var orders=[];
     document.querySelectorAll('.row-chk:checked').forEach(function(chk){
         orders.push({
-            num:  chk.dataset.num||chk.dataset.orderId,
-            dest: (chk.dataset.dest||'').trim(),
-            fee:  chk.dataset.fee ? parseFloat(chk.dataset.fee) : 0,
-            shop: chk.dataset.shop||''
+            orderId:  chk.dataset.orderId,
+            num:      chk.dataset.num||chk.dataset.orderId,
+            dest:     (chk.dataset.dest||'').trim(),
+            fee:      chk.dataset.fee ? parseFloat(chk.dataset.fee) : 0,
+            shop:     chk.dataset.shop||'',
+            client:   chk.dataset.client||'',
+            clientId: chk.dataset.clientId||''
         });
     });
 
-    /* Même destination pour toutes les commandes ? */
-    var destsNorm = orders.map(function(o){ return o.dest.toLowerCase(); });
-    var allSameDest = destsNorm[0]!=='' && destsNorm.every(function(d){ return d===destsNorm[0]; });
-
-    /* Même frais pour toutes les commandes ? */
-    var fees = orders.map(function(o){ return o.fee; }).filter(function(f){ return f>0; });
-    var allSameFee = fees.length===orders.length && fees.every(function(f){ return f===fees[0]; });
-
-    var listEl     = document.getElementById('multiOrdersList');
-    var destInfoEl = document.getElementById('multiDestInfo');
-    var destNoteEl = document.getElementById('multiDestNote');
-    listEl.innerHTML='';
-    destInfoEl.innerHTML='';
-
     var fmt = function(n){ return new Intl.NumberFormat('fr').format(n); };
 
-    if(allSameDest){
-        /* ── Même destination : liste compacte + bloc destination commune ── */
-        orders.forEach(function(o){
-            var item=document.createElement('div');
-            item.className='multi-order-item';
-            item.textContent='#'+o.num+(o.shop?' · '+o.shop:'');
-            listEl.appendChild(item);
-        });
-        var feeHtml = (allSameFee && fees[0])
-            ? '<div class="multi-common-dest-fee">💰 Frais de livraison : '+fmt(fees[0])+' GNF</div>'
-            : '';
-        destInfoEl.innerHTML='<div class="multi-common-dest">'
-            +'<div class="multi-common-dest-lbl">📍 Destination commune</div>'
-            +'<div class="multi-common-dest-val">'+orders[0].dest+'</div>'
-            +feeHtml+'</div>';
-        document.getElementById('assignFee').value = (allSameFee && fees[0]) ? fees[0] : '';
+    /* ── Construire les groupes par client ── */
+    var groupMap = {};
+    orders.forEach(function(o){
+        var key = o.clientId || ('anon_'+o.client);
+        if(!groupMap[key]){
+            groupMap[key] = { clientId:o.clientId, clientName:o.client||'Client', dest:o.dest, baseFee:o.fee, orders:[] };
+        }
+        groupMap[key].orders.push(o);
+    });
+    _assignGroups = Object.values(groupMap);
+    _isMultiClientBulk = _assignGroups.length > 1;
+
+    var listEl          = document.getElementById('multiOrdersList');
+    var destInfoEl      = document.getElementById('multiDestInfo');
+    var destNoteEl      = document.getElementById('multiDestNote');
+    var groupedFeesEl   = document.getElementById('groupedFeesList');
+    var assignFeeGroup  = document.getElementById('assignFeeGroup');
+    listEl.innerHTML=''; destInfoEl.innerHTML=''; groupedFeesEl.innerHTML='';
+
+    if(_isMultiClientBulk){
+        /* ══ PLUSIEURS CLIENTS → groupes séparés, frais indépendants ══ */
+        listEl.style.display='none';
+        destInfoEl.innerHTML='';
         destNoteEl.style.display='none';
+        assignFeeGroup.style.display='none';
+        groupedFeesEl.style.display='flex';
+
+        var totalClients = _assignGroups.length;
+        var baseFee = _assignGroups[0].baseFee || 0;
+
+        _assignGroups.forEach(function(g, gi){
+            var nums = g.orders.map(function(o){ return '#'+o.num; }).join(', ');
+            var feeVal = g.baseFee || baseFee;
+            var card = document.createElement('div');
+            card.style.cssText='padding:11px 13px;border-radius:9px;border:1.5px solid var(--cx-border);background:var(--cx-card2);';
+            card.innerHTML=
+                '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;">'
+                    +'<div style="font-size:12.5px;font-weight:800;color:var(--cx-text);">👤 '+g.clientName+'</div>'
+                    +'<span style="font-size:10.5px;font-weight:700;background:#eef2ff;color:#4f46e5;border:1.5px solid #c7d2fe;border-radius:6px;padding:2px 8px;white-space:nowrap;">'+g.orders.length+' commande'+(g.orders.length>1?'s':'')+' · 1 trajet</span>'
+                +'</div>'
+                +(g.dest ? '<div style="font-size:11.5px;color:var(--cx-muted);margin-bottom:6px;">📍 '+g.dest+'</div>' : '')
+                +'<div style="font-size:11px;color:var(--cx-muted);margin-bottom:5px;">'+nums+'</div>'
+                +'<div style="display:flex;align-items:center;gap:7px;">'
+                    +'<span style="font-size:11.5px;font-weight:700;color:var(--cx-text);white-space:nowrap;">💰 Frais :</span>'
+                    +'<input type="number" id="group-fee-'+gi+'" value="'+feeVal+'" min="0" step="500" '
+                        +'style="flex:1;padding:6px 10px;border:1.5px solid var(--cx-border);border-radius:7px;font-size:12.5px;font-family:inherit;background:var(--cx-card);color:var(--cx-text);" '
+                        +'placeholder="Frais GNF">'
+                    +'<span style="font-size:11px;color:var(--cx-muted);white-space:nowrap;">GNF</span>'
+                +'</div>';
+            groupedFeesEl.appendChild(card);
+        });
+
+        /* Résumé total */
+        var totalEl = document.createElement('div');
+        totalEl.style.cssText='padding:8px 12px;border-radius:8px;background:#f0fdf4;border:1.5px solid #bbf7d0;font-size:12px;font-weight:700;color:#065f46;';
+        totalEl.id='groupFeeTotal';
+        totalEl.innerHTML='📊 '+totalClients+' trajets · Total frais : '+fmt(baseFee*totalClients)+' GNF';
+        groupedFeesEl.appendChild(totalEl);
+
+        /* Recalcul total en live */
+        _assignGroups.forEach(function(g, gi){
+            document.getElementById('group-fee-'+gi).addEventListener('input', function(){
+                var total=0;
+                _assignGroups.forEach(function(_, i){
+                    total += parseFloat(document.getElementById('group-fee-'+i).value)||0;
+                });
+                document.getElementById('groupFeeTotal').innerHTML='📊 '+totalClients+' trajets · Total frais : '+fmt(total)+' GNF';
+            });
+        });
+
+        document.getElementById('assignBtn').textContent='🚴 Assigner les '+totalClients+' groupes';
+
     } else {
-        /* ── Destinations différentes : chaque commande avec sa destination + frais ── */
+        /* ══ UN SEUL CLIENT (ou destinations différentes) ══ */
+        listEl.style.display='';
+        assignFeeGroup.style.display='';
+        groupedFeesEl.style.display='none';
+
+        var g = _assignGroups[0];
+        var fees = orders.map(function(o){ return o.fee; }).filter(function(f){ return f>0; });
+        var allSameFee = fees.length===orders.length && fees.every(function(f){ return f===fees[0]; });
+
         orders.forEach(function(o){
-            var feeStr = o.fee>0 ? '💰 '+fmt(o.fee)+' GNF' : '';
-            var destStr = o.dest
-                ? '📍 '+o.dest
-                : '<span style="color:#ef4444;">📍 Destination non renseignée</span>';
             var item=document.createElement('div');
             item.className='multi-order-item';
-            item.innerHTML='<span style="font-weight:700;">#'+o.num+'</span>'
-                +(o.shop ? '<span style="color:var(--cx-muted);font-weight:400;"> · '+o.shop+'</span>' : '')
-                +'<div class="multi-order-item-dest">'+destStr+'</div>'
-                +(feeStr ? '<div class="multi-order-item-dest" style="color:#059669;font-weight:600;">'+feeStr+'</div>' : '');
+            item.innerHTML='<span style="font-weight:700;">#'+o.num+'</span>';
             listEl.appendChild(item);
         });
-        document.getElementById('assignFee').value = (allSameFee && fees[0]) ? fees[0] : '';
-        destNoteEl.style.display='';
+
+        var feeOnce = (allSameFee && fees[0]) ? fees[0] : 0;
+        destInfoEl.innerHTML='<div class="multi-common-dest">'
+            +'<div class="multi-common-dest-lbl">👤 '+(g.clientName||'Client')+' · 📍 Destination</div>'
+            +'<div class="multi-common-dest-val">'+(g.dest||'Non renseignée')+'</div>'
+            +(feeOnce ? '<div class="multi-common-dest-fee">💰 Frais de livraison : '+fmt(feeOnce)+' GNF'+(orders.length>1?' <span style="font-size:10px;opacity:.7;">(1 seul trajet)</span>':'')+'</div>' : '')
+            +'</div>';
+        document.getElementById('assignFee').value = feeOnce||'';
+        destNoteEl.innerHTML = orders.length>1 ? '⚠️ Même client — frais appliqué <b>une seule fois</b>, pas par commande.' : '';
+        destNoteEl.style.cssText = orders.length>1 ? 'font-size:11.5px;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:5px 9px;margin-top:4px;' : '';
+        destNoteEl.style.display = orders.length>1 ? '' : 'none';
+        document.getElementById('assignBtn').textContent='🚴 Confirmer l\'assignation';
     }
 
     document.getElementById('multiOrdersSection').style.display='block';
     document.getElementById('addrFlow').style.display='none';
     document.getElementById('destGroup').style.display='none';
-    document.getElementById('assignModalSub').textContent=_bulkOrderIds.size+' commandes — choisissez un chauffeur';
+    document.getElementById('assignModalSub').textContent=_bulkOrderIds.size+' commandes · '+_assignGroups.length+' groupe'+ (_assignGroups.length>1?'s':'')+' — choisissez un chauffeur';
 
     selectedDriverId=null;
     document.querySelectorAll('.driver-opt').forEach(function(el){ el.classList.remove('selected'); });
@@ -1356,29 +1421,66 @@ document.querySelectorAll('#driverList .driver-opt:not(.not-avail)').forEach(fun
 /* ── Soumettre l'assignation ── */
 async function submitAssign(){
     if(!selectedDriverId){ toast('Choisissez un chauffeur disponible.','error'); return; }
-    var fee=document.getElementById('assignFee').value.trim();
-    if(fee===''||isNaN(Number(fee))||Number(fee)<0){ toast('Entrez des frais valides (0 ou plus).','error'); return; }
+    /* En mode multi-clients, les frais sont par groupe (pas le champ global) */
+    var fee = '';
+    if(!_isMultiClientBulk){
+        fee=document.getElementById('assignFee').value.trim();
+        if(fee===''||isNaN(Number(fee))||Number(fee)<0){ toast('Entrez des frais valides (0 ou plus).','error'); return; }
+    }
 
     var btn=document.getElementById('assignBtn');
     btn.disabled=true;
 
     /* ── Mode multi (plusieurs commandes) ── */
     if(_bulkMode){
-        var ids=Array.from(_bulkOrderIds);
-        btn.textContent='⏳ 0/'+ids.length+'…';
         var ok=0;
-        for(var i=0;i<ids.length;i++){
-            btn.textContent='⏳ '+(i+1)+'/'+ids.length+'…';
-            var fd=new FormData();
-            fd.append('_token',CSRF);
-            fd.append('driver_id',selectedDriverId);
-            fd.append('delivery_fee',fee);
-            try{
-                var r=await fetch('/company/orders/'+ids[i]+'/assign',{method:'POST',body:fd});
-                var d=await r.json();
-                if(d.success) ok++;
-            }catch(e){}
+
+        if(_isMultiClientBulk){
+            /* Groupes séparés par client : chaque groupe avec son propre frais */
+            var totalOrders = _assignGroups.reduce(function(s,g){ return s+g.orders.length; },0);
+            btn.textContent='⏳ Groupe 1/'+_assignGroups.length+'…';
+
+            for(var gi=0;gi<_assignGroups.length;gi++){
+                btn.textContent='⏳ Groupe '+(gi+1)+'/'+_assignGroups.length+'…';
+                var group = _assignGroups[gi];
+                var groupFee = parseFloat(document.getElementById('group-fee-'+gi).value)||0;
+
+                for(var oi=0;oi<group.orders.length;oi++){
+                    /* Full fee sur la 1ère commande du groupe, 0 sur les autres (même client = 1 trajet) */
+                    var orderFee = oi===0 ? groupFee : 0;
+                    var fd=new FormData();
+                    fd.append('_token',CSRF);
+                    fd.append('driver_id',selectedDriverId);
+                    fd.append('delivery_fee',orderFee);
+                    try{
+                        var r=await fetch('/company/orders/'+group.orders[oi].orderId+'/assign',{method:'POST',body:fd});
+                        var d=await r.json();
+                        if(d.success) ok++;
+                    }catch(e){}
+                }
+            }
+        } else {
+            /* Même client ou destinations différentes : frais global */
+            var ids=Array.from(_bulkOrderIds);
+            btn.textContent='⏳ 0/'+ids.length+'…';
+            var isSingleClientBulk = _assignGroups.length===1 && _assignGroups[0].orders.length>1;
+
+            for(var i=0;i<ids.length;i++){
+                btn.textContent='⏳ '+(i+1)+'/'+ids.length+'…';
+                /* Même client → fee uniquement sur 1ère commande */
+                var orderFee = (isSingleClientBulk && i>0) ? 0 : Number(fee);
+                var fd=new FormData();
+                fd.append('_token',CSRF);
+                fd.append('driver_id',selectedDriverId);
+                fd.append('delivery_fee',orderFee);
+                try{
+                    var r=await fetch('/company/orders/'+ids[i]+'/assign',{method:'POST',body:fd});
+                    var d=await r.json();
+                    if(d.success) ok++;
+                }catch(e){}
+            }
         }
+
         closeModal('assignModal');
         clearSelection();
         if(ok>0){

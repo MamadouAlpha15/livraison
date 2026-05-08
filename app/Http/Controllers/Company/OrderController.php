@@ -117,23 +117,54 @@ class OrderController extends Controller
         $orders = Order::with(['shop', 'client', 'driver'])
             ->where('delivery_company_id', $company->id)
             ->whereIn('status', [Order::STATUS_CONFIRMEE, Order::STATUS_EN_LIVRAISON])
-            ->get()
-            ->map(fn($o) => [
-                'id'           => $o->id,
-                'shop'         => optional($o->shop)->name    ?? '—',
-                'client'       => optional($o->client)->name  ?? '—',
-                'destination'  => $o->delivery_destination    ?? '',
-                'driver'       => optional($o->driver)->name  ?? 'Non assigné',
-                'driver_phone' => optional($o->driver)->phone ?? '',
-                'status'       => $o->status,
-                'lat'          => $o->current_lat,
-                'lng'          => $o->current_lng,
-                'ping'         => $o->last_ping_at?->toIso8601String(),
-                'ping_ago'     => $o->last_ping_at?->diffForHumans() ?? 'jamais',
-                'fee'          => $o->delivery_fee ?? 0,
-            ]);
+            ->get();
 
-        return response()->json(['ok' => true, 'orders' => $orders]);
+        // One entry per driver — no duplicate markers for drivers with multiple orders
+        $grouped = $orders->groupBy('driver_id')->map(function ($driverOrders) {
+            // Best GPS = order with the most recent ping that actually has coordinates
+            $gpsOrder = $driverOrders
+                ->filter(fn($o) => $o->current_lat && $o->current_lng)
+                ->sortByDesc('last_ping_at')
+                ->first() ?? $driverOrders->first();
+
+            $driver = optional($driverOrders->first()->driver);
+
+            $status = $driverOrders->contains('status', Order::STATUS_EN_LIVRAISON)
+                ? Order::STATUS_EN_LIVRAISON
+                : Order::STATUS_CONFIRMEE;
+
+            $ordersList = $driverOrders->map(fn($o) => [
+                'id'          => $o->id,
+                'shop'        => optional($o->shop)->name   ?? '—',
+                'client'      => optional($o->client)->name ?? '—',
+                'destination' => $o->delivery_destination   ?? '',
+            ])->values()->all();
+
+            $destination = $driverOrders->pluck('delivery_destination')
+                ->filter()->unique()->implode(' · ');
+
+            $clients = $driverOrders
+                ->map(fn($o) => optional($o->client)->name ?? null)
+                ->filter()->unique()->implode(', ');
+
+            return [
+                'driver_id'    => $driverOrders->first()->driver_id,
+                'driver'       => $driver->name  ?? 'Non assigné',
+                'driver_phone' => $driver->phone ?? '',
+                'status'       => $status,
+                'lat'          => $gpsOrder->current_lat,
+                'lng'          => $gpsOrder->current_lng,
+                'ping'         => $gpsOrder->last_ping_at?->toIso8601String(),
+                'ping_ago'     => $gpsOrder->last_ping_at?->diffForHumans() ?? 'jamais',
+                'orders'       => $ordersList,
+                'order_count'  => $driverOrders->count(),
+                'client'       => $clients,
+                'destination'  => $destination,
+                'shop'         => optional($driverOrders->first()->shop)->name ?? '—',
+            ];
+        })->values();
+
+        return response()->json(['ok' => true, 'orders' => $grouped]);
     }
 
     public function inProgress()

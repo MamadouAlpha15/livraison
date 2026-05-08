@@ -815,12 +815,22 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                         $orderTotal = $c->order?->total ?? null;
                         $dest       = $c->order?->delivery_destination ?: $c->order?->client?->address;
                         if ($type === 'shop') {
-                            $lv    = $c->livreur;
-                            $linit = $lv ? $init($lv->name) : 'LV';
+                            $lv       = $c->livreur;
+                            $linit    = $lv ? $init($lv->name) : 'LV';
+                            /* Batch boutique : nombre de commandes dans ce lot */
+                            $bCount      = $c->delivery_batch_id ? ($batchCounts[$c->delivery_batch_id]->cnt ?? 1) : 1;
+                            $shopClient  = $c->order?->client?->name ?? null;
                         } else {
-                            $company = $c->order?->deliveryCompany;
-                            $driver  = $c->order?->driver?->user;
-                            $dInit   = $driver ? $init($driver->name) : 'CH';
+                            $company  = $c->order?->deliveryCompany;
+                            $driver   = $c->order?->driver?->user;
+                            $dInit    = $driver ? $init($driver->name) : 'CH';
+                            /* Nombre de commandes dans ce groupe (même client + chauffeur + destination) */
+                            $destNorm = strtolower(trim($c->order?->delivery_destination ?? ''));
+                            $gKey     = ($c->order?->user_id ?? '') . '::' . ($c->order?->driver_id ?? '') . '::' . $destNorm;
+                            $gCount   = $groupCounts[$gKey]->cnt ?? 1;
+                            $clientName = $c->order?->client?->name ?? null;
+                            /* Montant effectif : commission stockée > frais livraison > prix zone */
+                            $effectiveAmount = (float)($c->amount) ?: ((float)($c->order?->delivery_fee) ?: (float)($c->order?->deliveryZone?->price));
                         }
                     @endphp
                     <tr class="comm-row" data-id="{{ $c->id }}">
@@ -832,6 +842,26 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                                 <a href="{{ route('orders.show', $c->order_id) }}" class="ref-link">#{{ $c->order_id }}</a>
                             @else
                                 <span class="ref-cell">—</span>
+                            @endif
+                            @if($type === 'shop' && ($bCount ?? 1) > 1)
+                            <div style="margin-top:4px;">
+                                <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;background:#f0fdf4;color:#15803d;border:1px solid #86efac;border-radius:5px;padding:2px 7px;white-space:nowrap;">
+                                    📦 {{ $bCount }} commandes · 1 trajet
+                                </span>
+                                @if($shopClient ?? false)
+                                <div style="font-size:10px;color:var(--muted);margin-top:2px;">👤 {{ $shopClient }}</div>
+                                @endif
+                            </div>
+                            @endif
+                            @if($type === 'company' && isset($gCount) && $gCount > 1)
+                            <div style="margin-top:4px;">
+                                <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe;border-radius:5px;padding:2px 7px;white-space:nowrap;">
+                                    📦 {{ $gCount }} commandes · 1 trajet
+                                </span>
+                                @if($clientName)
+                                <div style="font-size:10px;color:var(--muted);margin-top:2px;">👤 {{ $clientName }}</div>
+                                @endif
+                            </div>
                             @endif
                         </td>
                         @if($type === 'shop')
@@ -896,9 +926,9 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                             @else
                                 <span style="color:var(--muted);font-size:12px">—</span>
                             @endif
-                            @if($type === 'company' && $c->amount)
+                            @if($type === 'company' && ($effectiveAmount ?? 0) > 0)
                                 <div style="text-align:right;margin-top:5px;padding-top:5px;border-top:1px dashed #c7d2fe">
-                                    <span style="font-size:13px;font-weight:700;color:#4338ca">{{ number_format($c->amount, 0, ',', ' ') }}</span>
+                                    <span style="font-size:13px;font-weight:700;color:#4338ca">{{ number_format($effectiveAmount, 0, ',', ' ') }}</span>
                                     <span style="font-size:10px;color:#6366f1;font-weight:600"> {{ $devise }}</span>
                                     <br><small style="color:#6366f1;font-size:10px">Commission fixée</small>
                                 </div>
@@ -910,7 +940,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                                        name="amounts[{{ $c->id }}]"
                                        class="comm-input comm-amount-input"
                                        data-row="{{ $c->id }}"
-                                       value="{{ $c->amount ?: '' }}"
+                                       value="{{ $type === 'company' ? (($effectiveAmount ?? 0) ?: '') : ($c->amount ?: '') }}"
                                        min="0"
                                        placeholder="Ex: 50 000">
                                 <span style="font-size:11px;font-weight:700;color:#92400e;white-space:nowrap">{{ $devise }}</span>
@@ -989,8 +1019,10 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                     $orderTotal = $c->order?->total ?? null;
                     $dest       = $c->order?->delivery_destination ?: $c->order?->client?->address;
                     if ($type === 'shop') {
-                        $lv    = $c->livreur;
-                        $linit = $lv ? $init($lv->name) : 'LV';
+                        $lv       = $c->livreur;
+                        $linit    = $lv ? $init($lv->name) : 'LV';
+                        $bCount   = $c->delivery_batch_id ? ($batchCounts[$c->delivery_batch_id]->cnt ?? 1) : 1;
+                        $shopClient = $c->order?->client?->name ?? null;
                     } else {
                         $company = $c->order?->deliveryCompany;
                         $driver  = $c->order?->driver?->user;
@@ -1003,6 +1035,16 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                             <a href="{{ route('orders.show', $c->order_id) }}" class="ref-link">#{{ $c->order_id }}</a>
                         @else
                             <span class="ref-cell">—</span>
+                        @endif
+                        @if($type === 'shop' && ($bCount ?? 1) > 1)
+                        <div style="margin-top:4px;">
+                            <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;background:#f0fdf4;color:#15803d;border:1px solid #86efac;border-radius:5px;padding:2px 7px;white-space:nowrap;">
+                                📦 {{ $bCount }} commandes · 1 trajet
+                            </span>
+                            @if($shopClient ?? false)
+                            <div style="font-size:10px;color:var(--muted);margin-top:2px;">👤 {{ $shopClient }}</div>
+                            @endif
+                        </div>
                         @endif
                     </td>
                     @if($type === 'shop')

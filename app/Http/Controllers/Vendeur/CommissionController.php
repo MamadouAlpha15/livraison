@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Vendeur;
 
 use App\Http\Controllers\Controller;
 use App\Models\CourierCommission;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +23,7 @@ class CommissionController extends Controller
         $type   = in_array($request->get('type'), ['shop', 'company']) ? $request->get('type') : 'shop';
 
         $query = CourierCommission::where('shop_id', $shop->id)
-            ->with(['livreur', 'order.client', 'order.driver.user', 'order.deliveryCompany'])
+            ->with(['livreur', 'order.client', 'order.driver.user', 'order.deliveryCompany', 'order.deliveryZone'])
             ->orderByDesc('id');
 
         if (in_array($status, [CourierCommission::STATUS_EN_ATTENTE, CourierCommission::STATUS_PAYEE])) {
@@ -36,6 +37,36 @@ class CommissionController extends Controller
         }
 
         $commissions = $query->paginate(20);
+
+        /* Pour type=company : calculer combien de commandes étaient dans chaque trajet groupe */
+        $groupCounts = collect();
+        if ($type === 'company') {
+            $groupCounts = Order::select(
+                    'user_id', 'driver_id',
+                    DB::raw('LOWER(TRIM(COALESCE(delivery_destination,\'\'))) AS dest_norm'),
+                    DB::raw('COUNT(*) AS cnt')
+                )
+                ->where('shop_id', $shop->id)
+                ->whereNotNull('driver_id')
+                ->where('status', Order::STATUS_LIVREE)
+                ->groupBy('user_id', 'driver_id', DB::raw('LOWER(TRIM(COALESCE(delivery_destination,\'\')))'))
+                ->having('cnt', '>', 1)
+                ->get()
+                ->keyBy(fn($r) => $r->user_id . '::' . $r->driver_id . '::' . $r->dest_norm);
+        }
+
+        /* Pour type=shop : compter les commandes de chaque batch (livraison groupée boutique) */
+        $batchCounts = collect();
+        if ($type === 'shop') {
+            $batchIds = $commissions->pluck('delivery_batch_id')->filter()->unique();
+            if ($batchIds->isNotEmpty()) {
+                $batchCounts = Order::select('delivery_batch_id', DB::raw('COUNT(*) AS cnt'))
+                    ->whereIn('delivery_batch_id', $batchIds)
+                    ->groupBy('delivery_batch_id')
+                    ->get()
+                    ->keyBy('delivery_batch_id');
+            }
+        }
 
         /* KPI globaux */
         $base = fn() => CourierCommission::where('shop_id', $shop->id);
@@ -70,7 +101,7 @@ class CommissionController extends Controller
             'commissions', 'type', 'status',
             'totalPending', 'totalPaid',
             'shopPending', 'companyPending', 'shopPaid', 'companyPaid',
-            'devise', 'shop'
+            'devise', 'shop', 'groupCounts', 'batchCounts'
         ));
     }
 
@@ -136,7 +167,7 @@ class CommissionController extends Controller
 
         $query = CourierCommission::where('shop_id', $shop->id)
             ->where('status', CourierCommission::STATUS_PAYEE)
-            ->with(['livreur', 'order.client', 'order.driver.user', 'order.deliveryCompany'])
+            ->with(['livreur', 'order.client', 'order.driver.user', 'order.deliveryCompany', 'order.deliveryZone'])
             ->orderByDesc('paid_at');
 
         if ($type === 'shop') {

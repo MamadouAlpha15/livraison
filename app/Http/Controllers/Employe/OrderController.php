@@ -77,6 +77,103 @@ class OrderController extends Controller
         ));
     }
 
+    public function carte()
+    {
+        $shopId = Auth::user()->currentShopId();
+        if (!$shopId) return redirect()->route('employe.orders.index');
+        $shop = Auth::user()->shop ?? Auth::user()->assignedShop;
+        return view('employe.orders.carte', compact('shop'));
+    }
+
+    public function carteData()
+    {
+        $shopId = Auth::user()->currentShopId();
+        abort_unless($shopId, 403);
+
+        $orders = Order::with(['client', 'driver', 'livreur'])
+            ->inShop($shopId)
+            ->whereIn('status', [Order::STATUS_CONFIRMEE, Order::STATUS_EN_LIVRAISON])
+            ->get();
+
+        // Clé unifiée : d_{driver_id} pour chauffeur entreprise, l_{livreur_id} pour livreur boutique
+        $grouped = $orders->groupBy(function ($o) {
+            if ($o->driver_id)  return 'd_' . $o->driver_id;
+            if ($o->livreur_id) return 'l_' . $o->livreur_id;
+            return null;
+        })->filter(fn($g, $k) => $k !== null);
+
+        $result = $grouped->map(function ($driverOrders, $key) {
+            $first = $driverOrders->first();
+
+            // Meilleure position GPS = ping le plus récent avec coordonnées réelles
+            $gpsOrder = $driverOrders
+                ->filter(fn($o) => $o->current_lat && $o->current_lng)
+                ->sortByDesc('last_ping_at')
+                ->first() ?? $first;
+
+            if ($first->driver_id) {
+                $d           = optional($first->driver);
+                $driverName  = $d->name  ?? 'Chauffeur';
+                $driverPhone = $d->phone ?? '';
+                $type        = 'company';
+            } else {
+                $d           = optional($first->livreur);
+                $driverName  = $d->name  ?? 'Livreur boutique';
+                $driverPhone = $d->phone ?? '';
+                $type        = 'boutique';
+            }
+
+            $status = $driverOrders->contains('status', Order::STATUS_EN_LIVRAISON)
+                ? Order::STATUS_EN_LIVRAISON
+                : Order::STATUS_CONFIRMEE;
+
+            $ordersList = $driverOrders->map(fn($o) => [
+                'id'          => $o->id,
+                'client'      => optional($o->client)->name ?? '—',
+                'destination' => $o->delivery_destination   ?? '',
+            ])->values()->all();
+
+            $destination = $driverOrders->pluck('delivery_destination')
+                ->filter()->unique()->implode(' · ');
+
+            // Découper en trajets : batch groupé (delivery_batch_id commun) OU commande individuelle
+            $trips = $driverOrders
+                ->groupBy(fn($o) => $o->delivery_batch_id ? 'batch_' . $o->delivery_batch_id : '__solo__' . $o->id)
+                ->map(function ($tripOrders, $tripKey) {
+                    $isBatch = str_starts_with($tripKey, 'batch_');
+                    return [
+                        'type'        => $isBatch ? 'batch' : 'solo',
+                        'count'       => $tripOrders->count(),
+                        'destination' => $tripOrders->pluck('delivery_destination')->filter()->unique()->implode(' · '),
+                        'orders'      => $tripOrders->map(fn($o) => [
+                            'id'          => $o->id,
+                            'client'      => optional($o->client)->name ?? '—',
+                            'destination' => $o->delivery_destination ?? '',
+                        ])->values()->all(),
+                    ];
+                })->values()->all();
+
+            return [
+                'key'          => $key,
+                'driver'       => $driverName,
+                'driver_phone' => $driverPhone,
+                'type'         => $type,
+                'status'       => $status,
+                'lat'          => $gpsOrder->current_lat,
+                'lng'          => $gpsOrder->current_lng,
+                'ping'         => $gpsOrder->last_ping_at?->toIso8601String(),
+                'ping_ago'     => $gpsOrder->last_ping_at?->diffForHumans() ?? 'jamais',
+                'orders'       => $ordersList,
+                'order_count'  => $driverOrders->count(),
+                'destination'  => $destination,
+                'trips'        => $trips,
+                'trip_count'   => count($trips),
+            ];
+        })->values();
+
+        return response()->json(['ok' => true, 'drivers' => $result]);
+    }
+
     public function pendingJson(Request $request)
     {
         $shopId = Auth::user()->currentShopId();
@@ -120,19 +217,25 @@ class OrderController extends Controller
             return response()->json(['success' => false, 'message' => 'Aucun livreur ou entreprise sélectionné.'], 422);
         }
 
-        $orders   = Order::whereIn('id', $data['order_ids'])->where('shop_id', $shopId)->get();
+        $orders = Order::whereIn('id', $data['order_ids'])->where('shop_id', $shopId)->get();
+
+        // Pré-filtrer les commandes non encore assignées
+        $eligible = $orders->filter(fn($o) => !$o->livreur_id && !$o->delivery_company_id);
+
+        // batch_id seulement si 2+ commandes → système de regroupement intentionnel
+        $batchId  = $eligible->count() > 1 ? \Illuminate\Support\Str::uuid()->toString() : null;
         $assigned = 0;
 
-        foreach ($orders as $order) {
-            if ($order->livreur_id || $order->delivery_company_id) continue;
-
+        foreach ($eligible as $order) {
             if (! empty($data['livreur_id'])) {
-                $order->livreur_id = $data['livreur_id'];
+                $order->livreur_id        = $data['livreur_id'];
+                $order->delivery_batch_id = $batchId; // null pour 1 commande, UUID pour groupe
                 if (in_array($order->status, ['en_attente', 'pending'])) {
                     $order->status = 'confirmée';
                 }
             } else {
                 $order->delivery_company_id = $data['delivery_company_id'];
+                $order->delivery_batch_id   = $batchId;
                 if (!empty($data['delivery_zone_id']))  $order->delivery_zone_id = $data['delivery_zone_id'];
                 if (isset($data['delivery_fee']) && $data['delivery_fee'] !== null) {
                     $order->delivery_fee = $data['delivery_fee'];

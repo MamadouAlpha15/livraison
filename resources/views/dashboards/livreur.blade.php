@@ -266,17 +266,22 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
             Aucune commande assignée pour le moment.
         </div>
         @else
-        @foreach($recentOrders as $order)
+        @foreach($recentOrders as $group)
         @php
-            $st = $statusMap[$order->status] ?? ['label'=>ucfirst($order->status),'cls'=>'s-other'];
+            $order = $group['order'];
+            $st    = $statusMap[$group['status']] ?? ['label'=>ucfirst($group['status']),'cls'=>'s-other'];
         @endphp
         <div class="lv-order-row">
-            <div class="lv-order-ico">📦</div>
+            <div class="lv-order-ico">{{ $group['count'] > 1 ? '📦' : '📦' }}</div>
             <div style="flex:1;min-width:0">
-                <div class="lv-order-num">Commande #{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</div>
-                <div class="lv-order-client">{{ $order->client?->name ?? $order->user?->name ?? 'Client' }}</div>
+                @if($group['count'] > 1)
+                    <div class="lv-order-num">{{ $group['count'] }} commandes · 1 trajet</div>
+                @else
+                    <div class="lv-order-num">Commande #{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</div>
+                @endif
+                <div class="lv-order-client">{{ $group['client']?->name ?? 'Client' }}</div>
             </div>
-            <div class="lv-order-amount">{{ $fmt($order->total) }}</div>
+            <div class="lv-order-amount">{{ $fmt($group['total']) }}</div>
             <span class="lv-order-status {{ $st['cls'] }}">{{ $st['label'] }}</span>
         </div>
         @endforeach

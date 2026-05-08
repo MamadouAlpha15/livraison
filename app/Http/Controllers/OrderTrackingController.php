@@ -36,6 +36,7 @@ class OrderTrackingController extends Controller
 
         // Livreur boutique (livreur_id) OU chauffeur entreprise (driver_id)
         $authorized = $order->livreur_id === $user->id;
+        $driver = null;
         if (! $authorized) {
             $driver = \App\Models\Driver::where('user_id', $user->id)->first();
             if ($driver && (int) $order->driver_id === $driver->id) {
@@ -49,11 +50,30 @@ class OrderTrackingController extends Controller
             'lng' => ['required','numeric','between:-180,180'],
         ]);
 
-        $order->update([
-            'current_lat' => $data['lat'],
-            'current_lng' => $data['lng'],
-            'last_ping_at'=> now(),
-        ]);
+        $gpsData = [
+            'current_lat'  => $data['lat'],
+            'current_lng'  => $data['lng'],
+            'last_ping_at' => now(),
+        ];
+
+        // Mettre à jour l'order ciblé
+        $order->update($gpsData);
+
+        // Propager le GPS aux autres commandes du même batch (livraison groupée intentionnelle)
+        // → batch_id commun = livreur porte toutes ces commandes en 1 trajet
+        if ($order->delivery_batch_id) {
+            Order::where('delivery_batch_id', $order->delivery_batch_id)
+                ->where('id', '!=', $order->id)
+                ->whereIn('status', [Order::STATUS_CONFIRMEE, Order::STATUS_EN_LIVRAISON])
+                ->update($gpsData);
+        } elseif ($driver) {
+            // Livreur entreprise (driver) sans batch : propager à ses autres commandes actives
+            Order::where('driver_id', $driver->id)
+                ->where('id', '!=', $order->id)
+                ->whereIn('status', [Order::STATUS_CONFIRMEE, Order::STATUS_EN_LIVRAISON])
+                ->update($gpsData);
+        }
+        // Assignation individuelle sans batch → GPS uniquement sur cette commande (pas de propagation)
 
         return response()->json(['ok' => true]);
     }

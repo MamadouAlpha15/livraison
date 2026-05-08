@@ -34,7 +34,23 @@ class DashboardController extends Controller
         $enAttente     = $orders->whereIn('status', ['ready', 'prête', 'assigned', 'confirmée', 'en_attente'])->count();
 
         $totalCommission = $livreur->courierCommissions()->sum('amount');
-        $recentOrders    = $orders->take(5);
+
+        // Grouper par client + destination : même client même adresse = 1 ligne dans "commandes récentes"
+        $statusPriority = ['en_attente' => 0, 'confirmée' => 1, 'en_livraison' => 2, 'livrée' => 3, 'annulée' => 4];
+        $recentOrders = $orders->groupBy(function ($o) {
+                $dest = strtolower(trim($o->delivery_destination ?? $o->client?->address ?? ''));
+                return ($o->user_id ?? 'anon') . '::' . $dest;
+            })->map(function ($grp) use ($statusPriority) {
+                $first  = $grp->first();
+                $status = $grp->sortBy(fn($o) => $statusPriority[$o->status] ?? 99)->first()->status;
+                return [
+                    'order'  => $first,
+                    'count'  => $grp->count(),
+                    'total'  => $grp->sum('total'),
+                    'status' => $status,
+                    'client' => $first->client ?? $first->user,
+                ];
+            })->values()->take(5);
 
         return view('dashboards.livreur', compact(
             'livreur', 'devise', 'shop',

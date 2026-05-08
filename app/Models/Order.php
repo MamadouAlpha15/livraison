@@ -13,7 +13,7 @@ class Order extends Model
 
     // Ajoute 'livreur_id' si tu fais des fill/update dessus
     protected $fillable = ['user_id','shop_id','total','status','ordonnance','livreur_id','current_lat','current_lng','last_ping_at',
-    'image','delivery_fee','delivery_destination','delivery_company_id','driver_id','delivery_zone_id'];
+    'image','delivery_fee','delivery_destination','delivery_company_id','driver_id','delivery_zone_id','delivery_batch_id'];
 
     /* Relations */
 

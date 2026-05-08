@@ -769,6 +769,9 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                 <div class="tb-title">📦 Commandes</div>
                 <div class="tb-sub">{{ $shop->name ?? 'Boutique' }} &nbsp;·&nbsp; <span class="devise-badge" style="font-size:10px;padding:2px 8px">💱 {{ $devise }}</span></div>
             </div>
+            <a href="{{ route('employe.orders.carte') }}" style="display:flex;align-items:center;gap:5px;height:30px;padding:0 12px;border-radius:8px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);color:#4f46e5;font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;text-decoration:none;transition:background .14s" onmouseover="this.style.background='rgba(99,102,241,.18)'" onmouseout="this.style.background='rgba(99,102,241,.1)'">
+                🗺️ <span class="desk-only">Carte GPS</span>
+            </a>
             <div id="autoRefreshBadge" style="display:flex;align-items:center;gap:6px;background:#f0fdf4;border:1px solid #86efac;border-radius:20px;padding:4px 12px;font-size:11.5px;font-weight:600;color:#166534;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0" onclick="togglePause()" title="Cliquer pour mettre en pause">
                 <span id="refreshDot" style="width:7px;height:7px;border-radius:50%;background:#22c55e;animation:blink 2.2s ease-in-out infinite;flex-shrink:0"></span>
                 <span id="refreshLabel">Actu dans <strong id="refreshCount">30</strong>s</span>
@@ -885,6 +888,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                             data-zone-price="{{ $order->deliveryZone->price ?? ($order->delivery_fee ?? '') }}"
                             data-order-num="{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
                             data-dest="{{ addslashes($order->delivery_destination ?: ($client?->address ?? '')) }}"
+                            data-client-id="{{ $order->user_id }}"
                             onchange="onCbChange(this)"></td>
                         <td><span style="font-family:var(--mono);font-size:11px;color:var(--muted)">#{{ $order->id }}</span></td>
                         <td><div style="display:flex;align-items:center;gap:9px"><div class="c-av">{{ $init }}</div><div><div class="c-name">{{ $client->name ?? 'Inconnu' }}</div>@if($client?->phone)<div class="c-sub">📞 {{ $client->phone }}</div>@endif</div></div></td>
@@ -943,7 +947,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                             @endif
                         </td>
                         <td><div style="display:flex;align-items:center;gap:5px;flex-wrap:nowrap">
-                            <a href="{{ route('orders.show',$order) }}" class="btn btn-info btn-sm">🔍</a>
+                            <!--<a href="{{ route('orders.show',$order) }}" class="btn btn-info btn-sm">🔍</a> !--->
                             @if($peutAnnuler)<button type="button" class="btn-cancel" onclick="openCancelModal('{{ route('employe.orders.cancel',$order) }}','#{{ $order->id }}','{{ addslashes($client->name ?? 'Inconnu') }}')">✕ Annuler</button>
                             @elseif($dejaAnnulee)<button type="button" class="btn-restore" onclick="openRestoreModal('{{ route('employe.orders.restore',$order) }}','#{{ $order->id }}','{{ addslashes($client->name ?? 'Inconnu') }}')">🔄 Restaurer</button>
                             @else<button type="button" class="btn-cancel disabled" disabled>✕</button>@endif
@@ -1000,6 +1004,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                             data-zone-price="{{ $order->deliveryZone->price ?? ($order->delivery_fee ?? '') }}"
                             data-order-num="{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
                             data-dest="{{ addslashes($order->delivery_destination ?: ($client?->address ?? '')) }}"
+                            data-client-id="{{ $order->user_id }}"
                             onchange="onCbChange(this)" style="flex-shrink:0;"><div class="c-av">{{ $init }}</div><div><div class="c-name">{{ $client->name ?? 'Inconnu' }}</div>@if($client?->phone)<div class="c-sub">📞 {{ $client->phone }}</div>@endif</div></div>
                         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span><span style="font-family:var(--mono);font-size:10px;color:var(--muted)">#{{ $order->id }}</span></div>
                     </div>
@@ -1821,6 +1826,7 @@ function _collectSelectedOrders() {
             zoneName:  cb.dataset.zoneName  || '',
             zonePrice: cb.dataset.zonePrice ? parseFloat(cb.dataset.zonePrice) : 0,
             dest:      (cb.dataset.dest    || '').trim(),
+            clientId:  cb.dataset.clientId  || '',
         });
     });
     return orders;
@@ -1829,11 +1835,13 @@ function _collectSelectedOrders() {
 function _groupByZone(orders) {
     const map = {};
     orders.forEach(o => {
-        /* Grouper par destination normalisée — même destination = même lot */
-        const key = o.dest ? _up(o.dest) : (o.zoneId || '__nozone__');
-        if (!map[key]) map[key] = { zoneId: '', zoneName: o.zoneName, zonePrice: o.zonePrice, dest: o.dest, orders: [] };
-        /* Conserver le premier zoneId non-vide du groupe (pour la recherche par ID) */
+        const destKey = o.dest ? _up(o.dest) : (o.zoneId || '__nozone__');
+        /* Même client + même destination → même lot (1 seul trajet) */
+        const key = o.clientId ? (o.clientId + '::' + destKey) : destKey;
+        if (!map[key]) map[key] = { zoneId: '', zoneName: o.zoneName, zonePrice: o.zonePrice, dest: o.dest, clientId: o.clientId, sameClient: true, orders: [] };
         if (!map[key].zoneId && o.zoneId) map[key].zoneId = o.zoneId;
+        /* Si plusieurs clients dans ce lot (clients différents même destination) */
+        if (map[key].clientId && o.clientId && map[key].clientId !== o.clientId) map[key].sameClient = false;
         map[key].orders.push(o);
     });
     return Object.values(map);
@@ -1910,34 +1918,7 @@ function submitBulkCompany(btn) {
 
         const groups = _groupByZone(orders);
 
-        if (groups.length === 1) {
-            /* ── Cas simple : même destination/zone pour toutes les commandes ── */
-            _bulkZoneLots = null;
-            const g = groups[0];
-            skipBtn.style.display  = '';
-            confirmBtn.textContent = '✅ Confirmer';
-            pillsEl.innerHTML = orders.map(o =>
-                `<span style="display:inline-flex;align-items:center;background:#eef2ff;border:1.5px solid #c7d2fe;color:#4f46e5;border-radius:6px;padding:3px 9px;font-size:11.5px;font-weight:700;">#${o.num}</span>`
-            ).join('');
-            summaryEl.style.display = '';
-
-            listEl.innerHTML = zones.map(z => {
-                const pre = g.zoneId && String(z.id) === String(g.zoneId);
-                return `<label class="blv-item${pre?' checked':''}" id="bz-label-${z.id}" for="bz-${z.id}" style="cursor:pointer;" onclick="selectBulkZone(${z.id}, ${parseFloat(z.price)||0})">
-                    <input type="radio" name="bulk_zone" id="bz-${z.id}" value="${z.id}" style="display:none;">
-                    <div style="width:38px;height:38px;border-radius:9px;background:${z.color||'#4f46e5'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px;">📍</div>
-                    <div style="flex:1;min-width:0;">
-                        <div style="font-size:13px;font-weight:700;color:var(--text);">${z.name}</div>
-                        <div style="font-size:11px;color:var(--muted);">${z.price?new Intl.NumberFormat('fr').format(z.price)+' GNF':'Prix libre'}${z.estimated_minutes?' · ~'+z.estimated_minutes+' min':''}</div>
-                    </div>
-                </label>`;
-            }).join('');
-            if (g.zoneId) {
-                const found = zones.find(z => String(z.id) === String(g.zoneId));
-                if (found) { _bulkZoneSelectedId = found.id; _bulkZoneSelectedFee = parseFloat(found.price)||0; }
-            }
-            return;
-        }
+        /* groups.length === 1 falls through to unified lot logic below */
 
         /* ── Cas lots : plusieurs groupes → vérifier chaque groupe contre les zones de l'entreprise ── */
         const validLots     = [];
@@ -1995,7 +1976,18 @@ function _renderBulkLotsWithSkipped(validLots, skippedOrders, listEl) {
             badge = `<span style="background:#fef3c7;border:1.5px solid #fde68a;color:#92400e;border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;flex-shrink:0;">⚠️ Sans destination</span>`;
         }
         const numsList = g.orders.map(o => '#'+o.num).join(', ');
-        const lotTotal = price ? `<div style="font-size:11px;color:#059669;font-weight:600;margin-top:4px;">💰 Frais de livraison : ${fmt(price)} GNF${g.orders.length > 1 ? ' × ' + g.orders.length + ' = ' + fmt(price * g.orders.length) + ' GNF' : ''}</div>` : '';
+        let lotTotal = '';
+        if (price) {
+            if (g.orders.length > 1 && g.sameClient) {
+                /* Même client → 1 seul trajet → 1 seul frais */
+                lotTotal = `<div style="font-size:11px;color:#059669;font-weight:600;margin-top:4px;">💰 Frais de livraison : ${fmt(price)} GNF <span style="font-size:10px;opacity:.7;">(1 seul trajet · même client)</span></div>`;
+            } else if (g.orders.length > 1) {
+                /* Clients différents → chacun paie */
+                lotTotal = `<div style="font-size:11px;color:#059669;font-weight:600;margin-top:4px;">💰 Frais de livraison : ${fmt(price)} GNF × ${g.orders.length} clients = ${fmt(price * g.orders.length)} GNF</div>`;
+            } else {
+                lotTotal = `<div style="font-size:11px;color:#059669;font-weight:600;margin-top:4px;">💰 Frais de livraison : ${fmt(price)} GNF</div>`;
+            }
+        }
         return `<div style="padding:10px 12px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
                 <div style="font-size:12.5px;font-weight:700;color:var(--text);">Lot ${i+1} · ${g.orders.length} commande${g.orders.length>1?'s':''}</div>${badge}</div>

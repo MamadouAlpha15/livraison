@@ -1408,9 +1408,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const DASH_COLORS = ['#10b981','#f59e0b','#3b82f6','#ec4899','#8b5cf6','#06b6d4','#f97316','#ef4444','#a78bfa','#84cc16'];
     let dashColorMap = {}, dashColorIdx = 0;
-    function getDashColor(id) {
-        if (dashColorMap[id] === undefined) dashColorMap[id] = dashColorIdx++;
-        return DASH_COLORS[dashColorMap[id] % DASH_COLORS.length];
+    function getDashColor(driverId) {
+        if (dashColorMap[driverId] === undefined) dashColorMap[driverId] = dashColorIdx++;
+        return DASH_COLORS[dashColorMap[driverId] % DASH_COLORS.length];
     }
 
     function makePin(color) {
@@ -1426,9 +1426,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const bdr = isLight ? 'rgba(0,0,0,.1)'  : 'rgba(99,102,241,.22)';
         const txt = isLight ? '#111827'         : '#e2e8f0';
         const sub = isLight ? '#6b7280'         : '#94a3b8';
+        let ordersHtml = '';
+        if (o.orders && o.orders.length > 1) {
+            ordersHtml = o.orders.map(ord =>
+                `<div style="color:${sub};font-size:11px">Cde #${ord.id} · ${esc(ord.shop)} · ${esc(ord.client)}</div>`
+            ).join('');
+        } else if (o.orders && o.orders.length === 1) {
+            const ord = o.orders[0];
+            ordersHtml = `<div style="color:${sub};font-size:11px">Commande #${ord.id} · ${esc(ord.shop)}</div>`;
+        }
         return `<div style="background:${bg};border:1px solid ${bdr};border-radius:9px;padding:10px 14px;color:${txt};font-size:12px;min-width:185px;box-shadow:0 6px 20px rgba(0,0,0,.18)">
             <div style="font-weight:800;margin-bottom:4px">🚴 ${esc(o.driver)}</div>
-            <div style="color:${sub};font-size:11px">Commande #${o.id} · ${esc(o.shop)}</div>
+            ${ordersHtml}
             ${o.destination ? `<div style="color:${sub};font-size:11px;margin-top:2px">📍 ${esc(o.destination)}</div>` : ''}
             ${o.ping_ago && o.ping_ago !== 'jamais' ? `<div style="color:#10b981;margin-top:5px;font-weight:700;font-size:11.5px">📡 ${esc(o.ping_ago)}</div>` : ''}
         </div>`;
@@ -1437,22 +1446,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const dashMarkers = {};
     let mapInitialized = false;
 
-    function updateDashMap(orders) {
-        const activeIds = new Set(orders.map(o => o.id));
+    function updateDashMap(drivers) {
+        const activeIds = new Set(drivers.map(o => o.driver_id));
         Object.keys(dashMarkers).forEach(id => {
             if (!activeIds.has(parseInt(id))) { map.removeLayer(dashMarkers[id]); delete dashMarkers[id]; }
         });
 
         const bounds = [];
-        orders.forEach(o => {
+        drivers.forEach(o => {
             if (!o.lat || !o.lng) return;
-            const color = getDashColor(o.id);
+            const color = getDashColor(o.driver_id);
             const pos   = [parseFloat(o.lat), parseFloat(o.lng)];
-            if (dashMarkers[o.id]) {
-                dashMarkers[o.id].setLatLng(pos);
-                if (dashMarkers[o.id].isPopupOpen()) dashMarkers[o.id].setPopupContent(buildMapPopup(o));
+            const did   = o.driver_id;
+            if (dashMarkers[did]) {
+                dashMarkers[did].setLatLng(pos);
+                if (dashMarkers[did].isPopupOpen()) dashMarkers[did].setPopupContent(buildMapPopup(o));
             } else {
-                dashMarkers[o.id] = L.marker(pos, {icon: makePin(color)})
+                dashMarkers[did] = L.marker(pos, {icon: makePin(color)})
                     .addTo(map)
                     .bindPopup(() => buildMapPopup(o));
             }

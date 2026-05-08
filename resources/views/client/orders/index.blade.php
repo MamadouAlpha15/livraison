@@ -551,6 +551,30 @@ $activeFilter  = request('status', 'all');
 
 // Devise de la première commande
 $devise = $orders->first()?->shop?->currency ?? 'GNF';
+
+// ── Grouper uniquement les commandes bulk-assignées ensemble (même delivery_batch_id)
+// Une assignation individuelle (batch_id null) → chaque commande reste seule
+$_statusPriority = ['en_attente'=>0,'confirmée'=>1,'en_livraison'=>2,'livrée'=>3,'annulée'=>4];
+$groups = $orders->getCollection()
+    ->groupBy(function ($o) {
+        // Regrouper seulement si batch_id explicite (assignation groupée intentionnelle)
+        return $o->delivery_batch_id ?: ('__solo__' . $o->id);
+    })
+    ->map(function ($grp) use ($_statusPriority) {
+        $status = $grp->sortBy(fn($o) => $_statusPriority[$o->status] ?? 99)->first()->status;
+        $first  = $grp->first();
+        return [
+            'orders'        => $grp,
+            'order'         => $first,
+            'count'         => $grp->count(),
+            'total'         => $grp->sum('total'),
+            'status'        => $status,
+            'all_items'     => $grp->flatMap(fn($o) => $o->items)->values(),
+            'shops'         => $grp->map(fn($o) => $o->shop)->filter()->unique('id')->values(),
+            'all_delivered' => $grp->every(fn($o) => $o->status === Order::STATUS_LIVREE),
+            'has_review'    => $grp->every(fn($o) => $o->review !== null),
+        ];
+    })->values();
 @endphp
 
 <div class="orders-page">
@@ -650,16 +674,20 @@ $devise = $orders->first()?->shop?->currency ?? 'GNF';
     </div>
     @else
     <div class="orders-list">
-        @foreach($orders as $order)
+        @foreach($groups as $group)
         @php
-            $cfg     = $statusConfig[$order->status] ?? $statusConfig[Order::STATUS_EN_ATTENTE];
-            $step    = $cfg['step'];
-            $firstItem   = $order->items->first();
+            $order        = $group['order'];
+            $isBulk       = $group['count'] > 1;
+            $cfg          = $statusConfig[$group['status']] ?? $statusConfig[Order::STATUS_EN_ATTENTE];
+            $step         = $cfg['step'];
+            $allItems     = $group['all_items'];
+            $firstItem    = $allItems->first();
             $firstProduct = $firstItem?->product;
-            $extraItems  = $order->items->count() - 1;
-            $devise      = $order->shop?->currency ?? 'GNF';
+            $extraItems   = $allItems->count() - 1;
+            $devise       = $order->shop?->currency ?? 'GNF';
+            $totalQty     = $allItems->sum('quantity');
+            $totalProds   = $allItems->count();
 
-            // Progression (0=attente, 1=confirmée, 2=livraison, 3=livrée)
             $steps = [
                 ['ico'=>'🕐','lbl'=>'Reçue'],
                 ['ico'=>'📦','lbl'=>'Confirmée'],
@@ -684,16 +712,27 @@ $devise = $orders->first()?->shop?->currency ?? 'GNF';
                          loading="lazy"
                          width="72" height="72">
                 @else
-                    <div class="order-thumb-placeholder">🛍️</div>
+                    <div class="order-thumb-placeholder">{{ $isBulk ? '📦' : '🛍️' }}</div>
                 @endif
 
-                {{-- Infos ── --}}
+                {{-- Infos --}}
                 <div class="order-info">
                     <div class="order-meta">
-                        <span class="order-num">#{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</span>
-                        <span class="order-date">{{ $order->created_at->format('d/m/Y · H:i') }}</span>
+                        @if($isBulk)
+                            <span class="order-num" style="font-size:11px">
+                                {{ $group['count'] }} commandes · 1 livraison
+                            </span>
+                            <span class="order-date" style="font-size:10px;color:var(--muted)">
+                                {{ $group['orders']->map(fn($o)=>'#'.str_pad($o->id,5,'0',STR_PAD_LEFT))->implode(' · ') }}
+                            </span>
+                        @else
+                            <span class="order-num">#{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</span>
+                            <span class="order-date">{{ $order->created_at->format('d/m/Y · H:i') }}</span>
+                        @endif
                     </div>
-                    <div class="order-shop">🏪 {{ $order->shop?->name ?? '—' }}</div>
+                    <div class="order-shop">
+                        🏪 {{ $group['shops']->pluck('name')->implode(' · ') ?: '—' }}
+                    </div>
                     @if($firstProduct)
                     <div class="order-product">
                         {{ Str::limit($firstProduct->name, 40) }}
@@ -707,17 +746,17 @@ $devise = $orders->first()?->shop?->currency ?? 'GNF';
                     </span>
                 </div>
 
-                {{-- Total ── --}}
+                {{-- Total --}}
                 <div class="order-right">
                     <div>
-                        <div class="order-total">{{ number_format($order->total, 0, ',', ' ') }}</div>
+                        <div class="order-total">{{ number_format($group['total'], 0, ',', ' ') }}</div>
                         <div class="order-currency">{{ $devise }}</div>
                     </div>
                 </div>
 
             </div>
 
-            {{-- Barre de progression (pas pour les annulées) ── --}}
+            {{-- Barre de progression (pas pour les annulées) --}}
             @if($step >= 0)
             <div class="order-progress">
                 <div class="progress-steps">
@@ -733,25 +772,24 @@ $devise = $orders->first()?->shop?->currency ?? 'GNF';
                 </div>
             </div>
             @else
-            {{-- Annulée ── --}}
             <div style="padding:10px 20px;background:#fef2f2;border-top:1px solid #fecaca;font-size:12px;color:#991b1b;font-weight:600;display:flex;align-items:center;gap:6px">
                 ❌ Cette commande a été annulée
             </div>
             @endif
 
-            {{-- Footer actions ── --}}
+            {{-- Footer actions --}}
             <div class="order-card-footer">
                 <div style="font-size:11.5px;color:var(--muted)">
-                    Qté : <strong style="color:var(--text)">{{ $order->items->sum('quantity') }}</strong> article{{ $order->items->sum('quantity') > 1 ? 's' : '' }}
-                    &middot; {{ $order->items->count() }} produit{{ $order->items->count() > 1 ? 's' : '' }}
+                    Qté : <strong style="color:var(--text)">{{ $totalQty }}</strong> article{{ $totalQty > 1 ? 's' : '' }}
+                    &middot; {{ $totalProds }} produit{{ $totalProds > 1 ? 's' : '' }}
                 </div>
                 <div style="display:flex;gap:7px;flex-wrap:wrap">
-                    {{-- Suivre ── --}}
+                    {{-- Suivre : lien vers la 1ère commande du groupe --}}
                     <a href="{{ route('suivi.show', $order) }}" class="btn-action btn-track">
                         🔍 Suivre
                     </a>
-                    {{-- Avis (si livrée et pas encore d'avis) ── --}}
-                    @if($order->status === Order::STATUS_LIVREE && !$order->review)
+                    {{-- Avis : seulement si toutes les commandes du groupe sont livrées et sans avis --}}
+                    @if($group['all_delivered'] && !$group['has_review'])
                     <a href="{{ route('client.reviews.create', $order) }}" class="btn-action btn-review">
                         ⭐ Laisser un avis
                     </a>
