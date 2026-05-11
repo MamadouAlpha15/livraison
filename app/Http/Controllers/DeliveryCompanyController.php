@@ -15,8 +15,17 @@ class DeliveryCompanyController extends Controller
 {  // liste des entreprises de livraison
     public function index()
     {
+        $filterCountry = null;
+        if (auth()->check()) {
+            $authUser      = auth()->user();
+            $filterCountry = $authUser->shop?->country
+                ?? $authUser->assignedShop?->country
+                ?? $authUser->country;
+        }
+
         $companies = DeliveryCompany::where('active', true)
             ->where('approved', true)
+            ->when($filterCountry, fn($q) => $q->where('country', $filterCountry))
             ->withAvg('reviews', 'rating')
             ->withCount(['reviews', 'drivers'])
             ->paginate(12);
@@ -37,7 +46,6 @@ class DeliveryCompanyController extends Controller
             'phone' => ['nullable','string','max:60'],
             'email' => ['nullable','email','max:190'],
             'address' => ['nullable','string','max:255'],
-            'commission_percent' => ['required','numeric','between:0,100'],
             'image' => ['nullable','image','mimes:jpg,jpeg,png,webp','max:4096'],
         ]);
 
@@ -48,6 +56,10 @@ class DeliveryCompanyController extends Controller
 
         // lier la company à l'utilisateur connecté
         $data['user_id'] = $request->user()->id;
+        $data['country']  = $request->user()->country;
+        $data['currency'] = $request->user()->country
+            ? DeliveryCompany::currencyForCountry($request->user()->country)
+            : 'GNF';
         $data['approved'] = false; // en attente d'approbation
         $data['active'] = true;
         $data['slug'] = Str::slug($data['name']) . '-' . time();
@@ -231,6 +243,12 @@ class DeliveryCompanyController extends Controller
         ? round((float) $ratingBase->avg('rating'), 1)
         : null;
 
+    $latestReviews = (clone $ratingBase)
+        ->with(['order.shop', 'client'])
+        ->latest()
+        ->limit(50)
+        ->get();
+
     $devise = $company->currency ?? 'GNF';
 
     return view('company.dashboard', compact(
@@ -247,7 +265,7 @@ class DeliveryCompanyController extends Controller
         'tauxReussite', 'tauxReussitePrev',
         'totalLivrees', 'totalAnnulees',
         'avgMins', 'avgMinsPrev',
-        'avgRating', 'ratingCount',
+        'avgRating', 'ratingCount', 'latestReviews',
         'devise'
     ));
 }

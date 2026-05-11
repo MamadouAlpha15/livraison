@@ -4,7 +4,7 @@
     $bodyClass = 'cx-dashboard';
     $u   = auth()->user();
     $ini = strtoupper(substr($u->name ?? 'A', 0, 1)) . strtoupper(substr(explode(' ', $u->name ?? 'A ')[1] ?? 'X', 0, 1));
-    $fmt = fn($n) => number_format($n ?? 0, 0, ',', ' ') . ' GNF';
+    $fmt = fn($n) => number_format($n ?? 0, 0, ',', ' ') . ' ' . ($company->currency ?? 'GNF');
     $curPeriod = request('period', '');
     $curStatus = request('status', 'all');
     $curDriver = request('driver_id', '');
@@ -273,10 +273,11 @@ body.cx-light .hx-fee{color:#059669}
         </a>
        
          <a href="{{ route('company.historique.index') }}" class="cx-nav-item active"><span class="cx-nav-ico">📊</span> Historique</a>
-                 
+         <a href="{{ route('company.rapport.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📈</span> Rapport</a>
+
         <div class="cx-nav-sec">Configuration</div>
         
-               <a href="#" class="cx-nav-item"><span class="cx-nav-ico">⚙️</span> Paramètres</a>
+               <a href="{{ route('company.parametre.index') }}" class="cx-nav-item"><span class="cx-nav-ico">⚙️</span> Paramètres</a>
                <a href="{{ route('company.users.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">👤</span> Utilisateurs
         </a>

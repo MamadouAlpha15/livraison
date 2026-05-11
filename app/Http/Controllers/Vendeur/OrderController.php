@@ -108,8 +108,10 @@ class OrderController extends Controller
             ->orderBy('name')
             ->get();
 
+        $shopCountry = $shop?->country ?? Auth::user()->country;
         $deliveryCompanies = DeliveryCompany::where('approved', true)
             ->where('active', true)
+            ->when($shopCountry, fn($q) => $q->where('country', $shopCountry))
             ->orderBy('name')
             ->get(['id', 'name', 'phone', 'image', 'commission_percent', 'address']);
 

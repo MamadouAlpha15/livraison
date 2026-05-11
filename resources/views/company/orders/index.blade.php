@@ -183,6 +183,18 @@ a{text-decoration:none;color:inherit;}
     border-radius:var(--r-xs);color:var(--cx-text);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s;
 }
 .date-input:focus{border-color:var(--cx-brand);}
+/* Période */
+.period-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:10px 16px 14px;border-top:1px solid var(--cx-border);}
+.period-lbl{font-size:11.5px;font-weight:700;color:var(--cx-muted);white-space:nowrap;margin-right:2px;}
+.period-btn{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:700;border:1.5px solid var(--cx-border);background:transparent;color:var(--cx-text2);font-family:inherit;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.period-btn:hover{background:var(--cx-card2);color:var(--cx-text);}
+.period-btn.active{background:var(--cx-brand);color:#fff;border-color:var(--cx-brand);}
+.custom-dates{display:none;align-items:center;gap:6px;flex-wrap:wrap;padding:0 16px 12px;}
+.custom-dates.show{display:flex;}
+.custom-dates label{font-size:11px;font-weight:700;color:var(--cx-muted);}
+body.cx-dark .period-btn{border-color:var(--cx-border);color:var(--cx-text2);}
+body.cx-dark .period-btn:hover{background:var(--cx-card2);color:var(--cx-text);}
+body.cx-dark .custom-dates label{color:var(--cx-muted);}
 
 /* Table card */
 .table-card{background:var(--cx-card);border:1px solid var(--cx-border);border-radius:var(--r);overflow:hidden;}
@@ -617,7 +629,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
         'livrée'       => ['lbl'=>'Livrée',       'cls'=>'badge-done'],
         'annulée'      => ['lbl'=>'Annulée',      'cls'=>'badge-cancel'],
     ];
-    $fmt = fn($n) => number_format($n ?? 0, 0, ',', ' ') . ' GNF';
+    $fmt = fn($n) => number_format($n ?? 0, 0, ',', ' ') . ' ' . $devise;
 @endphp
 
 @php
@@ -679,9 +691,10 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
         <a href="{{ route('company.historique.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">📊</span> Historique
         </a>
+        <a href="{{ route('company.rapport.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📈</span> Rapport</a>
 
         <div class="cx-nav-sec">Configuration</div>
-        <a href="#" class="cx-nav-item">
+        <a href="{{ route('company.parametre.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">⚙️</span> Paramètres
         </a>
         <a href="{{ route('company.users.index') }}" class="cx-nav-item">
@@ -775,11 +788,13 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
 
     {{-- FILTER BAR --}}
     <form method="GET" action="{{ route('company.orders.index') }}" id="filterForm">
-        <div class="filter-bar">
-            @php
-                $tabs = ['all'=>'Toutes','en_attente'=>'En attente','confirmée'=>'Confirmées','en_livraison'=>'En livraison','livrée'=>'Livrées','annulée'=>'Annulées'];
-                $cur  = request('status','all');
-            @endphp
+        @php
+            $tabs   = ['all'=>'Toutes','en_attente'=>'En attente','confirmée'=>'Confirmées','en_livraison'=>'En livraison','livrée'=>'Livrées','annulée'=>'Annulées'];
+            $cur    = request('status','all');
+            $curPer = $period ?? request('period','all');
+        @endphp
+        {{-- Ligne 1 : statuts + recherche --}}
+        <div class="filter-bar" style="border-bottom:none;border-radius:var(--r) var(--r) 0 0;padding-bottom:10px;">
             @foreach($tabs as $val => $lbl)
             <button type="button" class="tab-btn {{ $cur===$val?'active':'' }}" onclick="setStatus('{{ $val }}')">{{ $lbl }}</button>
             @endforeach
@@ -789,9 +804,24 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                 <input class="search-input" type="text" name="search" id="searchInput"
                        placeholder="Client, boutique, destination…" value="{{ request('search') }}">
             </div>
-            <input class="date-input" type="date" name="date" value="{{ request('date') }}"
-                   onchange="document.getElementById('filterForm').submit()">
             <input type="hidden" name="status" id="statusInput" value="{{ $cur }}">
+            <input type="hidden" name="period" id="periodInput" value="{{ $curPer }}">
+        </div>
+        {{-- Ligne 2 : Période --}}
+        <div class="filter-bar" style="border-top:1px solid var(--cx-border);border-radius:0 0 var(--r) var(--r);padding-top:10px;">
+            <span class="period-lbl">Période :</span>
+            @foreach(['all'=>'Tout','today'=>"Aujourd'hui",'yesterday'=>'Hier','week'=>'Cette semaine','month'=>'Ce mois','custom'=>'Personnalisé'] as $pval => $plbl)
+            <button type="button" class="period-btn {{ $curPer===$pval?'active':'' }}" onclick="setPeriod('{{ $pval }}')">{{ $plbl }}</button>
+            @endforeach
+        </div>
+        {{-- Champs date personnalisée --}}
+        <div class="custom-dates {{ $curPer==='custom'?'show':'' }}" id="customDates"
+             style="background:var(--cx-card);border:1px solid var(--cx-border);border-top:none;border-radius:0 0 var(--r) var(--r);padding:8px 16px 12px;">
+            <label>Du</label>
+            <input class="date-input" type="date" name="date_from" value="{{ request('date_from') }}">
+            <label>Au</label>
+            <input class="date-input" type="date" name="date_to" value="{{ request('date_to') }}"
+                   onchange="document.getElementById('filterForm').submit()">
         </div>
     </form>
 
@@ -1073,7 +1103,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
             </div>
 
             <div class="form-group" id="assignFeeGroup">
-                <label class="form-label">💰 Frais de livraison (GNF)</label>
+                <label class="form-label">💰 Frais de livraison ({{ $devise }})</label>
                 <input type="number" class="form-input" id="assignFee" placeholder="Ex: 50 000" min="0" step="500">
             </div>
             <div class="form-group" id="destGroup">
@@ -1120,6 +1150,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
 
 @push('scripts')
 <script>
+const DEVISE = @json($devise);
 /* ── Mode sombre ── */
 (function initTheme(){
     const sw   = document.getElementById('cxDarkSwitch');
@@ -1164,8 +1195,17 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
 
 const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 
-/* ── Filtre ── */
+/* ── Filtre statut ── */
 function setStatus(v){ document.getElementById('statusInput').value=v; document.getElementById('filterForm').submit(); }
+
+/* ── Filtre période ── */
+function setPeriod(v){
+    document.getElementById('periodInput').value = v;
+    const cd = document.getElementById('customDates');
+    if (v === 'custom') { cd.classList.add('show'); }
+    else { cd.classList.remove('show'); document.getElementById('filterForm').submit(); }
+}
+
 var _st;
 document.getElementById('searchInput').addEventListener('input',function(){ clearTimeout(_st); _st=setTimeout(function(){ document.getElementById('filterForm').submit(); },500); });
 
@@ -1307,8 +1347,8 @@ function openMultiAssign(){
                     +'<span style="font-size:11.5px;font-weight:700;color:var(--cx-text);white-space:nowrap;">💰 Frais :</span>'
                     +'<input type="number" id="group-fee-'+gi+'" value="'+feeVal+'" min="0" step="500" '
                         +'style="flex:1;padding:6px 10px;border:1.5px solid var(--cx-border);border-radius:7px;font-size:12.5px;font-family:inherit;background:var(--cx-card);color:var(--cx-text);" '
-                        +'placeholder="Frais GNF">'
-                    +'<span style="font-size:11px;color:var(--cx-muted);white-space:nowrap;">GNF</span>'
+                        +'placeholder="Frais '+DEVISE+'">'
+                    +'<span style="font-size:11px;color:var(--cx-muted);white-space:nowrap;">'+DEVISE+'</span>'
                 +'</div>';
             groupedFeesEl.appendChild(card);
         });
@@ -1317,7 +1357,7 @@ function openMultiAssign(){
         var totalEl = document.createElement('div');
         totalEl.style.cssText='padding:8px 12px;border-radius:8px;background:#f0fdf4;border:1.5px solid #bbf7d0;font-size:12px;font-weight:700;color:#065f46;';
         totalEl.id='groupFeeTotal';
-        totalEl.innerHTML='📊 '+totalClients+' trajets · Total frais : '+fmt(baseFee*totalClients)+' GNF';
+        totalEl.innerHTML='📊 '+totalClients+' trajets · Total frais : '+fmt(baseFee*totalClients)+' '+DEVISE;
         groupedFeesEl.appendChild(totalEl);
 
         /* Recalcul total en live */
@@ -1327,7 +1367,7 @@ function openMultiAssign(){
                 _assignGroups.forEach(function(_, i){
                     total += parseFloat(document.getElementById('group-fee-'+i).value)||0;
                 });
-                document.getElementById('groupFeeTotal').innerHTML='📊 '+totalClients+' trajets · Total frais : '+fmt(total)+' GNF';
+                document.getElementById('groupFeeTotal').innerHTML='📊 '+totalClients+' trajets · Total frais : '+fmt(total)+' '+DEVISE;
             });
         });
 
@@ -1354,7 +1394,7 @@ function openMultiAssign(){
         destInfoEl.innerHTML='<div class="multi-common-dest">'
             +'<div class="multi-common-dest-lbl">👤 '+(g.clientName||'Client')+' · 📍 Destination</div>'
             +'<div class="multi-common-dest-val">'+(g.dest||'Non renseignée')+'</div>'
-            +(feeOnce ? '<div class="multi-common-dest-fee">💰 Frais de livraison : '+fmt(feeOnce)+' GNF'+(orders.length>1?' <span style="font-size:10px;opacity:.7;">(1 seul trajet)</span>':'')+'</div>' : '')
+            +(feeOnce ? '<div class="multi-common-dest-fee">💰 Frais de livraison : '+fmt(feeOnce)+' '+DEVISE+(orders.length>1?' <span style="font-size:10px;opacity:.7;">(1 seul trajet)</span>':'')+'</div>' : '')
             +'</div>';
         document.getElementById('assignFee').value = feeOnce||'';
         destNoteEl.innerHTML = orders.length>1 ? '⚠️ Même client — frais appliqué <b>une seule fois</b>, pas par commande.' : '';
@@ -1537,7 +1577,7 @@ async function submitAssign(){
         var r=await fetch('/company/orders/'+currentOrderId+'/assign',{method:'POST',body:fd});
         var data=await r.json();
         if(data.success){
-            toast('✅ '+data.driver_name+' assigné · '+data.delivery_fee+' GNF','success');
+            toast('✅ '+data.driver_name+' assigné · '+data.delivery_fee+' '+DEVISE,'success');
             closeModal('assignModal');
             setTimeout(function(){ location.reload(); },1200);
         } else {

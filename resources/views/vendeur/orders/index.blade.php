@@ -1,7 +1,10 @@
 {{-- resources/views/vendeur/orders/index.blade.php --}}
 @extends('layouts.app')
 @section('title', 'Commandes reçues')
-@php $bodyClass = 'is-dashboard'; @endphp
+@php
+    $bodyClass = 'is-dashboard';
+    $devise = auth()->user()->shop?->currency ?? auth()->user()->assignedShop?->currency ?? 'GNF';
+@endphp
 
 @push('styles')
 <style>
@@ -283,13 +286,13 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); }
                                     @endif
                                     <div>
                                         <div class="prod-name">{{ Str::limit($item->product->name ?? '—', 45) }}</div>
-                                        <div class="prod-meta">Qté: {{ $item->quantity }} · {{ number_format($item->price,0,',',' ') }} GNF</div>
+                                        <div class="prod-meta">Qté: {{ $item->quantity }} · {{ number_format($item->price,0,',',' ') }} {{ $devise }}</div>
                                     </div>
                                 </div>
                                 @endforeach
                             </div>
                         </td>
-                        <td><span class="amount">{{ number_format($order->total,0,',',' ') }} <small style="font-size:10px;color:var(--muted);font-weight:500;">GNF</small></span></td>
+                        <td><span class="amount">{{ number_format($order->total,0,',',' ') }} <small style="font-size:10px;color:var(--muted);font-weight:500;">{{ $devise }}</small></span></td>
                         <td>
                             @switch($order->status)
                                 @case(\App\Models\Order::STATUS_EN_ATTENTE)
@@ -386,7 +389,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); }
                     @endforeach
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
-                    <span class="amount">{{ number_format($order->total,0,',',' ') }} GNF</span>
+                    <span class="amount">{{ number_format($order->total,0,',',' ') }} {{ $devise }}</span>
                     @if($order->shop && strtolower($order->shop->type) === 'pharmacie' && $order->ordonnance)
                         <button class="act-btn act-btn-ordonnance" data-bs-toggle="modal" data-bs-target="#ordonnanceModal" data-url="{{ asset('storage/'.$order->ordonnance) }}">📎 Ordonnance</button>
                     @endif

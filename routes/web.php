@@ -243,6 +243,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/carte',      [CompanyOrderController::class, 'mapView']) ->name('company.carte.index');
         Route::get('/carte/data', [CompanyOrderController::class, 'mapData']) ->name('company.carte.data');
 
+        /* Rapport général */
+        Route::get('/rapport', [\App\Http\Controllers\Company\RapportController::class, 'index'])->name('company.rapport.index');
+
+        /* Paramètres */
+        Route::get('/parametre',          [\App\Http\Controllers\Company\ParametreController::class, 'index'])          ->name('company.parametre.index');
+        Route::patch('/parametre/info',   [\App\Http\Controllers\Company\ParametreController::class, 'updateInfo'])     ->name('company.parametre.updateInfo');
+        Route::patch('/parametre/country',[\App\Http\Controllers\Company\ParametreController::class, 'updateCountry'])  ->name('company.parametre.updateCountry');
+        Route::patch('/parametre/password',[\App\Http\Controllers\Company\ParametreController::class, 'updatePassword'])->name('company.parametre.updatePassword');
+
         /* Utilisateurs (membres de l'entreprise) */
         Route::get('/users',                [CompanyUserController::class, 'index'])  ->name('company.users.index');
         Route::post('/users',               [CompanyUserController::class, 'store'])  ->name('company.users.store');

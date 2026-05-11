@@ -269,9 +269,10 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
         <div class="cx-nav-sec">Gestion</div>
         <a href="{{ route('company.zones.index') }}" class="cx-nav-item active"><span class="cx-nav-ico">📍</span> Zone de livraison</a>
                <a href="{{ route('company.historique.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📊</span> Historique</a>
+               <a href="{{ route('company.rapport.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📈</span> Rapport</a>
 
         <div class="cx-nav-sec">Configuration</div>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">⚙️</span> Paramètres</a>
+        <a href="{{ route('company.parametre.index') }}" class="cx-nav-item"><span class="cx-nav-ico">⚙️</span> Paramètres</a>
         <a href="{{ route('company.users.index') }}" class="cx-nav-item"><span class="cx-nav-ico">👤</span> Utilisateurs</a>
             </nav>
 
@@ -351,12 +352,12 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
                     <div class="stat-pill" style="--s-accent:#fbbf24">
                         <div class="stat-pill-ico">💰</div>
                         <div class="stat-pill-val">{{ $zones->isNotEmpty() ? number_format($zones->min('price'), 0, ',', ' ') : '—' }}</div>
-                        <div class="stat-pill-lbl">Prix min (GNF)</div>
+                        <div class="stat-pill-lbl">Prix min ({{ $devise }})</div>
                     </div>
                     <div class="stat-pill" style="--s-accent:#60a5fa">
                         <div class="stat-pill-ico">💎</div>
                         <div class="stat-pill-val">{{ $zones->isNotEmpty() ? number_format($zones->max('price'), 0, ',', ' ') : '—' }}</div>
-                        <div class="stat-pill-lbl">Prix max (GNF)</div>
+                        <div class="stat-pill-lbl">Prix max ({{ $devise }})</div>
                     </div>
                 </div>
             </div>
@@ -391,7 +392,7 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
                         <div class="zone-meta">
                             <div class="zone-meta-item">
                                 <span class="zone-meta-lbl">Prix livraison</span>
-                                <span class="zone-meta-val">{{ number_format($zone->price, 0, ',', ' ') }} <span style="font-size:11px;font-weight:600;color:var(--cx-muted)">GNF</span></span>
+                                <span class="zone-meta-val">{{ number_format($zone->price, 0, ',', ' ') }} <span style="font-size:11px;font-weight:600;color:var(--cx-muted)">{{ $devise }}</span></span>
                             </div>
                             <div class="zone-meta-item">
                                 <span class="zone-meta-lbl">Délai estimé</span>
@@ -458,7 +459,7 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
                         <input type="text" name="description" class="form-input" placeholder="Quartiers couverts, remarques…" value="{{ old('description') }}">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Prix de livraison (GNF) *</label>
+                        <label class="form-label">Prix de livraison ({{ $devise }}) *</label>
                         <input type="number" name="price" class="form-input" placeholder="1500" min="0" step="50" value="{{ old('price') }}" required>
                     </div>
                     <div class="form-group">
@@ -502,7 +503,7 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
                         <input type="text" name="description" id="editDesc" class="form-input">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Prix (GNF) *</label>
+                        <label class="form-label">Prix ({{ $devise }}) *</label>
                         <input type="number" name="price" id="editPrice" class="form-input" min="0" step="50" required>
                     </div>
                     <div class="form-group">

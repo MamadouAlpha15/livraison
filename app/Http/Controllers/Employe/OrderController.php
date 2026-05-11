@@ -45,8 +45,9 @@ class OrderController extends Controller
         $dateFrom   = $request->get('from');
         $dateTo     = $request->get('to');
         match ($dateFilter) {
-            'today'  => $q->whereDate('created_at', today()),
-            'week'   => $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+            'today'     => $q->whereDate('created_at', today()),
+            'yesterday' => $q->whereDate('created_at', today()->subDay()),
+            'week'      => $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
             'month'  => $q->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year),
             'custom' => $q->when($dateFrom, fn($qq) => $qq->whereDate('created_at', '>=', $dateFrom))
                           ->when($dateTo,   fn($qq) => $qq->whereDate('created_at', '<=', $dateTo)),
@@ -56,8 +57,11 @@ class OrderController extends Controller
         $orders = $q->paginate(15)->withQueryString();
 
         $livreurs          = User::livreurs()->inShop($shopId)->orderBy('name')->get();
-        $deliveryCompanies = DeliveryCompany::where('approved', true)->where('active', true)->orderBy('name')->get(['id','name','phone','image','commission_percent']);
         $shop              = Auth::user()->shop ?? Auth::user()->assignedShop;
+        $shopCountry       = $shop?->country ?? Auth::user()->country;
+        $deliveryCompanies = DeliveryCompany::where('approved', true)->where('active', true)
+            ->when($shopCountry, fn($q) => $q->where('country', $shopCountry))
+            ->orderBy('name')->get(['id','name','phone','image','commission_percent']);
         $devise            = $shop?->currency ?? 'GNF';
 
         $clientMessages = ShopMessage::where('shop_id', $shopId)
@@ -333,6 +337,11 @@ class OrderController extends Controller
             $fee = DeliveryZone::find($data['delivery_zone_id'])?->price;
         }
 
+        $shopCountry  = $order->shop?->country ?? null;
+        $shopCurrency = $shopCountry
+            ? \App\Models\DeliveryCompany::currencyForCountry($shopCountry)
+            : ($company->currency ?? 'GNF');
+
         $order->update([
             'delivery_company_id' => $company->id,
             'delivery_zone_id'    => $data['delivery_zone_id'] ?? null,
@@ -354,8 +363,8 @@ class OrderController extends Controller
                 . " · " . ($order->client->phone ?? '')
                 . "\nDestination : " . ($order->delivery_destination ?: ($order->client->address ?? 'Non renseignée'))
                 . (!empty($data['delivery_zone_id']) ? "\nZone : " . (DeliveryZone::find($data['delivery_zone_id'])?->name ?? '—') : '')
-                . ($fee ? "\nFrais de livraison : " . number_format($fee, 0, ',', ' ') . " GNF" : '')
-                . "\nMontant commande : " . number_format($order->total, 0, ',', ' ') . " GNF",
+                . ($fee ? "\nFrais de livraison : " . number_format($fee, 0, ',', ' ') . " {$shopCurrency}" : '')
+                . "\nMontant commande : " . number_format($order->total, 0, ',', ' ') . " {$shopCurrency}",
         ]);
 
         if ($request->expectsJson()) {

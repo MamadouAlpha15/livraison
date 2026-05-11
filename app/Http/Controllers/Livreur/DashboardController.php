@@ -13,10 +13,8 @@ class DashboardController extends Controller
     {
         $livreur = Auth::user();
         $shop    = $livreur->shop ?? $livreur->assignedShop;
-        $devise  = $shop?->currency ?? 'GNF';
-
-        // Livreur entreprise : driver lié au compte
-        $driver = Driver::where('user_id', $livreur->id)->first();
+        $driver  = Driver::where('user_id', $livreur->id)->first();
+        $devise  = $shop?->currency ?? $driver?->company?->currency ?? 'GNF';
 
         $orders = Order::with(['client', 'user', 'shop'])
             ->where(function ($q) use ($livreur, $driver) {

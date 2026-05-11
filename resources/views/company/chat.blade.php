@@ -3,6 +3,7 @@
 @php $bodyClass = 'is-dashboard'; @endphp
 
 
+
 @push('styles')
 <style>
 *,*::before,*::after{box-sizing:border-box}
@@ -390,7 +391,7 @@ main.app-main{
     $uIni = strtoupper(substr($uPts[0],0,1)) . strtoupper(substr($uPts[1]??'',0,1));
     $cPts = explode(' ', $company->name ?? 'C O');
     $cIni = strtoupper(substr($cPts[0],0,1)) . strtoupper(substr($cPts[1]??'',0,1));
-    $devise = $u->shop?->currency ?? $u->assignedShop?->currency ?? 'GNF';
+    $devise = $company->currency ?? 'GNF';
     $fmt = fn($n) => number_format($n??0, 0, ',', ' ') . ' ' . $devise;
 @endphp
 
@@ -582,7 +583,7 @@ main.app-main{
                     <option value="{{ $zone->id }}"
                             data-price="{{ $zone->price }}"
                             data-minutes="{{ $zone->estimated_minutes }}">
-                        {{ $zone->name }} — {{ number_format($zone->price,0,',',' ') }} GNF · ~{{ $zone->estimated_minutes }} min
+                        {{ $zone->name }} — {{ number_format($zone->price,0,',',' ') }} {{ $devise }} · ~{{ $zone->estimated_minutes }} min
                     </option>
                     @endforeach
                 </select>
@@ -605,6 +606,7 @@ main.app-main{
 @push('scripts')
 <script>
 (function(){
+const DEVISE     = @json($devise);
 const companyId = {{ $company->id }};
 const authId    = {{ auth()->id() }};
 const shopId    = @json((string)($shopId ?? ''));
@@ -801,7 +803,7 @@ window.onZoneChange = function(sel) {
     const display = document.getElementById('zonePriceDisplay');
     const opt     = sel.options[sel.selectedIndex];
     if (!sel.value) { hint.style.display = 'none'; return; }
-    display.textContent = new Intl.NumberFormat('fr-FR').format(opt.dataset.price) + ' GNF · ~' + opt.dataset.minutes + ' min';
+    display.textContent = new Intl.NumberFormat('fr-FR').format(opt.dataset.price) + ' ' + DEVISE + ' · ~' + opt.dataset.minutes + ' min';
     hint.style.display = 'block';
 };
 

@@ -53,9 +53,8 @@ class OrderController extends Controller
     {
         $user   = Auth::user();
         $shop   = $user->shop ?? $user->assignedShop;
-        $devise = $shop?->currency ?? 'GNF';
-
         $driver = $this->myDriver();
+        $devise = $shop?->currency ?? $driver?->company?->currency ?? 'GNF';
 
         // Mapper les filtres URL (anglais) → statuts DB (français)
         $statusFilter = match(request('status')) {

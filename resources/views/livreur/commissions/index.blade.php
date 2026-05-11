@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Mes commissions')
+@section('title', $isCompanyDriver ? 'Commissions de livraison' : 'Mes commissions')
 @php $bodyClass = 'is-dashboard'; @endphp
 
 @push('styles')
@@ -68,6 +68,16 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
 .cm-row-rate { font-size:11px; color:var(--muted); margin-top:2px; }
 .cm-row-ref  { font-size:11px; color:var(--green); margin-top:2px; font-weight:600; }
 
+/* ── BANNIÈRE INFO ENTREPRISE ── */
+.cm-info-banner {
+    padding:14px 16px; border-radius:12px;
+    background:#eff6ff; border:1.5px solid #bfdbfe;
+    display:flex; gap:12px; align-items:flex-start;
+}
+.cm-info-banner-ico { font-size:20px; flex-shrink:0; margin-top:1px; }
+.cm-info-banner-text { font-size:12.5px; color:#1e40af; line-height:1.55; }
+.cm-info-banner-text strong { font-weight:800; color:#1d4ed8; }
+
 /* ── EMPTY ── */
 .cm-empty { padding:36px 20px; text-align:center; color:var(--muted); font-size:13px; }
 .cm-empty-ico { font-size:40px; display:block; margin-bottom:10px; opacity:.35; }
@@ -103,8 +113,13 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
     <div class="cm-hero-top">
         <a href="{{ route('livreur.dashboard') }}" class="cm-hero-back">← Retour</a>
     </div>
+    @if($isCompanyDriver)
+    <div class="cm-hero-title">📊 Commissions de livraison</div>
+    <div class="cm-hero-sub">Montants payés par les boutiques à {{ $companyName }}</div>
+    @else
     <div class="cm-hero-title">💸 Mes commissions</div>
     <div class="cm-hero-sub">Suivi de vos gains sur chaque livraison</div>
+    @endif
 </div>
 
 {{-- KPI --}}
@@ -113,14 +128,14 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
         <div class="cm-kpi-ico">⏳</div>
         <div>
             <div class="cm-kpi-val">{{ $fmt($pendingTotal) }}</div>
-            <div class="cm-kpi-lbl">En attente de paiement</div>
+            <div class="cm-kpi-lbl">{{ $isCompanyDriver ? 'En attente (boutiques → entreprise)' : 'En attente de paiement' }}</div>
         </div>
     </div>
     <div class="cm-kpi green">
         <div class="cm-kpi-ico">✅</div>
         <div>
             <div class="cm-kpi-val">{{ $fmt($paidTotal) }}</div>
-            <div class="cm-kpi-lbl">Total payé</div>
+            <div class="cm-kpi-lbl">{{ $isCompanyDriver ? 'Total encaissé par l\'entreprise' : 'Total payé' }}</div>
         </div>
     </div>
 </div>
@@ -128,11 +143,22 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
 {{-- BODY --}}
 <div class="cm-body">
 
+    @if($isCompanyDriver)
+    <div class="cm-info-banner">
+        <div class="cm-info-banner-ico">ℹ️</div>
+        <div class="cm-info-banner-text">
+            <strong>Ces montants ne sont pas vos gains personnels.</strong><br>
+            Il s'agit des commissions versées par les boutiques à <strong>{{ $companyName }}</strong> pour chaque livraison effectuée.
+            Votre rémunération est gérée directement par votre entreprise.
+        </div>
+    </div>
+    @endif
+
     {{-- En attente --}}
     <div class="cm-card">
         <div class="cm-card-hd">
             <span class="cm-card-title">
-                ⏳ En attente
+                ⏳ {{ $isCompanyDriver ? 'En attente (boutiques → entreprise)' : 'En attente' }}
                 <span class="cm-card-badge badge-yellow">{{ $pending->total() }}</span>
             </span>
         </div>
@@ -151,7 +177,7 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
         @empty
         <div class="cm-empty">
             <span class="cm-empty-ico">💤</span>
-            Aucune commission en attente.
+            {{ $isCompanyDriver ? 'Aucun montant en attente.' : 'Aucune commission en attente.' }}
         </div>
         @endforelse
         @if($pending->hasPages())
@@ -163,7 +189,7 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
     <div class="cm-card">
         <div class="cm-card-hd">
             <span class="cm-card-title">
-                ✅ Payées
+                ✅ {{ $isCompanyDriver ? 'Encaissées par l\'entreprise' : 'Payées' }}
                 <span class="cm-card-badge badge-green">{{ $paid->total() }}</span>
             </span>
         </div>
@@ -184,7 +210,7 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
         @empty
         <div class="cm-empty">
             <span class="cm-empty-ico">🏦</span>
-            Pas encore de commission payée.
+            {{ $isCompanyDriver ? 'Aucun montant encaissé pour l\'instant.' : 'Pas encore de commission payée.' }}
         </div>
         @endforelse
         @if($paid->hasPages())

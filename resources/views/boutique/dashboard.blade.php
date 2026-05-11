@@ -1650,6 +1650,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 @push('scripts')
 <script>
+const DEVISE = @json($devise);
 /* SIDEBAR */
 function toggleGroup(btn) {
     const sub = btn.nextElementSibling;
@@ -2283,7 +2284,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             `<span class="bq-order-card-client">${bqEsc(o.client)}</span>` +
                         `</div>` +
                         addrHtml +
-                        `<div class="bq-order-card-amount">${o.total} ${o.devise || 'GNF'}</div>` +
+                        `<div class="bq-order-card-amount">${o.total} ${o.devise || DEVISE}</div>` +
                     `</div>` +
                     `<div class="bq-order-card-check">✓</div>`;
                 card.addEventListener('click', () => bqSelectOrderCard(card, o.id));
@@ -2372,7 +2373,7 @@ document.addEventListener('DOMContentLoaded', () => {
             zones.forEach(z => {
                 const opt = document.createElement('option');
                 opt.value           = z.id;
-                opt.textContent     = `${z.name} — ${new Intl.NumberFormat('fr-FR').format(z.price)} GNF`;
+                opt.textContent     = `${z.name} — ${new Intl.NumberFormat('fr-FR').format(z.price)} ${DEVISE}`;
                 opt.dataset.price   = z.price;
                 opt.dataset.minutes = z.estimated_minutes;
                 picker.appendChild(opt);
@@ -2405,7 +2406,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const delayEl = document.getElementById('bqZoneDelayVal');
         const opt     = sel.options[sel.selectedIndex];
         if (!sel.value) { hint.style.display = 'none'; return; }
-        priceEl.textContent = new Intl.NumberFormat('fr-FR').format(opt.dataset.price) + ' GNF';
+        priceEl.textContent = new Intl.NumberFormat('fr-FR').format(opt.dataset.price) + ' ' + DEVISE;
         delayEl.textContent = opt.dataset.minutes;
         hint.style.display  = 'block';
     };

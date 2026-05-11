@@ -256,9 +256,10 @@ body.cx-light .toolbar .search-box{background:#fff;}
         <a href="{{ route('company.historique.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">📊</span> Historique
         </a>
+        <a href="{{ route('company.rapport.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📈</span> Rapport</a>
 
         <div class="cx-nav-sec">Configuration</div>
-        <a href="#" class="cx-nav-item">
+        <a href="{{ route('company.parametre.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">⚙️</span> Paramètres
         </a>
         <a href="{{ route('company.users.index') }}" class="cx-nav-item">
@@ -335,7 +336,7 @@ body.cx-light .toolbar .search-box{background:#fff;}
             <div class="stat-card">
                 <div class="stat-ico amber">💰</div>
                 <div>
-                    <div class="stat-val">{{ number_format($stats['total_revenus'], 0, ',', ' ') }} GNF</div>
+                    <div class="stat-val">{{ number_format($stats['total_revenus'], 0, ',', ' ') }} {{ $company->currency ?? 'GNF' }}</div>
                     <div class="stat-lbl">Revenus de livraison</div>
                 </div>
             </div>
@@ -411,7 +412,7 @@ body.cx-light .toolbar .search-box{background:#fff;}
                     {{-- Revenus --}}
                     <div class="shop-revenue">
                         <span class="shop-revenue-lbl">💰 Revenus générés</span>
-                        <span class="shop-revenue-val">{{ number_format($shop->revenus ?? 0, 0, ',', ' ') }} GNF</span>
+                        <span class="shop-revenue-val">{{ number_format($shop->revenus ?? 0, 0, ',', ' ') }} {{ $company->currency ?? 'GNF' }}</span>
                     </div>
 
                     {{-- Actions --}}

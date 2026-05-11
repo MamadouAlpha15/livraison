@@ -828,7 +828,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                 <div class="filter-row">
                     <span style="font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap">Période :</span>
                     <div class="date-chips">
-                        @foreach(['all'=>'Tout','today'=>"Aujourd'hui",'week'=>'Cette semaine','month'=>'Ce mois','custom'=>'Personnalisé'] as $val=>$lbl)
+                        @foreach(['all'=>'Tout','today'=>"Aujourd'hui",'yesterday'=>'Hier','week'=>'Cette semaine','month'=>'Ce mois','custom'=>'Personnalisé'] as $val=>$lbl)
                         <button type="button" class="date-chip {{ ($dateFilter ?? 'all') === $val ? 'active' : '' }}"
                                 onclick="setDate('{{ $val }}')">{{ $lbl }}</button>
                         @endforeach
@@ -1079,6 +1079,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 
 @push('scripts')
 <script>
+const DEVISE = @json($devise);
 /* ════════════════════════════════════════════════
    MODAL ENTREPRISE + CHAT BOUTIQUE ↔ ENTREPRISE
    ════════════════════════════════════════════════ */
@@ -1331,7 +1332,7 @@ function loadCompanyZones(companyId) {
         zones.forEach(z => {
             const opt = document.createElement('option');
             opt.value        = z.id;
-            opt.textContent  = z.name + ' — ' + new Intl.NumberFormat('fr-FR').format(z.price) + ' GNF';
+            opt.textContent  = z.name + ' — ' + new Intl.NumberFormat('fr-FR').format(z.price) + ' ' + DEVISE;
             opt.dataset.price   = z.price;
             opt.dataset.minutes = z.estimated_minutes;
             picker.appendChild(opt);
@@ -1362,7 +1363,7 @@ function onZonePick(sel) {
     const delayEl  = document.getElementById('zoneDelayVal');
     const opt      = sel.options[sel.selectedIndex];
     if (!sel.value) { hint.style.display = 'none'; return; }
-    priceEl.textContent = new Intl.NumberFormat('fr-FR').format(opt.dataset.price) + ' GNF';
+    priceEl.textContent = new Intl.NumberFormat('fr-FR').format(opt.dataset.price) + ' ' + DEVISE;
     delayEl.textContent = opt.dataset.minutes;
     hint.style.display  = 'block';
 }
@@ -2030,7 +2031,7 @@ function _renderBulkLotsWithSkipped(validLots, skippedOrders, listEl) {
         const price   = g.zonePrice;
         let badge;
         if (hasZone) {
-            badge = `<span style="background:#eef2ff;border:1.5px solid #c7d2fe;color:#4f46e5;border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;">📍 ${label}${price?' — '+fmt(price)+' GNF':''}</span>`;
+            badge = `<span style="background:#eef2ff;border:1.5px solid #c7d2fe;color:#4f46e5;border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;">📍 ${label}${price?' — '+fmt(price)+' '+DEVISE:''}</span>`;
         } else if (label) {
             badge = `<span style="background:#f0fdf4;border:1.5px solid #bbf7d0;color:#065f46;border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;">📍 ${label}</span>`;
         } else {
@@ -2041,12 +2042,12 @@ function _renderBulkLotsWithSkipped(validLots, skippedOrders, listEl) {
         if (price) {
             if (g.orders.length > 1 && g.sameClient) {
                 /* Même client → 1 seul trajet → 1 seul frais */
-                lotTotal = `<div style="font-size:11px;color:#059669;font-weight:600;margin-top:4px;">💰 Frais de livraison : ${fmt(price)} GNF <span style="font-size:10px;opacity:.7;">(1 seul trajet · même client)</span></div>`;
+                lotTotal = `<div style="font-size:11px;color:#059669;font-weight:600;margin-top:4px;">💰 Frais de livraison : ${fmt(price)} ${DEVISE} <span style="font-size:10px;opacity:.7;">(1 seul trajet · même client)</span></div>`;
             } else if (g.orders.length > 1) {
                 /* Clients différents → chacun paie */
-                lotTotal = `<div style="font-size:11px;color:#059669;font-weight:600;margin-top:4px;">💰 Frais de livraison : ${fmt(price)} GNF × ${g.orders.length} clients = ${fmt(price * g.orders.length)} GNF</div>`;
+                lotTotal = `<div style="font-size:11px;color:#059669;font-weight:600;margin-top:4px;">💰 Frais de livraison : ${fmt(price)} ${DEVISE} × ${g.orders.length} clients = ${fmt(price * g.orders.length)} ${DEVISE}</div>`;
             } else {
-                lotTotal = `<div style="font-size:11px;color:#059669;font-weight:600;margin-top:4px;">💰 Frais de livraison : ${fmt(price)} GNF</div>`;
+                lotTotal = `<div style="font-size:11px;color:#059669;font-weight:600;margin-top:4px;">💰 Frais de livraison : ${fmt(price)} ${DEVISE}</div>`;
             }
         }
         return `<div style="padding:10px 12px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);">

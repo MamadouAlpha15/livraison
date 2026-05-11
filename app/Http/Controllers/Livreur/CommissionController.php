@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Livreur;
 
 use App\Http\Controllers\Controller;
 use App\Models\CourierCommission;
+use App\Models\Driver;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -16,6 +17,10 @@ class CommissionController extends Controller
         abort_unless($livreurId, 403);
         $shop  = $livreur->shop ?? $livreur->assignedShop;
         $devise = $shop?->currency ?? 'GNF';
+
+        $driver          = Driver::with('company')->where('user_id', $livreurId)->first();
+        $isCompanyDriver = $driver && $driver->delivery_company_id;
+        $companyName     = $isCompanyDriver ? ($driver->company?->name ?? 'l\'entreprise') : null;
 
         // Commissions en attente
         $pending = CourierCommission::with(['order', 'shop'])
@@ -40,7 +45,8 @@ class CommissionController extends Controller
             ->sum('amount');
 
         return view('livreur.commissions.index', compact(
-            'pending', 'paid', 'pendingTotal', 'paidTotal', 'devise'
+            'pending', 'paid', 'pendingTotal', 'paidTotal', 'devise',
+            'isCompanyDriver', 'companyName'
         ));
     }
 }

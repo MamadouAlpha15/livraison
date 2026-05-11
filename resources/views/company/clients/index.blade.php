@@ -260,9 +260,10 @@ body.cx-dark .toolbar .search-box input{color:#e2e8f0;}
         <a href="{{ route('company.historique.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">📊</span> Historique
         </a>
+        <a href="{{ route('company.rapport.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📈</span> Rapport</a>
 
         <div class="cx-nav-sec">Configuration</div>
-        <a href="#" class="cx-nav-item">
+        <a href="{{ route('company.parametre.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">⚙️</span> Paramètres
         </a>
         <a href="{{ route('company.users.index') }}" class="cx-nav-item">

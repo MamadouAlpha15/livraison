@@ -20,7 +20,8 @@ class ZoneController extends Controller
     {
         $company = $this->getCompany();
         $zones   = DeliveryZone::where('delivery_company_id', $company->id)->orderBy('name')->paginate(12);
-        return view('company.zones.index', compact('company', 'zones'));
+        $devise  = $company->currency ?? 'GNF';
+        return view('company.zones.index', compact('company', 'zones', 'devise'));
     }
 
     public function store(Request $request)

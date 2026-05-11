@@ -812,7 +812,7 @@ a{text-decoration:none;color:inherit;}
                             @endif
                         </div>
                         <div style="text-align:right;flex-shrink:0;">
-                            <div style="font-size:14px;font-weight:900;color:var(--brand);">{{ number_format($zone->price, 0, ',', ' ') }} <span style="font-size:10px;font-weight:600;color:var(--muted);">GNF</span></div>
+                            <div style="font-size:14px;font-weight:900;color:var(--brand);">{{ number_format($zone->price, 0, ',', ' ') }} <span style="font-size:10px;font-weight:600;color:var(--muted);">{{ $company->currency ?? 'GNF' }}</span></div>
                             <div style="font-size:10px;color:var(--muted);margin-top:1px;">~{{ $zone->estimated_minutes }} min</div>
                         </div>
                     </div>

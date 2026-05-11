@@ -64,7 +64,8 @@ class ShopController extends Controller
         // ✅ Création de la boutique et lien avec le vendeur
         $shop = new Shop($validated);
         $shop->user_id  = Auth::id();
-        $shop->country  = Auth::user()->country; // hérite du pays du propriétaire
+        $shop->country  = Auth::user()->country;
+        $shop->currency = \App\Models\DeliveryCompany::currencyForCountry(Auth::user()->country ?? '');
         $shop->save();
 
         // ✅ Mise à jour du vendeur → il devient admin de sa boutique
@@ -130,6 +131,10 @@ public function update(Request $request, \App\Models\Shop $shop)
         $data['image'] = $shop->image;
     }
 
+    if (!empty($data['country'])) {
+        $data['currency'] = \App\Models\DeliveryCompany::currencyForCountry($data['country']);
+    }
+
     $shop->update($data);
 
     return redirect()->route('shop.index', $shop->id)
@@ -173,10 +178,12 @@ public function update(Request $request, \App\Models\Shop $shop)
             ->orderBy('name')
             ->get();
 
-        // --- ENTREPRISES DE LIVRAISON (approuvées) pour le dropdown ---
+        // --- ENTREPRISES DE LIVRAISON (approuvées, même pays) pour le dropdown ---
+        $shopCountry = $shop->country ?? $user->country;
         $deliveryCompanies = \App\Models\DeliveryCompany::query()
             ->where('approved', true)
             ->where('active', true)
+            ->when($shopCountry, fn($q) => $q->where('country', $shopCountry))
             ->orderBy('name')
             ->get();
  

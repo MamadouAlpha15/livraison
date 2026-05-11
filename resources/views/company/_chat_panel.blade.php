@@ -49,7 +49,7 @@
             <span class="zone-dot" style="background:{{ $zone->color }};box-shadow:0 0 4px {{ $zone->color }}88;"></span>
             <span class="zone-pill-name">{{ $zone->name }}</span>
             <div style="text-align:right;flex-shrink:0;">
-                <div class="zone-pill-price">{{ number_format($zone->price,0,',',' ') }} GNF</div>
+                <div class="zone-pill-price">{{ number_format($zone->price,0,',',' ') }} {{$company->currency}}</div>
                 <div class="zone-pill-time">~{{ $zone->estimated_minutes }} min</div>
             </div>
         </div>

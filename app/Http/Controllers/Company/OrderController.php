@@ -43,9 +43,16 @@ class OrderController extends Controller
             });
         }
 
-        if ($request->filled('date')) {
-            $query->whereDate('created_at', $request->date);
-        }
+        $period = $request->input('period', 'all');
+        match($period) {
+            'today'     => $query->whereDate('created_at', today()),
+            'yesterday' => $query->whereDate('created_at', today()->subDay()),
+            'week'      => $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+            'month'     => $query->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year),
+            'custom'    => $query->when($request->filled('date_from'), fn($q) => $q->whereDate('created_at', '>=', $request->date_from))
+                                 ->when($request->filled('date_to'),   fn($q) => $q->whereDate('created_at', '<=', $request->date_to)),
+            default     => null,
+        };
 
         if ($request->filled('boutique')) {
             $query->where('shop_id', $request->boutique);
@@ -65,7 +72,8 @@ class OrderController extends Controller
 
         $drivers = $company->drivers()->orderByRaw("FIELD(status,'available','busy','offline')")->orderBy('name')->get();
 
-        return view('company.orders.index', compact('orders', 'stats', 'drivers', 'company'));
+        $devise = $company->currency ?? 'GNF';
+        return view('company.orders.index', compact('orders', 'stats', 'drivers', 'company', 'period', 'devise'));
     }
 
     public function assign(Request $request, Order $order)

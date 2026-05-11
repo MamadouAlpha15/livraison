@@ -52,6 +52,18 @@ html,body {
 }
 a { text-decoration:none; color:inherit; }
 
+/* Footer suit le thème du dashboard */
+body.cx-dashboard footer.app-footer {
+    background:var(--cx-surface) !important;
+    color:var(--cx-text2) !important;
+    border-top:1px solid rgba(255,255,255,.06);
+}
+body.cx-dashboard.cx-light footer.app-footer {
+    background:#eef1f7 !important;
+    color:#6b7280 !important;
+    border-top:1px solid rgba(0,0,0,.07);
+}
+
 /* Cacher la navbar du layout pour ce dashboard */
 body.cx-dashboard > nav,
 body.cx-dashboard > header,
@@ -897,9 +909,10 @@ body.cx-light .cx-chart-big { color:#111827; }
         <a href="{{ route('company.historique.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">📊</span> Historique
         </a>
+        <a href="{{ route('company.rapport.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📈</span> Rapport</a>
 
         <div class="cx-nav-sec">Configuration</div>
-        <a href="#" class="cx-nav-item">
+        <a href="{{ route('company.parametre.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">⚙️</span> Paramètres
         </a>
         <a href="{{ route('company.users.index') }}" class="cx-nav-item">
@@ -1296,9 +1309,9 @@ body.cx-light .cx-chart-big { color:#111827; }
                     </div>
 
                     {{-- Note moyenne --}}
-                    <div class="cx-perf-card">
+                    <div class="cx-perf-card" style="flex-direction:row;align-items:center;gap:10px;flex-wrap:wrap;">
                         <div class="cx-perf-ico">⭐</div>
-                        <div>
+                        <div style="flex:1;min-width:0;">
                             <div class="cx-perf-lbl">Note moyenne clients</div>
                             @if($avgRating !== null && $ratingCount > 0)
                                 <div class="cx-perf-val">{{ $avgRating }}<span>/5</span></div>
@@ -1311,6 +1324,12 @@ body.cx-light .cx-chart-big { color:#111827; }
                                 <div class="cx-perf-trend" style="color:var(--cx-muted)">Aucun avis reçu</div>
                             @endif
                         </div>
+                        @if($ratingCount > 0)
+                        <button onclick="document.getElementById('cxReviewsModal').classList.add('open')"
+                                style="flex-shrink:0;padding:5px 12px;background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3);border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap;">
+                            Voir
+                        </button>
+                        @endif
                     </div>
 
                 </div>
@@ -1323,6 +1342,61 @@ body.cx-light .cx-chart-big { color:#111827; }
 
 {{-- Conteneur des toasts de notification --}}
 <div class="cx-toasts" id="cxToasts"></div>
+
+{{-- ══ MODAL AVIS CLIENTS ══ --}}
+<div id="cxReviewsModal" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);align-items:center;justify-content:center;padding:16px;">
+    <div style="background:#1e293b;border-radius:18px;width:100%;max-width:520px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.5);overflow:hidden;">
+        {{-- Header --}}
+        <div style="padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+            <div>
+                <div style="font-size:15px;font-weight:800;color:#fff;">⭐ Avis des vendeurs</div>
+                <div style="font-size:11.5px;color:#94a3b8;margin-top:2px;">{{ $ratingCount }} avis · Moyenne {{ $avgRating ?? '—' }}/5</div>
+            </div>
+            <button onclick="document.getElementById('cxReviewsModal').classList.remove('open')"
+                    style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.1);border:none;color:#94a3b8;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+        </div>
+        {{-- Liste --}}
+        <div style="overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;">
+            @forelse($latestReviews as $rev)
+            @php
+                $shopName   = $rev->order?->shop?->name ?? 'Boutique inconnue';
+                $clientName = $rev->client?->name ?? 'Client';
+                $stars      = str_repeat('★', (int) $rev->rating) . str_repeat('☆', 5 - (int) $rev->rating);
+                $date       = $rev->created_at->format('d/m/Y');
+            @endphp
+            <div style="background:rgba(255,255,255,.05);border-radius:12px;padding:14px 16px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;flex-wrap:wrap;">
+                    <div style="font-size:12px;font-weight:700;color:#e2e8f0;">{{ $shopName }}</div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span style="font-size:13px;color:#f59e0b;letter-spacing:1px;">{{ $stars }}</span>
+                        <span style="font-size:10.5px;color:#64748b;">{{ $date }}</span>
+                    </div>
+                </div>
+                @if($rev->comment)
+                <div style="font-size:12.5px;color:#94a3b8;line-height:1.55;border-left:2px solid rgba(16,185,129,.4);padding-left:10px;">{{ $rev->comment }}</div>
+                @else
+                <div style="font-size:11.5px;color:#475569;font-style:italic;">Aucun commentaire.</div>
+                @endif
+                <div style="font-size:10.5px;color:#475569;margin-top:6px;">Par {{ $clientName }} · Commande #{{ $rev->order_id }}</div>
+            </div>
+            @empty
+            <div style="text-align:center;padding:32px 0;color:#64748b;font-size:13px;">Aucun avis pour l'instant.</div>
+            @endforelse
+        </div>
+    </div>
+</div>
+<style>
+#cxReviewsModal { display:none; }
+#cxReviewsModal.open { display:flex; }
+</style>
+<script>
+document.getElementById('cxReviewsModal')?.addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+});
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.getElementById('cxReviewsModal')?.classList.remove('open');
+});
+</script>
 
 @endsection
 
