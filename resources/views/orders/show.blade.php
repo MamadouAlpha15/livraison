@@ -628,13 +628,13 @@ $init = fn(string $n): string =>
 }
 .moto-searching { animation: moto-search 1.6s ease-in-out infinite; }
 .halo-ring {
-    position: absolute; inset: -8px; border-radius: 50%;
-    border: 2.5px solid rgba(240,106,15,.6);
+    position: absolute; inset: -5px; border-radius: 50%;
+    border: 2px solid rgba(240,106,15,.6);
     animation: halo-pulse 1.8s ease-out infinite;
 }
 .halo-ring2 {
-    position: absolute; inset: -8px; border-radius: 50%;
-    border: 2px solid rgba(240,106,15,.35);
+    position: absolute; inset: -5px; border-radius: 50%;
+    border: 1.5px solid rgba(240,106,15,.35);
     animation: halo-pulse 1.8s ease-out .6s infinite;
 }
 </style>
@@ -692,17 +692,17 @@ $init = fn(string $n): string =>
     /* ── Icône moto ── */
     function makeMotoIcon(searching) {
         return L.divIcon({
-            html: `<div style="position:relative;width:54px;height:54px">
+            html: `<div style="position:relative;width:32px;height:32px">
                 ${searching ? '<div class="halo-ring"></div><div class="halo-ring2"></div>' : ''}
                 <div class="${searching ? 'moto-searching' : ''}" style="
-                    width:54px;height:54px;border-radius:50%;
+                    width:32px;height:32px;border-radius:50%;
                     background:linear-gradient(135deg,#f06a0f 0%,#d45a00 100%);
-                    border:3px solid #fff;
-                    box-shadow:0 4px 20px rgba(240,106,15,.55),0 0 0 5px rgba(240,106,15,.15);
+                    border:2px solid #fff;
+                    box-shadow:0 2px 10px rgba(240,106,15,.55),0 0 0 3px rgba(240,106,15,.15);
                     display:flex;align-items:center;justify-content:center;
-                    font-size:26px;line-height:1;cursor:pointer">🛵</div>
+                    font-size:15px;line-height:1;cursor:pointer">🛵</div>
             </div>`,
-            iconSize:[54,54], iconAnchor:[27,27], popupAnchor:[0,-30], className:''
+            iconSize:[32,32], iconAnchor:[16,16], popupAnchor:[0,-18], className:''
         });
     }
 

@@ -95,26 +95,20 @@ class OrderController extends Controller
         $result = [];
 
         foreach ($orders as $order) {
-            $isCompanyOrder = $order->driver_id && $driver && (int)$order->driver_id === $driver->id;
-
-            if ($isCompanyOrder) {
-                // Livreur entreprise (driver) : groupe par client + destination
-                $destNorm = strtolower(trim($order->delivery_destination ?? $order->client?->address ?? ''));
-                $key = ($order->user_id ?? 'anon') . '::' . $destNorm;
-            } elseif ($order->delivery_batch_id) {
-                // Bulk-assigné via checkbox : batch_id commun → 1 groupe = 1 trajet
+            // Clé d'appartenance : batch_id si groupé intentionnellement, sinon solo par commande.
+            // Règle identique pour livreur boutique ET livreur entreprise :
+            //   delivery_batch_id présent → même lot = même trajet
+            //   absent → commande individuelle, jamais fusionnée avec d'autres
+            if ($order->delivery_batch_id) {
                 $key = 'batch_' . $order->delivery_batch_id;
             } else {
-                // Assignation individuelle (bouton ✅ par ligne) → jamais groupée
                 $key = '__solo__' . $order->id;
             }
 
             if (!isset($map[$key])) {
                 $map[$key] = count($result);
                 $result[] = [
-                    // Livreur entreprise : is_group=true dès la 1ère commande (affiche bloc retrait→livraison)
-                    // Livreur boutique   : is_group=false pour 1 commande, devient true si une 2ème rejoint
-                    'is_group'     => $isCompanyOrder,
+                    'is_group'     => false, // devient true si une 2ème commande rejoint le même batch
                     'orders'       => [$order],
                     'client'       => $order->client ?? $order->user,
                     'shop'         => $order->shop,
@@ -127,6 +121,11 @@ class OrderController extends Controller
             } else {
                 $idx = $map[$key];
                 $result[$idx]['is_group']  = true;
+                // Client différent du groupe → sa fee s'ajoute (chaque client paie sa livraison)
+                $knownUserIds = array_map(fn($o) => $o->user_id, $result[$idx]['orders']);
+                if (!in_array($order->user_id, $knownUserIds)) {
+                    $result[$idx]['delivery_fee'] += (float)($order->delivery_fee ?? 0);
+                }
                 $result[$idx]['orders'][]  = $order;
                 $result[$idx]['total']    += (float)$order->total;
                 $cur = $statusPriority[$result[$idx]['status']] ?? 99;
@@ -191,6 +190,17 @@ class OrderController extends Controller
                     if (CourierCommission::where('order_id', $order->id)->exists()) continue;
                 }
 
+                // Multi-client dans le même batch → sommer les fees de chaque commande
+                if ($batchId) {
+                    $batchOrders   = Order::where('delivery_batch_id', $batchId)->get();
+                    $isMultiClient = $batchOrders->pluck('user_id')->unique()->count() > 1;
+                    $commAmount    = $isMultiClient
+                        ? ((float)$batchOrders->sum('delivery_fee') ?: (float)(\App\Models\DeliveryZone::find($order->delivery_zone_id)?->price) ?: 0)
+                        : ((float)($order->delivery_fee) ?: (float)(\App\Models\DeliveryZone::find($order->delivery_zone_id)?->price) ?: 0);
+                } else {
+                    $commAmount = (float)($order->delivery_fee) ?: ((float)(\App\Models\DeliveryZone::find($order->delivery_zone_id)?->price) ?: 0);
+                }
+
                 CourierCommission::create([
                     'order_id'          => $order->id,
                     'livreur_id'        => $order->livreur_id ?? Auth::id(),
@@ -198,7 +208,7 @@ class OrderController extends Controller
                     'delivery_batch_id' => $batchId,
                     'order_total'       => $order->total,
                     'rate'              => 0,
-                    'amount'            => (float)($order->delivery_fee) ?: ((float)(\App\Models\DeliveryZone::find($order->delivery_zone_id)?->price) ?: 0),
+                    'amount'            => $commAmount,
                     'status'            => 'en_attente',
                 ]);
             }
@@ -274,8 +284,16 @@ class OrderController extends Controller
                 : CourierCommission::where('order_id', $order->id)->exists();
 
             if (! $commExists) {
-                // Montant : frais livraison > prix zone > 0 (saisie manuelle ensuite)
-                $commAmount = (float)($order->delivery_fee) ?: ((float)(\App\Models\DeliveryZone::find($order->delivery_zone_id)?->price) ?: 0);
+                // Multi-client dans le même batch → sommer les fees de chaque commande
+                if ($batchId) {
+                    $batchOrders   = Order::where('delivery_batch_id', $batchId)->get();
+                    $isMultiClient = $batchOrders->pluck('user_id')->unique()->count() > 1;
+                    $commAmount    = $isMultiClient
+                        ? ((float)$batchOrders->sum('delivery_fee') ?: (float)(\App\Models\DeliveryZone::find($order->delivery_zone_id)?->price) ?: 0)
+                        : ((float)($order->delivery_fee) ?: (float)(\App\Models\DeliveryZone::find($order->delivery_zone_id)?->price) ?: 0);
+                } else {
+                    $commAmount = (float)($order->delivery_fee) ?: ((float)(\App\Models\DeliveryZone::find($order->delivery_zone_id)?->price) ?: 0);
+                }
                 CourierCommission::create([
                     'order_id'           => $order->id,
                     'livreur_id'         => $order->livreur_id ?? Auth::id(),

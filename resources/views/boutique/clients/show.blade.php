@@ -246,9 +246,10 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
     }
     .tbl td:nth-child(1)::before { content:'Réf'; }
     .tbl td:nth-child(2)::before { content:'Produits'; }
-    .tbl td:nth-child(3)::before { content:'Montant'; }
-    .tbl td:nth-child(4)::before { content:'Statut'; }
-    .tbl td:nth-child(5)::before { content:'Date'; }
+    .tbl td:nth-child(3)::before { content:'Livraison'; }
+    .tbl td:nth-child(4)::before { content:'Montant'; }
+    .tbl td:nth-child(5)::before { content:'Statut'; }
+    .tbl td:nth-child(6)::before { content:'Date'; }
     .tbl td.right { text-align:right; }
 
     .amt-num  { font-size:13px; }
@@ -297,11 +298,13 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
                 @if($user->email)
                     <span class="cl-contact">✉️ {{ $user->email }}</span>
                 @endif
-                @if($user->phone)
-                    <span class="cl-contact">📞 {{ $user->phone }}</span>
+                @php $bestPhone = $latestPhone ?: $user->phone; @endphp
+                @if($bestPhone)
+                    <a href="tel:{{ $bestPhone }}" class="cl-contact" style="color:rgba(255,255,255,.65);text-decoration:none">📞 {{ $bestPhone }}</a>
                 @endif
-                @if($user->address)
-                    <span class="cl-contact">📍 {{ $user->address }}</span>
+                @php $bestAddress = $latestAddress ?: $user->address; @endphp
+                @if($bestAddress)
+                    <span class="cl-contact">📍 {{ $bestAddress }}</span>
                 @endif
                 <span class="cl-contact">
                     🗓️ Client depuis {{ \Carbon\Carbon::parse($stats->premiere_cmd ?? now())->translatedFormat('M Y') }}
@@ -376,6 +379,7 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
                 <tr>
                     <th>Réf</th>
                     <th>Produits</th>
+                    <th>Livraison</th>
                     <th class="right">Montant</th>
                     <th>Statut</th>
                     <th>Date</th>
@@ -402,6 +406,19 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
                             @endif
                         @else
                             <span style="color:var(--muted)">—</span>
+                        @endif
+                    </td>
+
+                    {{-- Livraison --}}
+                    <td>
+                        @if($order->delivery_destination)
+                            <div style="font-size:12px;color:var(--text);font-weight:600;max-width:180px;line-height:1.3">📍 {{ $order->delivery_destination }}</div>
+                        @endif
+                        @if($order->client_phone)
+                            <a href="tel:{{ $order->client_phone }}" style="font-size:11.5px;color:var(--muted);text-decoration:none;display:block;margin-top:3px">📞 {{ $order->client_phone }}</a>
+                        @endif
+                        @if(!$order->delivery_destination && !$order->client_phone)
+                            <span style="color:var(--muted);font-size:12px">—</span>
                         @endif
                     </td>
 

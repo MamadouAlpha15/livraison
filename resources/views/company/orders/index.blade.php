@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 @section('title', 'Mes commandes · ' . $company->name)
 @php $bodyClass = 'is-dashboard'; @endphp
 
@@ -275,6 +275,30 @@ td{padding:14px 16px;font-size:14.5px;vertical-align:middle;}
     cursor:pointer;font-family:inherit;transition:all .15s;
 }
 .btn-sel-cancel:hover{background:var(--cx-card);color:var(--cx-text);}
+.btn-sel-annuler{
+    padding:9px 14px;border-radius:var(--r-xs);border:1.5px solid #fca5a5;
+    background:#fee2e2;color:#991b1b;font-size:13px;font-weight:700;
+    cursor:pointer;font-family:inherit;transition:all .15s;
+}
+.btn-sel-annuler:hover{background:#fecaca;}
+.btn-sel-restaurer{
+    padding:9px 14px;border-radius:var(--r-xs);border:1.5px solid #6ee7b7;
+    background:#d1fae5;color:#065f46;font-size:13px;font-weight:700;
+    cursor:pointer;font-family:inherit;transition:all .15s;
+}
+.btn-sel-restaurer:hover{background:#a7f3d0;}
+.btn-action-cancel{
+    padding:5px 10px;border-radius:6px;border:1.5px solid #fca5a5;
+    background:#fee2e2;color:#991b1b;font-size:12px;font-weight:700;
+    cursor:pointer;white-space:nowrap;transition:all .13s;
+}
+.btn-action-cancel:hover{background:#fecaca;}
+.btn-action-restore{
+    padding:5px 10px;border-radius:6px;border:1.5px solid #6ee7b7;
+    background:#d1fae5;color:#065f46;font-size:12px;font-weight:700;
+    cursor:pointer;white-space:nowrap;transition:all .13s;
+}
+.btn-action-restore:hover{background:#a7f3d0;}
 /* Checkbox cell */
 .chk-th{width:44px;padding:12px 8px 12px 16px!important;}
 .chk-td{padding:12px 8px 12px 16px!important;}
@@ -651,12 +675,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
         <a href="{{route('company.zones.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">📍</span> Zone de livraison
         </a>
-        <a href="#" class="cx-nav-item">
-            <span class="cx-nav-ico">💲</span> Tarification
-        </a>
-        <a href="#" class="cx-nav-item">
-            <span class="cx-nav-ico">🔔</span> Notifications
-        </a>
+       
         <a href="{{ route('company.historique.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">📊</span> Historique
         </a>
@@ -665,12 +684,10 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
         <a href="#" class="cx-nav-item">
             <span class="cx-nav-ico">⚙️</span> Paramètres
         </a>
-        <a href="#" class="cx-nav-item">
+        <a href="{{ route('company.users.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">👤</span> Utilisateurs
         </a>
-        <a href="#" class="cx-nav-item">
-            <span class="cx-nav-ico">🔌</span> Intégrations
-        </a>
+
     </nav>
 
     <div class="cx-user-foot">
@@ -713,7 +730,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                 <div class="cx-tb-av">{{ $ini }}</div>
                 <div>
                     <div class="cx-tb-uname">{{ Str::limit($u->name ?? 'Admin', 16) }}</div>
-                    <div class="cx-tb-urole">Super Admin</div>
+                    <div class="cx-tb-urole">{{ $company->name }}</div>
                 </div>
             </div>
         </div>
@@ -786,7 +803,9 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
                 <span id="selBtnLabel">Assigner</span>
             </button>
-            <button class="btn-sel-cancel" onclick="clearSelection()">✕ Annuler</button>
+            <button class="btn-sel-annuler" onclick="bulkCancelOrders()">🚫 Annuler</button>
+            <button class="btn-sel-restaurer" onclick="bulkRestoreOrders()">♻️ Restaurer</button>
+            <button class="btn-sel-cancel" onclick="clearSelection()">✕ Effacer</button>
         </div>
     </div>
 
@@ -842,7 +861,10 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                     <td data-label="Client">
                         <div>
                             <div class="client-name">{{ $order->client->name ?? '—' }}</div>
-                            <div class="client-phone">{{ $order->client->phone ?? '' }}</div>
+                            @php $cPhone = $order->client_phone ?: ($order->client->phone ?? null); @endphp
+                            @if($cPhone)
+                            <a href="tel:{{ $cPhone }}" class="client-phone" style="text-decoration:none;color:var(--cx-muted)">📞 {{ $cPhone }}</a>
+                            @endif
                         </div>
                     </td>
                     <td data-label="Boutique">
@@ -908,7 +930,18 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                                 🚴 Assigner
                             </button>
                             @endif
-                           
+                            @if(!in_array($order->status, ['livrée','annulée']))
+                            <button class="btn-action-cancel"
+                                    onclick="cancelOrder({{ $order->id }}, this)">
+                                🚫 Annuler
+                            </button>
+                            @endif
+                            @if($order->status === 'annulée')
+                            <button class="btn-action-restore"
+                                    onclick="restoreOrder({{ $order->id }}, this)">
+                                ♻️ Restaurer
+                            </button>
+                            @endif
                         </div>
                     </td>
                 </tr>
@@ -1562,6 +1595,66 @@ function submitStatus(){
 function markDone(btn){
     if(!confirm('Marquer cette commande comme livrée ?')) return;
     currentOrderId=btn.getAttribute('data-id'); selectedStatusVal='livrée'; submitStatus();
+}
+
+/* ── Annuler / Restaurer (unitaire) ── */
+function cancelOrder(orderId, btn) {
+    if (!confirm('Annuler cette commande ?')) return;
+    btn.disabled = true;
+    fetch('/company/orders/' + orderId + '/cancel', {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json' }
+    }).then(r => r.json()).then(data => {
+        if (data.success) { toast('🚫 Commande annulée.', 'success'); setTimeout(() => location.reload(), 1200); }
+        else { toast('Erreur lors de l\'annulation.', 'error'); btn.disabled = false; }
+    }).catch(() => { toast('Erreur réseau.', 'error'); btn.disabled = false; });
+}
+function restoreOrder(orderId, btn) {
+    if (!confirm('Restaurer cette commande en attente ?')) return;
+    btn.disabled = true;
+    fetch('/company/orders/' + orderId + '/restore', {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json' }
+    }).then(r => r.json()).then(data => {
+        if (data.success) { toast('♻️ Commande restaurée.', 'success'); setTimeout(() => location.reload(), 1200); }
+        else { toast('Erreur lors de la restauration.', 'error'); btn.disabled = false; }
+    }).catch(() => { toast('Erreur réseau.', 'error'); btn.disabled = false; });
+}
+
+/* ── Annuler / Restaurer (bulk) ── */
+async function bulkCancelOrders() {
+    if (!_bulkOrderIds.size) return;
+    if (!confirm('Annuler ' + _bulkOrderIds.size + ' commande(s) sélectionnée(s) ?')) return;
+    try {
+        const res  = await fetch('{{ route("company.orders.bulk-cancel") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json' },
+            body: JSON.stringify({ order_ids: [..._bulkOrderIds] })
+        });
+        const data = await res.json();
+        if (data.success) {
+            toast('🚫 ' + data.count + ' commande(s) annulée(s).', 'success');
+            clearSelection();
+            setTimeout(() => location.reload(), 1400);
+        } else { toast('Erreur lors de l\'annulation.', 'error'); }
+    } catch(e) { toast('Erreur réseau.', 'error'); }
+}
+async function bulkRestoreOrders() {
+    if (!_bulkOrderIds.size) return;
+    if (!confirm('Restaurer ' + _bulkOrderIds.size + ' commande(s) sélectionnée(s) ?')) return;
+    try {
+        const res  = await fetch('{{ route("company.orders.bulk-restore") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json' },
+            body: JSON.stringify({ order_ids: [..._bulkOrderIds] })
+        });
+        const data = await res.json();
+        if (data.success) {
+            toast('♻️ ' + data.count + ' commande(s) restaurée(s).', 'success');
+            clearSelection();
+            setTimeout(() => location.reload(), 1400);
+        } else { toast('Erreur lors de la restauration.', 'error'); }
+    } catch(e) { toast('Erreur réseau.', 'error'); }
 }
 
 /* ── Toast ── */

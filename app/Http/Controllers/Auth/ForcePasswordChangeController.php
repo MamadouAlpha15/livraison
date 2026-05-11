@@ -33,10 +33,11 @@ class ForcePasswordChangeController extends Controller
         $role = $user->role ?? 'client';
 
         $redirect = match(true) {
-            $role === 'livreur'                       => route('livreur.dashboard'), // rederection vers sa vue
-            in_array($role, ['vendeur', 'employe'])   => route('boutique.dashboard'), // 
+            $role === 'livreur'                       => route('livreur.dashboard'),
+            in_array($role, ['vendeur', 'employe'])   => route('boutique.dashboard'),
             $role === 'client'                        => route('client.dashboard'),
-            default                                   => route('home'),
+            $role === 'company'                       => route('company.orders.index'),
+            default                                   => route('admin.dashboard'),
         };
 
         return redirect($redirect)->with('success', '✅ Mot de passe mis à jour ! Bienvenue sur Shopio.');

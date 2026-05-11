@@ -11,13 +11,15 @@ class ZoneController extends Controller
 {
     private function getCompany()
     {
-        return DeliveryCompany::where('user_id', auth()->id())->firstOrFail();
+        $company = DeliveryCompany::forUser(auth()->user());
+        abort_if(!$company, 404, "Aucune entreprise liée à ce compte.");
+        return $company;
     }
 
     public function index()
     {
         $company = $this->getCompany();
-        $zones   = DeliveryZone::where('delivery_company_id', $company->id)->orderBy('name')->get();
+        $zones   = DeliveryZone::where('delivery_company_id', $company->id)->orderBy('name')->paginate(12);
         return view('company.zones.index', compact('company', 'zones'));
     }
 

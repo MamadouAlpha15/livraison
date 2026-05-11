@@ -250,6 +250,47 @@ class OrderController extends Controller
         return response()->json(['success' => true, 'assigned' => $assigned]);
     }
 
+    public function bulkCancel(Request $request)
+    {
+        $shopId = Auth::user()->currentShopId();
+        if (!$shopId) return response()->json(['success' => false], 403);
+
+        $ids = $request->validate(['order_ids' => 'required|array|min:1'])['order_ids'];
+
+        $count = Order::whereIn('id', $ids)
+            ->where('shop_id', $shopId)
+            ->whereNotIn('status', ['annulée', 'livrée'])
+            ->update(['status' => 'annulée']);
+
+        return response()->json(['success' => true, 'count' => $count]);
+    }
+
+    public function bulkRestore(Request $request)
+    {
+        $shopId = Auth::user()->currentShopId();
+        if (!$shopId) return response()->json(['success' => false], 403);
+
+        $ids = $request->validate(['order_ids' => 'required|array|min:1'])['order_ids'];
+
+        $orders = Order::whereIn('id', $ids)
+            ->where('shop_id', $shopId)
+            ->whereIn('status', ['annulée', 'cancelled'])
+            ->get();
+
+        foreach ($orders as $order) {
+            $order->update([
+                'status'              => 'en_attente',
+                'livreur_id'          => null,
+                'delivery_company_id' => null,
+                'driver_id'           => null,
+                'delivery_zone_id'    => null,
+                'delivery_fee'        => null,
+            ]);
+        }
+
+        return response()->json(['success' => true, 'count' => $orders->count()]);
+    }
+
     public function assign(Request $request, Order $order)
     {
         $shopId = Auth::user()->currentShopId();

@@ -96,8 +96,7 @@
                 <label>Rôle <span style="color:#ef4444">*</span></label>
                 <select name="role_in_shop" required>
                     <option value="livreur"  {{ old('role_in_shop')==='livreur'  ?'selected':'' }}>🚚 Livreur</option>
-                    <option value="vendeur"  {{ old('role_in_shop')==='vendeur'  ?'selected':'' }}>🛒 Vendeur</option>
-                    <option value="employe"  {{ old('role_in_shop')==='employe'  ?'selected':'' }}>👤 Employé</option>
+                    
                 </select>
             </div>
 

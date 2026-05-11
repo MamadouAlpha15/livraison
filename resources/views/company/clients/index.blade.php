@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 @section('title', 'Clients · ' . $company->name)
 @php $bodyClass = 'is-dashboard'; @endphp
 
@@ -159,8 +159,8 @@ body.cx-light .ctbl tbody tr:hover td{background:rgba(124,58,237,.04);}
 /* Rank badge */
 .rank-badge{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;}
 .rank-1{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;box-shadow:0 2px 8px rgba(245,158,11,.4);}
-.rank-2{background:rgba(100,116,139,.3);color:#cbd5e1;}
-.rank-3{background:rgba(180,120,60,.25);color:#fbbf24;}
+.rank-2{background:linear-gradient(135deg,#94a3b8,#64748b);color:#fff;box-shadow:0 2px 8px rgba(100,116,139,.4);}
+.rank-3{background:linear-gradient(135deg,#cd7c2b,#b45309);color:#fff;box-shadow:0 2px 8px rgba(180,120,60,.4);}
 .rank-n{background:var(--cx-surface2);color:var(--cx-muted);}
 
 /* Pagination */
@@ -219,7 +219,7 @@ body.cx-dark .toolbar .search-box input{color:#e2e8f0;}
     <div class="cx-brand-hd">
         <div class="cx-brand-top">
             <a href="{{ route('company.dashboard') }}" class="cx-logo">
-                <div class="cx-logo-icon">🚚</div>
+                <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
                 <span>{{ Str::limit($company->name, 14) }}</span>
             </a>
             <button class="cx-close-btn" id="cxClose">✕</button>
@@ -257,12 +257,6 @@ body.cx-dark .toolbar .search-box input{color:#e2e8f0;}
         <a href="{{route('company.zones.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">📍</span> Zone de livraison
         </a>
-        <a href="#" class="cx-nav-item">
-            <span class="cx-nav-ico">💲</span> Tarification
-        </a>
-        <a href="#" class="cx-nav-item">
-            <span class="cx-nav-ico">🔔</span> Notifications
-        </a>
         <a href="{{ route('company.historique.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">📊</span> Historique
         </a>
@@ -271,12 +265,10 @@ body.cx-dark .toolbar .search-box input{color:#e2e8f0;}
         <a href="#" class="cx-nav-item">
             <span class="cx-nav-ico">⚙️</span> Paramètres
         </a>
-        <a href="#" class="cx-nav-item">
+        <a href="{{ route('company.users.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">👤</span> Utilisateurs
         </a>
-        <a href="#" class="cx-nav-item">
-            <span class="cx-nav-ico">🔌</span> Intégrations
-        </a>
+
     </nav>
 
     <div class="cx-user-foot">
@@ -427,21 +419,28 @@ body.cx-dark .toolbar .search-box input{color:#e2e8f0;}
                             <div class="cli-av">{{ $initials }}</div>
                             <div>
                                 <div class="cli-name">{{ $client->name ?? 'Inconnu' }}</div>
-                                <div class="cli-contact" style="display:none" class="hide-mobile">
-                                    @if($client->phone) 📞 {{ $client->phone }} @endif
+                                @php $bp = $client->order_phone ?: $client->phone; @endphp
+                                @if($bp)
+                                <div class="cli-contact">
+                                    <a href="tel:{{ $bp }}" style="text-decoration:none;color:inherit">📞 {{ $bp }}</a>
                                 </div>
+                                @endif
                             </div>
                         </div>
                     </td>
                     <td class="hide-mobile">
                         <div style="font-size:12px;color:var(--cx-text2);">
-                            @if($client->phone)
-                            <div>📞 {{ $client->phone }}</div>
+                            @php $bp = $client->order_phone ?: $client->phone; @endphp
+                            @if($bp)
+                            <a href="tel:{{ $bp }}" style="display:block;text-decoration:none;color:var(--cx-text2)">📞 {{ $bp }}</a>
+                            @endif
+                            @if($client->order_address)
+                            <div style="margin-top:3px;font-size:11px;color:var(--cx-muted);">📍 {{ Str::limit($client->order_address, 35) }}</div>
                             @endif
                             @if($client->email)
                             <div style="margin-top:2px;font-size:11px;color:var(--cx-muted);">{{ $client->email }}</div>
                             @endif
-                            @if(!$client->phone && !$client->email)
+                            @if(!$bp && !$client->order_address && !$client->email)
                             <span style="color:var(--cx-muted);">—</span>
                             @endif
                         </div>

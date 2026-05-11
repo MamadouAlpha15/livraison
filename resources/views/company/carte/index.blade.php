@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 @section('title', 'Carte en direct · ' . $company->name)
 @php
     $bodyClass = 'cx-dashboard';
@@ -150,6 +150,7 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 #map{width:100%;height:100%}
 /* Reset Leaflet images — évite que Bootstrap applique max-width:100% aux tuiles */
 #map img,.leaflet-container img,.leaflet-tile{max-width:none!important;height:auto}
+.leaflet-container{background:#e8ecf0!important}
 
 /* Bouton fermer le panneau (visible tablette+mobile) */
 .map-panel-close{
@@ -293,7 +294,7 @@ body.cx-light .cx-panel-toggle{background:rgba(124,58,237,.08);border-color:rgba
 <aside class="cx-sidebar" id="cxSidebar">
     <div class="cx-brand-hd">
         <div class="cx-brand-top">
-            <div class="cx-logo"><div class="cx-logo-icon">🚀</div> ShipXpress</div>
+            <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
             <button class="cx-close-btn" id="cxCloseBtn">✕</button>
         </div>
         <div class="cx-sys-badge"><span class="cx-sys-dot"></span> Système actif</div>
@@ -310,14 +311,11 @@ body.cx-light .cx-panel-toggle{background:rgba(124,58,237,.08);border-color:rgba
         <a href="{{ route('company.clients.index') }}" class="cx-nav-item"><span class="cx-nav-ico">👥</span> Clients</a>
         <div class="cx-nav-sec">Gestion</div>
         <a href="{{ route('company.zones.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📍</span> Zone de livraison</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">💲</span> Tarification</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">🔔</span> Notifications</a>
-        <a href="{{ route('company.historique.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📊</span> Historique</a>
+               <a href="{{ route('company.historique.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📊</span> Historique</a>
         <div class="cx-nav-sec">Configuration</div>
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">⚙️</span> Paramètres</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">👤</span> Utilisateurs</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">🔌</span> Intégrations</a>
-    </nav>
+        <a href="{{ route('company.users.index') }}" class="cx-nav-item"><span class="cx-nav-ico">👤</span> Utilisateurs</a>
+            </nav>
     <div class="cx-user-foot">
         <div class="cx-user-row">
             <div class="cx-user-av">{{ $ini }}</div>
@@ -493,19 +491,9 @@ function driverIcon(color, isMoving) {
 /* ── Initialisation Leaflet ── */
 const map = L.map('map', { center:[9.537,-13.677], zoom:13, zoomControl:true });
 
-const tilesDark  = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',  {attribution:'© OpenStreetMap © CARTO',maxZoom:19});
-const tilesLight = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',              {attribution:'© OpenStreetMap',         maxZoom:19});
-
-function applyMapTheme() {
-    const isLight = document.body.classList.contains('cx-light');
-    if (isLight) { map.removeLayer(tilesDark);  tilesLight.addTo(map); }
-    else          { map.removeLayer(tilesLight); tilesDark.addTo(map);  }
-    // Forcer Leaflet à recalculer après le swap de tuiles
-    setTimeout(() => map.invalidateSize(), 50);
-    setTimeout(() => map.invalidateSize(), 400);
-}
-new MutationObserver(applyMapTheme).observe(document.body, {attributes:true, attributeFilter:['class']});
-applyMapTheme();
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OpenStreetMap', maxZoom:19}).addTo(map);
+setTimeout(() => map.invalidateSize(), 50);
+setTimeout(() => map.invalidateSize(), 400);
 
 // Repositionner le zoom control en bas à droite pour éviter la FAB
 map.zoomControl.setPosition('bottomright');

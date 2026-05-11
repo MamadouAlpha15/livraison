@@ -43,6 +43,19 @@ class DeliveryCompany extends Model
         return $this->belongsTo(User::class);
     }
 
+    // Membres ayant accès au panel de cette entreprise (hors propriétaire)
+    public function members()
+    {
+        return $this->hasMany(User::class, 'company_id');
+    }
+
+    // Résout l'entreprise pour un utilisateur : propriétaire ou membre
+    public static function forUser(User $user): ?self
+    {
+        return static::where('user_id', $user->id)->first()
+            ?? ($user->company_id ? static::find($user->company_id) : null);
+    }
+
     public function zones()
     {
         return $this->hasMany(DeliveryZone::class);

@@ -35,12 +35,10 @@ class DashboardController extends Controller
 
         $totalCommission = $livreur->courierCommissions()->sum('amount');
 
-        // Grouper par client + destination : même client même adresse = 1 ligne dans "commandes récentes"
+        // Grouper uniquement par delivery_batch_id (lot intentionnel) — sinon chaque commande est solo
         $statusPriority = ['en_attente' => 0, 'confirmée' => 1, 'en_livraison' => 2, 'livrée' => 3, 'annulée' => 4];
-        $recentOrders = $orders->groupBy(function ($o) {
-                $dest = strtolower(trim($o->delivery_destination ?? $o->client?->address ?? ''));
-                return ($o->user_id ?? 'anon') . '::' . $dest;
-            })->map(function ($grp) use ($statusPriority) {
+        $recentOrders = $orders->groupBy(fn($o) => $o->delivery_batch_id ? 'batch_' . $o->delivery_batch_id : '__solo__' . $o->id)
+            ->map(function ($grp) use ($statusPriority) {
                 $first  = $grp->first();
                 $status = $grp->sortBy(fn($o) => $statusPriority[$o->status] ?? 99)->first()->status;
                 return [

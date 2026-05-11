@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 @section('title', 'Historique · ' . $company->name)
 @php
     $bodyClass = 'cx-dashboard';
@@ -263,14 +263,24 @@ body.cx-light .hx-fee{color:#059669}
         <a href="{{ route('company.livraisons.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🚚</span> Livraisons</a>
         <a href="{{ route('company.carte.index') }}"      class="cx-nav-item"><span class="cx-nav-ico">🗺️</span> Carte en direct</a>
         <a href="{{ route('company.drivers.index') }}"    class="cx-nav-item"><span class="cx-nav-ico">🚴</span> Chauffeurs</a>
-        <a href="{{ route('company.historique.index') }}" class="cx-nav-item active"><span class="cx-nav-ico">📊</span> Historique</a>
+      
         <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🏪</span> Boutiques</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">👥</span> Clients</a>
+        <a href="{{route('company.clients.index')}}" class="cx-nav-item"><span class="cx-nav-ico">👥</span> Clients</a>
 
+                <div class="cx-nav-sec">Gestion</div>
+        <a href="{{route('company.zones.index') }}" class="cx-nav-item">
+            <span class="cx-nav-ico">📍</span> Zone de livraison
+        </a>
+       
+         <a href="{{ route('company.historique.index') }}" class="cx-nav-item active"><span class="cx-nav-ico">📊</span> Historique</a>
+                 
         <div class="cx-nav-sec">Configuration</div>
-        <a href="{{ route('company.zones.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📍</span> Zone de livraison</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">💲</span> Tarification</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">⚙️</span> Paramètres</a>
+        
+               <a href="#" class="cx-nav-item"><span class="cx-nav-ico">⚙️</span> Paramètres</a>
+               <a href="{{ route('company.users.index') }}" class="cx-nav-item">
+            <span class="cx-nav-ico">👤</span> Utilisateurs
+        </a>
+
     </nav>
     <div class="cx-user-foot">
         <div class="cx-user-row">

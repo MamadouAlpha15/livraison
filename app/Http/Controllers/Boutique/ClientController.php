@@ -64,11 +64,20 @@ class ClientController extends Controller
         $filterUserIds = null; // null = pas de filtre actif
 
         if ($search !== null) {
-            $filterUserIds = User::where(function ($q) use ($search) {
+            // Recherche dans le profil utilisateur
+            $profileIds = User::where(function ($q) use ($search) {
                 $q->where('name',  'like', "%{$search}%")
                   ->orWhere('phone', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%");
             })->pluck('id')->toArray();
+
+            // Recherche dans client_phone saisi à la commande (dans cette boutique)
+            $orderPhoneIds = $shop->orders()
+                ->where('client_phone', 'like', "%{$search}%")
+                ->pluck('user_id')
+                ->toArray();
+
+            $filterUserIds = array_values(array_unique(array_merge($profileIds, $orderPhoneIds)));
         }
 
         /* ── TOP 5 DU MOIS ────────────────────────────────────────── */
@@ -87,10 +96,11 @@ class ClientController extends Controller
             ->with('user')
             ->select(
                 'user_id',
-                DB::raw('SUM(total)       as total_depense'),
-                DB::raw('COUNT(*)         as nb_commandes'),
-                DB::raw('MAX(created_at)  as derniere_cmd'),
-                DB::raw('MIN(created_at)  as premiere_cmd')
+                DB::raw('SUM(total)            as total_depense'),
+                DB::raw('COUNT(*)              as nb_commandes'),
+                DB::raw('MAX(created_at)       as derniere_cmd'),
+                DB::raw('MIN(created_at)       as premiere_cmd'),
+                DB::raw('MAX(client_phone)     as order_phone')
             )
             ->groupBy('user_id');
 
@@ -175,6 +185,9 @@ class ClientController extends Controller
 
         $devise = $shop->currency ?? 'GNF';
 
+        $latestPhone   = $shop->orders()->where('user_id', $user->id)->whereNotNull('client_phone')->latest()->value('client_phone');
+        $latestAddress = $shop->orders()->where('user_id', $user->id)->whereNotNull('delivery_destination')->latest()->value('delivery_destination');
+
         return view('boutique.clients.show', compact(
             'user',
             'commandes',
@@ -182,7 +195,8 @@ class ClientController extends Controller
             'isTop',
             'shop',
             'devise',
-            
+            'latestPhone',
+            'latestAddress',
         ));
     }
 }

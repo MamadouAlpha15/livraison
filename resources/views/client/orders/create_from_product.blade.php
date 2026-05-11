@@ -150,6 +150,12 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .lb-close { position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .lb-close:hover { background: rgba(255,255,255,.2); }
 
+/* ══ CHAMPS ADRESSE / TÉLÉPHONE ══ */
+.field-group { margin-bottom: 14px; }
+.field-label { font-size: 12px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 6px; display: block; }
+.field-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 13.5px; font-family: var(--font); color: var(--text); background: var(--surface); outline: none; transition: border-color .15s; }
+.field-input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(255,153,0,.12); }
+
 /* ══ RESPONSIVE ══ */
 @media (max-width: 700px) {
     .order-grid { grid-template-columns: 1fr; }
@@ -312,8 +318,10 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                 @csrf
                 <input type="hidden" name="product_id" value="{{ $product->id }}">
 
+               
+
                 <div class="order-grid">
-                    {{-- Gauche : quantité --}}
+                    {{-- Gauche : quantité + adresse + téléphone --}}
                     <div>
                         <div class="qty-row">
                             <span class="qty-label">Quantité</span>
@@ -327,6 +335,20 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                             @endif
                         </div>
 
+                        <div class="field-group">
+                            <label class="field-label" for="delivery_destination">📍 Adresse de livraison</label>
+                            <input type="text" name="delivery_destination" id="delivery_destination"
+                                   class="field-input" placeholder="Ex : Quartier Almamya, en face du marché…"
+                                   value="{{ old('delivery_destination', auth()->user()->address ?? '') }}">
+                        </div>
+
+                        <div class="field-group">
+                            <label class="field-label" for="client_phone">📞 Téléphone</label>
+                            <input type="tel" name="client_phone" id="client_phone"
+                                   class="field-input" placeholder="Ex : 622 00 00 00"
+                                   value="{{ old('client_phone', auth()->user()->phone ?? '') }}">
+                        </div>
+
                         @if($stockLow)
                         <div style="font-size:12.5px;color:#92400e;background:var(--amber-lt);border:1px solid #fde68a;border-radius:var(--r-sm);padding:8px 12px;margin-bottom:14px">
                             ⚠ Plus que <strong>{{ $stockVal }}</strong> unité{{ $stockVal > 1 ? 's' : '' }} disponible{{ $stockVal > 1 ? 's' : '' }} — commandez vite !
@@ -335,10 +357,6 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
                         <div style="font-size:13px;color:var(--green);display:flex;align-items:center;gap:6px;margin-bottom:14px">
                             ✓ Livraison disponible — paiement à la réception
-                        </div>
-
-                        <div style="font-size:13px;color:var(--muted);line-height:1.6">
-                            📞 Si vous avez des questions, contactez le vendeur via la page boutique.
                         </div>
                     </div>
 
@@ -436,6 +454,7 @@ function switchPhoto(url, thumb) {
     document.querySelectorAll('.prod-thumb').forEach(t => t.classList.remove('active'));
     thumb.classList.add('active');
     document.getElementById('mainImgWrap').onclick = () => openLb(url);
+    openLb(url);
 }
 
 /* Lightbox */

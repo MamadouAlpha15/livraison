@@ -109,7 +109,7 @@ class DeliveryCompanyController extends Controller
     // tableau de bord de l'entreprise de livraison
   public function dashboard(Request $request)
 {
-    $company = DeliveryCompany::where('user_id', $request->user()->id)->first();
+    $company = DeliveryCompany::forUser($request->user());
 
     // 1) Si l'utilisateur n'a pas d'entreprise, on affiche la vue de création (ou une vue dédiée)
     if (! $company) {
@@ -256,7 +256,7 @@ class DeliveryCompanyController extends Controller
     /* ── Live stats JSON — polling 20s depuis le dashboard ── */
     public function liveStats(Request $request)
     {
-        $company = DeliveryCompany::where('user_id', $request->user()->id)->first();
+        $company = DeliveryCompany::forUser($request->user());
         if (! $company || ! $company->approved) {
             return response()->json(['error' => 'unauthorized'], 403);
         }

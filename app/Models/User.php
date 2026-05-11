@@ -23,6 +23,7 @@ class User extends Authenticatable
         'role_in_shop',  // ex: admin|vendeur|livreur (rôle dans la boutique)
         'is_available',          // pour les livreurs
         'must_change_password',  // forcé à changer son mot de passe à la 1ère connexion
+        'company_id',            // FK vers delivery_companies (membres d'une entreprise)
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -77,6 +78,12 @@ class User extends Authenticatable
     public function courierCommissions()
     {
         return $this->hasMany(\App\Models\CourierCommission::class, 'livreur_id');
+    }
+
+    // Entreprise de livraison dont l'utilisateur est membre (via company_id)
+    public function deliveryCompany()
+    {
+        return $this->belongsTo(DeliveryCompany::class, 'company_id');
     }
 
     /* =========================

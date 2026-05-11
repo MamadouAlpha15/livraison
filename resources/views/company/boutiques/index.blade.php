@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 @section('title', 'Boutiques partenaires · ' . $company->name)
 @php $bodyClass = 'is-dashboard'; @endphp
 
@@ -214,7 +214,7 @@ body.cx-light .toolbar .search-box{background:#fff;}
     <div class="cx-brand-hd">
         <div class="cx-brand-top">
             <a href="{{ route('company.dashboard') }}" class="cx-logo">
-                <div class="cx-logo-icon">🚚</div>
+                <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
                 <span>{{ Str::limit($company->name, 14) }}</span>
             </a>
             <button class="cx-close-btn" id="cxClose">✕</button>
@@ -252,12 +252,7 @@ body.cx-light .toolbar .search-box{background:#fff;}
         <a href="{{route('company.zones.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">📍</span> Zone de livraison
         </a>
-        <a href="#" class="cx-nav-item">
-            <span class="cx-nav-ico">💲</span> Tarification
-        </a>
-        <a href="#" class="cx-nav-item">
-            <span class="cx-nav-ico">🔔</span> Notifications
-        </a>
+       
         <a href="{{ route('company.historique.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">📊</span> Historique
         </a>
@@ -266,18 +261,22 @@ body.cx-light .toolbar .search-box{background:#fff;}
         <a href="#" class="cx-nav-item">
             <span class="cx-nav-ico">⚙️</span> Paramètres
         </a>
-        <a href="#" class="cx-nav-item">
+        <a href="{{ route('company.users.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">👤</span> Utilisateurs
         </a>
-        <a href="#" class="cx-nav-item">
-            <span class="cx-nav-ico">🔌</span> Intégrations
-        </a>
-        <div class="cx-nav-sec">Configuration</div>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">⚙️</span> Paramètres</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">👤</span> Utilisateurs</a>
+
     </nav>
 
     <div class="cx-user-foot">
+        <button id="themeToggle" onclick="toggleTheme()" style="
+            width:100%;display:flex;align-items:center;gap:10px;
+            padding:8px 10px;border-radius:8px;margin-bottom:8px;
+            background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);
+            color:rgba(255,255,255,.75);font-size:12.5px;font-weight:600;
+            cursor:pointer;transition:background .15s;text-align:left;font-family:inherit;">
+            <span id="themeIco" style="font-size:15px;">🌙</span>
+            <span id="themeLbl">Mode sombre</span>
+        </button>
         <div class="cx-user-row">
             <div class="cx-user-av">{{ $ini }}</div>
             <div style="flex:1;min-width:0;">
@@ -474,5 +473,19 @@ cl?.addEventListener('click', closeSb);
 // Dark/light mode
 const saved = localStorage.getItem('cx-theme');
 if (saved) document.body.classList.add('cx-' + saved);
+updateThemeBtn(document.body.classList.contains('cx-light'));
+
+window.toggleTheme = function() {
+    const isLight = document.body.classList.toggle('cx-light');
+    localStorage.setItem('cx-theme', isLight ? 'light' : 'dark');
+    updateThemeBtn(isLight);
+};
+function updateThemeBtn(isLight) {
+    const ico = document.getElementById('themeIco');
+    const lbl = document.getElementById('themeLbl');
+    if (!ico || !lbl) return;
+    ico.textContent = isLight ? '🌙' : '☀️';
+    lbl.textContent = isLight ? 'Mode sombre' : 'Mode clair';
+}
 </script>
 @endsection

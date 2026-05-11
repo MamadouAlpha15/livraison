@@ -72,6 +72,7 @@ use App\Http\Controllers\DeliveryCompanyController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\DeliveryChatController;
 use App\Http\Controllers\Company\OrderController as CompanyOrderController;
+use App\Http\Controllers\Company\UserController as CompanyUserController;
 
 /* ── Contrôleurs : Export (Excel / PDF) ── */
 use App\Http\Controllers\Boutique\ExportController;
@@ -220,6 +221,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/orders/notifications',             [CompanyOrderController::class, 'notifications'])    ->name('company.orders.notifications');
         Route::post('/orders/{order}/assign',           [CompanyOrderController::class, 'assign'])           ->name('company.orders.assign');
         Route::post('/orders/{order}/status',           [CompanyOrderController::class, 'updateStatus'])     ->name('company.orders.status');
+        Route::post('/orders/{order}/cancel',           [CompanyOrderController::class, 'cancel'])           ->name('company.orders.cancel');
+        Route::post('/orders/{order}/restore',          [CompanyOrderController::class, 'restore'])          ->name('company.orders.restore');
+        Route::post('/orders/bulk-cancel',              [CompanyOrderController::class, 'bulkCancel'])       ->name('company.orders.bulk-cancel');
+        Route::post('/orders/bulk-restore',             [CompanyOrderController::class, 'bulkRestore'])      ->name('company.orders.bulk-restore');
 
         /* Livraisons en cours */
         Route::get('/livraisons',      [CompanyOrderController::class, 'inProgress'])    ->name('company.livraisons.index');
@@ -237,6 +242,11 @@ Route::middleware('auth')->group(function () {
         /* Carte en direct */
         Route::get('/carte',      [CompanyOrderController::class, 'mapView']) ->name('company.carte.index');
         Route::get('/carte/data', [CompanyOrderController::class, 'mapData']) ->name('company.carte.data');
+
+        /* Utilisateurs (membres de l'entreprise) */
+        Route::get('/users',                [CompanyUserController::class, 'index'])  ->name('company.users.index');
+        Route::post('/users',               [CompanyUserController::class, 'store'])  ->name('company.users.store');
+        Route::delete('/users/{user}',      [CompanyUserController::class, 'destroy'])->name('company.users.destroy');
 
         /* Zones de livraison */
         Route::get('/zones',                    [\App\Http\Controllers\Company\ZoneController::class, 'index'])  ->name('company.zones.index');
@@ -506,6 +516,8 @@ Route::middleware(['auth', 'role:employe,superadmin,admin,vendeur'])
         Route::get('orders/pending-json',                 [EmployeOrderController::class, 'pendingJson'])   ->name('orders.pending-json');
         Route::put('orders/{order}/assign',               [EmployeOrderController::class, 'assign'])        ->name('orders.assign');
         Route::post('orders/bulk-assign',                 [EmployeOrderController::class, 'bulkAssign'])    ->name('orders.bulk-assign');
+        Route::post('orders/bulk-cancel',                 [EmployeOrderController::class, 'bulkCancel'])    ->name('orders.bulk-cancel');
+        Route::post('orders/bulk-restore',                [EmployeOrderController::class, 'bulkRestore'])   ->name('orders.bulk-restore');
         Route::put('orders/{order}/send-to-company',      [EmployeOrderController::class, 'sendToCompany']) ->name('orders.sendToCompany');
         Route::put('orders/{order}/cancel',               [EmployeOrderController::class, 'cancel'])        ->name('orders.cancel');
         Route::put('orders/{order}/restore',              [EmployeOrderController::class, 'restore'])       ->name('orders.restore');

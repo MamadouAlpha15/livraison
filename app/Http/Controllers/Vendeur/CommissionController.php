@@ -38,25 +38,22 @@ class CommissionController extends Controller
 
         $commissions = $query->paginate(20);
 
-        /* Pour type=company : calculer combien de commandes étaient dans chaque trajet groupe */
+        /* Pour type=company : compter les commandes de chaque lot (delivery_batch_id) */
         $groupCounts = collect();
         if ($type === 'company') {
-            $groupCounts = Order::select(
-                    'user_id', 'driver_id',
-                    DB::raw('LOWER(TRIM(COALESCE(delivery_destination,\'\'))) AS dest_norm'),
-                    DB::raw('COUNT(*) AS cnt')
-                )
-                ->where('shop_id', $shop->id)
-                ->whereNotNull('driver_id')
-                ->where('status', Order::STATUS_LIVREE)
-                ->groupBy('user_id', 'driver_id', DB::raw('LOWER(TRIM(COALESCE(delivery_destination,\'\')))'))
-                ->having('cnt', '>', 1)
-                ->get()
-                ->keyBy(fn($r) => $r->user_id . '::' . $r->driver_id . '::' . $r->dest_norm);
+            $batchIds = $commissions->pluck('delivery_batch_id')->filter()->unique();
+            if ($batchIds->isNotEmpty()) {
+                $groupCounts = Order::select('delivery_batch_id', DB::raw('COUNT(*) AS cnt'))
+                    ->whereIn('delivery_batch_id', $batchIds)
+                    ->groupBy('delivery_batch_id')
+                    ->get()
+                    ->keyBy('delivery_batch_id');
+            }
         }
 
-        /* Pour type=shop : compter les commandes de chaque batch (livraison groupée boutique) */
-        $batchCounts = collect();
+        /* Pour type=shop : compter les commandes et collecter les arrêts de chaque batch */
+        $batchCounts       = collect();
+        $batchDestinations = collect();
         if ($type === 'shop') {
             $batchIds = $commissions->pluck('delivery_batch_id')->filter()->unique();
             if ($batchIds->isNotEmpty()) {
@@ -65,6 +62,18 @@ class CommissionController extends Controller
                     ->groupBy('delivery_batch_id')
                     ->get()
                     ->keyBy('delivery_batch_id');
+
+                // Arrêts détaillés : destination + nom client, pour affichage du trajet complet
+                $batchDestinations = Order::with('client:id,name,address')
+                    ->whereIn('delivery_batch_id', $batchIds)
+                    ->get(['id', 'delivery_batch_id', 'delivery_destination', 'user_id'])
+                    ->groupBy('delivery_batch_id')
+                    ->map(fn($bOrders) => $bOrders->map(fn($o) => [
+                        'client' => $o->client?->name,
+                        'dest'   => $o->delivery_destination ?: $o->client?->address,
+                    ])
+                    ->unique(fn($s) => strtolower(trim(($s['client'] ?? '') . '::' . ($s['dest'] ?? ''))))
+                    ->values()->all());
             }
         }
 
@@ -101,7 +110,7 @@ class CommissionController extends Controller
             'commissions', 'type', 'status',
             'totalPending', 'totalPaid',
             'shopPending', 'companyPending', 'shopPaid', 'companyPaid',
-            'devise', 'shop', 'groupCounts', 'batchCounts'
+            'devise', 'shop', 'groupCounts', 'batchCounts', 'batchDestinations'
         ));
     }
 

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 @section('title', 'Livraisons en cours · ' . $company->name)
 @php
     $bodyClass = 'cx-dashboard';
@@ -191,7 +191,7 @@ body.cx-light .lv-act-btn{background:#f3f4f6;border-color:rgba(0,0,0,.08)}
 <aside class="cx-sidebar" id="cxSidebar">
     <div class="cx-brand-hd">
         <div class="cx-brand-top">
-            <div class="cx-logo"><div class="cx-logo-icon">🚀</div> ShipXpress</div>
+            <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
             <button class="cx-close-btn" id="cxCloseBtn">✕</button>
         </div>
         <div class="cx-sys-badge"><span class="cx-sys-dot"></span> Système actif</div>
@@ -209,15 +209,12 @@ body.cx-light .lv-act-btn{background:#f3f4f6;border-color:rgba(0,0,0,.08)}
 
         <div class="cx-nav-sec">Gestion</div>
         <a href="{{ route('company.zones.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📍</span> Zone de livraison</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">💲</span> Tarification</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">🔔</span> Notifications</a>
-        <a href="{{ route('company.historique.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📊</span> Historique</a>
+               <a href="{{ route('company.historique.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📊</span> Historique</a>
 
         <div class="cx-nav-sec">Configuration</div>
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">⚙️</span> Paramètres</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">👤</span> Utilisateurs</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">🔌</span> Intégrations</a>
-    </nav>
+        <a href="{{ route('company.users.index') }}" class="cx-nav-item"><span class="cx-nav-ico">👤</span> Utilisateurs</a>
+            </nav>
     <div class="cx-user-foot">
         <div class="cx-user-row">
             <div class="cx-user-av">{{ $ini }}</div>

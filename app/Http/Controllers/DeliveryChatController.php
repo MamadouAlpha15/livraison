@@ -20,7 +20,7 @@ class DeliveryChatController extends Controller
     public function inbox(Request $request)
     {
         $user    = $request->user();
-        $company = DeliveryCompany::where('user_id', $user->id)->first();
+        $company = DeliveryCompany::forUser($user);
 
         if (!$company) {
             return redirect()->route('company.dashboard');
@@ -67,7 +67,7 @@ class DeliveryChatController extends Controller
     public function conversations(Request $request)
     {
         $user    = $request->user();
-        $company = DeliveryCompany::where('user_id', $user->id)->first();
+        $company = DeliveryCompany::forUser($user);
 
         if (!$company) {
             return response()->json(['ok' => false, 'error' => 'Entreprise introuvable'], 404);
@@ -100,11 +100,13 @@ class DeliveryChatController extends Controller
      */
     public function show(DeliveryCompany $company, Request $request)
     {
-        if (!$company->approved && $company->user_id !== $request->user()->id) {
+        $user            = $request->user();
+        $isCompanyMember = $company->user_id === $user->id || $user->company_id === $company->id;
+
+        if (!$company->approved && !$isCompanyMember) {
             abort(403, 'Entreprise non disponible.');
         }
 
-        $user   = $request->user();
         $shopId = $request->query('shop') ?? $request->query('shop_id') ?? null;
 
         if (!$shopId) {
@@ -116,7 +118,7 @@ class DeliveryChatController extends Controller
             }
         }
 
-        if (!$shopId && $company->user_id !== $user->id && $user->role !== 'admin') {
+        if (!$shopId && !$isCompanyMember && $user->role !== 'admin') {
             abort(403, 'Accès réservé aux vendeurs ou à l\'entreprise.');
         }
 
@@ -172,9 +174,9 @@ class DeliveryChatController extends Controller
             return response()->json(['ok' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $isCompanyOwner = $company->user_id === $user->id;
-        $isAdmin        = in_array($user->role, ['admin', 'superadmin']);
-        $isShopOwner    = false;
+        $isCompanyMember = $company->user_id === $user->id || $user->company_id === $company->id;
+        $isAdmin         = in_array($user->role, ['admin', 'superadmin']);
+        $isShopOwner     = false;
 
         if ($shopId) {
             if (isset($user->shop_id) && $user->shop_id == $shopId) {
@@ -186,11 +188,11 @@ class DeliveryChatController extends Controller
             }
         }
 
-        if (!($isCompanyOwner || $isShopOwner || $isAdmin)) {
+        if (!($isCompanyMember || $isShopOwner || $isAdmin)) {
             return response()->json(['ok' => false, 'error' => 'Non autorisé'], 403);
         }
 
-        $senderRole = $isCompanyOwner ? 'company' : ($isShopOwner ? 'shop' : 'admin');
+        $senderRole = $isCompanyMember ? 'company' : ($isShopOwner ? 'shop' : 'admin');
 
         $msg = DeliveryMessage::create([
             'delivery_company_id' => $company->id,
@@ -200,7 +202,7 @@ class DeliveryChatController extends Controller
             'message'             => $data['message'],
         ]);
 
-        $senderName = $isCompanyOwner
+        $senderName = $isCompanyMember
             ? $company->name
             : ($msg->shop?->name ?? $user->name ?? 'Boutique');
 
@@ -231,9 +233,9 @@ class DeliveryChatController extends Controller
             $shopId = $user->shop_id;
         }
 
-        $isCompanyOwner = $company->user_id === $user->id;
-        $isAdmin        = in_array($user->role, ['admin', 'superadmin']);
-        $isShopOwner    = false;
+        $isCompanyMember = $company->user_id === $user->id || $user->company_id === $company->id;
+        $isAdmin         = in_array($user->role, ['admin', 'superadmin']);
+        $isShopOwner     = false;
 
         if ($shopId) {
             if (isset($user->shop_id) && $user->shop_id == $shopId) {
@@ -245,7 +247,7 @@ class DeliveryChatController extends Controller
             }
         }
 
-        if (!($isCompanyOwner || $isShopOwner || $isAdmin)) {
+        if (!($isCompanyMember || $isShopOwner || $isAdmin)) {
             return response()->json(['ok' => false, 'error' => 'Non autorisé'], 403);
         }
 
@@ -282,7 +284,7 @@ class DeliveryChatController extends Controller
     public function markRead(Request $request)
     {
         $user    = $request->user();
-        $company = DeliveryCompany::where('user_id', $user->id)->first();
+        $company = DeliveryCompany::forUser($user);
 
         if (!$company) {
             return response()->json(['ok' => false, 'error' => 'Entreprise introuvable'], 404);

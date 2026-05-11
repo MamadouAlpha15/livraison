@@ -824,10 +824,8 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                             $company  = $c->order?->deliveryCompany;
                             $driver   = $c->order?->driver?->user;
                             $dInit    = $driver ? $init($driver->name) : 'CH';
-                            /* Nombre de commandes dans ce groupe (même client + chauffeur + destination) */
-                            $destNorm = strtolower(trim($c->order?->delivery_destination ?? ''));
-                            $gKey     = ($c->order?->user_id ?? '') . '::' . ($c->order?->driver_id ?? '') . '::' . $destNorm;
-                            $gCount   = $groupCounts[$gKey]->cnt ?? 1;
+                            /* Nombre de commandes dans ce lot (delivery_batch_id) */
+                            $gCount     = $c->delivery_batch_id ? ($groupCounts[$c->delivery_batch_id]->cnt ?? 1) : 1;
                             $clientName = $c->order?->client?->name ?? null;
                             /* Montant effectif : commission stockée > frais livraison > prix zone */
                             $effectiveAmount = (float)($c->amount) ?: ((float)($c->order?->delivery_fee) ?: (float)($c->order?->deliveryZone?->price));
@@ -908,7 +906,22 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                         </td>
                         @endif
                         <td data-label="Destination">
-                            @if($dest)
+                            @if($type === 'shop' && $c->delivery_batch_id && count($batchDestinations[$c->delivery_batch_id] ?? []) > 1)
+                                @php $stops = $batchDestinations[$c->delivery_batch_id]; @endphp
+                                <div style="display:flex;flex-direction:column;gap:4px;text-align:right">
+                                    @foreach($stops as $i => $stop)
+                                    <div class="dest-cell">
+                                        📍 {{ $stop['dest'] ?? 'Non renseignée' }}
+                                        @if($stop['client'])
+                                        <small>{{ $stop['client'] }}</small>
+                                        @endif
+                                    </div>
+                                    @if(!$loop->last)
+                                    <div style="font-size:10px;color:var(--muted);text-align:right">↓</div>
+                                    @endif
+                                    @endforeach
+                                </div>
+                            @elseif($dest)
                                 <div class="dest-cell" style="text-align:right">
                                     📍 {{ $dest }}
                                     <small>{{ $c->order?->delivery_destination ? 'Destination' : 'Adresse client' }}</small>

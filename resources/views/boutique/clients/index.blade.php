@@ -829,10 +829,14 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     <td>
                         <div class="client-cell">
                             <div class="c-av" style="background:{{ $cGrad }}">{{ $init }}</div>
+                            
                             <div>
                                 <div class="c-name">{{ $client->name }}</div>
                                 @if($client->email)<div class="c-email">{{ $client->email }}</div>@endif
-                                @if($client->phone)<div class="c-phone">📞 {{ $client->phone }}</div>@endif
+                                @php $bestPhone = $item->order_phone ?: $client->phone; @endphp
+                                @if($bestPhone)
+                                <a href="tel:{{ $bestPhone }}" class="c-phone" onclick="event.stopPropagation()" style="text-decoration:none;color:var(--muted)">📞 {{ $bestPhone }}</a>
+                                @endif
                             </div>
                         </div>
                     </td>
@@ -884,8 +888,9 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     <div class="c-av" style="background:{{ $cGrad }};width:38px;height:38px;font-size:12px;flex-shrink:0">{{ $init }}</div>
                     <div style="flex:1;min-width:0">
                         <div class="c-name" style="font-size:13.5px">{{ $client->name }}</div>
-                        @if($client->phone)
-                            <div class="c-phone" style="font-size:11px;color:var(--muted);margin-top:1px">📞 {{ $client->phone }}</div>
+                        @php $bestPhone = $item->order_phone ?: $client->phone; @endphp
+                        @if($bestPhone)
+                            <a href="tel:{{ $bestPhone }}" class="c-phone" style="font-size:11px;color:var(--muted);margin-top:1px;text-decoration:none;display:block">📞 {{ $bestPhone }}</a>
                         @elseif($client->email)
                             <div class="c-email" style="font-size:11px;color:var(--muted);margin-top:1px">{{ Str::limit($client->email, 28) }}</div>
                         @endif

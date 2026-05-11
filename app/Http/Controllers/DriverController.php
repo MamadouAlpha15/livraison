@@ -14,7 +14,7 @@ class DriverController extends Controller
     /* ── Helper: récupère et valide l'entreprise de l'utilisateur connecté ── */
     private function resolveCompany(): DeliveryCompany
     {
-        $company = DeliveryCompany::where('user_id', auth()->id())->first();
+        $company = DeliveryCompany::forUser(auth()->user());
 
         if (! $company) {
             abort(redirect()->route('company.dashboard')

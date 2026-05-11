@@ -1,5 +1,5 @@
 @extends('layouts.app')
-
+@php $bodyClass = 'is-dashboard'; @endphp
 @section('content')
 <div class="container">
     <h2>⭐ Donner un avis sur ma commande</h2>

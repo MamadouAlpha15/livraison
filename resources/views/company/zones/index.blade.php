@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 @section('title', 'Zones de livraison · ' . $company->name)
 @php
     $bodyClass = 'cx-dashboard';
@@ -268,15 +268,12 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
 
         <div class="cx-nav-sec">Gestion</div>
         <a href="{{ route('company.zones.index') }}" class="cx-nav-item active"><span class="cx-nav-ico">📍</span> Zone de livraison</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">💲</span> Tarification</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">🔔</span> Notifications</a>
-        <a href="{{ route('company.historique.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📊</span> Historique</a>
+               <a href="{{ route('company.historique.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📊</span> Historique</a>
 
         <div class="cx-nav-sec">Configuration</div>
         <a href="#" class="cx-nav-item"><span class="cx-nav-ico">⚙️</span> Paramètres</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">👤</span> Utilisateurs</a>
-        <a href="#" class="cx-nav-item"><span class="cx-nav-ico">🔌</span> Intégrations</a>
-    </nav>
+        <a href="{{ route('company.users.index') }}" class="cx-nav-item"><span class="cx-nav-ico">👤</span> Utilisateurs</a>
+            </nav>
 
     <div class="cx-user-foot">
         <div class="cx-user-row">
@@ -428,6 +425,13 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
                 </div>
                 @endforelse
             </div>
+
+            {{-- Pagination --}}
+@if($zones->hasPages())
+    <div style="margin-top:24px;display:flex;justify-content:center;">
+        {{ $zones->links() }}
+    </div>
+@endif
 
         </div>
     </div>

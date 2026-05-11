@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @php $bodyClass = 'is-dashboard'; @endphp
 
+
 @push('styles')
 <style>
 *, *::before, *::after { box-sizing: border-box; }
@@ -540,11 +541,11 @@ $statusConfig = [
     Order::STATUS_ANNULEE      => ['class'=>'cancel',   'strip'=>'strip-cancel',   'label'=>'Annulée',     'ico'=>'❌', 'step'=>-1],
 ];
 
-// Compteurs
-$totalCount    = $orders->total();
-$pendingCount  = $orders->getCollection()->where('status', Order::STATUS_EN_ATTENTE)->count();
-$deliveryCount = $orders->getCollection()->where('status', Order::STATUS_EN_LIVRAISON)->count();
-$doneCount     = $orders->getCollection()->where('status', Order::STATUS_LIVREE)->count();
+// Compteurs globaux (passés par le contrôleur, indépendants du filtre actif)
+$totalCount    = $counts['all'];
+$pendingCount  = $counts['en_attente'];
+$deliveryCount = $counts['en_livraison'];
+$doneCount     = $counts['livrée'];
 
 // Filtre actif (URL ?status=...)
 $activeFilter  = request('status', 'all');
@@ -636,29 +637,29 @@ $groups = $orders->getCollection()
 
     {{-- ── Filtres ── --}}
     <div class="filter-bar">
-        <a href="{{ request()->fullUrlWithQuery(['status' => 'all']) }}"
+        <a href="{{ request()->fullUrlWithQuery(['status' => 'all', 'page' => 1]) }}"
            class="filter-btn {{ $activeFilter === 'all' ? 'active' : '' }}">
-            Toutes <span class="cnt">{{ $orders->total() }}</span>
+            Toutes <span class="cnt">{{ $counts['all'] }}</span>
         </a>
-        <a href="{{ request()->fullUrlWithQuery(['status' => Order::STATUS_EN_ATTENTE]) }}"
+        <a href="{{ request()->fullUrlWithQuery(['status' => Order::STATUS_EN_ATTENTE, 'page' => 1]) }}"
            class="filter-btn {{ $activeFilter === Order::STATUS_EN_ATTENTE ? 'active' : '' }}">
-            ⏳ En attente
+            ⏳ En attente @if($counts['en_attente'] > 0)<span class="cnt">{{ $counts['en_attente'] }}</span>@endif
         </a>
-        <a href="{{ request()->fullUrlWithQuery(['status' => Order::STATUS_CONFIRMEE]) }}"
+        <a href="{{ request()->fullUrlWithQuery(['status' => Order::STATUS_CONFIRMEE, 'page' => 1]) }}"
            class="filter-btn {{ $activeFilter === Order::STATUS_CONFIRMEE ? 'active' : '' }}">
-            📦 Confirmées
+            📦 Confirmées @if($counts['confirmée'] > 0)<span class="cnt">{{ $counts['confirmée'] }}</span>@endif
         </a>
-        <a href="{{ request()->fullUrlWithQuery(['status' => Order::STATUS_EN_LIVRAISON]) }}"
+        <a href="{{ request()->fullUrlWithQuery(['status' => Order::STATUS_EN_LIVRAISON, 'page' => 1]) }}"
            class="filter-btn {{ $activeFilter === Order::STATUS_EN_LIVRAISON ? 'active' : '' }}">
-            🚚 En livraison
+            🚚 En livraison @if($counts['en_livraison'] > 0)<span class="cnt">{{ $counts['en_livraison'] }}</span>@endif
         </a>
-        <a href="{{ request()->fullUrlWithQuery(['status' => Order::STATUS_LIVREE]) }}"
+        <a href="{{ request()->fullUrlWithQuery(['status' => Order::STATUS_LIVREE, 'page' => 1]) }}"
            class="filter-btn {{ $activeFilter === Order::STATUS_LIVREE ? 'active' : '' }}">
-            ✅ Livrées
+            ✅ Livrées @if($counts['livrée'] > 0)<span class="cnt">{{ $counts['livrée'] }}</span>@endif
         </a>
-        <a href="{{ request()->fullUrlWithQuery(['status' => Order::STATUS_ANNULEE]) }}"
+        <a href="{{ request()->fullUrlWithQuery(['status' => Order::STATUS_ANNULEE, 'page' => 1]) }}"
            class="filter-btn {{ $activeFilter === Order::STATUS_ANNULEE ? 'active' : '' }}">
-            ❌ Annulées
+            ❌ Annulées @if($counts['annulée'] > 0)<span class="cnt">{{ $counts['annulée'] }}</span>@endif
         </a>
     </div>
 

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 @section('title', 'Dashboard · ShipXpress')
 @php $bodyClass = 'cx-dashboard'; @endphp
 
@@ -341,8 +341,7 @@ body.cx-light .cx-legend-item  { color:#4b5563; }
 body.cx-light .cx-perf-trend   { }
 body.cx-light .cx-stat-lbl     { color:#4b5563; }
 body.cx-light .cx-stat-trend   { color:#059669; }
-/* Fond Leaflet en mode clair */
-body.cx-light .leaflet-container { background:#e8ecf0 !important; }
+/* Fond Leaflet toujours clair (les tuiles OSM sont claires) */
 /* Topbar en mode clair : fond blanc net */
 body.cx-light .cx-topbar { background:#fff; box-shadow:0 1px 0 rgba(0,0,0,.07); }
 /* Wrap global en mode clair */
@@ -552,7 +551,8 @@ body.cx-light .cx-main { background:#F5F7FA; }
 /* Leaflet popup override */
 .leaflet-popup-content-wrapper { background:transparent!important; box-shadow:none!important; border:none!important; padding:0!important; }
 .leaflet-popup-tip-container { display:none; }
-.leaflet-container { background:var(--cx-surface)!important; }
+.leaflet-container { background:#e8ecf0 !important; }
+#cxMap { filter:none !important; }
 
 /* Pipeline */
 .cx-pipe-list { padding:12px 16px; display:flex; flex-direction:column; gap:10px; }
@@ -826,6 +826,12 @@ body.cx-light .cx-period-toggle { background:rgba(0,0,0,.04); border-color:rgba(
 body.cx-light .cx-period-btn { color:#6b7280; }
 body.cx-light .cx-chart-title2 { color:#111827; }
 body.cx-light .cx-chart-big { color:#111827; }
+
+.tb-info { flex: 1; min-width: 0; overflow: hidden; }
+/* Topbar greeting */
+.tb-greeting { font-size:14px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tb-greeting-sub { font-size:11px; color:var(--muted); margin-top:1px; }
+
 </style>
 @endpush
 
@@ -887,12 +893,7 @@ body.cx-light .cx-chart-big { color:#111827; }
         <a href="{{ route('company.zones.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">📍</span> Zone de livraison
         </a>
-        <a href="#" class="cx-nav-item">
-            <span class="cx-nav-ico">💲</span> Tarification
-        </a>
-        <a href="#" class="cx-nav-item">
-            <span class="cx-nav-ico">🔔</span> Notifications
-        </a>
+       
         <a href="{{ route('company.historique.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">📊</span> Historique
         </a>
@@ -901,12 +902,10 @@ body.cx-light .cx-chart-big { color:#111827; }
         <a href="#" class="cx-nav-item">
             <span class="cx-nav-ico">⚙️</span> Paramètres
         </a>
-        <a href="#" class="cx-nav-item">
+        <a href="{{ route('company.users.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico">👤</span> Utilisateurs
         </a>
-        <a href="#" class="cx-nav-item">
-            <span class="cx-nav-ico">🔌</span> Intégrations
-        </a>
+
     </nav>
 
     <div class="cx-user-foot">
@@ -914,7 +913,7 @@ body.cx-light .cx-chart-big { color:#111827; }
             <div class="cx-user-av">{{ $ini }}</div>
             <div style="flex:1;min-width:0">
                 <div class="cx-user-name">{{ Str::limit($u->name ?? 'Admin ShipXpress', 18) }}</div>
-                <div class="cx-user-role">Super Administrateur</div>
+                <div class="cx-user-role"> {{$company->name}}</div>
             </div>
             <form method="POST" action="{{ route('logout') }}" style="flex-shrink:0">
                 @csrf
@@ -942,13 +941,11 @@ body.cx-light .cx-chart-big { color:#111827; }
     {{-- TOPBAR --}}
     <div class="cx-topbar">
         <button class="cx-hamburger" id="cxHamburger">☰</button>
-
-        <div class="cx-search">
-            <span style="font-size:15px;color:var(--cx-muted);flex-shrink:0">🔍</span>
-            <input type="text" id="globalSearch" placeholder="Rechercher (commandes, livreurs, boutiques...)">
-            <span class="cx-kbd">Ctrl+K</span>
-        </div>
-
+          <div class="tb-info">
+                <div class="tb-greeting">Bonjour, {{ auth()->user()->name }} 👋</div>
+                <div class="tb-greeting-sub">Voici ce qui se passe dans votre entreprise aujourd'hui.</div>
+            </div>
+        
         <div class="cx-tb-right">
             <div class="cx-tb-status">
                 <span class="cx-sys-dot"></span> Système actif
@@ -980,7 +977,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                 <div class="cx-tb-av">{{ $ini }}</div>
                 <div>
                     <div class="cx-tb-uname">{{ Str::limit($u->name ?? 'Admin ShipXpress', 16) }}</div>
-                    <div class="cx-tb-urole">Super Admin</div>
+                    <div class="cx-tb-urole">{{$company->name}}</div>
                 </div>
                 <span style="color:var(--cx-muted);font-size:11px;margin-left:2px">▾</span>
             </div>
@@ -1393,17 +1390,8 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ── Carte Leaflet temps réel ── */
     const map = L.map('cxMap', { zoomControl:false }).setView([9.537,-13.677], 13);
 
-    const tilesDark  = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',  {attribution:'© CartoDB',       maxZoom:19, subdomains:'abcd'});
-    const tilesLight = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',              {attribution:'© OpenStreetMap', maxZoom:19});
-
-    function applyMapTheme() {
-        const isLight = document.body.classList.contains('cx-light');
-        if (isLight) { map.removeLayer(tilesDark);  tilesLight.addTo(map); }
-        else          { map.removeLayer(tilesLight); tilesDark.addTo(map);  }
-        setTimeout(() => map.invalidateSize(), 60);
-    }
-    new MutationObserver(applyMapTheme).observe(document.body, {attributes:true, attributeFilter:['class']});
-    applyMapTheme();
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OpenStreetMap', maxZoom:19}).addTo(map);
+    setTimeout(() => map.invalidateSize(), 60);
     L.control.zoom({ position:'bottomright' }).addTo(map);
 
     const DASH_COLORS = ['#10b981','#f59e0b','#3b82f6','#ec4899','#8b5cf6','#06b6d4','#f97316','#ef4444','#a78bfa','#84cc16'];

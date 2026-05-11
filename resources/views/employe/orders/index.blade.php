@@ -143,6 +143,10 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .bulk-btn-company:hover{background:rgba(255,255,255,.28);}
 .bulk-btn-clear{margin-left:auto;background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.18);padding:5px 10px;border-radius:6px;font-size:11.5px;}
 .bulk-btn-clear:hover{background:rgba(255,255,255,.22);color:#fff;}
+.bulk-btn-cancel{background:#fee2e2;color:#991b1b;border:1.5px solid #fca5a5;}
+.bulk-btn-cancel:hover{background:#fecaca;}
+.bulk-btn-restore{background:#d1fae5;color:#065f46;border:1.5px solid #6ee7b7;}
+.bulk-btn-restore:hover{background:#a7f3d0;}
 /* ── BULK LIVREUR MODAL ── */
 .blv-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:800;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px);}
 .blv-modal.open{display:flex;}
@@ -856,6 +860,8 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                 <span class="bulk-count" id="bulkCount">0 sélectionnée(s)</span>
                 <button class="bulk-btn bulk-btn-driver" onclick="openBulkDriverModal()">🚴 Assigner à mes livreurs</button>
                 <button class="bulk-btn bulk-btn-company" onclick="openBulkCompanyModalMode()">🏢 Assigner à une entreprise</button>
+                <button class="bulk-btn bulk-btn-cancel" onclick="bulkCancel()">🚫 Annuler</button>
+                <button class="bulk-btn bulk-btn-restore" onclick="bulkRestore()">♻️ Restaurer</button>
                 <button class="bulk-btn bulk-btn-clear" onclick="clearBulkSelection()">✕ Effacer</button>
             </div>
 
@@ -891,7 +897,15 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                             data-client-id="{{ $order->user_id }}"
                             onchange="onCbChange(this)"></td>
                         <td><span style="font-family:var(--mono);font-size:11px;color:var(--muted)">#{{ $order->id }}</span></td>
-                        <td><div style="display:flex;align-items:center;gap:9px"><div class="c-av">{{ $init }}</div><div><div class="c-name">{{ $client->name ?? 'Inconnu' }}</div>@if($client?->phone)<div class="c-sub">📞 {{ $client->phone }}</div>@endif</div></div></td>
+                             @php
+                              $displayPhone = $order->client_phone ?: $client?->phone;
+                            @endphp
+                        <td><div style="display:flex;align-items:center;gap:9px"><div class="c-av">{{ $init }}</div><div><div class="c-name">{{ $client->name ?? 'Inconnu' }}</div>  
+                         @if($displayPhone)
+                         <div class="c-sub">📞 {{ $displayPhone }}</div>
+                         @endif</div></div>
+                    </td>
+
                         <td>
                             @if($product)<div style="display:flex;align-items:center;gap:8px">@if($product->image)<img src="{{ asset('storage/'.$product->image) }}" class="prod-img" alt="{{ $product->name }}" onclick="openLightbox('{{ asset('storage/'.$product->image) }}','{{ addslashes($product->name) }}')">@else<div class="prod-ph">🏷️</div>@endif<div><div style="font-size:12.5px;font-weight:600;color:var(--text)">{{ Str::limit($product->name,22) }}</div><div style="font-size:11px;color:var(--muted)">Qté : {{ $order->items->first()->quantity ?? 1 }}</div></div></div>
                             @else<span style="color:var(--muted);font-size:12px">—</span>@endif
@@ -1005,7 +1019,13 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                             data-order-num="{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
                             data-dest="{{ addslashes($order->delivery_destination ?: ($client?->address ?? '')) }}"
                             data-client-id="{{ $order->user_id }}"
-                            onchange="onCbChange(this)" style="flex-shrink:0;"><div class="c-av">{{ $init }}</div><div><div class="c-name">{{ $client->name ?? 'Inconnu' }}</div>@if($client?->phone)<div class="c-sub">📞 {{ $client->phone }}</div>@endif</div></div>
+                            onchange="onCbChange(this)" style="flex-shrink:0;"><div class="c-av">{{ $init }}</div>
+                            @php
+                            $displayPhone = $order->client_phone ?: $client?->phone;
+                            @endphp
+                            <div>
+                                <div class="c-name">{{ $client->name ?? 'Inconnu' }}</div>
+                            @if($displayPhone)<div class="c-sub">📞 {{ $displayPhone  }}</div>@endif</div></div>
                         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span><span style="font-family:var(--mono);font-size:10px;color:var(--muted)">#{{ $order->id }}</span></div>
                     </div>
                     <div class="m-card-body">
@@ -1737,6 +1757,47 @@ function showBulkToast(msg, ok) {
     setTimeout(() => t.remove(), 3200);
 }
 
+/* ── BULK CANCEL / RESTORE ── */
+async function bulkCancel() {
+    if (!_bulkIds.size) return;
+    if (!confirm(`Annuler ${_bulkIds.size} commande(s) sélectionnée(s) ?`)) return;
+    try {
+        const res  = await fetch('{{ route("employe.orders.bulk-cancel") }}', {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN':CSRF, 'Accept':'application/json' },
+            body: JSON.stringify({ order_ids: [..._bulkIds] })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showBulkToast(`🚫 ${data.count} commande(s) annulée(s).`, true);
+            clearBulkSelection();
+            setTimeout(() => location.reload(), 1400);
+        } else {
+            showBulkToast('Erreur lors de l\'annulation.', false);
+        }
+    } catch(e) { showBulkToast('Erreur réseau.', false); }
+}
+
+async function bulkRestore() {
+    if (!_bulkIds.size) return;
+    if (!confirm(`Restaurer ${_bulkIds.size} commande(s) sélectionnée(s) ?`)) return;
+    try {
+        const res  = await fetch('{{ route("employe.orders.bulk-restore") }}', {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN':CSRF, 'Accept':'application/json' },
+            body: JSON.stringify({ order_ids: [..._bulkIds] })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showBulkToast(`♻️ ${data.count} commande(s) restaurée(s).`, true);
+            clearBulkSelection();
+            setTimeout(() => location.reload(), 1400);
+        } else {
+            showBulkToast('Erreur lors de la restauration.', false);
+        }
+    } catch(e) { showBulkToast('Erreur réseau.', false); }
+}
+
 /* ── MODAL LIVREUR BULK ── */
 function openBulkDriverModal() {
     if (!_bulkIds.size) return;
@@ -1836,11 +1897,11 @@ function _groupByZone(orders) {
     const map = {};
     orders.forEach(o => {
         const destKey = o.dest ? _up(o.dest) : (o.zoneId || '__nozone__');
-        /* Même client + même destination → même lot (1 seul trajet) */
-        const key = o.clientId ? (o.clientId + '::' + destKey) : destKey;
+        /* Même destination = même lot, qu'il y ait 1 ou plusieurs clients */
+        const key = destKey;
         if (!map[key]) map[key] = { zoneId: '', zoneName: o.zoneName, zonePrice: o.zonePrice, dest: o.dest, clientId: o.clientId, sameClient: true, orders: [] };
         if (!map[key].zoneId && o.zoneId) map[key].zoneId = o.zoneId;
-        /* Si plusieurs clients dans ce lot (clients différents même destination) */
+        /* Tracker si plusieurs clients dans ce lot (pour affichage des frais) */
         if (map[key].clientId && o.clientId && map[key].clientId !== o.clientId) map[key].sameClient = false;
         map[key].orders.push(o);
     });

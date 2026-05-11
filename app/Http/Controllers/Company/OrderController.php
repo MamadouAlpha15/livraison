@@ -12,7 +12,7 @@ class OrderController extends Controller
 {
     private function company(): DeliveryCompany
     {
-        $company = DeliveryCompany::where('user_id', auth()->id())->first();
+        $company = DeliveryCompany::forUser(auth()->user());
 
         if (!$company) {
             abort(403, "Aucune entreprise de livraison liée à ce compte.");
@@ -297,7 +297,13 @@ class OrderController extends Controller
         ], 'total')
         ->withMax(['orders as derniere_commande' => fn($q) =>
             $q->where('delivery_company_id', $company->id)
-        ], 'created_at');
+        ], 'created_at')
+        ->withMax(['orders as order_phone' => fn($q) =>
+            $q->where('delivery_company_id', $company->id)->whereNotNull('client_phone')
+        ], 'client_phone')
+        ->withMax(['orders as order_address' => fn($q) =>
+            $q->where('delivery_company_id', $company->id)->whereNotNull('delivery_destination')
+        ], 'delivery_destination');
 
         if ($search) {
             $clientsQuery->where(fn($q) =>
@@ -415,5 +421,61 @@ class OrderController extends Controller
         }
 
         return response()->json(['success' => true, 'status' => $data['status']]);
+    }
+
+    public function cancel(Request $request, Order $order)
+    {
+        $company = $this->company();
+        abort_unless((int) $order->delivery_company_id === $company->id, 403);
+        abort_unless(!in_array($order->status, [Order::STATUS_LIVREE, Order::STATUS_ANNULEE]), 422, 'Impossible d\'annuler cette commande.');
+
+        $order->update(['status' => Order::STATUS_ANNULEE]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function restore(Request $request, Order $order)
+    {
+        $company = $this->company();
+        abort_unless((int) $order->delivery_company_id === $company->id, 403);
+        abort_unless($order->status === Order::STATUS_ANNULEE, 422, 'Seules les commandes annulées peuvent être restaurées.');
+
+        $order->update([
+            'status'      => Order::STATUS_EN_ATTENTE,
+            'driver_id'   => null,
+            'delivery_fee'=> null,
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function bulkCancel(Request $request)
+    {
+        $company = $this->company();
+        $ids = $request->validate(['order_ids' => 'required|array|min:1'])['order_ids'];
+
+        $count = Order::whereIn('id', $ids)
+            ->where('delivery_company_id', $company->id)
+            ->whereNotIn('status', [Order::STATUS_LIVREE, Order::STATUS_ANNULEE])
+            ->update(['status' => Order::STATUS_ANNULEE]);
+
+        return response()->json(['success' => true, 'count' => $count]);
+    }
+
+    public function bulkRestore(Request $request)
+    {
+        $company = $this->company();
+        $ids = $request->validate(['order_ids' => 'required|array|min:1'])['order_ids'];
+
+        $count = Order::whereIn('id', $ids)
+            ->where('delivery_company_id', $company->id)
+            ->where('status', Order::STATUS_ANNULEE)
+            ->update([
+                'status'       => Order::STATUS_EN_ATTENTE,
+                'driver_id'    => null,
+                'delivery_fee' => null,
+            ]);
+
+        return response()->json(['success' => true, 'count' => $count]);
     }
 }

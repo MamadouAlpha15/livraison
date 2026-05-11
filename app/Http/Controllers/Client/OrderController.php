@@ -39,22 +39,32 @@ class OrderController extends Controller
     // ROUTE   : GET /client/orders
     // RÔLE    : Affiche la liste de toutes les commandes du client connecté
     // ============================================================
-    public function index()
+    public function index(Request $request)
     {
-        // Auth::user() = l'utilisateur connecté
-        // ->orders() = toutes les commandes qui lui appartiennent (relation définie dans le modèle User)
-        // ->with(['shop', 'items.product']) = on charge aussi la boutique et les produits de chaque commande
-        //    en une seule requête SQL (évite les N+1 queries — problème de performance)
-        // ->latest() = trie du plus récent au plus ancien (ORDER BY created_at DESC)
-        // ->paginate(10) = affiche 10 commandes par page avec pagination automatique
-        $orders = Auth::user()->orders()
-            ->with(['shop', 'items.product', 'review'])
-            ->latest()
-            ->paginate(15);
+        $user   = Auth::user();
+        $status = $request->get('status', 'all');
 
-        // On retourne la vue "resources/views/client/orders/index.blade.php"
-        // compact('orders') = passe la variable $orders à la vue (raccourci de ['orders' => $orders])
-        return view('client.orders.index', compact('orders'));
+        $query = $user->orders()
+            ->with(['shop', 'items.product', 'review'])
+            ->latest();
+
+        if ($status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        $orders = $query->paginate(15)->withQueryString();
+
+        // Compteurs globaux (indépendants du filtre actif) pour les onglets et les stats
+        $counts = [
+            'all'          => $user->orders()->count(),
+            'en_attente'   => $user->orders()->where('status', Order::STATUS_EN_ATTENTE)->count(),
+            'confirmée'    => $user->orders()->where('status', Order::STATUS_CONFIRMEE)->count(),
+            'en_livraison' => $user->orders()->where('status', Order::STATUS_EN_LIVRAISON)->count(),
+            'livrée'       => $user->orders()->where('status', Order::STATUS_LIVREE)->count(),
+            'annulée'      => $user->orders()->where('status', Order::STATUS_ANNULEE)->count(),
+        ];
+
+        return view('client.orders.index', compact('orders', 'counts'));
     }
 
     // ============================================================
@@ -222,8 +232,10 @@ class OrderController extends Controller
     {
         // Validation des données du formulaire
         $request->validate([
-            'product_id' => 'required|exists:products,id', // L'ID du produit doit exister en base
-            'quantity'   => 'required|integer|min:1',      // Quantité : nombre entier, minimum 1
+            'product_id'           => 'required|exists:products,id',
+            'quantity'             => 'required|integer|min:1',
+            'delivery_destination' => 'nullable|string|max:255',
+            'client_phone'         => 'nullable|string|max:30',
         ]);
 
         // On charge le produit avec sa boutique en une seule requête (optimisation)
@@ -245,12 +257,13 @@ class OrderController extends Controller
         // On calcule le total : prix unitaire × quantité
         $total = $product->price * $request->quantity;
 
-        // On crée la commande en base de données
         $order = Order::create([
-            'user_id' => Auth::id(),                 // ID du client connecté
-            'shop_id' => $product->shop->id,         // ID de la boutique du produit
-            'total'   => $total,                     // Montant calculé ci-dessus
-            'status'  => Order::STATUS_EN_ATTENTE,   // Statut initial : en attente
+            'user_id'              => Auth::id(),
+            'shop_id'              => $product->shop->id,
+            'total'                => $total,
+            'status'               => Order::STATUS_EN_ATTENTE,
+            'delivery_destination' => $request->delivery_destination,
+            'client_phone'         => $request->client_phone,
         ]);
 
         // On crée la ligne de commande (order item = détail du produit commandé)
