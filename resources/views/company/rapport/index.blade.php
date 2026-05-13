@@ -187,6 +187,23 @@ body.cx-light footer.app-footer { background:#eef1f7 !important; color:#6b7280 !
     .rev-grid { grid-template-columns:1fr; }
     .rev-item + .rev-item { border-left:none; border-top:1px solid var(--cx-border); }
 }
+
+/* ── Boutiques partenaires responsive ── */
+.bp-desktop { display:block }
+.bp-mobile  { display:none }
+
+.bp-mc-row { border-bottom:1px solid var(--cx-border); padding:13px 16px; }
+.bp-mc-row:last-child { border-bottom:none }
+.bp-mc-name { font-size:14px; font-weight:800; color:var(--cx-text); margin-bottom:9px; }
+.bp-mc-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.bp-mc-box { background:var(--cx-surface2); border:1px solid var(--cx-border); border-radius:7px; padding:8px 10px; }
+.bp-mc-lbl { font-size:10px; font-weight:700; color:var(--cx-muted); text-transform:uppercase; letter-spacing:.4px; margin-bottom:3px; }
+.bp-mc-val { font-size:15px; font-weight:900; font-family:monospace; color:var(--cx-text); }
+
+@media(max-width:600px) {
+    .bp-desktop { display:none }
+    .bp-mobile  { display:block }
+}
 </style>
 @endpush
 
@@ -198,8 +215,8 @@ body.cx-light footer.app-footer { background:#eef1f7 !important; color:#6b7280 !
     <div class="cx-brand-hd">
         <div class="cx-brand-top">
             <a href="{{ route('company.dashboard') }}" class="cx-logo">
-                <div class="cx-logo-icon">🏢</div>
-                <span style="font-size:13px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $company->name }}</span>
+                 <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
+                <span class="sb-shop-name">{{ $company->name }}</span>
             </a>
             <button class="cx-close-btn" id="cxClose">✕</button>
         </div>
@@ -457,6 +474,7 @@ body.cx-light footer.app-footer { background:#eef1f7 !important; color:#6b7280 !
                 <span class="rp-card-badge">{{ $topShops->count() }}</span>
             </div>
             @if($topShops->count())
+            <div class="bp-desktop">
             <div style="overflow-x:auto;">
             <table class="rp-table" style="min-width:500px;">
                 <thead><tr>
@@ -481,6 +499,33 @@ body.cx-light footer.app-footer { background:#eef1f7 !important; color:#6b7280 !
                 @endforeach
                 </tbody>
             </table>
+            </div>
+            </div>
+            <div class="bp-mobile">
+            @foreach($topShops as $s)
+            @php $taux = $s['total'] > 0 ? round($s['livrees']/$s['total']*100) : 0; @endphp
+            <div class="bp-mc-row">
+                <div class="bp-mc-name">🏪 {{ $s['name'] }}</div>
+                <div class="bp-mc-grid">
+                    <div class="bp-mc-box">
+                        <div class="bp-mc-lbl">Commandes</div>
+                        <div class="bp-mc-val">{{ $s['total'] }}</div>
+                    </div>
+                    <div class="bp-mc-box">
+                        <div class="bp-mc-lbl">Livrées</div>
+                        <div class="bp-mc-val" style="color:#34d399">{{ $s['livrees'] }}</div>
+                    </div>
+                    <div class="bp-mc-box">
+                        <div class="bp-mc-lbl">Taux</div>
+                        <div class="bp-mc-val"><span class="td-badge {{ $taux >= 70 ? 'badge-ok' : 'badge-warn' }}">{{ $taux }}%</span></div>
+                    </div>
+                    <div class="bp-mc-box">
+                        <div class="bp-mc-lbl">Revenus</div>
+                        <div class="bp-mc-val" style="color:#a78bfa">{{ $fmt($s['revenue']) }}</div>
+                    </div>
+                </div>
+            </div>
+            @endforeach
             </div>
             @else
             <div class="rp-empty">Aucune boutique partenaire sur cette période.</div>

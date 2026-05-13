@@ -311,8 +311,8 @@ body.cx-light .pw-strength { background: #e5e7eb; }
     <div class="cx-brand-hd">
         <div class="cx-brand-top">
             <a href="{{ route('company.dashboard') }}" class="cx-logo">
-                <div class="cx-logo-icon">🏢</div>
-                <span style="font-size:13px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $company->name }}</span>
+                 <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
+                <span class="sb-shop-name">{{ $company->name }}</span>
             </a>
             <button class="cx-close-btn" id="cxClose">✕</button>
         </div>

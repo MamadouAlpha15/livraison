@@ -167,24 +167,74 @@ body.cx-light .ctbl tbody tr:hover td{background:rgba(124,58,237,.04);}
 .pagination-wrap{margin-top:28px;display:flex;justify-content:center;}
 
 
+/* ── Desktop / Mobile visibility ── */
+.cli-desktop{display:block}
+.cli-mobile{display:none}
+
+/* ── Cartes mobile clients ── */
+.cli-mc-card{background:var(--cx-surface);border:1px solid var(--cx-border);border-radius:var(--r-sm);margin-bottom:12px;overflow:hidden}
+.cli-mc-head{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--cx-border)}
+.cli-mc-av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0}
+.cli-mc-name{font-size:14px;font-weight:800;color:var(--cx-text);line-height:1.2}
+.cli-mc-phone{font-size:12px;color:var(--cx-text2);margin-top:2px}
+.cli-mc-rank{margin-left:auto;flex-shrink:0}
+.cli-mc-stats{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--cx-border)}
+.cli-mc-stat{padding:11px 8px;text-align:center;border-right:1px solid var(--cx-border)}
+.cli-mc-stat:last-child{border-right:none}
+.cli-mc-stat-val{font-size:17px;font-weight:900;color:var(--cx-text);line-height:1}
+.cli-mc-stat-lbl{font-size:10px;font-weight:600;color:var(--cx-muted);text-transform:uppercase;letter-spacing:.4px;margin-top:3px}
+.cli-mc-foot{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;flex-wrap:wrap;gap:8px}
+.cli-mc-montant{font-family:'Courier New',monospace;font-size:16px;font-weight:800;color:#6d28d9}
+body.cx-dark .cli-mc-montant{color:#c4b5fd}
+
 /* Responsive */
-@media(max-width:900px){
+@media(max-width:1024px){
     .cx-sidebar{transform:translateX(-100%);}
     .cx-sidebar.open{transform:translateX(0);}
     .cx-wrap{padding-left:0;}
     .cx-hamburger{display:flex;}
-    .hide-mobile{display:none!important;}
+    .cx-close-btn{display:block;}
+    .cx-content{padding:20px 20px 48px;}
 }
 @media(max-width:768px){
     .cx-content{padding:16px 14px 40px;}
-    .stats-bar{grid-template-columns:1fr 1fr;}
+    .stats-bar{grid-template-columns:1fr 1fr 1fr;gap:10px;}
+    .stat-card{padding:14px 12px;}
+    .stat-val{font-size:18px;}
     .cx-tb-uname,.cx-tb-urole{display:none;}
     .cx-topbar{padding:0 14px;}
+    .cx-topbar-sub{display:none;}
 }
-@media(max-width:540px){
-    .stats-bar{grid-template-columns:1fr;}
-    .toolbar{flex-direction:column;align-items:stretch;}
+@media(max-width:640px){
+    .cx-content{padding:12px 12px 48px;}
+    .stats-bar{grid-template-columns:1fr 1fr;gap:8px;}
+    .stat-card{padding:12px 10px;gap:10px;}
+    .stat-ico{width:36px;height:36px;font-size:16px;}
+    .stat-val{font-size:16px;}
+    .stat-lbl{font-size:10.5px;}
+    .cx-topbar{padding:0 12px;gap:8px;}
+    .cx-topbar-title{font-size:13px;}
+    .toolbar{flex-direction:column;align-items:stretch;gap:8px;margin-bottom:14px;}
+    .toolbar-title{font-size:15px;}
     .search-box{min-width:0;}
+    /* Basculement tableau ↔ cartes */
+    .cli-desktop{display:none}
+    .cli-mobile{display:block}
+}
+@media(max-width:480px){
+    .stats-bar{grid-template-columns:1fr 1fr;}
+    .stat-val{font-size:15px;}
+    .cli-mc-stat-val{font-size:15px;}
+    .cli-mc-montant{font-size:14px;}
+}
+@media(max-width:360px){
+    .stats-bar{grid-template-columns:1fr 1fr;}
+    .stat-card{padding:10px 8px;gap:8px;}
+    .stat-val{font-size:14px;}
+    .cx-topbar-title{font-size:11.5px;}
+    .cli-mc-stats{grid-template-columns:repeat(2,1fr)}
+    .cli-mc-stat{padding:9px 6px;}
+    .cli-mc-stat-val{font-size:14px;}
 }
 .cx-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1100;}
 .cx-overlay.open{display:block;}
@@ -370,7 +420,8 @@ body.cx-dark .toolbar .search-box input{color:#e2e8f0;}
         </div>
         </form>
 
-        {{-- Table --}}
+        {{-- Table DESKTOP --}}
+        <div class="cli-desktop">
         <div class="clients-table-wrap">
             <div class="clients-table-hd">
                 <span class="clients-table-title">👥 Clients livrés par {{ $company->name }}</span>
@@ -490,6 +541,77 @@ body.cx-dark .toolbar .search-box input{color:#e2e8f0;}
             </table>
             @endif
         </div>
+        </div>{{-- /cli-desktop --}}
+
+        {{-- Cartes MOBILE --}}
+        <div class="cli-mobile">
+            @if($clients->isEmpty())
+            <div class="empty-state" style="background:var(--cx-surface);border:1px solid var(--cx-border);border-radius:var(--r-sm);">
+                <div class="empty-ico">👥</div>
+                <div class="empty-title">Aucun client trouvé</div>
+                <div class="empty-sub">
+                    @if($search) Aucun client ne correspond à « {{ $search }} ».
+                    @else Quand des commandes seront livrées, les clients apparaîtront ici.
+                    @endif
+                </div>
+            </div>
+            @else
+            @foreach($clients as $i => $client)
+            @php
+                $rank2    = $clients->firstItem() + $i;
+                $rankCls2 = $rank2 === 1 ? 'rank-1' : ($rank2 === 2 ? 'rank-2' : ($rank2 === 3 ? 'rank-3' : 'rank-n'));
+                $initials2 = cliIni($client->name ?? 'CL');
+                $bp2 = $client->order_phone ?: $client->phone;
+            @endphp
+            <div class="cli-mc-card">
+
+                {{-- En-tête : avatar + nom + rang --}}
+                <div class="cli-mc-head">
+                    <div class="cli-mc-av">{{ $initials2 }}</div>
+                    <div style="flex:1;min-width:0">
+                        <div class="cli-mc-name">{{ $client->name ?? 'Inconnu' }}</div>
+                        @if($bp2)
+                        <div class="cli-mc-phone">
+                            <a href="tel:{{ $bp2 }}" style="text-decoration:none;color:inherit">📞 {{ $bp2 }}</a>
+                        </div>
+                        @endif
+                    </div>
+                    <div class="cli-mc-rank"><div class="rank-badge {{ $rankCls2 }}">{{ $rank2 }}</div></div>
+                </div>
+
+                {{-- Stats : Total / Livrées / Annulées / En cours --}}
+                <div class="cli-mc-stats">
+                    <div class="cli-mc-stat">
+                        <div class="cli-mc-stat-val" style="color:var(--cx-brand)">{{ $client->total_orders }}</div>
+                        <div class="cli-mc-stat-lbl">Total</div>
+                    </div>
+                    <div class="cli-mc-stat">
+                        <div class="cli-mc-stat-val" style="color:#34d399">{{ $client->livrees }}</div>
+                        <div class="cli-mc-stat-lbl">Livrées</div>
+                    </div>
+                    <div class="cli-mc-stat">
+                        <div class="cli-mc-stat-val" style="color:#f87171">{{ $client->annulees }}</div>
+                        <div class="cli-mc-stat-lbl">Annulées</div>
+                    </div>
+                    <div class="cli-mc-stat">
+                        <div class="cli-mc-stat-val" style="color:#fbbf24">{{ $client->en_cours }}</div>
+                        <div class="cli-mc-stat-lbl">En cours</div>
+                    </div>
+                </div>
+
+                {{-- Pied : montant + dernière commande --}}
+                <div class="cli-mc-foot">
+                    <span class="cli-mc-montant">
+                        {{ $client->total_montant > 0 ? number_format($client->total_montant,0,',',' ').' '.$devise : '0 '.$devise }}
+                    </span>
+                    @if($client->derniere_commande)
+                    <span class="date-chip">{{ \Carbon\Carbon::parse($client->derniere_commande)->locale('fr')->diffForHumans() }}</span>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+            @endif
+        </div>{{-- /cli-mobile --}}
 
         {{-- Pagination --}}
         @if($clients->hasPages())

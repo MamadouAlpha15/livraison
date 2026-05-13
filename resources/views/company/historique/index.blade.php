@@ -179,13 +179,37 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .hx-pagination .page-item.active .page-link{background:var(--cx-brand);border-color:var(--cx-brand);color:#fff}
 .hx-pagination .page-item.disabled .page-link{opacity:.4;pointer-events:none}
 
+/* ── Desktop / Mobile visibility ── */
+.hx-desktop{display:block}
+.hx-mobile{display:none}
+
+/* ── Mobile cards (mc-*) ── */
+.mc-card{background:var(--cx-surface);border:1px solid var(--cx-border);border-radius:var(--r-sm);margin-bottom:12px;overflow:hidden}
+.mc-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--cx-border);gap:8px;flex-wrap:wrap}
+.mc-id{font-size:15px;font-weight:900;color:var(--cx-brand);font-family:monospace}
+.mc-date{font-size:11px;color:var(--cx-muted);margin-left:8px}
+.mc-amounts{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--cx-border)}
+.mc-amount-box{padding:13px 14px;background:var(--cx-surface2)}
+.mc-amount-fee{border-right:1px solid var(--cx-border)}
+.mc-amount-lbl{font-size:10.5px;font-weight:700;color:var(--cx-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.mc-amount-val{font-size:18px;font-weight:900;font-family:monospace;color:var(--cx-green);word-break:break-all;line-height:1.2}
+.mc-amount-total .mc-amount-val{color:var(--cx-text)}
+.mc-rows{padding:4px 0}
+.mc-row{display:flex;align-items:flex-start;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--cx-border);gap:10px}
+.mc-lbl{font-size:12px;font-weight:700;color:var(--cx-muted);flex-shrink:0;min-width:110px}
+.mc-val{font-size:13px;font-weight:600;color:var(--cx-text);text-align:right;word-break:break-word}
+
 /* ── MODE CLAIR ── */
 body.cx-light{--cx-bg:#F5F7FA;--cx-surface:#fff;--cx-surface2:#eef1f7;--cx-border:rgba(0,0,0,.08);--cx-border2:rgba(0,0,0,.13);--cx-text:#111827;--cx-text2:#4b5563;--cx-muted:#9ca3af}
 body.cx-light,html.cx-light body{background:#F5F7FA!important}
 body.cx-light .cx-topbar{background:#fff;border-bottom-color:rgba(0,0,0,.07);box-shadow:0 1px 4px rgba(0,0,0,.06)}
 body.cx-light .cx-tb-link{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.08);color:#374151}
-body.cx-light .hx-filters,.body.cx-light .hx-table-card{background:#fff;border-color:rgba(0,0,0,.08)}
+body.cx-light .hx-filters{background:#fff;border-color:rgba(0,0,0,.08)}
+body.cx-light .hx-table-card{background:#fff;border-color:rgba(0,0,0,.08)}
 body.cx-light .hx-input,.body.cx-light .hx-select,.body.cx-light .hx-search{background:#f3f4f6;border-color:rgba(0,0,0,.1);color:#111827}
+body.cx-light .hx-input{background:#f3f4f6;border-color:rgba(0,0,0,.1);color:#111827}
+body.cx-light .hx-select{background:#f3f4f6;border-color:rgba(0,0,0,.1);color:#111827}
+body.cx-light .hx-search{background:#f3f4f6;border-color:rgba(0,0,0,.1);color:#111827}
 body.cx-light .hx-table thead th{background:#f3f4f6}
 body.cx-light .hx-table tbody tr:hover{background:rgba(0,0,0,.02)}
 body.cx-light .hx-period-btn{color:#4b5563;border-color:rgba(0,0,0,.1)}
@@ -197,46 +221,91 @@ body.cx-light .hx-order-id{color:var(--cx-brand)}
 body.cx-light .hx-badge-livree{background:rgba(16,185,129,.1);color:#065f46}
 body.cx-light .hx-badge-annulee{background:rgba(239,68,68,.08);color:#b91c1c}
 body.cx-light .hx-fee{color:#059669}
+body.cx-light .hx-table td{border-bottom-color:rgba(0,0,0,.06)}
+body.cx-light .mc-card{background:#fff;border-color:rgba(0,0,0,.08)}
+body.cx-light .mc-head{border-bottom-color:rgba(0,0,0,.07)}
+body.cx-light .mc-amount-box{background:#f3f4f6}
+body.cx-light .mc-amounts{border-bottom-color:rgba(0,0,0,.07)}
+body.cx-light .mc-amount-fee{border-right-color:rgba(0,0,0,.07)}
+body.cx-light .mc-row{border-bottom-color:rgba(0,0,0,.06)}
+body.cx-light .mc-amount-val{color:#059669}
+body.cx-light .mc-amount-total .mc-amount-val{color:#111827}
 
-/* ── RESPONSIVE ── */
+/* ══ RESPONSIVE ══ */
+
+/* ── Tablette large (1024px) ── */
 @media(max-width:1024px){
     .cx-sidebar{transform:translateX(-100%)}
     .cx-sidebar.open{transform:translateX(0)}
+    .cx-close-btn{display:flex}
     .cx-wrap{padding-left:0}
     .cx-hamburger{display:block}
     .hx-stats{grid-template-columns:repeat(3,1fr)}
+    .hx-body{padding:18px 18px 70px}
 }
+
+/* ── Tablette (768px) ── */
 @media(max-width:768px){
-    .hx-stats{grid-template-columns:repeat(2,1fr)}
-    .hx-banner{padding:18px 16px 16px}
-    .hx-body{padding:14px 14px 60px}
-    .hx-banner-title{font-size:18px}
+    .hx-banner{padding:20px 16px 18px}
+    .hx-banner-title{font-size:18px;gap:7px}
+    .hx-banner-sub{font-size:12px}
+    .hx-stats{grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+    .hx-stat{padding:12px 10px}
+    .hx-stat-val{font-size:18px}
+    .hx-stat-val.small{font-size:13px}
+    .hx-body{padding:14px 14px 70px}
+    .hx-filters{padding:12px 14px}
+    .cx-tb-link span{display:none}
 }
+
+/* ── Mobile (640px) ── */
 @media(max-width:640px){
-    .hx-stats{grid-template-columns:1fr 1fr}
-    .hx-filter-row{gap:6px}
-    .hx-period-btns{gap:4px}
-    .hx-period-btn{padding:5px 10px;font-size:11px}
+    .hx-banner{padding:16px 14px 14px}
+    .hx-banner-title{font-size:16px}
+    .hx-stats{grid-template-columns:repeat(2,1fr);gap:7px;margin-top:14px}
+    .hx-stat{padding:10px 10px}
+    .hx-stat-val{font-size:16px}
+    .hx-body{padding:10px 10px 70px}
+
+    /* Topbar */
+    .cx-topbar{padding:0 12px;gap:8px}
+    .cx-topbar-title{font-size:13px}
+    .cx-tb-right{gap:6px}
+    .cx-tb-link{padding:0 8px;font-size:11.5px}
+
+    /* Filtres */
+    .hx-filters{padding:10px 12px}
+    .hx-filter-row{flex-direction:column;align-items:stretch;gap:8px}
+    .hx-period-btns{display:flex;flex-wrap:wrap;gap:4px}
+    .hx-period-btn{padding:5px 10px;font-size:11.5px;flex:1;text-align:center;min-width:calc(50% - 4px)}
     .hx-sep{display:none}
-    .hx-search-wrap{flex:1 1 100%}
-    .hx-select{min-width:unset;width:100%}
-    .hx-date-range{width:100%}
-    .hx-input{flex:1}
-    /* Table → cards */
-    .hx-table-wrap{overflow-x:unset}
-    .hx-table,.hx-table tbody{display:block}
-    .hx-table thead{display:none}
-    .hx-table tbody tr{display:block;border:1px solid var(--cx-border);border-radius:var(--r-sm);margin-bottom:10px;padding:12px 14px;background:var(--cx-surface)}
-    .hx-table td{display:flex;align-items:flex-start;padding:5px 0;border:none;font-size:13.5px;gap:10px}
-    .hx-table td::before{content:attr(data-label);font-size:10.5px;font-weight:800;color:var(--cx-muted);text-transform:uppercase;letter-spacing:.6px;min-width:80px;flex-shrink:0;padding-top:2px}
-    .hx-table td[data-label="Actions"],.hx-table td:last-child::before{display:none}
+    .hx-select{width:100%;min-width:unset}
+    .hx-search-wrap{width:100%}
+    .hx-filter-second{flex-direction:column;align-items:stretch;gap:8px}
+    .hx-date-range{flex-wrap:wrap;gap:6px}
+    .hx-date-lbl{font-size:11px;white-space:nowrap;min-width:20px}
+    .hx-input{flex:1;min-width:0}
+    .hx-date-range a{width:100%;justify-content:center}
+
+    /* Basculement tableau ↔ cartes */
+    .hx-desktop{display:none}
+    .hx-mobile{display:block}
 }
+
+/* ── Petit mobile (480px) ── */
 @media(max-width:480px){
     .hx-stats{grid-template-columns:1fr 1fr}
-    .hx-stat-val{font-size:18px}
+    .hx-stat-val{font-size:15px}
+    .hx-banner-title{font-size:15px}
+    .hx-period-btn{min-width:unset;flex:1}
 }
+
+/* ── Très petit (360px) ── */
 @media(max-width:360px){
-    .hx-stats{grid-template-columns:1fr}
+    .hx-stats{grid-template-columns:1fr 1fr}
+    .hx-stat{padding:8px}
+    .hx-stat-val{font-size:14px}
+    .cx-topbar-title{font-size:12px}
 }
 </style>
 @endpush
@@ -311,7 +380,7 @@ body.cx-light .hx-fee{color:#059669}
     {{-- TOPBAR --}}
     <div class="cx-topbar">
         <button class="cx-hamburger" id="cxHamburger">☰</button>
-        <span class="cx-topbar-title">📊 Historique des livraisons</span>
+        <span class="cx-topbar-title">📊 {{ $shopFilter ? 'Historique · '.$shopFilter->name : 'Historique des livraisons' }}</span>
         <div class="cx-tb-right">
             @if(request('shop_id'))
                 <a href="{{ route('company.historique.index') }}" class="cx-tb-link" style="background:rgba(124,58,237,.15);border-color:rgba(124,58,237,.3);color:#c4b5fd;">
@@ -326,14 +395,14 @@ body.cx-light .hx-fee{color:#059669}
     @if(request('shop_id'))
     @php $filteredShop = \App\Models\Shop::find(request('shop_id')); @endphp
     @if($filteredShop)
-    <div style="background:linear-gradient(90deg,rgba(124,58,237,.15),rgba(99,102,241,.08));border-bottom:1px solid rgba(124,58,237,.2);padding:10px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-        <span style="font-size:18px;">🏪</span>
-        <div>
-            <div style="font-size:13px;font-weight:800;color:#c4b5fd;">Filtré par boutique : {{ $filteredShop->name }}</div>
-            <div style="font-size:11.5px;color:var(--cx-text2);">Affichage de l'historique uniquement pour cette boutique</div>
+    <div style="background:linear-gradient(90deg,rgba(124,58,237,.15),rgba(99,102,241,.08));border-bottom:1px solid rgba(124,58,237,.2);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span style="font-size:16px;flex-shrink:0;">🏪</span>
+        <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:800;color:#c4b5fd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Filtré : {{ $filteredShop->name }}</div>
+            <div style="font-size:11px;color:var(--cx-text2);">Historique de cette boutique uniquement</div>
         </div>
-        <a href="{{ route('company.historique.index') }}" style="margin-left:auto;font-size:12px;color:var(--cx-muted);padding:5px 12px;border:1px solid rgba(124,58,237,.3);border-radius:6px;background:rgba(124,58,237,.1);color:#c4b5fd;white-space:nowrap;">
-            ✕ Effacer le filtre boutique
+        <a href="{{ route('company.historique.index') }}" style="flex-shrink:0;font-size:11.5px;padding:5px 10px;border:1px solid rgba(124,58,237,.3);border-radius:6px;background:rgba(124,58,237,.1);color:#c4b5fd;white-space:nowrap;">
+            ✕ Tout voir
         </a>
     </div>
     @endif
@@ -344,7 +413,13 @@ body.cx-light .hx-fee{color:#059669}
         <div class="hx-banner-grid"></div>
         <div class="hx-banner-inner">
             <div class="hx-banner-title">📊 Historique des livraisons</div>
-            <div class="hx-banner-sub">{{ $company->name }} · Toutes les livraisons terminées et annulées</div>
+            <div class="hx-banner-sub">
+                @if($shopFilter)
+                    {{ $shopFilter->name }} · Livraisons de cette boutique
+                @else
+                    {{ $company->name }} · Toutes les livraisons terminées et annulées
+                @endif
+            </div>
             <div class="hx-stats">
                 <div class="hx-stat" style="--s-accent:#34d399">
                     <div class="hx-stat-val">{{ $stats['total_livrees'] }}</div>
@@ -359,11 +434,11 @@ body.cx-light .hx-fee{color:#059669}
                     <div class="hx-stat-lbl">Livrées auj.</div>
                 </div>
                 <div class="hx-stat" style="--s-accent:#a78bfa">
-                    <div class="hx-stat-val" style="font-size:15px">{{ $fmt($stats['revenus_month']) }}</div>
+                    <div class="hx-stat-val" style="font-size:clamp(12px,2.5vw,15px);word-break:break-all">{{ $fmt($stats['revenus_month']) }}</div>
                     <div class="hx-stat-lbl">Revenus ce mois</div>
                 </div>
                 <div class="hx-stat" style="--s-accent:#60a5fa">
-                    <div class="hx-stat-val" style="font-size:15px">{{ $fmt($stats['revenus_total']) }}</div>
+                    <div class="hx-stat-val" style="font-size:clamp(12px,2.5vw,15px);word-break:break-all">{{ $fmt($stats['revenus_total']) }}</div>
                     <div class="hx-stat-lbl">Revenus total</div>
                 </div>
             </div>
@@ -436,8 +511,8 @@ body.cx-light .hx-fee{color:#059669}
             @endif
         </form>
 
-        {{-- TABLE --}}
-        <div class="hx-table-card">
+        {{-- ══ TABLE DESKTOP ══ --}}
+        <div class="hx-table-card hx-desktop">
             <div class="hx-table-wrap">
                 <table class="hx-table">
                     <thead>
@@ -450,52 +525,35 @@ body.cx-light .hx-fee{color:#059669}
                             <th>Frais liv.</th>
                             <th>Montant</th>
                             <th>Statut</th>
-                            <th>Date clôture</th>
+                            <th>Clôture</th>
                         </tr>
                     </thead>
                     <tbody>
                     @forelse($orders as $order)
+                    @php
+                        $dParts = $order->driver ? explode(' ', $order->driver->name) : [];
+                        $dAv    = $order->driver ? strtoupper(substr($dParts[0],0,1)).strtoupper(substr($dParts[1]??'X',0,1)) : '';
+                    @endphp
                     <tr>
-                        <td data-label="Commande">
-                            <div>
-                                <div class="hx-order-id">#{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</div>
-                                <div class="hx-date">{{ $order->created_at->format('d/m/y') }}</div>
-                            </div>
+                        <td>
+                            <div class="hx-order-id">#{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</div>
+                            <div class="hx-date">{{ $order->created_at->format('d/m/y') }}</div>
                         </td>
-                        <td data-label="Boutique">
-                            <div>
-                                <div class="hx-shop">🏪 {{ optional($order->shop)->name ?? '—' }}</div>
-                                @if(optional($order->shop)->address)
-                                <div class="hx-shop-addr">📍 {{ $order->shop->address }}</div>
-                                @endif
-                            </div>
+                        <td>
+                            <div class="hx-shop">{{ optional($order->shop)->name ?? '—' }}</div>
                         </td>
-                        <td data-label="Client">
-                            <div>
-                                <div class="hx-client">{{ optional($order->client)->name ?? '—' }}</div>
-                                <div class="hx-phone">{{ optional($order->client)->phone ?? '' }}</div>
-                            </div>
+                        <td>
+                            <div class="hx-client">{{ optional($order->client)->name ?? '—' }}</div>
+                            <div class="hx-phone">{{ optional($order->client)->phone ?? '' }}</div>
                         </td>
-                        <td data-label="Destination">
-                            @if($order->delivery_destination)
-                                <div class="hx-dest">{{ $order->delivery_destination }}</div>
-                            @else
-                                <span style="color:var(--cx-muted);font-size:12px;font-style:italic">—</span>
-                            @endif
+                        <td>
+                            <div class="hx-dest">{{ $order->delivery_destination ?: '—' }}</div>
                         </td>
-                        <td data-label="Chauffeur">
+                        <td>
                             @if($order->driver)
-                                @php
-                                    $parts = explode(' ', $order->driver->name);
-                                    $av = strtoupper(substr($parts[0],0,1)).strtoupper(substr($parts[1]??'X',0,1));
-                                @endphp
                                 <div class="hx-driver">
                                     <div class="hx-driver-av">
-                                        @if($order->driver->photo)
-                                            <img src="{{ asset('storage/'.$order->driver->photo) }}" alt="">
-                                        @else
-                                            {{ $av }}
-                                        @endif
+                                        @if($order->driver->photo)<img src="{{ asset('storage/'.$order->driver->photo) }}" alt="">@else{{ $dAv }}@endif
                                     </div>
                                     <div>
                                         <div class="hx-driver-name">{{ $order->driver->name }}</div>
@@ -503,25 +561,19 @@ body.cx-light .hx-fee{color:#059669}
                                     </div>
                                 </div>
                             @else
-                                <span class="hx-no-driver">Non assigné</span>
+                                <span class="hx-no-driver">—</span>
                             @endif
                         </td>
-                        <td data-label="Frais">
-                            <span class="hx-fee">{{ $order->delivery_fee ? $fmt($order->delivery_fee) : '—' }}</span>
-                        </td>
-                        <td data-label="Montant">
-                            <span class="hx-amount">{{ $fmt($order->total) }}</span>
-                        </td>
-                        <td data-label="Statut">
+                        <td><span class="hx-fee">{{ $order->delivery_fee ? $fmt($order->delivery_fee) : '—' }}</span></td>
+                        <td><span class="hx-amount">{{ $fmt($order->total) }}</span></td>
+                        <td>
                             @if($order->status === 'livrée')
                                 <span class="hx-badge hx-badge-livree">✅ Livrée</span>
                             @else
                                 <span class="hx-badge hx-badge-annulee">❌ Annulée</span>
                             @endif
                         </td>
-                        <td data-label="Clôture" style="color:var(--cx-muted);font-size:12.5px;white-space:nowrap">
-                            {{ $order->updated_at->format('d/m/y H:i') }}
-                        </td>
+                        <td style="color:var(--cx-muted);font-size:12px;white-space:nowrap">{{ $order->updated_at->format('d/m/y H:i') }}</td>
                     </tr>
                     @empty
                     <tr><td colspan="9">
@@ -537,6 +589,98 @@ body.cx-light .hx-fee{color:#059669}
             </div>
             @if($orders->hasPages())
             <div class="hx-pagination">{{ $orders->links() }}</div>
+            @endif
+        </div>
+
+        {{-- ══ CARTES MOBILE ══ --}}
+        <div class="hx-mobile">
+            @forelse($orders as $order)
+            @php
+                $isLivree = $order->status === 'livrée';
+                $dParts   = $order->driver ? explode(' ', $order->driver->name) : [];
+                $dAv      = $order->driver ? strtoupper(substr($dParts[0],0,1)).strtoupper(substr($dParts[1]??'X',0,1)) : '';
+            @endphp
+            <div class="mc-card">
+                {{-- En-tête carte --}}
+                <div class="mc-head">
+                    <div>
+                        <span class="mc-id">#{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</span>
+                        <span class="mc-date">{{ $order->created_at->format('d/m/y · H:i') }}</span>
+                    </div>
+                    @if($isLivree)
+                        <span class="hx-badge hx-badge-livree">✅ Livrée</span>
+                    @else
+                        <span class="hx-badge hx-badge-annulee">❌ Annulée</span>
+                    @endif
+                </div>
+
+                {{-- Montants en évidence --}}
+                <div class="mc-amounts">
+                    <div class="mc-amount-box mc-amount-fee">
+                        <div class="mc-amount-lbl">🚚 Frais livraison</div>
+                        <div class="mc-amount-val">{{ $order->delivery_fee ? $fmt($order->delivery_fee) : '—' }}</div>
+                    </div>
+                    <div class="mc-amount-box mc-amount-total">
+                        <div class="mc-amount-lbl">💰 Montant commande</div>
+                        <div class="mc-amount-val">{{ $fmt($order->total) }}</div>
+                    </div>
+                </div>
+
+                {{-- Détails --}}
+                <div class="mc-rows">
+                    <div class="mc-row">
+                        <span class="mc-lbl">🏪 Boutique</span>
+                        <span class="mc-val">{{ optional($order->shop)->name ?? '—' }}</span>
+                    </div>
+                    <div class="mc-row">
+                        <span class="mc-lbl">👤 Client</span>
+                        <span class="mc-val">{{ optional($order->client)->name ?? '—' }}
+                            @if(optional($order->client)->phone)
+                            <span style="color:var(--cx-muted);font-size:11.5px;display:block">{{ $order->client->phone }}</span>
+                            @endif
+                        </span>
+                    </div>
+                    @if($order->delivery_destination)
+                    <div class="mc-row">
+                        <span class="mc-lbl">📍 Destination</span>
+                        <span class="mc-val">{{ $order->delivery_destination }}</span>
+                    </div>
+                    @endif
+                    <div class="mc-row">
+                        <span class="mc-lbl">🚴 Chauffeur</span>
+                        <span class="mc-val">
+                            @if($order->driver)
+                                <div style="display:flex;align-items:center;gap:7px;">
+                                    <div class="hx-driver-av" style="width:26px;height:26px;font-size:9px;border-radius:6px;">
+                                        @if($order->driver->photo)<img src="{{ asset('storage/'.$order->driver->photo) }}" alt="">@else{{ $dAv }}@endif
+                                    </div>
+                                    <div>
+                                        <div style="font-size:13px;font-weight:700;color:var(--cx-text)">{{ $order->driver->name }}</div>
+                                        @if($order->driver->phone)<div style="font-size:11px;color:var(--cx-muted)">{{ $order->driver->phone }}</div>@endif
+                                    </div>
+                                </div>
+                            @else
+                                <span style="color:var(--cx-muted);font-style:italic;font-size:12.5px">Non assigné</span>
+                            @endif
+                        </span>
+                    </div>
+                    <div class="mc-row" style="border-bottom:none">
+                        <span class="mc-lbl">📅 Clôturée</span>
+                        <span class="mc-val" style="color:var(--cx-muted)">{{ $order->updated_at->format('d/m/Y à H:i') }}</span>
+                    </div>
+                </div>
+            </div>
+            @empty
+            <div class="hx-empty" style="background:var(--cx-surface);border:1px solid var(--cx-border);border-radius:var(--r);padding:48px 20px;">
+                <div class="hx-empty-ico">📊</div>
+                <div class="hx-empty-title">Aucun historique trouvé</div>
+                <div class="hx-empty-sub">Modifiez les filtres ou attendez que des livraisons soient terminées.</div>
+            </div>
+            @endforelse
+            @if($orders->hasPages())
+            <div class="hx-pagination" style="background:var(--cx-surface);border:1px solid var(--cx-border);border-radius:var(--r);margin-top:4px;">
+                {{ $orders->links() }}
+            </div>
             @endif
         </div>
 

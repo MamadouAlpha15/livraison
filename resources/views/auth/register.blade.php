@@ -116,9 +116,7 @@ $countries = [
                 <div class="role-card {{ old('role') === 'company' ? 'active':'' }}" onclick="setRole('company',this)">
                     <span class="rc-ico">🚚</span>Entreprise livraison
                 </div>
-                <div class="role-card {{ old('role') === 'livreur' ? 'active':'' }}" onclick="setRole('livreur',this)">
-                    <span class="rc-ico">🛵</span>Livreur
-                </div>
+               
             </div>
             @error('role')<p class="f-error">{{ $message }}</p>@enderror
         </div>

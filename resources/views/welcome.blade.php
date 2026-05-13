@@ -1387,7 +1387,7 @@ body {
         <div class="faq-grid">
             <div class="faq-item">
                 <div class="faq-q">Comment créer ma boutique ? <span class="arrow">+</span></div>
-                <div class="faq-a">Inscrivez-vous, choisissez le rôle "Vendeur", puis cliquez sur "Créer une boutique". Remplissez les informations de base et vous êtes prêt en moins de 5 minutes.</div>
+                <div class="faq-a">Inscrivez-vous, choisissez le rôle "Admin Boutique", puis cliquez sur "Créer une boutique". Remplissez les informations de base et vous êtes prêt en moins de 5 minutes.</div>
             </div>
             <div class="faq-item">
                 <div class="faq-q">Comment fonctionne la livraison ? <span class="arrow">+</span></div>
@@ -1395,7 +1395,7 @@ body {
             </div>
             <div class="faq-item">
                 <div class="faq-q">Puis-je avoir plusieurs boutiques ? <span class="arrow">+</span></div>
-                <div class="faq-a">Oui, avec le plan Entreprise vous pouvez gérer plusieurs boutiques depuis un seul compte administrateur avec un tableau de bord centralisé.</div>
+                <div class="faq-a">Oui, vous pouvez creé plusieurs boutiques.</div>
             </div>
             <div class="faq-item">
                 <div class="faq-q">Comment les paiements sont-ils gérés ? <span class="arrow">+</span></div>
@@ -1403,7 +1403,7 @@ body {
             </div>
             <div class="faq-item">
                 <div class="faq-q">Est-ce que je peux exporter mes données ? <span class="arrow">+</span></div>
-                <div class="faq-a">Oui, vous pouvez exporter vos commandes, paiements et statistiques en Excel ou PDF directement depuis votre dashboard, disponible dès le plan Pro.</div>
+                <div class="faq-a">Oui, vous pouvez exporter vos commandes, paiements et statistiques en Excel ou PDF directement depuis votre dashboard,.</div>
             </div>
             <div class="faq-item">
                 <div class="faq-q">Comment contacter le support ? <span class="arrow">+</span></div>

@@ -4,14 +4,17 @@
 @section('title', 'Modifier — ' . $driver->name)
 
 @push('styles')
+<script>(function(){if(localStorage.getItem('cx-theme')==='dark')document.documentElement.classList.add('cx-predark');})();</script>
+<style>
+html.cx-predark body{background:#0b0d22!important;color:#e2e8f0!important}</style>
 <style>
     :root {
-        --cx-bg:      #07091a;
-        --cx-card:    #141630;
-        --cx-border:  #1e2147;
+        --cx-bg:      #F5F7FA;
+        --cx-card:    #ffffff;
+        --cx-border:  rgba(0,0,0,.09);
         --cx-brand:   #7c3aed;
-        --cx-text:    #e2e8f0;
-        --cx-muted:   #94a3b8;
+        --cx-text:    #111827;
+        --cx-muted:   #6b7280;
         --cx-green:   #10b981;
         --cx-amber:   #f59e0b;
         --cx-red:     #ef4444;
@@ -37,7 +40,34 @@
         display: grid; grid-template-columns: 320px 1fr; gap: 1.5rem;
         padding: 1.75rem 2rem; max-width: 1100px; margin: 0 auto;
     }
-    @media (max-width: 820px) { .drv-form-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 820px) {
+        .drv-form-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+        .drv-banner { padding: 1.5rem 1.1rem 1.25rem; }
+        .drv-banner h1 { font-size: 1.35rem; }
+        .drv-form-layout { padding: 1rem 1rem 2rem; gap: 1rem; }
+        .drv-panel-body { padding: 1rem; }
+        .drv-panel-header { padding: .8rem 1rem; }
+        .btn-row { flex-direction: column; }
+        .stats-strip { grid-template-columns: repeat(3,1fr); gap: .4rem; }
+    }
+    @media (max-width: 480px) {
+        .drv-banner h1 { font-size: 1.2rem; }
+        .drv-banner-sub { font-size: .82rem; }
+        .drv-form-layout { padding: .75rem .75rem 2rem; }
+        .drv-panel-body { padding: .85rem; }
+        .stats-strip { gap: .35rem; }
+        .stat-pill-val { font-size: 1.1rem; }
+    }
+    @media (max-width: 360px) {
+        .drv-banner { padding: 1.1rem .85rem 1rem; }
+        .drv-banner h1 { font-size: 1.1rem; }
+        .drv-form-layout { padding: .6rem .6rem 2rem; gap: .75rem; }
+        .drv-panel-body { padding: .75rem; }
+        .form-control { font-size: .88rem; padding: .65rem .85rem; }
+        .status-grid { grid-template-columns: repeat(3,1fr); }
+    }
 
     .drv-panel {
         background: var(--cx-card); border: 1px solid var(--cx-border);
@@ -59,7 +89,7 @@
     .current-photo-box {
         border-radius: 14px; overflow: hidden;
         border: 2px solid var(--cx-border);
-        background: rgba(15,17,41,.5);
+        background: #f3f4f6;
         aspect-ratio: 1; position: relative;
         margin-bottom: .85rem;
     }
@@ -68,9 +98,9 @@
     }
     .current-photo-badge {
         position: absolute; top: 8px; left: 8px;
-        background: rgba(7,9,26,.75); backdrop-filter: blur(4px);
-        border: 1px solid rgba(255,255,255,.12); border-radius: 6px;
-        padding: .2rem .55rem; font-size: .7rem; color: var(--cx-muted);
+        background: rgba(0,0,0,.55); backdrop-filter: blur(4px);
+        border: 1px solid rgba(255,255,255,.15); border-radius: 6px;
+        padding: .2rem .55rem; font-size: .7rem; color: #e2e8f0;
     }
     /* No photo placeholder */
     .no-photo-box {
@@ -96,7 +126,7 @@
     .photo-drop-label-sm { font-size: .78rem; color: var(--cx-muted); margin-bottom: .4rem; }
     .photo-drop {
         border: 2px dashed var(--cx-border); border-radius: 12px;
-        background: rgba(15,17,41,.5);
+        background: #f9fafb;
         display: flex; flex-direction: column; align-items: center; justify-content: center;
         gap: .6rem; min-height: 120px; cursor: pointer;
         transition: border-color .2s, background .2s; position: relative; overflow: hidden;
@@ -126,7 +156,7 @@
         background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.2);
         border-radius: 8px; font-size: .76rem; color: var(--cx-green);
     }
-    .compress-bar-wrap { margin-top: .5rem; background: rgba(255,255,255,.06); border-radius: 99px; height: 5px; overflow: hidden; }
+    .compress-bar-wrap { margin-top: .5rem; background: rgba(0,0,0,.08); border-radius: 99px; height: 5px; overflow: hidden; }
     .compress-bar { height: 100%; background: var(--cx-brand); border-radius: 99px; transition: width .4s ease; width: 0%; }
 
     /* Stats strip */
@@ -143,12 +173,12 @@
     }
     .form-label .req { color: var(--cx-red); margin-left: 2px; }
     .form-control {
-        width: 100%; background: rgba(15,17,41,.7); border: 1px solid var(--cx-border);
+        width: 100%; background: #f9fafb; border: 1px solid var(--cx-border);
         border-radius: 10px; color: var(--cx-text); padding: .75rem 1rem; font-size: .93rem;
         outline: none; transition: border-color .2s, box-shadow .2s; box-sizing: border-box;
     }
     .form-control:focus { border-color: var(--cx-brand); box-shadow: 0 0 0 3px rgba(124,58,237,.18); }
-    .form-control::placeholder { color: #475569; }
+    .form-control::placeholder { color: #9ca3af; }
 
     /* Password row */
     .pwd-row { display: flex; gap: .5rem; }
@@ -261,7 +291,7 @@
 
     /* Overlays */
     .processing-overlay {
-        position: fixed; inset: 0; background: rgba(7,9,26,.8);
+        position: fixed; inset: 0; background: rgba(0,0,0,.55);
         display: none; place-items: center; z-index: 999; flex-direction: column; gap: 1rem;
     }
     .processing-overlay.active { display: flex; }
@@ -273,7 +303,7 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .processing-label { color: var(--cx-muted); font-size: .9rem; }
 
-    .del-overlay { position: fixed; inset: 0; background: rgba(7,9,26,.85); display: none; place-items: center; z-index: 1000; }
+    .del-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: none; place-items: center; z-index: 1000; }
     .del-overlay.active { display: grid; }
     .del-modal {
         background: var(--cx-card); border: 1px solid rgba(239,68,68,.3);
@@ -287,6 +317,35 @@
     .del-cancel:hover { border-color: var(--cx-brand); color: var(--cx-text); }
     .del-confirm { background: var(--cx-red); border: none; color: #fff; padding: .65rem 1.5rem; border-radius: 8px; cursor: pointer; font-size: .88rem; font-weight: 600; }
     .del-confirm:hover { background: #dc2626; }
+
+    /* ══ MODE SOMBRE ══ */
+    body.cx-dark {
+        --cx-bg:     #0b0d22;
+        --cx-card:   #0d1226;
+        --cx-border: rgba(255,255,255,.08);
+        --cx-text:   #e2e8f0;
+        --cx-muted:  #94a3b8;
+        background: var(--cx-bg) !important;
+        color: var(--cx-text);
+    }
+    body.cx-dark .form-control { background: #111930; color: #e2e8f0; }
+    body.cx-dark .form-control::placeholder { color: #475569; }
+    body.cx-dark .photo-drop { background: rgba(15,17,41,.6); }
+    body.cx-dark .current-photo-box { background: #111930; }
+    body.cx-dark .current-photo-badge { background: rgba(0,0,0,.7); }
+    body.cx-dark .no-photo-box { background: rgba(124,58,237,.05); }
+    body.cx-dark .pwd-hint { background: rgba(245,158,11,.07); border-color: rgba(245,158,11,.2); color: #fbbf24; }
+    body.cx-dark .role-card { background: #0d1226; }
+    body.cx-dark .status-card { background: #0d1226; }
+    body.cx-dark .linked-account { background: rgba(124,58,237,.08); border-color: rgba(124,58,237,.2); }
+    body.cx-dark .btn-ghost { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.1); color: #94a3b8; }
+    body.cx-dark .btn-ghost:hover { border-color: var(--cx-brand); color: #e2e8f0; }
+    body.cx-dark .del-modal { background: #0d1226; }
+    body.cx-dark .del-cancel { border-color: rgba(255,255,255,.1); color: #94a3b8; }
+    body.cx-dark .del-cancel:hover { border-color: var(--cx-brand); color: #e2e8f0; }
+    body.cx-dark .section-divider::before,
+    body.cx-dark .section-divider::after { background: rgba(255,255,255,.08); }
+    body.cx-dark .compress-bar-wrap { background: rgba(255,255,255,.06); }
 </style>
 @endpush
 
@@ -521,6 +580,14 @@
 
 @push('scripts')
 <script>
+/* ── Thème sombre ── */
+(function(){
+    const t = localStorage.getItem('cx-theme') || 'light';
+    if(t === 'dark') document.body.classList.add('cx-dark');
+    else document.body.classList.remove('cx-dark');
+    document.documentElement.classList.remove('cx-predark');
+})();
+
 /* ── Photo ── */
 const MAX_DIM = 800, QUALITY = 0.85, MAX_BYTES = 5 * 1024 * 1024;
 const photoInput       = document.getElementById('photoInput');

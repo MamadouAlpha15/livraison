@@ -4,15 +4,18 @@
 @section('title', 'Ajouter un chauffeur')
 
 @push('styles')
+<script>(function(){if(localStorage.getItem('cx-theme')==='dark')document.documentElement.classList.add('cx-predark');})();</script>
+<style>
+html.cx-predark body{background:#0b0d22!important;color:#e2e8f0!important}</style>
 <style>
     :root {
-        --cx-bg:      #07091a;
-        --cx-surface: #0f1129;
-        --cx-card:    #141630;
-        --cx-border:  #1e2147;
+        --cx-bg:      #F5F7FA;
+        --cx-surface: #ffffff;
+        --cx-card:    #ffffff;
+        --cx-border:  rgba(0,0,0,.09);
         --cx-brand:   #7c3aed;
-        --cx-text:    #e2e8f0;
-        --cx-muted:   #94a3b8;
+        --cx-text:    #111827;
+        --cx-muted:   #6b7280;
         --cx-green:   #10b981;
         --cx-red:     #ef4444;
     }
@@ -41,7 +44,31 @@
         max-width: 1100px;
         margin: 0 auto;
     }
-    @media (max-width: 820px) { .drv-form-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 820px) {
+        .drv-form-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+        .drv-banner { padding: 1.5rem 1.1rem 1.25rem; }
+        .drv-banner h1 { font-size: 1.35rem; }
+        .drv-form-layout { padding: 1rem 1rem 2rem; gap: 1rem; }
+        .drv-panel-body { padding: 1rem; }
+        .drv-panel-header { padding: .8rem 1rem; }
+        .btn-row { flex-direction: column; }
+        .status-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+        .drv-banner h1 { font-size: 1.2rem; }
+        .drv-banner-sub { font-size: .82rem; }
+        .drv-form-layout { padding: .75rem .75rem 2rem; }
+        .drv-panel-body { padding: .85rem; }
+    }
+    @media (max-width: 360px) {
+        .drv-banner { padding: 1.1rem .85rem 1rem; }
+        .drv-banner h1 { font-size: 1.1rem; }
+        .drv-form-layout { padding: .6rem .6rem 2rem; gap: .75rem; }
+        .drv-panel-body { padding: .75rem; }
+        .form-control { font-size: .88rem; padding: .65rem .85rem; }
+    }
 
     .drv-panel {
         background: var(--cx-card);
@@ -65,7 +92,7 @@
     /* Photo drop */
     .photo-drop {
         border: 2px dashed var(--cx-border); border-radius: 14px;
-        background: rgba(15,17,41,.6);
+        background: #f9fafb;
         display: flex; flex-direction: column; align-items: center; justify-content: center;
         gap: .75rem; min-height: 200px; cursor: pointer;
         transition: border-color .2s, background .2s;
@@ -115,13 +142,13 @@
     }
     .form-label .req { color: var(--cx-red); margin-left: 2px; }
     .form-control {
-        width: 100%; background: rgba(15,17,41,.7);
+        width: 100%; background: #f9fafb;
         border: 1px solid var(--cx-border); border-radius: 10px;
         color: var(--cx-text); padding: .75rem 1rem; font-size: .93rem;
         outline: none; transition: border-color .2s, box-shadow .2s; box-sizing: border-box;
     }
     .form-control:focus { border-color: var(--cx-brand); box-shadow: 0 0 0 3px rgba(124,58,237,.18); }
-    .form-control::placeholder { color: #475569; }
+    .form-control::placeholder { color: #9ca3af; }
 
     /* Password row */
     .pwd-row { display: flex; gap: .5rem; }
@@ -220,7 +247,7 @@
     .role-badge.employe { background: rgba(99,102,241,.1); border-color: rgba(99,102,241,.3); color: #818cf8; }
 
     .processing-overlay {
-        position: fixed; inset: 0; background: rgba(7,9,26,.8);
+        position: fixed; inset: 0; background: rgba(0,0,0,.55);
         display: none; place-items: center; z-index: 999; flex-direction: column; gap: 1rem;
     }
     .processing-overlay.active { display: flex; }
@@ -231,6 +258,28 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     .processing-label { color: var(--cx-muted); font-size: .9rem; }
+
+    /* ══ MODE SOMBRE ══ */
+    body.cx-dark {
+        --cx-bg:     #0b0d22;
+        --cx-card:   #0d1226;
+        --cx-border: rgba(255,255,255,.08);
+        --cx-text:   #e2e8f0;
+        --cx-muted:  #94a3b8;
+        background: var(--cx-bg) !important;
+        color: var(--cx-text);
+    }
+    body.cx-dark .form-control { background: #111930; color: #e2e8f0; }
+    body.cx-dark .form-control::placeholder { color: #475569; }
+    body.cx-dark .photo-drop { background: rgba(15,17,41,.6); }
+    body.cx-dark .tips-card { background: rgba(124,58,237,.08); border-color: rgba(124,58,237,.22); }
+    body.cx-dark .pwd-hint { background: rgba(245,158,11,.07); border-color: rgba(245,158,11,.2); color: #fbbf24; }
+    body.cx-dark .role-card { background: #0d1226; }
+    body.cx-dark .status-card { background: #0d1226; }
+    body.cx-dark .btn-ghost { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.1); color: #94a3b8; }
+    body.cx-dark .btn-ghost:hover { border-color: var(--cx-brand); color: #e2e8f0; }
+    body.cx-dark .section-divider::before,
+    body.cx-dark .section-divider::after { background: rgba(255,255,255,.08); }
 </style>
 @endpush
 
@@ -384,6 +433,14 @@
 
 @push('scripts')
 <script>
+/* ── Thème sombre ── */
+(function(){
+    const t = localStorage.getItem('cx-theme') || 'light';
+    if(t === 'dark') document.body.classList.add('cx-dark');
+    else document.body.classList.remove('cx-dark');
+    document.documentElement.classList.remove('cx-predark');
+})();
+
 /* ── Photo compression ── */
 const MAX_DIM = 800, QUALITY = 0.85, MAX_BYTES = 5 * 1024 * 1024;
 const photoInput  = document.getElementById('photoInput');

@@ -181,25 +181,51 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 /* Pagination */
 .pagination-wrap { display:flex; justify-content:center; padding:16px; }
 
+/* ── Double structure desktop / mobile ── */
+.tbl-desktop { display:block }
+.tbl-mobile  { display:none }
+
+.om-card { border-bottom:1px solid var(--border); }
+.om-card:last-child { border-bottom:none }
+.om-head {
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    padding:12px 16px; background:#f8fafc;
+    border-bottom:1px solid var(--border);
+}
+.om-row {
+    display:flex; align-items:flex-start;
+    justify-content:space-between;
+    padding:9px 16px; gap:10px;
+    border-bottom:1px solid #f8fafc;
+}
+.om-row:last-child { border-bottom:none }
+.om-lbl {
+    font-size:10.5px; font-weight:700; color:var(--muted);
+    text-transform:uppercase; letter-spacing:.4px;
+    flex-shrink:0; min-width:72px; padding-top:2px;
+}
+.om-val { font-size:13px; font-weight:600; color:var(--text); text-align:right; word-break:break-word; }
+
 /* ── RESPONSIVE ── */
 
-/* Tablette large */
 @media(max-width:1024px) {
     .cl-kpi-val { font-size:15px; }
     .tbl th, .tbl td { padding:12px 14px; }
 }
 
-/* Tablette */
 @media(max-width:768px) {
     .cl-hero    { padding:18px 16px 76px; }
     .cl-kpi-row { padding:0 16px; gap:10px; }
     .cl-kpi     { flex:0 0 calc(50% - 5px); min-width:0; }
     .cl-body    { padding:20px 16px 40px; }
-    .tbl th, .tbl td { padding:11px 12px; font-size:12px; }
     .card-hd    { padding:12px 16px; }
 }
 
-/* Mobile */
+@media(max-width:640px) {
+    .tbl-desktop { display:none }
+    .tbl-mobile  { display:block }
+}
+
 @media(max-width:480px) {
     .cl-hero        { padding:14px 12px 70px; }
     .cl-hero-body   { gap:14px; }
@@ -207,63 +233,27 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
     .cl-name        { font-size:17px; }
     .cl-contacts    { font-size:11.5px; gap:6px; }
     .cl-back        { font-size:12px; padding:7px 12px; }
-
-    .cl-kpi-row { padding:0 12px; gap:8px; margin-top:-44px; }
-    .cl-kpi     { flex:0 0 calc(50% - 4px); min-width:0; padding:12px 14px; gap:10px; }
-    .cl-kpi-ico { width:38px; height:38px; font-size:16px; border-radius:10px; }
-    .cl-kpi-val { font-size:14px; }
-    .cl-kpi-lbl { font-size:10px; }
-
-    .cl-body    { padding:14px 0 40px; }
-
-    /* La carte commandes prend toute la largeur */
-    .orders-card { border-radius:0; box-shadow:none; }
-    .card-hd     { padding:12px 16px; }
-
-    /* Table → liste de cartes verticales */
-    .tbl, .tbl tbody { display:block; width:100%; }
-    .tbl thead { display:none; }
-
-    .tbl tbody tr {
-        display:block;
-        padding:12px 16px;
-        border-bottom:1px solid var(--border);
-    }
-    .tbl tbody tr:last-child { border-bottom:none; }
-    .tbl tbody tr:hover { background:#fafcff; }
-
-    .tbl td {
-        display:flex; align-items:flex-start;
-        justify-content:space-between;
-        padding:5px 0; border:none; font-size:12.5px;
-    }
-    /* Labels auto générés par nth-child */
-    .tbl td::before {
-        font-size:10px; font-weight:700; color:var(--muted);
-        text-transform:uppercase; letter-spacing:.4px;
-        flex-shrink:0; margin-right:10px;
-        padding-top:3px; min-width:62px;
-    }
-    .tbl td:nth-child(1)::before { content:'Réf'; }
-    .tbl td:nth-child(2)::before { content:'Produits'; }
-    .tbl td:nth-child(3)::before { content:'Livraison'; }
-    .tbl td:nth-child(4)::before { content:'Montant'; }
-    .tbl td:nth-child(5)::before { content:'Statut'; }
-    .tbl td:nth-child(6)::before { content:'Date'; }
-    .tbl td.right { text-align:right; }
-
-    .amt-num  { font-size:13px; }
-    .oid      { font-size:11px; }
+    .cl-kpi-row     { padding:0 12px; gap:8px; margin-top:-44px; }
+    .cl-kpi         { flex:0 0 calc(50% - 4px); min-width:0; padding:12px 14px; gap:10px; }
+    .cl-kpi-ico     { width:38px; height:38px; font-size:16px; border-radius:10px; }
+    .cl-kpi-val     { font-size:14px; }
+    .cl-kpi-lbl     { font-size:10px; }
+    .cl-body        { padding:14px 0 40px; }
+    .orders-card    { border-radius:0; box-shadow:none; }
+    .card-hd        { padding:12px 16px; }
+    .om-head        { padding:10px 12px; gap:6px; }
+    .om-row         { padding:8px 12px; }
+    .om-lbl         { min-width:62px; font-size:10px; }
+    .om-val         { font-size:12.5px; }
 }
 
-/* Petit mobile */
 @media(max-width:360px) {
-    .cl-avatar  { width:48px; height:48px; font-size:15px; }
-    .cl-name    { font-size:15px; }
+    .cl-avatar   { width:48px; height:48px; font-size:15px; }
+    .cl-name     { font-size:15px; }
     .cl-contacts { font-size:11px; }
-    .cl-kpi     { flex:0 0 100%; }
-    .cl-kpi-val { font-size:13px; }
-    .cl-kpi-ico { width:34px; height:34px; font-size:14px; }
+    .cl-kpi      { flex:0 0 100%; }
+    .cl-kpi-val  { font-size:13px; }
+    .cl-kpi-ico  { width:34px; height:34px; font-size:14px; }
 }
 </style>
 @endpush
@@ -374,7 +364,11 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
         @if($commandes->isEmpty())
             <div class="tbl-empty">Aucune commande trouvée pour ce client.</div>
         @else
-        <table class="tbl">
+
+        {{-- ── Desktop : table ── --}}
+        <div class="tbl-desktop">
+        <div style="overflow-x:auto">
+        <table class="tbl" style="min-width:560px">
             <thead>
                 <tr>
                     <th>Réf</th>
@@ -389,17 +383,11 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
                 @foreach($commandes as $order)
                 @php $st = $statusMap[$order->status] ?? ['label'=>ucfirst($order->status),'cls'=>'p-muted']; @endphp
                 <tr>
-                    {{-- Référence --}}
                     <td><span class="oid">#{{ $order->id }}</span></td>
-
-                    {{-- Produits --}}
                     <td>
                         @if($order->items && $order->items->count() > 0)
                             @foreach($order->items->take(2) as $item)
-                            <div class="prod-line">
-                                {{ $item->product->name ?? 'Produit supprimé' }}
-                                <span class="prod-qty">×{{ $item->quantity }}</span>
-                            </div>
+                            <div class="prod-line">{{ $item->product->name ?? 'Produit supprimé' }}<span class="prod-qty"> ×{{ $item->quantity }}</span></div>
                             @endforeach
                             @if($order->items->count() > 2)
                             <div class="prod-more">+{{ $order->items->count()-2 }} autre(s)</div>
@@ -408,8 +396,6 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
                             <span style="color:var(--muted)">—</span>
                         @endif
                     </td>
-
-                    {{-- Livraison --}}
                     <td>
                         @if($order->delivery_destination)
                             <div style="font-size:12px;color:var(--text);font-weight:600;max-width:180px;line-height:1.3">📍 {{ $order->delivery_destination }}</div>
@@ -421,17 +407,11 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
                             <span style="color:var(--muted);font-size:12px">—</span>
                         @endif
                     </td>
-
-                    {{-- Montant --}}
                     <td class="right">
                         <div class="amt-num">{{ $fmt($order->total) }}</div>
                         <span class="amt-dev">{{ $devise }}</span>
                     </td>
-
-                    {{-- Statut --}}
                     <td><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span></td>
-
-                    {{-- Date --}}
                     <td>
                         <div class="dt-main">{{ $order->created_at->format('d/m/Y') }}</div>
                         <div class="dt-hour">{{ $order->created_at->format('H:i') }}</div>
@@ -440,6 +420,62 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
                 @endforeach
             </tbody>
         </table>
+        </div>
+        </div>
+
+        {{-- ── Mobile : cartes ── --}}
+        <div class="tbl-mobile">
+        @foreach($commandes as $order)
+        @php $st = $statusMap[$order->status] ?? ['label'=>ucfirst($order->status),'cls'=>'p-muted']; @endphp
+        <div class="om-card">
+            <div class="om-head">
+                <span class="oid">#{{ $order->id }}</span>
+                <span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span>
+                <div style="margin-left:auto;text-align:right">
+                    <div class="dt-main">{{ $order->created_at->format('d/m/Y') }}</div>
+                    <div class="dt-hour">{{ $order->created_at->format('H:i') }}</div>
+                </div>
+            </div>
+            <div class="om-body">
+                <div class="om-row">
+                    <span class="om-lbl">Produits</span>
+                    <div class="om-val">
+                        @if($order->items && $order->items->count() > 0)
+                            @foreach($order->items->take(2) as $item)
+                            <div class="prod-line">{{ $item->product->name ?? 'Produit supprimé' }} <span class="prod-qty">×{{ $item->quantity }}</span></div>
+                            @endforeach
+                            @if($order->items->count() > 2)
+                            <div class="prod-more">+{{ $order->items->count()-2 }} autre(s)</div>
+                            @endif
+                        @else
+                            <span style="color:var(--muted)">—</span>
+                        @endif
+                    </div>
+                </div>
+                @if($order->delivery_destination || $order->client_phone)
+                <div class="om-row">
+                    <span class="om-lbl">Livraison</span>
+                    <div class="om-val">
+                        @if($order->delivery_destination)
+                        <div style="font-size:12px;font-weight:600;line-height:1.3">📍 {{ $order->delivery_destination }}</div>
+                        @endif
+                        @if($order->client_phone)
+                        <a href="tel:{{ $order->client_phone }}" style="font-size:11.5px;color:var(--muted);text-decoration:none;display:block;margin-top:2px">📞 {{ $order->client_phone }}</a>
+                        @endif
+                    </div>
+                </div>
+                @endif
+                <div class="om-row">
+                    <span class="om-lbl">Montant</span>
+                    <div class="om-val">
+                        <div class="amt-num">{{ $fmt($order->total) }}</div>
+                        <span class="amt-dev">{{ $devise }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endforeach
+        </div>
 
         @if($commandes->hasPages())
         <div class="pagination-wrap">{{ $commandes->links() }}</div>

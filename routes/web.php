@@ -336,7 +336,31 @@ Route::middleware(['auth', 'role:superadmin'])
         /* Gestion des boutiques */
         Route::resource('shops', AdminShopController::class)->only(['index', 'update']);
 
-        /* Validation d'une entreprise de livraison */
+        /* Produits (vue globale superadmin) */
+        Route::get('/products', [\App\Http\Controllers\Admin\ProductController::class, 'index'])->name('products.index');
+        Route::post('/products/{product}/toggle', [\App\Http\Controllers\Admin\ProductController::class, 'toggle'])->name('products.toggle');
+
+        /* Commandes boutiques (vue globale superadmin) */
+        Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/{order}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
+        Route::post('/orders/{order}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.status');
+
+        /* Vendeurs & Employés (vue globale superadmin) */
+        Route::get('/vendeurs', [\App\Http\Controllers\Admin\VendeurController::class, 'index'])->name('vendeurs.index');
+
+        /* Clients boutiques (vue globale superadmin) */
+        Route::get('/clients', [\App\Http\Controllers\Admin\ClientController::class, 'index'])->name('clients.index');
+
+        /* Livreurs (vue globale superadmin) */
+        Route::get('/livreurs', [\App\Http\Controllers\Admin\LivreurController::class, 'index'])->name('livreurs.index');
+
+        /* Entreprises livraison (vue globale superadmin) */
+        Route::get('/entreprises', [\App\Http\Controllers\Admin\EntrepriseController::class, 'index'])->name('entreprises.index');
+        Route::post('/entreprises/{entreprise}/approve', [\App\Http\Controllers\Admin\EntrepriseController::class, 'approve'])->name('entreprises.approve');
+        Route::post('/entreprises/{entreprise}/reject', [\App\Http\Controllers\Admin\EntrepriseController::class, 'reject'])->name('entreprises.reject');
+        Route::post('/entreprises/{entreprise}/toggle', [\App\Http\Controllers\Admin\EntrepriseController::class, 'toggleActive'])->name('entreprises.toggle');
+
+        /* Validation d'une entreprise de livraison (dashboard) */
         Route::post('/companies/{company}/approve', [DashboardController::class, 'approveCompany'])
             ->name('companies.approve');
     });

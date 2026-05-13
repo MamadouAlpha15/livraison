@@ -69,15 +69,20 @@ class UserController extends Controller
         $company = $this->company();
 
         if (!$this->isOwner($company)) {
-            abort(403, "Seul le propriétaire peut retirer des membres.");
+            abort(403, "Seul le propriétaire peut supprimer des membres.");
         }
 
         if ($user->company_id !== $company->id) {
             abort(403);
         }
 
-        $user->update(['company_id' => null, 'role' => 'client']);
+        if ($user->id === $company->user_id) {
+            return back()->with('error', "Impossible de supprimer le propriétaire de l'entreprise.");
+        }
 
-        return back()->with('success', "Accès retiré pour {$user->name}.");
+        $name = $user->name;
+        $user->delete();
+
+        return back()->with('success', "Le compte de {$name} a été supprimé définitivement.");
     }
 }

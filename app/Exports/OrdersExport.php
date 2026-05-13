@@ -40,20 +40,25 @@ class OrdersExport implements FromCollection, WithHeadings, ShouldAutoSize
         $orders = $query->orderByDesc('created_at')->get();
 
         return $orders->map(function($o) {
+            $client = $o->client->name
+                ?? $o->client_phone
+                ?? $o->delivery_destination
+                ?? '—';
             return [
-                'ID' => $o->id,
-                'Client' => $o->client->name ?? '—',
-                'Shop' => $o->shop->name ?? '—',
+                'ID'      => $o->id,
+                'Client'  => $client,
+                'Téléphone' => $o->client_phone ?? '—',
+                'Shop'    => $o->shop->name ?? '—',
                 'Livreur' => $o->livreur->name ?? '—',
-                'Total' => $o->total,
-                'Statut' => $o->status,
-                'Date' => optional($o->created_at)->format('d/m/Y H:i')
+                'Total'   => $o->total,
+                'Statut'  => $o->status,
+                'Date'    => optional($o->created_at)->format('d/m/Y H:i'),
             ];
         });
     }
 
     public function headings(): array
     {
-        return ['ID','Client','Shop','Livreur','Total','Statut','Date'];
+        return ['ID', 'Client', 'Téléphone', 'Shop', 'Livreur', 'Total', 'Statut', 'Date'];
     }
 }

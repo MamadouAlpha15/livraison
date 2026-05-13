@@ -28,9 +28,20 @@
     </thead>
     <tbody>
         @foreach($orders as $o)
+        @php
+            $clientName = $o->client->name
+                ?? $o->client_phone
+                ?? $o->delivery_destination
+                ?? '—';
+        @endphp
         <tr>
             <td>#{{ str_pad($o->id, 4, '0', STR_PAD_LEFT) }}</td>
-            <td>{{ $o->client->name ?? '—' }}</td>
+            <td>
+                {{ $clientName }}
+                @if($o->client_phone && $o->client)
+                    <br><small style="color:#666">{{ $o->client_phone }}</small>
+                @endif
+            </td>
             <td>{{ $o->shop->name ?? '—' }}</td>
             <td>{{ $o->livreur->name ?? '—' }}</td>
             <td>{{ number_format($o->total, 0, ',', ' ') }} GNF</td>

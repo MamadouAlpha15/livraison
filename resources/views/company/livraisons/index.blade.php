@@ -80,7 +80,7 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .cx-overlay.open{display:block}
 
 /* ── MAIN ── */
-.cx-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.cx-main{flex:1;min-width:0;display:flex;flex-direction:column;min-height:100vh;background:var(--cx-bg)}
 .cx-topbar{height:60px;background:var(--cx-surface);border-bottom:1px solid var(--cx-border);display:flex;align-items:center;gap:12px;padding:0 20px;position:sticky;top:0;z-index:100}
 .cx-hamburger{display:none;background:none;border:none;color:var(--cx-text2);font-size:18px;cursor:pointer;padding:4px 8px;border-radius:6px}
 .cx-topbar-title{font-size:15px;font-weight:800;color:var(--cx-text)}
@@ -162,6 +162,30 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .cx-toast-ico{font-size:18px;flex-shrink:0}
 .cx-toast-msg{font-size:13px;font-weight:600;color:var(--cx-text);flex:1}
 
+/* ── Desktop / Mobile visibility ── */
+.lv-desktop{display:block}
+.lv-mobile{display:none}
+
+/* ── Cartes mobile ── */
+.lv-mc-card{background:var(--cx-surface);border:1px solid var(--cx-border);border-radius:var(--r-sm);margin-bottom:12px;overflow:hidden}
+.lv-mc-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--cx-border);gap:8px;flex-wrap:wrap}
+.lv-mc-id{font-size:15px;font-weight:900;color:var(--cx-brand);font-family:monospace}
+.lv-mc-time{font-size:11px;color:var(--cx-muted);margin-left:6px}
+.lv-mc-time.urgent{color:var(--cx-amber);font-weight:700}
+.lv-mc-fee-box{padding:13px 14px;background:var(--cx-surface2);border-bottom:1px solid var(--cx-border);display:flex;align-items:center;justify-content:space-between}
+.lv-mc-fee-lbl{font-size:10.5px;font-weight:700;color:var(--cx-muted);text-transform:uppercase;letter-spacing:.5px}
+.lv-mc-fee-val{font-size:20px;font-weight:900;font-family:monospace;color:var(--cx-green)}
+.lv-mc-rows{padding:4px 0}
+.lv-mc-row{display:flex;align-items:flex-start;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--cx-border);gap:10px}
+.lv-mc-lbl{font-size:12px;font-weight:700;color:var(--cx-muted);flex-shrink:0;min-width:100px}
+.lv-mc-val{font-size:13px;font-weight:600;color:var(--cx-text);text-align:right;word-break:break-word}
+.lv-mc-actions{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--cx-border);background:var(--cx-surface2)}
+.lv-mc-btn{flex:1;padding:9px 12px;border-radius:var(--r-xs);font-size:13px;font-weight:700;border:1px solid;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px}
+.lv-mc-btn-done{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.3);color:#34d399}
+.lv-mc-btn-done:hover{background:rgba(16,185,129,.2)}
+.lv-mc-btn-cancel{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.25);color:#f87171}
+.lv-mc-btn-cancel:hover{background:rgba(239,68,68,.18)}
+
 /* ── MODE CLAIR ── */
 body.cx-light{--cx-bg:#F5F7FA;--cx-surface:#fff;--cx-surface2:#eef1f7;--cx-border:rgba(0,0,0,.08);--cx-text:#111827;--cx-text2:#4b5563;--cx-muted:#9ca3af}
 body.cx-light,html.cx-light,html.cx-light body{background:#F5F7FA!important}
@@ -170,17 +194,61 @@ body.cx-light .cx-tb-btn{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.08)
 body.cx-light .lv-stat,body.cx-light .lv-search{background:#fff;border-color:rgba(0,0,0,.08)}
 body.cx-light .lv-table tbody tr:hover{background:rgba(0,0,0,.02)}
 body.cx-light .lv-act-btn{background:#f3f4f6;border-color:rgba(0,0,0,.08)}
+body.cx-light .lv-mc-card{background:#fff;border-color:rgba(0,0,0,.08)}
+body.cx-light .lv-mc-fee-box{background:#f3f4f6;border-color:rgba(0,0,0,.07)}
+body.cx-light .lv-mc-head{border-color:rgba(0,0,0,.07)}
+body.cx-light .lv-mc-row{border-color:rgba(0,0,0,.06)}
+body.cx-light .lv-mc-actions{background:#f3f4f6;border-color:rgba(0,0,0,.07)}
+body.cx-light .lv-mc-fee-val{color:#059669}
+body.cx-light .lv-mc-btn-done{background:rgba(16,185,129,.08);color:#065f46}
+body.cx-light .lv-mc-btn-cancel{background:rgba(239,68,68,.06);color:#b91c1c}
 
-@media(max-width:900px){
+/* ══ RESPONSIVE ══ */
+@media(max-width:1024px){
     .cx-sidebar{transform:translateX(-100%)}
     .cx-sidebar.open{transform:translateX(0)}
     .cx-wrap{padding-left:0}
     .cx-hamburger{display:block}
+    .cx-close-btn{display:flex}
+    .lv-stats{padding:20px 20px 0}
+    .lv-toolbar{padding:16px 20px 0}
+    .lv-table-wrap{padding:14px 20px 48px}
+}
+@media(max-width:768px){
+    .lv-stats{grid-template-columns:repeat(3,1fr);gap:10px;padding:16px 16px 0}
+    .lv-stat{padding:14px 14px}
+    .lv-stat-val{font-size:22px}
+    .cx-topbar-sub{display:none}
 }
 @media(max-width:640px){
-    .lv-stats{grid-template-columns:1fr;padding:16px 16px 0}
-    .lv-toolbar{padding:14px 16px 0}
-    .lv-table-wrap{padding:12px 16px 40px}
+    .lv-stats{grid-template-columns:1fr 1fr;gap:8px;padding:14px 14px 0}
+    .lv-stat:last-child{grid-column:1/-1}
+    .lv-stat{padding:12px 12px}
+    .lv-stat-val{font-size:20px}
+    .lv-toolbar{padding:12px 14px 0;gap:6px;flex-wrap:wrap}
+    .lv-search-wrap{flex:1 1 100%;max-width:100%}
+    .lv-filter-btn{padding:6px 12px;font-size:11.5px}
+    .lv-pulse{display:none}
+    .cx-topbar{padding:0 12px;gap:8px}
+    .cx-topbar-title{font-size:13px}
+    /* Basculement tableau ↔ cartes */
+    .lv-desktop{display:none}
+    .lv-mobile{display:block;padding:12px 14px 48px}
+}
+@media(max-width:480px){
+    .lv-stats{grid-template-columns:1fr 1fr}
+    .lv-stat-val{font-size:18px}
+    .lv-stat-lbl{font-size:10px}
+    .lv-mc-fee-val{font-size:18px}
+}
+@media(max-width:360px){
+    .lv-stats{grid-template-columns:1fr 1fr}
+    .lv-stat{padding:10px 8px}
+    .lv-stat-val{font-size:16px}
+    .cx-topbar-title{font-size:11.5px}
+    .lv-mc-lbl{min-width:85px}
+    .lv-mc-fee-val{font-size:16px}
+    .lv-filter-btn{padding:5px 8px;font-size:11px}
 }
 </style>
 @endpush
@@ -286,7 +354,8 @@ body.cx-light .lv-act-btn{background:#f3f4f6;border-color:rgba(0,0,0,.08)}
         </div>
     </div>
 
-    {{-- Table --}}
+    {{-- Table DESKTOP --}}
+    <div class="lv-desktop">
     <div class="lv-table-wrap">
         <table class="lv-table" id="lvTable">
             <thead>
@@ -299,7 +368,6 @@ body.cx-light .lv-act-btn{background:#f3f4f6;border-color:rgba(0,0,0,.08)}
                     <th>Statut</th>
                     <th>Mis à jour</th>
                     <th>Frais</th>
-                    
                 </tr>
             </thead>
             <tbody id="lvBody">
@@ -343,17 +411,9 @@ body.cx-light .lv-act-btn{background:#f3f4f6;border-color:rgba(0,0,0,.08)}
                 <td style="font-weight:700;color:var(--cx-green)">
                     {{ $order->delivery_fee ? number_format($order->delivery_fee,0,',',' ') : '—' }}
                 </td>
-                <td>
-                    <div style="display:flex;gap:5px">
-                        <button class="lv-act-btn done" title="Marquer livré"
-                            onclick="updateStatus({{ $order->id }},'livrée')">✓</button>
-                        <button class="lv-act-btn cancel" title="Annuler"
-                            onclick="updateStatus({{ $order->id }},'annulée')">✕</button>
-                    </div>
-                </td>
             </tr>
             @empty
-            <tr><td colspan="9">
+            <tr><td colspan="8">
                 <div class="lv-empty">
                     <div class="lv-empty-ico">🚚</div>
                     <div class="lv-empty-title">Aucune livraison en cours</div>
@@ -364,6 +424,86 @@ body.cx-light .lv-act-btn{background:#f3f4f6;border-color:rgba(0,0,0,.08)}
             </tbody>
         </table>
     </div>
+    </div>{{-- /lv-desktop --}}
+
+    {{-- Cartes MOBILE --}}
+    <div class="lv-mobile" id="lvMobile">
+        @forelse($orders as $order)
+        @php
+            $isLiv2  = $order->status === 'en_livraison';
+            $drvIni2 = $order->driver
+                ? strtoupper(substr($order->driver->name,0,1)).strtoupper(substr(explode(' ',$order->driver->name)[1]??'X',0,1))
+                : '?';
+            $diff2 = $order->updated_at->diffInMinutes(now());
+        @endphp
+        <div class="lv-mc-card"
+             data-status="{{ $order->status }}"
+             data-search="{{ strtolower(optional($order->shop)->name.' '.optional($order->client)->name.' '.($order->delivery_destination ?? '').' '.optional($order->driver)->name) }}">
+
+            {{-- En-tête --}}
+            <div class="lv-mc-head">
+                <div>
+                    <span class="lv-mc-id">#{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}</span>
+                    <span class="lv-mc-time {{ $diff2 > 60 ? 'urgent' : '' }}">· {{ $order->updated_at->diffForHumans() }}</span>
+                </div>
+                @if($isLiv2)
+                    <span class="lv-badge b-livraison"><span class="lv-badge-dot"></span> En route</span>
+                @else
+                    <span class="lv-badge b-confirm"><span class="lv-badge-dot"></span> Assignée</span>
+                @endif
+            </div>
+
+            {{-- Frais --}}
+            <div class="lv-mc-fee-box">
+                <span class="lv-mc-fee-lbl">🚚 Frais livraison</span>
+                <span class="lv-mc-fee-val">
+                    {{ $order->delivery_fee ? number_format($order->delivery_fee,0,',',' ').' '.($company->currency ?? 'GNF') : '—' }}
+                </span>
+            </div>
+
+            {{-- Détails --}}
+            <div class="lv-mc-rows">
+                <div class="lv-mc-row">
+                    <span class="lv-mc-lbl">🏪 Boutique</span>
+                    <span class="lv-mc-val">{{ optional($order->shop)->name ?? '—' }}</span>
+                </div>
+                <div class="lv-mc-row">
+                    <span class="lv-mc-lbl">👤 Client</span>
+                    <span class="lv-mc-val">{{ optional($order->client)->name ?? '—' }}</span>
+                </div>
+                @if($order->delivery_destination)
+                <div class="lv-mc-row">
+                    <span class="lv-mc-lbl">📍 Destination</span>
+                    <span class="lv-mc-val">{{ $order->delivery_destination }}</span>
+                </div>
+                @endif
+                <div class="lv-mc-row" style="border-bottom:none">
+                    <span class="lv-mc-lbl">🚴 Chauffeur</span>
+                    <span class="lv-mc-val">
+                        @if($order->driver)
+                            <div style="display:flex;align-items:center;gap:7px;justify-content:flex-end">
+                                <div class="lv-driver-av" style="width:24px;height:24px;font-size:9px;">{{ $drvIni2 }}</div>
+                                <div style="text-align:right">
+                                    <div style="font-weight:700;font-size:13px">{{ $order->driver->name }}</div>
+                                    @if($order->driver->phone)<div style="font-size:11px;color:var(--cx-muted)">{{ $order->driver->phone }}</div>@endif
+                                </div>
+                            </div>
+                        @else
+                            <span style="color:var(--cx-muted);font-style:italic;font-size:12.5px">Non assigné</span>
+                        @endif
+                    </span>
+                </div>
+            </div>
+
+        </div>
+        @empty
+        <div class="lv-empty" style="background:var(--cx-surface);border:1px solid var(--cx-border);border-radius:var(--r-sm)">
+            <div class="lv-empty-ico">🚚</div>
+            <div class="lv-empty-title">Aucune livraison en cours</div>
+            <div class="lv-empty-sub">Les livraisons assignées et en route apparaîtront ici.</div>
+        </div>
+        @endforelse
+    </div>{{-- /lv-mobile --}}
 
 </main>
 </div>
@@ -420,10 +560,10 @@ function setFilter(f) {
 
 function filterRows() {
     const q = document.getElementById('lvSearch').value.toLowerCase();
-    document.querySelectorAll('#lvBody tr[data-status]').forEach(tr => {
-        const matchF = currentFilter === 'all' || tr.dataset.status === currentFilter;
-        const matchQ = !q || (tr.dataset.search || '').includes(q);
-        tr.style.display = matchF && matchQ ? '' : 'none';
+    document.querySelectorAll('#lvBody tr[data-status], #lvMobile .lv-mc-card[data-status]').forEach(el => {
+        const matchF = currentFilter === 'all' || el.dataset.status === currentFilter;
+        const matchQ = !q || (el.dataset.search || '').includes(q);
+        el.style.display = matchF && matchQ ? '' : 'none';
     });
 }
 
@@ -470,7 +610,7 @@ async function pollData() {
         // Reconstruire le tbody
         const tbody = document.getElementById('lvBody');
         if (!orders.length) {
-            tbody.innerHTML = `<tr><td colspan="9">
+            tbody.innerHTML = `<tr><td colspan="8">
                 <div class="lv-empty">
                     <div class="lv-empty-ico">🚚</div>
                     <div class="lv-empty-title">Aucune livraison en cours</div>
@@ -508,10 +648,6 @@ async function pollData() {
                 <td>${badge}</td>
                 <td><span class="lv-time">${esc(o.updated_at)}</span></td>
                 <td style="font-weight:700;color:var(--cx-green)">${o.fee ? Number(o.fee).toLocaleString('fr-FR') : '—'}</td>
-                <td><div style="display:flex;gap:5px">
-                    <button class="lv-act-btn done"   title="Marquer livrée" onclick="updateStatus(${o.id},'livrée')">✓</button>
-                    <button class="lv-act-btn cancel"  title="Annuler"       onclick="updateStatus(${o.id},'annulée')">✕</button>
-                </div></td>
             </tr>`;
         }).join('');
 

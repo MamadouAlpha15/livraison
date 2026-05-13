@@ -60,7 +60,11 @@ class OrderController extends Controller
 
         $orders = $query->paginate(20)->withQueryString();
 
-        $base = fn() => Order::where('delivery_company_id', $company->id);
+        $boutiqueId = $request->filled('boutique') ? (int) $request->boutique : null;
+        $shopFilter = $boutiqueId ? \App\Models\Shop::find($boutiqueId) : null;
+
+        $base = fn() => Order::where('delivery_company_id', $company->id)
+            ->when($boutiqueId, fn($q) => $q->where('shop_id', $boutiqueId));
 
         $stats = [
             'total'         => $base()->count(),
@@ -73,7 +77,7 @@ class OrderController extends Controller
         $drivers = $company->drivers()->orderByRaw("FIELD(status,'available','busy','offline')")->orderBy('name')->get();
 
         $devise = $company->currency ?? 'GNF';
-        return view('company.orders.index', compact('orders', 'stats', 'drivers', 'company', 'period', 'devise'));
+        return view('company.orders.index', compact('orders', 'stats', 'drivers', 'company', 'period', 'devise', 'shopFilter'));
     }
 
     public function assign(Request $request, Order $order)
@@ -269,7 +273,11 @@ class OrderController extends Controller
 
         $orders = $query->paginate(25)->withQueryString();
 
-        $base = fn() => Order::where('delivery_company_id', $company->id);
+        $shopId     = $request->filled('shop_id') ? (int) $request->shop_id : null;
+        $shopFilter = $shopId ? \App\Models\Shop::find($shopId) : null;
+
+        $base = fn() => Order::where('delivery_company_id', $company->id)
+            ->when($shopId, fn($q) => $q->where('shop_id', $shopId));
 
         $stats = [
             'total_livrees'  => $base()->where('status', Order::STATUS_LIVREE)->count(),
@@ -284,7 +292,7 @@ class OrderController extends Controller
 
         $drivers = $company->drivers()->orderBy('name')->get();
 
-        return view('company.historique.index', compact('orders', 'stats', 'drivers', 'company'));
+        return view('company.historique.index', compact('orders', 'stats', 'drivers', 'company', 'shopFilter'));
     }
 
     public function clients(Request $request)

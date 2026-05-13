@@ -96,7 +96,7 @@ class ExportController extends Controller
         if (!empty($filters['date_to'])) $query->whereDate('created_at','<=',$filters['date_to']);
         if (!empty($filters['livreur_id'])) $query->where('livreur_id',$filters['livreur_id']);
 
-        $orders = $query->with(['client', 'livreur', 'shop'])->orderByDesc('created_at')->limit(1000)->get();
+        $orders = $query->with(['client', 'livreur', 'shop'])->orderByDesc('created_at')->get();
 
         $pdf = Pdf::loadView('exports.orders_pdf', compact('orders','filters'));
         return $pdf->download('orders_shop_'.$shopId.'_'.now()->format('Ymd_His').'.pdf');

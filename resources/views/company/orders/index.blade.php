@@ -317,6 +317,8 @@ td{padding:14px 16px;font-size:14.5px;vertical-align:middle;}
 /* Ligne sélectionnée */
 tbody tr.row-selected{background:rgba(124,58,237,.07)!important;}
 body.cx-dark tbody tr.row-selected{background:rgba(124,58,237,.13)!important;}
+.mc-card.row-selected{border-color:rgba(124,58,237,.4)!important;box-shadow:0 0 0 2px rgba(124,58,237,.15)!important;}
+body.cx-dark .mc-card.row-selected{border-color:rgba(139,92,246,.5)!important;box-shadow:0 0 0 2px rgba(124,58,237,.25)!important;}
 /* Multi-mode : infos commandes dans le modal */
 .multi-orders-list{max-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;margin-bottom:14px;
     scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.3) transparent;}
@@ -347,6 +349,28 @@ body.cx-dark .multi-common-dest-fee{color:#34d399;}
 }
 .pagination-wrap .page-item.active .page-link{background:var(--cx-brand);border-color:var(--cx-brand);color:#fff;}
 .pagination-wrap .page-item.disabled .page-link{opacity:.4;pointer-events:none;}
+
+/* ── Desktop / Mobile visibility ── */
+.ord-desktop{display:block}
+.ord-mobile{display:none}
+
+/* ── Mobile cards (mc-*) ── */
+.mc-card{background:var(--cx-card);border:1px solid var(--cx-border);border-radius:var(--r-sm);margin-bottom:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.mc-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--cx-border);gap:8px;flex-wrap:wrap}
+.mc-id{font-size:15px;font-weight:900;color:var(--cx-brand);font-family:monospace}
+.mc-amounts{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--cx-border)}
+.mc-amount-box{padding:13px 14px;background:var(--cx-card2)}
+.mc-amount-fee{border-right:1px solid var(--cx-border)}
+.mc-amount-lbl{font-size:10.5px;font-weight:700;color:var(--cx-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.mc-amount-val{font-size:18px;font-weight:900;font-family:monospace;color:#059669;word-break:break-all;line-height:1.2}
+.mc-amount-total .mc-amount-val{color:var(--cx-text)}
+.mc-rows{padding:4px 0}
+.mc-row{display:flex;align-items:flex-start;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--cx-border);gap:10px}
+.mc-lbl{font-size:12px;font-weight:700;color:var(--cx-muted);flex-shrink:0;min-width:100px}
+.mc-val{font-size:13px;font-weight:600;color:var(--cx-text);text-align:right;word-break:break-word}
+.mc-actions{display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--cx-border);background:var(--cx-card2)}
+body.cx-dark .mc-amount-val{color:#34d399}
+body.cx-dark .mc-amount-total .mc-amount-val{color:var(--cx-text)}
 
 /* ── MODAL ── */
 .modal-overlay{
@@ -486,38 +510,26 @@ body.cx-dark .multi-common-dest-fee{color:#34d399;}
     .page-banner{padding:18px 14px 16px;}
     .banner-title{font-size:17px;}
     .banner-sub{font-size:11.5px;}
+    /* Topbar */
+    .cx-topbar{padding:0 12px;gap:8px;}
+    .cx-topbar-title{font-size:13px;}
+    .cx-tb-right{gap:6px;}
     /* Filter bar: tabs wrap as pills, search+date full-width */
     .filter-bar{flex-wrap:wrap;gap:6px;padding:10px 12px;}
     .tab-btn{padding:5px 10px;font-size:11px;}
     .tab-sep{display:none;}
     .search-wrap{flex:1 1 100%;min-width:unset;}
     .date-input{flex:1 1 100%;}
-    /* Table → card layout */
-    .table-wrap{overflow-x:unset;}
-    .table-wrap table,.table-wrap tbody{display:block;}
-    .table-wrap thead{display:none;}
-    .table-wrap tbody tr{
-        display:block;border:1px solid var(--cx-border);
-        border-radius:var(--r-sm);margin-bottom:10px;
-        padding:12px 14px;background:var(--cx-card);
-        box-shadow:0 1px 4px rgba(0,0,0,.06);
-    }
-    .table-wrap td{
-        display:flex;align-items:flex-start;
-        padding:6px 0;border:none;font-size:14px;gap:10px;
-    }
-    .table-wrap td::before{
-        content:attr(data-label);
-        font-size:11px;font-weight:800;color:var(--cx-muted);
-        text-transform:uppercase;letter-spacing:.6px;
-        min-width:86px;flex-shrink:0;padding-top:2px;
-    }
-    .table-wrap td[data-label="Actions"]{
-        margin-top:8px;border-top:1px solid var(--cx-border);padding-top:12px;
-    }
-    .table-wrap td[data-label="Actions"]::before{display:none;}
-    .td-dest{max-width:none;}
-    .td-date{white-space:normal;}
+    /* Période */
+    .period-bar{padding:8px 12px 10px;gap:4px;flex-wrap:wrap;}
+    .period-btn{padding:4px 10px;font-size:11px;}
+    /* Sélection multiple */
+    .sel-bar{padding:10px 12px;gap:8px;}
+    .sel-bar-actions{gap:6px;}
+    .btn-sel-assign,.btn-sel-annuler,.btn-sel-restaurer,.btn-sel-cancel{padding:7px 12px;font-size:12px;}
+    /* Basculement tableau ↔ cartes */
+    .ord-desktop{display:none}
+    .ord-mobile{display:block}
     /* Modal → bottom sheet */
     .modal-overlay{padding:0;align-items:flex-end;}
     .cx-modal{max-width:100%;border-radius:var(--r) var(--r) 0 0;max-height:92vh;}
@@ -527,11 +539,25 @@ body.cx-dark .multi-common-dest-fee{color:#34d399;}
 }
 @media(max-width:480px){
     .stats-bar{grid-template-columns:1fr 1fr;}
+    .page-banner{padding:16px 12px 14px;}
+    .banner-title{font-size:15px;gap:7px;}
+    .stat-pill{padding:10px 10px;}
+    .stat-pill-val{font-size:18px;}
+    .mc-amount-val{font-size:16px;}
+    .pw{padding:10px 10px 60px;}
     .cx-topbar-title span{display:none;}
 }
 @media(max-width:360px){
-    .stats-bar{grid-template-columns:1fr;}
-    .stat-pill-val{font-size:18px;}
+    .stats-bar{grid-template-columns:1fr 1fr;}
+    .stat-pill{padding:8px;}
+    .stat-pill-val{font-size:15px;}
+    .banner-title{font-size:14px;}
+    .cx-topbar-title{font-size:11.5px;}
+    .period-btn{padding:3px 8px;font-size:10.5px;}
+    .mc-amount-val{font-size:15px;}
+    .mc-lbl{min-width:85px;}
+    .mc-actions{gap:6px;}
+    .btn-action,.btn-action-cancel,.btn-action-restore{padding:6px 10px;font-size:11.5px;}
 }
 
 /* ══ TOGGLE MODE SOMBRE ══ */
@@ -736,7 +762,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
     {{-- TOPBAR --}}
     <div class="cx-topbar">
         <button class="cx-hamburger" id="cxHamburger">☰</button>
-        <div class="cx-topbar-title">📦 <span>Commandes</span></div>
+        <div class="cx-topbar-title">📦 <span>{{ $shopFilter ? 'Commandes · '.$shopFilter->name : 'Commandes' }}</span></div>
         <div class="cx-tb-right">
             <a href="{{ route('company.chat.inbox') }}" class="cx-tb-btn" title="Chat">💬</a>
             <div class="cx-tb-user">
@@ -756,7 +782,13 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
         <div class="banner-top">
             <div>
                 <div class="banner-title">📦 Mes commandes</div>
-                <div class="banner-sub">{{ $company->name }} · Commandes assignées à votre entreprise</div>
+                <div class="banner-sub">
+                    @if($shopFilter)
+                        {{ $shopFilter->name }} · Commandes de cette boutique
+                    @else
+                        {{ $company->name }} · Commandes assignées à votre entreprise
+                    @endif
+                </div>
             </div>
         </div>
         <div class="stats-bar">
@@ -786,6 +818,20 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
 
 <div class="pw">
 
+    {{-- BADGE BOUTIQUE FILTRÉE --}}
+    @if($shopFilter)
+    <div style="background:linear-gradient(90deg,rgba(124,58,237,.15),rgba(99,102,241,.08));border:1px solid rgba(124,58,237,.2);border-radius:var(--r-sm);padding:10px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <span style="font-size:18px;">🏪</span>
+        <div>
+            <div style="font-size:13px;font-weight:800;color:#a78bfa;">Filtré par boutique : {{ $shopFilter->name }}</div>
+            <div style="font-size:11.5px;color:var(--cx-text2);">Affichage des commandes uniquement pour cette boutique</div>
+        </div>
+        <a href="{{ route('company.orders.index') }}" style="margin-left:auto;font-size:12px;padding:5px 12px;border:1px solid rgba(124,58,237,.3);border-radius:6px;background:rgba(124,58,237,.1);color:#c4b5fd;white-space:nowrap;">
+            ✕ Voir toutes les commandes
+        </a>
+    </div>
+    @endif
+
     {{-- FILTER BAR --}}
     <form method="GET" action="{{ route('company.orders.index') }}" id="filterForm">
         @php
@@ -793,6 +839,9 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
             $cur    = request('status','all');
             $curPer = $period ?? request('period','all');
         @endphp
+        @if($shopFilter)
+        <input type="hidden" name="boutique" value="{{ $shopFilter->id }}">
+        @endif
         {{-- Ligne 1 : statuts + recherche --}}
         <div class="filter-bar" style="border-bottom:none;border-radius:var(--r) var(--r) 0 0;padding-bottom:10px;">
             @foreach($tabs as $val => $lbl)
@@ -839,8 +888,8 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
         </div>
     </div>
 
-    {{-- TABLE --}}
-    <div class="table-card">
+    {{-- TABLE DESKTOP --}}
+    <div class="table-card ord-desktop">
         <div class="table-wrap">
             <table>
                 <thead>
@@ -991,6 +1040,125 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
         <div class="pagination-wrap">{{ $orders->links() }}</div>
         @endif
     </div>
+</div>
+
+{{-- ══ CARTES MOBILE ══ --}}
+<div class="ord-mobile">
+    @forelse($orders as $order)
+    @php
+        $st         = $statusMap[$order->status] ?? ['lbl'=>$order->status,'cls'=>'badge-wait'];
+        $cPhone     = $order->client_phone ?: ($order->client->phone ?? null);
+        $dest       = $order->delivery_destination ?: ($order->client->address ?? null);
+        $displayFee = $order->delivery_fee ?? $order->deliveryZone?->price ?? null;
+    @endphp
+    <div class="mc-card" data-order-id="{{ $order->id }}">
+
+        {{-- En-tête : ID + checkbox + statut --}}
+        <div class="mc-head">
+            <div style="display:flex;align-items:center;gap:10px;">
+                @if(in_array($order->status, ['en_attente','confirmée']))
+                <input type="checkbox" class="row-chk"
+                       data-order-id="{{ $order->id }}"
+                       data-num="{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
+                       data-fee="{{ $order->delivery_fee ?? $order->deliveryZone?->price ?? '' }}"
+                       data-dest="{{ $order->delivery_destination ?? $order->client->address ?? '' }}"
+                       data-shop="{{ $order->shop->name ?? '' }}"
+                       data-client="{{ $order->client->name ?? '' }}"
+                       data-client-id="{{ $order->user_id }}"
+                       data-shop-addr="{{ $order->shop->address ?? '' }}"
+                       data-client-addr="{{ $order->client->address ?? '' }}"
+                       onchange="toggleRow(this)"
+                       style="width:18px;height:18px;accent-color:var(--cx-brand);cursor:pointer;border-radius:4px;flex-shrink:0;">
+                @endif
+                <span class="mc-id">#{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</span>
+            </div>
+            <span class="badge {{ $st['cls'] }}">{{ $st['lbl'] }}</span>
+        </div>
+
+        {{-- Montants en évidence --}}
+        <div class="mc-amounts">
+            <div class="mc-amount-box mc-amount-fee">
+                <div class="mc-amount-lbl">🚚 Frais liv.</div>
+                <div class="mc-amount-val">{{ $displayFee ? $fmt($displayFee) : '—' }}</div>
+            </div>
+            <div class="mc-amount-box mc-amount-total">
+                <div class="mc-amount-lbl">💰 Montant</div>
+                <div class="mc-amount-val">{{ $fmt($order->total) }}</div>
+            </div>
+        </div>
+
+        {{-- Détails --}}
+        <div class="mc-rows">
+            <div class="mc-row">
+                <span class="mc-lbl">👤 Client</span>
+                <span class="mc-val">{{ $order->client->name ?? '—' }}
+                    @if($cPhone)<span style="color:var(--cx-muted);font-size:11.5px;display:block">📞 {{ $cPhone }}</span>@endif
+                </span>
+            </div>
+            <div class="mc-row">
+                <span class="mc-lbl">🏪 Boutique</span>
+                <span class="mc-val">{{ $order->shop->name ?? '—' }}</span>
+            </div>
+            @if($dest)
+            <div class="mc-row">
+                <span class="mc-lbl">📍 Destination</span>
+                <span class="mc-val">{{ $dest }}</span>
+            </div>
+            @endif
+            <div class="mc-row">
+                <span class="mc-lbl">🚴 Chauffeur</span>
+                <span class="mc-val">
+                    @if($order->driver)
+                        {{ $order->driver->name }}
+                        @if($order->driver->phone)<span style="color:var(--cx-muted);font-size:11.5px;display:block">{{ $order->driver->phone }}</span>@endif
+                    @else
+                        <span style="color:var(--cx-muted);font-style:italic;font-size:12.5px">Non assigné</span>
+                    @endif
+                </span>
+            </div>
+            <div class="mc-row" style="border-bottom:none">
+                <span class="mc-lbl">📅 Date</span>
+                <span class="mc-val" style="color:var(--cx-muted)">{{ \Carbon\Carbon::parse($order->created_at)->format('d/m/y H:i') }}</span>
+            </div>
+        </div>
+
+        {{-- Actions --}}
+        <div class="mc-actions">
+            @if(in_array($order->status, ['en_attente','confirmée']))
+            <button class="btn-action btn-assign"
+                    data-id="{{ $order->id }}"
+                    data-fee="{{ $order->delivery_fee ?? '' }}"
+                    data-zone-price="{{ $order->deliveryZone?->price ?? '' }}"
+                    data-dest="{{ $order->delivery_destination ?? '' }}"
+                    data-num="{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
+                    data-shop="{{ $order->shop->name ?? '' }}"
+                    data-shop-addr="{{ $order->shop->address ?? '' }}"
+                    data-client-addr="{{ $order->client->address ?? '' }}"
+                    onclick="openAssign(this)">
+                🚴 Assigner
+            </button>
+            @endif
+            @if(!in_array($order->status, ['livrée','annulée']))
+            <button class="btn-action-cancel" onclick="cancelOrder({{ $order->id }}, this)">🚫 Annuler</button>
+            @endif
+            @if($order->status === 'annulée')
+            <button class="btn-action-restore" onclick="restoreOrder({{ $order->id }}, this)">♻️ Restaurer</button>
+            @endif
+        </div>
+
+    </div>
+    @empty
+    <div class="empty-state" style="background:var(--cx-card);border:1px solid var(--cx-border);border-radius:var(--r-sm);">
+        <div class="empty-ico">📦</div>
+        <div class="empty-txt">Aucune commande assignée à votre entreprise</div>
+        <div class="empty-sub">Les boutiques vous confient leurs livraisons depuis leur tableau de bord.</div>
+    </div>
+    @endforelse
+    @if($orders->hasPages())
+    <div class="pagination-wrap" style="background:var(--cx-card);border:1px solid var(--cx-border);border-radius:var(--r-sm);margin-top:4px;">
+        {{ $orders->links() }}
+    </div>
+    @endif
 </div>
 
 {{-- ═══ MODAL ASSIGNER CHAUFFEUR ═══ --}}
@@ -1237,17 +1405,17 @@ document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ closeModa
 
 /* ── Sélection multiple ── */
 function toggleRow(chk){
-    var tr=chk.closest('tr');
-    if(chk.checked){ _bulkOrderIds.add(chk.dataset.orderId); tr.classList.add('row-selected'); }
-    else            { _bulkOrderIds.delete(chk.dataset.orderId); tr.classList.remove('row-selected'); }
+    var tr=chk.closest('tr')||chk.closest('.mc-card');
+    if(chk.checked){ _bulkOrderIds.add(chk.dataset.orderId); if(tr)tr.classList.add('row-selected'); }
+    else            { _bulkOrderIds.delete(chk.dataset.orderId); if(tr)tr.classList.remove('row-selected'); }
     updateSelBar();
 }
 function toggleAllRows(masterChk){
     document.querySelectorAll('.row-chk').forEach(function(chk){
         chk.checked=masterChk.checked;
-        var tr=chk.closest('tr');
-        if(masterChk.checked){ _bulkOrderIds.add(chk.dataset.orderId); tr.classList.add('row-selected'); }
-        else                  { _bulkOrderIds.delete(chk.dataset.orderId); tr.classList.remove('row-selected'); }
+        var tr=chk.closest('tr')||chk.closest('.mc-card');
+        if(masterChk.checked){ _bulkOrderIds.add(chk.dataset.orderId); if(tr)tr.classList.add('row-selected'); }
+        else                  { _bulkOrderIds.delete(chk.dataset.orderId); if(tr)tr.classList.remove('row-selected'); }
     });
     updateSelBar();
 }
@@ -1271,7 +1439,9 @@ function updateSelBar(){
 function clearSelection(){
     _bulkOrderIds.clear();
     document.querySelectorAll('.row-chk').forEach(function(chk){
-        chk.checked=false; chk.closest('tr').classList.remove('row-selected');
+        chk.checked=false;
+        var tr=chk.closest('tr')||chk.closest('.mc-card');
+        if(tr)tr.classList.remove('row-selected');
     });
     var chkAll=document.getElementById('chkAll');
     if(chkAll){ chkAll.checked=false; chkAll.indeterminate=false; }
