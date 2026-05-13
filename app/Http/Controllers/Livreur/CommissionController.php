@@ -16,11 +16,25 @@ class CommissionController extends Controller
         $livreurId = $livreur->id;
         abort_unless($livreurId, 403);
         $shop  = $livreur->shop ?? $livreur->assignedShop;
-        $devise = $shop?->currency ?? 'GNF';
 
         $driver          = Driver::with('company')->where('user_id', $livreurId)->first();
         $isCompanyDriver = $driver && $driver->delivery_company_id;
         $companyName     = $isCompanyDriver ? ($driver->company?->name ?? 'l\'entreprise') : null;
+
+        // Devise : priorité à l'entreprise de livraison, sinon boutique, sinon GNF
+        if ($isCompanyDriver && $driver->company) {
+            $rawCurrency = $driver->company->currency
+                        ?? \App\Models\DeliveryCompany::currencyForCountry($driver->company->country ?? '');
+        } else {
+            $rawCurrency = $shop?->currency ?? 'GNF';
+        }
+        $devise = match(strtoupper($rawCurrency)) {
+            'XOF','XAF'  => 'FCFA',
+            'EUR'        => '€',
+            'USD'        => '$',
+            'GBP'        => '£',
+            default      => strtoupper($rawCurrency),
+        };
 
         // Commissions en attente
         $pending = CourierCommission::with(['order', 'shop'])

@@ -209,6 +209,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
         <div class="sb-sec livr">── SaaS Livraison</div>
         <a href="{{ route('admin.entreprises.index') }}" class="sb-a"><span class="sb-i">🚚</span><span>Entreprises livraison</span></a>
         <a href="{{ route('admin.livreurs.index') }}" class="sb-a"><span class="sb-i">🏍️</span><span>Livreurs</span></a>
+        <a href="{{ route('admin.zones.index') }}" class="sb-a"><span class="sb-i">🗺️</span><span>Zones de livraison</span></a>
         <div class="sb-sec fin">── Finance</div>
         <a href="#" class="sb-a" onclick="return false"><span class="sb-i">💳</span><span>Paiements</span></a>
         <a href="#" class="sb-a" onclick="return false"><span class="sb-i">💹</span><span>Commissions</span></a>

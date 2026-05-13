@@ -254,8 +254,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
         <a href="{{ route('admin.livreurs.index') }}" class="sb-a">
             <span class="sb-i">🏍️</span><span>Livreurs</span>
         </a>
-        <a href="#" class="sb-a" onclick="nt();return false">
+        <a href="{{ route('admin.zones.index') }}" class="sb-a">
             <span class="sb-i">🗺️</span><span>Zones de livraison</span>
+        </a>
+        <a href="{{ route('admin.suivi.index') }}" class="sb-a">
+            <span class="sb-i">📍</span><span>Suivi en temps réel</span>
         </a>
         <div class="sb-sec fin">── Finance</div>
         <a href="#" class="sb-a" onclick="nt();return false">

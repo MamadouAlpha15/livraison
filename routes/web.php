@@ -354,6 +354,13 @@ Route::middleware(['auth', 'role:superadmin'])
         /* Livreurs (vue globale superadmin) */
         Route::get('/livreurs', [\App\Http\Controllers\Admin\LivreurController::class, 'index'])->name('livreurs.index');
 
+        /* Suivi en temps réel (vue globale superadmin) */
+        Route::get('/suivi', [\App\Http\Controllers\Admin\SuiviController::class, 'index'])->name('suivi.index');
+
+        /* Zones de livraison (vue globale superadmin) */
+        Route::get('/zones', [\App\Http\Controllers\Admin\ZoneController::class, 'index'])->name('zones.index');
+        Route::post('/zones/{zone}/toggle', [\App\Http\Controllers\Admin\ZoneController::class, 'toggleActive'])->name('zones.toggle');
+
         /* Entreprises livraison (vue globale superadmin) */
         Route::get('/entreprises', [\App\Http\Controllers\Admin\EntrepriseController::class, 'index'])->name('entreprises.index');
         Route::post('/entreprises/{entreprise}/approve', [\App\Http\Controllers\Admin\EntrepriseController::class, 'approve'])->name('entreprises.approve');

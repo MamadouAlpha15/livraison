@@ -2,6 +2,7 @@
 @php $bodyClass = 'is-dashboard'; @endphp
 
 @push('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 *,*::before,*::after{box-sizing:border-box}
 :root{
@@ -13,7 +14,6 @@
     --amber:#f59e0b;--abg:rgba(245,158,11,.1);
     --red:#ef4444;--rbg:rgba(239,68,68,.1);
     --blue:#3b82f6;--bbg:rgba(59,130,246,.1);
-    --indigo:#6366f1;--ibg:rgba(99,102,241,.1);
     --font:'Segoe UI',system-ui,sans-serif;
 }
 body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-webkit-font-smoothing:antialiased}
@@ -67,7 +67,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .con{flex:1;padding:24px}
 .flash{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;margin-bottom:20px;font-size:12.5px;font-weight:600}
 .flash.ok{background:var(--gbg);color:#065f46;border:1px solid rgba(16,185,129,.2)}
-.flash.err{background:var(--rbg);color:#7f1d1d;border:1px solid rgba(239,68,68,.2)}
 .bc{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);margin-bottom:20px}
 .bc a{color:var(--muted);text-decoration:none}.bc a:hover{color:var(--text)}.bc .bs{color:rgba(0,0,0,.15)}
 .ph{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:22px;flex-wrap:wrap}
@@ -75,30 +74,43 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .ph-sub{font-size:11.5px;color:var(--muted)}
 
 /* kpi */
-.kpi-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:22px}
+.kpi-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;margin-bottom:22px}
 .kpi{background:var(--card);border-radius:13px;padding:16px;border:1px solid var(--bd);position:relative;overflow:hidden;transition:transform .18s,box-shadow .18s;cursor:default}
 .kpi:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(0,0,0,.08)}
 .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:13px 13px 0 0}
 .kpi.p::before{background:linear-gradient(90deg,#7c3aed,#8b5cf6)}
 .kpi.g::before{background:linear-gradient(90deg,#10b981,#34d399)}
 .kpi.a::before{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
-.kpi.r::before{background:linear-gradient(90deg,#ef4444,#f87171)}
-.kpi.i::before{background:linear-gradient(90deg,#6366f1,#818cf8)}
 .kpi.b::before{background:linear-gradient(90deg,#3b82f6,#60a5fa)}
+.kpi.r::before{background:linear-gradient(90deg,#ef4444,#f87171)}
 .kpi-ic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;margin-bottom:11px}
 .kpi-ic.p{background:rgba(139,92,246,.12)}.kpi-ic.g{background:var(--gbg)}.kpi-ic.a{background:var(--abg)}
-.kpi-ic.r{background:var(--rbg)}.kpi-ic.i{background:var(--ibg)}.kpi-ic.b{background:var(--bbg)}
+.kpi-ic.b{background:var(--bbg)}.kpi-ic.r{background:var(--rbg)}
 .kpi-v{font-size:24px;font-weight:900;color:var(--text);letter-spacing:-1px;line-height:1;margin-bottom:4px}
 .kpi-l{font-size:11.5px;color:var(--muted);font-weight:500}
+.kpi-s{font-size:10px;color:rgba(100,116,139,.55);margin-top:2px}
+
+/* live pulse */
+.pulse-wrap{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:var(--green)}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.6}}
+
+/* map */
+.map-card{background:var(--card);border-radius:13px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);margin-bottom:20px}
+.map-hd{padding:12px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.map-ht{font-size:13px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:7px}
+#map{height:400px;width:100%;z-index:1}
+.map-legend{padding:10px 18px;border-top:1px solid var(--bd);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.map-leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);font-weight:600}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 
 /* chips */
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
 .chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:700;text-decoration:none;border:1.5px solid var(--bd);color:var(--muted);background:var(--card);transition:all .15s}
 .chip:hover{border-color:#a78bfa;color:var(--brand)}
 .chip.on{background:rgba(124,58,237,.09);border-color:#a78bfa;color:var(--brand)}
-.chip.av{background:var(--gbg);border-color:rgba(16,185,129,.3);color:#065f46}
-.chip.bsy{background:var(--abg);border-color:rgba(245,158,11,.3);color:#92400e}
-.chip.off{background:rgba(100,116,139,.1);border-color:rgba(100,116,139,.2);color:var(--muted)}
+.chip.live-chip{background:var(--gbg);border-color:rgba(16,185,129,.3);color:#065f46}
+.chip.gps-chip{background:var(--bbg);border-color:rgba(59,130,246,.3);color:#1d4ed8}
 
 /* filter bar */
 .fb{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
@@ -109,11 +121,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .fb-btn{height:34px;padding:0 14px;border-radius:8px;border:1px solid var(--bd);background:var(--card);font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:var(--font);transition:all .13s}
 .fb-btn:hover{background:var(--bg);color:var(--text)}
 
-/* active filter chip */
-.filter-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);color:#1d4ed8;margin-bottom:12px}
-.filter-tag a{color:inherit;text-decoration:none;font-size:13px;line-height:1;opacity:.7}
-.filter-tag a:hover{opacity:1}
-
 /* section card */
 .sc{background:var(--card);border-radius:13px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .sc-h{padding:14px 20px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
@@ -123,25 +130,32 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .tbl-wrap{overflow-x:auto}
 .tbl{width:100%;border-collapse:collapse}
 .tbl th{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:9px 16px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap;text-align:left}
-.tbl td{padding:11px 16px;font-size:12px;color:var(--text);border-bottom:1px solid var(--bd);vertical-align:middle}
+.tbl td{padding:10px 16px;font-size:12px;color:var(--text);border-bottom:1px solid var(--bd);vertical-align:middle}
 .tbl tr:last-child td{border-bottom:none}
 .tbl tbody tr:hover{background:rgba(124,58,237,.02)}
-.t-drv{display:flex;align-items:center;gap:9px}
-.t-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
-.t-name{font-weight:700;font-size:12.5px}.t-sub{font-size:10.5px;color:var(--muted)}
+
+/* order row */
+.t-ord{display:flex;align-items:center;gap:8px}
+.t-id{font-size:11px;font-weight:800;color:var(--brand);background:rgba(124,58,237,.07);padding:2px 7px;border-radius:6px;white-space:nowrap}
+.t-name{font-weight:600;font-size:12px}.t-sub{font-size:10.5px;color:var(--muted)}
 
 /* badges */
 .bdg{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
-.bdg.g{color:#065f46;background:var(--gbg)}.bdg.a{color:#92400e;background:var(--abg)}
-.bdg.m{color:var(--muted);background:rgba(100,116,139,.1)}.bdg.b{color:#1d4ed8;background:var(--bbg)}
-.bdg.p{color:var(--bdk);background:rgba(124,58,237,.1)}
+.bdg.g{color:#065f46;background:var(--gbg)}.bdg.b{color:#1d4ed8;background:var(--bbg)}
+.bdg.a{color:#92400e;background:var(--abg)}.bdg.m{color:var(--muted);background:rgba(100,116,139,.1)}
+.bdg.r{color:#7f1d1d;background:var(--rbg)}
 
-/* status dot */
-.sdot{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700}
-.sdot::before{content:'';width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.sdot.available{color:#065f46}.sdot.available::before{background:var(--green)}
-.sdot.busy{color:#92400e}.sdot.busy::before{background:var(--amber)}
-.sdot.offline{color:var(--muted)}.sdot.offline::before{background:#94a3b8}
+/* gps status */
+.gps-live{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#065f46}
+.gps-live::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s ease-in-out infinite;flex-shrink:0}
+.gps-old{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#92400e}
+.gps-old::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--amber);flex-shrink:0}
+.gps-none{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--muted)}
+.gps-none::before{content:'';width:7px;height:7px;border-radius:50%;background:#94a3b8;flex-shrink:0}
+
+/* view btn */
+.btn-map{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:7px;font-size:11px;font-weight:700;background:var(--bbg);color:#1d4ed8;border:1px solid rgba(59,130,246,.2);cursor:pointer;transition:all .13s;text-decoration:none}
+.btn-map:hover{background:rgba(59,130,246,.18);transform:translateY(-1px)}
 
 /* empty */
 .empty{padding:56px 20px;text-align:center}
@@ -153,11 +167,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .pag{padding:12px 20px;border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .pag-info{font-size:11.5px;color:var(--muted)}
 
-.btn-g{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:8px;background:var(--bg);color:var(--muted);font-size:11.5px;font-weight:700;border:1px solid var(--bd);cursor:pointer;text-decoration:none;transition:all .13s;font-family:var(--font)}
-.btn-g:hover{background:#e2e8f0;color:var(--text)}
-
 @media(max-width:900px){.sb{transform:translateX(-100%)}.sb.open{transform:translateX(0);box-shadow:4px 0 32px rgba(0,0,0,.32)}.sb-ov.open{display:block}.mn{margin-left:0}.kpi-g{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:640px){.con{padding:13px}.tb{padding:0 13px}}
+@media(max-width:640px){.con{padding:13px}.tb{padding:0 13px}#map{height:260px}}
 </style>
 @endpush
 
@@ -166,14 +177,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
     $me     = auth()->user();
     $meName = $me->name ?? 'Fondateur';
     $meInit = strtoupper(substr($meName,0,1));
-
     $totalPending = \App\Models\DeliveryCompany::where('approved', false)->count();
 
-    $statusLabel = [
-        'available' => ['label' => 'Disponible',    'class' => 'available'],
-        'busy'      => ['label' => 'En livraison',  'class' => 'busy'],
-        'offline'   => ['label' => 'Hors ligne',    'class' => 'offline'],
-    ];
+    $curGps    = request('gps','');
+    $curCo     = request('company_id','');
+    $curSearch = request('search','');
+    $bp        = array_filter(['company_id'=>$curCo,'search'=>$curSearch]);
+
+    $now = now();
 @endphp
 
 <div class="sa">
@@ -208,11 +219,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
             <span class="sb-i">🚚</span><span>Entreprises livraison</span>
             @if($totalPending>0)<span class="sb-pill r">{{ $totalPending }}</span>@endif
         </a>
-        <a href="{{ route('admin.livreurs.index') }}" class="sb-a on">
-            <span class="sb-i">🏍️</span><span>Livreurs</span>
-        </a>
+        <a href="{{ route('admin.livreurs.index') }}" class="sb-a"><span class="sb-i">🏍️</span><span>Livreurs</span></a>
         <a href="{{ route('admin.zones.index') }}" class="sb-a"><span class="sb-i">🗺️</span><span>Zones de livraison</span></a>
-        <a href="{{ route('admin.suivi.index') }}" class="sb-a"><span class="sb-i">📍</span><span>Suivi en temps réel</span></a>
+        <a href="{{ route('admin.suivi.index') }}" class="sb-a on">
+            <span class="sb-i">📍</span><span>Suivi en temps réel</span>
+            @if($stats['en_livraison']>0)<span class="sb-pill g">{{ $stats['en_livraison'] }}</span>@endif
+        </a>
         <div class="sb-sec fin">── Finance</div>
         <a href="#" class="sb-a" onclick="nt();return false"><span class="sb-i">💳</span><span>Paiements</span></a>
         <a href="#" class="sb-a" onclick="nt();return false"><span class="sb-i">💹</span><span>Commissions</span></a>
@@ -269,120 +281,112 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 
 <div class="con">
 
-    @if(session('success'))
-        <div class="flash ok">✅ {{ session('success') }}</div>
-    @endif
-    @if(session('error') || session('danger'))
-        <div class="flash err">❌ {{ session('error') ?? session('danger') }}</div>
-    @endif
-
     {{-- Breadcrumb --}}
     <div class="bc">
         <a href="{{ route('admin.dashboard') }}">⚡ Accueil</a>
         <span class="bs">›</span>
-        @if($filteredCompany)
-            <a href="{{ route('admin.entreprises.index') }}">Entreprises</a>
-            <span class="bs">›</span>
-            <span style="color:var(--text);font-weight:600">{{ $filteredCompany->name }}</span>
-        @else
-            <span style="color:var(--text);font-weight:600">Livreurs</span>
-        @endif
+        <span style="color:var(--text);font-weight:600">Suivi en temps réel</span>
     </div>
 
     {{-- Page header --}}
     <div class="ph">
         <div>
-            <h1>🏍️ Livreurs
-                @if($filteredCompany)
-                    <span style="font-size:14px;font-weight:600;color:var(--muted)">— {{ $filteredCompany->name }}</span>
-                @endif
-            </h1>
+            <h1>📍 Suivi en temps réel</h1>
             <div class="ph-sub">
-                @if($filteredCompany)
-                    Livreurs de l'entreprise <strong>{{ $filteredCompany->name }}</strong>
-                @else
-                    Tous les livreurs du SaaS Livraison
+                Toutes les livraisons en cours · GPS actif
+                @if($stats['live']>0)
+                    <span style="margin-left:6px" class="pulse-wrap"><span class="pulse"></span>{{ $stats['live'] }} position(s) live</span>
                 @endif
             </div>
         </div>
-        @if($filteredCompany)
-        <a href="{{ route('admin.livreurs.index') }}" class="btn-g">✕ Voir tous</a>
-        @endif
+        <button onclick="location.reload()" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:var(--bg);border:1px solid var(--bd);font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:var(--font);transition:all .13s" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='var(--bg)'">
+            🔄 Actualiser
+        </button>
     </div>
-
-    {{-- Active company filter tag --}}
-    @if($filteredCompany)
-    <div style="margin-bottom:12px">
-        <span class="filter-tag">
-            🚚 {{ $filteredCompany->name }}
-            <a href="{{ route('admin.livreurs.index', array_filter(['status'=>request('status'),'search'=>request('search')])) }}">✕</a>
-        </span>
-    </div>
-    @endif
 
     {{-- Stats --}}
     <div class="kpi-g">
-        <div class="kpi p">
-            <div class="kpi-ic p">🏍️</div>
-            <div class="kpi-v">{{ $stats['total'] }}</div>
-            <div class="kpi-l">Total livreurs</div>
+        <div class="kpi a">
+            <div class="kpi-ic a">🛵</div>
+            <div class="kpi-v">{{ $stats['en_livraison'] }}</div>
+            <div class="kpi-l">En livraison</div>
+            <div class="kpi-s">Commandes actives</div>
         </div>
         <div class="kpi g">
-            <div class="kpi-ic g">🟢</div>
-            <div class="kpi-v">{{ $stats['available'] }}</div>
-            <div class="kpi-l">Disponibles</div>
+            <div class="kpi-ic g">📡</div>
+            <div class="kpi-v">{{ $stats['live'] }}</div>
+            <div class="kpi-l">GPS live</div>
+            <div class="kpi-s">Ping &lt; 5 min</div>
         </div>
-        <div class="kpi a">
-            <div class="kpi-ic a">⚡</div>
-            <div class="kpi-v">{{ $stats['busy'] }}</div>
-            <div class="kpi-l">En livraison</div>
+        <div class="kpi b">
+            <div class="kpi-ic b">📍</div>
+            <div class="kpi-v">{{ $stats['avec_gps'] }}</div>
+            <div class="kpi-l">Avec position</div>
+            <div class="kpi-s">GPS transmis</div>
         </div>
         <div class="kpi r">
-            <div class="kpi-ic r">⚫</div>
-            <div class="kpi-v">{{ $stats['offline'] }}</div>
-            <div class="kpi-l">Hors ligne</div>
+            <div class="kpi-ic r">🚫</div>
+            <div class="kpi-v">{{ $stats['sans_gps'] }}</div>
+            <div class="kpi-l">Sans GPS</div>
+            <div class="kpi-s">Pas de position</div>
         </div>
-        <div class="kpi i">
-            <div class="kpi-ic i">📦</div>
-            <div class="kpi-v">{{ $stats['livraisons'] }}</div>
-            <div class="kpi-l">Livraisons total</div>
+        <div class="kpi p">
+            <div class="kpi-ic p">🏍️</div>
+            <div class="kpi-v">{{ $stats['livreurs_busy'] }}</div>
+            <div class="kpi-l">Livreurs actifs</div>
+            <div class="kpi-s">Statut "En livraison"</div>
         </div>
     </div>
 
-    {{-- Status chips --}}
-    @php
-        $curStatus  = request('status','');
-        $curCompany = request('company_id','');
-        $curSearch  = request('search','');
-        $bp = array_filter(['company_id'=>$curCompany,'search'=>$curSearch]);
-    @endphp
+    {{-- Carte --}}
+    <div class="map-card">
+        <div class="map-hd">
+            <div class="map-ht">
+                🗺️ Carte des livraisons
+                @if($mapPoints->count()>0)
+                    <span style="font-size:11px;font-weight:600;color:var(--muted)">({{ $mapPoints->count() }} position(s))</span>
+                @endif
+            </div>
+            @if($mapPoints->count()>0)
+                <div class="pulse-wrap"><span class="pulse"></span>Données en direct</div>
+            @endif
+        </div>
+        <div id="map"></div>
+        <div class="map-legend">
+            <div class="map-leg-item"><div class="leg-dot" style="background:#10b981"></div>GPS live (&lt; 5 min)</div>
+            <div class="map-leg-item"><div class="leg-dot" style="background:#f59e0b"></div>GPS ancien (&gt; 5 min)</div>
+            <div style="margin-left:auto;font-size:10.5px;color:var(--muted)">
+                Powered by <a href="https://leafletjs.com" target="_blank" style="color:var(--brand)">Leaflet</a> · OpenStreetMap
+            </div>
+        </div>
+    </div>
+
+    {{-- GPS chips --}}
     <div class="chips">
-        <a href="{{ route('admin.livreurs.index', $bp) }}"
-           class="chip {{ $curStatus==='' ? 'on' : '' }}">Tous</a>
-        <a href="{{ route('admin.livreurs.index', array_merge($bp,['status'=>'available'])) }}"
-           class="chip av {{ $curStatus==='available' ? 'on' : '' }}">🟢 Disponibles</a>
-        <a href="{{ route('admin.livreurs.index', array_merge($bp,['status'=>'busy'])) }}"
-           class="chip bsy {{ $curStatus==='busy' ? 'on' : '' }}">⚡ En livraison</a>
-        <a href="{{ route('admin.livreurs.index', array_merge($bp,['status'=>'offline'])) }}"
-           class="chip off {{ $curStatus==='offline' ? 'on' : '' }}">⚫ Hors ligne</a>
+        <a href="{{ route('admin.suivi.index', $bp) }}"
+           class="chip {{ $curGps==='' ? 'on' : '' }}">Toutes</a>
+        <a href="{{ route('admin.suivi.index', array_merge($bp,['gps'=>'live'])) }}"
+           class="chip live-chip {{ $curGps==='live' ? 'on' : '' }}">📡 GPS live</a>
+        <a href="{{ route('admin.suivi.index', array_merge($bp,['gps'=>'with'])) }}"
+           class="chip gps-chip {{ $curGps==='with' ? 'on' : '' }}">📍 Avec GPS</a>
+        <a href="{{ route('admin.suivi.index', array_merge($bp,['gps'=>'without'])) }}"
+           class="chip {{ $curGps==='without' ? 'on' : '' }}">🚫 Sans GPS</a>
     </div>
 
     {{-- Filter bar --}}
-    <form id="filterForm" method="GET" action="{{ route('admin.livreurs.index') }}">
-        @if($curStatus)<input type="hidden" name="status" value="{{ $curStatus }}">@endif
+    <form id="filterForm" method="GET" action="{{ route('admin.suivi.index') }}">
+        @if($curGps)<input type="hidden" name="gps" value="{{ $curGps }}">@endif
         <div class="fb">
             <select name="company_id" class="fb-sel" onchange="document.getElementById('filterForm').submit()">
                 <option value="">🚚 Toutes les entreprises</option>
                 @foreach($companies as $co)
-                    <option value="{{ $co->id }}" {{ (string)$curCompany === (string)$co->id ? 'selected' : '' }}>
-                        {{ $co->name }}
-                    </option>
+                    <option value="{{ $co->id }}" {{ (string)$curCo === (string)$co->id ? 'selected' : '' }}>{{ $co->name }}</option>
                 @endforeach
             </select>
-            <input type="text" name="search" class="fb-inp" placeholder="🔍 Nom, email, téléphone…" value="{{ $curSearch }}">
+            <input type="text" name="search" class="fb-inp" placeholder="🔍 ID, client, destination…" value="{{ $curSearch }}">
             <button type="submit" class="fb-btn">Filtrer</button>
-            @if($curSearch || $curCompany)
-                <a href="{{ route('admin.livreurs.index', $curStatus ? ['status'=>$curStatus] : []) }}" class="fb-btn">✕ Réinitialiser</a>
+            @if($curSearch || $curCo)
+                <a href="{{ route('admin.suivi.index', $curGps ? ['gps'=>$curGps] : []) }}" class="fb-btn">✕ Réinitialiser</a>
             @endif
         </div>
     </form>
@@ -391,89 +395,128 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
     <div class="sc">
         <div class="sc-h">
             <div class="sc-t">
-                🏍️ Livreurs
-                <span style="font-size:11px;font-weight:600;color:var(--muted)">({{ $livreurs->total() }})</span>
+                🛵 Livraisons en cours
+                <span style="font-size:11px;font-weight:600;color:var(--muted)">({{ $orders->total() }})</span>
             </div>
         </div>
 
-        @if($livreurs->isEmpty())
+        @if($orders->isEmpty())
             <div class="empty">
-                <div class="empty-ico">🏍️</div>
-                <div class="empty-t">Aucun livreur trouvé</div>
-                <div class="empty-s">Modifiez vos filtres ou attendez de nouvelles inscriptions.</div>
+                <div class="empty-ico">📍</div>
+                <div class="empty-t">Aucune livraison en cours</div>
+                <div class="empty-s">Toutes les commandes sont livrées ou en attente.</div>
             </div>
         @else
         <div class="tbl-wrap">
             <table class="tbl">
                 <thead>
                     <tr>
-                        <th>Livreur</th>
+                        <th>Commande</th>
+                        <th>Client</th>
+                        <th>Destination</th>
+                        <th>Livreur / Driver</th>
                         <th>Entreprise</th>
-                        <th>Contact</th>
-                        <th>Statut</th>
-                        <th>Livraisons</th>
-                        <th>Inscrit le</th>
+                        <th>GPS</th>
+                        <th>Dernier ping</th>
+                        <th>Depuis</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($livreurs as $drv)
+                    @foreach($orders as $order)
                     @php
-                        $init = strtoupper(substr($drv->name ?? 'L', 0, 1));
-                        $stData = $statusLabel[$drv->status] ?? ['label' => $drv->status, 'class' => 'offline'];
+                        $hasGps   = $order->current_lat && $order->current_lng;
+                        $isLive   = $hasGps && $order->last_ping_at && $order->last_ping_at->gt($now->copy()->subMinutes(5));
+                        $isOld    = $hasGps && !$isLive;
+
+                        $livreurName = $order->driver?->name
+                                    ?? $order->livreur?->name
+                                    ?? null;
                     @endphp
                     <tr>
-                        {{-- Livreur --}}
+                        {{-- ID + boutique --}}
                         <td>
-                            <div class="t-drv">
-                                @if($drv->photo)
-                                    <img src="{{ asset('storage/'.$drv->photo) }}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0" alt="">
-                                @else
-                                    <div class="t-av">{{ $init }}</div>
-                                @endif
-                                <div>
-                                    <div class="t-name">{{ $drv->name }}</div>
-                                    @if($drv->email)<div class="t-sub">{{ $drv->email }}</div>@endif
-                                </div>
+                            <div class="t-ord">
+                                <span class="t-id">#{{ $order->id }}</span>
                             </div>
+                            @if($order->shop)
+                                <div class="t-sub" style="margin-top:3px">🏪 {{ $order->shop->name }}</div>
+                            @endif
                         </td>
 
-                        {{-- Entreprise --}}
+                        {{-- Client --}}
                         <td>
-                            @if($drv->company)
-                                <a href="{{ route('admin.livreurs.index', ['company_id'=>$drv->company->id]) }}"
-                                   style="color:var(--brand);font-weight:600;font-size:12px;text-decoration:none">
-                                    🚚 {{ $drv->company->name }}
-                                </a>
+                            @if($order->client)
+                                <div class="t-name">{{ $order->client->name }}</div>
+                                @if($order->client_phone)
+                                    <div class="t-sub">📞 {{ $order->client_phone }}</div>
+                                @endif
                             @else
                                 <span style="color:var(--muted)">—</span>
                             @endif
                         </td>
 
-                        {{-- Contact --}}
-                        <td>
-                            @if($drv->phone)
-                                <div style="font-size:12px">📞 {{ $drv->phone }}</div>
+                        {{-- Destination --}}
+                        <td style="max-width:180px">
+                            @if($order->delivery_destination)
+                                <div style="font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:175px" title="{{ $order->delivery_destination }}">
+                                    📌 {{ $order->delivery_destination }}
+                                </div>
+                            @else
+                                <span style="color:var(--muted)">—</span>
                             @endif
-                            @if(!$drv->email && !$drv->phone)
+                            @if($order->deliveryZone)
+                                <div class="t-sub">{{ $order->deliveryZone->name }}</div>
+                            @endif
+                        </td>
+
+                        {{-- Livreur --}}
+                        <td>
+                            @if($livreurName)
+                                <span class="bdg b">🏍️ {{ $livreurName }}</span>
+                            @else
+                                <span style="color:var(--muted)">Non assigné</span>
+                            @endif
+                        </td>
+
+                        {{-- Entreprise --}}
+                        <td>
+                            @if($order->deliveryCompany)
+                                <div style="font-size:12px;font-weight:600;color:var(--brand)">🚚 {{ $order->deliveryCompany->name }}</div>
+                            @else
                                 <span style="color:var(--muted)">—</span>
                             @endif
                         </td>
 
-                        {{-- Statut --}}
+                        {{-- GPS --}}
                         <td>
-                            <span class="sdot {{ $stData['class'] }}">{{ $stData['label'] }}</span>
+                            @if($isLive)
+                                <span class="gps-live">Live</span>
+                                @if($hasGps)
+                                <button onclick="flyTo({{ $order->current_lat }},{{ $order->current_lng }},'#{{ $order->id }}')"
+                                        class="btn-map" style="margin-top:4px;display:block">
+                                    🗺️ Voir sur carte
+                                </button>
+                                @endif
+                            @elseif($isOld)
+                                <span class="gps-old">Position ancienne</span>
+                            @else
+                                <span class="gps-none">Pas de GPS</span>
+                            @endif
                         </td>
 
-                        {{-- Livraisons --}}
+                        {{-- Dernier ping --}}
                         <td>
-                            @php $oc = $drv->orders_count ?? 0; @endphp
-                            <span class="bdg {{ $oc > 0 ? 'b' : 'm' }}">📦 {{ $oc }}</span>
+                            @if($order->last_ping_at)
+                                <div style="font-size:11.5px">{{ $order->last_ping_at->format('H:i') }}</div>
+                                <div class="t-sub">{{ $order->last_ping_at->diffForHumans() }}</div>
+                            @else
+                                <span style="color:var(--muted)">—</span>
+                            @endif
                         </td>
 
-                        {{-- Date --}}
+                        {{-- En livraison depuis --}}
                         <td>
-                            <div style="font-size:11.5px">{{ optional($drv->created_at)->format('d/m/Y') }}</div>
-                            <div style="font-size:10px;color:var(--muted)">{{ optional($drv->created_at)->diffForHumans() }}</div>
+                            <div style="font-size:11.5px">{{ optional($order->updated_at)->diffForHumans() }}</div>
                         </td>
                     </tr>
                     @endforeach
@@ -481,10 +524,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
             </table>
         </div>
 
-        @if($livreurs->hasPages())
+        @if($orders->hasPages())
         <div class="pag">
-            <div class="pag-info">Affichage {{ $livreurs->firstItem() }}–{{ $livreurs->lastItem() }} sur {{ $livreurs->total() }}</div>
-            {{ $livreurs->withQueryString()->links() }}
+            <div class="pag-info">Affichage {{ $orders->firstItem() }}–{{ $orders->lastItem() }} sur {{ $orders->total() }}</div>
+            {{ $orders->withQueryString()->links() }}
         </div>
         @endif
         @endif
@@ -498,7 +541,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 @endsection
 
 @push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+/* sidebar */
 const sb=document.getElementById('sb'),ov=document.getElementById('sbOv'),mn=document.querySelector('.mn');
 function closeSb(){sb.classList.remove('open');ov.classList.remove('open');sb.classList.add('closed');mn.classList.add('sb-closed')}
 function toggleSb(){if(sb.classList.contains('closed')){sb.classList.remove('closed');mn.classList.remove('sb-closed')}else{sb.classList.toggle('open');ov.classList.toggle('open')}}
@@ -507,5 +552,61 @@ function toggleDrop(){dr.classList.toggle('open')}
 document.addEventListener('click',e=>{const b=document.getElementById('tbU');if(b&&!b.contains(e.target)&&!dr.contains(e.target))dr.classList.remove('open');});
 let _t;
 function nt(msg='Bientôt disponible'){const el=document.getElementById('toast');el.textContent=msg;el.style.transform='translateY(0)';el.style.opacity='1';clearTimeout(_t);_t=setTimeout(()=>{el.style.transform='translateY(80px)';el.style.opacity='0';},2800);}
+
+/* ─── Leaflet map ─── */
+@php
+    $pts = $mapPoints->map(fn($o) => [
+        'lat'   => $o->current_lat,
+        'lng'   => $o->current_lng,
+        'id'    => $o->id,
+        'live'  => $o->last_ping_at && $o->last_ping_at->gt(now()->subMinutes(5)),
+        'label' => '#'.$o->id.' — '.($o->client?->name ?? 'Client')
+                  .($o->delivery_destination ? ' → '.Str::limit($o->delivery_destination,30) : ''),
+        'ping'  => $o->last_ping_at ? $o->last_ping_at->diffForHumans() : null,
+    ]);
+@endphp
+
+const mapPoints = @json($pts);
+
+const map = L.map('map');
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+    maxZoom: 19
+}).addTo(map);
+
+function makeIcon(live) {
+    return L.divIcon({
+        html: `<div style="width:14px;height:14px;border-radius:50%;background:${live?'#10b981':'#f59e0b'};border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3)"></div>`,
+        className:'',
+        iconSize:[14,14],
+        iconAnchor:[7,7]
+    });
+}
+
+const bounds = [];
+
+if (mapPoints.length > 0) {
+    mapPoints.forEach(p => {
+        const m = L.marker([p.lat, p.lng], {icon: makeIcon(p.live)}).addTo(map);
+        m.bindPopup(`
+            <strong>${p.label}</strong><br>
+            <span style="font-size:11px;color:#64748b">${p.ping ? '🕐 ' + p.ping : 'Pas de ping'}</span><br>
+            <span style="font-size:10px;color:#64748b">${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}</span>
+        `);
+        bounds.push([p.lat, p.lng]);
+    });
+    map.fitBounds(bounds, {padding:[30,30]});
+} else {
+    // Centre sur l'Afrique de l'Ouest par défaut
+    map.setView([11.0, -10.5], 5);
+}
+
+function flyTo(lat, lng, label) {
+    map.flyTo([lat, lng], 15, {duration: 1.2});
+    setTimeout(() => {
+        L.popup().setLatLng([lat,lng]).setContent(`<strong>${label}</strong>`).openOn(map);
+    }, 1300);
+    document.getElementById('map').scrollIntoView({behavior:'smooth', block:'center'});
+}
 </script>
 @endpush

@@ -13,7 +13,6 @@
     --amber:#f59e0b;--abg:rgba(245,158,11,.1);
     --red:#ef4444;--rbg:rgba(239,68,68,.1);
     --blue:#3b82f6;--bbg:rgba(59,130,246,.1);
-    --indigo:#6366f1;--ibg:rgba(99,102,241,.1);
     --font:'Segoe UI',system-ui,sans-serif;
 }
 body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-webkit-font-smoothing:antialiased}
@@ -75,19 +74,19 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .ph-sub{font-size:11.5px;color:var(--muted)}
 
 /* kpi */
-.kpi-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:22px}
+.kpi-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;margin-bottom:22px}
 .kpi{background:var(--card);border-radius:13px;padding:16px;border:1px solid var(--bd);position:relative;overflow:hidden;transition:transform .18s,box-shadow .18s;cursor:default}
 .kpi:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(0,0,0,.08)}
 .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:13px 13px 0 0}
 .kpi.p::before{background:linear-gradient(90deg,#7c3aed,#8b5cf6)}
 .kpi.g::before{background:linear-gradient(90deg,#10b981,#34d399)}
-.kpi.a::before{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
 .kpi.r::before{background:linear-gradient(90deg,#ef4444,#f87171)}
-.kpi.i::before{background:linear-gradient(90deg,#6366f1,#818cf8)}
 .kpi.b::before{background:linear-gradient(90deg,#3b82f6,#60a5fa)}
+.kpi.a::before{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+.kpi.i::before{background:linear-gradient(90deg,#6366f1,#818cf8)}
 .kpi-ic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;margin-bottom:11px}
-.kpi-ic.p{background:rgba(139,92,246,.12)}.kpi-ic.g{background:var(--gbg)}.kpi-ic.a{background:var(--abg)}
-.kpi-ic.r{background:var(--rbg)}.kpi-ic.i{background:var(--ibg)}.kpi-ic.b{background:var(--bbg)}
+.kpi-ic.p{background:rgba(139,92,246,.12)}.kpi-ic.g{background:var(--gbg)}.kpi-ic.r{background:var(--rbg)}
+.kpi-ic.b{background:var(--bbg)}.kpi-ic.a{background:var(--abg)}.kpi-ic.i{background:rgba(99,102,241,.1)}
 .kpi-v{font-size:24px;font-weight:900;color:var(--text);letter-spacing:-1px;line-height:1;margin-bottom:4px}
 .kpi-l{font-size:11.5px;color:var(--muted);font-weight:500}
 
@@ -96,9 +95,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:700;text-decoration:none;border:1.5px solid var(--bd);color:var(--muted);background:var(--card);transition:all .15s}
 .chip:hover{border-color:#a78bfa;color:var(--brand)}
 .chip.on{background:rgba(124,58,237,.09);border-color:#a78bfa;color:var(--brand)}
-.chip.av{background:var(--gbg);border-color:rgba(16,185,129,.3);color:#065f46}
-.chip.bsy{background:var(--abg);border-color:rgba(245,158,11,.3);color:#92400e}
-.chip.off{background:rgba(100,116,139,.1);border-color:rgba(100,116,139,.2);color:var(--muted)}
+.chip.act{background:var(--gbg);border-color:rgba(16,185,129,.3);color:#065f46}
+.chip.inact{background:var(--rbg);border-color:rgba(239,68,68,.3);color:#7f1d1d}
 
 /* filter bar */
 .fb{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
@@ -109,7 +107,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .fb-btn{height:34px;padding:0 14px;border-radius:8px;border:1px solid var(--bd);background:var(--card);font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:var(--font);transition:all .13s}
 .fb-btn:hover{background:var(--bg);color:var(--text)}
 
-/* active filter chip */
+/* filter tag */
 .filter-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);color:#1d4ed8;margin-bottom:12px}
 .filter-tag a{color:inherit;text-decoration:none;font-size:13px;line-height:1;opacity:.7}
 .filter-tag a:hover{opacity:1}
@@ -126,22 +124,31 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .tbl td{padding:11px 16px;font-size:12px;color:var(--text);border-bottom:1px solid var(--bd);vertical-align:middle}
 .tbl tr:last-child td{border-bottom:none}
 .tbl tbody tr:hover{background:rgba(124,58,237,.02)}
-.t-drv{display:flex;align-items:center;gap:9px}
-.t-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
-.t-name{font-weight:700;font-size:12.5px}.t-sub{font-size:10.5px;color:var(--muted)}
+
+/* zone row */
+.z-name{display:flex;align-items:center;gap:8px}
+.z-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;border:2px solid rgba(255,255,255,.6);box-shadow:0 0 0 1px rgba(0,0,0,.1)}
+.z-label{font-weight:700;font-size:12.5px}
+.z-desc{font-size:10.5px;color:var(--muted);margin-top:1px}
 
 /* badges */
 .bdg{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
-.bdg.g{color:#065f46;background:var(--gbg)}.bdg.a{color:#92400e;background:var(--abg)}
+.bdg.g{color:#065f46;background:var(--gbg)}.bdg.r{color:#7f1d1d;background:var(--rbg)}
 .bdg.m{color:var(--muted);background:rgba(100,116,139,.1)}.bdg.b{color:#1d4ed8;background:var(--bbg)}
-.bdg.p{color:var(--bdk);background:rgba(124,58,237,.1)}
 
-/* status dot */
-.sdot{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700}
-.sdot::before{content:'';width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.sdot.available{color:#065f46}.sdot.available::before{background:var(--green)}
-.sdot.busy{color:#92400e}.sdot.busy::before{background:var(--amber)}
-.sdot.offline{color:var(--muted)}.sdot.offline::before{background:#94a3b8}
+/* price badge */
+.price-badge{display:inline-flex;align-items:center;font-size:13px;font-weight:900;color:var(--brand)}
+
+/* time badge */
+.time-badge{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;color:var(--muted)}
+
+/* action buttons */
+.btn-sm{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:700;border:none;cursor:pointer;font-family:var(--font);transition:all .13s}
+.btn-sm:hover{transform:translateY(-1px)}
+.btn-toggle-on{background:var(--rbg);color:#7f1d1d;border:1px solid rgba(239,68,68,.2)}
+.btn-toggle-on:hover{background:rgba(239,68,68,.2)}
+.btn-toggle-off{background:var(--gbg);color:#065f46;border:1px solid rgba(16,185,129,.2)}
+.btn-toggle-off:hover{background:rgba(16,185,129,.2)}
 
 /* empty */
 .empty{padding:56px 20px;text-align:center}
@@ -169,11 +176,25 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 
     $totalPending = \App\Models\DeliveryCompany::where('approved', false)->count();
 
-    $statusLabel = [
-        'available' => ['label' => 'Disponible',    'class' => 'available'],
-        'busy'      => ['label' => 'En livraison',  'class' => 'busy'],
-        'offline'   => ['label' => 'Hors ligne',    'class' => 'offline'],
-    ];
+    $fmtMin = function($min) {
+        if ($min < 60) return $min . ' min';
+        $h = intdiv($min, 60); $m = $min % 60;
+        return $m > 0 ? "{$h}h{$m}" : "{$h}h";
+    };
+
+    $fmtCur = function($co) {
+        $raw = $co->currency ?? \App\Models\DeliveryCompany::currencyForCountry($co->country ?? '');
+        return match(strtoupper($raw)) {
+            'GNF'        => 'GNF',
+            'XOF','XAF'  => 'FCFA',
+            'EUR'        => '€',
+            'USD'        => '$',
+            'GBP'        => '£',
+            default      => strtoupper($raw),
+        };
+    };
+
+    $globalCur = $filteredCompany ? $fmtCur($filteredCompany) : null;
 @endphp
 
 <div class="sa">
@@ -208,10 +229,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
             <span class="sb-i">🚚</span><span>Entreprises livraison</span>
             @if($totalPending>0)<span class="sb-pill r">{{ $totalPending }}</span>@endif
         </a>
-        <a href="{{ route('admin.livreurs.index') }}" class="sb-a on">
-            <span class="sb-i">🏍️</span><span>Livreurs</span>
-        </a>
-        <a href="{{ route('admin.zones.index') }}" class="sb-a"><span class="sb-i">🗺️</span><span>Zones de livraison</span></a>
+        <a href="{{ route('admin.livreurs.index') }}" class="sb-a"><span class="sb-i">🏍️</span><span>Livreurs</span></a>
+        <a href="{{ route('admin.zones.index') }}" class="sb-a on"><span class="sb-i">🗺️</span><span>Zones de livraison</span></a>
         <a href="{{ route('admin.suivi.index') }}" class="sb-a"><span class="sb-i">📍</span><span>Suivi en temps réel</span></a>
         <div class="sb-sec fin">── Finance</div>
         <a href="#" class="sb-a" onclick="nt();return false"><span class="sb-i">💳</span><span>Paiements</span></a>
@@ -284,29 +303,31 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
             <a href="{{ route('admin.entreprises.index') }}">Entreprises</a>
             <span class="bs">›</span>
             <span style="color:var(--text);font-weight:600">{{ $filteredCompany->name }}</span>
+            <span class="bs">›</span>
+            <span style="color:var(--text);font-weight:600">Zones</span>
         @else
-            <span style="color:var(--text);font-weight:600">Livreurs</span>
+            <span style="color:var(--text);font-weight:600">Zones de livraison</span>
         @endif
     </div>
 
     {{-- Page header --}}
     <div class="ph">
         <div>
-            <h1>🏍️ Livreurs
+            <h1>🗺️ Zones de livraison
                 @if($filteredCompany)
                     <span style="font-size:14px;font-weight:600;color:var(--muted)">— {{ $filteredCompany->name }}</span>
                 @endif
             </h1>
             <div class="ph-sub">
                 @if($filteredCompany)
-                    Livreurs de l'entreprise <strong>{{ $filteredCompany->name }}</strong>
+                    Zones de livraison de <strong>{{ $filteredCompany->name }}</strong>
                 @else
-                    Tous les livreurs du SaaS Livraison
+                    Toutes les zones de livraison du SaaS Livraison
                 @endif
             </div>
         </div>
         @if($filteredCompany)
-        <a href="{{ route('admin.livreurs.index') }}" class="btn-g">✕ Voir tous</a>
+        <a href="{{ route('admin.zones.index') }}" class="btn-g">✕ Voir toutes</a>
         @endif
     </div>
 
@@ -315,7 +336,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
     <div style="margin-bottom:12px">
         <span class="filter-tag">
             🚚 {{ $filteredCompany->name }}
-            <a href="{{ route('admin.livreurs.index', array_filter(['status'=>request('status'),'search'=>request('search')])) }}">✕</a>
+            <a href="{{ route('admin.zones.index', array_filter(['status'=>request('status'),'search'=>request('search')])) }}">✕</a>
         </span>
     </div>
     @endif
@@ -323,29 +344,43 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
     {{-- Stats --}}
     <div class="kpi-g">
         <div class="kpi p">
-            <div class="kpi-ic p">🏍️</div>
+            <div class="kpi-ic p">🗺️</div>
             <div class="kpi-v">{{ $stats['total'] }}</div>
-            <div class="kpi-l">Total livreurs</div>
+            <div class="kpi-l">Total zones</div>
         </div>
         <div class="kpi g">
             <div class="kpi-ic g">🟢</div>
-            <div class="kpi-v">{{ $stats['available'] }}</div>
-            <div class="kpi-l">Disponibles</div>
-        </div>
-        <div class="kpi a">
-            <div class="kpi-ic a">⚡</div>
-            <div class="kpi-v">{{ $stats['busy'] }}</div>
-            <div class="kpi-l">En livraison</div>
+            <div class="kpi-v">{{ $stats['actives'] }}</div>
+            <div class="kpi-l">Actives</div>
         </div>
         <div class="kpi r">
-            <div class="kpi-ic r">⚫</div>
-            <div class="kpi-v">{{ $stats['offline'] }}</div>
-            <div class="kpi-l">Hors ligne</div>
+            <div class="kpi-ic r">🔴</div>
+            <div class="kpi-v">{{ $stats['inactives'] }}</div>
+            <div class="kpi-l">Inactives</div>
+        </div>
+        <div class="kpi b">
+            <div class="kpi-ic b">💰</div>
+            <div class="kpi-v" style="font-size:18px">
+                {{ $stats['prix_moy'] ? number_format($stats['prix_moy'], 0, ',', ' ') : '–' }}
+                @if($stats['prix_moy'] && $globalCur)<span style="font-size:12px;font-weight:600;color:var(--muted)"> {{ $globalCur }}</span>@endif
+            </div>
+            <div class="kpi-l">Prix moyen</div>
+        </div>
+        <div class="kpi a">
+            <div class="kpi-ic a">📉</div>
+            <div class="kpi-v" style="font-size:18px">
+                {{ $stats['prix_min'] ? number_format($stats['prix_min'], 0, ',', ' ') : '–' }}
+                @if($stats['prix_min'] && $globalCur)<span style="font-size:12px;font-weight:600;color:var(--muted)"> {{ $globalCur }}</span>@endif
+            </div>
+            <div class="kpi-l">Prix min</div>
         </div>
         <div class="kpi i">
-            <div class="kpi-ic i">📦</div>
-            <div class="kpi-v">{{ $stats['livraisons'] }}</div>
-            <div class="kpi-l">Livraisons total</div>
+            <div class="kpi-ic i">📈</div>
+            <div class="kpi-v" style="font-size:18px">
+                {{ $stats['prix_max'] ? number_format($stats['prix_max'], 0, ',', ' ') : '–' }}
+                @if($stats['prix_max'] && $globalCur)<span style="font-size:12px;font-weight:600;color:var(--muted)"> {{ $globalCur }}</span>@endif
+            </div>
+            <div class="kpi-l">Prix max</div>
         </div>
     </div>
 
@@ -357,18 +392,16 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
         $bp = array_filter(['company_id'=>$curCompany,'search'=>$curSearch]);
     @endphp
     <div class="chips">
-        <a href="{{ route('admin.livreurs.index', $bp) }}"
-           class="chip {{ $curStatus==='' ? 'on' : '' }}">Tous</a>
-        <a href="{{ route('admin.livreurs.index', array_merge($bp,['status'=>'available'])) }}"
-           class="chip av {{ $curStatus==='available' ? 'on' : '' }}">🟢 Disponibles</a>
-        <a href="{{ route('admin.livreurs.index', array_merge($bp,['status'=>'busy'])) }}"
-           class="chip bsy {{ $curStatus==='busy' ? 'on' : '' }}">⚡ En livraison</a>
-        <a href="{{ route('admin.livreurs.index', array_merge($bp,['status'=>'offline'])) }}"
-           class="chip off {{ $curStatus==='offline' ? 'on' : '' }}">⚫ Hors ligne</a>
+        <a href="{{ route('admin.zones.index', $bp) }}"
+           class="chip {{ $curStatus==='' ? 'on' : '' }}">Toutes</a>
+        <a href="{{ route('admin.zones.index', array_merge($bp,['status'=>'active'])) }}"
+           class="chip act {{ $curStatus==='active' ? 'on' : '' }}">🟢 Actives</a>
+        <a href="{{ route('admin.zones.index', array_merge($bp,['status'=>'inactive'])) }}"
+           class="chip inact {{ $curStatus==='inactive' ? 'on' : '' }}">🔴 Inactives</a>
     </div>
 
     {{-- Filter bar --}}
-    <form id="filterForm" method="GET" action="{{ route('admin.livreurs.index') }}">
+    <form id="filterForm" method="GET" action="{{ route('admin.zones.index') }}">
         @if($curStatus)<input type="hidden" name="status" value="{{ $curStatus }}">@endif
         <div class="fb">
             <select name="company_id" class="fb-sel" onchange="document.getElementById('filterForm').submit()">
@@ -379,10 +412,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
                     </option>
                 @endforeach
             </select>
-            <input type="text" name="search" class="fb-inp" placeholder="🔍 Nom, email, téléphone…" value="{{ $curSearch }}">
+            <input type="text" name="search" class="fb-inp" placeholder="🔍 Nom ou description…" value="{{ $curSearch }}">
             <button type="submit" class="fb-btn">Filtrer</button>
             @if($curSearch || $curCompany)
-                <a href="{{ route('admin.livreurs.index', $curStatus ? ['status'=>$curStatus] : []) }}" class="fb-btn">✕ Réinitialiser</a>
+                <a href="{{ route('admin.zones.index', $curStatus ? ['status'=>$curStatus] : []) }}" class="fb-btn">✕ Réinitialiser</a>
             @endif
         </div>
     </form>
@@ -391,89 +424,103 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
     <div class="sc">
         <div class="sc-h">
             <div class="sc-t">
-                🏍️ Livreurs
-                <span style="font-size:11px;font-weight:600;color:var(--muted)">({{ $livreurs->total() }})</span>
+                🗺️ Zones
+                <span style="font-size:11px;font-weight:600;color:var(--muted)">({{ $zones->total() }})</span>
             </div>
         </div>
 
-        @if($livreurs->isEmpty())
+        @if($zones->isEmpty())
             <div class="empty">
-                <div class="empty-ico">🏍️</div>
-                <div class="empty-t">Aucun livreur trouvé</div>
-                <div class="empty-s">Modifiez vos filtres ou attendez de nouvelles inscriptions.</div>
+                <div class="empty-ico">🗺️</div>
+                <div class="empty-t">Aucune zone trouvée</div>
+                <div class="empty-s">Modifiez vos filtres ou sélectionnez une autre entreprise.</div>
             </div>
         @else
         <div class="tbl-wrap">
             <table class="tbl">
                 <thead>
                     <tr>
-                        <th>Livreur</th>
+                        <th>Zone</th>
                         <th>Entreprise</th>
-                        <th>Contact</th>
+                        <th>Prix</th>
+                        <th>Délai estimé</th>
                         <th>Statut</th>
-                        <th>Livraisons</th>
-                        <th>Inscrit le</th>
+                        <th>Créée le</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($livreurs as $drv)
+                    @foreach($zones as $zone)
                     @php
-                        $init = strtoupper(substr($drv->name ?? 'L', 0, 1));
-                        $stData = $statusLabel[$drv->status] ?? ['label' => $drv->status, 'class' => 'offline'];
+                        $co  = $zone->company;
+                        $cur = $co ? $fmtCur($co) : 'GNF';
                     @endphp
                     <tr>
-                        {{-- Livreur --}}
+                        {{-- Zone --}}
                         <td>
-                            <div class="t-drv">
-                                @if($drv->photo)
-                                    <img src="{{ asset('storage/'.$drv->photo) }}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0" alt="">
-                                @else
-                                    <div class="t-av">{{ $init }}</div>
-                                @endif
+                            <div class="z-name">
+                                <div class="z-dot" style="background:{{ $zone->color ?? '#7c3aed' }}"></div>
                                 <div>
-                                    <div class="t-name">{{ $drv->name }}</div>
-                                    @if($drv->email)<div class="t-sub">{{ $drv->email }}</div>@endif
+                                    <div class="z-label">{{ $zone->name }}</div>
+                                    @if($zone->description)
+                                        <div class="z-desc">{{ Str::limit($zone->description, 55) }}</div>
+                                    @endif
                                 </div>
                             </div>
                         </td>
 
                         {{-- Entreprise --}}
                         <td>
-                            @if($drv->company)
-                                <a href="{{ route('admin.livreurs.index', ['company_id'=>$drv->company->id]) }}"
+                            @if($co)
+                                <a href="{{ route('admin.zones.index', ['company_id'=>$co->id]) }}"
                                    style="color:var(--brand);font-weight:600;font-size:12px;text-decoration:none">
-                                    🚚 {{ $drv->company->name }}
+                                    🚚 {{ $co->name }}
                                 </a>
                             @else
                                 <span style="color:var(--muted)">—</span>
                             @endif
                         </td>
 
-                        {{-- Contact --}}
+                        {{-- Prix --}}
                         <td>
-                            @if($drv->phone)
-                                <div style="font-size:12px">📞 {{ $drv->phone }}</div>
-                            @endif
-                            @if(!$drv->email && !$drv->phone)
-                                <span style="color:var(--muted)">—</span>
-                            @endif
+                            <span class="price-badge">
+                                {{ number_format($zone->price, 0, ',', ' ') }}
+                                <span style="font-size:11px;font-weight:600;margin-left:3px;color:var(--muted)">{{ $cur }}</span>
+                            </span>
+                        </td>
+
+                        {{-- Délai --}}
+                        <td>
+                            <span class="time-badge">
+                                ⏱️ {{ $fmtMin($zone->estimated_minutes) }}
+                            </span>
                         </td>
 
                         {{-- Statut --}}
                         <td>
-                            <span class="sdot {{ $stData['class'] }}">{{ $stData['label'] }}</span>
-                        </td>
-
-                        {{-- Livraisons --}}
-                        <td>
-                            @php $oc = $drv->orders_count ?? 0; @endphp
-                            <span class="bdg {{ $oc > 0 ? 'b' : 'm' }}">📦 {{ $oc }}</span>
+                            @if($zone->active)
+                                <span class="bdg g">🟢 Active</span>
+                            @else
+                                <span class="bdg r">🔴 Inactive</span>
+                            @endif
                         </td>
 
                         {{-- Date --}}
                         <td>
-                            <div style="font-size:11.5px">{{ optional($drv->created_at)->format('d/m/Y') }}</div>
-                            <div style="font-size:10px;color:var(--muted)">{{ optional($drv->created_at)->diffForHumans() }}</div>
+                            <div style="font-size:11.5px">{{ optional($zone->created_at)->format('d/m/Y') }}</div>
+                            <div style="font-size:10px;color:var(--muted)">{{ optional($zone->created_at)->diffForHumans() }}</div>
+                        </td>
+
+                        {{-- Action --}}
+                        <td>
+                            <form method="POST" action="{{ route('admin.zones.toggle', $zone) }}" style="margin:0">
+                                @csrf
+                                @if($zone->active)
+                                    <button type="submit" class="btn-sm btn-toggle-on">⏸ Désactiver</button>
+                                @else
+                                    <button type="submit" class="btn-sm btn-toggle-off">▶ Activer</button>
+                                @endif
+                            </form>
                         </td>
                     </tr>
                     @endforeach
@@ -481,10 +528,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
             </table>
         </div>
 
-        @if($livreurs->hasPages())
+        @if($zones->hasPages())
         <div class="pag">
-            <div class="pag-info">Affichage {{ $livreurs->firstItem() }}–{{ $livreurs->lastItem() }} sur {{ $livreurs->total() }}</div>
-            {{ $livreurs->withQueryString()->links() }}
+            <div class="pag-info">Affichage {{ $zones->firstItem() }}–{{ $zones->lastItem() }} sur {{ $zones->total() }}</div>
+            {{ $zones->withQueryString()->links() }}
         </div>
         @endif
         @endif
