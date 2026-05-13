@@ -1879,8 +1879,11 @@ let _bulkZoneSelectedFee = null;
 let _bulkZoneLots        = null;
 
 function _collectSelectedOrders() {
+    const seen = new Set();
     const orders = [];
     document.querySelectorAll('.order-cb:checked').forEach(cb => {
+        if (seen.has(cb.value)) return;
+        seen.add(cb.value);
         orders.push({
             id:        cb.value,
             num:       cb.dataset.orderNum || String(cb.value).padStart(5,'0'),

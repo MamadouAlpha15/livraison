@@ -1455,9 +1455,12 @@ function openMultiAssign(){
     if(_bulkOrderIds.size===0) return;
     _bulkMode=true;
 
-    /* Collecter les infos de chaque commande sélectionnée */
+    /* Collecter les infos de chaque commande sélectionnée (dédoublonnage desktop+mobile) */
     var orders=[];
+    var _seen=new Set();
     document.querySelectorAll('.row-chk:checked').forEach(function(chk){
+        if(_seen.has(chk.dataset.orderId)) return;
+        _seen.add(chk.dataset.orderId);
         orders.push({
             orderId:  chk.dataset.orderId,
             num:      chk.dataset.num||chk.dataset.orderId,
