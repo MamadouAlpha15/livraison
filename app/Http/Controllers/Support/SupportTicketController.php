@@ -14,33 +14,64 @@ use App\Notifications\NewSupportTicket;
 
 class SupportTicketController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $u = Auth::user();
 
-        // Clients : leurs tickets ; Staff/Admin : tickets de leur boutique ; Superadmin : tout
-        if (in_array($u->role, ['superadmin'])) {
-            $tickets = SupportTicket::with('shop','creator')->latest()->paginate(12);
-        } elseif (in_array($u->role, ['admin','employe','vendeur']) || $u->role_in_shop) {
-            $tickets = SupportTicket::with('shop','creator')
-                ->where('shop_id', $u->shop_id)->latest()->paginate(12);
-        } else { // client / livreur
-            $tickets = SupportTicket::with('shop','creator')
-                ->where('user_id', $u->id)->latest()->paginate(12);
+        if ($u->role === 'superadmin') {
+            $query = SupportTicket::with('shop', 'creator')->withCount('messages')->latest();
+
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+            if ($request->filled('shop_id')) {
+                $query->where('shop_id', $request->shop_id);
+            }
+            if ($request->filled('search')) {
+                $q = $request->search;
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('subject', 'like', "%$q%")
+                        ->orWhereHas('creator', fn($u) => $u->where('name', 'like', "%$q%"));
+                });
+            }
+
+            $tickets = $query->paginate(25)->withQueryString();
+
+            $stats = [
+                'total'   => SupportTicket::count(),
+                'open'    => SupportTicket::where('status', 'open')->count(),
+                'closed'  => SupportTicket::where('status', 'closed')->count(),
+                'pending' => SupportTicket::where('status', 'open')
+                    ->whereDoesntHave('messages', fn($q) => $q->whereHas('author', fn($u) => $u->where('role', 'superadmin')))
+                    ->count(),
+            ];
+
+            $shops = \App\Models\Shop::orderBy('name')->get(['id', 'name']);
+
+            return view('admin.support.index', compact('tickets', 'stats', 'shops'));
         }
 
-        return view('support.index', compact('tickets'));
+        $shop = null;
+
+        if (in_array($u->role, ['admin', 'employe', 'vendeur']) || $u->role_in_shop) {
+            $shop    = $u->shop;
+            $tickets = SupportTicket::with('shop', 'creator')
+                ->withCount('messages')
+                ->where('shop_id', $u->shop_id)->latest()->paginate(20);
+        } else {
+            $tickets = SupportTicket::with('shop', 'creator')
+                ->withCount('messages')
+                ->where('user_id', $u->id)->latest()->paginate(20);
+        }
+
+        return view('support.index', compact('tickets', 'shop'));
     }
 
     public function create()
     {
-        $u = Auth::user();
-        // Clients choisissent la boutique ciblée (ou toutes) ; admins ont leur shop pré-sélectionné
-        $shops = in_array($u->role, ['admin','employe','vendeur']) && $u->shop_id
-            ? Shop::where('id', $u->shop_id)->get()
-            : Shop::orderBy('name')->get();
-
-        return view('support.create', compact('shops'));
+        $u    = Auth::user();
+        $shop = $u->shop;
+        return view('support.create', compact('shop'));
     }
 
     public function store(Request $r)
@@ -68,19 +99,8 @@ class SupportTicketController extends Controller
             'body'      => $data['message'],
         ]);
 
-        // Notifier les destinataires (staff de la boutique ou superadmin)
-        $recipients = collect();
-        if ($ticket->shop_id) {
-            $recipients = User::where('shop_id', $ticket->shop_id)
-                ->where(function($q){
-                    $q->whereIn('role', ['admin','employe','vendeur'])
-                      ->orWhereIn('role_in_shop', ['admin','employe','vendeur']);
-                })->get();
-        } else {
-            $recipients = User::where('role','superadmin')->get();
-        }
-
-        foreach ($recipients as $to) {
+        // Notifier le SuperAdmin (destinataire unique : la plateforme)
+        foreach (User::where('role', 'superadmin')->get() as $to) {
             $to->notify(new NewSupportTicket($ticket));
         }
 
@@ -90,8 +110,15 @@ class SupportTicketController extends Controller
     public function show(SupportTicket $ticket)
     {
         $this->authorizeTicket($ticket);
-        $ticket->load(['creator','shop','messages.author']);
-        return view('support.show', compact('ticket'));
+        $ticket->load(['creator', 'shop', 'messages.author']);
+        $u = Auth::user();
+
+        if ($u->role === 'superadmin') {
+            return view('admin.support.show', compact('ticket'));
+        }
+
+        $shop = (in_array($u->role, ['admin', 'employe', 'vendeur']) || $u->role_in_shop) ? $u->shop : null;
+        return view('support.show', compact('ticket', 'shop'));
     }
 
     public function close(SupportTicket $ticket)

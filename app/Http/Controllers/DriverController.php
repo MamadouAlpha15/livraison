@@ -308,6 +308,28 @@ class DriverController extends Controller
     }
 
     /* ────────────────────────────────────────────
+     |  RELEASE — libère un driver bloqué en busy sans commandes actives
+     ──────────────────────────────────────────── */
+    public function release(Driver $driver)
+    {
+        $company = $this->resolveCompany();
+        abort_unless($driver->delivery_company_id === $company->id, 403);
+
+        $hasActive = \App\Models\Order::where('driver_id', $driver->id)
+            ->whereIn('status', [\App\Models\Order::STATUS_CONFIRMEE, \App\Models\Order::STATUS_EN_LIVRAISON])
+            ->exists();
+
+        if (!$hasActive) {
+            $isOnline = $driver->user_id
+                ? (bool) \App\Models\User::where('id', $driver->user_id)->value('is_available')
+                : false;
+            $driver->update(['status' => $isOnline ? 'available' : 'offline']);
+        }
+
+        return back()->with('success', "Statut de « {$driver->name} » synchronisé.");
+    }
+
+    /* ────────────────────────────────────────────
      |  DESTROY
      ──────────────────────────────────────────── */
     public function destroy(Driver $driver)

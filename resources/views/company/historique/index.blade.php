@@ -420,22 +420,28 @@ body.cx-light .mc-amount-total .mc-amount-val{color:#111827}
                     {{ $company->name }} · Toutes les livraisons terminées et annulées
                 @endif
             </div>
+            @php
+                [$livreesLbl, $annuleesLbl, $revenusLbl] = match($period) {
+                    'today' => ['Livrées auj.',    'Annulées auj.',    'Revenus auj.'],
+                    'week'  => ['Livrées (sem.)',  'Annulées (sem.)',  'Revenus (sem.)'],
+                    'month' => ['Livrées (mois)',  'Annulées (mois)',  'Revenus (mois)'],
+                    default => (request()->filled('date_from') || request()->filled('date_to'))
+                        ? ['Livrées (période)', 'Annulées (période)', 'Revenus (période)']
+                        : ['Total livrées',     'Total annulées',     'Revenus totaux'],
+                };
+            @endphp
             <div class="hx-stats">
                 <div class="hx-stat" style="--s-accent:#34d399">
                     <div class="hx-stat-val">{{ $stats['total_livrees'] }}</div>
-                    <div class="hx-stat-lbl">Total livrées</div>
+                    <div class="hx-stat-lbl">{{ $livreesLbl }}</div>
                 </div>
                 <div class="hx-stat" style="--s-accent:#f87171">
                     <div class="hx-stat-val">{{ $stats['total_annulees'] }}</div>
-                    <div class="hx-stat-lbl">Annulées</div>
-                </div>
-                <div class="hx-stat" style="--s-accent:#34d399">
-                    <div class="hx-stat-val">{{ $stats['livrees_today'] }}</div>
-                    <div class="hx-stat-lbl">Livrées auj.</div>
+                    <div class="hx-stat-lbl">{{ $annuleesLbl }}</div>
                 </div>
                 <div class="hx-stat" style="--s-accent:#a78bfa">
-                    <div class="hx-stat-val" style="font-size:clamp(12px,2.5vw,15px);word-break:break-all">{{ $fmt($stats['revenus_month']) }}</div>
-                    <div class="hx-stat-lbl">Revenus ce mois</div>
+                    <div class="hx-stat-val" style="font-size:clamp(12px,2.5vw,15px);word-break:break-all">{{ $fmt($stats['revenus']) }}</div>
+                    <div class="hx-stat-lbl">{{ $revenusLbl }}</div>
                 </div>
                 <div class="hx-stat" style="--s-accent:#60a5fa">
                     <div class="hx-stat-val" style="font-size:clamp(12px,2.5vw,15px);word-break:break-all">{{ $fmt($stats['revenus_total']) }}</div>

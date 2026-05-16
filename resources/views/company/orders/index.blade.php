@@ -791,6 +791,16 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                 </div>
             </div>
         </div>
+        @php
+            [$livreesLbl, $revenusLbl] = match($period) {
+                'today'     => ['Livrées auj.',     'Revenus auj.'],
+                'yesterday' => ['Livrées hier',     'Revenus hier'],
+                'week'      => ['Livrées (sem.)',   'Revenus (sem.)'],
+                'month'     => ['Livrées (mois)',   'Revenus (mois)'],
+                'custom'    => ['Livrées (période)','Revenus (période)'],
+                default     => ['Livrées (total)',  'Revenus totaux'],
+            };
+        @endphp
         <div class="stats-bar">
             <div class="stat-pill" style="--s-accent:#a78bfa">
                 <div class="stat-pill-val">{{ $stats['total'] }}</div>
@@ -805,12 +815,12 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                 <div class="stat-pill-lbl">En livraison</div>
             </div>
             <div class="stat-pill" style="--s-accent:#34d399">
-                <div class="stat-pill-val">{{ $stats['livrees_today'] }}</div>
-                <div class="stat-pill-lbl">Livrées auj.</div>
+                <div class="stat-pill-val">{{ $stats['livrees'] }}</div>
+                <div class="stat-pill-lbl">{{ $livreesLbl }}</div>
             </div>
             <div class="stat-pill" style="--s-accent:#34d399">
-                <div class="stat-pill-val" style="font-size:15px;">{{ $fmt($stats['revenus_today']) }}</div>
-                <div class="stat-pill-lbl">Revenus auj.</div>
+                <div class="stat-pill-val" style="font-size:15px;">{{ $fmt($stats['revenus']) }}</div>
+                <div class="stat-pill-lbl">{{ $revenusLbl }}</div>
             </div>
         </div>
     </div>
@@ -916,10 +926,11 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                 @php $st = $statusMap[$order->status] ?? ['lbl'=>$order->status,'cls'=>'badge-wait']; @endphp
                 <tr data-order-id="{{ $order->id }}">
                     <td class="chk-td" data-label="">
-                        @if(in_array($order->status, ['en_attente','confirmée']))
+                        @if($order->status !== 'livrée')
                         <input type="checkbox" class="row-chk"
                                data-order-id="{{ $order->id }}"
                                data-num="{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
+                               data-status="{{ $order->status }}"
                                data-fee="{{ $order->delivery_fee ?? $order->deliveryZone?->price ?? '' }}"
                                data-dest="{{ $order->delivery_destination ?? $order->client->address ?? '' }}"
                                data-shop="{{ $order->shop->name ?? '' }}"
@@ -1056,10 +1067,11 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
         {{-- En-tête : ID + checkbox + statut --}}
         <div class="mc-head">
             <div style="display:flex;align-items:center;gap:10px;">
-                @if(in_array($order->status, ['en_attente','confirmée']))
+                @if($order->status !== 'livrée')
                 <input type="checkbox" class="row-chk"
                        data-order-id="{{ $order->id }}"
                        data-num="{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
+                       data-status="{{ $order->status }}"
                        data-fee="{{ $order->delivery_fee ?? $order->deliveryZone?->price ?? '' }}"
                        data-dest="{{ $order->delivery_destination ?? $order->client->address ?? '' }}"
                        data-shop="{{ $order->shop->name ?? '' }}"
@@ -1424,17 +1436,33 @@ function updateSelBar(){
     var bar=document.getElementById('selBar');
     var cnt=document.getElementById('selCount');
     var lbl=document.getElementById('selBtnLabel');
+    var btnAssign    = document.querySelector('.btn-sel-assign');
+    var btnAnnuler   = document.querySelector('.btn-sel-annuler');
+    var btnRestaurer = document.querySelector('.btn-sel-restaurer');
     if(n>0){
         bar.classList.add('show');
         cnt.textContent=n+' commande'+(n>1?'s':'')+' sélectionné'+(n>1?'es':'e');
         lbl.textContent='Assigner ('+n+')';
+        /* Détecter les statuts sélectionnés (dédoublonnage desktop+mobile) */
+        var hasActive=false, hasAnnulee=false, seen=new Set();
+        document.querySelectorAll('.row-chk:checked').forEach(function(chk){
+            if(seen.has(chk.dataset.orderId)) return;
+            seen.add(chk.dataset.orderId);
+            if(chk.dataset.status==='annulée') hasAnnulee=true; else hasActive=true;
+        });
+        if(btnAssign)    btnAssign.style.display    = hasActive  ? '' : 'none';
+        if(btnAnnuler)   btnAnnuler.style.display   = hasActive  ? '' : 'none';
+        if(btnRestaurer) btnRestaurer.style.display = hasAnnulee ? '' : 'none';
     } else {
         bar.classList.remove('show');
+        if(btnAssign)    btnAssign.style.display    = '';
+        if(btnAnnuler)   btnAnnuler.style.display   = '';
+        if(btnRestaurer) btnRestaurer.style.display = '';
     }
-    /* Maj checkbox "tout sélectionner" */
-    var total=document.querySelectorAll('.row-chk').length;
+    /* Maj checkbox "tout sélectionner" — diviser par 2 (desktop + mobile) */
+    var uniqueTotal = Math.round(document.querySelectorAll('.row-chk').length / 2);
     var chkAll=document.getElementById('chkAll');
-    if(chkAll){ chkAll.checked=n>0&&n===total; chkAll.indeterminate=n>0&&n<total; }
+    if(chkAll){ chkAll.checked=n>0&&n===uniqueTotal; chkAll.indeterminate=n>0&&n<uniqueTotal; }
 }
 function clearSelection(){
     _bulkOrderIds.clear();

@@ -86,6 +86,12 @@ class User extends Authenticatable
         return $this->belongsTo(DeliveryCompany::class, 'company_id');
     }
 
+    // Entreprise de livraison dont l'utilisateur est le PROPRIÉTAIRE (delivery_companies.user_id)
+    public function ownedCompany()
+    {
+        return $this->hasOne(DeliveryCompany::class, 'user_id');
+    }
+
     /* =========================
      | Helper: boutique courante
      |=========================*/

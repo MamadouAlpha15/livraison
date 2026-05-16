@@ -962,7 +962,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 </div>
             </div>
             <div class="sb-section">Aide</div>
-            <a href="{{ route('support.index') }}" class="sb-item"><span class="ico">🎧</span> Support</a>
+            <a href="{{ route('support.index') }}" class="sb-item"><span class="ico">🎧</span> Support <span class="sb-badge" id="sbSupportBadge" style="display:none;background:#10b981"></span></a>
         </nav>
         <div class="sb-footer">
            
@@ -1010,9 +1010,10 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                             🔔 Notifications <span id="notifDropdownTotal" style="background:var(--brand-lt);color:var(--brand-dk);font-size:10px;padding:1px 7px;border-radius:20px">0</span>
                         </div>
                         <div id="notifList" style="max-height:320px;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:#d1d5db #f9fafb"></div>
-                        <div style="padding:8px 14px;border-top:1px solid var(--border);display:flex;gap:6px">
+                        <div style="padding:8px 14px;border-top:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap">
                             <a href="{{ route('boutique.orders.index') }}" class="btn btn-sm" style="flex:1;justify-content:center;font-size:11px">📦 Commandes</a>
                             <a href="{{ route('boutique.messages.hub') }}" class="btn btn-sm" style="flex:1;justify-content:center;font-size:11px">💬 Messages</a>
+                            <a href="{{ route('support.index') }}" class="btn btn-sm" style="flex:1;justify-content:center;font-size:11px">🎧 Support</a>
                         </div>
                     </div>
                 </div>
@@ -1876,25 +1877,34 @@ document.addEventListener('DOMContentLoaded', () => {
 <script>
 (function () {
     const CSRF = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+    const _UID = '{{ auth()->id() }}';
+
+    /* ── Clés localStorage préfixées par UID (évite contamination cross-user) ── */
+    const _KEY_MSG     = 'bq_last_msg_id_'       + _UID;
+    const _KEY_CO      = 'bq_last_co_msg_id_'    + _UID;
+    const _KEY_SUP     = 'bq_last_support_id_'   + _UID;
+    const _KEY_ALERTS  = 'boutique_notif_alerts_' + _UID;
+    const _KEY_CO_SEEN = 'bq_co_seen_'           + _UID;
 
     /* ── État local ── */
     let _prevMsg            = -1;
     let _prevOrders         = -1;
     let _prevCompanyMsg     = -1;
     let _notifOpen          = false;
-    /* Persiste entre navigations pour éviter de re-notifier les mêmes messages */
-    let _lastSeenMsgId        = parseInt(sessionStorage.getItem('bq_last_msg_id') || '0', 10);
-    let _lastSeenCompanyMsgId = parseInt(sessionStorage.getItem('bq_last_company_msg_id') || '0', 10);
+    /* Persiste entre sessions via localStorage pour éviter re-notification après reconnexion */
+    let _lastSeenMsgId        = parseInt(localStorage.getItem(_KEY_MSG) || '0', 10);
+    let _lastSeenCompanyMsgId = parseInt(localStorage.getItem(_KEY_CO)  || '0', 10);
+    let _lastSeenSupportId    = parseInt(localStorage.getItem(_KEY_SUP) || '0', 10);
 
-    /* Restaurer les alertes depuis sessionStorage (persiste entre navigations) */
+    /* Restaurer les alertes depuis localStorage (persiste entre sessions) */
     let _alerts = [];
     try {
-        const saved = sessionStorage.getItem('boutique_notif_alerts');
+        const saved = localStorage.getItem(_KEY_ALERTS);
         if (saved) _alerts = JSON.parse(saved);
     } catch(e) {}
 
     function _saveAlerts() {
-        try { sessionStorage.setItem('boutique_notif_alerts', JSON.stringify(_alerts)); } catch(e) {}
+        try { localStorage.setItem(_KEY_ALERTS, JSON.stringify(_alerts)); } catch(e) {}
     }
 
     /* ── Helpers badge générique ── */
@@ -1914,7 +1924,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const t = document.createElement('div');
         t.style.cssText = `
             position:fixed;bottom:${20 + document.querySelectorAll('.rt-toast').length * 60}px;
-            right:20px;background:${type==='order'?'#111118':type==='msg'?'#1e40af':type==='company'?'#4f46e5':'#1f2937'};
+            right:20px;background:${type==='order'?'#111118':type==='msg'?'#1e40af':type==='company'?'#4f46e5':type==='support'?'#166534':'#1f2937'};
             color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:600;
             z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,.25);
             animation:slideInRight .3s cubic-bezier(.23,1,.32,1);
@@ -1941,11 +1951,14 @@ document.addEventListener('DOMContentLoaded', () => {
         list.innerHTML = _alerts.slice(0, 20).map(a => {
             const isOrder      = a.type === 'order';
             const isCompanyMsg = a.type === 'company_msg';
+            const isSupport    = a.type === 'support';
             /* Badge contextuel */
             const badge = isOrder
                 ? `<span style="font-size:9px;font-weight:700;background:#fef3c7;color:#92400e;border:1px solid #fde68a;border-radius:20px;padding:1px 6px;white-space:nowrap;flex-shrink:0">En cours</span>`
                 : isCompanyMsg
                 ? `<span style="font-size:9px;font-weight:700;background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe;border-radius:20px;padding:1px 6px;white-space:nowrap;flex-shrink:0">Entreprise</span>`
+                : isSupport
+                ? `<span style="font-size:9px;font-weight:700;background:#f0fdf4;color:#166534;border:1px solid #86efac;border-radius:20px;padding:1px 6px;white-space:nowrap;flex-shrink:0">SuperAdmin</span>`
                 : '';
             /* Bouton × pour messages uniquement */
             const closeBtn = !isOrder
@@ -1958,7 +1971,7 @@ document.addEventListener('DOMContentLoaded', () => {
                            onmouseover="this.style.background='#fee2e2';this.style.color='#dc2626'"
                            onmouseout="this.style.background='none';this.style.color='#9ca3af'">×</button>`
                 : '';
-            /* onclick : pour entreprise → ouvrir chat, pour messages → dismiss, commandes → rien */
+            /* onclick : entreprise → chat, support → aller au ticket, messages → dismiss, commandes → rien */
             let rowClickHandler = '';
             let rowHref = a.url || '#';
             let rowTag = 'a';
@@ -1966,11 +1979,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 rowTag = 'div';
                 const _safeName = encodeURIComponent(a.companyName || '');
                 rowClickHandler = `onclick="bqOpenCompanyChat(${a.companyId},decodeURIComponent('${_safeName}'));_dismissAlert(${a.id})"`;
+            } else if (isSupport) {
+                rowClickHandler = `onclick="_dismissAlert(${a.id})"`;
             } else if (!isOrder) {
                 rowClickHandler = `onclick="_dismissAlert(${a.id})"`;
             }
-            const rowBg    = isOrder ? '#fffbeb' : isCompanyMsg ? '#f5f3ff' : '#fff';
-            const rowHover = isOrder ? '#fef9ec' : isCompanyMsg ? '#ede9fe' : '#f9fafb';
+            const rowBg    = isOrder ? '#fffbeb' : isCompanyMsg ? '#f5f3ff' : isSupport ? '#f0fdf4' : '#fff';
+            const rowHover = isOrder ? '#fef9ec' : isCompanyMsg ? '#ede9fe' : isSupport ? '#dcfce7' : '#f9fafb';
 
             const innerRow = isCompanyMsg && a.companyId
                 ? `<div ${rowClickHandler} style="display:flex;align-items:center;gap:10px;flex:1;padding:10px 12px;cursor:pointer;min-width:0">`
@@ -2078,7 +2093,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         pushAlert('💬', label, '{{ route("boutique.messages.hub") }}', 'msg', '', m.time);
                     });
                     _lastSeenMsgId = newMsgs[0].id;
-                    try { sessionStorage.setItem('bq_last_msg_id', _lastSeenMsgId); } catch(e) {}
+                    try { localStorage.setItem(_KEY_MSG, _lastSeenMsgId); } catch(e) {}
                 }
             }
             _prevMsg = d.messages_unread;
@@ -2088,7 +2103,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const newCMsgs = d.latest_company_messages.filter(m => {
                     if (m.id <= _lastSeenCompanyMsgId) return false;
                     try {
-                        const seen = JSON.parse(sessionStorage.getItem('bq_co_seen') || '{}');
+                        const seen = JSON.parse(localStorage.getItem(_KEY_CO_SEEN) || '{}');
                         if (seen[m.company_id] && m.id <= seen[m.company_id]) return false;
                     } catch(e) {}
                     return true;
@@ -2119,7 +2134,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     _saveAlerts();
                     _lastSeenCompanyMsgId = newCMsgs[0].id;
-                    try { sessionStorage.setItem('bq_last_company_msg_id', _lastSeenCompanyMsgId); } catch(e) {}
+                    try { localStorage.setItem(_KEY_CO, _lastSeenCompanyMsgId); } catch(e) {}
                 }
             }
             _prevCompanyMsg = d.company_messages_unread ?? 0;
@@ -2156,9 +2171,50 @@ document.addEventListener('DOMContentLoaded', () => {
             /* Livreurs */
             setBadge('sbLivreursBadge', d.livreurs_available);
 
-            /* Cloche totale : messages clients + commandes + alertes entreprises non dismissées */
+            /* ── Réponses support SuperAdmin ── */
+            if (Array.isArray(d.support_replies) && d.support_replies.length) {
+                const newReplies = d.support_replies.filter(m => m.id > _lastSeenSupportId);
+                if (newReplies.length) {
+                    /* Toast une seule fois si c'est pas le 1er poll */
+                    if (_lastSeenSupportId > 0) {
+                        showToast(`🎧 <div>Le SuperAdmin a répondu à votre ticket support !</div>`, 'support');
+                    }
+                    /* Une alerte par ticket — si le SuperAdmin renvoie sur le même ticket, on met à jour */
+                    [...newReplies].reverse().forEach(m => {
+                        const existing = _alerts.find(a => a.type === 'support' && a.ticketId === m.ticket_id);
+                        if (existing) {
+                            existing.msg          = `SuperAdmin a répondu : « ${m.ticket_subject} »`;
+                            existing.time         = m.time;
+                            existing.supportMsgId = m.id;
+                        } else {
+                            pushAlert(
+                                '🎧',
+                                `SuperAdmin a répondu : « ${m.ticket_subject} »`,
+                                '/support/' + m.ticket_id,
+                                'support',
+                                m.body,
+                                m.time
+                            );
+                            _alerts[0].ticketId     = m.ticket_id;
+                            _alerts[0].supportMsgId = m.id;
+                        }
+                    });
+                    /* Mettre à jour le dernier ID vu */
+                    _lastSeenSupportId = Math.max(...d.support_replies.map(m => m.id));
+                    localStorage.setItem(_KEY_SUP, _lastSeenSupportId);
+                    _saveAlerts();
+                } else if (_lastSeenSupportId === 0 && d.support_replies.length) {
+                    /* Premier poll : initialiser sans notifier */
+                    _lastSeenSupportId = Math.max(...d.support_replies.map(m => m.id));
+                    localStorage.setItem(_KEY_SUP, _lastSeenSupportId);
+                }
+            }
+
+            /* Cloche totale : messages clients + commandes + alertes entreprises + support non dismissées */
             const companyAlertCount = _alerts.filter(a => a.type === 'company_msg').length;
-            const total = d.messages_unread + d.orders_pending + companyAlertCount;
+            const supportAlertCount = _alerts.filter(a => a.type === 'support').length;
+            setBadge('sbSupportBadge', supportAlertCount);
+            const total = d.messages_unread + d.orders_pending + companyAlertCount + supportAlertCount;
             setBadge('notifBellCount', total);
             const totalEl = document.getElementById('notifDropdownTotal');
             if (totalEl) totalEl.textContent = _alerts.length;

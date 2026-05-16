@@ -63,15 +63,32 @@ class OrderController extends Controller
         $boutiqueId = $request->filled('boutique') ? (int) $request->boutique : null;
         $shopFilter = $boutiqueId ? \App\Models\Shop::find($boutiqueId) : null;
 
+        // Base sans filtre période (pour en_livraison qui est un état courant)
         $base = fn() => Order::where('delivery_company_id', $company->id)
             ->when($boutiqueId, fn($q) => $q->where('shop_id', $boutiqueId));
 
+        // Base avec le filtre période appliqué — suit exactement le filtre de la liste
+        $statsBase = function() use ($company, $boutiqueId, $period, $request) {
+            $q = Order::where('delivery_company_id', $company->id)
+                ->when($boutiqueId, fn($qq) => $qq->where('shop_id', $boutiqueId));
+            match($period) {
+                'today'     => $q->whereDate('created_at', today()),
+                'yesterday' => $q->whereDate('created_at', today()->subDay()),
+                'week'      => $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+                'month'     => $q->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year),
+                'custom'    => $q->when($request->filled('date_from'), fn($q2) => $q2->whereDate('created_at', '>=', $request->date_from))
+                                 ->when($request->filled('date_to'),   fn($q2) => $q2->whereDate('created_at', '<=', $request->date_to)),
+                default     => null,
+            };
+            return $q;
+        };
+
         $stats = [
-            'total'         => $base()->count(),
-            'en_attente'    => $base()->where('status', Order::STATUS_EN_ATTENTE)->count(),
-            'en_livraison'  => $base()->where('status', Order::STATUS_EN_LIVRAISON)->count(),
-            'livrees_today' => $base()->where('status', Order::STATUS_LIVREE)->whereDate('updated_at', today())->count(),
-            'revenus_today' => $base()->where('status', Order::STATUS_LIVREE)->whereDate('updated_at', today())->sum('delivery_fee'),
+            'total'        => $statsBase()->count(),
+            'en_attente'   => $statsBase()->where('status', Order::STATUS_EN_ATTENTE)->count(),
+            'en_livraison' => $statsBase()->where('status', Order::STATUS_EN_LIVRAISON)->count(),
+            'livrees'      => $statsBase()->where('status', Order::STATUS_LIVREE)->count(),
+            'revenus'      => $statsBase()->where('status', Order::STATUS_LIVREE)->sum('delivery_fee'),
         ];
 
         $drivers = $company->drivers()->orderByRaw("FIELD(status,'available','busy','offline')")->orderBy('name')->get();
@@ -275,24 +292,45 @@ class OrderController extends Controller
 
         $shopId     = $request->filled('shop_id') ? (int) $request->shop_id : null;
         $shopFilter = $shopId ? \App\Models\Shop::find($shopId) : null;
+        $period     = $request->input('period', '');
 
-        $base = fn() => Order::where('delivery_company_id', $company->id)
-            ->when($shopId, fn($q) => $q->where('shop_id', $shopId));
+        // Base filtrée par période + shop + driver — suit exactement les filtres actifs
+        $statsBase = function() use ($company, $shopId, $period, $request) {
+            $q = Order::where('delivery_company_id', $company->id)
+                ->whereIn('status', [Order::STATUS_LIVREE, Order::STATUS_ANNULEE])
+                ->when($shopId, fn($qq) => $qq->where('shop_id', $shopId))
+                ->when($request->filled('driver_id'), fn($qq) => $qq->where('driver_id', $request->driver_id));
+
+            if ($period) {
+                match($period) {
+                    'today' => $q->whereDate('updated_at', today()),
+                    'week'  => $q->whereBetween('updated_at', [now()->startOfWeek(), now()->endOfWeek()]),
+                    'month' => $q->whereMonth('updated_at', now()->month)->whereYear('updated_at', now()->year),
+                    default => null,
+                };
+            } elseif ($request->filled('date_from') || $request->filled('date_to')) {
+                $q->when($request->filled('date_from'), fn($q2) => $q2->whereDate('updated_at', '>=', $request->date_from))
+                  ->when($request->filled('date_to'),   fn($q2) => $q2->whereDate('updated_at', '<=', $request->date_to));
+            }
+            return $q;
+        };
+
+        // Revenus global (référence fixe, sans filtre période)
+        $revenusGlobal = Order::where('delivery_company_id', $company->id)
+            ->when($shopId, fn($q) => $q->where('shop_id', $shopId))
+            ->where('status', Order::STATUS_LIVREE)
+            ->sum('delivery_fee');
 
         $stats = [
-            'total_livrees'  => $base()->where('status', Order::STATUS_LIVREE)->count(),
-            'total_annulees' => $base()->where('status', Order::STATUS_ANNULEE)->count(),
-            'revenus_total'  => $base()->where('status', Order::STATUS_LIVREE)->sum('delivery_fee'),
-            'revenus_month'  => $base()->where('status', Order::STATUS_LIVREE)
-                                    ->whereMonth('updated_at', now()->month)
-                                    ->whereYear('updated_at', now()->year)
-                                    ->sum('delivery_fee'),
-            'livrees_today'  => $base()->where('status', Order::STATUS_LIVREE)->whereDate('updated_at', today())->count(),
+            'total_livrees'  => $statsBase()->where('status', Order::STATUS_LIVREE)->count(),
+            'total_annulees' => $statsBase()->where('status', Order::STATUS_ANNULEE)->count(),
+            'revenus'        => $statsBase()->where('status', Order::STATUS_LIVREE)->sum('delivery_fee'),
+            'revenus_total'  => $revenusGlobal,
         ];
 
         $drivers = $company->drivers()->orderBy('name')->get();
 
-        return view('company.historique.index', compact('orders', 'stats', 'drivers', 'company', 'shopFilter'));
+        return view('company.historique.index', compact('orders', 'stats', 'drivers', 'company', 'shopFilter', 'period'));
     }
 
     public function clients(Request $request)
@@ -401,6 +439,25 @@ class OrderController extends Controller
         return response()->json(['ok' => true, 'orders' => $orders]);
     }
 
+    /**
+     * Libère le chauffeur seulement s'il n'a plus de commandes actives.
+     * Respecte son is_available pour choisir entre 'available' et 'offline'.
+     */
+    private function releaseDriverIfFree(Driver $driver): void
+    {
+        $hasActive = Order::where('driver_id', $driver->id)
+            ->whereIn('status', [Order::STATUS_CONFIRMEE, Order::STATUS_EN_LIVRAISON])
+            ->exists();
+
+        if ($hasActive) return;
+
+        $isOnline = $driver->user_id
+            ? (bool) \App\Models\User::where('id', $driver->user_id)->value('is_available')
+            : false;
+
+        $driver->update(['status' => $isOnline ? 'available' : 'offline']);
+    }
+
     public function updateStatus(Request $request, Order $order)
     {
         $company = $this->company();
@@ -417,21 +474,16 @@ class OrderController extends Controller
             'status' => ['required', 'in:' . implode(',', $allowed)],
         ]);
 
+        $driverId = $order->driver_id;
         $order->update(['status' => $data['status']]);
 
-        if ($order->driver_id) {
-            $freedDriver = Driver::find($order->driver_id);
-            if ($freedDriver) {
+        if ($driverId) {
+            $driver = Driver::find($driverId);
+            if ($driver) {
                 if (in_array($data['status'], [Order::STATUS_LIVREE, Order::STATUS_ANNULEE], true)) {
-                    // Libérer le chauffeur : statut selon son is_available (ne pas forcer is_available)
-                    $driverIsOnline = $freedDriver->user_id
-                        ? (bool) \App\Models\User::where('id', $freedDriver->user_id)->value('is_available')
-                        : false;
-                    $freedDriver->update(['status' => $driverIsOnline ? 'available' : 'offline']);
-
+                    $this->releaseDriverIfFree($driver);
                 } elseif ($data['status'] === Order::STATUS_EN_LIVRAISON) {
-                    // L'entreprise force manuellement en_livraison → marquer le chauffeur busy
-                    $freedDriver->update(['status' => 'busy']);
+                    $driver->update(['status' => 'busy']);
                 }
             }
         }
@@ -445,7 +497,13 @@ class OrderController extends Controller
         abort_unless((int) $order->delivery_company_id === $company->id, 403);
         abort_unless(!in_array($order->status, [Order::STATUS_LIVREE, Order::STATUS_ANNULEE]), 422, 'Impossible d\'annuler cette commande.');
 
+        $driverId = $order->driver_id;
         $order->update(['status' => Order::STATUS_ANNULEE]);
+
+        if ($driverId) {
+            $driver = Driver::find($driverId);
+            if ($driver) $this->releaseDriverIfFree($driver);
+        }
 
         return response()->json(['success' => true]);
     }
@@ -470,10 +528,24 @@ class OrderController extends Controller
         $company = $this->company();
         $ids = $request->validate(['order_ids' => 'required|array|min:1'])['order_ids'];
 
+        // Récupérer les driver_ids concernés avant l'annulation
+        $driverIds = Order::whereIn('id', $ids)
+            ->where('delivery_company_id', $company->id)
+            ->whereNotIn('status', [Order::STATUS_LIVREE, Order::STATUS_ANNULEE])
+            ->whereNotNull('driver_id')
+            ->pluck('driver_id')
+            ->unique();
+
         $count = Order::whereIn('id', $ids)
             ->where('delivery_company_id', $company->id)
             ->whereNotIn('status', [Order::STATUS_LIVREE, Order::STATUS_ANNULEE])
             ->update(['status' => Order::STATUS_ANNULEE]);
+
+        // Libérer les chauffeurs qui n'ont plus de commandes actives
+        foreach ($driverIds as $driverId) {
+            $driver = Driver::find($driverId);
+            if ($driver) $this->releaseDriverIfFree($driver);
+        }
 
         return response()->json(['success' => true, 'count' => $count]);
     }

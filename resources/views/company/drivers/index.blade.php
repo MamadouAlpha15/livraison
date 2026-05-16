@@ -636,10 +636,21 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
                         @endphp
                         <div class="dc-status-info">
                             <span class="dc-status-info-label">Statut</span>
-                            <span class="dc-status-pill {{ $pillCfg[0] }}">
-                                <span class="dc-status-dot-sm {{ $pillCfg[1] }}"></span>
-                                {{ $pillCfg[2] }}
-                            </span>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span class="dc-status-pill {{ $pillCfg[0] }}">
+                                    <span class="dc-status-dot-sm {{ $pillCfg[1] }}"></span>
+                                    {{ $pillCfg[2] }}
+                                </span>
+                                @if($driver->status === 'busy' && ($driver->en_cours_count ?? 0) === 0)
+                                <form method="POST" action="{{ route('company.drivers.release', $driver) }}" style="margin:0;">
+                                    @csrf
+                                    <button type="submit" title="Libérer ce chauffeur (aucune commande active)"
+                                        style="background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.35);color:#f59e0b;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;cursor:pointer;">
+                                        🔓 Libérer
+                                    </button>
+                                </form>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>

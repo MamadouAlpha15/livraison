@@ -24,16 +24,14 @@ class SupportMessageController extends Controller
             'body'      => $data['body'],
         ]);
 
-        // Email la contre-partie : si client parle -> staff; si staff parle -> client
-        $notifyUsers = collect();
-        if ($r->user()->id === $ticket->user_id) {
-            // créateur (client) a parlé -> notifier staff
-            $notifyUsers = $this->staffRecipients($ticket);
+        // Notifier la contre-partie : boutique → SuperAdmin, SuperAdmin → créateur du ticket
+        $sender = $r->user();
+        if ($sender->role === 'superadmin') {
+            $notify = collect([$ticket->creator]);
         } else {
-            // staff a parlé -> notifier le client
-            $notifyUsers = collect([$ticket->creator]);
+            $notify = \App\Models\User::where('role', 'superadmin')->get();
         }
-        foreach ($notifyUsers as $u) {
+        foreach ($notify as $u) {
             $u->notify(new NewSupportMessage($msg));
         }
 

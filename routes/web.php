@@ -214,6 +214,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/drivers/{driver}/edit',         [DriverController::class, 'edit'])         ->name('company.drivers.edit');
         Route::put('/drivers/{driver}',              [DriverController::class, 'update'])       ->name('company.drivers.update');
         Route::patch('/drivers/{driver}/status',     [DriverController::class, 'updateStatus']) ->name('company.drivers.status');
+        Route::post('/drivers/{driver}/release',     [DriverController::class, 'release'])      ->name('company.drivers.release');
         Route::delete('/drivers/{driver}',           [DriverController::class, 'destroy'])      ->name('company.drivers.destroy');
 
         /* Commandes (vue globale entreprise de livraison) */
@@ -332,6 +333,7 @@ Route::middleware(['auth', 'role:superadmin'])
 
         /* Tableau de bord */
         Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
+        Route::get('/dashboard/stats', [AdminDashboard::class, 'stats'])->name('dashboard.stats');
 
         /* Gestion des boutiques */
         Route::resource('shops', AdminShopController::class)->only(['index', 'update']);
@@ -366,6 +368,36 @@ Route::middleware(['auth', 'role:superadmin'])
         Route::post('/entreprises/{entreprise}/approve', [\App\Http\Controllers\Admin\EntrepriseController::class, 'approve'])->name('entreprises.approve');
         Route::post('/entreprises/{entreprise}/reject', [\App\Http\Controllers\Admin\EntrepriseController::class, 'reject'])->name('entreprises.reject');
         Route::post('/entreprises/{entreprise}/toggle', [\App\Http\Controllers\Admin\EntrepriseController::class, 'toggleActive'])->name('entreprises.toggle');
+
+        /* Paiements (vue globale superadmin) */
+        Route::get('/paiements', [\App\Http\Controllers\Admin\PaymentController::class, 'index'])->name('paiements.index');
+        Route::post('/paiements/{payment}/mark-paid', [\App\Http\Controllers\Admin\PaymentController::class, 'markPaid'])->name('paiements.mark-paid');
+
+        /* Commissions livreurs (vue globale superadmin) */
+        Route::get('/commissions', [\App\Http\Controllers\Admin\CommissionController::class, 'index'])->name('commissions.index');
+        Route::post('/commissions/{commission}/mark-paid', [\App\Http\Controllers\Admin\CommissionController::class, 'markPaid'])->name('commissions.mark-paid');
+
+        /* Tous les utilisateurs (vue globale superadmin) */
+        Route::get('/users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');
+
+        /* Revenus plateforme (vue globale superadmin) */
+        Route::get('/revenus', [\App\Http\Controllers\Admin\RevenusController::class, 'index'])->name('revenus.index');
+
+        /* Revenus par boutique */
+        Route::get('/revenus/boutiques', [\App\Http\Controllers\Admin\RevenusShopsController::class, 'index'])->name('revenus-boutiques.index');
+        Route::get('/revenus/boutiques/{shop}', [\App\Http\Controllers\Admin\RevenusShopsController::class, 'show'])->name('revenus-boutiques.show');
+
+        /* Revenus par entreprise de livraison */
+        Route::get('/revenus/entreprises', [\App\Http\Controllers\Admin\RevenusEntreprisesController::class, 'index'])->name('revenus-entreprises.index');
+        Route::get('/revenus/entreprises/{company}', [\App\Http\Controllers\Admin\RevenusEntreprisesController::class, 'show'])->name('revenus-entreprises.show');
+
+        /* Avis & Notation */
+        Route::get('/avis', [\App\Http\Controllers\Admin\AvisController::class, 'index'])->name('avis.index');
+        Route::delete('/avis/boutique/{review}', [\App\Http\Controllers\Admin\AvisController::class, 'destroyShop'])->name('avis.destroy-shop');
+        Route::delete('/avis/entreprise/{review}', [\App\Http\Controllers\Admin\AvisController::class, 'destroyCompany'])->name('avis.destroy-company');
+
+        /* Tickets support (vue SuperAdmin) */
+        Route::get('/support', [\App\Http\Controllers\Support\SupportTicketController::class, 'index'])->name('support.index');
 
         /* Validation d'une entreprise de livraison (dashboard) */
         Route::post('/companies/{company}/approve', [DashboardController::class, 'approveCompany'])

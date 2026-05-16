@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 @php $bodyClass = 'is-dashboard'; @endphp
 
 @push('styles')
@@ -89,6 +89,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .kpi-v{font-size:24px;font-weight:900;color:var(--text);letter-spacing:-1px;line-height:1;margin-bottom:4px}
 .kpi-l{font-size:11.5px;color:var(--muted);font-weight:500}
 .kpi-s{font-size:10px;color:rgba(100,116,139,.55);margin-top:2px}
+
+/* svg sidebar icons */
+.sb-i{width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:.85}
+.sb-a:hover .sb-i,.sb-a.on .sb-i{opacity:1}
+.sb-ft-ico{width:16px;height:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:.7}
+.sb-ft-row:hover .sb-ft-ico{opacity:1}
 
 /* live pulse */
 .pulse-wrap{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:var(--green)}
@@ -185,6 +191,50 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
     $bp        = array_filter(['company_id'=>$curCo,'search'=>$curSearch]);
 
     $now = now();
+
+    /* ═══ BIBLIOTHÈQUE D'ICÔNES SVG PREMIUM ═══ */
+    $s = 'stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"';
+    $sl= 'stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"';
+    $I = [
+        'brand_lg'=> '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h9l-1 8L21 10h-9l1-8z"/></svg>',
+        'home'   => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+        'store'  => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+        'bag'    => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+        'box'    => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>',
+        'brief'  => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
+        'user'   => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+        'users'  => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+        'truck'  => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3"/><rect width="7" height="7" x="14" y="12" rx="1"/><path d="M5 17a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/><path d="M15 19a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/></svg>',
+        'bike'   => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>',
+        'map'    => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>',
+        'pin'    => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+        'card'   => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>',
+        'trend'  => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
+        'dollar' => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+        'receipt'=> '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M14 8H8m8 4H8m5 4H8"/></svg>',
+        'star'   => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+        'ticket' => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3Z"/></svg>',
+        'cog'    => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>',
+        'logout' => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
+        'profile'=> '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+        'close'  => '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+        'menu'   => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>',
+        'chevron'=> '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>',
+        // Grandes versions pour KPI / contenu
+        'bike_lg'  => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" '.$sl.'><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>',
+        'signal_lg'=> '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" '.$sl.'><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/></svg>',
+        'pin_lg'   => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" '.$sl.'><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+        'ban_lg'   => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" '.$sl.'><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>',
+        'nav_lg'   => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" '.$sl.'><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>',
+        'map_lg'   => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" '.$sl.'><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>',
+        'refresh'  => '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" '.$sl.'><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>',
+        'truck_sm' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3"/><rect width="7" height="7" x="14" y="12" rx="1"/><path d="M5 17a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/><path d="M15 19a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/></svg>',
+        'store_sm' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+        'phone_sm' => '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.34 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+        'loc_sm'   => '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+        'eye_sm'   => '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>',
+        'bike_sm'  => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>',
+    ];
 @endphp
 
 <div class="sa">
@@ -192,12 +242,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 {{-- ════════ SIDEBAR ════════ --}}
 <aside class="sb" id="sb">
     <div class="sb-logo">
-        <div class="sb-ico-wrap">⚡</div>
+        <div class="sb-ico-wrap">{!! $I['brand_lg'] !!}</div>
         <div>
             <div class="sb-appname">{{ config('app.name','Shopio') }}</div>
             <div class="sb-apptag">Plateforme · Super Admin</div>
         </div>
-        <button class="sb-close" onclick="closeSb()" title="Fermer">✕</button>
+        <button class="sb-close" onclick="closeSb()" title="Fermer">{!! $I['close'] !!}</button>
     </div>
     <div class="sb-me">
         <div class="sb-av">{{ $meInit }}</div>
@@ -207,44 +257,49 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
         </div>
     </div>
     <nav class="sb-nav">
-        <a href="{{ route('admin.dashboard') }}" class="sb-a"><span class="sb-i">🏠</span><span>Vue d'ensemble</span></a>
+        <a href="{{ route('admin.dashboard') }}" class="sb-a"><span class="sb-i">{!! $I['home'] !!}</span><span>Vue d'ensemble</span></a>
         <div class="sb-sec shop">── SaaS Boutiques</div>
-        <a href="{{ route('admin.shops.index') }}" class="sb-a"><span class="sb-i">🏪</span><span>Boutiques</span></a>
-        <a href="{{ route('admin.products.index') }}" class="sb-a"><span class="sb-i">🛍️</span><span>Produits</span></a>
-        <a href="{{ route('admin.orders.index') }}" class="sb-a"><span class="sb-i">📦</span><span>Commandes boutiques</span></a>
-        <a href="{{ route('admin.vendeurs.index') }}" class="sb-a"><span class="sb-i">👔</span><span>Vendeurs &amp; Employés</span></a>
-        <a href="{{ route('admin.clients.index') }}" class="sb-a"><span class="sb-i">🧑‍💼</span><span>Clients boutiques</span></a>
+        <a href="{{ route('admin.shops.index') }}" class="sb-a"><span class="sb-i">{!! $I['store'] !!}</span><span>Boutiques</span></a>
+        <a href="{{ route('admin.products.index') }}" class="sb-a"><span class="sb-i">{!! $I['bag'] !!}</span><span>Produits</span></a>
+        <a href="{{ route('admin.orders.index') }}" class="sb-a"><span class="sb-i">{!! $I['box'] !!}</span><span>Commandes boutiques</span></a>
+        <a href="{{ route('admin.vendeurs.index') }}" class="sb-a"><span class="sb-i">{!! $I['brief'] !!}</span><span>Vendeurs &amp; Employés</span></a>
+        <a href="{{ route('admin.clients.index') }}" class="sb-a"><span class="sb-i">{!! $I['user'] !!}</span><span>Clients boutiques</span></a>
         <div class="sb-sec livr">── SaaS Livraison</div>
         <a href="{{ route('admin.entreprises.index') }}" class="sb-a">
-            <span class="sb-i">🚚</span><span>Entreprises livraison</span>
+            <span class="sb-i">{!! $I['truck'] !!}</span><span>Entreprises livraison</span>
             @if($totalPending>0)<span class="sb-pill r">{{ $totalPending }}</span>@endif
         </a>
-        <a href="{{ route('admin.livreurs.index') }}" class="sb-a"><span class="sb-i">🏍️</span><span>Livreurs</span></a>
-        <a href="{{ route('admin.zones.index') }}" class="sb-a"><span class="sb-i">🗺️</span><span>Zones de livraison</span></a>
+        <a href="{{ route('admin.livreurs.index') }}" class="sb-a"><span class="sb-i">{!! $I['bike'] !!}</span><span>Livreurs</span></a>
+        <a href="{{ route('admin.zones.index') }}" class="sb-a"><span class="sb-i">{!! $I['map'] !!}</span><span>Zones de livraison</span></a>
         <a href="{{ route('admin.suivi.index') }}" class="sb-a on">
-            <span class="sb-i">📍</span><span>Suivi en temps réel</span>
+            <span class="sb-i">{!! $I['pin'] !!}</span><span>Suivi en temps réel</span>
             @if($stats['en_livraison']>0)<span class="sb-pill g">{{ $stats['en_livraison'] }}</span>@endif
         </a>
         <div class="sb-sec fin">── Finance</div>
-        <a href="#" class="sb-a" onclick="nt();return false"><span class="sb-i">💳</span><span>Paiements</span></a>
-        <a href="#" class="sb-a" onclick="nt();return false"><span class="sb-i">💹</span><span>Commissions</span></a>
-        <a href="#" class="sb-a" onclick="nt();return false"><span class="sb-i">💰</span><span>Revenus plateforme</span></a>
-        <a href="#" class="sb-a" onclick="nt();return false"><span class="sb-i">🧾</span><span>Factures &amp; Exports</span></a>
+        <a href="{{ route('admin.paiements.index') }}" class="sb-a"><span class="sb-i">{!! $I['card'] !!}</span><span>Paiements</span></a>
+        <a href="{{ route('admin.commissions.index') }}" class="sb-a"><span class="sb-i">{!! $I['trend'] !!}</span><span>Commissions</span></a>
+        <a href="{{ route('admin.revenus-boutiques.index') }}" class="sb-a"><span class="sb-i">{!! $I['store'] !!}</span><span>Revenus boutiques</span></a>
+        <a href="{{ route('admin.revenus-entreprises.index') }}" class="sb-a"><span class="sb-i">{!! $I['truck'] !!}</span><span>Revenus entreprises</span></a>
+        <a href="{{ route('admin.revenus.index') }}" class="sb-a"><span class="sb-i">{!! $I['dollar'] !!}</span><span>Revenus plateforme</span></a>
+        <a href="#" class="sb-a" onclick="nt();return false"><span class="sb-i">{!! $I['receipt'] !!}</span><span>Factures &amp; Exports</span></a>
         <div class="sb-sec plat">── Plateforme</div>
-        <a href="#" class="sb-a" onclick="nt();return false"><span class="sb-i">👥</span><span>Tous les utilisateurs</span></a>
-        <a href="#" class="sb-a" onclick="nt();return false"><span class="sb-i">📊</span><span>Rapports globaux</span></a>
-        <a href="#" class="sb-a" onclick="nt();return false"><span class="sb-i">⭐</span><span>Avis &amp; Notation</span></a>
-        <a href="#" class="sb-a" onclick="nt();return false"><span class="sb-i">🎫</span><span>Tickets support</span></a>
-        <a href="#" class="sb-a" onclick="nt();return false"><span class="sb-i">⚙️</span><span>Paramètres système</span></a>
+        <a href="{{ route('admin.users.index') }}" class="sb-a"><span class="sb-i">{!! $I['users'] !!}</span><span>Tous les utilisateurs</span></a>
+        <a href="{{ route('admin.avis.index') }}" class="sb-a"><span class="sb-i">{!! $I['star'] !!}</span><span>Avis &amp; Notation</span></a>
+        <a href="{{ route('admin.support.index') }}" class="sb-a"><span class="sb-i">{!! $I['ticket'] !!}</span><span>Tickets support</span></a>
+        <a href="#" class="sb-a" onclick="nt();return false"><span class="sb-i">{!! $I['cog'] !!}</span><span>Paramètres système</span></a>
     </nav>
     <div class="sb-ft">
         <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;font-size:11.5px;color:rgba(255,255,255,.6);font-weight:600">
             <div class="live-dot"></div>Système opérationnel
         </div>
-        <a href="{{ route('profile.edit') }}" class="sb-ft-row"><span style="font-size:14px">👤</span>Mon profil</a>
+        <a href="{{ route('profile.edit') }}" class="sb-ft-row">
+            <span class="sb-ft-ico">{!! $I['profile'] !!}</span>Mon profil
+        </a>
         <form method="POST" action="{{ route('logout') }}" style="margin:0">
             @csrf
-            <button type="submit" class="sb-ft-row"><span style="font-size:14px">⎋</span>Déconnexion</button>
+            <button type="submit" class="sb-ft-row">
+                <span class="sb-ft-ico">{!! $I['logout'] !!}</span>Déconnexion
+            </button>
         </form>
     </div>
 </aside>
@@ -253,11 +308,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 {{-- ════════ MAIN ════════ --}}
 <div class="mn">
 <header class="tb">
-    <button class="ham" onclick="toggleSb()">☰</button>
+    <button class="ham" onclick="toggleSb()">{!! $I['menu'] !!}</button>
     <div class="tb-ttl">Super<b>Admin</b></div>
     <div class="tb-sp"></div>
     <div class="tb-acts">
-        <a href="{{ route('profile.edit') }}" class="tb-btn" title="Profil">👤</a>
+        <a href="{{ route('profile.edit') }}" class="tb-btn" title="Profil">{!! $I['profile'] !!}</a>
     </div>
     <div style="position:relative">
         <button class="tb-user" id="tbU" onclick="toggleDrop()">
@@ -266,14 +321,18 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
                 <div class="tb-uname">{{ Str::limit($meName,14) }}</div>
                 <div class="tb-urole">SuperAdmin</div>
             </div>
-            <span style="font-size:11px;color:var(--muted)">▾</span>
+            <span style="display:flex;align-items:center;color:var(--muted)">{!! $I['chevron'] !!}</span>
         </button>
         <div class="drop" id="drop">
-            <a href="{{ route('profile.edit') }}" class="drop-i">👤 Mon profil</a>
+            <a href="{{ route('profile.edit') }}" class="drop-i">
+                <span style="display:flex">{!! $I['profile'] !!}</span> Mon profil
+            </a>
             <div class="drop-sep"></div>
             <form method="POST" action="{{ route('logout') }}" style="margin:0">
                 @csrf
-                <button type="submit" class="drop-i d">⎋ Déconnexion</button>
+                <button type="submit" class="drop-i d">
+                    <span style="display:flex">{!! $I['logout'] !!}</span> Déconnexion
+                </button>
             </form>
         </div>
     </div>
@@ -283,7 +342,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 
     {{-- Breadcrumb --}}
     <div class="bc">
-        <a href="{{ route('admin.dashboard') }}">⚡ Accueil</a>
+        <a href="{{ route('admin.dashboard') }}">
+            <span style="display:inline-flex;align-items:center;gap:4px">{!! $I['home'] !!} Accueil</span>
+        </a>
         <span class="bs">›</span>
         <span style="color:var(--text);font-weight:600">Suivi en temps réel</span>
     </div>
@@ -291,7 +352,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
     {{-- Page header --}}
     <div class="ph">
         <div>
-            <h1>📍 Suivi en temps réel</h1>
+            <h1 style="display:flex;align-items:center;gap:10px">
+                <span style="display:inline-flex;width:34px;height:34px;background:rgba(124,58,237,.1);border-radius:9px;align-items:center;justify-content:center;color:var(--brand)">{!! $I['pin_lg'] !!}</span>
+                Suivi en temps réel
+            </h1>
             <div class="ph-sub">
                 Toutes les livraisons en cours · GPS actif
                 @if($stats['live']>0)
@@ -299,39 +363,39 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
                 @endif
             </div>
         </div>
-        <button onclick="location.reload()" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:var(--bg);border:1px solid var(--bd);font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:var(--font);transition:all .13s" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='var(--bg)'">
-            🔄 Actualiser
+        <button onclick="location.reload()" style="display:inline-flex;align-items:center;gap:7px;padding:8px 15px;border-radius:8px;background:var(--bg);border:1px solid var(--bd);font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:var(--font);transition:all .13s" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='var(--bg)'">
+            {!! $I['refresh'] !!} Actualiser
         </button>
     </div>
 
     {{-- Stats --}}
     <div class="kpi-g">
         <div class="kpi a">
-            <div class="kpi-ic a">🛵</div>
+            <div class="kpi-ic a" style="color:var(--amber)">{!! $I['bike_lg'] !!}</div>
             <div class="kpi-v">{{ $stats['en_livraison'] }}</div>
             <div class="kpi-l">En livraison</div>
             <div class="kpi-s">Commandes actives</div>
         </div>
         <div class="kpi g">
-            <div class="kpi-ic g">📡</div>
+            <div class="kpi-ic g" style="color:var(--green)">{!! $I['signal_lg'] !!}</div>
             <div class="kpi-v">{{ $stats['live'] }}</div>
             <div class="kpi-l">GPS live</div>
             <div class="kpi-s">Ping &lt; 5 min</div>
         </div>
         <div class="kpi b">
-            <div class="kpi-ic b">📍</div>
+            <div class="kpi-ic b" style="color:var(--blue)">{!! $I['pin_lg'] !!}</div>
             <div class="kpi-v">{{ $stats['avec_gps'] }}</div>
             <div class="kpi-l">Avec position</div>
             <div class="kpi-s">GPS transmis</div>
         </div>
         <div class="kpi r">
-            <div class="kpi-ic r">🚫</div>
+            <div class="kpi-ic r" style="color:var(--red)">{!! $I['ban_lg'] !!}</div>
             <div class="kpi-v">{{ $stats['sans_gps'] }}</div>
             <div class="kpi-l">Sans GPS</div>
             <div class="kpi-s">Pas de position</div>
         </div>
         <div class="kpi p">
-            <div class="kpi-ic p">🏍️</div>
+            <div class="kpi-ic p" style="color:var(--brand)">{!! $I['nav_lg'] !!}</div>
             <div class="kpi-v">{{ $stats['livreurs_busy'] }}</div>
             <div class="kpi-l">Livreurs actifs</div>
             <div class="kpi-s">Statut "En livraison"</div>
@@ -342,7 +406,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
     <div class="map-card">
         <div class="map-hd">
             <div class="map-ht">
-                🗺️ Carte des livraisons
+                <span style="display:inline-flex;color:var(--brand)">{!! $I['map_lg'] !!}</span>
+                Carte des livraisons
                 @if($mapPoints->count()>0)
                     <span style="font-size:11px;font-weight:600;color:var(--muted)">({{ $mapPoints->count() }} position(s))</span>
                 @endif
@@ -366,11 +431,17 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
         <a href="{{ route('admin.suivi.index', $bp) }}"
            class="chip {{ $curGps==='' ? 'on' : '' }}">Toutes</a>
         <a href="{{ route('admin.suivi.index', array_merge($bp,['gps'=>'live'])) }}"
-           class="chip live-chip {{ $curGps==='live' ? 'on' : '' }}">📡 GPS live</a>
+           class="chip live-chip {{ $curGps==='live' ? 'on' : '' }}">
+            <span style="display:inline-flex">{!! $I['signal_lg'] !!}</span> GPS live
+        </a>
         <a href="{{ route('admin.suivi.index', array_merge($bp,['gps'=>'with'])) }}"
-           class="chip gps-chip {{ $curGps==='with' ? 'on' : '' }}">📍 Avec GPS</a>
+           class="chip gps-chip {{ $curGps==='with' ? 'on' : '' }}">
+            <span style="display:inline-flex">{!! $I['pin_lg'] !!}</span> Avec GPS
+        </a>
         <a href="{{ route('admin.suivi.index', array_merge($bp,['gps'=>'without'])) }}"
-           class="chip {{ $curGps==='without' ? 'on' : '' }}">🚫 Sans GPS</a>
+           class="chip {{ $curGps==='without' ? 'on' : '' }}">
+            <span style="display:inline-flex">{!! $I['ban_lg'] !!}</span> Sans GPS
+        </a>
     </div>
 
     {{-- Filter bar --}}
@@ -395,14 +466,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
     <div class="sc">
         <div class="sc-h">
             <div class="sc-t">
-                🛵 Livraisons en cours
+                <span style="display:inline-flex;color:var(--amber)">{!! $I['bike_lg'] !!}</span> Livraisons en cours
                 <span style="font-size:11px;font-weight:600;color:var(--muted)">({{ $orders->total() }})</span>
             </div>
         </div>
 
         @if($orders->isEmpty())
             <div class="empty">
-                <div class="empty-ico">📍</div>
+                <div class="empty-ico" style="display:flex;justify-content:center;opacity:.25;margin-bottom:10px;font-size:36px">{!! $I['pin_lg'] !!}</div>
                 <div class="empty-t">Aucune livraison en cours</div>
                 <div class="empty-s">Toutes les commandes sont livrées ou en attente.</div>
             </div>
@@ -439,7 +510,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
                                 <span class="t-id">#{{ $order->id }}</span>
                             </div>
                             @if($order->shop)
-                                <div class="t-sub" style="margin-top:3px">🏪 {{ $order->shop->name }}</div>
+                                <div class="t-sub" style="margin-top:3px;display:flex;align-items:center;gap:3px"><span style="display:inline-flex;opacity:.65">{!! $I['store_sm'] !!}</span> {{ $order->shop->name }}</div>
                             @endif
                         </td>
 
@@ -448,7 +519,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
                             @if($order->client)
                                 <div class="t-name">{{ $order->client->name }}</div>
                                 @if($order->client_phone)
-                                    <div class="t-sub">📞 {{ $order->client_phone }}</div>
+                                    <div class="t-sub" style="display:flex;align-items:center;gap:3px"><span style="display:inline-flex;opacity:.65">{!! $I['phone_sm'] !!}</span> {{ $order->client_phone }}</div>
                                 @endif
                             @else
                                 <span style="color:var(--muted)">—</span>
@@ -458,8 +529,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
                         {{-- Destination --}}
                         <td style="max-width:180px">
                             @if($order->delivery_destination)
-                                <div style="font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:175px" title="{{ $order->delivery_destination }}">
-                                    📌 {{ $order->delivery_destination }}
+                                <div style="font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:175px;display:flex;align-items:center;gap:3px" title="{{ $order->delivery_destination }}">
+                                    <span style="display:inline-flex;flex-shrink:0;opacity:.65">{!! $I['loc_sm'] !!}</span> {{ $order->delivery_destination }}
                                 </div>
                             @else
                                 <span style="color:var(--muted)">—</span>
@@ -472,7 +543,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
                         {{-- Livreur --}}
                         <td>
                             @if($livreurName)
-                                <span class="bdg b">🏍️ {{ $livreurName }}</span>
+                                <span class="bdg b" style="display:inline-flex;align-items:center;gap:4px"><span style="display:inline-flex">{!! $I['bike_sm'] !!}</span> {{ $livreurName }}</span>
                             @else
                                 <span style="color:var(--muted)">Non assigné</span>
                             @endif
@@ -481,7 +552,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
                         {{-- Entreprise --}}
                         <td>
                             @if($order->deliveryCompany)
-                                <div style="font-size:12px;font-weight:600;color:var(--brand)">🚚 {{ $order->deliveryCompany->name }}</div>
+                                <div style="font-size:12px;font-weight:600;color:var(--brand);display:flex;align-items:center;gap:4px"><span style="display:inline-flex">{!! $I['truck_sm'] !!}</span> {{ $order->deliveryCompany->name }}</div>
                             @else
                                 <span style="color:var(--muted)">—</span>
                             @endif
@@ -493,8 +564,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
                                 <span class="gps-live">Live</span>
                                 @if($hasGps)
                                 <button onclick="flyTo({{ $order->current_lat }},{{ $order->current_lng }},'#{{ $order->id }}')"
-                                        class="btn-map" style="margin-top:4px;display:block">
-                                    🗺️ Voir sur carte
+                                        class="btn-map" style="margin-top:4px;display:inline-flex">
+                                    {!! $I['eye_sm'] !!} Voir sur carte
                                 </button>
                                 @endif
                             @elseif($isOld)

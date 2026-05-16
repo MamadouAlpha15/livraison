@@ -610,6 +610,21 @@ class BoutiqueMessageController extends Controller
                 'time'         => $m->created_at->format('H:i'),
             ]);
 
+        /* ── Réponses SuperAdmin sur les tickets support de cette boutique ── */
+        $latestSupportReplies = \App\Models\SupportMessage::whereHas('ticket', fn($q) => $q->where('shop_id', $shop->id))
+            ->whereHas('author', fn($q) => $q->where('role', 'superadmin'))
+            ->with(['ticket:id,subject', 'author:id,name'])
+            ->orderByDesc('id')
+            ->limit(10)
+            ->get()
+            ->map(fn($m) => [
+                'id'              => $m->id,
+                'ticket_id'       => $m->ticket_id,
+                'ticket_subject'  => \Illuminate\Support\Str::limit($m->ticket?->subject ?? 'Ticket #'.$m->ticket_id, 55),
+                'body'            => \Illuminate\Support\Str::limit($m->body ?? '', 60),
+                'time'            => $m->created_at->format('H:i'),
+            ]);
+
         return response()->json([
             'messages_unread'          => $messagesUnread,
             'orders_pending'           => $ordersPending,
@@ -618,6 +633,7 @@ class BoutiqueMessageController extends Controller
             'latest_messages'          => $latestMessages,
             'company_messages_unread'  => $companyMessagesUnread,
             'latest_company_messages'  => $latestCompanyMessages,
+            'support_replies'          => $latestSupportReplies,
         ]);
     }
 }

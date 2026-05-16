@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use App\Models\Order;
 
 class DeliveryCompany extends Model
 {
@@ -56,7 +57,12 @@ class DeliveryCompany extends Model
 
     public function drivers()
     {
-        return $this->hasMany(Driver::class); // peut avoir plusieurs chauffeurs
+        return $this->hasMany(Driver::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'delivery_company_id');
     }
 
     public function messages()
