@@ -2,6 +2,42 @@
 @section('title', 'Support · ' . ($shop->name ?? 'Boutique'))
 @php $bodyClass = 'is-dashboard'; @endphp
 
+@php
+$_s  = 'stroke-width="1.75"';
+$_s2 = 'stroke-width="2"';
+$_s1 = 'stroke-width="1.5"';
+$I   = [];
+/* sidebar 17px */
+$I['dash_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>';
+$I['msg_nav']   = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+$I['box_nav']   = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>';
+$I['tag_nav']   = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>';
+$I['users_nav'] = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+$I['team_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>';
+$I['bike_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1l-5 8h8"/><path d="M12 6l2.5 5"/></svg>';
+$I['bldg_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>';
+$I['coin_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="14" x2="15" y2="14"/></svg>';
+$I['card_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
+$I['chart_nav'] = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>';
+$I['list_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><path d="M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2"/><path d="M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"/><polyline points="9 12 11 14 15 10"/></svg>';
+$I['gear_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+$I['hdp_nav']   = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>';
+/* topbar 15px */
+$I['hdp_tb']    = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>';
+/* flash 14px */
+$I['check_flash'] = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3730a3" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+/* empty-state 40px */
+$I['hdp_empty'] = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s1.' stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>';
+/* ticket icon 20px */
+$I['hdp_tk']    = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>';
+$I['check_tk']  = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+/* store badge 12px */
+$I['store_meta'] = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9z"/><path d="M3 9l2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9"/><line x1="12" y1="3" x2="12" y2="9"/></svg>';
+/* mobile header icon 13px */
+$I['hdp_mob']   = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6366f1" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>';
+$I['check_mob'] = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+@endphp
+
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -104,7 +140,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .tk-row{display:flex;align-items:center;gap:14px;padding:15px 18px;border-bottom:1px solid var(--border);text-decoration:none;color:var(--text);transition:background .14s;}
 .tk-row:last-child{border-bottom:none;}
 .tk-row:hover{background:#f8fafc;}
-.tk-ico{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.tk-ico{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .tk-ico.open{background:rgba(99,102,241,.1);}
 .tk-ico.closed{background:#f1f5f9;}
 .tk-body{flex:1;min-width:0;}
@@ -129,7 +165,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 
 /* Empty state */
 .empty-state{padding:56px 20px;text-align:center;}
-.empty-state .ico{font-size:44px;display:block;margin-bottom:14px;}
+.empty-state .ico{display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
 .empty-state p{font-size:14px;color:var(--muted);}
 
 /* ── Responsive ── */
@@ -197,32 +233,32 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
         </div>
     </div>
     <nav class="sb-nav">
-        <a href="{{ route('boutique.dashboard') }}" class="sb-item" style="margin-bottom:4px"><span class="ico">⊞</span> Tableau de bord</a>
+        <a href="{{ route('boutique.dashboard') }}" class="sb-item" style="margin-bottom:4px"><span class="ico">{!! $I['dash_nav'] !!}</span> Tableau de bord</a>
         <div class="sb-section">Boutique</div>
-        <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">💬</span> Messages</a>
-        <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">📦</span> Commandes</a>
-        <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">🏷️</span> Produits</a>
-        <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">👥</span> Clients</a>
-        <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">🧑‍💼</span> Équipe</a>
+        <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">{!! $I['msg_nav'] !!}</span> Messages</a>
+        <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">{!! $I['box_nav'] !!}</span> Commandes</a>
+        <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">{!! $I['tag_nav'] !!}</span> Produits</a>
+        <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">{!! $I['users_nav'] !!}</span> Clients</a>
+        <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">{!! $I['team_nav'] !!}</span> Équipe</a>
         <div class="sb-section">Livraison</div>
-        <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">🚴</span> Livreurs</a>
-        <a href="{{ route('delivery.companies.index') }}" class="sb-item"><span class="ico">🏢</span> Partenaires</a>
+        <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">{!! $I['bike_nav'] !!}</span> Livreurs</a>
+        <a href="{{ route('delivery.companies.index') }}" class="sb-item"><span class="ico">{!! $I['bldg_nav'] !!}</span> Partenaires</a>
         <div class="sb-section">Finances</div>
         <div class="sb-group">
             <button class="sb-group-toggle" onclick="toggleGroup(this)" type="button">
-                <span class="ico">💰</span> Finances &amp; Rapports <span class="sb-arrow">▶</span>
+                <span class="ico">{!! $I['coin_nav'] !!}</span> Finances &amp; Rapports <span class="sb-arrow">▶</span>
             </button>
             <div class="sb-sub">
-                <a href="{{ route('boutique.payments.index') }}" class="sb-item"><span class="ico">💳</span> Paiements</a>
-                <a href="{{ route('boutique.commissions.index') }}" class="sb-item"><span class="ico">📊</span> Commissions</a>
-                <a href="{{ route('boutique.reports.index') }}" class="sb-item"><span class="ico">📋</span> Rapports</a>
+                <a href="{{ route('boutique.payments.index') }}" class="sb-item"><span class="ico">{!! $I['card_nav'] !!}</span> Paiements</a>
+                <a href="{{ route('boutique.commissions.index') }}" class="sb-item"><span class="ico">{!! $I['chart_nav'] !!}</span> Commissions</a>
+                <a href="{{ route('boutique.reports.index') }}" class="sb-item"><span class="ico">{!! $I['list_nav'] !!}</span> Rapports</a>
                 @if($u->role === 'admin')
-                <a href="{{ route('shop.edit', $shop) }}" class="sb-item"><span class="ico">⚙️</span> Paramètres</a>
+                <a href="{{ route('shop.edit', $shop) }}" class="sb-item"><span class="ico">{!! $I['gear_nav'] !!}</span> Paramètres</a>
                 @endif
             </div>
         </div>
         <div class="sb-section">Aide</div>
-        <a href="{{ route('support.index') }}" class="sb-item active"><span class="ico">🎧</span> Support</a>
+        <a href="{{ route('support.index') }}" class="sb-item active"><span class="ico">{!! $I['hdp_nav'] !!}</span> Support</a>
     </nav>
     <div class="sb-footer">
         <a href="{{ route('profile.edit') }}" class="sb-user">
@@ -246,7 +282,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
     <div class="topbar">
         @if(!$isSA && $shop)<button class="btn-hamburger" id="btnMenu">☰</button>@endif
         <div class="tb-info">
-            <div class="tb-title">🎧 Support</div>
+            <div class="tb-title" style="display:flex;align-items:center;gap:6px">{!! $I['hdp_tb'] !!} Support</div>
             <div class="tb-sub">
                 @if($isSA) Tous les tickets plateforme @else {{ $shop->name ?? 'Boutique' }} · Contactez le SuperAdmin @endif
             </div>
@@ -259,7 +295,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
     <div class="content">
 
         @if(session('success'))
-        <div class="flash flash-success">✅ {{ session('success') }}</div>
+        <div class="flash flash-success">{!! $I['check_flash'] !!} {{ session('success') }}</div>
         @endif
 
         {{-- Stats --}}
@@ -280,7 +316,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 
         @if($tickets->isEmpty())
         <div class="empty-state">
-            <span class="ico">🎧</span>
+            <span class="ico">{!! $I['hdp_empty'] !!}</span>
             <p style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px">Aucun ticket de support</p>
             <p>@if($isSA) Aucune boutique n'a ouvert de ticket pour l'instant. @else Créez un ticket si vous avez un problème ou une question. @endif</p>
             @if(!$isSA)<a href="{{ route('support.create') }}" class="btn-new" style="margin:0 auto;display:inline-flex">✚ Ouvrir un ticket</a>@endif
@@ -291,11 +327,11 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
         <div class="tickets-card">
             @foreach($tickets as $t)
             <a href="{{ route('support.show', $t) }}" class="tk-row">
-                <div class="tk-ico {{ $t->status === 'open' ? 'open' : 'closed' }}">{{ $t->status === 'open' ? '🎧' : '✅' }}</div>
+                <div class="tk-ico {{ $t->status === 'open' ? 'open' : 'closed' }}">{!! $t->status === 'open' ? $I['hdp_tk'] : $I['check_tk'] !!}</div>
                 <div class="tk-body">
                     <div class="tk-subject">{{ $t->subject }}</div>
                     <div class="tk-meta">
-                        @if($isSA && $t->shop)<span>🏪 {{ $t->shop->name }}</span> ·@endif
+                        @if($isSA && $t->shop)<span style="display:inline-flex;align-items:center;gap:3px">{!! $I['store_meta'] !!} {{ $t->shop->name }}</span> ·@endif
                         <span>{{ $t->creator->name ?? '—' }}</span>
                         <span class="tk-msgs">· {{ $t->messages_count }} msg</span>
                     </div>
@@ -313,14 +349,14 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
             @foreach($tickets as $t)
             <a href="{{ route('support.show', $t) }}" class="m-card">
                 <div class="m-card-hd">
-                    <div style="font-size:13.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">
-                        {{ $t->status === 'open' ? '🎧' : '✅' }} {{ $t->subject }}
+                    <div style="font-size:13.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;display:flex;align-items:center;gap:5px">
+                        {!! $t->status === 'open' ? $I['hdp_mob'] : $I['check_mob'] !!} {{ $t->subject }}
                     </div>
                     <span class="badge-{{ $t->status }}"><span class="badge-dot"></span>{{ $t->status === 'open' ? 'Ouvert' : 'Fermé' }}</span>
                 </div>
                 <div class="m-card-body">
                     @if($isSA && $t->shop)
-                    <div><div class="m-lbl">Boutique</div><div style="font-size:13px;font-weight:600">🏪 {{ $t->shop->name }}</div></div>
+                    <div><div class="m-lbl">Boutique</div><div style="font-size:13px;font-weight:600;display:flex;align-items:center;gap:3px">{!! $I['store_meta'] !!} {{ $t->shop->name }}</div></div>
                     @endif
                     <div style="display:flex;gap:16px">
                         <div><div class="m-lbl">Ouvert par</div><div style="font-size:12.5px">{{ $t->creator->name ?? '—' }}</div></div>

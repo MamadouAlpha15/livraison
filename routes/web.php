@@ -141,6 +141,10 @@ Route::get('/suivi/{order}/position', [SuiviController::class, 'position'])
 Route::get('/suivi/{order}/data', [SuiviController::class, 'data'])
     ->name('suivi.data');
 
+/* Position GPS du client (public — envoyée depuis la page de suivi) */
+Route::post('/suivi/{order}/client-location', [SuiviController::class, 'updateClientLocation'])
+    ->name('suivi.client-location');
+
 
 /* ══════════════════════════════════════════════════════════════════════════
 |  3. AUTH / PROFIL
@@ -628,6 +632,7 @@ Route::middleware(['auth', 'role:livreur'])
         Route::put('orders/{order}/complete',       [LivreurOrderController::class, 'complete'])     ->name('orders.complete');
         Route::post('orders/start-bulk',            [LivreurOrderController::class, 'startBulk'])    ->name('orders.startBulk');
         Route::post('orders/complete-bulk',         [LivreurOrderController::class, 'completeBulk']) ->name('orders.completeBulk');
+        Route::get('orders/{order}/carte',          [LivreurOrderController::class, 'carte'])        ->name('orders.carte');
 
         /* Disponibilité */
         Route::put('/availability/toggle', [AvailabilityController::class, 'toggle'])->name('availability.toggle');

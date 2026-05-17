@@ -17,6 +17,50 @@
 @section('title', 'Livreurs · ' . $shop->name)
 @php $bodyClass = 'is-dashboard'; @endphp
 
+@php
+$_s  = 'fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"';
+$_s2 = 'fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"';
+$_s1 = 'fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"';
+$I = [
+    /* sidebar nav 17px */
+    'dash_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>',
+    'msg_nav'    => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    'box_nav'    => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+    'tag_nav'    => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>',
+    'users_nav'  => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    'team_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="17"/><line x1="9.5" y1="14.5" x2="14.5" y2="14.5"/></svg>',
+    'bike_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1"/><path d="M5.5 17.5L11 5.5 15 10l2-3h1.5"/><line x1="11" y1="5.5" x2="7" y2="5.5"/></svg>',
+    'bldg_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    'wallet_nav' => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 13a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" fill="currentColor" stroke="none"/></svg>',
+    'card_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+    'chart_nav'  => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+    'list_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+    'gear_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+    'hdp_nav'    => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',
+    /* topbar */
+    'bike_tb'    => '<svg width="15" height="15" viewBox="0 0 24 24" '.$_s2.'><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1"/><path d="M5.5 17.5L11 5.5 15 10l2-3h1.5"/><line x1="11" y1="5.5" x2="7" y2="5.5"/></svg>',
+    'plus_tb'    => '<svg width="13" height="13" viewBox="0 0 24 24" '.$_s2.'><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+    /* stat cards 22px */
+    'bike_stat'    => '<svg width="22" height="22" viewBox="0 0 24 24" '.$_s.'><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1"/><path d="M5.5 17.5L11 5.5 15 10l2-3h1.5"/><line x1="11" y1="5.5" x2="7" y2="5.5"/></svg>',
+    'online_stat'  => '<svg width="22" height="22" viewBox="0 0 24 24" '.$_s.'><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>',
+    'box_stat'     => '<svg width="22" height="22" viewBox="0 0 24 24" '.$_s.'><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+    'offline_stat' => '<svg width="22" height="22" viewBox="0 0 24 24" '.$_s.'><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>',
+    /* section header dots 10px */
+    'dot_online'  => '<svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="#10b981"/></svg>',
+    'dot_offline' => '<svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="none" stroke="#94a3b8" stroke-width="1.5"/></svg>',
+    'list_hd'     => '<svg width="14" height="14" viewBox="0 0 24 24" '.$_s2.'><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>',
+    /* phone / trash / plus */
+    'phone_lnk'  => '<svg width="11" height="11" viewBox="0 0 24 24" '.$_s2.'><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.84a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+    'trash_btn'  => '<svg width="13" height="13" viewBox="0 0 24 24" '.$_s2.'><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>',
+    /* mobile labels 11px */
+    'box_lbl'    => '<svg width="11" height="11" viewBox="0 0 24 24" '.$_s2.'><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+    'bolt_lbl'   => '<svg width="11" height="11" viewBox="0 0 24 24" '.$_s2.'><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+    /* empty states */
+    'bike_empty_sm' => '<svg width="36" height="36" viewBox="0 0 24 24" '.$_s1.' style="opacity:.25"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1"/><path d="M5.5 17.5L11 5.5 15 10l2-3h1.5"/><line x1="11" y1="5.5" x2="7" y2="5.5"/></svg>',
+    'bike_empty'    => '<svg width="44" height="44" viewBox="0 0 24 24" '.$_s1.' style="opacity:.3"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1"/><path d="M5.5 17.5L11 5.5 15 10l2-3h1.5"/><line x1="11" y1="5.5" x2="7" y2="5.5"/></svg>',
+];
+@endphp
+
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -158,7 +202,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .stat-ico {
     width: 44px; height: 44px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 20px; flex-shrink: 0;
+    flex-shrink: 0;
     background: var(--sc-bg, var(--brand-mlt));
 }
 .stat-val { font-size: 26px; font-weight: 800; font-family: var(--mono); color: var(--text); line-height: 1; letter-spacing: -.5px; }
@@ -313,7 +357,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 /* Empty */
 .empty-box { padding: 48px 20px; text-align: center; }
-.empty-ico  { font-size: 44px; display: block; margin-bottom: 12px; opacity: .3; }
+.empty-ico  { display: flex; align-items:center; justify-content:center; margin-bottom: 12px; }
 .empty-txt  { font-size: 14px; color: var(--muted); }
 
 /* ══ RESPONSIVE ══ */
@@ -335,7 +379,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .stat-card { padding: 14px 12px; gap: 10px; }
     .stat-val { font-size: 22px; }
-    .stat-ico { width: 38px; height: 38px; font-size: 17px; }
+    .stat-ico { width: 38px; height: 38px; }
     .content { padding: 10px; }
     .online-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .driver-card-online { padding: 14px 12px; }
@@ -390,63 +434,63 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     </div>
     <nav class="sb-nav">
         <a href="{{ route('boutique.dashboard') }}" class="sb-item" style="margin-bottom:4px">
-            <span class="ico">⊞</span> Tableau de bord
+            <span class="ico">{!! $I['dash_nav'] !!}</span> Tableau de bord
         </a>
         <div class="sb-section">Boutique</div>
         <a href="{{ route('boutique.messages.hub') }}" class="sb-item">
-            <span class="ico">💬</span> Messages
+            <span class="ico">{!! $I['msg_nav'] !!}</span> Messages
         </a>
         <a href="{{ route('boutique.orders.index') }}" class="sb-item">
-            <span class="ico">📦</span> Commandes
+            <span class="ico">{!! $I['box_nav'] !!}</span> Commandes
             @if($pendingCount > 0)<span class="sb-badge">{{ $pendingCount }}</span>@endif
         </a>
         <a href="{{ route('products.index') }}" class="sb-item">
-            <span class="ico">🏷️</span> Produits
+            <span class="ico">{!! $I['tag_nav'] !!}</span> Produits
         </a>
         <a href="{{ route('boutique.clients.index') }}" class="sb-item">
-            <span class="ico">👥</span> Clients
+            <span class="ico">{!! $I['users_nav'] !!}</span> Clients
         </a>
         <a href="{{ route('boutique.employees.index') }}" class="sb-item">
-            <span class="ico">🧑‍💼</span> Équipe
+            <span class="ico">{!! $I['team_nav'] !!}</span> Équipe
         </a>
         <div class="sb-section">Livraison</div>
         {{-- Livreurs — actif sur cette page ── --}}
         <a href="{{ route('boutique.livreurs.index') }}" class="sb-item active">
-            <span class="ico">🚴</span> Livreurs
+            <span class="ico">{!! $I['bike_nav'] !!}</span> Livreurs
             @if($enLigne > 0)
                 <span class="sb-badge">{{ $enLigne }}</span>
             @endif
         </a>
         <a href="{{ route('delivery.companies.index') }}" class="sb-item">
-            <span class="ico">🏢</span> Partenaires
+            <span class="ico">{!! $I['bldg_nav'] !!}</span> Partenaires
         </a>
         <div class="sb-section">Finances</div>
         <div class="sb-group">
             <button class="sb-group-toggle" onclick="toggleGroup(this)" type="button">
-                <span class="ico">💰</span>
+                <span class="ico">{!! $I['wallet_nav'] !!}</span>
                 Finances & Rapports
                 <span class="sb-arrow">▶</span>
             </button>
             <div class="sb-sub">
                 <a href="{{ route('boutique.payments.index') }}" class="sb-item">
-                    <span class="ico">💳</span> Paiements
+                    <span class="ico">{!! $I['card_nav'] !!}</span> Paiements
                 </a>
                 <a href="{{ route('boutique.commissions.index') }}" class="sb-item">
-                    <span class="ico">📊</span> Commissions
+                    <span class="ico">{!! $I['chart_nav'] !!}</span> Commissions
                 </a>
                 <a href="{{ route('boutique.reports.index') }}" class="sb-item">
-                    <span class="ico">📋</span> Rapports
+                    <span class="ico">{!! $I['list_nav'] !!}</span> Rapports
                 </a>
                 @if(auth()->user()->role === 'admin')
                 <a href="{{ route('shop.edit', $shop) }}" class="sb-item">
-                    <span class="ico">⚙️</span> Paramètres
+                    <span class="ico">{!! $I['gear_nav'] !!}</span> Paramètres
                 </a>
                 @endif
             </div>
         </div>
         <div class="sb-section">Aide</div>
         <a href="{{ route('support.index') }}" class="sb-item">
-            <span class="ico">🎧</span> Support
+            <span class="ico">{!! $I['hdp_nav'] !!}</span> Support
         </a>
     </nav>
     <div class="sb-footer">
@@ -474,11 +518,11 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     <div class="topbar">
         <button class="btn-hamburger" id="btnMenu" aria-label="Menu">☰</button>
         <div class="tb-info">
-            <div class="tb-title">🚴 Livreurs</div>
+            <div class="tb-title">{!! $I['bike_tb'] !!} Livreurs</div>
             <div class="tb-sub">{{ $shop->name }} · {{ $total }} livreur(s) · <span style="color:var(--brand);font-weight:700">{{ $enLigne }} en ligne</span></div>
         </div>
         <a href="{{ route('boutique.employees.create') }}" class="btn btn-primary btn-sm">
-            ➕ Ajouter un livreur
+            {!! $I['plus_tb'] !!} Ajouter un livreur
         </a>
     </div>
 
@@ -497,28 +541,28 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         {{-- ════ KPI STATS ════ --}}
         <div class="stats-grid">
             <div class="stat-card" style="--sc-color:#3b82f6;--sc-bg:#eff6ff">
-                <div class="stat-ico">🚴</div>
+                <div class="stat-ico">{!! $I['bike_stat'] !!}</div>
                 <div>
                     <div class="stat-val">{{ $total }}</div>
                     <div class="stat-lbl">Total livreurs</div>
                 </div>
             </div>
             <div class="stat-card" style="--sc-color:var(--brand);--sc-bg:var(--brand-mlt)">
-                <div class="stat-ico">🟢</div>
+                <div class="stat-ico">{!! $I['online_stat'] !!}</div>
                 <div>
                     <div class="stat-val" style="color:var(--brand)">{{ $enLigne }}</div>
                     <div class="stat-lbl">En ligne</div>
                 </div>
             </div>
             <div class="stat-card" style="--sc-color:#f59e0b;--sc-bg:#fffbeb">
-                <div class="stat-ico">📦</div>
+                <div class="stat-ico">{!! $I['box_stat'] !!}</div>
                 <div>
                     <div class="stat-val" style="color:#d97706">{{ $enCourse }}</div>
                     <div class="stat-lbl">En course</div>
                 </div>
             </div>
             <div class="stat-card" style="--sc-color:#94a3b8;--sc-bg:#f3f6f4">
-                <div class="stat-ico">⭕</div>
+                <div class="stat-ico">{!! $I['offline_stat'] !!}</div>
                 <div>
                     <div class="stat-val" style="color:var(--muted)">{{ $horsligne }}</div>
                     <div class="stat-lbl">Hors ligne</div>
@@ -529,14 +573,14 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         {{-- ════ LIVREURS EN LIGNE MAINTENANT ════ --}}
         <div class="sec-hd">
             <div class="sec-title">
-                🟢 En ligne maintenant
+                {!! $I['dot_online'] !!} En ligne maintenant
                 <span class="sec-badge">{{ $enLigne }} disponible{{ $enLigne > 1 ? 's' : '' }}</span>
             </div>
         </div>
 
         @if($enLigneNow->isEmpty())
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:32px;text-align:center;margin-bottom:28px;box-shadow:var(--shadow-sm)">
-            <div style="font-size:36px;opacity:.25;margin-bottom:10px">🚴</div>
+            <div style="display:flex;justify-content:center;margin-bottom:10px">{!! $I['bike_empty_sm'] !!}</div>
             <div style="font-size:13px;color:var(--muted);font-weight:500">Aucun livreur en ligne pour le moment.</div>
         </div>
         @else
@@ -559,7 +603,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
                 {{-- Téléphone ── --}}
                 @if($lv->phone)
-                <div class="driver-phone">📞 {{ $lv->phone }}</div>
+                <div class="driver-phone" style="display:flex;align-items:center;justify-content:center;gap:3px">{!! $I['phone_lnk'] !!} {{ $lv->phone }}</div>
                 @else
                 <div class="driver-phone" style="visibility:hidden">—</div>
                 @endif
@@ -600,20 +644,20 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         {{-- ════ TOUS LES LIVREURS ════ --}}
         <div class="sec-hd" style="margin-bottom:16px">
             <div class="sec-title">
-                📋 Tous les livreurs
+                {!! $I['list_hd'] !!} Tous les livreurs
                 <span class="sec-badge warn">{{ $total }}</span>
             </div>
             <a href="{{ route('boutique.employees.create') }}" class="btn btn-sm">
-                ➕ Ajouter
+                {!! $I['plus_tb'] !!} Ajouter
             </a>
         </div>
 
         @if($livreurs->isEmpty())
         <div class="empty-box">
-            <span class="empty-ico">🛵</span>
+            <span class="empty-ico">{!! $I['bike_empty'] !!}</span>
             <div class="empty-txt">Aucun livreur rattaché à cette boutique.</div>
             <a href="{{ route('boutique.employees.create') }}" class="btn btn-primary" style="display:inline-flex;margin-top:16px">
-                ➕ Ajouter le premier livreur
+                {!! $I['plus_tb'] !!} Ajouter le premier livreur
             </a>
         </div>
         @else
@@ -622,8 +666,10 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         <div class="all-card tbl-wrap">
             <div class="all-card-hd">
                 <span class="all-card-title">Liste complète — {{ $total }} livreur(s)</span>
-                <span style="font-size:11px;color:var(--muted)">
-                    🟢 {{ $enLigne }} en ligne &nbsp;·&nbsp; ⭕ {{ $horsligne }} hors ligne
+                <span style="font-size:11px;color:var(--muted);display:inline-flex;align-items:center;gap:6px">
+                    <span style="display:inline-flex;align-items:center;gap:3px">{!! $I['dot_online'] !!} {{ $enLigne }} en ligne</span>
+                    &nbsp;·&nbsp;
+                    <span style="display:inline-flex;align-items:center;gap:3px">{!! $I['dot_offline'] !!} {{ $horsligne }} hors ligne</span>
                 </span>
             </div>
             <table class="tbl">
@@ -658,7 +704,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                                 <div>
                                     <div class="lv-name">{{ $lv->name }}</div>
                                     @if($lv->email)<div class="lv-email">{{ $lv->email }}</div>@endif
-                                    @if($lv->phone)<div class="lv-phone">📞 {{ $lv->phone }}</div>@endif
+                                    @if($lv->phone)<div class="lv-phone" style="display:flex;align-items:center;gap:3px">{!! $I['phone_lnk'] !!} {{ $lv->phone }}</div>@endif
                                 </div>
                             </div>
                         </td>
@@ -708,7 +754,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                                   action="{{ route('boutique.employees.destroy', $lv) }}"
                                   onsubmit="return confirm('Supprimer {{ addslashes($lv->name) }} ?')">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+                                <button type="submit" class="btn btn-danger btn-sm">{!! $I['trash_btn'] !!}</button>
                             </form>
                         </td>
                     </tr>
@@ -737,7 +783,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                         </div>
                         <div style="flex:1;min-width:0">
                             <div class="lv-name">{{ $lv->name }}</div>
-                            @if($lv->phone)<div class="lv-phone">📞 {{ $lv->phone }}</div>@endif
+                            @if($lv->phone)<div class="lv-phone" style="display:flex;align-items:center;gap:3px">{!! $I['phone_lnk'] !!} {{ $lv->phone }}</div>@endif
                         </div>
                     </div>
                     @if(!$lv->is_available)
@@ -756,11 +802,11 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 </div>
                 <div class="m-driver-body">
                     <div class="m-row">
-                        <span class="m-lbl">📦 Total livraisons</span>
+                        <span class="m-lbl" style="display:inline-flex;align-items:center;gap:4px">{!! $I['box_lbl'] !!} Total livraisons</span>
                         <span style="font-family:var(--mono);font-weight:700;color:var(--text)">{{ $totalLivs }}</span>
                     </div>
                     <div class="m-row">
-                        <span class="m-lbl">⚡ Aujourd'hui</span>
+                        <span class="m-lbl" style="display:inline-flex;align-items:center;gap:4px">{!! $I['bolt_lbl'] !!} Aujourd'hui</span>
                         <span style="font-family:var(--mono);font-weight:700;color:{{ $todayLivs > 0 ? 'var(--brand)' : 'var(--muted)' }}">{{ $todayLivs }}</span>
                     </div>
                     <div class="m-row" style="margin-top:4px">
@@ -769,7 +815,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                               action="{{ route('boutique.employees.destroy', $lv) }}"
                               onsubmit="return confirm('Supprimer {{ addslashes($lv->name) }} ?')">
                             @csrf @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">🗑️ Supprimer</button>
+                            <button type="submit" class="btn btn-danger btn-sm">{!! $I['trash_btn'] !!} Supprimer</button>
                         </form>
                     </div>
                 </div>

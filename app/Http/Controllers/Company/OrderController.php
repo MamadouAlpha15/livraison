@@ -167,6 +167,8 @@ class OrderController extends Controller
                 'shop'        => optional($o->shop)->name   ?? '—',
                 'client'      => optional($o->client)->name ?? '—',
                 'destination' => $o->delivery_destination   ?? '',
+                'client_lat'  => $o->client_lat,
+                'client_lng'  => $o->client_lng,
             ])->values()->all();
 
             $destination = $driverOrders->pluck('delivery_destination')

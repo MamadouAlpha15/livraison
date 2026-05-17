@@ -6,6 +6,80 @@
 
 @php $bodyClass = 'is-dashboard'; @endphp
 
+@php
+$_s  = 'stroke-width="1.75"';
+$_s2 = 'stroke-width="2"';
+$_s1 = 'stroke-width="1.5"';
+$I   = [];
+/* sidebar 17px */
+$I['dash_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>';
+$I['msg_nav']   = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+$I['box_nav']   = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>';
+$I['tag_nav']   = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>';
+$I['users_nav'] = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+$I['team_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>';
+$I['bike_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1l-5 8h8"/><path d="M12 6l2.5 5"/></svg>';
+$I['bldg_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>';
+$I['coin_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="14" x2="15" y2="14"/></svg>';
+$I['card_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
+$I['chart_nav'] = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>';
+$I['list_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><path d="M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2"/><path d="M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"/><polyline points="9 12 11 14 15 10"/></svg>';
+$I['gear_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+$I['hdp_nav']   = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>';
+/* topbar 15px */
+$I['list_tb']   = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><path d="M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2"/><path d="M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"/><polyline points="9 12 11 14 15 10"/></svg>';
+$I['crown_tb']  = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+/* page h1 20px */
+$I['list_pg']   = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><path d="M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2"/><path d="M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"/><polyline points="9 12 11 14 15 10"/></svg>';
+/* devise badge 12px */
+$I['exchange_badge'] = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>';
+/* crown badge 12px */
+$I['crown_badge'] = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#92400e" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+/* export btn 13px */
+$I['dl_btn']    = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+/* sec-title 16px */
+$I['calendar_sec'] = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+$I['chart_sec']   = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>';
+$I['target_sec']  = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>';
+$I['trend_sec']   = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>';
+$I['card_sec']    = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
+$I['users_sec']   = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+$I['trophy_sec']  = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2"/><path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2"/><path d="M6 2h12v11a6 6 0 0 1-12 0V2z"/><line x1="12" y1="13" x2="12" y2="17"/><path d="M8 21h8"/></svg>';
+$I['link_sec']    = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
+/* kpi 20px */
+$I['coin_kpi']   = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="14" x2="15" y2="14"/></svg>';
+$I['box_kpi']    = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>';
+$I['archive_kpi']= '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>';
+$I['clock_kpi']  = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+$I['bike_kpi']   = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1l-5 8h8"/><path d="M12 6l2.5 5"/></svg>';
+$I['x_kpi']      = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+$I['check_kpi']  = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+$I['trophy_kpi'] = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2"/><path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2"/><path d="M6 2h12v11a6 6 0 0 1-12 0V2z"/><line x1="12" y1="13" x2="12" y2="17"/><path d="M8 21h8"/></svg>';
+$I['warn_kpi']   = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+$I['alert_kpi']  = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+$I['cart_kpi']   = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>';
+$I['money_kpi']  = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>';
+$I['list_kpi']   = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><path d="M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2"/><path d="M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"/></svg>';
+$I['chart_kpi']  = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>';
+$I['star_kpi']   = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+$I['user_kpi']   = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+/* chart tabs 13px */
+$I['coin_tab']   = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="14" x2="15" y2="14"/></svg>';
+$I['box_tab']    = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>';
+/* top card titles 13px */
+$I['tag_title']  = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>';
+$I['bike_title'] = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1l-5 8h8"/><path d="M12 6l2.5 5"/></svg>';
+$I['user_title'] = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+/* no-data 32px */
+$I['mail_nd']    = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s1.' stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>';
+$I['bike_nd']    = '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s1.' stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1l-5 8h8"/><path d="M12 6l2.5 5"/></svg>';
+/* quick-link 24px */
+$I['box_ql']    = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s1.' stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>';
+$I['card_ql']   = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s1.' stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
+$I['money_ql']  = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s1.' stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>';
+$I['users_ql']  = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s1.' stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+@endphp
+
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -152,7 +226,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 .kpi { background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--kc, var(--brand)); border-radius: var(--r); padding: 16px 18px; box-shadow: var(--shadow-sm); transition: box-shadow .2s; }
 .kpi:hover { box-shadow: var(--shadow); }
-.kpi-ico  { font-size: 20px; margin-bottom: 8px; }
+.kpi-ico  { margin-bottom: 8px; display: flex; align-items: center; }
 .kpi-lbl  { font-size: 10.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 5px; }
 .kpi-val  { font-size: 24px; font-weight: 800; font-family: var(--mono); color: var(--text); letter-spacing: -.8px; line-height: 1; cursor: help; }
 .kpi-unit { font-size: 10px; color: var(--muted); margin-top: 4px; }
@@ -201,13 +275,13 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 /* No data state */
 .no-data { padding: 32px 18px; text-align: center; color: var(--muted); font-size: 13px; }
-.no-data-ico { font-size: 32px; margin-bottom: 10px; display: block; }
+.no-data-ico { margin-bottom: 10px; display: flex; align-items: center; justify-content: center; }
 
 /* Liens rapides */
 .links-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 22px; }
 .quick-link { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px 14px; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; transition: all .18s; box-shadow: var(--shadow-sm); }
 .quick-link:hover { border-color: var(--brand); background: var(--brand-mlt); transform: translateY(-2px); }
-.quick-link-ico { font-size: 24px; }
+.quick-link-ico { display: flex; align-items: center; justify-content: center; }
 .quick-link-lbl { font-size: 12px; font-weight: 700; color: var(--text); }
 .quick-link-sub { font-size: 10.5px; color: var(--muted); }
 
@@ -289,33 +363,33 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         </div>
     </div>
     <nav class="sb-nav">
-        <a href="{{ route('boutique.dashboard') }}" class="sb-item" style="margin-bottom:4px"><span class="ico">⊞</span> Tableau de bord</a>
+        <a href="{{ route('boutique.dashboard') }}" class="sb-item" style="margin-bottom:4px"><span class="ico">{!! $I['dash_nav'] !!}</span> Tableau de bord</a>
         <div class="sb-section">Boutique</div>
-        <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">💬</span> Messages</a>
-        <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">📦</span> Commandes @if($pendingCount > 0)<span class="sb-badge">{{ $pendingCount }}</span>@endif</a>
-        <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">🏷️</span> Produits</a>
-        <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">👥</span> Clients</a>
-        <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">🧑‍💼</span> Équipe</a>
+        <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">{!! $I['msg_nav'] !!}</span> Messages</a>
+        <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">{!! $I['box_nav'] !!}</span> Commandes @if($pendingCount > 0)<span class="sb-badge">{{ $pendingCount }}</span>@endif</a>
+        <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">{!! $I['tag_nav'] !!}</span> Produits</a>
+        <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">{!! $I['users_nav'] !!}</span> Clients</a>
+        <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">{!! $I['team_nav'] !!}</span> Équipe</a>
         <div class="sb-section">Livraison</div>
-        <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">🚴</span> Livreurs</a>
-        <a href="{{ route('delivery.companies.index') }}" class="sb-item"><span class="ico">🏢</span> Partenaires</a>
+        <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">{!! $I['bike_nav'] !!}</span> Livreurs</a>
+        <a href="{{ route('delivery.companies.index') }}" class="sb-item"><span class="ico">{!! $I['bldg_nav'] !!}</span> Partenaires</a>
         <div class="sb-section">Finances</div>
         <div class="sb-group">
             <button class="sb-group-toggle open" onclick="toggleGroup(this)" type="button">
-                <span class="ico">💰</span> Finances & Rapports
+                <span class="ico">{!! $I['coin_nav'] !!}</span> Finances & Rapports
                 <span class="sb-arrow" style="transform:rotate(90deg);color:rgba(255,255,255,.5)">▶</span>
             </button>
             <div class="sb-sub open">
-                <a href="{{ route('boutique.payments.index') }}" class="sb-item"><span class="ico">💳</span> Paiements</a>
-                <a href="{{ route('boutique.commissions.index') }}" class="sb-item"><span class="ico">📊</span> Commissions</a>
-                <a href="{{ route('boutique.reports.index') }}" class="sb-item active"><span class="ico">📋</span> Rapports</a>
+                <a href="{{ route('boutique.payments.index') }}" class="sb-item"><span class="ico">{!! $I['card_nav'] !!}</span> Paiements</a>
+                <a href="{{ route('boutique.commissions.index') }}" class="sb-item"><span class="ico">{!! $I['chart_nav'] !!}</span> Commissions</a>
+                <a href="{{ route('boutique.reports.index') }}" class="sb-item active"><span class="ico">{!! $I['list_nav'] !!}</span> Rapports</a>
                 @if(auth()->user()->role === 'admin')
-                <a href="{{ route('shop.edit', $shop) }}" class="sb-item"><span class="ico">⚙️</span> Paramètres</a>
+                <a href="{{ route('shop.edit', $shop) }}" class="sb-item"><span class="ico">{!! $I['gear_nav'] !!}</span> Paramètres</a>
                 @endif
             </div>
         </div>
         <div class="sb-section">Aide</div>
-        <a href="{{ route('support.index') }}" class="sb-item"><span class="ico">🎧</span> Support</a>
+        <a href="{{ route('support.index') }}" class="sb-item"><span class="ico">{!! $I['hdp_nav'] !!}</span> Support</a>
     </nav>
     <div class="sb-footer">
         <a href="{{ route('profile.edit') }}" class="sb-user">
@@ -337,8 +411,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     <div class="topbar">
         <button class="btn-hamburger" id="btnMenu" aria-label="Menu">☰</button>
         <div class="tb-info">
-            <div class="tb-title">📋 Rapports & Statistiques</div>
-            <div class="tb-sub">{{ $shop->name ?? 'Boutique' }}@if($isSuper) · <span style="color:#f59e0b;font-weight:700">👑 Super Admin</span>@endif</div>
+            <div class="tb-title">{!! $I['list_tb'] !!} Rapports & Statistiques</div>
+            <div class="tb-sub">{{ $shop->name ?? 'Boutique' }}@if($isSuper) · <span style="color:#f59e0b;font-weight:700;display:inline-flex;align-items:center;gap:4px">{!! $I['crown_tb'] !!} Super Admin</span>@endif</div>
         </div>
     </div>
 
@@ -346,11 +420,11 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
     <div class="page-hd">
         <div>
-            <h1 class="page-title">📋 Rapports & Statistiques</h1>
+            <h1 class="page-title" style="display:flex;align-items:center;gap:8px">{!! $I['list_pg'] !!} Rapports & Statistiques</h1>
             <p class="page-sub">
                 {{ $shop->name ?? 'Toutes les boutiques' }} &nbsp;·&nbsp;
-                <span class="devise-badge">💱 {{ $devise }}</span>
-                @if($isSuper) &nbsp;<span class="super-badge">👑 Super Admin</span>@endif
+                <span class="devise-badge">{!! $I['exchange_badge'] !!} {{ $devise }}</span>
+                @if($isSuper) &nbsp;<span class="super-badge" style="display:inline-flex;align-items:center;gap:4px">{!! $I['crown_badge'] !!} Super Admin</span>@endif
             </p>
         </div>
     </div>
@@ -380,7 +454,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         <input type="hidden" name="period" id="periodInput" value="{{ $period }}">
 
         <a href="{{ $exportUrl }}" class="btn-export">
-            ⬇️ Exporter CSV
+            {!! $I['dl_btn'] !!} Exporter CSV
         </a>
     </div>
     </form>
@@ -393,11 +467,11 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     </div>
 
     {{-- SECTION 1 : KPI PÉRIODE --}}
-    <div class="sec-title">📅 {{ $periodLabel }}</div>
+    <div class="sec-title">{!! $I['calendar_sec'] !!} {{ $periodLabel }}</div>
     <div class="kpi-grid-2" style="margin-bottom:14px">
 
         <div class="kpi" style="--kc:#6366f1">
-            <div class="kpi-ico">💰</div>
+            <div class="kpi-ico">{!! $I['coin_kpi'] !!}</div>
             <div class="kpi-lbl">Revenu net — période</div>
             <div class="kpi-val" title="{{ number_format($revenueThisMonth, 0, ',', ' ') }} {{ $devise }}">
                 {{ $fmt($revenueThisMonth) }}
@@ -413,7 +487,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         </div>
 
         <div class="kpi" style="--kc:#3b82f6">
-            <div class="kpi-ico">📦</div>
+            <div class="kpi-ico">{!! $I['box_kpi'] !!}</div>
             <div class="kpi-lbl">Commandes — période</div>
             <div class="kpi-val">{{ $ordersThisMonth }}</div>
             <div class="kpi-unit">commandes reçues</div>
@@ -423,46 +497,46 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     </div>
 
     {{-- SECTION 2 : PIPELINE --}}
-    <div class="sec-title">📊 Pipeline commandes — période</div>
+    <div class="sec-title">{!! $I['chart_sec'] !!} Pipeline commandes — période</div>
     <div class="kpi-grid-4" style="margin-bottom:22px">
         <div class="kpi" style="--kc:#6b7280">
-            <div class="kpi-ico">🗂️</div><div class="kpi-lbl">Total (all time)</div>
+            <div class="kpi-ico">{!! $I['archive_kpi'] !!}</div><div class="kpi-lbl">Total (all time)</div>
             <div class="kpi-val">{{ $totalOrders }}</div>
             <div class="kpi-unit">depuis le début</div>
         </div>
         <div class="kpi" style="--kc:#f59e0b">
-            <div class="kpi-ico">⏳</div><div class="kpi-lbl">En attente</div>
+            <div class="kpi-ico">{!! $I['clock_kpi'] !!}</div><div class="kpi-lbl">En attente</div>
             <div class="kpi-val">{{ $pendingOrders }}</div>
             <div class="kpi-unit">à traiter</div>
         </div>
         <div class="kpi" style="--kc:#8b5cf6">
-            <div class="kpi-ico">🚴</div><div class="kpi-lbl">En livraison</div>
+            <div class="kpi-ico">{!! $I['bike_kpi'] !!}</div><div class="kpi-lbl">En livraison</div>
             <div class="kpi-val">{{ $deliveringOrders }}</div>
             <div class="kpi-unit">en route</div>
         </div>
         <div class="kpi" style="--kc:#ef4444">
-            <div class="kpi-ico">❌</div><div class="kpi-lbl">Annulées</div>
+            <div class="kpi-ico">{!! $I['x_kpi'] !!}</div><div class="kpi-lbl">Annulées</div>
             <div class="kpi-val">{{ $cancelledOrders }}</div>
             <div class="kpi-unit">commandes perdues</div>
         </div>
     </div>
 
     {{-- SECTION 3 : PERFORMANCE --}}
-    <div class="sec-title">🎯 Performance — période</div>
+    <div class="sec-title">{!! $I['target_sec'] !!} Performance — période</div>
     <div class="kpi-grid-4">
         <div class="kpi" style="--kc:#6366f1">
-            <div class="kpi-ico">✅</div><div class="kpi-lbl">Livrées</div>
+            <div class="kpi-ico">{!! $I['check_kpi'] !!}</div><div class="kpi-lbl">Livrées</div>
             <div class="kpi-val">{{ $deliveredOrders }}</div>
             <div class="kpi-unit">livrées avec succès</div>
         </div>
         <div class="kpi" style="--kc:{{ $tauxLivraison >= 80 ? '#6366f1' : ($tauxLivraison >= 50 ? '#f59e0b' : '#ef4444') }}">
-            <div class="kpi-ico">{{ $tauxLivraison >= 80 ? '🏆' : ($tauxLivraison >= 50 ? '⚠️' : '🚨') }}</div>
+            <div class="kpi-ico">{!! $tauxLivraison >= 80 ? $I['trophy_kpi'] : ($tauxLivraison >= 50 ? $I['warn_kpi'] : $I['alert_kpi']) !!}</div>
             <div class="kpi-lbl">Taux livraison</div>
             <div class="kpi-val">{{ $tauxLivraison }}%</div>
             <div class="kpi-unit">des commandes livrées</div>
         </div>
         <div class="kpi" style="--kc:{{ $tauxAnnulation <= 10 ? '#22c55e' : ($tauxAnnulation <= 25 ? '#f59e0b' : '#ef4444') }}">
-            <div class="kpi-ico">{{ $tauxAnnulation <= 10 ? '✅' : ($tauxAnnulation <= 25 ? '⚠️' : '🚨') }}</div>
+            <div class="kpi-ico">{!! $tauxAnnulation <= 10 ? $I['check_kpi'] : ($tauxAnnulation <= 25 ? $I['warn_kpi'] : $I['alert_kpi']) !!}</div>
             <div class="kpi-lbl">Taux annulation</div>
             <div class="kpi-val">{{ $tauxAnnulation }}%</div>
             <div class="kpi-unit">des commandes annulées</div>
@@ -474,7 +548,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             </div>
         </div>
         <div class="kpi" style="--kc:#f59e0b">
-            <div class="kpi-ico">🛒</div><div class="kpi-lbl">Panier moyen</div>
+            <div class="kpi-ico">{!! $I['cart_kpi'] !!}</div><div class="kpi-lbl">Panier moyen</div>
             <div class="kpi-val" title="{{ number_format($panierMoyen, 0, ',', ' ') }} {{ $devise }}">
                 {{ $fmt($panierMoyen) }}
             </div>
@@ -486,13 +560,13 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     </div>
 
     {{-- SECTION 4 : GRAPHIQUE CHART.JS --}}
-    <div class="sec-title">📈 Évolution sur 6 mois</div>
+    <div class="sec-title">{!! $I['trend_sec'] !!} Évolution sur 6 mois</div>
     <div class="chart-card">
         <div class="chart-card-hd">
             <span class="chart-card-title">Revenus & Commandes — 6 derniers mois</span>
             <div class="chart-tabs">
-                <button class="chart-tab active" id="tabRevenue" onclick="switchChart('revenue')">💰 Revenus</button>
-                <button class="chart-tab" id="tabOrders" onclick="switchChart('orders')">📦 Commandes</button>
+                <button class="chart-tab active" id="tabRevenue" onclick="switchChart('revenue')" style="display:inline-flex;align-items:center;gap:5px">{!! $I['coin_tab'] !!} Revenus</button>
+                <button class="chart-tab" id="tabOrders" onclick="switchChart('orders')" style="display:inline-flex;align-items:center;gap:5px">{!! $I['box_tab'] !!} Commandes</button>
             </div>
         </div>
         <div class="chart-body">
@@ -503,10 +577,10 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     </div>
 
     {{-- SECTION 5 : FINANCES --}}
-    <div class="sec-title">💳 Finances globales</div>
+    <div class="sec-title">{!! $I['card_sec'] !!} Finances globales</div>
     <div class="kpi-grid-3">
         <div class="kpi" style="--kc:#6366f1">
-            <div class="kpi-ico">💵</div><div class="kpi-lbl">Revenu net total</div>
+            <div class="kpi-ico">{!! $I['money_kpi'] !!}</div><div class="kpi-lbl">Revenu net total</div>
             <div class="kpi-val" title="{{ number_format($totalRevenue, 0, ',', ' ') }} {{ $devise }}">
                 {{ $fmt($totalRevenue) }}
             </div>
@@ -517,7 +591,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <div class="kpi-explain">CA livré - commissions payées. Votre vrai revenu net.</div>
         </div>
         <div class="kpi" style="--kc:#f59e0b">
-            <div class="kpi-ico">⏳</div><div class="kpi-lbl">Commissions à payer</div>
+            <div class="kpi-ico">{!! $I['clock_kpi'] !!}</div><div class="kpi-lbl">Commissions à payer</div>
             <div class="kpi-val" title="{{ number_format($commissionsPending, 0, ',', ' ') }} {{ $devise }}">
                 {{ $fmt($commissionsPending) }}
             </div>
@@ -530,7 +604,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             </div>
         </div>
         <div class="kpi" style="--kc:#3b82f6">
-            <div class="kpi-ico">✅</div><div class="kpi-lbl">Commissions payées</div>
+            <div class="kpi-ico">{!! $I['check_kpi'] !!}</div><div class="kpi-lbl">Commissions payées</div>
             <div class="kpi-val" title="{{ number_format($commissionsPaid, 0, ',', ' ') }} {{ $devise }}">
                 {{ $fmt($commissionsPaid) }}
             </div>
@@ -542,32 +616,32 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     </div>
 
     {{-- SECTION 6 : ÉQUIPE --}}
-    <div class="sec-title">👥 Équipe</div>
+    <div class="sec-title">{!! $I['users_sec'] !!} Équipe</div>
     <div class="kpi-grid-2" style="margin-bottom:22px">
         <div class="kpi" style="--kc:#2563eb">
-            <div class="kpi-ico">👤</div><div class="kpi-lbl">Vendeurs actifs</div>
+            <div class="kpi-ico">{!! $I['user_kpi'] !!}</div><div class="kpi-lbl">Vendeurs actifs</div>
             <div class="kpi-val">{{ $vendors }}</div>
             <div class="kpi-unit">vendeurs rattachés</div>
         </div>
         <div class="kpi" style="--kc:#7c3aed">
-            <div class="kpi-ico">🚴</div><div class="kpi-lbl">Livreurs actifs</div>
+            <div class="kpi-ico">{!! $I['bike_kpi'] !!}</div><div class="kpi-lbl">Livreurs actifs</div>
             <div class="kpi-val">{{ $livreurs }}</div>
             <div class="kpi-unit">livreurs rattachés</div>
         </div>
     </div>
 
     {{-- SECTION 7 : TOP PRODUITS + TOP LIVREURS (côte à côte) --}}
-    <div class="sec-title">🏆 Classements — {{ $periodLabel }}</div>
+    <div class="sec-title">{!! $I['trophy_sec'] !!} Classements — {{ $periodLabel }}</div>
     <div class="two-col">
 
         {{-- Top produits --}}
         <div class="top-card">
             <div class="chart-card-hd">
-                <span class="chart-card-title">🏷️ Top produits vendus</span>
+                <span class="chart-card-title" style="display:inline-flex;align-items:center;gap:5px">{!! $I['tag_title'] !!} Top produits vendus</span>
                 <a href="{{ route('products.top') }}" style="font-size:11px;color:var(--brand);font-weight:600;text-decoration:none">Voir tous →</a>
             </div>
             @if(isset($topProducts) && $topProducts->count() > 0)
-            @php $maxVentes = $topProducts->max('ventes') ?: 1; $rangs = ['🥇','🥈','🥉','4','5']; @endphp
+            @php $maxVentes = $topProducts->max('ventes') ?: 1; $rangs = ['1','2','3','4','5']; @endphp
             @foreach($topProducts as $i => $product)
             @php $pct = round(($product->ventes/$maxVentes)*100); @endphp
             <div class="sp-row">
@@ -578,18 +652,18 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             </div>
             @endforeach
             @else
-            <div class="no-data"><span class="no-data-ico">📭</span>Aucune vente sur cette période.</div>
+            <div class="no-data"><span class="no-data-ico">{!! $I['mail_nd'] !!}</span>Aucune vente sur cette période.</div>
             @endif
         </div>
 
         {{-- Top livreurs --}}
         <div class="top-card">
             <div class="chart-card-hd">
-                <span class="chart-card-title">🚴 Top livreurs</span>
+                <span class="chart-card-title" style="display:inline-flex;align-items:center;gap:5px">{!! $I['bike_title'] !!} Top livreurs</span>
                 <a href="{{ route('boutique.livreurs.index') }}" style="font-size:11px;color:var(--brand);font-weight:600;text-decoration:none">Voir tous →</a>
             </div>
             @if(isset($topLivreurs) && $topLivreurs->count() > 0)
-            @php $maxLiv = $topLivreurs->max('livraisons') ?: 1; $rangs2 = ['🥇','🥈','🥉','4','5']; @endphp
+            @php $maxLiv = $topLivreurs->max('livraisons') ?: 1; $rangs2 = ['1','2','3','4','5']; @endphp
             @foreach($topLivreurs as $i => $livreur)
             @php $pct2 = round(($livreur->livraisons/$maxLiv)*100); @endphp
             <div class="sp-row">
@@ -600,14 +674,14 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             </div>
             @endforeach
             @else
-            <div class="no-data"><span class="no-data-ico">🚴</span>Aucune livraison sur cette période.</div>
+            <div class="no-data"><span class="no-data-ico">{!! $I['bike_nd'] !!}</span>Aucune livraison sur cette période.</div>
             @endif
         </div>
 
     </div>
 
     {{-- SECTION 8 : CLIENTS NOUVEAUX VS FIDÈLES --}}
-    <div class="sec-title">👥 Rétention clients — {{ $periodLabel }}</div>
+    <div class="sec-title">{!! $I['users_sec'] !!} Rétention clients — {{ $periodLabel }}</div>
     @php
         $cTotal    = $clientStats['total']    ?? 0;
         $cNouveaux = $clientStats['nouveaux'] ?? 0;
@@ -618,7 +692,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     <div class="two-col" style="margin-bottom:22px">
         <div class="top-card">
             <div class="chart-card-hd">
-                <span class="chart-card-title">👤 Clients sur la période</span>
+                <span class="chart-card-title" style="display:inline-flex;align-items:center;gap:5px">{!! $I['user_title'] !!} Clients sur la période</span>
             </div>
             <div class="client-stats-wrap">
                 <div>
@@ -657,17 +731,17 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
         <div class="kpi-grid-2" style="margin:0;align-content:start;gap:12px">
             <div class="kpi" style="--kc:#6366f1;grid-column:1/-1">
-                <div class="kpi-ico">📋</div>
+                <div class="kpi-ico">{!! $I['list_kpi'] !!}</div>
                 <div class="kpi-lbl">Export CSV</div>
                 <div style="font-size:13px;color:var(--text-2);margin:6px 0 12px;line-height:1.5">
                     Téléchargez toutes les commandes de la période sélectionnée avec détails (client, livreur, montants, statut).
                 </div>
                 <a href="{{ $exportUrl }}" class="btn-export" style="display:inline-flex;margin:0">
-                    ⬇️ Exporter — {{ $periodLabel }}
+                    {!! $I['dl_btn'] !!} Exporter — {{ $periodLabel }}
                 </a>
             </div>
             <div class="kpi" style="--kc:#f59e0b">
-                <div class="kpi-ico">📊</div>
+                <div class="kpi-ico">{!! $I['chart_kpi'] !!}</div>
                 <div class="kpi-lbl">Taux rétention</div>
                 <div class="kpi-val">{{ $cTotal > 0 ? $pctFid : 0 }}%</div>
                 <div class="kpi-unit">clients sont fidèles</div>
@@ -679,7 +753,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 </div>
             </div>
             <div class="kpi" style="--kc:#6366f1">
-                <div class="kpi-ico">✨</div>
+                <div class="kpi-ico">{!! $I['star_kpi'] !!}</div>
                 <div class="kpi-lbl">Nouveaux clients</div>
                 <div class="kpi-val">{{ $cNouveaux }}</div>
                 <div class="kpi-unit">1ère commande</div>
@@ -689,12 +763,12 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     </div>
 
     {{-- SECTION 9 : LIENS RAPIDES --}}
-    <div class="sec-title">🔗 Accès rapide</div>
+    <div class="sec-title">{!! $I['link_sec'] !!} Accès rapide</div>
     <div class="links-grid">
-        <a href="{{ route('boutique.orders.index') }}" class="quick-link"><span class="quick-link-ico">📦</span><span class="quick-link-lbl">Commandes</span><span class="quick-link-sub">{{ $pendingOrders }} en attente</span></a>
-        <a href="{{ route('boutique.payments.index') }}" class="quick-link"><span class="quick-link-ico">💳</span><span class="quick-link-lbl">Paiements</span><span class="quick-link-sub">Voir les revenus</span></a>
-        <a href="{{ route('boutique.commissions.index') }}" class="quick-link"><span class="quick-link-ico">💸</span><span class="quick-link-lbl">Commissions</span><span class="quick-link-sub">{{ number_format($commissionsPending/1000,0) }}k {{ $devise }} à payer</span></a>
-        <a href="{{ route('boutique.clients.index') }}" class="quick-link"><span class="quick-link-ico">👥</span><span class="quick-link-lbl">Clients</span><span class="quick-link-sub">Voir les clients</span></a>
+        <a href="{{ route('boutique.orders.index') }}" class="quick-link"><span class="quick-link-ico">{!! $I['box_ql'] !!}</span><span class="quick-link-lbl">Commandes</span><span class="quick-link-sub">{{ $pendingOrders }} en attente</span></a>
+        <a href="{{ route('boutique.payments.index') }}" class="quick-link"><span class="quick-link-ico">{!! $I['card_ql'] !!}</span><span class="quick-link-lbl">Paiements</span><span class="quick-link-sub">Voir les revenus</span></a>
+        <a href="{{ route('boutique.commissions.index') }}" class="quick-link"><span class="quick-link-ico">{!! $I['money_ql'] !!}</span><span class="quick-link-lbl">Commissions</span><span class="quick-link-sub">{{ number_format($commissionsPending/1000,0) }}k {{ $devise }} à payer</span></a>
+        <a href="{{ route('boutique.clients.index') }}" class="quick-link"><span class="quick-link-ico">{!! $I['users_ql'] !!}</span><span class="quick-link-lbl">Clients</span><span class="quick-link-sub">Voir les clients</span></a>
     </div>
 
 </div>{{-- /page-wrap --}}

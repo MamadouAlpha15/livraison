@@ -2,6 +2,44 @@
 @section('title', 'Ticket #' . $ticket->id . ' · Support')
 @php $bodyClass = 'is-dashboard'; @endphp
 
+@php
+$_s  = 'stroke-width="1.75"';
+$_s2 = 'stroke-width="2"';
+$_s1 = 'stroke-width="1.5"';
+$I   = [];
+/* sidebar 17px */
+$I['dash_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>';
+$I['msg_nav']   = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+$I['box_nav']   = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>';
+$I['tag_nav']   = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>';
+$I['users_nav'] = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+$I['team_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>';
+$I['bike_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1l-5 8h8"/><path d="M12 6l2.5 5"/></svg>';
+$I['bldg_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>';
+$I['coin_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="14" x2="15" y2="14"/></svg>';
+$I['card_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
+$I['chart_nav'] = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>';
+$I['list_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><path d="M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2"/><path d="M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"/><polyline points="9 12 11 14 15 10"/></svg>';
+$I['gear_nav']  = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+$I['hdp_nav']   = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>';
+/* breadcrumb 12px */
+$I['bolt_bc']   = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
+$I['store_bc']  = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9z"/><path d="M3 9l2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9"/><line x1="12" y1="3" x2="12" y2="9"/></svg>';
+$I['hdp_bc']    = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>';
+/* flash/banner 14px */
+$I['check_ok']  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+/* ticket header 12px */
+$I['store_meta']= '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9z"/><path d="M3 9l2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9"/><line x1="12" y1="3" x2="12" y2="9"/></svg>';
+/* lock button 13px */
+$I['lock_btn']  = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+/* modal icon 44px */
+$I['lock_modal']= '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ef4444" '.$_s1.' stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+/* modal warn icons 16px */
+$I['stop_warn'] = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+$I['ban_warn']  = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#92400e" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>';
+$I['bulb_warn'] = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#92400e" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14z"/></svg>';
+@endphp
+
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -134,12 +172,12 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .modal-overlay.open{display:flex;}
 .modal-box{background:var(--surface);border-radius:var(--r);padding:28px 26px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.22);animation:modalIn .2s ease;}
 @keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(-8px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.modal-icon{font-size:44px;text-align:center;margin-bottom:14px;}
+.modal-icon{text-align:center;margin-bottom:14px;display:flex;align-items:center;justify-content:center;}
 .modal-title{font-size:17px;font-weight:800;color:var(--text);text-align:center;margin-bottom:10px;}
 .modal-body{font-size:13.5px;color:var(--text-2);text-align:center;line-height:1.65;margin-bottom:20px;}
 .modal-warns{display:flex;flex-direction:column;gap:8px;margin-bottom:22px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px 16px;}
 .warn-row{display:flex;align-items:flex-start;gap:10px;font-size:12.5px;color:#92400e;font-weight:600;}
-.warn-ico{font-size:16px;flex-shrink:0;margin-top:1px;}
+.warn-ico{flex-shrink:0;margin-top:1px;display:flex;align-items:center;}
 .modal-actions{display:flex;gap:10px;}
 .btn-modal-cancel{flex:1;padding:11px;border-radius:var(--r-sm);border:1.5px solid var(--border-dk);background:var(--surface);color:var(--text-2);font-size:13.5px;font-weight:700;font-family:var(--font);cursor:pointer;transition:all .14s;}
 .btn-modal-cancel:hover{border-color:var(--brand);color:var(--brand);}
@@ -209,32 +247,32 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
             </div>
         </div>
         <nav class="sb-nav">
-            <a href="{{ route('boutique.dashboard') }}" class="sb-item" style="margin-bottom:4px"><span class="ico">⊞</span> Tableau de bord</a>
+            <a href="{{ route('boutique.dashboard') }}" class="sb-item" style="margin-bottom:4px"><span class="ico">{!! $I['dash_nav'] !!}</span> Tableau de bord</a>
             <div class="sb-section">Boutique</div>
-            <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">💬</span> Messages</a>
-            <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">📦</span> Commandes</a>
-            <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">🏷️</span> Produits</a>
-            <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">👥</span> Clients</a>
-            <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">🧑‍💼</span> Équipe</a>
+            <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">{!! $I['msg_nav'] !!}</span> Messages</a>
+            <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">{!! $I['box_nav'] !!}</span> Commandes</a>
+            <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">{!! $I['tag_nav'] !!}</span> Produits</a>
+            <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">{!! $I['users_nav'] !!}</span> Clients</a>
+            <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">{!! $I['team_nav'] !!}</span> Équipe</a>
             <div class="sb-section">Livraison</div>
-            <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">🚴</span> Livreurs</a>
-            <a href="{{ route('delivery.companies.index') }}" class="sb-item"><span class="ico">🏢</span> Partenaires</a>
+            <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">{!! $I['bike_nav'] !!}</span> Livreurs</a>
+            <a href="{{ route('delivery.companies.index') }}" class="sb-item"><span class="ico">{!! $I['bldg_nav'] !!}</span> Partenaires</a>
             <div class="sb-section">Finances</div>
             <div class="sb-group">
                 <button class="sb-group-toggle" onclick="toggleGroup(this)" type="button">
-                    <span class="ico">💰</span> Finances &amp; Rapports <span class="sb-arrow">▶</span>
+                    <span class="ico">{!! $I['coin_nav'] !!}</span> Finances &amp; Rapports <span class="sb-arrow">▶</span>
                 </button>
                 <div class="sb-sub">
-                    <a href="{{ route('boutique.payments.index') }}" class="sb-item"><span class="ico">💳</span> Paiements</a>
-                    <a href="{{ route('boutique.commissions.index') }}" class="sb-item"><span class="ico">📊</span> Commissions</a>
-                    <a href="{{ route('boutique.reports.index') }}" class="sb-item"><span class="ico">📋</span> Rapports</a>
+                    <a href="{{ route('boutique.payments.index') }}" class="sb-item"><span class="ico">{!! $I['card_nav'] !!}</span> Paiements</a>
+                    <a href="{{ route('boutique.commissions.index') }}" class="sb-item"><span class="ico">{!! $I['chart_nav'] !!}</span> Commissions</a>
+                    <a href="{{ route('boutique.reports.index') }}" class="sb-item"><span class="ico">{!! $I['list_nav'] !!}</span> Rapports</a>
                     @if($u->role === 'admin')
-                    <a href="{{ route('shop.edit', $shop) }}" class="sb-item"><span class="ico">⚙️</span> Paramètres</a>
+                    <a href="{{ route('shop.edit', $shop) }}" class="sb-item"><span class="ico">{!! $I['gear_nav'] !!}</span> Paramètres</a>
                     @endif
                 </div>
             </div>
             <div class="sb-section">Aide</div>
-            <a href="{{ route('support.index') }}" class="sb-item active"><span class="ico">🎧</span> Support</a>
+            <a href="{{ route('support.index') }}" class="sb-item active"><span class="ico">{!! $I['hdp_nav'] !!}</span> Support</a>
         </nav>
         <div class="sb-footer">
             <a href="{{ route('profile.edit') }}" class="sb-user">
@@ -262,19 +300,19 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
             @endif
             <div class="tb-bc">
                 @if($isSuperAdmin)
-                    <a href="{{ route('admin.dashboard') }}">⚡ Admin</a>
+                    <a href="{{ route('admin.dashboard') }}" style="display:inline-flex;align-items:center;gap:4px">{!! $I['bolt_bc'] !!} Admin</a>
                 @else
-                    <a href="{{ route('boutique.dashboard') }}">🏪 {{ $shop->name ?? 'Boutique' }}</a>
+                    <a href="{{ route('boutique.dashboard') }}" style="display:inline-flex;align-items:center;gap:4px">{!! $I['store_bc'] !!} {{ $shop->name ?? 'Boutique' }}</a>
                 @endif
                 <span style="color:var(--muted)">›</span>
-                <a href="{{ $isSuperAdmin ? route('admin.support.index') : route('support.index') }}">🎧 Support</a>
+                <a href="{{ $isSuperAdmin ? route('admin.support.index') : route('support.index') }}" style="display:inline-flex;align-items:center;gap:4px">{!! $I['hdp_bc'] !!} Support</a>
                 <span style="color:var(--muted)">›</span>
                 <span class="cur">Ticket #{{ $ticket->id }}</span>
             </div>
         </div>
 
         @if(session('success'))
-        <div class="flash-ok">✅ {{ session('success') }}</div>
+        <div class="flash-ok">{!! $I['check_ok'] !!} {{ session('success') }}</div>
         @endif
 
         {{-- Ticket header --}}
@@ -286,14 +324,17 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         <span class="badge-dot"></span>
                         {{ $ticket->status === 'open' ? 'Ouvert' : 'Fermé' }}
                     </span>
-                    @if($ticket->shop)<span>🏪 {{ $ticket->shop->name }}</span>@endif
+                    @if($ticket->shop)<span style="display:inline-flex;align-items:center;gap:3px">{!! $I['store_meta'] !!} {{ $ticket->shop->name }}</span>@endif
                     <span>Par <strong>{{ $ticket->creator->name ?? '—' }}</strong></span>
                     <span>{{ $ticket->created_at->format('d/m/Y à H:i') }}</span>
                 </div>
             </div>
+            <div>
+                <a href="{{route('support.index') }}" class ="btn btn-info">Retour</a>
+            </div>
             @if($ticket->status === 'open')
             <button type="button" class="btn-close-ticket" onclick="openCloseModal()">
-                🔒 Fermer le ticket
+                {!! $I['lock_btn'] !!} Fermer le ticket
             </button>
             @endif
         </div>
@@ -340,7 +381,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
             </div>
             @else
             <div class="closed-banner">
-                ✅ Ce ticket est fermé — aucun nouveau message ne peut être ajouté.
+                {!! $I['check_ok'] !!} Ce ticket est fermé — aucun nouveau message ne peut être ajouté.
                 <a href="{{ route('support.create') }}" style="color:var(--brand);font-weight:700;margin-left:auto;text-decoration:none;white-space:nowrap">
                     Ouvrir un nouveau ticket →
                 </a>
@@ -355,7 +396,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 @if($ticket->status === 'open')
 <div class="modal-overlay" id="closeModal">
     <div class="modal-box">
-        <div class="modal-icon">🔒</div>
+        <div class="modal-icon">{!! $I['lock_modal'] !!}</div>
         <div class="modal-title">Fermer ce ticket ?</div>
         <div class="modal-body">
             Vous êtes sur le point de fermer le ticket&nbsp;:<br>
@@ -363,21 +404,21 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
         </div>
         <div class="modal-warns">
             <div class="warn-row">
-                <span class="warn-ico">⛔</span>
+                <span class="warn-ico">{!! $I['stop_warn'] !!}</span>
                 <span>Une fois fermé, <strong>vous ne pourrez plus rouvrir ce ticket</strong>. Il sera archivé définitivement.</span>
             </div>
             <div class="warn-row">
-                <span class="warn-ico">🚫</span>
+                <span class="warn-ico">{!! $I['ban_warn'] !!}</span>
                 <span>Le SuperAdmin <strong>ne pourra plus répondre</strong> à cette conversation.</span>
             </div>
             <div class="warn-row">
-                <span class="warn-ico">💡</span>
+                <span class="warn-ico">{!! $I['bulb_warn'] !!}</span>
                 <span>Si vous avez encore besoin d'aide, <strong>créez un nouveau ticket</strong> après la fermeture.</span>
             </div>
         </div>
         <div class="modal-actions">
             <button type="button" class="btn-modal-cancel" onclick="closeCloseModal()">← Annuler</button>
-            <button type="button" class="btn-modal-close" onclick="confirmClose()">🔒 Oui, fermer définitivement</button>
+            <button type="button" class="btn-modal-close" onclick="confirmClose()" style="display:inline-flex;align-items:center;justify-content:center;gap:6px">{!! $I['lock_btn'] !!} Oui, fermer définitivement</button>
         </div>
     </div>
 </div>

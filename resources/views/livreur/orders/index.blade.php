@@ -449,6 +449,11 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
             @elseif(in_array($s, $deliverStatuses))
                 <button type="button" class="ord-action-gps" id="gpsBtn_{{ $order->id }}"
                         onclick="toggleGps({{ $order->id }}, this)" title="GPS tracking">📡</button>
+                <a href="{{ route('livreur.orders.carte', $order) }}"
+                   style="display:inline-flex;align-items:center;gap:5px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--blue-lt);background:var(--blue-lt);color:var(--blue-dk);font-size:12.5px;font-weight:700;text-decoration:none;white-space:nowrap">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Carte GPS
+                </a>
                 @if($isBulk)
                 <form action="{{ route('livreur.orders.completeBulk') }}" method="POST" style="flex:1"
                       onsubmit="return confirm('Confirmer la livraison des {{ count($grpOrders) }} commandes ?')">

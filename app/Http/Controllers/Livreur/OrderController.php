@@ -336,4 +336,11 @@ class OrderController extends Controller
             return back()->with('error', "Impossible de marquer la commande comme livrée : " . $e->getMessage());
         }
     }
+
+    public function carte(Order $order)
+    {
+        $this->authorizeOrder($order);
+        $order->load(['client', 'shop', 'items.product']);
+        return view('livreur.orders.carte', compact('order'));
+    }
 }

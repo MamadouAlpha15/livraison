@@ -1505,8 +1505,16 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>`;
     }
 
-    const dashMarkers = {};
+    const dashMarkers       = {};
+    const dashClientMarkers = {};
     let mapInitialized = false;
+
+    function clientPinIcon() {
+        return L.divIcon({
+            html: `<div style="width:14px;height:14px;border-radius:50%;background:#3b82f6;border:2px solid #fff;box-shadow:0 0 0 3px rgba(59,130,246,.25),0 2px 6px rgba(59,130,246,.4)"></div>`,
+            iconSize:[14,14], iconAnchor:[7,7], className:''
+        });
+    }
 
     function updateDashMap(drivers) {
         const activeIds = new Set(drivers.map(o => o.driver_id));
@@ -1529,6 +1537,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     .bindPopup(() => buildMapPopup(o));
             }
             bounds.push(pos);
+        });
+
+        /* ── Marqueurs clients (positions partagées) ── */
+        const activeOrderIds = new Set();
+        drivers.forEach(o => {
+            (o.orders || []).forEach(ord => {
+                if (ord.client_lat && ord.client_lng) {
+                    activeOrderIds.add(ord.id);
+                    const cpos = [parseFloat(ord.client_lat), parseFloat(ord.client_lng)];
+                    if (dashClientMarkers[ord.id]) {
+                        dashClientMarkers[ord.id].setLatLng(cpos);
+                    } else {
+                        const name = ord.client || 'Client';
+                        dashClientMarkers[ord.id] = L.marker(cpos, { icon: clientPinIcon() })
+                            .addTo(map)
+                            .bindPopup(`<div style="font-family:system-ui;padding:2px 4px"><b style="font-size:12px">📍 ${name}</b><br><span style="font-size:10.5px;color:#94a3b8">Position partagée</span></div>`);
+                    }
+                }
+            });
+        });
+        Object.keys(dashClientMarkers).forEach(id => {
+            if (!activeOrderIds.has(parseInt(id))) {
+                map.removeLayer(dashClientMarkers[id]);
+                delete dashClientMarkers[id];
+            }
         });
 
         if (bounds.length > 0 && !mapInitialized) {

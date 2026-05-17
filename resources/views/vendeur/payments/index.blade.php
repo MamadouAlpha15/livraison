@@ -14,6 +14,48 @@
 
 @php $bodyClass = 'is-dashboard'; @endphp
 
+@php
+$_s  = 'stroke-width="1.75"';
+$_s2 = 'stroke-width="2"';
+$_s1 = 'stroke-width="1.5"';
+$I = [
+/* ── sidebar 17px ── */
+'dash_nav'  => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+'msg_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+'box_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+'tag_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>',
+'users_nav' => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+'team_nav'  => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>',
+'bike_nav'  => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="17" r="3"/><circle cx="19" cy="17" r="3"/><path d="M12 4h4l2 6"/><path d="M6.8 17H12l5-9"/><path d="M5 14l2.5-5H12"/></svg>',
+'bldg_nav'  => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><rect x="9" y="14" width="6" height="7"/></svg>',
+'wallet_nav'=> '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>',
+'card_nav'  => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+'chart_nav' => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>',
+'list_nav'  => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>',
+'gear_nav'  => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+'hdp_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',
+/* ── topbar 15px ── */
+'coin_tb'        => '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+/* ── page header 20px ── */
+'coin_pg'        => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+/* ── devise badge 12px ── */
+'exchange_badge' => '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4m0 0L3 8m4-4 4 4"/><path d="M17 8v12m0 0 4-4m-4 4-4-4"/></svg>',
+/* ── hero panel 28px ── */
+'hero_coin'      => '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s1.' stroke-linecap="round" stroke-linejoin="round" style="color:rgba(255,255,255,.9)"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+/* ── empty state 40px ── */
+'card_empty'     => '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s1.' stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+/* ── inline 11–12px ── */
+'phone_lnk'    => '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.28h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.27v.65z"/></svg>',
+'cash_method'  => '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="22" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg>',
+'mobile_method'=> '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
+'card_method'  => '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+'clock_pill'   => '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+'coin_lbl'     => '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+'card_lbl'     => '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+'calendar_lbl' => '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+];
+@endphp
+
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -165,7 +207,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     border: 1px solid rgba(99,102,241,.25);
     border-radius: 16px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 28px; flex-shrink: 0;
+    flex-shrink: 0;
 }
 .hero-lbl { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
 .hero-val  { font-size: 36px; font-weight: 800; color: #fff; font-family: var(--mono); letter-spacing: -1.5px; line-height: 1; }
@@ -257,7 +299,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 /* Empty */
 .empty-state { padding: 56px 20px; text-align: center; }
-.empty-state .ico { font-size: 40px; display: block; margin-bottom: 12px; opacity: .35; }
+.empty-state .ico { display: flex; align-items: center; justify-content: center; margin-bottom: 12px; opacity: .35; }
 .empty-state p { font-size: 14px; color: var(--muted); }
 
 /* Pagination */
@@ -297,7 +339,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     .kpi-row { grid-template-columns: 1fr 1fr; gap: 8px; }
     .revenue-hero { padding: 18px 16px; gap: 14px; }
     .hero-val { font-size: 28px; }
-    .hero-icon { width: 48px; height: 48px; font-size: 22px; }
+    .hero-icon { width: 48px; height: 48px; }
 }
 
 @media (max-width: 380px) {
@@ -348,59 +390,59 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     </div>
     <nav class="sb-nav">
         <a href="{{ route('boutique.dashboard') }}" class="sb-item" style="margin-bottom:4px">
-            <span class="ico">⊞</span> Tableau de bord
+            <span class="ico">{!! $I['dash_nav'] !!}</span> Tableau de bord
         </a>
         <div class="sb-section">Boutique</div>
         <a href="{{ route('boutique.messages.hub') }}" class="sb-item">
-            <span class="ico">💬</span> Messages
+            <span class="ico">{!! $I['msg_nav'] !!}</span> Messages
         </a>
         <a href="{{ route('boutique.orders.index') }}" class="sb-item">
-            <span class="ico">📦</span> Commandes
+            <span class="ico">{!! $I['box_nav'] !!}</span> Commandes
             @if($pendingCount > 0)<span class="sb-badge">{{ $pendingCount }}</span>@endif
         </a>
         <a href="{{ route('products.index') }}" class="sb-item">
-            <span class="ico">🏷️</span> Produits
+            <span class="ico">{!! $I['tag_nav'] !!}</span> Produits
         </a>
         <a href="{{ route('boutique.clients.index') }}" class="sb-item">
-            <span class="ico">👥</span> Clients
+            <span class="ico">{!! $I['users_nav'] !!}</span> Clients
         </a>
         <a href="{{ route('boutique.employees.index') }}" class="sb-item">
-            <span class="ico">🧑‍💼</span> Équipe
+            <span class="ico">{!! $I['team_nav'] !!}</span> Équipe
         </a>
         <div class="sb-section">Livraison</div>
         <a href="{{ route('boutique.livreurs.index') }}" class="sb-item">
-            <span class="ico">🚴</span> Livreurs
+            <span class="ico">{!! $I['bike_nav'] !!}</span> Livreurs
         </a>
         <a href="{{ route('delivery.companies.index') }}" class="sb-item">
-            <span class="ico">🏢</span> Partenaires
+            <span class="ico">{!! $I['bldg_nav'] !!}</span> Partenaires
         </a>
         <div class="sb-section">Finances</div>
         <div class="sb-group">
             <button class="sb-group-toggle open" onclick="toggleGroup(this)" type="button">
-                <span class="ico">💰</span>
+                <span class="ico">{!! $I['wallet_nav'] !!}</span>
                 Finances & Rapports
                 <span class="sb-arrow" style="transform:rotate(90deg);color:rgba(255,255,255,.5)">▶</span>
             </button>
             <div class="sb-sub open">
                 <a href="{{ route('boutique.payments.index') }}" class="sb-item active">
-                    <span class="ico">💳</span> Paiements
+                    <span class="ico">{!! $I['card_nav'] !!}</span> Paiements
                 </a>
                 <a href="{{ route('boutique.commissions.index') }}" class="sb-item">
-                    <span class="ico">📊</span> Commissions
+                    <span class="ico">{!! $I['chart_nav'] !!}</span> Commissions
                 </a>
                 <a href="{{ route('boutique.reports.index') }}" class="sb-item">
-                    <span class="ico">📋</span> Rapports
+                    <span class="ico">{!! $I['list_nav'] !!}</span> Rapports
                 </a>
                 @if(auth()->user()->role === 'admin')
                 <a href="{{ route('shop.edit', $shop) }}" class="sb-item">
-                    <span class="ico">⚙️</span> Paramètres
+                    <span class="ico">{!! $I['gear_nav'] !!}</span> Paramètres
                 </a>
                 @endif
             </div>
         </div>
         <div class="sb-section">Aide</div>
         <a href="{{ route('support.index') }}" class="sb-item">
-            <span class="ico">🎧</span> Support
+            <span class="ico">{!! $I['hdp_nav'] !!}</span> Support
         </a>
     </nav>
     <div class="sb-footer">
@@ -426,7 +468,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     <div class="topbar">
         <button class="btn-hamburger" id="btnMenu" aria-label="Menu">☰</button>
         <div class="tb-info">
-            <div class="tb-title">💰 Revenus & Paiements</div>
+            <div class="tb-title" style="display:flex;align-items:center;gap:6px">{!! $I['coin_tb'] !!} Revenus & Paiements</div>
             <div class="tb-sub">{{ $shop->name }} · <span style="font-family:var(--mono);font-size:10px;background:var(--brand-mlt);color:var(--brand-dk);padding:1px 7px;border-radius:10px;border:1px solid var(--brand-lt)">{{ $devise }}</span></div>
         </div>
     </div>
@@ -436,18 +478,18 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     {{-- ── Header ── --}}
     <div class="page-hd">
         <div>
-            <h1 class="page-title">💰 Revenus</h1>
+            <h1 class="page-title" style="display:flex;align-items:center;gap:8px">{!! $I['coin_pg'] !!} Revenus</h1>
             <p class="page-sub">
                 {{ $shop->name }}
                 &nbsp;·&nbsp;
-                <span class="devise-badge">💱 {{ $devise }}</span>
+                <span class="devise-badge">{!! $I['exchange_badge'] !!} {{ $devise }}</span>
             </p>
         </div>
     </div>
 
     {{-- ── Hero total revenus ── --}}
     <div class="revenue-hero">
-        <div class="hero-icon">💵</div>
+        <div class="hero-icon">{!! $I['hero_coin'] !!}</div>
         <div>
             <div class="hero-lbl">Total des revenus confirmés</div>
             {{-- Devise dynamique de la boutique --}}
@@ -503,7 +545,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
         @if($payments->isEmpty())
         <div class="empty-state">
-            <span class="ico">💳</span>
+            <span class="ico">{!! $I['card_empty'] !!}</span>
             <p>Aucun paiement confirmé pour le moment.</p>
         </div>
         @else
@@ -537,7 +579,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                             <div>
                                 <div class="c-name">{{ $client?->name ?? 'Client inconnu' }}</div>
                                 @if($client?->phone)
-                                <div class="c-sub">📞 {{ $client->phone }}</div>
+                                <div class="c-sub" style="display:flex;align-items:center;gap:3px">{!! $I['phone_lnk'] !!} {{ $client->phone }}</div>
                                 @endif
                             </div>
                         </div>
@@ -554,7 +596,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     {{-- Méthode de paiement --}}
                     <td>
                         <span class="method-badge">
-                            @if($payment->method === 'cash') 💵 @elseif($payment->method === 'mobile') 📱 @else 💳 @endif
+                            @if($payment->method === 'cash') {!! $I['cash_method'] !!} @elseif($payment->method === 'mobile') {!! $I['mobile_method'] !!} @else {!! $I['card_method'] !!} @endif
                             {{ ucfirst($payment->method) }}
                         </span>
                     </td>
@@ -564,7 +606,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                         @if($payment->status === 'payé' || $payment->status === 'paid')
                             <span class="pill p-success">✓ Payé</span>
                         @else
-                            <span class="pill p-warning">⏳ En attente</span>
+                            <span class="pill p-warning">{!! $I['clock_pill'] !!} En attente</span>
                         @endif
                     </td>
 
@@ -612,21 +654,21 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             {{-- Corps --}}
             <div class="m-pay-body">
                 <div class="m-row">
-                    <span class="m-lbl">💰 Montant</span>
+                    <span class="m-lbl" style="display:inline-flex;align-items:center;gap:4px">{!! $I['coin_lbl'] !!} Montant</span>
                     <span style="font-family:var(--mono);font-weight:700;font-size:15px;color:var(--brand)">
                         {{ number_format($payment->amount, 0, ',', ' ') }}
                         <span style="font-size:10px;color:var(--muted);font-weight:500">{{ $devise }}</span>
                     </span>
                 </div>
                 <div class="m-row">
-                    <span class="m-lbl">💳 Méthode</span>
+                    <span class="m-lbl" style="display:inline-flex;align-items:center;gap:4px">{!! $I['card_lbl'] !!} Méthode</span>
                     <span class="method-badge">
-                        @if($payment->method === 'cash') 💵 @elseif($payment->method === 'mobile') 📱 @else 💳 @endif
+                        @if($payment->method === 'cash') {!! $I['cash_method'] !!} @elseif($payment->method === 'mobile') {!! $I['mobile_method'] !!} @else {!! $I['card_method'] !!} @endif
                         {{ ucfirst($payment->method) }}
                     </span>
                 </div>
                 <div class="m-row">
-                    <span class="m-lbl">📅 Date</span>
+                    <span class="m-lbl" style="display:inline-flex;align-items:center;gap:4px">{!! $I['calendar_lbl'] !!} Date</span>
                     <span style="font-size:12px;color:var(--text-2);font-weight:500">
                         {{ $payment->created_at->format('d/m/Y H:i') }}
                     </span>

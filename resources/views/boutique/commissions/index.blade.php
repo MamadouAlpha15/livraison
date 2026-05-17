@@ -15,6 +15,70 @@
 @section('title', 'Commissions · ' . $shop->name)
 @php $bodyClass = 'is-dashboard'; @endphp
 
+@php
+$_s  = 'stroke-width="1.75"';
+$_s2 = 'stroke-width="2"';
+$_s1 = 'stroke-width="1.5"';
+$I = [
+/* ── sidebar 17px ── */
+'dash_nav'  => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+'msg_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+'box_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+'tag_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>',
+'users_nav' => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+'team_nav'  => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>',
+'bike_nav'  => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="17" r="3"/><circle cx="19" cy="17" r="3"/><path d="M12 4h4l2 6"/><path d="M6.8 17H12l5-9"/><path d="M5 14l2.5-5H12"/></svg>',
+'bldg_nav'  => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><rect x="9" y="14" width="6" height="7"/></svg>',
+'wallet_nav'=> '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>',
+'card_nav'  => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+'chart_nav' => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>',
+'list_nav'  => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>',
+'gear_nav'  => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+'hdp_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',
+/* ── topbar/header ── */
+'coin_tb'        => '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+'coin_pg'        => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+'exchange_badge' => '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4m0 0L3 8m4-4 4 4"/><path d="M17 8v12m0 0 4-4m-4 4-4-4"/></svg>',
+/* ── KPI 22px ── */
+'check_kpi' => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round" style="color:#a5b4fc"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+'clock_kpi' => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round" style="color:#fcd34d"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+/* ── type tabs 14px ── */
+'bike_tab'  => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="17" r="3"/><circle cx="19" cy="17" r="3"/><path d="M12 4h4l2 6"/><path d="M6.8 17H12l5-9"/><path d="M5 14l2.5-5H12"/></svg>',
+'bldg_tab'  => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><rect x="9" y="14" width="6" height="7"/></svg>',
+/* ── status tabs 13px ── */
+'clock_tab'    => '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+'check_tab'    => '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+'download_tab' => '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+/* ── how-to 18px ── */
+'bulb_how'  => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round" style="color:rgba(255,255,255,.8)"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.5-1.5 4.5-3 6H8c-1.5-1.5-3-3.5-3-6a7 7 0 0 1 7-7z"/></svg>',
+/* ── info box 16px ── */
+'info_ico'  => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+/* ── payout labels 12px ── */
+'paperclip_lbl' => '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>',
+'note_lbl'      => '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+/* ── buttons 13px ── */
+'check_btn'  => '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+/* ── table headers 12px ── */
+'pin_hd'   => '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+'coin_hd'  => '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+/* ── inline small ── */
+'box_tag'    => '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>',
+'user_tag'   => '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+'phone_lnk'  => '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.28h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.27v.65z"/></svg>',
+'bldg_mini'  => '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><rect x="9" y="14" width="6" height="7"/></svg>',
+/* ── dest pin 11px ── */
+'pin_cell'   => '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+/* ── row alert 11px ── */
+'warn_alert' => '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+/* ── empty state 40px ── */
+'bike_empty' => '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s1.' stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="17" r="3"/><circle cx="19" cy="17" r="3"/><path d="M12 4h4l2 6"/><path d="M6.8 17H12l5-9"/><path d="M5 14l2.5-5H12"/></svg>',
+'bldg_empty' => '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s1.' stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><rect x="9" y="14" width="6" height="7"/></svg>',
+/* ── modal ── */
+'money_modal' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+'check_modal' => '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+];
+@endphp
+
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -122,7 +186,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .kpi-card.pending { background: linear-gradient(135deg, #451a03, #78350f); border: 1px solid rgba(245,158,11,.25); }
 .kpi-card.paid    { background: linear-gradient(135deg, #161021, #4F46E5); border: 1px solid rgba(99,102,241,.25); }
 .kpi-card::after  { content: ''; position: absolute; right: -30px; top: -30px; width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,.04); pointer-events: none; }
-.kpi-ico { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+.kpi-ico { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .kpi-card.pending .kpi-ico { background: rgba(245,158,11,.15); border: 1px solid rgba(245,158,11,.25); }
 .kpi-card.paid    .kpi-ico { background: rgba(99,102,241,.15); border: 1px solid rgba(99,102,241,.25); }
 .kpi-lbl  { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
@@ -174,7 +238,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     font-size: 12.5px; color: #4338ca; font-weight: 600;
     margin-bottom: 12px; display: flex; align-items: flex-start; gap: 8px;
 }
-.company-info-box .ico { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.company-info-box .ico { flex-shrink: 0; margin-top: 1px; display:flex; align-items:center; justify-content:center; }
 .company-ro-note {
     font-size: 11px; color: #4f46e5; font-weight: 600;
     background: #eef2ff; border: 1px solid #c7d2fe;
@@ -340,7 +404,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
 
 /* ══ EMPTY ══ */
 .empty-state { padding: 56px 20px; text-align: center; }
-.empty-state .ico { font-size: 40px; display: block; margin-bottom: 12px; opacity: .3; }
+.empty-state .ico { display: flex; align-items: center; justify-content: center; margin-bottom: 12px; opacity: .3; }
 .empty-state h3 { font-size: 15px; font-weight: 700; color: var(--text); margin: 0 0 6px; }
 .empty-state p { font-size: 13px; color: var(--muted); margin: 0; }
 
@@ -366,7 +430,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
     border-bottom: 1px solid var(--border);
     display: flex; align-items: center; gap: 12px;
 }
-.modal-ico { font-size: 28px; flex-shrink: 0; }
+.modal-ico { flex-shrink: 0; display:flex; align-items:center; justify-content:center; }
 .modal-title { font-size: 17px; font-weight: 800; color: var(--text); margin: 0; }
 .modal-sub   { font-size: 13px; color: var(--muted); margin: 4px 0 0; }
 .modal-body { padding: 20px 24px; }
@@ -416,7 +480,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
     .page-wrap { padding: 14px 14px 40px; }
     .kpi-card { padding: 14px 16px; gap: 10px; }
     .kpi-val { font-size: 22px; }
-    .kpi-ico { width: 40px; height: 40px; font-size: 18px; }
+    .kpi-ico { width: 40px; height: 40px; }
     .status-tab { font-size: 12.5px; padding: 12px 14px; }
     .how-to-step { font-size: 11.5px; padding: 6px 10px; }
     .payout-bar { gap: 8px; }
@@ -544,37 +608,37 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
     </div>
     <nav class="sb-nav">
         <a href="{{ route('boutique.dashboard') }}" class="sb-item" style="margin-bottom:4px">
-            <span class="ico">⊞</span> Tableau de bord
+            <span class="ico">{!! $I['dash_nav'] !!}</span> Tableau de bord
         </a>
         <div class="sb-section">Boutique</div>
-        <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">💬</span> Messages</a>
+        <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">{!! $I['msg_nav'] !!}</span> Messages</a>
         <a href="{{ route('boutique.orders.index') }}" class="sb-item">
-            <span class="ico">📦</span> Commandes
+            <span class="ico">{!! $I['box_nav'] !!}</span> Commandes
             @if($pendingCount > 0)<span class="sb-badge">{{ $pendingCount }}</span>@endif
         </a>
-        <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">🏷️</span> Produits</a>
-        <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">👥</span> Clients</a>
-        <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">🧑‍💼</span> Équipe</a>
+        <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">{!! $I['tag_nav'] !!}</span> Produits</a>
+        <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">{!! $I['users_nav'] !!}</span> Clients</a>
+        <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">{!! $I['team_nav'] !!}</span> Équipe</a>
         <div class="sb-section">Livraison</div>
-        <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">🚴</span> Livreurs</a>
-        <a href="{{ route('delivery.companies.index') }}" class="sb-item"><span class="ico">🏢</span> Partenaires</a>
+        <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">{!! $I['bike_nav'] !!}</span> Livreurs</a>
+        <a href="{{ route('delivery.companies.index') }}" class="sb-item"><span class="ico">{!! $I['bldg_nav'] !!}</span> Partenaires</a>
         <div class="sb-section">Finances</div>
         <div class="sb-group">
             <button class="sb-group-toggle open" onclick="toggleGroup(this)" type="button">
-                <span class="ico">💰</span> Finances & Rapports
+                <span class="ico">{!! $I['wallet_nav'] !!}</span> Finances & Rapports
                 <span class="sb-arrow" style="transform:rotate(90deg);color:rgba(255,255,255,.5)">▶</span>
             </button>
             <div class="sb-sub open">
-                <a href="{{ route('boutique.payments.index') }}" class="sb-item"><span class="ico">💳</span> Paiements</a>
-                <a href="{{ route('boutique.commissions.index') }}" class="sb-item active"><span class="ico">📊</span> Commissions</a>
-                <a href="{{ route('boutique.reports.index') }}" class="sb-item"><span class="ico">📋</span> Rapports</a>
+                <a href="{{ route('boutique.payments.index') }}" class="sb-item"><span class="ico">{!! $I['card_nav'] !!}</span> Paiements</a>
+                <a href="{{ route('boutique.commissions.index') }}" class="sb-item active"><span class="ico">{!! $I['chart_nav'] !!}</span> Commissions</a>
+                <a href="{{ route('boutique.reports.index') }}" class="sb-item"><span class="ico">{!! $I['list_nav'] !!}</span> Rapports</a>
                 @if(auth()->user()->role === 'admin')
-                <a href="{{ route('shop.edit', $shop) }}" class="sb-item"><span class="ico">⚙️</span> Paramètres</a>
+                <a href="{{ route('shop.edit', $shop) }}" class="sb-item"><span class="ico">{!! $I['gear_nav'] !!}</span> Paramètres</a>
                 @endif
             </div>
         </div>
         <div class="sb-section">Aide</div>
-        <a href="{{ route('support.index') }}" class="sb-item"><span class="ico">🎧</span> Support</a>
+        <a href="{{ route('support.index') }}" class="sb-item"><span class="ico">{!! $I['hdp_nav'] !!}</span> Support</a>
     </nav>
     <div class="sb-footer">
         <a href="{{ route('profile.edit') }}" class="sb-user">
@@ -597,7 +661,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
     <div class="topbar">
         <button class="btn-hamburger" id="btnMenu">☰</button>
         <div class="tb-info">
-            <div class="tb-title">💸 Commissions livreurs</div>
+            <div class="tb-title" style="display:flex;align-items:center;gap:6px">{!! $I['coin_tb'] !!} Commissions livreurs</div>
             <div class="tb-sub">{{ $shop->name }} · <span style="font-family:var(--mono);font-size:10px;background:var(--brand-mlt);color:var(--brand-dk);padding:1px 7px;border-radius:10px;border:1px solid var(--brand-lt)">{{ $devise }}</span></div>
         </div>
     </div>
@@ -607,8 +671,8 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
     {{-- ── Header ── --}}
     <div class="page-hd">
         <div>
-            <h1 class="page-title">💸 Commissions livreurs</h1>
-            <p class="page-sub">{{ $shop->name }} &nbsp;·&nbsp; <span class="devise-badge">💱 {{ $devise }}</span></p>
+            <h1 class="page-title" style="display:flex;align-items:center;gap:8px">{!! $I['coin_pg'] !!} Commissions livreurs</h1>
+            <p class="page-sub">{{ $shop->name }} &nbsp;·&nbsp; <span class="devise-badge">{!! $I['exchange_badge'] !!} {{ $devise }}</span></p>
         </div>
     </div>
 
@@ -616,7 +680,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
     @if($type === 'shop')
     <div class="kpi-row" style="grid-template-columns:1fr">
         <div class="kpi-card paid">
-            <div class="kpi-ico">✅</div>
+            <div class="kpi-ico">{!! $I['check_kpi'] !!}</div>
             <div>
                 <div class="kpi-lbl">Total déjà payé — mes livreurs</div>
                 <div class="kpi-val">{{ number_format($shopPaid, 0, ',', ' ') }}</div>
@@ -628,7 +692,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
     @else
     <div class="kpi-row">
         <div class="kpi-card pending">
-            <div class="kpi-ico">⏳</div>
+            <div class="kpi-ico">{!! $I['clock_kpi'] !!}</div>
             <div>
                 <div class="kpi-lbl">Total en attente — entreprises</div>
                 <div class="kpi-val">{{ number_format($companyPending, 0, ',', ' ') }}</div>
@@ -637,7 +701,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
             </div>
         </div>
         <div class="kpi-card paid">
-            <div class="kpi-ico">✅</div>
+            <div class="kpi-ico">{!! $I['check_kpi'] !!}</div>
             <div>
                 <div class="kpi-lbl">Total déjà payé — entreprises</div>
                 <div class="kpi-val">{{ number_format($companyPaid, 0, ',', ' ') }}</div>
@@ -666,14 +730,14 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
     <div class="type-tabs">
         <a href="{{ route('boutique.commissions.index', ['type' => 'shop', 'status' => $status]) }}"
            class="type-tab {{ $type === 'shop' ? 'active shop' : '' }}">
-            🚴 Commissions de mes livreurs
+            {!! $I['bike_tab'] !!} Commissions de mes livreurs
             @if($shopPendingCount > 0)
             <span class="type-badge">{{ $shopPendingCount }}</span>
             @endif
         </a>
         <a href="{{ route('boutique.commissions.index', ['type' => 'company', 'status' => $status]) }}"
            class="type-tab {{ $type === 'company' ? 'active company' : '' }}">
-            🏢 Commissions entreprises
+            {!! $I['bldg_tab'] !!} Commissions entreprises
             @if($companyPendingCount > 0)
             <span class="type-badge">{{ $companyPendingCount }}</span>
             @endif
@@ -684,17 +748,17 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
     <div class="status-tabs">
         <a href="{{ route('boutique.commissions.index', ['type' => $type, 'status' => 'en_attente']) }}"
            class="status-tab {{ $status === 'en_attente' ? 'active' : '' }}">
-            ⏳ <span class="tab-label">En attente</span>
+            {!! $I['clock_tab'] !!} <span class="tab-label">En attente</span>
             <span class="tab-count">{{ $status === 'en_attente' ? $commissions->total() : '—' }}</span>
         </a>
         <a href="{{ route('boutique.commissions.index', ['type' => $type, 'status' => 'payée']) }}"
            class="status-tab {{ $status !== 'en_attente' ? 'active' : '' }}">
-            ✅ <span class="tab-label">Payées</span>
+            {!! $I['check_tab'] !!} <span class="tab-label">Payées</span>
             <span class="tab-count">{{ $status !== 'en_attente' ? $commissions->total() : '—' }}</span>
         </a>
         @if($status !== 'en_attente' && $commissions->isNotEmpty())
         <a href="{{ route('boutique.commissions.export', ['type' => $type]) }}" class="status-tab" style="flex:0;padding:13px 18px;color:#065f46;background:#ecfdf5;border-left:1px solid var(--border)">
-            ⬇️ <span class="tab-label">Exporter CSV</span>
+            {!! $I['download_tab'] !!} <span class="tab-label">Exporter CSV</span>
         </a>
         @endif
     </div>
@@ -706,7 +770,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
 
     @if($type === 'shop')
     <div class="how-to">
-        <div style="font-size:20px;flex-shrink:0;margin-top:2px">💡</div>
+        <div style="flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center">{!! $I['bulb_how'] !!}</div>
         <div style="flex:1;min-width:0">
             <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:10px">Comment payer un livreur de votre boutique ?</div>
             <div class="how-to-steps">
@@ -719,14 +783,14 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
     </div>
     @else
     <div class="company-info-box">
-        <span class="ico">ℹ️</span>
+        <span class="ico">{!! $I['info_ico'] !!}</span>
         <div>
             Ces frais correspondent aux livraisons effectuées par les chauffeurs de vos <strong>entreprises partenaires</strong>.
             Cochez les lignes, saisissez le montant convenu et marquez-les comme payées.
         </div>
     </div>
     <div class="how-to">
-        <div style="font-size:20px;flex-shrink:0;margin-top:2px">💡</div>
+        <div style="flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center">{!! $I['bulb_how'] !!}</div>
         <div style="flex:1;min-width:0">
             <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:10px">Comment payer une commission entreprise ?</div>
             <div class="how-to-steps">
@@ -753,7 +817,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
 
             <div style="flex:1;min-width:160px;display:flex;flex-direction:column;gap:3px;">
                 <label style="font-size:11px;font-weight:700;color:var(--text-2);display:flex;align-items:center;">
-                    📎 Référence paiement
+                    {!! $I['paperclip_lbl'] !!} Référence paiement
                     <div class="tooltip-wrap">
                         <span class="tooltip-icon">?</span>
                         <div class="tooltip-box">Ex : "Orange Money #001", "Virement banque". Sert à retrouver ce paiement.</div>
@@ -764,7 +828,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
 
             <div style="flex:2;min-width:160px;display:flex;flex-direction:column;gap:3px;">
                 <label style="font-size:11px;font-weight:700;color:var(--text-2);display:flex;align-items:center;">
-                    📝 Note interne
+                    {!! $I['note_lbl'] !!} Note interne
                     <div class="tooltip-wrap">
                         <span class="tooltip-icon">?</span>
                         <div class="tooltip-box">Visible uniquement par vous et vos admins.</div>
@@ -776,16 +840,16 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
             <button type="button" id="markPaidBtn" class="btn btn-primary"
                     style="flex-shrink:0;padding:10px 20px;font-size:13.5px;align-self:flex-end;opacity:.4;cursor:not-allowed"
                     data-disabled="1">
-                ✅ Marquer comme payées
+                {!! $I['check_btn'] !!} Marquer comme payées
             </button>
         </div>
 
         <div class="comm-card">
             <div class="comm-card-hd">
                 @if($type === 'shop')
-                <span class="comm-card-title" style="color:#15803d">🚴 {{ $commissions->total() }} commission{{ $commissions->total() > 1 ? 's' : '' }} livreur boutique en attente</span>
+                <span class="comm-card-title" style="color:#15803d;display:inline-flex;align-items:center;gap:6px">{!! $I['bike_tab'] !!} {{ $commissions->total() }} commission{{ $commissions->total() > 1 ? 's' : '' }} livreur boutique en attente</span>
                 @else
-                <span class="comm-card-title" style="color:#4338ca">🏢 {{ $commissions->total() }} commission{{ $commissions->total() > 1 ? 's' : '' }} entreprise en attente</span>
+                <span class="comm-card-title" style="color:#4338ca;display:inline-flex;align-items:center;gap:6px">{!! $I['bldg_tab'] !!} {{ $commissions->total() }} commission{{ $commissions->total() > 1 ? 's' : '' }} entreprise en attente</span>
                 @endif
                 <label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer">
                     <input type="checkbox" id="checkAll"> Tout sélectionner
@@ -803,9 +867,9 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                         <th>Entreprise partenaire</th>
                         <th>Chauffeur</th>
                         @endif
-                        <th>📍 Destination</th>
+                        <th><span style="display:inline-flex;align-items:center;gap:5px">{!! $I['pin_hd'] !!} Destination</span></th>
                         <th class="col-montant">Montant commande</th>
-                        <th style="background:#fef9ec;color:#92400e;">💰 Commission à payer</th>
+                        <th style="background:#fef9ec;color:#92400e;"><span style="display:inline-flex;align-items:center;gap:5px">{!! $I['coin_hd'] !!} Commission à payer</span></th>
                         <th class="col-date">Date</th>
                     </tr>
                 </thead>
@@ -844,20 +908,20 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                             @if($type === 'shop' && ($bCount ?? 1) > 1)
                             <div style="margin-top:4px;">
                                 <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;background:#f0fdf4;color:#15803d;border:1px solid #86efac;border-radius:5px;padding:2px 7px;white-space:nowrap;">
-                                    📦 {{ $bCount }} commandes · 1 trajet
+                                    {!! $I['box_tag'] !!} {{ $bCount }} commandes · 1 trajet
                                 </span>
                                 @if($shopClient ?? false)
-                                <div style="font-size:10px;color:var(--muted);margin-top:2px;">👤 {{ $shopClient }}</div>
+                                <div style="font-size:10px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:3px">{!! $I['user_tag'] !!} {{ $shopClient }}</div>
                                 @endif
                             </div>
                             @endif
                             @if($type === 'company' && isset($gCount) && $gCount > 1)
                             <div style="margin-top:4px;">
                                 <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe;border-radius:5px;padding:2px 7px;white-space:nowrap;">
-                                    📦 {{ $gCount }} commandes · 1 trajet
+                                    {!! $I['box_tag'] !!} {{ $gCount }} commandes · 1 trajet
                                 </span>
                                 @if($clientName)
-                                <div style="font-size:10px;color:var(--muted);margin-top:2px;">👤 {{ $clientName }}</div>
+                                <div style="font-size:10px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:3px">{!! $I['user_tag'] !!} {{ $clientName }}</div>
                                 @endif
                             </div>
                             @endif
@@ -870,7 +934,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                                     {{ $lv?->name ?? '—' }}
                                 </div>
                                 @if($lv?->phone ?? false)
-                                <div style="font-size:10.5px;color:var(--muted);margin-top:3px">📞 {{ $lv->phone }}</div>
+                                <div style="font-size:10.5px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:3px">{!! $I['phone_lnk'] !!} {{ $lv->phone }}</div>
                                 @endif
                             </div>
                         </td>
@@ -881,12 +945,12 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                                 @if($company->image)
                                 <img src="{{ asset('storage/' . $company->image) }}" alt="" style="width:22px;height:22px;border-radius:6px;object-fit:cover;flex-shrink:0">
                                 @else
-                                <div style="width:22px;height:22px;border-radius:6px;background:#e0e7ff;display:flex;align-items:center;justify-content:center;font-size:10px;color:#4338ca;flex-shrink:0">🏢</div>
+                                <div style="width:22px;height:22px;border-radius:6px;background:#e0e7ff;display:flex;align-items:center;justify-content:center;color:#4338ca;flex-shrink:0">{!! $I['bldg_mini'] !!}</div>
                                 @endif
                                 <div>
                                     <div style="font-size:12.5px;font-weight:700;color:#3730a3">{{ $company->name }}</div>
                                     @if($company->phone)
-                                    <div style="font-size:10px;color:var(--muted)">📞 {{ $company->phone }}</div>
+                                    <div style="font-size:10px;color:var(--muted);display:flex;align-items:center;gap:3px">{!! $I['phone_lnk'] !!} {{ $company->phone }}</div>
                                     @endif
                                 </div>
                             </div>
@@ -910,8 +974,8 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                                 @php $stops = $batchDestinations[$c->delivery_batch_id]; @endphp
                                 <div style="display:flex;flex-direction:column;gap:4px;text-align:right">
                                     @foreach($stops as $i => $stop)
-                                    <div class="dest-cell">
-                                        📍 {{ $stop['dest'] ?? 'Non renseignée' }}
+                                    <div class="dest-cell" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+                                        {!! $I['pin_cell'] !!} {{ $stop['dest'] ?? 'Non renseignée' }}
                                         @if($stop['client'])
                                         <small>{{ $stop['client'] }}</small>
                                         @endif
@@ -922,8 +986,8 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                                     @endforeach
                                 </div>
                             @elseif($dest)
-                                <div class="dest-cell" style="text-align:right">
-                                    📍 {{ $dest }}
+                                <div class="dest-cell" style="display:flex;align-items:center;justify-content:flex-end;gap:4px;flex-wrap:wrap">
+                                    {!! $I['pin_cell'] !!} {{ $dest }}
                                     <small>{{ $c->order?->delivery_destination ? 'Destination' : 'Adresse client' }}</small>
                                 </div>
                             @else
@@ -958,7 +1022,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                                        placeholder="Ex: 50 000">
                                 <span style="font-size:11px;font-weight:700;color:#92400e;white-space:nowrap">{{ $devise }}</span>
                             </div>
-                            <div class="row-alert" id="alert-{{ $c->id }}">⚠️ Entrez un montant avant de payer</div>
+                            <div class="row-alert" id="alert-{{ $c->id }}"><span style="display:inline-flex;align-items:center;gap:4px">{!! $I['warn_alert'] !!} Entrez un montant avant de payer</span></div>
                         </td>
                         <td data-label="Date" class="col-date">
                             <div class="date-cell" style="text-align:right">
@@ -978,7 +1042,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
     @else
     <div class="comm-card">
         <div class="empty-state">
-            <span class="ico">{{ $type === 'shop' ? '🚴' : '🏢' }}</span>
+            <span class="ico">{!! $type === 'shop' ? $I['bike_empty'] : $I['bldg_empty'] !!}</span>
             <h3>Aucune commission en attente</h3>
             <p>{{ $type === 'shop' ? 'Tous vos livreurs boutique ont été payés.' : 'Toutes les commissions entreprise ont été réglées.' }}</p>
         </div>
@@ -993,7 +1057,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
     @if($commissions->isEmpty())
     <div class="comm-card">
         <div class="empty-state">
-            <span class="ico">{{ $type === 'shop' ? '🚴' : '🏢' }}</span>
+            <span class="ico">{!! $type === 'shop' ? $I['bike_empty'] : $I['bldg_empty'] !!}</span>
             <h3>Aucune commission payée</h3>
             <p>{{ $type === 'shop' ? 'Aucun paiement enregistré pour vos livreurs boutique.' : 'Aucun paiement enregistré pour les entreprises partenaires.' }}</p>
         </div>
@@ -1002,9 +1066,9 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
     <div class="comm-card">
         <div class="comm-card-hd">
             @if($type === 'shop')
-            <span class="comm-card-title" style="color:#15803d">🚴 {{ $commissions->total() }} commission{{ $commissions->total() > 1 ? 's' : '' }} livreur boutique payée{{ $commissions->total() > 1 ? 's' : '' }}</span>
+            <span class="comm-card-title" style="color:#15803d;display:inline-flex;align-items:center;gap:6px">{!! $I['bike_tab'] !!} {{ $commissions->total() }} commission{{ $commissions->total() > 1 ? 's' : '' }} livreur boutique payée{{ $commissions->total() > 1 ? 's' : '' }}</span>
             @else
-            <span class="comm-card-title" style="color:#4338ca">🏢 {{ $commissions->total() }} commission{{ $commissions->total() > 1 ? 's' : '' }} entreprise payée{{ $commissions->total() > 1 ? 's' : '' }}</span>
+            <span class="comm-card-title" style="color:#4338ca;display:inline-flex;align-items:center;gap:6px">{!! $I['bldg_tab'] !!} {{ $commissions->total() }} commission{{ $commissions->total() > 1 ? 's' : '' }} entreprise payée{{ $commissions->total() > 1 ? 's' : '' }}</span>
             @endif
         </div>
         <div class="tbl-wrap">
@@ -1018,7 +1082,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                     <th>Entreprise partenaire</th>
                     <th>Chauffeur</th>
                     @endif
-                    <th>📍 Destination</th>
+                    <th><span style="display:inline-flex;align-items:center;gap:5px">{!! $I['pin_hd'] !!} Destination</span></th>
                     <th class="col-montant">Montant commande</th>
                     <th>Commission payée</th>
                     <th>Statut</th>
@@ -1052,10 +1116,10 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                         @if($type === 'shop' && ($bCount ?? 1) > 1)
                         <div style="margin-top:4px;">
                             <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;background:#f0fdf4;color:#15803d;border:1px solid #86efac;border-radius:5px;padding:2px 7px;white-space:nowrap;">
-                                📦 {{ $bCount }} commandes · 1 trajet
+                                {!! $I['box_tag'] !!} {{ $bCount }} commandes · 1 trajet
                             </span>
                             @if($shopClient ?? false)
-                            <div style="font-size:10px;color:var(--muted);margin-top:2px;">👤 {{ $shopClient }}</div>
+                            <div style="font-size:10px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:3px">{!! $I['user_tag'] !!} {{ $shopClient }}</div>
                             @endif
                         </div>
                         @endif
@@ -1074,12 +1138,12 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                             @if($company->image)
                             <img src="{{ asset('storage/' . $company->image) }}" alt="" style="width:22px;height:22px;border-radius:6px;object-fit:cover;flex-shrink:0">
                             @else
-                            <div style="width:22px;height:22px;border-radius:6px;background:#e0e7ff;display:flex;align-items:center;justify-content:center;font-size:10px;color:#4338ca;flex-shrink:0">🏢</div>
+                            <div style="width:22px;height:22px;border-radius:6px;background:#e0e7ff;display:flex;align-items:center;justify-content:center;color:#4338ca;flex-shrink:0">{!! $I['bldg_mini'] !!}</div>
                             @endif
                             <div>
                                 <div style="font-size:12.5px;font-weight:700;color:#3730a3">{{ $company->name }}</div>
                                 @if($company->phone)
-                                <div style="font-size:10px;color:var(--muted)">📞 {{ $company->phone }}</div>
+                                <div style="font-size:10px;color:var(--muted);display:flex;align-items:center;gap:3px">{!! $I['phone_lnk'] !!} {{ $company->phone }}</div>
                                 @endif
                             </div>
                         </div>
@@ -1100,7 +1164,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                     @endif
                     <td data-label="Destination">
                         @if($dest)
-                            <div class="dest-cell" style="text-align:right">📍 {{ $dest }}</div>
+                            <div class="dest-cell" style="display:flex;align-items:center;justify-content:flex-end;gap:4px">{!! $I['pin_cell'] !!} {{ $dest }}</div>
                         @else
                             <span class="dest-empty">—</span>
                         @endif
@@ -1166,7 +1230,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
 <div class="modal-overlay" id="confirmModal">
     <div class="modal-box">
         <div class="modal-header">
-            <span class="modal-ico">💸</span>
+            <span class="modal-ico">{!! $I['money_modal'] !!}</span>
             <div>
                 <div class="modal-title">Confirmer le paiement</div>
                 <div class="modal-sub">Cette action est irréversible</div>
@@ -1193,7 +1257,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
         </div>
         <div class="modal-footer">
             <button class="modal-cancel" onclick="closeConfirmModal()">Annuler</button>
-            <button class="modal-confirm" id="modalConfirmBtn">✅ Confirmer le paiement</button>
+            <button class="modal-confirm" id="modalConfirmBtn" style="display:flex;align-items:center;justify-content:center;gap:6px">{!! $I['check_modal'] !!} Confirmer le paiement</button>
         </div>
     </div>
 </div>
@@ -1365,7 +1429,7 @@ function openConfirmModal() {
             var msg = document.createElement('div');
             msg.id = 'globalAmountAlert';
             msg.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#ef4444;color:#fff;padding:12px 24px;border-radius:10px;font-weight:700;font-size:14px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.3)';
-            msg.textContent = '⚠️ Saisissez le montant dans chaque ligne cochée avant de payer';
+            msg.textContent = '⚠ Saisissez le montant dans chaque ligne cochée avant de payer';
             document.body.appendChild(msg);
             setTimeout(function() { msg.remove(); }, 3500);
         }

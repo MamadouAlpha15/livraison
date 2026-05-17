@@ -6,6 +6,51 @@
 @section('title', 'Mes Produits')
 @php $bodyClass = 'is-dashboard'; @endphp
 
+@php
+$_s  = 'fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"';
+$_s2 = 'fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"';
+$_s1 = 'fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"';
+$I = [
+    /* sidebar nav 17px */
+    'msg_nav'    => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    'box_nav'    => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+    'tag_nav'    => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>',
+    'users_nav'  => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    'team_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="17"/><line x1="9.5" y1="14.5" x2="14.5" y2="14.5"/></svg>',
+    'bike_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1"/><path d="M5.5 17.5L11 5.5 15 10l2-3h1.5"/><line x1="11" y1="5.5" x2="7" y2="5.5"/></svg>',
+    'bldg_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    'wallet_nav' => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 13a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" fill="currentColor" stroke="none"/></svg>',
+    'card_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+    'chart_nav'  => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+    'list_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+    'gear_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+    'hdp_nav'    => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',
+    /* topbar */
+    'tag_tb'     => '<svg width="15" height="15" viewBox="0 0 24 24" '.$_s2.'><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>',
+    'plus_tb'    => '<svg width="13" height="13" viewBox="0 0 24 24" '.$_s2.'><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+    /* page header */
+    'tag_pg'     => '<svg width="20" height="20" viewBox="0 0 24 24" '.$_s.'><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>',
+    'plus_pg'    => '<svg width="14" height="14" viewBox="0 0 24 24" '.$_s2.'><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+    /* stat cards 22px */
+    'box_stat'   => '<svg width="22" height="22" viewBox="0 0 24 24" '.$_s.'><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+    'check_stat' => '<svg width="22" height="22" viewBox="0 0 24 24" '.$_s.'><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+    'warn_stat'  => '<svg width="22" height="22" viewBox="0 0 24 24" '.$_s.'><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    /* filter bar */
+    'search_btn' => '<svg width="13" height="13" viewBox="0 0 24 24" '.$_s2.'><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+    /* product card */
+    'tag_placeholder' => '<svg width="36" height="36" viewBox="0 0 24 24" '.$_s1.' style="opacity:.35"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>',
+    'box_chip'   => '<svg width="11" height="11" viewBox="0 0 24 24" '.$_s2.'><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+    'clock_chip' => '<svg width="11" height="11" viewBox="0 0 24 24" '.$_s2.'><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    'photos_chip'=> '<svg width="11" height="11" viewBox="0 0 24 24" '.$_s2.'><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
+    'edit_btn'   => '<svg width="13" height="13" viewBox="0 0 24 24" '.$_s2.'><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
+    'trash_btn'  => '<svg width="13" height="13" viewBox="0 0 24 24" '.$_s2.'><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>',
+    /* empty state */
+    'empty_icon' => '<svg width="52" height="52" viewBox="0 0 24 24" '.$_s1.' style="opacity:.25"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/><line x1="12" y1="17" x2="12" y2="17"/></svg>',
+    /* delete modal */
+    'trash_icon' => '<svg width="36" height="36" viewBox="0 0 24 24" '.$_s1.'><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>',
+];
+@endphp
+
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -154,7 +199,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     display: flex; align-items: center; gap: 12px;
     box-shadow: var(--shadow-sm); min-width: 150px; flex: 1;
 }
-.stat-ico { font-size: 22px; flex-shrink: 0; }
+.stat-ico { flex-shrink: 0; display:flex; align-items:center; justify-content:center; }
 .stat-val { font-size: 24px; font-weight: 800; font-family: var(--mono); color: var(--text); line-height: 1; }
 .stat-lbl { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; margin-top: 2px; }
 
@@ -233,7 +278,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     gap: 6px; background: linear-gradient(135deg, #f3f6f4, #eef1f0);
     color: var(--muted);
 }
-.product-img-placeholder span { font-size: 36px; opacity: .4; }
+.product-img-placeholder span { display:flex; align-items:center; justify-content:center; }
 .product-img-placeholder p { font-size: 11px; font-weight: 600; margin: 0; }
 
 /* Badges sur l'image */
@@ -343,7 +388,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 /* Empty state */
 .empty-state { padding: 64px 20px; text-align: center; grid-column: 1/-1; }
-.empty-ico { font-size: 56px; display: block; margin: 0 auto 16px; opacity: .3; }
+.empty-ico { display: flex; align-items:center; justify-content:center; margin: 0 auto 16px; }
 .empty-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
 .empty-sub   { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
 
@@ -361,7 +406,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     animation: modalIn .2s ease;
 }
 @keyframes modalIn { from { opacity:0; transform:scale(.95) translateY(-8px); } to { opacity:1; transform:scale(1) translateY(0); } }
-.modal-icon  { font-size: 38px; text-align: center; margin-bottom: 12px; }
+.modal-icon  { text-align: center; margin-bottom: 12px; display:flex; align-items:center; justify-content:center; }
 .modal-title { font-size: 16px; font-weight: 700; color: var(--text); text-align: center; margin-bottom: 8px; }
 .modal-sub   { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 22px; line-height: 1.6; }
 .modal-sub strong { color: var(--text); }
@@ -420,7 +465,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     .stat-card { padding: 8px 10px; min-width: 0; }
     .stat-val { font-size: 18px; }
     .stat-lbl { font-size: 9px; }
-    .stat-ico { font-size: 18px; }
+    .stat-ico { }
     /* Masquer le bouton "Dupliquer" sur mobile — trop petit */
     .action-btn.dupe { display: none; }
     /* Ajouter produit en pleine largeur */
@@ -569,7 +614,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 {{-- Modal suppression --}}
 <div class="modal-overlay" id="deleteModal">
     <div class="modal-box">
-        <div class="modal-icon">🗑️</div>
+        <div class="modal-icon">{!! $I['trash_icon'] !!}</div>
         <div class="modal-title">Supprimer ce produit ?</div>
         <div class="modal-sub">
             <strong id="modalProductName"></strong><br>
@@ -579,7 +624,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <button type="button" class="action-btn" onclick="closeDeleteModal()" style="flex:1">← Retour</button>
             <form id="deleteForm" method="POST" style="flex:1;display:contents">
                 @csrf @method('DELETE')
-                <button type="submit" class="action-btn btn-del-confirm" style="flex:1">🗑️ Supprimer</button>
+                <button type="submit" class="action-btn btn-del-confirm" style="flex:1">{!! $I['trash_btn'] !!} Supprimer</button>
             </form>
         </div>
     </div>
@@ -616,43 +661,43 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <span class="ico">⊞</span> Tableau de bord
         </a>
         <div class="sb-section">Boutique</div>
-        <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">💬</span> Messages</a>
+        <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">{!! $I['msg_nav'] !!}</span> Messages</a>
         <a href="{{ route('boutique.orders.index') }}" class="sb-item">
-            <span class="ico">📦</span> Commandes
+            <span class="ico">{!! $I['box_nav'] !!}</span> Commandes
             @if($pendingOrdersCount > 0)<span class="sb-badge">{{ $pendingOrdersCount }}</span>@endif
         </a>
         <a href="{{ route('products.index') }}" class="sb-item active">
-            <span class="ico">🏷️</span> Produits
+            <span class="ico">{!! $I['tag_nav'] !!}</span> Produits
         </a>
         <a href="{{ route('boutique.clients.index') }}" class="sb-item">
-            <span class="ico">👥</span> Clients
+            <span class="ico">{!! $I['users_nav'] !!}</span> Clients
         </a>
         <a href="{{ route('boutique.employees.index') }}" class="sb-item">
-            <span class="ico">🧑‍💼</span> Équipe
+            <span class="ico">{!! $I['team_nav'] !!}</span> Équipe
         </a>
         <div class="sb-section">Livraison</div>
         <a href="{{ route('boutique.livreurs.index') }}" class="sb-item">
-            <span class="ico">🚴</span> Livreurs
+            <span class="ico">{!! $I['bike_nav'] !!}</span> Livreurs
         </a>
         <a href="{{ route('delivery.companies.index') }}" class="sb-item">
-            <span class="ico">🏢</span> Partenaires
+            <span class="ico">{!! $I['bldg_nav'] !!}</span> Partenaires
         </a>
         <div class="sb-section">Finances</div>
         <div class="sb-group">
             <button class="sb-group-toggle" onclick="toggleGroup(this)" type="button">
-                <span class="ico">💰</span> Finances & Rapports <span class="sb-arrow">▶</span>
+                <span class="ico">{!! $I['wallet_nav'] !!}</span> Finances & Rapports <span class="sb-arrow">▶</span>
             </button>
             <div class="sb-sub">
-                <a href="{{ route('boutique.payments.index') }}" class="sb-item"><span class="ico">💳</span> Paiements</a>
-                <a href="{{ route('boutique.commissions.index') }}" class="sb-item"><span class="ico">📊</span> Commissions</a>
-                <a href="{{ route('boutique.reports.index') }}" class="sb-item"><span class="ico">📋</span> Rapports</a>
+                <a href="{{ route('boutique.payments.index') }}" class="sb-item"><span class="ico">{!! $I['card_nav'] !!}</span> Paiements</a>
+                <a href="{{ route('boutique.commissions.index') }}" class="sb-item"><span class="ico">{!! $I['chart_nav'] !!}</span> Commissions</a>
+                <a href="{{ route('boutique.reports.index') }}" class="sb-item"><span class="ico">{!! $I['list_nav'] !!}</span> Rapports</a>
                 @if(auth()->user()->role === 'admin')
-                <a href="{{ route('shop.edit', $shop) }}" class="sb-item"><span class="ico">⚙️</span> Paramètres</a>
+                <a href="{{ route('shop.edit', $shop) }}" class="sb-item"><span class="ico">{!! $I['gear_nav'] !!}</span> Paramètres</a>
                 @endif
             </div>
         </div>
         <div class="sb-section">Aide</div>
-        <a href="{{ route('support.index') }}" class="sb-item"><span class="ico">🎧</span> Support</a>
+        <a href="{{ route('support.index') }}" class="sb-item"><span class="ico">{!! $I['hdp_nav'] !!}</span> Support</a>
     </nav>
 
     <div class="sb-footer">
@@ -679,11 +724,11 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     <div class="topbar">
         <button class="btn-hamburger" id="btnMenu" aria-label="Menu">☰</button>
         <div class="tb-info">
-            <div class="tb-title">🏷️ Catalogue produits</div>
+            <div class="tb-title">{!! $I['tag_tb'] !!} Catalogue produits</div>
             <div class="tb-sub">{{ $shop->name ?? 'Boutique' }} · {{ $totalProducts }} produit(s)</div>
         </div>
         <a href="{{ route('products.create') }}" style="padding:7px 14px;border-radius:var(--r-sm);font-size:12px;font-weight:700;background:var(--brand);color:#fff;border:1px solid var(--brand-dk);text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:background .15s">
-            ➕ Ajouter
+            {!! $I['plus_tb'] !!} Ajouter
         </a>
     </div>
 
@@ -723,25 +768,25 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     {{-- Header --}}
     <div class="page-hd">
         <div>
-            <h1 class="page-title">🏷️ Catalogue produits</h1>
+            <h1 class="page-title">{!! $I['tag_pg'] !!} Catalogue produits</h1>
             <p class="page-sub">Gérez vos produits — modification, activation et suivi du stock.</p>
         </div>
         <a href="{{ route('products.create') }}" class="filter-btn filter-btn-primary" style="font-size:13px;padding:10px 20px">
-            ➕ Ajouter un produit
+            {!! $I['plus_pg'] !!} Ajouter un produit
         </a>
     </div>
 
     {{-- Stats --}}
     <div class="stats-row">
         <div class="stat-card" style="--sc-color:#3b82f6">
-            <span class="stat-ico">📦</span>
+            <span class="stat-ico">{!! $I['box_stat'] !!}</span>
             <div>
                 <div class="stat-val">{{ $totalProducts }}</div>
                 <div class="stat-lbl">Total produits</div>
             </div>
         </div>
         <div class="stat-card" style="--sc-color:#6366f1">
-            <span class="stat-ico">✅</span>
+            <span class="stat-ico">{!! $I['check_stat'] !!}</span>
             <div>
                 {{-- id="statActiveCount" utilisé par le JS toggle pour mise à jour en temps réel --}}
                 <div class="stat-val" id="statActiveCount">{{ $activeProducts }}</div>
@@ -749,7 +794,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             </div>
         </div>
         <div class="stat-card" style="--sc-color:#ef4444">
-            <span class="stat-ico">⚠️</span>
+            <span class="stat-ico">{!! $I['warn_stat'] !!}</span>
             <div>
                 <div class="stat-val">{{ $outOfStock }}</div>
                 <div class="stat-lbl">Rupture stock</div>
@@ -832,7 +877,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             </select>
 
             <button type="submit" class="filter-btn filter-btn-primary">
-                🔍 Filtrer
+                {!! $I['search_btn'] !!} Filtrer
             </button>
 
             @if(request()->hasAny(['search','category','status']))
@@ -868,7 +913,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                          class="product-img" alt="{{ $product->name }}">
                 @else
                     <div class="product-img-placeholder">
-                        <span>🏷️</span>
+                        <span>{!! $I['tag_placeholder'] !!}</span>
                         <p>Aucune image</p>
                     </div>
                 @endif
@@ -936,13 +981,13 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     {{-- Stock : affiché même si 0 (rupture) ── --}}
                     @if($product->stock !== null)
                     <span class="product-meta-chip {{ $stockOut ? 'danger' : ($stockLow ? 'amber' : '') }}">
-                        📦 {{ $product->stock }} en stock
+                        {!! $I['box_chip'] !!} {{ $product->stock }} en stock
                     </span>
                     @endif
                     {{-- Temps préparation restaurant ── --}}
                     @if($product->preparation_time)
                     <span class="product-meta-chip">
-                        ⏱ {{ $product->preparation_time }}min
+                        {!! $I['clock_chip'] !!} {{ $product->preparation_time }}min
                     </span>
                     @endif
                     @if(count($gallery) > 0)
@@ -963,7 +1008,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     <span class="gallery-chip"
                           onclick="openGallery({{ $photosJson }}, {{ json_encode($product->name) }}, {{ $totalPhotos }})"
                           title="Voir les {{ $totalPhotos }} photos">
-                        🖼 {{ $totalPhotos }} photo{{ $totalPhotos > 1 ? 's' : '' }}
+                        {!! $I['photos_chip'] !!} {{ $totalPhotos }} photo{{ $totalPhotos > 1 ? 's' : '' }}
                     </span>
                     @endif
                 </div>
@@ -971,7 +1016,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
             {{-- Footer actions --}}
             <div class="product-footer">
-                <a href="{{ route('products.edit', $product) }}" class="action-btn edit">✏️ Modifier</a>
+                <a href="{{ route('products.edit', $product) }}" class="action-btn edit">{!! $I['edit_btn'] !!} Modifier</a>
 
                 <form action="{{ route('products.duplicate', $product) }}" method="POST" style="flex:0.7">
                     @csrf
@@ -980,13 +1025,13 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
                 <button type="button" class="action-btn del"
                         onclick="openDeleteModal('{{ route('products.destroy', $product) }}', '{{ addslashes($product->name) }}')">
-                    🗑️
+                    {!! $I['trash_btn'] !!}
                 </button>
             </div>
         </div>
         @empty
         <div class="empty-state">
-            <span class="empty-ico">📭</span>
+            <span class="empty-ico">{!! $I['empty_icon'] !!}</span>
             <div class="empty-title">Aucun produit trouvé</div>
             <p class="empty-sub">
                 @if(request()->hasAny(['search','category','status']))
@@ -995,8 +1040,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     Ajoutez votre premier produit pour commencer à vendre.
                 @endif
             </p>
-            <a href="{{ route('products.create') }}" class="filter-btn filter-btn-primary" style="display:inline-flex">
-                ➕ Ajouter un produit
+            <a href="{{ route('products.create') }}" class="filter-btn filter-btn-primary" style="display:inline-flex;align-items:center;gap:5px">
+                {!! $I['plus_pg'] !!} Ajouter un produit
             </a>
         </div>
         @endforelse

@@ -326,6 +326,35 @@ html, body {
 /* Bootstrap impose max-width:100%;height:auto sur toutes les <img> — ça casse les tuiles Leaflet */
 .leaflet-container img { max-width: none !important; height: auto !important; }
 .leaflet-tile          { max-width: none !important; }
+
+/* ── Partage de position client ── */
+.share-loc-strip {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+}
+.share-loc-info  { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.share-loc-text  { min-width: 0; }
+.share-loc-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.share-loc-sub   { font-size: 11px; color: var(--muted); margin-top: 1px; display:flex; align-items:center; gap:4px; }
+.share-loc-btn {
+    flex-shrink: 0;
+    padding: 8px 18px; border-radius: 30px; border: none; cursor: pointer;
+    background: var(--blue); color: #fff;
+    font-size: 13px; font-weight: 700; font-family: var(--font);
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: background .2s, transform .15s; white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(59,130,246,.35);
+}
+.share-loc-btn:hover  { opacity: .9; transform: scale(1.03); }
+.share-loc-btn.active { background: var(--green); box-shadow: 0 2px 8px rgba(16,185,129,.35); }
+@media (max-width: 600px) {
+    .share-loc-strip  { padding: 10px 14px; gap: 8px; }
+    .share-loc-title  { font-size: 12px; }
+    .share-loc-sub    { font-size: 10.5px; }
+    .share-loc-btn    { padding: 7px 14px; font-size: 12px; }
+}
 </style>
 @endpush
 
@@ -483,6 +512,31 @@ $init = fn(string $n): string =>
             </div>
             @endif
         </div>
+
+        {{-- Strip partage de position client --}}
+        @if(!$isDelivered && !$isCancelled)
+        @php $hadPosition = !is_null($order->client_lat) && !is_null($order->client_lng); @endphp
+        <div class="share-loc-strip" id="shareLocStrip">
+            <div class="share-loc-info">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{ $hadPosition ? '#10b981' : '#3b82f6' }}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7z"/></svg>
+                <div class="share-loc-text">
+                    <div class="share-loc-title">Partager ma position</div>
+                    @if($hadPosition)
+                    <div class="share-loc-sub" id="shareSub" style="color:#10b981;display:flex;align-items:center;gap:4px">
+                        <span style="width:6px;height:6px;border-radius:50%;background:#10b981;flex-shrink:0;display:inline-block"></span>
+                        Votre dernière position est encore visible par votre livreur
+                    </div>
+                    @else
+                    <div class="share-loc-sub" id="shareSub">Guidez votre livreur directement chez vous</div>
+                    @endif
+                </div>
+            </div>
+            <button class="share-loc-btn" id="shareLocBtn" type="button">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Partager
+            </button>
+        </div>
+        @endif
     </div>
 
     {{-- ── Progress ── --}}
@@ -950,6 +1004,10 @@ $init = fn(string $n): string =>
                     trailShadow.addLatLng([nLat, nLng]);
                     if (delta > 0.0004) map.panTo([nLat, nLng], { animate:true, duration:.9 });
                     lat = nLat; lng = nLng;
+                    /* Mettre à jour la route OSRM si le client partage sa position */
+                    if (typeof scheduleRouteUpdate === 'function' && clientLat !== null) {
+                        scheduleRouteUpdate();
+                    }
                 }
             }
 
@@ -983,6 +1041,167 @@ $init = fn(string $n): string =>
     } else if (!IS_CANCELLED) {
         pollId = setInterval(refreshAll, 5000);
         refreshAll();
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+     *  PARTAGE DE POSITION CLIENT
+     * ══════════════════════════════════════════════════════════════════ */
+    const CLIENT_LOC_URL = '{{ route('suivi.client-location', $order) }}';
+    const CSRF_TOKEN     = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+
+    let clientLat    = null;
+    let clientLng    = null;
+    let clientMarker = null;
+    let routeLine    = null;
+    let routeShadow  = null;
+    let watchId      = null;
+    let lastSentTs   = 0;
+    let shareActive  = false;
+    let routeTimer   = null;
+
+    /* ── Icône position client (bleu) ── */
+    function makeClientIcon() {
+        return L.divIcon({
+            html: `<div style="width:20px;height:20px;border-radius:50%;
+                        background:#3b82f6;border:2.5px solid #fff;
+                        box-shadow:0 0 0 3px rgba(59,130,246,.3),0 2px 8px rgba(59,130,246,.45)"></div>`,
+            iconSize:[20,20], iconAnchor:[10,10], className:''
+        });
+    }
+
+    /* ── Envoie la position au serveur (throttle 8 s) ── */
+    async function sendClientLocation(clat, clng) {
+        const now = Date.now();
+        if (now - lastSentTs < 8000) return;
+        lastSentTs = now;
+        try {
+            await fetch(CLIENT_LOC_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type':    'application/json',
+                    'X-CSRF-TOKEN':    CSRF_TOKEN,
+                    'X-Requested-With':'XMLHttpRequest'
+                },
+                body: JSON.stringify({ lat: clat, lng: clng })
+            });
+        } catch {}
+    }
+
+    /* ── Trace OSRM du livreur vers le client ── */
+    async function fetchRoute(dLat, dLng, cLat, cLng) {
+        try {
+            const url = `https://router.project-osrm.org/route/v1/driving/${dLng},${dLat};${cLng},${cLat}?overview=full&geometries=geojson`;
+            const res = await fetch(url);
+            const data = await res.json();
+            if (data.code !== 'Ok' || !data.routes?.length) return null;
+            return data.routes[0].geometry.coordinates.map(([lo, la]) => [la, lo]);
+        } catch { return null; }
+    }
+
+    async function updateRoute() {
+        if (!gpsFound || clientLat === null) {
+            if (routeLine)   { map.removeLayer(routeLine);   routeLine   = null; }
+            if (routeShadow) { map.removeLayer(routeShadow); routeShadow = null; }
+            return;
+        }
+        const pts = await fetchRoute(lat, lng, clientLat, clientLng);
+        if (!pts) return;
+        if (routeShadow) routeShadow.setLatLngs(pts);
+        else routeShadow = L.polyline(pts, { color:'rgba(0,0,0,.12)', weight:7, lineCap:'round' }).addTo(map);
+        if (routeLine)  routeLine.setLatLngs(pts);
+        else routeLine  = L.polyline(pts, { color:'#3b82f6', weight:3.5, opacity:.82, lineCap:'round', dashArray:'8 5' }).addTo(map);
+        routeShadow.bringToBack();
+        routeLine.bringToBack();
+        /* Remettre le trail au-dessus */
+        trailShadow.bringToFront();
+        trail.bringToFront();
+        marker.bringToFront();
+    }
+
+    function scheduleRouteUpdate() {
+        clearTimeout(routeTimer);
+        routeTimer = setTimeout(updateRoute, 1800);
+    }
+
+    /* ── Marker client sur la carte ── */
+    function updateClientMarker(clat, clng) {
+        if (clientMarker) {
+            clientMarker.setLatLng([clat, clng]);
+        } else {
+            clientMarker = L.marker([clat, clng], { icon: makeClientIcon() })
+                .addTo(map)
+                .bindPopup('<div style="font-family:system-ui;padding:2px 4px"><b style="font-size:13px">Votre position</b><br><span style="font-size:11px;color:#94a3b8">Partagée en direct</span></div>');
+        }
+    }
+
+    /* ── UI bouton ── */
+    const shareBtn = document.getElementById('shareLocBtn');
+    const shareSubEl = document.getElementById('shareSub');
+
+    function setShareUI(active) {
+        shareActive = active;
+        if (!shareBtn) return;
+        shareBtn.innerHTML = active
+            ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Arrêter`
+            : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Partager`;
+        shareBtn.classList.toggle('active', active);
+
+        /* Icône pin : verte si position connue, bleue sinon */
+        const pinIcon = document.querySelector('#shareLocStrip svg');
+        if (pinIcon) pinIcon.setAttribute('stroke', active || clientLat !== null ? '#10b981' : '#3b82f6');
+
+        if (shareSubEl) {
+            if (active) {
+                shareSubEl.style.color = '#10b981';
+                shareSubEl.innerHTML = `<span style="width:6px;height:6px;border-radius:50%;background:#10b981;flex-shrink:0;display:inline-block;animation:gps-pulse 1.8s ease-in-out infinite"></span> Position partagée · votre livreur vous voit`;
+            } else if (clientLat !== null) {
+                shareSubEl.style.color = '#10b981';
+                shareSubEl.innerHTML = `<span style="width:6px;height:6px;border-radius:50%;background:#10b981;flex-shrink:0;display:inline-block"></span> Votre dernière position est encore visible par votre livreur`;
+            } else {
+                shareSubEl.style.color = '';
+                shareSubEl.textContent = 'Guidez votre livreur directement chez vous';
+            }
+        }
+    }
+
+    /* ── Démarrage partage ── */
+    function startSharing() {
+        if (!('geolocation' in navigator)) {
+            if (shareSubEl) shareSubEl.textContent = 'Géolocalisation non disponible';
+            return;
+        }
+        watchId = navigator.geolocation.watchPosition(
+            pos => {
+                const { latitude: clat, longitude: clng } = pos.coords;
+                clientLat = clat; clientLng = clng;
+                sendClientLocation(clat, clng);
+                updateClientMarker(clat, clng);
+                scheduleRouteUpdate();
+            },
+            err => {
+                if (err.code === 1) { /* permission refusée */
+                    if (shareSubEl) shareSubEl.textContent = 'Permission refusée — activez la localisation';
+                    stopSharing(false);
+                }
+            },
+            { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
+        );
+        setShareUI(true);
+    }
+
+    /* ── Arrêt partage ── */
+    function stopSharing(clearMarker = true) {
+        if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+        setShareUI(false);
+        if (clearMarker && clientMarker) { map.removeLayer(clientMarker); clientMarker = null; }
+        if (routeLine)   { map.removeLayer(routeLine);   routeLine   = null; }
+        if (routeShadow) { map.removeLayer(routeShadow); routeShadow = null; }
+    }
+
+    if (shareBtn && !IS_DELIVERED && !IS_CANCELLED) {
+        shareBtn.addEventListener('click', () => {
+            if (shareActive) stopSharing(true); else startSharing();
+        });
     }
 
 })();

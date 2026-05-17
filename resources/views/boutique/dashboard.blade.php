@@ -68,7 +68,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .sidebar::-webkit-scrollbar-thumb { background: rgba(99,102,241,.4); border-radius: 4px; }
 .sidebar::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,.7); }
 .sb-brand { padding: 18px 16px 14px; border-bottom: 1px solid var(--sb-border); flex-shrink: 0; position: relative; }
-.sb-close { display: none; position: absolute; top: 14px; right: 12px; width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.10); color: rgba(255,255,255,.6); font-size: 18px; line-height: 1; cursor: pointer; align-items: center; justify-content: center; transition: background .15s, color .15s; flex-shrink: 0; }
+.sb-close { display: none; position: absolute; top: 14px; right: 12px; width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.10); color: rgba(255,255,255,.6); cursor: pointer; align-items: center; justify-content: center; transition: background .15s, color .15s; flex-shrink: 0; }
+.sb-ft-ico { width:16px;height:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:.7; }
 .sb-close:hover { background: rgba(239,68,68,.18); border-color: rgba(239,68,68,.3); color: #fca5a5; }
 @media (max-width: 900px) { .sb-close { display: flex; } }
 .sb-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; }
@@ -145,7 +146,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .btn-sm { padding: 5px 10px; font-size: 11px; }
 .btn-ghost { background: transparent; border-color: transparent; color: var(--brand); padding: 5px 8px; }
 .btn-ghost:hover { background: var(--brand-mlt); border-color: var(--brand-lt); }
-.btn-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 6px; color: var(--text); font-size: 20px; }
+.btn-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 6px; color: var(--text); display:flex;align-items:center;justify-content:center; }
 
 /* Export : visible sur grand écran, caché sur petit */
 .topbar-export-group { display: flex; gap: 6px; }
@@ -186,7 +187,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
 .kpi { background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--kpi-color, var(--brand)); border-radius: var(--r); padding: 18px 20px 16px; position: relative; overflow: hidden; box-shadow: var(--shadow-sm); transition: box-shadow .22s, transform .22s, border-color .15s; }
 .kpi:hover { box-shadow: 0 8px 28px rgba(0,0,0,.09), 0 2px 6px rgba(0,0,0,.04); transform: translateY(-2px); }
-.kpi-icon { width: 44px; height: 44px; background: var(--kpi-bg, var(--brand-mlt)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 12px; border: 1.5px solid var(--kpi-border, rgba(0,0,0,.08)); box-shadow: 0 0 0 3px var(--kpi-ring, transparent), 0 2px 10px var(--kpi-glow, rgba(0,0,0,.06)); }
+.kpi-icon { width: 44px; height: 44px; background: var(--kpi-bg, var(--brand-mlt)); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; border: 1.5px solid var(--kpi-border, rgba(0,0,0,.08)); box-shadow: 0 0 0 3px var(--kpi-ring, transparent), 0 2px 10px var(--kpi-glow, rgba(0,0,0,.06)); }
 .kpi-lbl { font-size: 10.5px; color: var(--muted); font-weight: 700; letter-spacing: .4px; margin-bottom: 5px; text-transform: uppercase; }
 .kpi-val { font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -.8px; font-family: var(--mono); line-height: 1; }
 .kpi-unit { font-size: 10px; color: var(--muted); margin-top: 4px; }
@@ -248,7 +249,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .delivery-card { border-radius: 16px !important; overflow: hidden; border: none !important; box-shadow: 0 4px 20px rgba(0,0,0,.08) !important; }
 .delivery-card-hero { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%); padding: 18px 20px 14px; display: flex; align-items: center; justify-content: space-between; }
 .delivery-card-hero-left { display: flex; align-items: center; gap: 12px; }
-.delivery-card-icon { width: 44px; height: 44px; background: rgba(255,255,255,.12); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.delivery-card-icon { width: 44px; height: 44px; background: rgba(255,255,255,.12); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
 .delivery-card-title { font-size: 15px; font-weight: 800; color: #fff; margin: 0; }
 .delivery-card-sub { font-size: 11px; color: rgba(255,255,255,.55); margin-top: 2px; }
 .delivery-card-manage { font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,.8); text-decoration: none; background: rgba(255,255,255,.1); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,.2); transition: all .15s; }
@@ -285,7 +286,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 /* Notice aucun livreur */
 .no-livreur-notice { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 28px 20px; text-align: center; }
-.no-livreur-notice .notice-icon { font-size: 36px; }
+.no-livreur-notice .notice-icon { display:flex;align-items:center;justify-content:center; }
 .no-livreur-notice .notice-title { font-size: 14px; font-weight: 700; color: var(--text); }
 .no-livreur-notice .notice-sub   { font-size: 12px; color: var(--muted); line-height: 1.6; max-width: 260px; }
 
@@ -369,7 +370,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .today-card { background: linear-gradient(90deg, #291d95, #291d95, #aa28d9 ); border: 1px solid rgba(99,102,241,.35); border-radius: var(--r); padding: 20px 22px; display: flex; align-items: center; gap: 16px; box-shadow: 0 8px 32px rgba(79,70,229,.35), 0 2px 8px rgba(0,0,0,.2); position: relative; overflow: hidden; }
 .today-card::before { content: ''; position: absolute; right: -30px; top: -30px; width: 140px; height: 140px; background: rgba(255,255,255,.06); border-radius: 50%; pointer-events: none; }
 .today-card::after  { content: ''; position: absolute; left: -20px; bottom: -30px; width: 110px; height: 110px; background: rgba(255,255,255,.04); border-radius: 50%; pointer-events: none; }
-.today-icon { width: 48px; height: 48px; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; backdrop-filter: blur(4px); }
+.today-icon { width: 48px; height: 48px; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; backdrop-filter: blur(4px); }
 .today-lbl  { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.55); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 4px; }
 .today-val  { font-size: 26px; font-weight: 800; color: #fff; font-family: var(--mono); letter-spacing: -1px; line-height: 1; text-shadow: 0 2px 8px rgba(0,0,0,.2); }
 .today-unit { font-size: 10px; color: rgba(255,255,255,.45); margin-top: 3px; }
@@ -384,7 +385,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .alert-item.warning { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
 .alert-item.success { background: #eef2ff; border-color: #a5b4fc; color: #3730a3; }
 .alert-item.info    { background: #eff6ff; border-color: #93c5fd; color: #1e40af; }
-.alert-ico  { font-size: 16px; flex-shrink: 0; }
+.alert-ico  { display:flex;align-items:center;justify-content:center;flex-shrink: 0; }
 .alert-msg  { flex: 1; line-height: 1.4; }
 .alert-cta  { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; border: 1px solid currentColor; text-decoration: none; color: inherit; white-space: nowrap; flex-shrink: 0; opacity: .75; transition: opacity .15s; }
 .alert-cta:hover { opacity: 1; }
@@ -393,7 +394,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .kanban-col { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px 14px 14px; text-align: center; box-shadow: var(--shadow-sm); transition: all .2s; cursor: default; position: relative; overflow: hidden; }
 .kanban-col::after { content: ''; position: absolute; bottom: -10px; right: -10px; width: 55px; height: 55px; border-radius: 50%; background: var(--k-color); opacity: .05; pointer-events: none; }
 .kanban-col:hover { box-shadow: var(--shadow); transform: translateY(-3px); border-color: var(--k-color); }
-.kanban-ico-wrap { width: 46px; height: 46px; border-radius: 50%; background: var(--k-bg); border: 2.5px solid var(--k-color); box-shadow: 0 0 0 4px var(--k-bg), 0 4px 14px rgba(0,0,0,.10); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 20px; transition: transform .2s; }
+.kanban-ico-wrap { width: 46px; height: 46px; border-radius: 50%; background: var(--k-bg); border: 2.5px solid var(--k-color); box-shadow: 0 0 0 4px var(--k-bg), 0 4px 14px rgba(0,0,0,.10); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; transition: transform .2s; }
 .kanban-col:hover .kanban-ico-wrap { transform: scale(1.1); }
 .kanban-count { font-size: 30px; font-weight: 800; font-family: var(--mono); color: var(--k-color); line-height: 1; letter-spacing: -1.5px; }
 .kanban-lbl   { font-size: 10px; font-weight: 700; color: var(--muted); margin-top: 5px; text-transform: uppercase; letter-spacing: .5px; }
@@ -402,14 +403,14 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .quick-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); box-shadow: var(--shadow-sm); overflow: hidden; }
 .quick-card-hd { padding: 13px 18px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
 .quick-card-title { font-size: 13px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
-.quick-card-title .title-ico { width: 24px; height: 24px; background: var(--brand-mlt); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+.quick-card-title .title-ico { width: 24px; height: 24px; background: var(--brand-mlt); border-radius: 6px; display: flex; align-items: center; justify-content: center; }
 .quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
 .quick-btn { display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 20px 14px 18px; text-decoration: none; border-right: 1px solid var(--border); transition: background .15s, transform .15s; position: relative; cursor: pointer; }
 .quick-btn:last-child { border-right: none; }
 .quick-btn:hover { background: var(--q-bg, var(--brand-mlt)); }
 .quick-btn::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--q-color, var(--brand)); opacity: 0; transition: opacity .15s; }
 .quick-btn:hover::before { opacity: 1; }
-.quick-btn-ico { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; background: var(--q-bg, var(--brand-mlt)); border: 1px solid var(--q-border, var(--brand-lt)); transition: transform .15s; flex-shrink: 0; }
+.quick-btn-ico { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: var(--q-bg, var(--brand-mlt)); border: 1px solid var(--q-border, var(--brand-lt)); transition: transform .15s; flex-shrink: 0; }
 .quick-btn:hover .quick-btn-ico { transform: scale(1.08); }
 .quick-btn-lbl { font-size: 12.5px; font-weight: 700; color: var(--text); line-height: 1.2; text-align: center; }
 .quick-btn-sub { font-size: 10.5px; color: var(--muted); line-height: 1.3; text-align: center; }
@@ -444,13 +445,13 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .risk-row:last-child { border-bottom: none; }
 .risk-row:hover { background: var(--bg); }
 .risk-img { width: 38px; height: 38px; border-radius: var(--r-sm); object-fit: cover; flex-shrink: 0; border: 1px solid var(--border); }
-.risk-img-placeholder { width: 38px; height: 38px; border-radius: var(--r-sm); background: #f3f6f4; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.risk-img-placeholder { width: 38px; height: 38px; border-radius: var(--r-sm); background: #f3f6f4; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .risk-info { flex: 1; min-width: 0; }
 .risk-name { font-size: 12.5px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .risk-meta { font-size: 10.5px; color: var(--muted); margin-top: 1px; }
 .risk-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; white-space: nowrap; flex-shrink: 0; }
 .risk-empty { padding: 20px 18px; text-align: center; font-size: 13px; color: var(--muted); }
-.risk-empty .ico { font-size: 28px; display: block; margin-bottom: 6px; }
+.risk-empty .ico { display: flex; align-items:center; justify-content:center; margin-bottom: 6px; }
 
 /* PÉRIODE */
 .period-card { margin-bottom: 22px; }
@@ -526,7 +527,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 @media(max-width:680px){ .tb-search{ display:none; } }
 
 /* Topbar icon button */
-.tb-icon-btn { width:34px; height:34px; border-radius:8px; background:transparent; border:1px solid var(--border); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:15px; transition:all .15s; color:var(--text-2); flex-shrink:0; text-decoration:none; }
+.tb-icon-btn { width:34px; height:34px; border-radius:8px; background:transparent; border:1px solid var(--border); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .15s; color:var(--text-2); flex-shrink:0; text-decoration:none; }
 .tb-icon-btn:hover { background:var(--brand-mlt); border-color:var(--brand-lt); color:var(--brand); }
 
 /* Topbar greeting */
@@ -574,7 +575,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .resume-items { display:flex; flex-direction:column; gap:10px; }
 .resume-item { display:flex; align-items:center; gap:12px; padding:13px 16px; background:var(--bg); border:1px solid var(--border); border-radius:var(--r-sm); transition:all .18s; }
 .resume-item:hover { border-color:var(--brand-lt); background:var(--brand-mlt); transform:translateX(3px); }
-.resume-item-ico { width:36px; height:36px; border-radius:9px; background:var(--surface); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.resume-item-ico { width:36px; height:36px; border-radius:9px; background:var(--surface); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .resume-item-val { font-size:19px; font-weight:800; font-family:var(--mono); color:var(--text); letter-spacing:-.5px; line-height:1; }
 .resume-item-lbl { font-size:10.5px; color:var(--muted); margin-top:2px; font-weight:600; }
 
@@ -761,6 +762,113 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 @endpush
 
 @php
+/* ══════════════════════════════════════════════════
+   BIBLIOTHÈQUE D'ICÔNES SVG PREMIUM — boutique dashboard
+══════════════════════════════════════════════════ */
+$s  = 'stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"';
+$s2 = 'stroke-linecap="round" stroke-linejoin="round" stroke-width="2"';
+$I = [
+    // ── Sidebar nav 17px ──
+    'grid'      => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
+    'msg'       => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    'box'       => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+    'tag'       => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>',
+    'users'     => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    'briefcase' => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>',
+    'bike'      => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1m-2 1l3 6H5.5m2.5-6h2l4 6"/></svg>',
+    'building'  => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    'coin'      => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+    'card'      => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+    'chart'     => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+    'clip'      => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/></svg>',
+    'gear'      => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+    'headphone' => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',
+    // ── Close / hamburger ──
+    'close'     => '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s2.'><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    'menu'      => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s2.'><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>',
+    // ── Footer 14px ──
+    'logout'    => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
+    // ── Topbar 16px ──
+    'bell'      => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+    'moon'      => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+    // ── Notification dropdown 14px ──
+    'box_sm'    => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+    'msg_sm'    => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    'hdp_sm'    => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',
+    // ── Export 12px ──
+    'download'  => '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+    'table_sm'  => '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>',
+    'file_sm'   => '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+    // ── Flash 13px ──
+    'check_sm'  => '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s2.'><polyline points="20 6 9 17 4 12"/></svg>',
+    'x_sm'      => '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s2.'><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    'info_sm'   => '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s2.'><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+    // ── KPI 22px (blanc sur gradient coloré) ──
+    'dollar_kpi'=> '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+    'box_kpi'   => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+    'cart_kpi'  => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
+    'bike_kpi'  => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1m-2 1l3 6H5.5m2.5-6h2l4 6"/></svg>',
+    // ── Today cards 22px (blanc) ──
+    'money_kpi' => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>',
+    'box_today' => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+    // ── Kanban 20px (couleur via currentColor) ──
+    'clock_k'   => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    'check_k'   => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><polyline points="20 6 9 17 4 12"/></svg>',
+    'truck_k'   => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
+    'trophy_k'  => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><polyline points="8 6 2 6 2 12 8 12"/><polyline points="16 6 22 6 22 12 16 12"/><path d="M12 17v4"/><line x1="8" y1="21" x2="16" y2="21"/><path d="M8 6v6a4 4 0 0 0 8 0V6"/></svg>',
+    'x_k'       => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+    // ── Quick actions 22px ──
+    'list_q'    => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>',
+    'plus_q'    => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>',
+    'bike_q'    => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1m-2 1l3 6H5.5m2.5-6h2l4 6"/></svg>',
+    'card_q'    => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+    // ── Alert 16px ──
+    'alert_a'   => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+    'warn_a'    => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    'clock_a'   => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    'party_a'   => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+    // ── Livreurs phone/warn 13px ──
+    'phone_sm'  => '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.37a2 2 0 0 1 1.99-2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l.54-.54a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+    'warn_sm'   => '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    // ── Delivery hero 22px (blanc) ──
+    'bike_hero' => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1m-2 1l3 6H5.5m2.5-6h2l4 6"/></svg>',
+    'truck_hero'=> '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
+    'truck_co'  => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
+    // ── Tabs 13px ──
+    'bike_tab'  => '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1m-2 1l3 6H5.5m2.5-6h2l4 6"/></svg>',
+    'bldg_tab'  => '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    // ── No livreur notice 36px ──
+    'bike_noti' => '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1m-2 1l3 6H5.5m2.5-6h2l4 6"/></svg>',
+    // ── Button inline 13px ──
+    'users_btn' => '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    'bldg_btn'  => '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    'msg_btn'   => '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    // ── Card title 14px ──
+    'flash_t'   => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+    'cal_t'     => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+    'chart_t'   => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+    'warn_t'    => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    'trophy_t'  => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><polyline points="8 6 2 6 2 12 8 12"/><polyline points="16 6 22 6 22 12 16 12"/><path d="M12 17v4"/><line x1="8" y1="21" x2="16" y2="21"/><path d="M8 6v6a4 4 0 0 0 8 0V6"/></svg>',
+    // ── Résumé rapide 18px ──
+    'cart_r'    => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
+    'users_r'   => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    'bike_r'    => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1m-2 1l3 6H5.5m2.5-6h2l4 6"/></svg>',
+    'bldg_r'    => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    'dollar_r'  => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+    // ── Chat modal ──
+    'close_chat'=> '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    'bldg_chat' => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    // ── Confier zone ──
+    'box_conf'  => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+    'pin_zone'  => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+    'dollar_zn' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+    'clock_zn'  => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    // ── Produits vide 28px ──
+    'check_big' => '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+    'tag_ph'    => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>',
+];
+@endphp
+@php
     $parts    = explode(' ', auth()->user()->name);
     $initials = strtoupper(substr($parts[0],0,1)) . (isset($parts[1]) ? strtoupper(substr($parts[1],0,1)) : strtoupper(substr($parts[0],1,1)));
     $now      = \Illuminate\Support\Carbon::now();
@@ -827,17 +935,17 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     $caTodayDelta = $caYesterday > 0 ? round((($caToday - $caYesterday) / $caYesterday) * 100, 1) : ($caToday > 0 ? 100 : 0);
     $alerts = collect();
     $cmdEnRetard = $shop->orders()->whereIn('status', ['pending', 'en attente', 'en_attente'])->where('created_at', '<', now()->subHours(2))->count();
-    if ($cmdEnRetard > 0) $alerts->push(['type'=>'danger','ico'=>'🚨','msg'=>"{$cmdEnRetard} commande(s) en attente depuis plus de 2h — à traiter urgemment",'link'=>route('boutique.orders.index'),'cta'=>'Voir les commandes']);
+    if ($cmdEnRetard > 0) $alerts->push(['type'=>'danger','ico'=>$I['alert_a'],'msg'=>"{$cmdEnRetard} commande(s) en attente depuis plus de 2h — à traiter urgemment",'link'=>route('boutique.orders.index'),'cta'=>'Voir les commandes']);
     $cmdALivrer = $shop->orders()->whereIn('status', ['confirmée', 'confirmed', 'processing'])->whereNull('driver_id')->whereNull('delivery_company_id')->count();
-    if ($cmdALivrer > 0 && $livreursDisponibles->isEmpty()) $alerts->push(['type'=>'warning','ico'=>'⚠️','msg'=>"{$cmdALivrer} commande(s) prête(s) à livrer mais aucun livreur disponible",'link'=>route('delivery.companies.index'),'cta'=>'Trouver un livreur']);
-    if (!$shop->is_approved) $alerts->push(['type'=>'warning','ico'=>'⏳','msg'=>"Votre boutique est en attente de validation par l'administrateur",'link'=>null,'cta'=>null]);
-    if ($caTodayDelta >= 20 && $caToday > 0) $alerts->push(['type'=>'success','ico'=>'🎉','msg'=>"Excellente journée ! Vos revenus d'aujourd'hui sont en hausse de {$caTodayDelta}% vs hier",'link'=>null,'cta'=>null]);
+    if ($cmdALivrer > 0 && $livreursDisponibles->isEmpty()) $alerts->push(['type'=>'warning','ico'=>$I['warn_a'],'msg'=>"{$cmdALivrer} commande(s) prête(s) à livrer mais aucun livreur disponible",'link'=>route('delivery.companies.index'),'cta'=>'Trouver un livreur']);
+    if (!$shop->is_approved) $alerts->push(['type'=>'warning','ico'=>$I['clock_a'],'msg'=>"Votre boutique est en attente de validation par l'administrateur",'link'=>null,'cta'=>null]);
+    if ($caTodayDelta >= 20 && $caToday > 0) $alerts->push(['type'=>'success','ico'=>$I['party_a'],'msg'=>"Excellente journée ! Vos revenus d'aujourd'hui sont en hausse de {$caTodayDelta}% vs hier",'link'=>null,'cta'=>null]);
     $kanban = [
-        ['key'=>'en_attente',  'label'=>'En attente','count'=>$shop->orders()->whereIn('status',['pending','en attente','en_attente'])->count(),'color'=>'#f59e0b','bg'=>'#fffbeb','ico'=>'⏰'],
-        ['key'=>'confirmees',  'label'=>'Confirmées','count'=>$shop->orders()->whereIn('status',['confirmed','confirmée','processing'])->count(),'color'=>'#10b981','bg'=>'#ecfdf5','ico'=>'✅'],
-        ['key'=>'en_livraison','label'=>'En livraison','count'=>$shop->orders()->whereIn('status',['en_livraison','delivering','shipped'])->count(),'color'=>'#6366f1','bg'=>'#eef2ff','ico'=>'🚚'],
-        ['key'=>'terminees',   'label'=>'Terminées','count'=>$shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->where('status','livrée')->count(),'color'=>'#22c55e','bg'=>'#dcfce7','ico'=>'✅'],
-        ['key'=>'annulees',    'label'=>'Annulées','count'=>$shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->whereIn('status',['annulée','cancelled'])->count(),'color'=>'#ef4444','bg'=>'#fef2f2','ico'=>'❌'],
+        ['key'=>'en_attente',  'label'=>'En attente','count'=>$shop->orders()->whereIn('status',['pending','en attente','en_attente'])->count(),'color'=>'#f59e0b','bg'=>'#fffbeb','ico'=>$I['clock_k']],
+        ['key'=>'confirmees',  'label'=>'Confirmées','count'=>$shop->orders()->whereIn('status',['confirmed','confirmée','processing'])->count(),'color'=>'#10b981','bg'=>'#ecfdf5','ico'=>$I['check_k']],
+        ['key'=>'en_livraison','label'=>'En livraison','count'=>$shop->orders()->whereIn('status',['en_livraison','delivering','shipped'])->count(),'color'=>'#6366f1','bg'=>'#eef2ff','ico'=>$I['truck_k']],
+        ['key'=>'terminees',   'label'=>'Terminées','count'=>$shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->where('status','livrée')->count(),'color'=>'#22c55e','bg'=>'#dcfce7','ico'=>$I['trophy_k']],
+        ['key'=>'annulees',    'label'=>'Annulées','count'=>$shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->whereIn('status',['annulée','cancelled'])->count(),'color'=>'#ef4444','bg'=>'#fef2f2','ico'=>$I['x_k']],
     ];
     $hasLivreurs  = $livreursDisponibles->isNotEmpty();
     $hasCompanies = isset($deliveryCompanies) && $deliveryCompanies->isNotEmpty();
@@ -866,25 +974,25 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     <div class="bq-chat-panel">
         <div class="bq-chat-hd">
             <div class="bq-chat-hd-info">
-                <div class="bq-chat-hd-av" id="bqChatAv">🏢</div>
+                <div class="bq-chat-hd-av" id="bqChatAv">{!! $I['bldg_chat'] !!}</div>
                 <div>
                     <div class="bq-chat-hd-name" id="bqChatName">Entreprise</div>
                     <div class="bq-chat-hd-sub" id="bqChatSub">Entreprise de livraison partenaire</div>
                 </div>
             </div>
-            <button class="bq-chat-close" onclick="bqCloseChatModal()">✕</button>
+            <button class="bq-chat-close" onclick="bqCloseChatModal()">{!! $I['close_chat'] !!}</button>
         </div>
         {{-- Zone confier la livraison (au-dessus des messages pour ne pas masquer le dernier) --}}
         <div class="bq-confier-zone" id="bqConfierZone" style="display:none;">
-            <div class="bq-confier-hint">
-                📦 <strong>Confier une livraison</strong>
+            <div class="bq-confier-hint" style="display:flex;align-items:flex-start;gap:6px">
+                {!! $I['box_conf'] !!} <strong>Confier une livraison</strong>
                 <span style="display:block;font-size:10.5px;color:#047857;font-weight:400;margin-top:2px;">
                     Cochez une ou plusieurs commandes → choisissez une zone → cliquez Confier
                 </span>
             </div>
             <div id="bqOrdersList" style="display:flex;flex-direction:column;gap:5px;max-height:150px;overflow-y:auto;margin-bottom:8px;scrollbar-width:thin;scrollbar-color:#86efac #f0fdf4;"></div>
             <div id="bqZonePickerWrap" style="display:none;margin-bottom:8px;">
-                <label style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">📍 Zone de livraison</label>
+                <label style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.4px;display:flex;align-items:center;gap:5px;margin-bottom:5px;">{!! $I['pin_zone'] !!} Zone de livraison</label>
                 <input type="text" id="bqZoneSearch" placeholder="🔍 Rechercher une zone…" autocomplete="off"
                        oninput="filterZoneSelect(this,'bqZonePicker')"
                        style="width:100%;padding:7px 10px;border:1.5px solid #bbf7d0;border-radius:8px;font-size:12px;font-family:inherit;background:#fff;color:#0f172a;outline:none;margin-bottom:6px;box-sizing:border-box;">
@@ -892,11 +1000,11 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     <option value="">— Choisir une zone —</option>
                 </select>
                 <div id="bqZonePriceHint" style="display:none;margin-top:5px;padding:7px 10px;background:#f0fdf4;border-radius:7px;font-size:12px;font-weight:700;color:#065f46;">
-                    💰 Prix : <span id="bqZonePriceVal"></span> · ⏱ <span id="bqZoneDelayVal"></span> min
+                    <span style="display:inline-flex;align-items:center;gap:4px">{!! $I['dollar_zn'] !!} Prix :</span> <span id="bqZonePriceVal"></span> · <span style="display:inline-flex;align-items:center;gap:4px">{!! $I['clock_zn'] !!}</span> <span id="bqZoneDelayVal"></span> min
                 </div>
             </div>
-            <button class="bq-btn-confier" id="bqBtnConfier" onclick="bqConfierLivraison()">
-                📦 Confier la livraison à cette entreprise
+            <button class="bq-btn-confier" id="bqBtnConfier" onclick="bqConfierLivraison()" style="gap:6px">
+                {!! $I['box_conf'] !!} Confier la livraison à cette entreprise
             </button>
         </div>
 
@@ -923,7 +1031,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width:100%;height:100%;object-fit:cover;border-radius:9px"></div>
                 <span class="sb-shop-name">{{ $shop->name }}</span>
             </a>
-            <button class="sb-close" id="btnCloseSidebar" aria-label="Fermer le menu">✕</button>
+            <button class="sb-close" id="btnCloseSidebar" aria-label="Fermer le menu">{!! $I['close'] !!}</button>
             <div class="sb-status">
                 <span class="pulse"></span>
                 {{ $shop->is_approved ? 'Boutique active' : 'En attente de validation' }}
@@ -939,30 +1047,30 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             </div>
         </div>
         <nav class="sb-nav">
-            <a href="{{ route('boutique.dashboard') }}" class="sb-item active" style="margin-bottom:4px"><span class="ico">⊞</span> Tableau de bord</a> 
+            <a href="{{ route('boutique.dashboard') }}" class="sb-item active" style="margin-bottom:4px"><span class="ico">{!! $I['grid'] !!}</span> Tableau de bord</a>
             <div class="sb-section">Boutique</div>
-            <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">💬</span> Messages <span class="sb-badge" id="sbMsgBadge" style="display:none"></span></a>
-            <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">📦</span> Commandes <span class="sb-badge" id="sbOrdersBadge" style="{{ $pendingCount > 0 ? '' : 'display:none' }}">{{ $pendingCount }}</span></a>
-            <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">🏷️</span> Produits</a>
-            <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">👥</span> Clients</a>
-            <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">🧑‍💼</span> Équipe</a>
+            <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">{!! $I['msg'] !!}</span> Messages <span class="sb-badge" id="sbMsgBadge" style="display:none"></span></a>
+            <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">{!! $I['box'] !!}</span> Commandes <span class="sb-badge" id="sbOrdersBadge" style="{{ $pendingCount > 0 ? '' : 'display:none' }}">{{ $pendingCount }}</span></a>
+            <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">{!! $I['tag'] !!}</span> Produits</a>
+            <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">{!! $I['users'] !!}</span> Clients</a>
+            <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">{!! $I['briefcase'] !!}</span> Équipe</a>
             <div class="sb-section">Livraison</div>
-            <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">🚴</span> Livreurs <span class="sb-badge" id="sbLivreursBadge" style="{{ $livreursDisponibles->count() > 0 ? '' : 'display:none' }}">{{ $livreursDisponibles->count() }}</span></a>
-            <a href="{{ route('delivery.companies.index') }}" class="sb-item"><span class="ico">🏢</span> Partenaires</a>
+            <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">{!! $I['bike'] !!}</span> Livreurs <span class="sb-badge" id="sbLivreursBadge" style="{{ $livreursDisponibles->count() > 0 ? '' : 'display:none' }}">{{ $livreursDisponibles->count() }}</span></a>
+            <a href="{{ route('delivery.companies.index') }}" class="sb-item"><span class="ico">{!! $I['building'] !!}</span> Partenaires</a>
             <div class="sb-section">Finances</div>
             <div class="sb-group">
                 <button class="sb-group-toggle" onclick="toggleGroup(this)" type="button">
-                    <span class="ico">💰</span> Finances & Rapports <span class="sb-arrow">▶</span>
+                    <span class="ico">{!! $I['coin'] !!}</span> Finances & Rapports <span class="sb-arrow">▶</span>
                 </button>
                 <div class="sb-sub">
-                    <a href="{{ route('boutique.payments.index') }}" class="sb-item"><span class="ico">💳</span> Paiements</a>
-                    <a href="{{ route('boutique.commissions.index') }}" class="sb-item"><span class="ico">📊</span> Commissions</a>
-                    <a href="{{ route('boutique.reports.index') }}" class="sb-item"><span class="ico">📋</span> Rapports</a>
-                    @if(auth()->user()->role === 'admin')<a href="{{ route('shop.edit', $shop) }}" class="sb-item"><span class="ico">⚙️</span> Paramètres</a>@endif
+                    <a href="{{ route('boutique.payments.index') }}" class="sb-item"><span class="ico">{!! $I['card'] !!}</span> Paiements</a>
+                    <a href="{{ route('boutique.commissions.index') }}" class="sb-item"><span class="ico">{!! $I['chart'] !!}</span> Commissions</a>
+                    <a href="{{ route('boutique.reports.index') }}" class="sb-item"><span class="ico">{!! $I['clip'] !!}</span> Rapports</a>
+                    @if(auth()->user()->role === 'admin')<a href="{{ route('shop.edit', $shop) }}" class="sb-item"><span class="ico">{!! $I['gear'] !!}</span> Paramètres</a>@endif
                 </div>
             </div>
             <div class="sb-section">Aide</div>
-            <a href="{{ route('support.index') }}" class="sb-item"><span class="ico">🎧</span> Support <span class="sb-badge" id="sbSupportBadge" style="display:none;background:#10b981"></span></a>
+            <a href="{{ route('support.index') }}" class="sb-item"><span class="ico">{!! $I['headphone'] !!}</span> Support <span class="sb-badge" id="sbSupportBadge" style="display:none;background:#10b981"></span></a>
         </nav>
         <div class="sb-footer">
            
@@ -975,7 +1083,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             </a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="sb-logout"><span class="ico">⎋</span> {{ __('app.logout') }}</button>
+                <button type="submit" class="sb-logout"><span class="sb-ft-ico">{!! $I['logout'] !!}</span> {{ __('app.logout') }}</button>
             </form>
         </div>
     </aside>
@@ -986,7 +1094,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
         {{-- ══ TOPBAR RESPONSIVE ══ --}}
         <div class="topbar">
-            <button class="btn-hamburger" id="btnMenu" aria-label="Menu">☰</button>
+            <button class="btn-hamburger" id="btnMenu" aria-label="Menu">{!! $I['menu'] !!}</button>
             <div class="tb-info">
                 <div class="tb-greeting">Bonjour, {{ auth()->user()->name }} 👋</div>
                 <div class="tb-greeting-sub">Voici ce qui se passe avec votre boutique aujourd'hui.</div>
@@ -997,23 +1105,24 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <div class="tb-actions">
 
                 {{-- Mode sombre --}}
-                <button class="tb-icon-btn" id="btnDarkMode" title="Mode sombre / clair">🌙</button>
+                <button class="tb-icon-btn" id="btnDarkMode" title="Mode sombre / clair">{!! $I['moon'] !!}</button>
 
                 {{-- Cloche notifications temps réel --}}
                 <div class="notif-bell-wrap" id="notifBellWrap" style="position:relative;display:inline-flex">
-                    <button class="btn btn-sm" id="notifBellBtn" onclick="toggleNotifDropdown()" title="Notifications" style="position:relative;padding:6px 10px;font-size:15px">
-                        🔔
-                        <span id="notifBellCount" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:#fff;font-size:9px;font-weight:800;min-width:16px;height:16px;border-radius:20px;padding:0 3px;display:none;align-items:center;justify-content:center;border:2px solid #fff"></span>
+                    <button class="btn btn-sm" id="notifBellBtn" onclick="toggleNotifDropdown()" title="Notifications" style="position:relative;padding:6px 10px;display:inline-flex;align-items:center;gap:4px">
+                        {!! $I['bell'] !!}
+                        <span id="notifBellCount" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:#fff;font-size:9px;font-weight:800;min-width:16px;height:16px;border-radius:20px;padding:0 3px;align-items:center;justify-content:center;border:2px solid #fff"></span>
                     </button>
                     <div id="notifDropdown" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);width:280px;z-index:500;overflow:hidden">
-                        <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between">
-                            🔔 Notifications <span id="notifDropdownTotal" style="background:var(--brand-lt);color:var(--brand-dk);font-size:10px;padding:1px 7px;border-radius:20px">0</span>
+                        <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;justify-content:space-between">
+                            <span style="display:flex;align-items:center;gap:6px">{!! $I['bell'] !!} Notifications</span>
+                            <span id="notifDropdownTotal" style="background:var(--brand-lt);color:var(--brand-dk);font-size:10px;padding:1px 7px;border-radius:20px">0</span>
                         </div>
                         <div id="notifList" style="max-height:320px;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:#d1d5db #f9fafb"></div>
                         <div style="padding:8px 14px;border-top:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap">
-                            <a href="{{ route('boutique.orders.index') }}" class="btn btn-sm" style="flex:1;justify-content:center;font-size:11px">📦 Commandes</a>
-                            <a href="{{ route('boutique.messages.hub') }}" class="btn btn-sm" style="flex:1;justify-content:center;font-size:11px">💬 Messages</a>
-                            <a href="{{ route('support.index') }}" class="btn btn-sm" style="flex:1;justify-content:center;font-size:11px">🎧 Support</a>
+                            <a href="{{ route('boutique.orders.index') }}" class="btn btn-sm" style="flex:1;justify-content:center;font-size:11px;gap:4px">{!! $I['box_sm'] !!} Commandes</a>
+                            <a href="{{ route('boutique.messages.hub') }}" class="btn btn-sm" style="flex:1;justify-content:center;font-size:11px;gap:4px">{!! $I['msg_sm'] !!} Messages</a>
+                            <a href="{{ route('support.index') }}" class="btn btn-sm" style="flex:1;justify-content:center;font-size:11px;gap:4px">{!! $I['hdp_sm'] !!} Support</a>
                         </div>
                     </div>
                 </div>
@@ -1023,16 +1132,16 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
                 {{-- Export grand écran --}}
                 <div class="topbar-export-group">
-                    <a href="{{ route('boutique.export.orders.excel') }}" class="btn btn-sm">⬇ Excel</a>
-                    <a href="{{ route('boutique.export.orders.pdf') }}" class="btn btn-sm">⬇ PDF</a>
+                    <a href="{{ route('boutique.export.orders.excel') }}" class="btn btn-sm" style="gap:4px">{!! $I['download'] !!} Excel</a>
+                    <a href="{{ route('boutique.export.orders.pdf') }}" class="btn btn-sm" style="gap:4px">{!! $I['download'] !!} PDF</a>
                 </div>
 
                 {{-- Export petit écran : dropdown --}}
                 <div class="topbar-export-dropdown">
-                    <button class="export-dropdown-btn" onclick="toggleExportMenu(this)" type="button">⬇ ▾</button>
+                    <button class="export-dropdown-btn" onclick="toggleExportMenu(this)" type="button" style="gap:4px">{!! $I['download'] !!} ▾</button>
                     <div class="export-menu" id="exportMenu">
-                        <a href="{{ route('boutique.export.orders.excel') }}">📊 Excel</a>
-                        <a href="{{ route('boutique.export.orders.pdf') }}">📄 PDF</a>
+                        <a href="{{ route('boutique.export.orders.excel') }}" style="gap:8px">{!! $I['table_sm'] !!} Excel</a>
+                        <a href="{{ route('boutique.export.orders.pdf') }}" style="gap:8px">{!! $I['file_sm'] !!} PDF</a>
                     </div>
                 </div>
 
@@ -1047,7 +1156,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         @foreach(['success','info','warning','danger'] as $type)
             @if(session($type))
             <div class="flash flash-{{ $type }}">
-                <span>{{ $type === 'success' ? '✓' : ($type === 'danger' ? '✕' : 'ℹ') }}</span>
+                <span style="display:flex;align-items:center">{!! $type === 'success' ? $I['check_sm'] : ($type === 'danger' ? $I['x_sm'] : $I['info_sm']) !!}</span>
                 {{ session($type) }}
             </div>
             @endif
@@ -1058,7 +1167,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             {{-- KPI Grid --}}
             <div class="kpi-grid" style="margin-bottom:22px">
                 <div class="kpi"  style="--kpi-color:#8b5cf6;--kpi-bg:#f5f3ff">
-                    <div class="kpi-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);border-color:rgba(139,92,246,.3);box-shadow:0 0 0 3px rgba(139,92,246,.12),0 4px 14px rgba(139,92,246,.4)">💰</div>
+                    <div class="kpi-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);border-color:rgba(139,92,246,.3);box-shadow:0 0 0 3px rgba(139,92,246,.12),0 4px 14px rgba(139,92,246,.4)">{!! $I['dollar_kpi'] !!}</div>
                     <div class="kpi-lbl">{{ __('app.net_revenue') }}</div>
                     <div class="kpi-val" id="kpiCaVal">{{ number_format($caMonth,0,',',' ') }}</div>
                     <div class="kpi-unit">{{ $devise }} · {{ $_monthYear($now) }}</div>
@@ -1072,21 +1181,21 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     @endif
                 </div>
                 <div class="kpi" style="--kpi-color:#8b5cf6;--kpi-bg:#f5f3ff">
-                    <div class="kpi-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);border-color:rgba(139,92,246,.3);box-shadow:0 0 0 3px rgba(139,92,246,.12),0 4px 14px rgba(139,92,246,.4)">📦</div>
+                    <div class="kpi-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);border-color:rgba(139,92,246,.3);box-shadow:0 0 0 3px rgba(139,92,246,.12),0 4px 14px rgba(139,92,246,.4)">{!! $I['box_kpi'] !!}</div>
                     <div class="kpi-lbl">{{ __('app.orders_this_month') }}</div>
                     <div class="kpi-val" id="kpiCmdVal">{{ $cmdMonth }}</div>
                     <div class="kpi-unit">commandes</div>
                     <div class="kpi-delta {{ $cmdToday >= $cmdYest ? 'up':'down' }}" id="kpiCmdDelta">{{ $cmdToday >= $cmdYest ? '↑':'↓' }} {{ $cmdToday }} aujourd'hui</div>
                 </div>
                 <div class="kpi" style="--kpi-color:#d97706;--kpi-bg:#fffbeb">
-                    <div class="kpi-icon" style="background:linear-gradient(135deg,#f59e0b,#b45309);border-color:rgba(169, 141, 110, 0.3);box-shadow:0 0 0 3px rgba(217,119,6,.12),0 4px 14px rgba(147, 94, 33, 0.4)">🛒</div>
+                    <div class="kpi-icon" style="background:linear-gradient(135deg,#f59e0b,#b45309);border-color:rgba(169, 141, 110, 0.3);box-shadow:0 0 0 3px rgba(217,119,6,.12),0 4px 14px rgba(147, 94, 33, 0.4)">{!! $I['cart_kpi'] !!}</div>
                     <div class="kpi-lbl">{{ __('app.avg_basket') }}</div>
                     <div class="kpi-val" id="kpiPanierVal">{{ number_format($panier,0,',',' ') }}</div>
                     <div class="kpi-unit">{{ $devise }} / commande</div>
                     <div class="kpi-delta {{ $panierDelta >= 0 ? 'up':'down' }}" id="kpiPanierDelta">{{ $panierDelta >= 0 ? '↑':'↓' }} {{ abs($panierDelta) }}% vs mois précédent</div>
                 </div>
                 <div class="kpi" style="--kpi-color:#d97706;--kpi-bg:#fffbeb">
-                    <div class="kpi-icon" style="background:linear-gradient(135deg,#f59e0b,#b45309);border-color:rgba(217,119,6,.3);box-shadow:0 0 0 3px rgba(217,119,6,.12),0 4px 14px rgba(217,119,6,.4)">🚴</div>
+                    <div class="kpi-icon" style="background:linear-gradient(135deg,#f59e0b,#b45309);border-color:rgba(217,119,6,.3);box-shadow:0 0 0 3px rgba(217,119,6,.12),0 4px 14px rgba(217,119,6,.4)">{!! $I['bike_kpi'] !!}</div>
                     <div class="kpi-lbl">{{ __('app.delivery_rate') }}</div>
                     <div class="kpi-val" id="kpiTauxVal">{{ $tauxLiv }}%</div>
                     <div class="kpi-unit" id="kpiTauxUnit">{{ $livres }} / {{ $totalCmdMonth }} livrées</div>
@@ -1098,7 +1207,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             {{-- BLOC A --}}
             <div class="today-grid">
                 <div class="today-card">
-                    <div class="today-icon">💵</div>
+                    <div class="today-icon">{!! $I['money_kpi'] !!}</div>
                     <div style="flex:1;min-width:0">
                         <div class="today-lbl">{{ __('app.today_net_revenue') }}</div>
                         <div class="today-val" id="todayCaVal">{{ number_format($caToday, 0, ',', ' ') }}</div>
@@ -1126,7 +1235,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     </div>
                 </div>
                 <div class="today-card" style="background:linear-gradient(135deg, #0c1a35 0%, #0f2850 40%, #0d3060 100%); box-shadow:0 8px 32px rgba(15,40,80,.4), 0 2px 8px rgba(0,0,0,.25); border-color:rgba(59,130,246,.25)">
-                    <div class="today-icon">📦</div>
+                    <div class="today-icon">{!! $I['box_today'] !!}</div>
                     <div>
                         <div class="today-lbl">{{ __('app.today_orders') }}</div>
                         <div class="today-val" id="todayCmdVal">{{ $cmdToday }}</div>
@@ -1153,7 +1262,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <div class="alerts-zone">
                 @foreach($alerts as $alert)
                 <div class="alert-item {{ $alert['type'] }}">
-                    <span class="alert-ico">{{ $alert['ico'] }}</span>
+                    <span class="alert-ico">{!! $alert['ico'] !!}</span>
                     <span class="alert-msg">{{ $alert['msg'] }}</span>
                     @if($alert['link'])<a href="{{ $alert['link'] }}" class="alert-cta">{{ $alert['cta'] }} →</a>@endif
                 </div>
@@ -1170,7 +1279,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 <div class="kanban-grid">
                     @foreach($kanban as $col)
                     <div class="kanban-col {{ $col['count'] > 0 ? 'has-items' : '' }}" style="--k-color:{{ $col['color'] }};--k-bg:{{ $col['bg'] }}">
-                        <div class="kanban-ico-wrap">{{ $col['ico'] }}</div>
+                        <div class="kanban-ico-wrap" style="color:{{ $col['color'] }}">{!! $col['ico'] !!}</div>
                         <div class="kanban-count" id="kb-{{ $col['key'] }}">{{ $col['count'] }}</div>
                         <div class="kanban-lbl">{{ $col['label'] }}</div>
                         @if($col['label'] === 'Terminées')<div style="font-size:9px;color:var(--muted);margin-top:3px;font-weight:600">ce mois</div>@endif
@@ -1183,14 +1292,14 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <div class="quick-section">
                 <div class="quick-card">
                     <div class="quick-card-hd">
-                        <div class="quick-card-title"><span class="title-ico">⚡</span> Actions rapides</div>
+                        <div class="quick-card-title"><span class="title-ico">{!! $I['flash_t'] !!}</span> Actions rapides</div>
                         <span style="font-size:11px;color:var(--muted)">Accès direct aux tâches courantes</span>
                     </div>
                     <div class="quick-grid">
-                        <a href="{{ route('boutique.orders.index') }}" class="quick-btn" style="--q-bg:#fffbeb;--q-border:#fde68a;--q-color:#f59e0b"><div class="quick-btn-ico">📋</div><div class="quick-btn-lbl">Commandes</div><div class="quick-btn-sub">Voir & gérer</div></a>
-                        <a href="{{ route('products.create') }}" class="quick-btn" style="--q-bg:#eef2ff;--q-border:#a5b4fc;--q-color:#6366f1"><div class="quick-btn-ico">➕</div><div class="quick-btn-lbl">Nouveau produit</div><div class="quick-btn-sub">Ajouter au catalogue</div></a>
-                        <a href="{{ route('boutique.livreurs.index') }}" class="quick-btn" style="--q-bg:#f5f3ff;--q-border:#c4b5fd;--q-color:#8b5cf6"><div class="quick-btn-ico">🚴</div><div class="quick-btn-lbl">Livreurs</div><div class="quick-btn-sub">Voir en ligne</div></a>
-                        <a href="{{ route('boutique.payments.index') }}" class="quick-btn" style="--q-bg:#eff6ff;--q-border:#93c5fd;--q-color:#3b82f6"><div class="quick-btn-ico">💳</div><div class="quick-btn-lbl">Paiements</div><div class="quick-btn-sub">Revenus reçus</div></a>
+                        <a href="{{ route('boutique.orders.index') }}" class="quick-btn" style="--q-bg:#fffbeb;--q-border:#fde68a;--q-color:#f59e0b"><div class="quick-btn-ico" style="color:#f59e0b">{!! $I['list_q'] !!}</div><div class="quick-btn-lbl">Commandes</div><div class="quick-btn-sub">Voir & gérer</div></a>
+                        <a href="{{ route('products.create') }}" class="quick-btn" style="--q-bg:#eef2ff;--q-border:#a5b4fc;--q-color:#6366f1"><div class="quick-btn-ico" style="color:#6366f1">{!! $I['plus_q'] !!}</div><div class="quick-btn-lbl">Nouveau produit</div><div class="quick-btn-sub">Ajouter au catalogue</div></a>
+                        <a href="{{ route('boutique.livreurs.index') }}" class="quick-btn" style="--q-bg:#f5f3ff;--q-border:#c4b5fd;--q-color:#8b5cf6"><div class="quick-btn-ico" style="color:#8b5cf6">{!! $I['bike_q'] !!}</div><div class="quick-btn-lbl">Livreurs</div><div class="quick-btn-sub">Voir en ligne</div></a>
+                        <a href="{{ route('boutique.payments.index') }}" class="quick-btn" style="--q-bg:#eff6ff;--q-border:#93c5fd;--q-color:#3b82f6"><div class="quick-btn-ico" style="color:#3b82f6">{!! $I['card_q'] !!}</div><div class="quick-btn-lbl">Paiements</div><div class="quick-btn-sub">Revenus reçus</div></a>
                     </div>
                 </div>
             </div>
@@ -1397,7 +1506,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                         {{-- Hero header --}}
                         <div class="delivery-card-hero">
                             <div class="delivery-card-hero-left">
-                                <div class="delivery-card-icon">🚴</div>
+                                <div class="delivery-card-icon">{!! $I['bike_hero'] !!}</div>
                                 <div>
                                     <div class="delivery-card-title">Livraison</div>
                                     <div class="delivery-card-sub">{{ $livreursDisponibles->count() }} livreur(s) disponible(s)</div>
@@ -1407,8 +1516,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                         </div>
                         {{-- Tabs --}}
                         <div class="tab-bar">
-                            <button class="tab-btn active" data-tab="livreurs">🚴 Livreurs <span class="tab-count">{{ $livreursDisponibles->count() }}</span></button>
-                            @if($hasCompanies)<button class="tab-btn" data-tab="companies">🏢 Entreprises <span class="tab-count {{ $deliveryCompanies->count() === 0 ? 'zero':'' }}">{{ $deliveryCompanies->count() }}</span></button>@endif
+                            <button class="tab-btn active" data-tab="livreurs" style="gap:5px">{!! $I['bike_tab'] !!} Livreurs <span class="tab-count">{{ $livreursDisponibles->count() }}</span></button>
+                            @if($hasCompanies)<button class="tab-btn" data-tab="companies" style="gap:5px">{!! $I['bldg_tab'] !!} Entreprises <span class="tab-count {{ $deliveryCompanies->count() === 0 ? 'zero':'' }}">{{ $deliveryCompanies->count() }}</span></button>@endif
                         </div>
                         {{-- Liste livreurs --}}
                         <div class="tab-panel active" id="tab-livreurs">
@@ -1427,11 +1536,11 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                                         <div class="lv-nm">{{ $livreur->name }}</div>
                                         @if($livreur->phone)
                                             <div class="lv-phone">
-                                                <span>📞</span>
+                                                {!! $I['phone_sm'] !!}
                                                 <a href="tel:{{ $livreur->phone }}" style="color:inherit;text-decoration:none">{{ $livreur->phone }}</a>
                                             </div>
                                         @else
-                                            <div class="lv-phone-warn">⚠️ Pas de téléphone</div>
+                                            <div class="lv-phone-warn" style="display:flex;align-items:center;gap:4px">{!! $I['warn_sm'] !!} Pas de téléphone</div>
                                         @endif
                                     </div>
                                     <span class="lv-status-badge {{ $busy ? 'busy' : 'available' }}">{{ $busy ? 'En course' : 'Dispo' }}</span>
@@ -1454,10 +1563,10 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                             <div class="co-list">
                                 @foreach($deliveryCompanies->take(4) as $company)
                                 <div class="co-row" onclick="window.location='{{ route('company.chat.show', $company) }}'" title="Ouvrir la discussion">
-                                    <div class="co-logo">@if(!empty($company->logo))<img src="{{ asset('storage/'.$company->logo) }}" alt="{{ $company->name }}">@else 🚚 @endif</div>
+                                    <div class="co-logo">@if(!empty($company->logo))<img src="{{ asset('storage/'.$company->logo) }}" alt="{{ $company->name }}">@else {!! $I['truck_co'] !!} @endif</div>
                                     <div class="co-info"><div class="co-nm">{{ $company->name }}</div><div class="co-mt">{{ $company->phone ?? 'Contact non renseigné' }}</div></div>
                                     @if($company->commission_rate)<span class="co-commission">{{ number_format($company->commission_rate*100,1) }}%</span>@endif
-                                    <a href="{{ route('company.chat.show', $company) }}" class="btn btn-sm btn-primary" onclick="event.stopPropagation()">💬 Contacter</a>
+                                    <a href="{{ route('company.chat.show', $company) }}" class="btn btn-sm btn-primary" onclick="event.stopPropagation()" style="gap:4px">{!! $I['msg_btn'] !!} Contacter</a>
                                 </div>
                                 @endforeach
                             </div>
@@ -1470,7 +1579,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                         {{-- Hero header vide --}}
                         <div class="delivery-card-hero">
                             <div class="delivery-card-hero-left">
-                                <div class="delivery-card-icon">🚚</div>
+                                <div class="delivery-card-icon">{!! $I['truck_hero'] !!}</div>
                                 <div>
                                     <div class="delivery-card-title">Livraison</div>
                                     <div class="delivery-card-sub">Aucun livreur actif</div>
@@ -1480,26 +1589,26 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                         </div>
                         @if(!$hasCompanies)
                         <div class="no-livreur-notice">
-                            <div class="notice-icon">🚴</div>
+                            <div class="notice-icon">{!! $I['bike_noti'] !!}</div>
                             <div class="notice-title">Aucun livreur disponible</div>
                             <div class="notice-sub">Ajoutez vos propres livreurs dans <strong>Équipe</strong>, ou contactez une entreprise partenaire.</div>
                             <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;justify-content:center">
-                                <a href="{{ route('boutique.employees.create') }}" class="btn btn-sm">👥 Ajouter un livreur</a>
-                                <a href="{{ route('delivery.companies.index') }}" class="btn btn-primary btn-sm">🏢 Entreprise partenaire</a>
+                                <a href="{{ route('boutique.employees.create') }}" class="btn btn-sm" style="gap:4px">{!! $I['users_btn'] !!} Ajouter un livreur</a>
+                                <a href="{{ route('delivery.companies.index') }}" class="btn btn-primary btn-sm" style="gap:4px">{!! $I['bldg_btn'] !!} Entreprise partenaire</a>
                             </div>
                         </div>
                         @else
                         <div style="padding:12px 18px;background:#fffbeb;border-bottom:1px solid #fde68a;display:flex;align-items:flex-start;gap:10px">
-                            <span style="font-size:18px;flex-shrink:0">⚠️</span>
-                            <div><div style="font-size:12.5px;color:#92400e;font-weight:700;margin-bottom:3px">Vous n'avez pas de livreurs</div><div style="font-size:11.5px;color:#b45309;line-height:1.55">Contactez une entreprise partenaire ci-dessous. Cliquez sur <strong>💬 Contacter</strong> pour ouvrir une discussion.</div></div>
+                            <span style="flex-shrink:0;display:flex;margin-top:2px">{!! $I['warn_a'] !!}</span>
+                            <div><div style="font-size:12.5px;color:#92400e;font-weight:700;margin-bottom:3px">Vous n'avez pas de livreurs</div><div style="font-size:11.5px;color:#b45309;line-height:1.55">Contactez une entreprise partenaire ci-dessous. Cliquez sur <strong>Contacter</strong> pour ouvrir une discussion.</div></div>
                         </div>
                         <div class="co-list">
                             @foreach($deliveryCompanies->take(4) as $company)
                             <div class="co-row" onclick="window.location='{{ route('company.chat.show', $company) }}'" title="Ouvrir la discussion">
-                                <div class="co-logo">@if(!empty($company->logo))<img src="{{ asset('storage/'.$company->logo) }}" alt="{{ $company->name }}">@else 🚚 @endif</div>
+                                <div class="co-logo">@if(!empty($company->logo))<img src="{{ asset('storage/'.$company->logo) }}" alt="{{ $company->name }}">@else {!! $I['truck_co'] !!} @endif</div>
                                 <div class="co-info"><div class="co-nm">{{ $company->name }}</div><div class="co-mt">{{ $company->phone ?? 'Contact non renseigné' }}</div></div>
                                 @if($company->commission_rate)<span class="co-commission">{{ number_format($company->commission_rate*100,1) }}%</span>@endif
-                                <a href="{{ route('company.chat.show', $company) }}" class="btn btn-sm btn-primary" onclick="event.stopPropagation()">💬 Contacter</a>
+                                <a href="{{ route('company.chat.show', $company) }}" class="btn btn-sm btn-primary" onclick="event.stopPropagation()" style="gap:4px">{!! $I['msg_btn'] !!} Contacter</a>
                             </div>
                             @endforeach
                         </div>
@@ -1513,7 +1622,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             {{-- TOP PRODUITS --}}
             @if($topProducts->isNotEmpty())
             <div class="card">
-                <div class="card-hd"><span class="card-title" style="cursor:pointer;" onclick="window.location='{{ route('products.top') }}'">Top produits — ventes du mois 🏆</span><a href="{{ route('products.top') }}" class="btn btn-ghost btn-sm">Voir le classement →</a></div>
+                <div class="card-hd"><span class="card-title" style="cursor:pointer;display:inline-flex;align-items:center;gap:5px" onclick="window.location='{{ route('products.top') }}'">Top produits — ventes du mois {!! $I['trophy_t'] !!}</span><a href="{{ route('products.top') }}" class="btn btn-ghost btn-sm">Voir le classement →</a></div>
                 <div class="card-bd">
                     @foreach($topProducts as $product)
                     @php $pct = round(($product->order_items_count / $maxSales)*100); @endphp
@@ -1529,15 +1638,15 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
             {{-- PRODUITS A RISQUE --}}
             <div class="card" style="margin-bottom:22px">
-                <div class="card-hd"><span class="card-title">⚠️ Produits à risque — 0 vente ce mois</span><a href="{{ route('products.index') }}" class="btn btn-ghost btn-sm">Gérer les produits →</a></div>
+                <div class="card-hd"><span class="card-title" style="display:inline-flex;align-items:center;gap:5px">{!! $I['warn_t'] !!} Produits à risque — 0 vente ce mois</span><a href="{{ route('products.index') }}" class="btn btn-ghost btn-sm">Gérer les produits →</a></div>
                 @if($produitsRisque->isEmpty())
-                    <div class="risk-empty"><span class="ico">🎉</span>Tous vos produits ont été vendus ce mois !</div>
+                    <div class="risk-empty"><span class="ico">{!! $I['check_big'] !!}</span>Tous vos produits ont été vendus ce mois !</div>
                 @else
                 <div style="display:flex;flex-wrap:wrap;gap:0;padding:0">
                     @foreach($produitsRisque as $product)
                     <div class="risk-row" style="flex:1;min-width:180px;border-right:1px solid #f3f6f4;border-bottom:none">
                         @if(!empty($product->image))<img src="{{ asset('storage/'.$product->image) }}" alt="{{ $product->name }}" class="risk-img">
-                        @else<div class="risk-img-placeholder">🏷️</div>@endif
+                        @else<div class="risk-img-placeholder">{!! $I['tag_ph'] !!}</div>@endif
                         <div class="risk-info">
                             <div class="risk-name" title="{{ $product->name }}">{{ Str::limit($product->name, 20) }}</div>
                             <div class="risk-meta">{{ $product->price ? number_format($product->price,0,',',' ').' '.$devise : 'Prix non défini' }}</div>
@@ -1553,7 +1662,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <div class="perf-grid">
             <div class="card period-card" id="periodCard" style="margin-bottom:0">
                 <div class="card-hd">
-                    <span class="card-title">📅 Analyse par période</span>
+                    <span class="card-title" style="display:inline-flex;align-items:center;gap:5px">{!! $I['cal_t'] !!} Analyse par période</span>
                     <span class="period-label" id="periodLabel">Période : <strong>Ce mois</strong></span>
                 </div>
                 <div class="period-btns">
@@ -1601,39 +1710,39 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
             {{-- Résumé rapide --}}
             <div class="card" style="margin-bottom:0">
-                <div class="card-hd"><span class="card-title">📊 Résumé rapide</span></div>
+                <div class="card-hd"><span class="card-title" style="display:inline-flex;align-items:center;gap:5px">{!! $I['chart_t'] !!} Résumé rapide</span></div>
                 <div class="card-bd">
                     <div class="resume-items">
                         <div class="resume-item">
-                            <div class="resume-item-ico">🛒</div>
+                            <div class="resume-item-ico">{!! $I['cart_r'] !!}</div>
                             <div>
                                 <div class="resume-item-val">{{ $totalProduits }}</div>
                                 <div class="resume-item-lbl">Total produits</div>
                             </div>
                         </div>
                         <div class="resume-item">
-                            <div class="resume-item-ico">👥</div>
+                            <div class="resume-item-ico">{!! $I['users_r'] !!}</div>
                             <div>
                                 <div class="resume-item-val">{{ $clientsActifsCount }}</div>
                                 <div class="resume-item-lbl">Clients actifs</div>
                             </div>
                         </div>
                         <div class="resume-item">
-                            <div class="resume-item-ico">🚴</div>
+                            <div class="resume-item-ico">{!! $I['bike_r'] !!}</div>
                             <div>
                                 <div class="resume-item-val">{{ $livreursActifsCount }}</div>
                                 <div class="resume-item-lbl">Livreurs actifs</div>
                             </div>
                         </div>
                         <div class="resume-item">
-                            <div class="resume-item-ico">🏢</div>
+                            <div class="resume-item-ico">{!! $I['bldg_r'] !!}</div>
                             <div>
                                 <div class="resume-item-val">{{ $partenairesCount }}</div>
                                 <div class="resume-item-lbl">Partenaires</div>
                             </div>
                         </div>
                         <div class="resume-item" style="border-color:var(--brand-lt);background:var(--brand-mlt)">
-                            <div class="resume-item-ico" style="background:var(--brand-mlt);border-color:var(--brand-lt)">💰</div>
+                            <div class="resume-item-ico" style="background:var(--brand-mlt);border-color:var(--brand-lt);color:var(--brand)">{!! $I['dollar_r'] !!}</div>
                             <div>
                                 <div class="resume-item-val" style="color:var(--brand);font-size:16px">{{ number_format($caMonth/1000000,1) }}M</div>
                                 <div class="resume-item-lbl" style="color:var(--brand-dk)">Revenu net ce mois</div>
@@ -1652,6 +1761,21 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 @push('scripts')
 <script>
 const DEVISE = @json($devise);
+
+/* ── Icônes SVG JS (notification bell, toasts, boutons dynamiques) ── */
+const _SVG = {
+    msg:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    bldg:  '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    box:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+    hdp:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',
+    check: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>',
+    clock: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    tag:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>',
+    pin:   '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+    moon:  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+    sun:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
+};
+
 /* SIDEBAR */
 function toggleGroup(btn) {
     const sub = btn.nextElementSibling;
@@ -1762,7 +1886,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnDark) {
         btnDark.addEventListener('click', () => {
             document.documentElement.classList.toggle('dark');
-            btnDark.textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
+            btnDark.innerHTML = document.documentElement.classList.contains('dark') ? _SVG.sun : _SVG.moon;
         });
     }
 
@@ -1945,7 +2069,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const list = document.getElementById('notifList');
         if (!list) return;
         if (!_alerts.length) {
-            list.innerHTML = '<div style="padding:20px;text-align:center;color:#9ca3af;font-size:12.5px">✅ Aucune alerte</div>';
+            list.innerHTML = `<div style="padding:20px;text-align:center;color:#9ca3af;font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:6px">${_SVG.check} Aucune alerte</div>`;
             return;
         }
         list.innerHTML = _alerts.slice(0, 20).map(a => {
@@ -1996,7 +2120,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div style="display:flex;align-items:center;border-bottom:1px solid #f3f6f4;background:${rowBg};transition:background .12s"
                  onmouseover="this.style.background='${rowHover}'" onmouseout="this.style.background='${rowBg}'">
                 ${innerRow}
-                    <span style="font-size:18px;flex-shrink:0">${a.ico}</span>
+                    <span style="width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:.85">${a.ico}</span>
                     <div style="flex:1;min-width:0">
                         <div style="font-size:12.5px;font-weight:600;color:#111;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.msg}</div>
                         <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
@@ -2083,14 +2207,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     /* Toast seulement si ce n'est pas le premier poll (évite le spam au chargement) */
                     if (_prevMsg >= 0) {
                         const n = newMsgs.length;
-                        showToast(`💬 <div>${n} nouveau${n>1?'x':''} message${n>1?'s':''} non lu${n>1?'s':''}</div>`, 'msg');
+                        showToast(`${_SVG.msg} <div>${n} nouveau${n>1?'x':''} message${n>1?'s':''} non lu${n>1?'s':''}</div>`, 'msg');
                     }
                     /* Alertes individuelles (du plus ancien au plus récent dans la cloche) */
                     [...newMsgs].reverse().forEach(m => {
                         const label = m.product_name
                             ? `${m.sender_name} · ${m.product_name} — message non lu`
                             : `${m.sender_name} — message non lu`;
-                        pushAlert('💬', label, '{{ route("boutique.messages.hub") }}', 'msg', '', m.time);
+                        pushAlert(_SVG.msg, label, '{{ route("boutique.messages.hub") }}', 'msg', '', m.time);
                     });
                     _lastSeenMsgId = newMsgs[0].id;
                     try { localStorage.setItem(_KEY_MSG, _lastSeenMsgId); } catch(e) {}
@@ -2111,7 +2235,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (newCMsgs.length > 0) {
                     if (_prevCompanyMsg >= 0) {
                         const n = newCMsgs.length;
-                        showToast(`🏢 <div>${n} nouveau${n>1?'x':''} message${n>1?'s':''} d'entreprise${n>1?'s':''}</div>`, 'company');
+                        showToast(`${_SVG.bldg} <div>${n} nouveau${n>1?'x':''} message${n>1?'s':''} d'entreprise${n>1?'s':''}</div>`, 'company');
                     }
                     /* Grouper par entreprise — une seule alerte par entreprise */
                     const byCompany = {};
@@ -2129,7 +2253,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             existing.msg  = label;
                             existing.time = g.time;
                         } else {
-                            pushAlert('🏢', label, null, 'company_msg', '', g.time, g.company_id, g.company_name);
+                            pushAlert(_SVG.bldg, label, null, 'company_msg', '', g.time, g.company_id, g.company_name);
                         }
                     });
                     _saveAlerts();
@@ -2149,16 +2273,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     existing.msg = label;
                     if (_prevOrders >= 0 && d.orders_pending > _prevOrders) {
                         const n = d.orders_pending - _prevOrders;
-                        showToast(`📦 <div>${n} nouvelle${n>1?'s':''} commande${n>1?'s':''} !</div>`, 'order');
+                        showToast(`${_SVG.box} <div>${n} nouvelle${n>1?'s':''} commande${n>1?'s':''} !</div>`, 'order');
                         existing.time = new Date().getHours().toString().padStart(2,'0')+':'+new Date().getMinutes().toString().padStart(2,'0');
                     }
                 } else {
                     /* Créer l'entrée commande pour la première fois */
                     if (_prevOrders >= 0 && d.orders_pending > _prevOrders) {
                         const n = d.orders_pending - _prevOrders;
-                        showToast(`📦 <div>${n} nouvelle${n>1?'s':''} commande${n>1?'s':''} !</div>`, 'order');
+                        showToast(`${_SVG.box} <div>${n} nouvelle${n>1?'s':''} commande${n>1?'s':''} !</div>`, 'order');
                     }
-                    pushAlert('📦', label, '{{ route("boutique.orders.index") }}', 'order');
+                    pushAlert(_SVG.box, label, '{{ route("boutique.orders.index") }}', 'order');
                 }
                 _saveAlerts();
             } else if (d.orders_pending === 0 && _alerts.some(a => a.type === 'order')) {
@@ -2177,7 +2301,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (newReplies.length) {
                     /* Toast une seule fois si c'est pas le 1er poll */
                     if (_lastSeenSupportId > 0) {
-                        showToast(`🎧 <div>Le SuperAdmin a répondu à votre ticket support !</div>`, 'support');
+                        showToast(`${_SVG.hdp} <div>Le SuperAdmin a répondu à votre ticket support !</div>`, 'support');
                     }
                     /* Une alerte par ticket — si le SuperAdmin renvoie sur le même ticket, on met à jour */
                     [...newReplies].reverse().forEach(m => {
@@ -2188,7 +2312,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             existing.supportMsgId = m.id;
                         } else {
                             pushAlert(
-                                '🎧',
+                                _SVG.hdp,
                                 `SuperAdmin a répondu : « ${m.ticket_subject} »`,
                                 '/support/' + m.ticket_id,
                                 'support',
@@ -2271,7 +2395,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         /* Header */
-        document.getElementById('bqChatAv').textContent   = '🏢';
+        document.getElementById('bqChatAv').innerHTML   = _SVG.bldg;
         document.getElementById('bqChatName').textContent = _bqCompanyName;
 
         /* Vider messages */
@@ -2287,7 +2411,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const btnC = document.getElementById('bqBtnConfier');
         btnC.disabled  = false;
         btnC.classList.remove('done');
-        btnC.innerHTML = '📦 Confier la livraison à cette entreprise';
+        btnC.innerHTML = _SVG.box + ' Confier la livraison à cette entreprise';
 
         /* Ouvrir */
         document.getElementById('bqChatModal').classList.add('open');
@@ -2327,10 +2451,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.className = 'bq-order-card';
                 card.dataset.orderId = o.id;
                 const thumbHtml = o.photo
-                    ? `<div class="bq-order-card-thumb"><img src="${o.photo}" alt="" onerror="this.parentElement.innerHTML='🏷️'"></div>`
-                    : `<div class="bq-order-card-thumb">🏷️</div>`;
+                    ? `<div class="bq-order-card-thumb"><img src="${o.photo}" alt="" onerror="this.parentElement.innerHTML=_SVG.tag"></div>`
+                    : `<div class="bq-order-card-thumb">${_SVG.tag}</div>`;
                 const addrHtml = o.address
-                    ? `<div class="bq-order-card-address">📍 ${bqEsc(o.address)}</div>`
+                    ? `<div class="bq-order-card-address">${_SVG.pin} ${bqEsc(o.address)}</div>`
                     : '';
                 card.innerHTML =
                     thumbHtml +
@@ -2362,7 +2486,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('bqBtnConfier');
         if (!btn) return;
         btn.disabled  = n === 0 || _bqConfierDone;
-        btn.innerHTML = n > 1 ? `📦 Confier ${n} commandes` : '📦 Confier la livraison à cette entreprise';
+        btn.innerHTML = n > 1 ? `${_SVG.box} Confier ${n} commandes` : _SVG.box + ' Confier la livraison à cette entreprise';
         const cnt = document.getElementById('bqSelCount');
         if (cnt) cnt.textContent = n > 0 ? `${n} sélectionnée${n>1?'s':''}` : '';
         const allCards = document.querySelectorAll('#bqOrdersList .bq-order-card');
@@ -2480,7 +2604,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const btn     = document.getElementById('bqBtnConfier');
         btn.disabled  = true;
-        btn.innerHTML = '⏳ Envoi…';
+        btn.innerHTML = _SVG.clock + ' Envoi…';
 
         const picker  = document.getElementById('bqZonePicker');
         const zoneId  = picker?.value || null;
@@ -2514,22 +2638,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (successCount > 0) {
             _bqConfierDone = true;
             btn.classList.add('done');
-            btn.innerHTML = '✅ Confiée !';
+            btn.innerHTML = _SVG.check + ' Confiée !';
             document.getElementById('bqConfierZone').style.display = 'none';
 
             bqRenderMessages([{
                 id: 'local-' + Date.now(),
                 from_type: 'system',
                 body: successCount === 1
-                    ? `✅ Commande ${successNums[0]} confiée à ${_bqCompanyName}. Statut : En attente.`
-                    : `✅ ${successCount} commandes confiées à ${_bqCompanyName}. Statut : En attente.`,
+                    ? `${_SVG.check} Commande ${successNums[0]} confiée à ${_bqCompanyName}. Statut : En attente.`
+                    : `${_SVG.check} ${successCount} commandes confiées à ${_bqCompanyName}. Statut : En attente.`,
                 created_at: new Date().toISOString()
             }], false);
 
             setTimeout(() => location.reload(), 2000);
         } else {
             btn.disabled  = false;
-            btn.innerHTML = '📦 Confier la livraison à cette entreprise';
+            btn.innerHTML = _SVG.box + ' Confier la livraison à cette entreprise';
             alert('Erreur lors de la soumission. Veuillez réessayer.');
         }
     };

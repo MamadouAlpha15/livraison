@@ -6,6 +6,71 @@
 @section('title', 'Commandes · ' . ($shop->name ?? 'Boutique'))
 @php $bodyClass = 'is-dashboard'; @endphp
 
+@php
+$_s  = 'fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"';
+$_s2 = 'fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"';
+$_s1 = 'fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"';
+$I = [
+    /* sidebar nav 17px */
+    'msg_nav'    => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    'box_nav'    => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+    'tag_nav'    => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>',
+    'users_nav'  => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    'team_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="17"/><line x1="9.5" y1="14.5" x2="14.5" y2="14.5"/></svg>',
+    'bike_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1"/><path d="M5.5 17.5L11 5.5 15 10l2-3h1.5"/><line x1="11" y1="5.5" x2="7" y2="5.5"/></svg>',
+    'bldg_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    'wallet_nav' => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 13a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" fill="currentColor" stroke="none"/></svg>',
+    'card_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+    'chart_nav'  => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+    'list_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+    'gear_nav'   => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+    'hdp_nav'    => '<svg width="17" height="17" viewBox="0 0 24 24" '.$_s.'><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',
+    /* topbar */
+    'box_tb'     => '<svg width="15" height="15" viewBox="0 0 24 24" '.$_s2.'><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+    'currency_tb'=> '<svg width="11" height="11" viewBox="0 0 24 24" '.$_s2.'><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+    'map_tb'     => '<svg width="13" height="13" viewBox="0 0 24 24" '.$_s2.'><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>',
+    /* filter */
+    'search_fil' => '<svg width="13" height="13" viewBox="0 0 24 24" '.$_s2.'><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+    /* bulk bar 13px */
+    'bike_bulk'  => '<svg width="13" height="13" viewBox="0 0 24 24" '.$_s2.'><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1"/><path d="M5.5 17.5L11 5.5 15 10l2-3h1.5"/><line x1="11" y1="5.5" x2="7" y2="5.5"/></svg>',
+    'bldg_bulk'  => '<svg width="13" height="13" viewBox="0 0 24 24" '.$_s2.'><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    'ban_bulk'   => '<svg width="13" height="13" viewBox="0 0 24 24" '.$_s2.'><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>',
+    'recycle_bulk'=> '<svg width="13" height="13" viewBox="0 0 24 24" '.$_s2.'><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.93"/></svg>',
+    /* company modal */
+    'bldg_hd'    => '<svg width="16" height="16" viewBox="0 0 24 24" '.$_s2.'><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    'truck_logo' => '<svg width="18" height="18" viewBox="0 0 24 24" '.$_s.'><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
+    'msg_btn'    => '<svg width="14" height="14" viewBox="0 0 24 24" '.$_s2.'><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    'check_btn'  => '<svg width="13" height="13" viewBox="0 0 24 24" '.$_s2.'><polyline points="20 6 9 17 4 12"/></svg>',
+    /* driver modal */
+    'bike_hd'    => '<svg width="16" height="16" viewBox="0 0 24 24" '.$_s2.'><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1"/><path d="M5.5 17.5L11 5.5 15 10l2-3h1.5"/><line x1="11" y1="5.5" x2="7" y2="5.5"/></svg>',
+    /* zone modal */
+    'pin_hd'     => '<svg width="16" height="16" viewBox="0 0 24 24" '.$_s2.'><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+    'box_lbl'    => '<svg width="11" height="11" viewBox="0 0 24 24" '.$_s2.'><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+    /* chat modal */
+    'bldg_av'    => '<svg width="20" height="20" viewBox="0 0 24 24" '.$_s.'><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    'box_ctx'    => '<svg width="18" height="18" viewBox="0 0 24 24" '.$_s.'><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+    'pin_lbl'    => '<svg width="11" height="11" viewBox="0 0 24 24" '.$_s2.'><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+    'box_confier'=> '<svg width="18" height="18" viewBox="0 0 24 24" '.$_s.'><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+    'coin_lbl'   => '<svg width="11" height="11" viewBox="0 0 24 24" '.$_s2.'><circle cx="12" cy="12" r="10"/><path d="M12 6v12M9 9h4.5a2.25 2.25 0 0 1 0 4.5H9v4.5"/></svg>',
+    'clock_lbl'  => '<svg width="11" height="11" viewBox="0 0 24 24" '.$_s2.'><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    /* cancel modal */
+    'warn_icon'  => '<svg width="36" height="36" viewBox="0 0 24 24" '.$_s1.'><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    'x_btn'      => '<svg width="13" height="13" viewBox="0 0 24 24" '.$_s2.'><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    /* restore modal */
+    'refresh_icon'=> '<svg width="36" height="36" viewBox="0 0 24 24" '.$_s1.'><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.93"/></svg>',
+    'refresh_btn' => '<svg width="13" height="13" viewBox="0 0 24 24" '.$_s2.'><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.93"/></svg>',
+    /* empty state */
+    'empty_state' => '<svg width="40" height="40" viewBox="0 0 24 24" '.$_s1.' style="opacity:.3"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
+    /* table / mobile */
+    'tag_product' => '<svg width="22" height="22" viewBox="0 0 24 24" '.$_s.'><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>',
+    'pin_addr'    => '<svg width="11" height="11" viewBox="0 0 24 24" '.$_s2.'><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+    'bldg_chip'   => '<svg width="11" height="11" viewBox="0 0 24 24" '.$_s2.'><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    'check_assign'=> '<svg width="11" height="11" viewBox="0 0 24 24" '.$_s2.'><polyline points="20 6 9 17 4 12"/></svg>',
+    'bldg_btn'    => '<svg width="13" height="13" viewBox="0 0 24 24" '.$_s2.'><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    'search_det'  => '<svg width="12" height="12" viewBox="0 0 24 24" '.$_s2.'><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
+];
+@endphp
+
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -109,7 +174,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .c-sub{font-size:11px;color:var(--muted);}
 .prod-img{width:58px;height:58px;border-radius:var(--r-sm);object-fit:cover;border:2px solid var(--border);flex-shrink:0;cursor:pointer;transition:transform .15s,box-shadow .15s;}
 .prod-img:hover{transform:scale(1.07);box-shadow:0 4px 16px rgba(0,0,0,.18);}
-.prod-ph{width:58px;height:58px;border-radius:var(--r-sm);background:#f3f6f4;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.prod-ph{width:58px;height:58px;border-radius:var(--r-sm);background:#f3f6f4;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .addr-cell{font-size:11.5px;color:var(--text-2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .addr-empty{color:var(--muted);font-size:11px;}
 /* ── LIGHTBOX PHOTO ── */
@@ -180,7 +245,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .lv-chip{display:inline-flex;align-items:center;gap:6px;background:var(--brand-mlt);border:1px solid var(--brand-lt);border-radius:20px;padding:4px 10px 4px 4px;font-size:11.5px;font-weight:600;color:var(--brand-dk);}
 .lv-chip-av{width:22px;height:22px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;}
 .empty-state{padding:56px 20px;text-align:center;}
-.empty-state .ico{font-size:40px;display:block;margin-bottom:12px;opacity:.35;}
+.empty-state .ico{display:block;margin-bottom:12px;}
 .empty-state p{font-size:14px;color:var(--muted);}
 .pagination-wrap{display:flex;justify-content:center;padding:16px 0 4px;}
 .pagination-wrap .pagination{gap:4px;margin:0;}
@@ -192,7 +257,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .modal-overlay.open{display:flex;}
 .modal-box{background:var(--surface);border-radius:var(--r);padding:28px 26px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:modalIn .2s ease;}
 @keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(-8px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.modal-icon{font-size:38px;text-align:center;margin-bottom:12px;}
+.modal-icon{text-align:center;margin-bottom:12px;display:flex;align-items:center;justify-content:center;}
 .modal-title{font-size:16px;font-weight:700;color:var(--text);text-align:center;margin-bottom:8px;}
 .modal-sub{font-size:13px;color:var(--muted);text-align:center;line-height:1.6;margin-bottom:22px;}
 .modal-sub strong{color:var(--text);font-weight:700;}
@@ -215,7 +280,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
     background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;
 }
 .chat-hd-info{display:flex;align-items:center;gap:10px;}
-.chat-hd-av{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;}
+.chat-hd-av{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
 .chat-hd-av img{width:100%;height:100%;object-fit:cover;}
 .chat-hd-name{font-size:14px;font-weight:800;color:#fff;line-height:1.2;}
 .chat-hd-sub{font-size:11px;color:rgba(255,255,255,.7);margin-top:1px;}
@@ -231,7 +296,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .chat-order-num{font-size:11px;font-weight:800;color:#1d4ed8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
 .chat-order-client{font-size:13px;font-weight:700;color:#1e40af;}
 .chat-order-meta{font-size:11.5px;color:#3b82f6;margin-top:2px;}
-.chat-ctx-ico{width:34px;height:34px;border-radius:9px;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.chat-ctx-ico{width:34px;height:34px;border-radius:9px;background:#dbeafe;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 
 /* Messages */
 .chat-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:8px;background:#f8fafc;scrollbar-width:thin;scrollbar-color:#c7d2fe transparent;}
@@ -441,7 +506,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
     <div class="modal-box" style="max-width:480px;padding:22px 20px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
             <div>
-                <div style="font-size:15px;font-weight:800;color:var(--text);">🏢 Choisir une entreprise</div>
+                <div style="font-size:15px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:6px;">{!! $I['bldg_hd'] !!} Choisir une entreprise</div>
                 <div style="font-size:12px;color:var(--muted);margin-top:2px;">Discutez et confiez la livraison</div>
             </div>
             <button onclick="closeCompanyModal()" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--muted);">✕</button>
@@ -462,7 +527,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                     @if($dc->image)
                         <img src="{{ asset('storage/'.$dc->image) }}" style="width:100%;height:100%;object-fit:cover;" alt="" id="dc-img-{{ $dc->id }}">
                     @else
-                        <span style="font-size:17px;">🚚</span>
+                        {!! $I['truck_logo'] !!}
                     @endif
                 </div>
                 {{-- Infos --}}
@@ -481,7 +546,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                             data-company-name="{{ $dc->name }}"
                             data-company-img="{{ $dc->image ? asset('storage/'.$dc->image) : '' }}"
                             onclick="openChatFromCompany(this)">
-                        💬
+                        {!! $I['msg_btn'] !!}
                     </button>
                     <button class="btn btn-sm bulk-assign-company bulk-show"
                             style="display:none;background:#eef2ff;border-color:#c7d2fe;color:#4f46e5;font-weight:700;"
@@ -489,7 +554,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                             data-company-name="{{ addslashes($dc->name) }}"
                             onclick="submitBulkCompany(this)"
                             title="Confier les commandes sélectionnées à cette entreprise">
-                        ✅ Confier
+                        {!! $I['check_btn'] !!} Confier
                     </button>
                 </div>
             </div>
@@ -511,7 +576,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
     <div class="blv-box">
         <div class="blv-hd">
             <div>
-                <div class="blv-title">🚴 Assigner à un livreur</div>
+                <div class="blv-title" style="display:flex;align-items:center;gap:6px;">{!! $I['bike_hd'] !!} Assigner à un livreur</div>
                 <div class="blv-sub"><span id="bulkDriverCount">0</span> commande(s) sélectionnée(s) seront assignées</div>
             </div>
             <button class="blv-close" onclick="closeBulkDriverModal()">✕</button>
@@ -535,7 +600,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
         @endif
         <div class="blv-footer">
             <button class="btn" style="flex:0 0 auto;" onclick="closeBulkDriverModal()">Annuler</button>
-            <button class="btn btn-primary" style="flex:1;justify-content:center;" id="bulkDriverSubmit" onclick="submitBulkDriver()">✅ Assigner les commandes</button>
+            <button class="btn btn-primary" style="flex:1;justify-content:center;" id="bulkDriverSubmit" onclick="submitBulkDriver()">{!! $I['check_btn'] !!} Assigner les commandes</button>
         </div>
     </div>
 </div>
@@ -545,7 +610,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
     <div class="blv-box">
         <div class="blv-hd">
             <div>
-                <div class="blv-title">📍 Zone de livraison</div>
+                <div class="blv-title" style="display:flex;align-items:center;gap:6px;">{!! $I['pin_hd'] !!} Zone de livraison</div>
                 <div class="blv-sub">
                     <span id="bulkZoneOrderCount">0</span> commande(s) → <span id="bulkZoneCompanyName"></span>
                 </div>
@@ -554,7 +619,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
         </div>
         {{-- Résumé des commandes sélectionnées (mode zone simple) --}}
         <div id="bulkZoneOrdersSummary" style="display:none;padding:8px 4px 10px;">
-            <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">📦 Commandes sélectionnées</div>
+            <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:4px;">{!! $I['box_lbl'] !!} Commandes sélectionnées</div>
             <div id="bulkZoneOrdersPills" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
         </div>
         <div class="blv-list" id="bulkZoneList" style="min-height:80px;">
@@ -563,7 +628,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
         <div class="blv-footer">
             <button class="btn" style="flex:0 0 auto;" onclick="closeBulkZoneModal()">← Retour</button>
             <button class="btn" id="bulkZoneSkip" style="flex:0 0 auto;background:#f8fafc;" onclick="confirmBulkZone(true)">Passer (sans zone)</button>
-            <button class="btn btn-primary" style="flex:1;justify-content:center;" id="bulkZoneConfirm" onclick="confirmBulkZone(false)">✅ Confirmer</button>
+            <button class="btn btn-primary" style="flex:1;justify-content:center;" id="bulkZoneConfirm" onclick="confirmBulkZone(false)">{!! $I['check_btn'] !!} Confirmer</button>
         </div>
     </div>
 </div>
@@ -575,7 +640,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
         {{-- Header --}}
         <div class="chat-hd">
             <div class="chat-hd-info">
-                <div class="chat-hd-av" id="chatCompanyAv">🏢</div>
+                <div class="chat-hd-av" id="chatCompanyAv">{!! $I['bldg_av'] !!}</div>
                 <div>
                     <div class="chat-hd-name" id="chatCompanyName">Entreprise</div>
                     <div class="chat-hd-sub">Livraison · Discussion en cours</div>
@@ -586,7 +651,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 
         {{-- Contexte commande --}}
         <div class="chat-order-ctx">
-            <div class="chat-ctx-ico">📦</div>
+            <div class="chat-ctx-ico">{!! $I['box_ctx'] !!}</div>
             <div>
                 <div class="chat-order-num" id="chatOrderNum">Commande #—</div>
                 <div class="chat-order-client" id="chatClientName">Client —</div>
@@ -604,7 +669,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 
             {{-- Sélecteur de zone (affiché si l'entreprise a des zones) --}}
             <div id="zonePickerWrap" style="display:none;margin-bottom:8px;">
-                <label style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;">📍 Zone de livraison</label>
+                <label style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.4px;display:flex;align-items:center;gap:4px;margin-bottom:5px;">{!! $I['pin_lbl'] !!} Zone de livraison</label>
                 <input type="text" id="zoneSearch" placeholder="🔍 Rechercher une zone…" autocomplete="off"
                        oninput="filterZoneSelect(this,'zonePicker')"
                        style="width:100%;padding:7px 10px;border:1.5px solid #bbf7d0;border-radius:8px;font-size:12px;font-family:inherit;background:#fff;color:#0f172a;outline:none;margin-bottom:6px;box-sizing:border-box;">
@@ -614,12 +679,12 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                     <option value="">— Choisir une zone —</option>
                 </select>
                 <div id="zonePriceHint" style="display:none;margin-top:5px;padding:7px 10px;background:#f0fdf4;border-radius:7px;font-size:12px;font-weight:700;color:#065f46;">
-                    💰 Prix : <span id="zonePriceVal"></span> · ⏱ <span id="zoneDelayVal"></span> min
+                    {!! $I['coin_lbl'] !!} Prix : <span id="zonePriceVal"></span> · {!! $I['clock_lbl'] !!} <span id="zoneDelayVal"></span> min
                 </div>
             </div>
 
             <button class="btn-confier" id="btnConfier" onclick="confierLivraison()">
-                📦 Confier la livraison à cette entreprise
+                {!! $I['box_confier'] !!} Confier la livraison à cette entreprise
             </button>
         </div>
 
@@ -638,14 +703,14 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 {{-- MODALS --}}
 <div class="modal-overlay" id="cancelModal">
     <div class="modal-box">
-        <div class="modal-icon">⚠️</div>
+        <div class="modal-icon">{!! $I['warn_icon'] !!}</div>
         <div class="modal-title">Annuler cette commande ?</div>
         <div class="modal-sub">Commande <strong id="modalOrderId"></strong> — client <strong id="modalClientName"></strong><br>Cette action est <strong>irréversible</strong>.</div>
         <div class="modal-actions">
             <button type="button" class="btn" onclick="closeModal()">← Retour</button>
             <form id="cancelForm" method="POST" style="flex:1;display:contents">
                 @csrf @method('PUT')
-                <button type="submit" class="btn btn-cancel-confirm" style="flex:1">❌ Confirmer</button>
+                <button type="submit" class="btn btn-cancel-confirm" style="flex:1">{!! $I['x_btn'] !!} Confirmer</button>
             </form>
         </div>
     </div>
@@ -653,14 +718,14 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 
 <div class="modal-overlay" id="restoreModal">
     <div class="modal-box">
-        <div class="modal-icon">🔄</div>
+        <div class="modal-icon">{!! $I['refresh_icon'] !!}</div>
         <div class="modal-title">Restaurer cette commande ?</div>
         <div class="modal-sub">Commande <strong id="modalRestoreOrderId"></strong> — client <strong id="modalRestoreClientName"></strong><br>La commande repassera au statut <strong>En attente</strong>.</div>
         <div class="modal-actions">
             <button type="button" class="btn" onclick="closeRestoreModal()">← Retour</button>
             <form id="restoreForm" method="POST" style="flex:1;display:contents">
                 @csrf @method('PUT')
-                <button type="submit" class="btn btn-restore-confirm" style="flex:1">🔄 Confirmer</button>
+                <button type="submit" class="btn btn-restore-confirm" style="flex:1">{!! $I['refresh_btn'] !!} Confirmer</button>
             </form>
         </div>
     </div>
@@ -721,33 +786,33 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
         <nav class="sb-nav">
             <a href="{{ route('boutique.dashboard') }}" class="sb-item" style="margin-bottom:4px"><span class="ico">⊞</span> Tableau de bord</a>
             <div class="sb-section">Boutique</div>
-            <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">💬</span> Messages</a>
+            <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">{!! $I['msg_nav'] !!}</span> Messages</a>
             <a href="{{ route('boutique.orders.index') }}" class="sb-item active">
-                <span class="ico">📦</span> Commandes
+                <span class="ico">{!! $I['box_nav'] !!}</span> Commandes
                 @if($pendingCount > 0)<span class="sb-badge">{{ $pendingCount }}</span>@endif
             </a>
-            <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">🏷️</span> Produits</a>
-            <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">👥</span> Clients</a>
-            <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">🧑‍💼</span> Équipe</a>
+            <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">{!! $I['tag_nav'] !!}</span> Produits</a>
+            <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">{!! $I['users_nav'] !!}</span> Clients</a>
+            <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">{!! $I['team_nav'] !!}</span> Équipe</a>
             <div class="sb-section">Livraison</div>
-            <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">🚴</span> Livreurs</a>
-            <a href="{{ route('delivery.companies.index') }}" class="sb-item"><span class="ico">🏢</span> Partenaires</a>
+            <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">{!! $I['bike_nav'] !!}</span> Livreurs</a>
+            <a href="{{ route('delivery.companies.index') }}" class="sb-item"><span class="ico">{!! $I['bldg_nav'] !!}</span> Partenaires</a>
             <div class="sb-section">Finances</div>
             <div class="sb-group">
                 <button class="sb-group-toggle" onclick="toggleGroup(this)" type="button">
-                    <span class="ico">💰</span> Finances & Rapports <span class="sb-arrow">▶</span>
+                    <span class="ico">{!! $I['wallet_nav'] !!}</span> Finances & Rapports <span class="sb-arrow">▶</span>
                 </button>
                 <div class="sb-sub">
-                    <a href="{{ route('boutique.payments.index') }}" class="sb-item"><span class="ico">💳</span> Paiements</a>
-                    <a href="{{ route('boutique.commissions.index') }}" class="sb-item"><span class="ico">📊</span> Commissions</a>
-                    <a href="{{ route('boutique.reports.index') }}" class="sb-item"><span class="ico">📋</span> Rapports</a>
+                    <a href="{{ route('boutique.payments.index') }}" class="sb-item"><span class="ico">{!! $I['card_nav'] !!}</span> Paiements</a>
+                    <a href="{{ route('boutique.commissions.index') }}" class="sb-item"><span class="ico">{!! $I['chart_nav'] !!}</span> Commissions</a>
+                    <a href="{{ route('boutique.reports.index') }}" class="sb-item"><span class="ico">{!! $I['list_nav'] !!}</span> Rapports</a>
                     @if(auth()->user()->role === 'admin')
-                    <a href="{{ route('shop.edit', $shop) }}" class="sb-item"><span class="ico">⚙️</span> Paramètres</a>
+                    <a href="{{ route('shop.edit', $shop) }}" class="sb-item"><span class="ico">{!! $I['gear_nav'] !!}</span> Paramètres</a>
                     @endif
                 </div>
             </div>
             <div class="sb-section">Aide</div>
-            <a href="{{ route('support.index') }}" class="sb-item"><span class="ico">🎧</span> Support</a>
+            <a href="{{ route('support.index') }}" class="sb-item"><span class="ico">{!! $I['hdp_nav'] !!}</span> Support</a>
         </nav>
         <div class="sb-footer">
             <a href="{{ route('profile.edit') }}" class="sb-user">
@@ -770,11 +835,11 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
         <div class="topbar">
             <button class="btn-hamburger" id="btnMenu">☰</button>
             <div class="tb-info">
-                <div class="tb-title">📦 Commandes</div>
-                <div class="tb-sub">{{ $shop->name ?? 'Boutique' }} &nbsp;·&nbsp; <span class="devise-badge" style="font-size:10px;padding:2px 8px">💱 {{ $devise }}</span></div>
+                <div class="tb-title">{!! $I['box_tb'] !!} Commandes</div>
+                <div class="tb-sub">{{ $shop->name ?? 'Boutique' }} &nbsp;·&nbsp; <span class="devise-badge" style="font-size:10px;padding:2px 8px">{!! $I['currency_tb'] !!} {{ $devise }}</span></div>
             </div>
             <a href="{{ route('employe.orders.carte') }}" style="display:flex;align-items:center;gap:5px;height:30px;padding:0 12px;border-radius:8px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);color:#4f46e5;font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;text-decoration:none;transition:background .14s" onmouseover="this.style.background='rgba(99,102,241,.18)'" onmouseout="this.style.background='rgba(99,102,241,.1)'">
-                🗺️ <span class="desk-only">Carte GPS</span>
+                {!! $I['map_tb'] !!} <span class="desk-only">Carte GPS</span>
             </a>
             <div id="autoRefreshBadge" style="display:flex;align-items:center;gap:6px;background:#f0fdf4;border:1px solid #86efac;border-radius:20px;padding:4px 12px;font-size:11.5px;font-weight:600;color:#166534;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0" onclick="togglePause()" title="Cliquer pour mettre en pause">
                 <span id="refreshDot" style="width:7px;height:7px;border-radius:50%;background:#22c55e;animation:blink 2.2s ease-in-out infinite;flex-shrink:0"></span>
@@ -795,7 +860,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                 {{-- Ligne 1 : recherche + statut + boutons --}}
                 <div class="filter-row">
                     <div class="filter-search-wrap">
-                        <span class="ico-search">🔍</span>
+                        <span class="ico-search">{!! $I['search_fil'] !!}</span>
                         <input type="text" name="search" class="filter-input"
                                placeholder="Rechercher client ou #commande…"
                                value="{{ $search ?? '' }}">
@@ -858,10 +923,10 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
             {{-- ── BARRE D'ACTIONS GROUPÉES ── --}}
             <div class="bulk-bar" id="bulkBar">
                 <span class="bulk-count" id="bulkCount">0 sélectionnée(s)</span>
-                <button class="bulk-btn bulk-btn-driver" onclick="openBulkDriverModal()">🚴 Assigner à mes livreurs</button>
-                <button class="bulk-btn bulk-btn-company" onclick="openBulkCompanyModalMode()">🏢 Assigner à une entreprise</button>
-                <button class="bulk-btn bulk-btn-cancel" onclick="bulkCancel()">🚫 Annuler</button>
-                <button class="bulk-btn bulk-btn-restore" onclick="bulkRestore()">♻️ Restaurer</button>
+                <button class="bulk-btn bulk-btn-driver" onclick="openBulkDriverModal()">{!! $I['bike_bulk'] !!} Assigner à mes livreurs</button>
+                <button class="bulk-btn bulk-btn-company" onclick="openBulkCompanyModalMode()">{!! $I['bldg_bulk'] !!} Assigner à une entreprise</button>
+                <button class="bulk-btn bulk-btn-cancel" onclick="bulkCancel()">{!! $I['ban_bulk'] !!} Annuler</button>
+                <button class="bulk-btn bulk-btn-restore" onclick="bulkRestore()">{!! $I['recycle_bulk'] !!} Restaurer</button>
                 <button class="bulk-btn bulk-btn-clear" onclick="clearBulkSelection()">✕ Effacer</button>
             </div>
 
@@ -872,7 +937,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                     <span style="font-size:11px;color:var(--muted)">Page {{ $orders->currentPage() }}/{{ $orders->lastPage() }} · {{ $orders->total() }} commande(s)</span>
                 </div>
                 @if($orders->isEmpty())
-                <div class="empty-state"><span class="ico">📭</span><p>Aucune commande.</p></div>
+                <div class="empty-state"><span class="ico">{!! $I['empty_state'] !!}</span><p>Aucune commande.</p></div>
                 @else
                 <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
                 <table class="tbl" style="min-width:720px;">
@@ -907,12 +972,12 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                     </td>
 
                         <td>
-                            @if($product)<div style="display:flex;align-items:center;gap:8px">@if($product->image)<img src="{{ asset('storage/'.$product->image) }}" class="prod-img" alt="{{ $product->name }}" onclick="openLightbox('{{ asset('storage/'.$product->image) }}','{{ addslashes($product->name) }}')">@else<div class="prod-ph">🏷️</div>@endif<div><div style="font-size:12.5px;font-weight:600;color:var(--text)">{{ Str::limit($product->name,22) }}</div><div style="font-size:11px;color:var(--muted)">Qté : {{ $order->items->first()->quantity ?? 1 }}</div></div></div>
+                            @if($product)<div style="display:flex;align-items:center;gap:8px">@if($product->image)<img src="{{ asset('storage/'.$product->image) }}" class="prod-img" alt="{{ $product->name }}" onclick="openLightbox('{{ asset('storage/'.$product->image) }}','{{ addslashes($product->name) }}')">@else<div class="prod-ph">{!! $I['tag_product'] !!}</div>@endif<div><div style="font-size:12.5px;font-weight:600;color:var(--text)">{{ Str::limit($product->name,22) }}</div><div style="font-size:11px;color:var(--muted)">Qté : {{ $order->items->first()->quantity ?? 1 }}</div></div></div>
                             @else<span style="color:var(--muted);font-size:12px">—</span>@endif
                         </td>
                         <td>
                             @php $addr = $order->delivery_destination ?: ($client?->address ?? ''); @endphp
-                            @if($addr)<div class="addr-cell" title="{{ $addr }}">📍 {{ $addr }}</div>@else<span class="addr-empty">—</span>@endif
+                            @if($addr)<div class="addr-cell" title="{{ $addr }}">{!! $I['pin_addr'] !!} {{ $addr }}</div>@else<span class="addr-empty">—</span>@endif
                         </td>
                         <td><div class="amount">{{ number_format($order->total,0,',',' ') }} <small>{{ $devise }}</small></div></td>
                         <td><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span></td>
@@ -921,7 +986,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                                 <div class="lv-chip"><div class="lv-chip-av">{{ initiales($order->livreur->name) }}</div>{{ Str::limit($order->livreur->name,14) }}</div>
                             @elseif($order->deliveryCompany)
                                 <div class="lv-chip" style="background:#eef2ff;border-color:#c7d2fe;color:#4f46e5;">
-                                    <div class="lv-chip-av" style="background:#6366f1;">🏢</div>
+                                    <div class="lv-chip-av" style="background:#6366f1;">{!! $I['bldg_chip'] !!}</div>
                                     {{ Str::limit($order->deliveryCompany->name,14) }}
                                 </div>
                             @else
@@ -940,7 +1005,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                                         <option value="{{ $lv->id }}">{{ $lv->name }} {{ $lv->is_available ? '🟢' : '🟡' }}</option>
                                         @endforeach
                                     </select>
-                                    <button type="submit" class="btn btn-primary btn-sm" title="Assigner ce livreur">✅</button>
+                                    <button type="submit" class="btn btn-primary btn-sm" title="Assigner ce livreur">{!! $I['check_assign'] !!}</button>
                                 </form>
                                 {{-- Entreprise externe --}}
                                 <button type="button"
@@ -953,7 +1018,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                                         data-dest="{{ addslashes($order->delivery_destination ?: ($client->address ?? '')) }}"
                                         data-shop-id="{{ $shop->id ?? '' }}"
                                         onclick="openCompanyModal(this)">
-                                    🏢
+                                    {!! $I['bldg_btn'] !!}
                                 </button>
                             </div>
                             @elseif($order->livreur || $order->deliveryCompany)
@@ -963,7 +1028,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         <td><div style="display:flex;align-items:center;gap:5px;flex-wrap:nowrap">
                             <!--<a href="{{ route('orders.show',$order) }}" class="btn btn-info btn-sm">🔍</a> !--->
                             @if($peutAnnuler)<button type="button" class="btn-cancel" onclick="openCancelModal('{{ route('employe.orders.cancel',$order) }}','#{{ $order->id }}','{{ addslashes($client->name ?? 'Inconnu') }}')">✕ Annuler</button>
-                            @elseif($dejaAnnulee)<button type="button" class="btn-restore" onclick="openRestoreModal('{{ route('employe.orders.restore',$order) }}','#{{ $order->id }}','{{ addslashes($client->name ?? 'Inconnu') }}')">🔄 Restaurer</button>
+                            @elseif($dejaAnnulee)<button type="button" class="btn-restore" onclick="openRestoreModal('{{ route('employe.orders.restore',$order) }}','#{{ $order->id }}','{{ addslashes($client->name ?? 'Inconnu') }}')">{!! $I['refresh_btn'] !!} Restaurer</button>
                             @else<button type="button" class="btn-cancel disabled" disabled>✕</button>@endif
                             @if($order->status === 'livrée' && $order->deliveryCompany)
                                 @if(!isset($reviewsByOrderId[$order->id]))
@@ -1029,14 +1094,14 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span><span style="font-family:var(--mono);font-size:10px;color:var(--muted)">#{{ $order->id }}</span></div>
                     </div>
                     <div class="m-card-body">
-                        @if($product)<div style="display:flex;align-items:center;gap:9px">@if($product->image)<img src="{{ asset('storage/'.$product->image) }}" class="prod-img" alt="{{ $product->name }}" onclick="openLightbox('{{ asset('storage/'.$product->image) }}','{{ addslashes($product->name) }}')">@else<div class="prod-ph">🏷️</div>@endif<div><div style="font-size:13px;font-weight:600">{{ $product->name }}</div><div style="font-size:11px;color:var(--muted)">Qté : {{ $order->items->first()->quantity ?? 1 }}</div></div></div>@endif
+                        @if($product)<div style="display:flex;align-items:center;gap:9px">@if($product->image)<img src="{{ asset('storage/'.$product->image) }}" class="prod-img" alt="{{ $product->name }}" onclick="openLightbox('{{ asset('storage/'.$product->image) }}','{{ addslashes($product->name) }}')">@else<div class="prod-ph">{!! $I['tag_product'] !!}</div>@endif<div><div style="font-size:13px;font-weight:600">{{ $product->name }}</div><div style="font-size:11px;color:var(--muted)">Qté : {{ $order->items->first()->quantity ?? 1 }}</div></div></div>@endif
                         @php $mAddr = $order->delivery_destination ?: ($client?->address ?? ''); @endphp
-                        @if($mAddr)<div class="m-row"><span class="m-lbl">Adresse</span><span style="font-size:12px;color:var(--text-2);text-align:right;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{{ $mAddr }}">📍 {{ $mAddr }}</span></div>@endif
+                        @if($mAddr)<div class="m-row"><span class="m-lbl">Adresse</span><span style="font-size:12px;color:var(--text-2);text-align:right;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{{ $mAddr }}">{!! $I['pin_addr'] !!} {{ $mAddr }}</span></div>@endif
                         <div class="m-row"><span class="m-lbl">Montant</span><span class="amount">{{ number_format($order->total,0,',',' ') }} <small>{{ $devise }}</small></span></div>
-                        <div class="m-row"><span class="m-lbl">Assignation</span>@if($order->livreur)<div class="lv-chip"><div class="lv-chip-av">{{ initiales($order->livreur->name) }}</div>{{ $order->livreur->name }}</div>@elseif($order->deliveryCompany)<div class="lv-chip" style="background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8;"><div class="lv-chip-av" style="background:#3b82f6;font-size:10px;">🏢</div>{{ $order->deliveryCompany->name }}</div>@else<span class="pill p-warning">Non assigné</span>@endif</div>
+                        <div class="m-row"><span class="m-lbl">Assignation</span>@if($order->livreur)<div class="lv-chip"><div class="lv-chip-av">{{ initiales($order->livreur->name) }}</div>{{ $order->livreur->name }}</div>@elseif($order->deliveryCompany)<div class="lv-chip" style="background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8;"><div class="lv-chip-av" style="background:#3b82f6;">{!! $I['bldg_chip'] !!}</div>{{ $order->deliveryCompany->name }}</div>@else<span class="pill p-warning">Non assigné</span>@endif</div>
                         @if(!$order->livreur && !$order->deliveryCompany)
                         <div style="display:flex;flex-direction:column;gap:6px;">
-                            @if($livreurs->isNotEmpty())<form action="{{ route('employe.orders.assign',$order) }}" method="POST" style="display:flex;gap:8px;align-items:center">@csrf @method('PUT')<select name="livreur_id" class="assign-select" style="flex:1" required><option value="">— Choisir —</option>@foreach($livreurs as $lv)<option value="{{ $lv->id }}">{{ $lv->name }} {{ $lv->is_available ? '🟢' : '🟡' }}</option>@endforeach</select><button type="submit" class="btn btn-primary btn-sm">✅</button></form>@endif
+                            @if($livreurs->isNotEmpty())<form action="{{ route('employe.orders.assign',$order) }}" method="POST" style="display:flex;gap:8px;align-items:center">@csrf @method('PUT')<select name="livreur_id" class="assign-select" style="flex:1" required><option value="">— Choisir —</option>@foreach($livreurs as $lv)<option value="{{ $lv->id }}">{{ $lv->name }} {{ $lv->is_available ? '🟢' : '🟡' }}</option>@endforeach</select><button type="submit" class="btn btn-primary btn-sm">{!! $I['check_assign'] !!}</button></form>@endif
                             <button type="button" class="btn btn-sm" style="background:#eef2ff;border-color:#c7d2fe;color:#4f46e5;width:100%;justify-content:center;"
                                     data-order-id="{{ $order->id }}"
                                     data-order-num="#{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
@@ -1044,15 +1109,15 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                                     data-phone="{{ $client->phone ?? '' }}"
                                     data-dest="{{ addslashes($order->delivery_destination ?: ($client->address ?? '')) }}"
                                     data-shop-id="{{ $shop->id ?? '' }}"
-                                    onclick="openCompanyModal(this)">🏢 Confier à une entreprise</button>
+                                    onclick="openCompanyModal(this)">{!! $I['bldg_btn'] !!} Confier à une entreprise</button>
                         </div>
                         @endif
                     </div>
                     <div class="m-card-foot">
-                        <a href="{{ route('orders.show',$order) }}" class="btn btn-info btn-sm">🔍 Détails</a>
+                        
                         @if($order->livreur || $order->deliveryCompany)<span class="btn btn-assigned btn-sm">✔ Assignée</span>@endif
                         @if($peutAnnuler)<button type="button" class="btn-cancel" style="flex:1;justify-content:center" onclick="openCancelModal('{{ route('employe.orders.cancel',$order) }}','#{{ $order->id }}','{{ addslashes($client->name ?? 'Inconnu') }}')">✕ Annuler</button>
-                        @elseif($dejaAnnulee)<button type="button" class="btn-restore" style="flex:1;justify-content:center" onclick="openRestoreModal('{{ route('employe.orders.restore',$order) }}','#{{ $order->id }}','{{ addslashes($client->name ?? 'Inconnu') }}')">🔄 Restaurer</button>@endif
+                        @elseif($dejaAnnulee)<button type="button" class="btn-restore" style="flex:1;justify-content:center" onclick="openRestoreModal('{{ route('employe.orders.restore',$order) }}','#{{ $order->id }}','{{ addslashes($client->name ?? 'Inconnu') }}')">{!! $I['refresh_btn'] !!} Restaurer</button>@endif
                         @if($order->status === 'livrée' && $order->deliveryCompany)
                             @if(!isset($reviewsByOrderId[$order->id]))
                             <button type="button" class="btn-noter" style="flex:1;justify-content:center;"
@@ -1068,7 +1133,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                     </div>
                 </div>
                 @empty
-                <div class="empty-state"><span class="ico">📭</span><p>Aucune commande.</p></div>
+                <div class="empty-state"><span class="ico">{!! $I['empty_state'] !!}</span><p>Aucune commande.</p></div>
                 @endforelse
                 <div class="pagination-wrap">{{ $orders->links() }}</div>
             </div>
@@ -1080,6 +1145,18 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 @push('scripts')
 <script>
 const DEVISE = @json($devise);
+/* ── SVG icon constants for JS-generated HTML ── */
+const _SVG = {
+    bldg:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    box:    '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+    pin:    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+    check:  '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>',
+    clock:  '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    coin:   '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M9 9h4.5a2.25 2.25 0 0 1 0 4.5H9v4.5"/></svg>',
+    warn:   '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    x:      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    recycle:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.93"/></svg>',
+};
 /* ════════════════════════════════════════════════
    MODAL ENTREPRISE + CHAT BOUTIQUE ↔ ENTREPRISE
    ════════════════════════════════════════════════ */
@@ -1140,7 +1217,7 @@ function openChatFromCompany(btn) {
     if (companyImg) {
         av.innerHTML = `<img src="${companyImg}" style="width:100%;height:100%;object-fit:cover;" alt="">`;
     } else {
-        av.textContent = '🏢';
+        av.innerHTML = _SVG.bldg;
     }
     document.getElementById('chatCompanyName').textContent = companyName;
 
@@ -1149,14 +1226,14 @@ function openChatFromCompany(btn) {
     document.getElementById('chatClientName').textContent = _clientName;
     let meta = '';
     if (_clientPhone) meta += '📞 ' + _clientPhone;
-    if (_dest)        meta += (meta ? '  ·  ' : '') + '📍 ' + _dest;
-    document.getElementById('chatClientMeta').textContent = meta;
+    if (_dest)        meta += (meta ? '  ·  ' : '') + _SVG.pin + ' ' + _dest;
+    document.getElementById('chatClientMeta').innerHTML = meta;
 
     /* Reset bouton confier */
     const btnC = document.getElementById('btnConfier');
     btnC.disabled  = false;
     btnC.classList.remove('done');
-    btnC.textContent = '📦 Confier la livraison à cette entreprise';
+    btnC.innerHTML = _SVG.box + ' Confier la livraison à cette entreprise';
 
     /* Vider messages */
     const list = document.getElementById('chatMsgList');
@@ -1378,7 +1455,7 @@ function confierLivraison() {
 
     const btn = document.getElementById('btnConfier');
     btn.disabled = true;
-    btn.textContent = '⏳ Envoi en cours…';
+    btn.innerHTML = _SVG.clock + ' Envoi en cours…';
 
     /* FormData + _method=PUT pour le method spoofing Laravel */
     const formData = new FormData();
@@ -1401,13 +1478,13 @@ function confierLivraison() {
         if (data.success) {
             _confierDone = true;
             btn.classList.add('done');
-            btn.textContent = '✅ Livraison confiée ! Statut : En attente';
+            btn.innerHTML = _SVG.check + ' Livraison confiée ! Statut : En attente';
 
             /* Message de confirmation local */
             renderMessages([{
                 id: 'local-' + Date.now(),
                 sender_role: 'system',
-                message: '✅ Commande ' + _orderNum + ' confiée à cette entreprise. Statut : En attente.',
+                message: _SVG.check + ' Commande ' + _orderNum + ' confiée à cette entreprise. Statut : En attente.',
                 created_at: new Date().toISOString()
             }], false);
 
@@ -1415,13 +1492,13 @@ function confierLivraison() {
             setTimeout(() => location.reload(), 2000);
         } else {
             btn.disabled = false;
-            btn.textContent = '📦 Confier la livraison à cette entreprise';
+            btn.innerHTML = _SVG.box + ' Confier la livraison à cette entreprise';
             alert(data.message || 'Erreur lors de la soumission.');
         }
     })
     .catch(() => {
         btn.disabled = false;
-        btn.textContent = '📦 Confier la livraison à cette entreprise';
+        btn.innerHTML = _SVG.box + ' Confier la livraison à cette entreprise';
         alert('Erreur réseau. Veuillez réessayer.');
     });
 }
@@ -1572,7 +1649,7 @@ function setDate(val) {
         _rateOrderId = btn.dataset.orderId;
         _rateUrl     = btn.dataset.rateUrl;
         _rateStar    = 0;
-        document.getElementById('rateCompanyName').textContent = '🏢 ' + (btn.dataset.company || 'Entreprise');
+        document.getElementById('rateCompanyName').innerHTML = _SVG.bldg + ' ' + (btn.dataset.company || 'Entreprise');
         document.getElementById('rateOrderNum').textContent    = 'Commande ' + (btn.dataset.orderNum || ('#' + _rateOrderId));
         document.getElementById('rateComment').value = '';
         document.getElementById('rateLabel').textContent = '';
@@ -1607,8 +1684,8 @@ function setDate(val) {
     window.submitRating = async function() {
         if (!_rateStar || !_rateUrl) return;
         const btn = document.getElementById('rateSubmitBtn');
-        btn.disabled    = true;
-        btn.textContent = '⏳ Envoi…';
+        btn.disabled  = true;
+        btn.innerHTML = _SVG.clock + ' Envoi…';
 
         try {
             const resp = await fetch(_rateUrl, {
@@ -1770,7 +1847,7 @@ async function bulkCancel() {
         });
         const data = await res.json();
         if (data.success) {
-            showBulkToast(`🚫 ${data.count} commande(s) annulée(s).`, true);
+            showBulkToast(`${_SVG.x} ${data.count} commande(s) annulée(s).`, true);
             clearBulkSelection();
             setTimeout(() => location.reload(), 1400);
         } else {
@@ -1790,7 +1867,7 @@ async function bulkRestore() {
         });
         const data = await res.json();
         if (data.success) {
-            showBulkToast(`♻️ ${data.count} commande(s) restaurée(s).`, true);
+            showBulkToast(`${_SVG.recycle} ${data.count} commande(s) restaurée(s).`, true);
             clearBulkSelection();
             setTimeout(() => location.reload(), 1400);
         } else {
@@ -1818,7 +1895,7 @@ async function submitBulkDriver() {
     if (!radio) { showBulkToast('Sélectionnez un livreur.', false); return; }
 
     const btn = document.getElementById('bulkDriverSubmit');
-    btn.disabled = true; btn.textContent = '⏳ Assignation…';
+    btn.disabled = true; btn.innerHTML = _SVG.clock + ' Assignation…';
 
     try {
         const res = await fetch(BULK_ASSIGN_URL, {
@@ -1829,16 +1906,16 @@ async function submitBulkDriver() {
         const data = await res.json();
         closeBulkDriverModal();
         if (data.success) {
-            showBulkToast(`✅ ${data.assigned} commande(s) assignée(s) !`, true);
+            showBulkToast(`${_SVG.check} ${data.assigned} commande(s) assignée(s) !`, true);
             clearBulkSelection();
             setTimeout(() => location.reload(), 1400);
         } else {
             showBulkToast(data.message || 'Erreur lors de l\'assignation.', false);
-            btn.disabled = false; btn.textContent = '✅ Assigner les commandes';
+            btn.disabled = false; btn.innerHTML = _SVG.check + ' Assigner les commandes';
         }
     } catch(e) {
         showBulkToast('Erreur réseau.', false);
-        btn.disabled = false; btn.textContent = '✅ Assigner les commandes';
+        btn.disabled = false; btn.innerHTML = _SVG.check + ' Assigner les commandes';
     }
 }
 
@@ -1849,8 +1926,8 @@ function openBulkCompanyModalMode() {
 
     /* Contexte */
     const n = _bulkIds.size;
-    document.getElementById('ctxOrderNum').textContent   = `📦 ${n} commande(s) sélectionnée(s)`;
-    document.getElementById('ctxClientName').textContent = 'Choisissez une entreprise puis cliquez ✅ Confier';
+    document.getElementById('ctxOrderNum').innerHTML   = `${_SVG.box} ${n} commande(s) sélectionnée(s)`;
+    document.getElementById('ctxClientName').textContent = 'Choisissez une entreprise puis cliquez Confier';
     document.getElementById('ctxClientPhone').textContent = '';
     document.getElementById('companyModalCtx').style.display = 'block';
 
@@ -1950,7 +2027,7 @@ function submitBulkCompany(btn) {
     summaryEl.style.display = 'none';
     skipBtn.style.display   = 'none';
     confirmBtn.disabled     = false;
-    confirmBtn.textContent  = '✅ Confirmer';
+    confirmBtn.innerHTML  = _SVG.check + ' Confirmer';
     document.getElementById('bulkZoneModal').classList.add('open');
 
     /* Charger les zones puis décider du mode */
@@ -1966,17 +2043,17 @@ function submitBulkCompany(btn) {
             ).join(' ');
             listEl.innerHTML = `
                 <div style="padding:12px 14px;border-radius:9px;border:1.5px solid #fde68a;background:#fffbeb;margin-bottom:10px;">
-                    <div style="font-size:12.5px;font-weight:700;color:#92400e;margin-bottom:3px;">⚠️ Aucune zone de livraison configurée</div>
+                    <div style="font-size:12.5px;font-weight:700;color:#92400e;margin-bottom:3px;display:flex;align-items:center;gap:5px;">${_SVG.warn} Aucune zone de livraison configurée</div>
                     <div style="font-size:11px;color:#78350f;line-height:1.5;"><b>${_bulkZoneCompanyName}</b> n'a pas encore configuré ses zones de livraison. Les frais de livraison ne seront pas pré-remplis.</div>
                 </div>
                 <div style="padding:10px 12px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);">
-                    <div style="font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:6px;">📦 ${orders.length} commande${orders.length>1?'s':''} à confier</div>
+                    <div style="font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:5px;">${_SVG.box} ${orders.length} commande${orders.length>1?'s':''} à confier</div>
                     <div style="display:flex;flex-wrap:wrap;gap:4px;">${numsList}</div>
                 </div>`;
             summaryEl.style.display  = 'none';
             skipBtn.style.display    = 'none';
             confirmBtn.disabled      = false;
-            confirmBtn.textContent   = '✅ Confier quand même';
+            confirmBtn.innerHTML   = _SVG.check + ' Confier quand même';
             _bulkZoneLots = null;
             return;
         }
@@ -2014,10 +2091,10 @@ function submitBulkCompany(btn) {
         _renderBulkLotsWithSkipped(validLots, skippedOrders, listEl);
 
         if (!validLots.length) {
-            confirmBtn.disabled = true; confirmBtn.textContent = '❌ Aucun lot valide';
+            confirmBtn.disabled = true; confirmBtn.innerHTML = _SVG.x + ' Aucun lot valide';
         } else {
-            confirmBtn.disabled    = false;
-            confirmBtn.textContent = validLots.length > 1 ? `✅ Confirmer ${validLots.length} lots` : '✅ Confirmer';
+            confirmBtn.disabled  = false;
+            confirmBtn.innerHTML = validLots.length > 1 ? `${_SVG.check} Confirmer ${validLots.length} lots` : _SVG.check + ' Confirmer';
         }
     })
     .catch(() => {
@@ -2034,23 +2111,23 @@ function _renderBulkLotsWithSkipped(validLots, skippedOrders, listEl) {
         const price   = g.zonePrice;
         let badge;
         if (hasZone) {
-            badge = `<span style="background:#eef2ff;border:1.5px solid #c7d2fe;color:#4f46e5;border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;">📍 ${label}${price?' — '+fmt(price)+' '+DEVISE:''}</span>`;
+            badge = `<span style="background:#eef2ff;border:1.5px solid #c7d2fe;color:#4f46e5;border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:3px;">${_SVG.pin} ${label}${price?' — '+fmt(price)+' '+DEVISE:''}</span>`;
         } else if (label) {
-            badge = `<span style="background:#f0fdf4;border:1.5px solid #bbf7d0;color:#065f46;border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;">📍 ${label}</span>`;
+            badge = `<span style="background:#f0fdf4;border:1.5px solid #bbf7d0;color:#065f46;border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:3px;">${_SVG.pin} ${label}</span>`;
         } else {
-            badge = `<span style="background:#fef3c7;border:1.5px solid #fde68a;color:#92400e;border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;flex-shrink:0;">⚠️ Sans destination</span>`;
+            badge = `<span style="background:#fef3c7;border:1.5px solid #fde68a;color:#92400e;border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;flex-shrink:0;display:inline-flex;align-items:center;gap:3px;">${_SVG.warn} Sans destination</span>`;
         }
         const numsList = g.orders.map(o => '#'+o.num).join(', ');
         let lotTotal = '';
         if (price) {
             if (g.orders.length > 1 && g.sameClient) {
                 /* Même client → 1 seul trajet → 1 seul frais */
-                lotTotal = `<div style="font-size:11px;color:#059669;font-weight:600;margin-top:4px;">💰 Frais de livraison : ${fmt(price)} ${DEVISE} <span style="font-size:10px;opacity:.7;">(1 seul trajet · même client)</span></div>`;
+                lotTotal = `<div style="font-size:11px;color:#059669;font-weight:600;margin-top:4px;display:flex;align-items:center;gap:4px;">${_SVG.coin} Frais de livraison : ${fmt(price)} ${DEVISE} <span style="font-size:10px;opacity:.7;">(1 seul trajet · même client)</span></div>`;
             } else if (g.orders.length > 1) {
                 /* Clients différents → chacun paie */
-                lotTotal = `<div style="font-size:11px;color:#059669;font-weight:600;margin-top:4px;">💰 Frais de livraison : ${fmt(price)} ${DEVISE} × ${g.orders.length} clients = ${fmt(price * g.orders.length)} ${DEVISE}</div>`;
+                lotTotal = `<div style="font-size:11px;color:#059669;font-weight:600;margin-top:4px;display:flex;align-items:center;gap:4px;">${_SVG.coin} Frais de livraison : ${fmt(price)} ${DEVISE} × ${g.orders.length} clients = ${fmt(price * g.orders.length)} ${DEVISE}</div>`;
             } else {
-                lotTotal = `<div style="font-size:11px;color:#059669;font-weight:600;margin-top:4px;">💰 Frais de livraison : ${fmt(price)} ${DEVISE}</div>`;
+                lotTotal = `<div style="font-size:11px;color:#059669;font-weight:600;margin-top:4px;display:flex;align-items:center;gap:4px;">${_SVG.coin} Frais de livraison : ${fmt(price)} ${DEVISE}</div>`;
             }
         }
         return `<div style="padding:10px 12px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);">
@@ -2064,7 +2141,7 @@ function _renderBulkLotsWithSkipped(validLots, skippedOrders, listEl) {
         const dests = [...new Set(skippedOrders.map(o => o.lotDest).filter(Boolean))].join(', ');
         html += `${validLots.length ? '<div style="height:8px;"></div>' : ''}
         <div style="padding:11px 13px;border-radius:9px;border:1.5px solid #fecaca;background:#fef2f2;">
-            <div style="font-size:12px;font-weight:700;color:#dc2626;margin-bottom:4px;">⚠️ ${skippedOrders.length} commande${skippedOrders.length>1?'s':''} ignorée${skippedOrders.length>1?'s':''}</div>
+            <div style="font-size:12px;font-weight:700;color:#dc2626;margin-bottom:4px;display:flex;align-items:center;gap:4px;">${_SVG.warn} ${skippedOrders.length} commande${skippedOrders.length>1?'s':''} ignorée${skippedOrders.length>1?'s':''}</div>
             <div style="font-size:11.5px;color:#7f1d1d;font-weight:600;margin-bottom:3px;">${nums}</div>
             <div style="font-size:10.5px;color:#b91c1c;">Zone${dests?' "'+dests+'"':''} non disponible chez <b>${_bulkZoneCompanyName}</b>. Confiez ces commandes séparément ou choisissez une autre entreprise.</div>
         </div>`;
@@ -2088,7 +2165,7 @@ async function confirmBulkZone(skipZone) {
     const confirmBtn = document.getElementById('bulkZoneConfirm');
     const origText   = confirmBtn.textContent;
     confirmBtn.disabled = true;
-    confirmBtn.textContent = '⏳…';
+    confirmBtn.innerHTML = _SVG.clock + '…';
 
     /* ── Mode lots : envoyer chaque lot séparément ── */
     if (_bulkZoneLots) {
@@ -2113,7 +2190,7 @@ async function confirmBulkZone(skipZone) {
             }
             closeBulkZoneModal();
             window.closeCompanyModal();
-            showBulkToast(`✅ ${totalAssigned} commande(s) réparties et confiées à ${_bulkZoneCompanyName} !`, true);
+            showBulkToast(`${_SVG.check} ${totalAssigned} commande(s) réparties et confiées à ${_bulkZoneCompanyName} !`, true);
             clearBulkSelection();
             setTimeout(() => location.reload(), 1400);
         } catch(e) {
@@ -2142,7 +2219,7 @@ async function confirmBulkZone(skipZone) {
         closeBulkZoneModal();
         window.closeCompanyModal();
         if (data.success) {
-            showBulkToast(`✅ ${data.assigned} commande(s) confiée(s) à ${_bulkZoneCompanyName} !`, true);
+            showBulkToast(`${_SVG.check} ${data.assigned} commande(s) confiée(s) à ${_bulkZoneCompanyName} !`, true);
             clearBulkSelection();
             setTimeout(() => location.reload(), 1400);
         } else {

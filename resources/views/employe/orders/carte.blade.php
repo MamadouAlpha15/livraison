@@ -276,10 +276,19 @@ map.zoomControl.setPosition('bottomright');
 window.addEventListener('resize', () => map.invalidateSize());
 
 /* ── State ── */
-const markers  = {};
-const traces   = {};
-const polylines= {};
-let   selectedKey = null;
+const markers      = {};
+const traces       = {};
+const polylines    = {};
+const clientMarkers= {}; /* keyed by order id */
+let   selectedKey  = null;
+
+/* ── Icône client (bleu) ── */
+function clientIcon() {
+    return L.divIcon({
+        html: `<div style="width:16px;height:16px;border-radius:50%;background:#3b82f6;border:2px solid #fff;box-shadow:0 0 0 3px rgba(59,130,246,.25),0 2px 6px rgba(59,130,246,.4)"></div>`,
+        iconSize:[16,16], iconAnchor:[8,8], className:''
+    });
+}
 
 /* ── Rendu panneau ── */
 function renderPanel(drivers) {
@@ -385,6 +394,44 @@ function updateMap(drivers) {
         }
         if (markers[k].isPopupOpen()) markers[k].setPopupContent(buildPopup(o));
         bounds.push(pos);
+    });
+
+    /* ── Marqueurs clients (positions partagées) ── */
+    const activeOrderIds = new Set();
+    drivers.forEach(o => {
+        (o.trips || []).forEach(t => {
+            (t.orders || []).forEach(ord => {
+                if (ord.client_lat && ord.client_lng) {
+                    activeOrderIds.add(ord.id);
+                    const pos = [parseFloat(ord.client_lat), parseFloat(ord.client_lng)];
+                    if (clientMarkers[ord.id]) {
+                        clientMarkers[ord.id].setLatLng(pos);
+                    } else {
+                        clientMarkers[ord.id] = L.marker(pos, { icon: clientIcon() })
+                            .addTo(map)
+                            .bindPopup(`<div style="font-family:system-ui;padding:2px 4px"><b style="font-size:12px">📍 ${esc(ord.client)}</b><br><span style="font-size:10.5px;color:#94a3b8">Position partagée</span></div>`);
+                    }
+                }
+            });
+        });
+        /* Fallback: orders sans trips */
+        (o.orders || []).forEach(ord => {
+            if (ord.client_lat && ord.client_lng && !activeOrderIds.has(ord.id)) {
+                activeOrderIds.add(ord.id);
+                const pos = [parseFloat(ord.client_lat), parseFloat(ord.client_lng)];
+                if (clientMarkers[ord.id]) clientMarkers[ord.id].setLatLng(pos);
+                else clientMarkers[ord.id] = L.marker(pos, { icon: clientIcon() })
+                    .addTo(map)
+                    .bindPopup(`<div style="font-family:system-ui;padding:2px 4px"><b style="font-size:12px">📍 ${esc(ord.client)}</b></div>`);
+            }
+        });
+    });
+    /* Remove stale client markers */
+    Object.keys(clientMarkers).forEach(id => {
+        if (!activeOrderIds.has(parseInt(id))) {
+            map.removeLayer(clientMarkers[id]);
+            delete clientMarkers[id];
+        }
     });
 
     document.getElementById('crtNoSignal')?.classList.toggle('show', !hasGps && drivers.length > 0);

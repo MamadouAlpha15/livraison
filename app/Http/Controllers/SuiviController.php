@@ -83,18 +83,39 @@ class SuiviController extends Controller
         }
 
         return response()->json([
-            'status'       => $order->status,
-            'status_label' => $sInfo['label'],
-            'status_ico'   => $sInfo['ico'],
-            'status_badge' => $sInfo['badge'],
-            'step'         => $sInfo['step'],
-            'lat'          => $order->current_lat,
-            'lng'          => $order->current_lng,
-            'updated'      => optional($order->last_ping_at)?->toIso8601String(),
-            'is_delivered' => $order->status === 'livrée',
-            'is_cancelled' => $order->status === 'annulée',
-            'is_ongoing'   => $order->status === 'en_livraison',
-            'livreur'      => $livreur,
+            'status'              => $order->status,
+            'status_label'        => $sInfo['label'],
+            'status_ico'          => $sInfo['ico'],
+            'status_badge'        => $sInfo['badge'],
+            'step'                => $sInfo['step'],
+            'lat'                 => $order->current_lat,
+            'lng'                 => $order->current_lng,
+            'updated'             => optional($order->last_ping_at)?->toIso8601String(),
+            'is_delivered'        => $order->status === 'livrée',
+            'is_cancelled'        => $order->status === 'annulée',
+            'is_ongoing'          => $order->status === 'en_livraison',
+            'livreur'             => $livreur,
+            'client_lat'          => $order->client_lat,
+            'client_lng'          => $order->client_lng,
+            'client_location_age' => $order->client_location_shared_at
+                ? now()->diffInSeconds($order->client_location_shared_at)
+                : null,
         ]);
+    }
+
+    public function updateClientLocation(Request $request, Order $order)
+    {
+        $request->validate([
+            'lat' => 'required|numeric|between:-90,90',
+            'lng' => 'required|numeric|between:-180,180',
+        ]);
+
+        $order->update([
+            'client_lat'                  => $request->lat,
+            'client_lng'                  => $request->lng,
+            'client_location_shared_at'   => now(),
+        ]);
+
+        return response()->json(['ok' => true]);
     }
 }
