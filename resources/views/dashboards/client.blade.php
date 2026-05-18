@@ -443,12 +443,9 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 /* ══ HERO BANNER ══ */
 .hero {
     background: linear-gradient(135deg, var(--navy) 0%, #3d5a73 100%);
-    margin: 0 32px 24px;
     border-radius: var(--r);
-    padding: 36px 40px;
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 24px; overflow: hidden; position: relative;
-    margin-top: 24px;
+    display: flex; align-items: center;
+    overflow: hidden; position: relative;
 }
 .hero::before {
     content: '';
@@ -559,14 +556,14 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     display: flex; align-items: center; justify-content: center;
     font-size: 17px; flex-shrink: 0;
 }
-.order-info { flex: 1; min-width: 0; }
-.order-ref  { font-size: 12.5px; font-weight: 700; color: var(--text); font-family: monospace; }
-.order-shop { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
-.order-amount { font-size: 13.5px; font-weight: 700; color: var(--text); font-family: monospace; white-space: nowrap; }
+.order-info { flex: 1; min-width: 0; overflow: hidden; }
+.order-ref  { font-size: 12.5px; font-weight: 700; color: var(--text); font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.order-shop { font-size: 11.5px; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.order-amount { font-size: 13.5px; font-weight: 700; color: var(--text); font-family: monospace; white-space: nowrap; flex-shrink: 0; }
 .order-pill {
     display: inline-flex; align-items: center; gap: 4px;
     font-size: 10.5px; font-weight: 700; padding: 3px 10px; border-radius: 20px;
-    white-space: nowrap;
+    white-space: nowrap; flex-shrink: 0;
 }
 .pill-livree    { background: #d1fae5; color: #065f46; }
 .pill-pending   { background: #fef3c7; color: #92400e; }
@@ -624,6 +621,40 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 18px;
     margin-bottom: 28px;
+}
+
+/* ══ AVATAR BOUTIQUE (cercle initiales) ══ */
+.shop-av {
+    width: 46px; height: 46px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 900; color: #fff;
+    font-family: var(--display); letter-spacing: .5px;
+    flex-shrink: 0;
+    border: 2.5px solid rgba(255,255,255,.9);
+    box-shadow: 0 4px 16px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.25);
+    position: relative; overflow: hidden;
+    transition: transform .2s, box-shadow .2s;
+}
+.shop-av::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(160deg, rgba(255,255,255,.18) 0%, transparent 60%);
+    border-radius: 50%; pointer-events: none;
+}
+.shop-card:hover .shop-av,
+.top-shop-card:hover .shop-av {
+    transform: scale(1.08);
+    box-shadow: 0 6px 20px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.3);
+}
+
+/* Nom boutique — court = tout afficher, long = 2 lignes + ellipsis */
+.shop-name-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+    line-height: 1.25;
+    font-family: var(--display); font-size: 14px; font-weight: 800; color: var(--text);
 }
 
 /* ══ CARD BOUTIQUE ══ */
@@ -708,31 +739,864 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 /* ══ PAGINATION ══ */
 .c-pagination { display: flex; justify-content: center; padding: 8px 0; }
 
-/* ══ RESPONSIVE ══ */
-@media (max-width: 900px) {
-    .hero { margin: 16px; padding: 28px 24px; }
-    .steps { margin: 0 16px 20px; padding: 16px 20px; flex-wrap: wrap; gap: 12px; }
-    .step-arrow { display: none; }
-    .c-main { padding: 0 16px 50px; }
-    .hero-right { display: none; }
-    .nav { padding: 0 16px; }
+/* ══ SYSTÈME ICÔNES SVG ══ */
+.si { display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+.si svg { display:block; }
+.nav-link .si { vertical-align:-.15em; }
+
+/* ══ PAGE WRAP (sidebar + main) ══ */
+.page-wrap {
+    display: flex; gap: 22px; align-items: flex-start;
+    max-width: 1440px; margin: 0 auto;
+    padding: 20px 24px 60px;
+}
+
+/* ══ SIDEBAR ══ */
+.sidebar {
+    width: 260px; flex-shrink: 0;
+    display: flex; flex-direction: column; gap: 14px;
+    position: sticky; top: calc(var(--nav-h) + 14px);
+    max-height: calc(100vh - var(--nav-h) - 28px);
+    overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+
+.sb-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r); box-shadow: var(--shadow-sm); overflow: hidden;
+}
+.sb-hd {
+    padding: 11px 14px; border-bottom: 1px solid var(--border);
+    font-family: var(--display); font-size: 12px; font-weight: 800;
+    color: var(--text); text-transform: uppercase; letter-spacing: .5px;
+    display: flex; align-items: center; gap: 7px;
+}
+.sb-cat-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 9px 12px;
+    cursor: pointer; transition: background .12s;
+    font-size: 12px; font-weight: 500; color: var(--text-2);
+    text-decoration: none; background: none; outline: none;
+    width: 100%; text-align: left; font-family: var(--font);
+    border: none;
+    border-bottom: 1px solid var(--grey);
+    border-left: 3px solid transparent;
+}
+.sb-cat-item:last-child { border-bottom: none; }
+.sb-cat-item:hover { background: var(--grey); color: var(--text); }
+.sb-cat-item.active { background: var(--orange-lt); color: var(--orange); font-weight: 700; border-left-color: var(--orange); }
+.sb-cat-ico { display: flex; flex-shrink: 0; }
+.sb-cat-name { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-cat-cnt {
+    font-size: 10px; font-weight: 700; background: var(--grey-2);
+    border-radius: 20px; padding: 1px 6px; color: var(--muted);
+    flex-shrink: 0; white-space: nowrap;
+}
+
+.sb-location {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 11px 14px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12.5px; font-weight: 600; color: var(--text);
+    box-shadow: var(--shadow-sm);
+}
+
+.sb-cta {
+    background: linear-gradient(135deg, var(--navy) 0%, #3d5a73 100%);
+    border-radius: var(--r); padding: 18px 14px; text-align: center;
+    position: relative; overflow: hidden;
+}
+.sb-cta::before {
+    content: ''; position: absolute; right: -25px; top: -25px;
+    width: 90px; height: 90px; border-radius: 50%;
+    background: rgba(255,255,255,.06); pointer-events: none;
+}
+.sb-cta-title {
+    font-family: var(--display); font-size: 13px; font-weight: 900;
+    color: #fff; margin-bottom: 5px; line-height: 1.3; position: relative; z-index: 1;
+}
+.sb-cta-sub {
+    font-size: 11px; color: rgba(255,255,255,.65);
+    margin-bottom: 12px; line-height: 1.5; position: relative; z-index: 1;
+}
+.sb-cta-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 8px 16px; border-radius: 50px;
+    font-size: 11.5px; font-weight: 700; background: var(--orange); color: #fff;
+    border: none; cursor: pointer; text-decoration: none; transition: all .15s;
+    position: relative; z-index: 1;
+}
+.sb-cta-btn:hover { background: var(--orange-dk); color: #fff; }
+
+.sb-top-shop {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 14px; border-bottom: 1px solid var(--grey);
+    text-decoration: none; color: inherit; transition: background .12s;
+}
+.sb-top-shop:last-child { border-bottom: none; }
+.sb-top-shop:hover { background: var(--grey); }
+.sb-top-num {
+    font-size: 14px; font-weight: 900; color: var(--orange);
+    font-family: var(--display); width: 18px; flex-shrink: 0; text-align: center;
+}
+.sb-top-av {
+    width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 900; color: #fff;
+    font-family: var(--display); flex-shrink: 0; overflow: hidden;
+    border: 2px solid rgba(255,255,255,.88);
+    box-shadow: 0 3px 10px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.2);
+    position: relative; letter-spacing: .3px;
+}
+.sb-top-av::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(160deg, rgba(255,255,255,.16) 0%, transparent 55%);
+    border-radius: 50%;
+}
+.sb-top-av img { width: 100%; height: 100%; object-fit: cover; }
+.sb-top-info { flex: 1; min-width: 0; }
+.sb-top-name { font-size: 12px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-top-rating { font-size: 10.5px; color: var(--orange); font-weight: 600; }
+
+/* ══ MAIN COLUMN ══ */
+.main-col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 18px; }
+
+/* ══ HERO ══ */
+.hero {
+    border-radius: var(--r); overflow: hidden; position: relative;
+    height: 300px;
+    background:
+        linear-gradient(to right,
+            #07111f        0%,
+            #07111f       43%,
+            rgba(7,17,31,.86) 53%,
+            rgba(7,17,31,.18) 64%,
+            transparent    72%
+        ),
+        url('/images/phone.png') right center / auto 100% no-repeat,
+        #07111f;
+    display: flex; align-items: center;
+}
+.hero-content {
+    position: relative; z-index: 1;
+    padding: 32px 42px; max-width: 560px;
+}
+.hero-welcome {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 50px; margin-bottom: 10px;
+    font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,.85);
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16);
+    letter-spacing: .2px;
+}
+.hero-title {
+    font-family: var(--display); font-weight: 900; font-size: 30px;
+    color: #fff; line-height: 1.15; margin: 0 0 8px; letter-spacing: -.5px;
+}
+.hero-title .country {
+    color: var(--orange);
+    text-shadow: 0 0 24px rgba(240,106,15,.45);
+}
+.hero-subtitle {
+    font-size: 12.5px; color: rgba(255,255,255,.58);
+    line-height: 1.55; margin: 0 0 14px; max-width: 380px;
+}
+.hero-subtitle strong { color: rgba(255,255,255,.85); }
+.hero-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+.hero-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 10px; border-radius: 8px;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+    backdrop-filter: blur(10px); white-space: nowrap;
+}
+.hero-badge-ico { font-size: 13px; flex-shrink: 0; }
+.hero-badge-txt { display: flex; flex-direction: column; gap: 1px; }
+.hero-badge-label { font-size: 10.5px; font-weight: 700; color: #fff; line-height: 1; }
+.hero-badge-sub { font-size: 9px; color: rgba(255,255,255,.4); line-height: 1; }
+/* Carte rating haut droite */
+.hero-rating-card {
+    position: absolute; top: 16px; right: 16px; z-index: 3;
+    background: rgba(7,17,31,.62); border: 1px solid rgba(255,255,255,.18);
+    border-radius: 12px; padding: 11px 16px; text-align: center;
+    backdrop-filter: blur(24px); min-width: 120px;
+    box-shadow: 0 6px 24px rgba(0,0,0,.45);
+}
+.hero-rating-stars { color: #fbbf24; font-size: 13px; letter-spacing: 2px; margin-bottom: 3px; }
+.hero-rating-val { font-family: var(--display); font-size: 22px; font-weight: 900; color: #fff; line-height: 1; }
+.hero-rating-lbl { font-size: 9.5px; color: rgba(255,255,255,.5); margin-top: 2px; }
+.hero-rating-reviews { font-size: 10.5px; font-weight: 700; color: var(--orange); margin-top: 4px; }
+
+/* ══ STATS ROW ══ */
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 16px 18px;
+    box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 14px;
+    transition: box-shadow .2s;
+}
+.stat-card:hover { box-shadow: var(--shadow); }
+.stat-ico {
+    width: 46px; height: 46px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+}
+.stat-ico.s1 { background: #eff6ff; color: #3b82f6; }
+.stat-ico.s2 { background: #fff7ed; color: var(--orange); }
+.stat-ico.s3 { background: #f0fdf4; color: #22c55e; }
+.stat-ico.s4 { background: #fdf4ff; color: #a855f7; }
+.stat-val {
+    font-family: var(--display); font-size: 22px; font-weight: 900;
+    color: var(--text); line-height: 1; white-space: nowrap;
+}
+.stat-lbl { font-size: 12px; font-weight: 600; color: var(--text-2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stat-sub { font-size: 10.5px; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Wrapper texte stat — min-width: 0 obligatoire pour que ellipsis fonctionne dans flex */
+.stat-card > div:last-child { min-width: 0; overflow: hidden; }
+
+/* ══ POP CATEGORIES ROW ══ */
+.pop-cats-row {
+    display: flex; gap: 10px; overflow-x: auto;
+    padding-bottom: 4px; scrollbar-width: none;
+}
+.pop-cats-row::-webkit-scrollbar { display: none; }
+.pop-cat-chip {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 11px 16px;
+    cursor: pointer; transition: all .18s; display: flex;
+    flex-direction: column; align-items: center; gap: 4px;
+    box-shadow: var(--shadow-sm); text-decoration: none;
+    flex-shrink: 0; min-width: 90px; text-align: center;
+}
+.pop-cat-chip:hover { border-color: var(--orange); box-shadow: 0 4px 14px rgba(240,106,15,.18); transform: translateY(-2px); }
+.pop-cat-chip.active { background: var(--orange-lt); border-color: var(--orange); }
+.pop-cat-chip.active .pop-cat-name { color: var(--orange); }
+.pop-cat-ico { font-size: 24px; line-height: 1; }
+.pop-cat-name { font-size: 11px; font-weight: 700; color: var(--text); line-height: 1.2; white-space: nowrap; }
+.pop-cat-cnt { font-size: 10px; color: var(--muted); white-space: nowrap; }
+
+/* ══ TOP SHOPS GRID (4 cards) ══ */
+.top-shops-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.top-shop-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r); overflow: hidden;
+    box-shadow: var(--shadow-sm); transition: all .22s;
+    display: flex; flex-direction: column;
+}
+.top-shop-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); border-color: transparent; }
+.top-shop-img {
+    height: 140px; overflow: hidden; position: relative;
+    background: var(--grey); flex-shrink: 0;
+}
+.top-shop-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
+.top-shop-card:hover .top-shop-img img { transform: scale(1.07); }
+.top-shop-img-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 38px; }
+.top-shop-open-badge {
+    position: absolute; top: 10px; left: 10px;
+    background: #22c55e; color: #fff;
+    font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 20px;
+    letter-spacing: .3px;
+}
+.top-shop-heart {
+    position: absolute; top: 8px; right: 8px;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(255,255,255,.9); display: flex; align-items: center; justify-content: center;
+    font-size: 14px; cursor: pointer; border: none;
+    transition: background .15s; box-shadow: 0 2px 6px rgba(0,0,0,.15);
+}
+.top-shop-heart:hover { background: #fff; }
+.top-shop-heart.favorited { background: #fff0f0; color: #e53e3e; }
+.top-shop-heart.favorited svg { stroke: #e53e3e; fill: #e53e3e; }
+
+/* Bouton cœur sur cartes boutiques principales */
+.shop-card-fav-btn {
+    position: absolute; top: 8px; right: 8px;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(255,255,255,.9); display: flex; align-items: center; justify-content: center;
+    border: none; cursor: pointer; z-index: 2;
+    transition: all .18s; box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    color: var(--text-2);
+}
+.shop-card-fav-btn:hover { background: #fff0f0; color: #e53e3e; transform: scale(1.12); }
+.shop-card-fav-btn.favorited { background: #fff0f0; color: #e53e3e; }
+.shop-card-fav-btn.favorited svg { stroke: #e53e3e; fill: #e53e3e; }
+
+/* Bouton cœur navbar */
+.nav-fav-btn {
+    position: relative;
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 1.5px solid var(--border); background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .15s; flex-shrink: 0; color: var(--text-2);
+}
+.nav-fav-btn:hover { border-color: #e53e3e; background: #fff0f0; color: #e53e3e; }
+.nav-fav-badge {
+    position: absolute; top: -4px; right: -4px;
+    background: #e53e3e; color: #fff;
+    font-size: 9px; font-weight: 800;
+    border-radius: 20px; padding: 1px 5px;
+    min-width: 16px; text-align: center;
+    font-family: monospace; border: 1.5px solid var(--surface);
+    display: none;
+}
+.nav-fav-badge.show { display: block; }
+
+/* ══ DRAWER FAVORIS ══ */
+.fav-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.35); z-index: 400;
+}
+.fav-overlay.open { display: block; }
+
+.fav-drawer {
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: 440px; max-width: 100vw;
+    background: var(--surface);
+    box-shadow: -4px 0 32px rgba(0,0,0,.15);
+    z-index: 500; display: flex; flex-direction: column;
+    transform: translateX(100%);
+    transition: transform .28s cubic-bezier(.23,1,.32,1);
+    visibility: hidden;
+}
+.fav-drawer.open { transform: translateX(0); visibility: visible; }
+
+.fav-drawer-hd {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+    background: linear-gradient(135deg, #fff5f5, var(--surface));
+    flex-shrink: 0;
+}
+.fav-drawer-ico {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, #e53e3e, #f97316);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(229,62,62,.35);
+}
+.fav-drawer-title {
+    font-family: var(--display); font-size: 17px; font-weight: 900;
+    color: var(--text); flex: 1;
+}
+.fav-drawer-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.fav-drawer-close {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 1px solid var(--border); background: var(--grey);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: var(--text-2); transition: all .15s; flex-shrink: 0;
+}
+.fav-drawer-close:hover { background: #fee2e2; border-color: #fca5a5; color: #e53e3e; }
+
+.fav-list {
+    flex: 1; overflow-y: auto; padding: 16px;
+    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    display: flex; flex-direction: column; gap: 12px;
+}
+.fav-list::-webkit-scrollbar { width: 4px; }
+.fav-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.fav-shop-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r); overflow: hidden;
+    box-shadow: var(--shadow-sm); display: flex;
+    transition: all .18s; text-decoration: none; color: inherit;
+}
+.fav-shop-card:hover { box-shadow: var(--shadow); border-color: var(--orange); }
+.fav-shop-img {
+    width: 90px; flex-shrink: 0;
+    background: var(--grey); overflow: hidden;
+}
+.fav-shop-img img { width: 100%; height: 100%; object-fit: cover; }
+.fav-shop-img-ph {
+    width: 100%; height: 100%; min-height: 80px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+}
+.fav-shop-info { flex: 1; padding: 12px 14px; min-width: 0; }
+.fav-shop-type { font-size: 10px; font-weight: 700; color: var(--orange); text-transform: uppercase; letter-spacing: .5px; }
+.fav-shop-name { font-family: var(--display); font-size: 13.5px; font-weight: 800; color: var(--text); margin: 2px 0 6px; }
+.fav-shop-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+.fav-shop-chip {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 10.5px; color: var(--text-2);
+    background: var(--grey); border: 1px solid var(--border);
+    border-radius: 4px; padding: 2px 7px;
+}
+.fav-shop-rm {
+    display: flex; align-items: center; padding: 0 12px;
+    border: none; background: none; cursor: pointer;
+    color: var(--muted); transition: color .15s; flex-shrink: 0;
+}
+.fav-shop-rm:hover { color: #e53e3e; }
+
+.fav-empty {
+    padding: 48px 20px; text-align: center; color: var(--muted);
+}
+.fav-empty-ico {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: #fff5f5; display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px; color: #f9a8a8;
+}
+.fav-empty-title { font-family: var(--display); font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+.fav-empty-sub { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+.fav-drawer-footer {
+    padding: 14px 20px; border-top: 1px solid var(--border);
+    flex-shrink: 0;
+}
+.fav-visit-all-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 12px; border-radius: var(--r);
+    background: linear-gradient(135deg, var(--orange), var(--orange-dk));
+    color: #fff; font-size: 13px; font-weight: 700; font-family: var(--font);
+    border: none; cursor: pointer; text-decoration: none;
+    transition: opacity .15s;
+}
+.fav-visit-all-btn:hover { opacity: .9; }
+
+.top-shop-av-circle {
+    width: 52px; height: 52px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; font-weight: 900; color: #fff;
+    font-family: var(--display); letter-spacing: .5px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 14px rgba(0,0,0,.22);
+}
+.top-shop-body { padding: 12px 13px 10px; flex: 1; }
+.top-shop-body-row { display: flex; gap: 11px; align-items: flex-start; }
+.top-shop-head { display: flex; align-items: center; gap: 5px; margin-bottom: 4px; }
+.top-shop-name { font-family: var(--display); font-size: 13.5px; font-weight: 800; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.top-shop-verified { color: #3b82f6; font-size: 13px; flex-shrink: 0; }
+.top-shop-tag {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    color: var(--orange); background: var(--orange-lt);
+    border-radius: 5px; padding: 2px 7px; margin-bottom: 5px;
+    text-transform: uppercase; letter-spacing: .3px;
+}
+.top-shop-desc { font-size: 11.5px; color: var(--text-2); line-height: 1.45; margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.top-shop-loc { font-size: 10.5px; color: var(--muted); display: flex; align-items: center; gap: 3px; }
+.top-shop-footer {
+    padding: 10px 13px 13px; border-top: 1px solid var(--grey);
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.top-shop-stats { display: flex; align-items: center; gap: 10px; }
+.top-shop-rating { display: flex; align-items: center; gap: 3px; font-size: 11.5px; font-weight: 700; color: var(--orange); }
+.top-shop-sales { font-size: 10.5px; color: var(--muted); display: flex; align-items: center; gap: 3px; }
+.top-shop-btn {
+    padding: 7px 13px; border-radius: 50px; text-align: center;
+    font-size: 11.5px; font-weight: 700;
+    background: var(--orange); color: #fff; text-decoration: none;
+    transition: background .15s; white-space: nowrap; flex-shrink: 0;
+}
+.top-shop-btn:hover { background: var(--orange-dk); color: #fff; }
+
+/* ══════════════════════════════════════
+   RESPONSIVE — adapté à tous les écrans
+   ══════════════════════════════════════ */
+
+/* ── Grand écran (≤ 1280px) ── */
+@media (max-width: 1280px) {
+    .page-wrap { padding: 18px 18px 60px; }
+    .top-shops-grid { grid-template-columns: repeat(3, 1fr); }
+    /* Stats compactes pour tenir en 4 colonnes dans la zone 1100-1280px */
+    .stat-card { padding: 13px 14px; gap: 11px; }
+    .stat-ico { width: 40px; height: 40px; font-size: 17px; border-radius: 10px; }
+    .stat-val { font-size: 19px; }
+    .stat-lbl { font-size: 11px; }
+    .stat-sub { display: none; }
+}
+
+/* ── Tablette paysage (≤ 1100px) ── */
+@media (max-width: 1100px) {
+    .page-wrap { padding: 16px 16px 60px; gap: 18px; }
+    .sidebar { width: 234px; }
+    .top-shops-grid { grid-template-columns: repeat(2, 1fr); }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .hero { height: 270px; }
+    .hero-title { font-size: 26px; }
+    /* Liens nav cachés dès 1100px — trop encombrés avec sidebar + actions */
     .nav-links { display: none; }
 }
-@media (max-width: 600px) {
-    .shops-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-    .hero-title { font-size: 22px; }
-    .steps { display: none; }
-    .nav-search { display: none; }
-    .msg-drawer { width: 100vw; }
+
+/* ── Tablette portrait (≤ 900px) ── */
+@media (max-width: 900px) {
+    /* Nav */
+    .nav { padding: 0 14px; gap: 12px; }
+
+    /* Layout : sidebar passe au-dessus en ligne */
+    .page-wrap {
+        flex-direction: column;
+        padding: 12px 12px 60px;
+        gap: 14px;
+    }
+    .sidebar {
+        width: 100%;
+        position: static;
+        max-height: none;
+        overflow-y: visible;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+    }
+    .sb-card { min-width: 0; }
+
+    /* Hero */
+    .hero {
+        height: 240px;
+        background-size: auto 95% !important;
+    }
+    .hero-content { padding: 24px 28px; max-width: 480px; }
+    .hero-title { font-size: 23px; }
+    .hero-subtitle { font-size: 12px; margin-bottom: 10px; }
+    .hero-badge { padding: 5px 8px; }
+    .hero-badge-sub { display: none; }
+    /* Rating card : cachée sur tablette — elle bloque l'image téléphone */
+    .hero-rating-card { display: none; }
+    /* Contenu occupe plus d'espace */
+    .hero-content { max-width: 58%; }
+
+    /* Grilles */
+    .stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .top-shops-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .shops-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+}
+
+/* ── Grand téléphone (≤ 640px) ── */
+@media (max-width: 640px) {
+    /* Nav */
+    .nav { padding: 0 12px; gap: 8px; }
+    .nav-search { flex: 1; max-width: none; }
+    /* "Mes commandes" : on cache le texte dès 640px pour libérer la nav */
     .nav-orders-btn span { display: none; }
+    .nav-orders-btn { padding: 7px 10px; }
+    .nav-actions { gap: 7px; }
+
+    /* Layout */
+    .page-wrap { padding: 10px 10px 60px; gap: 12px; }
+    .sidebar { grid-template-columns: 1fr; }
+
+    /* ── HERO MOBILE : texte à gauche, image visible à droite ── */
+    .hero {
+        height: 260px !important;
+        background:
+            linear-gradient(to right,
+                #07111f      0%,
+                #07111f     40%,
+                rgba(7,17,31,.88) 54%,
+                rgba(7,17,31,.28) 68%,
+                transparent  78%
+            ),
+            url('/images/phone.png') right center / auto 100% no-repeat,
+            #07111f !important;
+        flex-direction: row !important;
+        align-items: center;
+        padding: 0;
+    }
+
+    /* Carte rating : absolue compacte */
+    .hero-rating-card {
+        position: absolute !important;
+        top: 10px; right: 10px;
+        padding: 8px 11px;
+        min-width: 88px;
+        border-radius: 10px;
+        text-align: center;
+        flex-direction: column;
+    }
+    .hero-rating-stars { font-size: 11px; letter-spacing: 1px; margin-bottom: 2px; }
+    .hero-rating-val   { font-size: 17px; }
+    .hero-rating-lbl   { font-size: 8.5px; margin-top: 2px; }
+    .hero-rating-reviews { font-size: 9.5px; margin-top: 3px; }
+
+    /* Contenu texte limité à gauche */
+    .hero-content {
+        padding: 18px 14px;
+        max-width: 62%;
+        position: relative; z-index: 2;
+    }
+    .hero-welcome { font-size: 10px; padding: 3px 9px; margin-bottom: 7px; }
+    .hero-title   { font-size: 17px; letter-spacing: -.3px; margin-bottom: 7px; }
+    .hero-subtitle {
+        font-size: 11px;
+        max-width: 100%;
+        margin-bottom: 10px;
+        display: block !important;
+    }
+    /* Badges : 2 par ligne */
+    .hero-badges {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        gap: 5px;
+    }
+    .hero-badge { padding: 5px 7px; gap: 5px; border-radius: 7px; }
+    .hero-badge-ico { font-size: 12px; }
+    .hero-badge-label { font-size: 9.5px; }
+    .hero-badge-sub { display: none; }
+
+    /* Stats */
+    .stats-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .stat-card { padding: 12px 13px; gap: 10px; }
+    .stat-ico { width: 38px; height: 38px; font-size: 17px; border-radius: 10px; }
+    .stat-val { font-size: 18px; }
+    .stat-lbl { font-size: 11px; }
+    .stat-sub { display: none; }
+
+    /* Catégories chips */
+    .pop-cat-chip { min-width: 75px; padding: 9px 10px; }
+    .pop-cat-ico { font-size: 20px; }
+    .pop-cat-name { font-size: 10px; }
+    .pop-cat-cnt { display: none; }
+
+    /* Top shops */
+    .top-shops-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .top-shop-img { height: 110px; }
+    .top-shop-av-circle { width: 40px; height: 40px; font-size: 13px; }
+    .top-shop-name { font-size: 12px; }
+    .top-shop-desc { -webkit-line-clamp: 1; }
+    .top-shop-btn { padding: 6px 10px; font-size: 10.5px; }
+
+    /* Commandes récentes : compact sur téléphone */
+    .order-row { padding: 10px 14px; gap: 8px; }
+    .order-ico { width: 34px; height: 34px; font-size: 13px; border-radius: 8px; }
+    .order-ref { font-size: 12px; }
+    .order-shop { font-size: 10.5px; }
+    .order-amount { font-size: 12px; }
+    .order-pill { font-size: 9px; padding: 2px 6px; }
+
+    /* Boutiques grid */
+    .shops-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .shop-card-img { height: 130px; }
+
+    /* Shop card internals — 2-col narrow cards */
+    .shop-card-body { padding: 9px 11px; gap: 3px; }
+    .shop-card-footer { padding: 7px 11px; }
+    .shop-av { width: 36px; height: 36px; font-size: 11px; }
+    .shop-card-name { font-size: 12px; }
+    .shop-card-type { font-size: 9.5px; padding: 2px 6px; }
+    .shop-card-desc { font-size: 10.5px; }
+    .shop-card-cta { padding: 6px 9px; font-size: 10px; }
+    .shop-card-rating { font-size: 10px; gap: 3px; }
+
+    /* Top shop card internals at 2-col */
+    .top-shop-body { padding: 8px 10px 7px; }
+    .top-shop-footer { padding: 7px 10px 9px; }
+    .top-shop-stats { gap: 5px; font-size: 10px; }
+
+    /* Drawer messages */
+    .msg-drawer { width: 100vw; }
+
+    /* Section headers : cache le sous-titre inline à partir de 640px */
+    .sec-title > span { display: none; }
+    .sec-hd { gap: 8px; }
+    .sec-link { white-space: nowrap; font-size: 11.5px; flex-shrink: 0; }
 }
-@media (max-width: 400px) {
+
+/* ── Téléphone standard (≤ 480px) ── */
+@media (max-width: 480px) {
+    /* Nav */
+    .nav-search { max-width: 130px; }
+    .nav-orders-btn { padding: 7px 10px; }
+
+    /* Hero : dégradé pur, sans image téléphone (plus de place) */
+    .hero {
+        background: linear-gradient(135deg, #07111f 0%, #1a2744 55%, #0d1b35 100%) !important;
+        height: 200px !important;
+        padding: 0 !important;
+    }
+    .hero-content { max-width: 100% !important; padding: 18px 16px !important; }
+    .hero-welcome { font-size: 9.5px; padding: 3px 8px; margin-bottom: 6px; }
+    .hero-title { font-size: 17px; margin-bottom: 6px; letter-spacing: -.3px; }
+    .hero-subtitle { display: none !important; }
+    .hero-badges { grid-template-columns: 1fr 1fr; gap: 4px; }
+    .hero-badge { padding: 4px 6px; gap: 4px; }
+    .hero-badge-label { font-size: 9px; }
+
+    /* Stats */
+    .stats-row { gap: 6px; }
+    .stat-card { padding: 10px 11px; gap: 8px; }
+    .stat-ico { width: 34px; height: 34px; font-size: 15px; border-radius: 9px; }
+    .stat-val { font-size: 15px; }
+    .stat-lbl { font-size: 10px; }
+
+    /* Commandes récentes */
+    .order-row { padding: 9px 12px; gap: 7px; }
+    .order-ico { width: 32px; height: 32px; font-size: 12px; border-radius: 7px; }
+    .order-ref { font-size: 11.5px; }
+    .order-shop { font-size: 10px; }
+    .order-amount { font-size: 11.5px; }
+    .order-pill { font-size: 8.5px; padding: 2px 5px; }
+
+    /* Top shops en 1 colonne */
+    .top-shops-grid { grid-template-columns: 1fr; }
+    .top-shop-img { height: 140px; }
+    .top-shop-av-circle { width: 46px; height: 46px; font-size: 15px; }
+    .top-shop-name { font-size: 13px; }
+
+    /* Boutiques : 1 colonne */
+    .shops-grid { grid-template-columns: 1fr; gap: 10px; }
+    .shop-card-img { height: 170px; }
+    .shop-card-body { padding: 12px 14px; }
+    .shop-card-footer { padding: 10px 14px; }
+
+    /* Sidebar en 1 colonne */
+    .sidebar { grid-template-columns: 1fr; }
+}
+
+/* ── Très petit écran (≤ 360px) ── */
+@media (max-width: 360px) {
+    .nav { padding: 0 8px; gap: 6px; justify-content: space-between; }
+    .nav-search { display: none; }
+    .nav-actions { gap: 5px; }
+    .nav-orders-btn { padding: 6px 8px; }
+
+    .page-wrap { padding: 8px 8px 60px; }
+    .hero-title { font-size: 18px; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .stat-card { flex-direction: column; align-items: flex-start; gap: 4px; padding: 10px; }
     .shops-grid { grid-template-columns: 1fr; }
+    .shop-card-footer { flex-direction: column; gap: 5px; align-items: stretch; }
+    .shop-card-cta { text-align: center; justify-content: center; }
+    .shop-card-rating { justify-content: center; }
+
+    /* Commandes récentes : compact sur très petit écran */
+    .order-row { gap: 6px; padding: 9px 10px; }
+    .order-ico { width: 30px; height: 30px; font-size: 12px; border-radius: 7px; flex-shrink: 0; }
+    .order-ref { font-size: 11px; }
+    .order-shop { font-size: 9.5px; }
+    .order-pill { display: none; }
+    .order-amount { font-size: 11.5px; white-space: nowrap; }
 }
+
+/* ══ CLOCHE NOTIFICATION CLIENT ══ */
+.cn-bell-wrap { position: relative; display: inline-flex; }
+.cn-bell-btn {
+    position: relative; width: 38px; height: 38px; border-radius: 50%;
+    border: 1.5px solid var(--border); background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .15s; flex-shrink: 0; color: var(--text-2);
+}
+.cn-bell-btn:hover,.cn-bell-btn.has-notif { border-color: var(--orange); background: var(--orange-lt); color: var(--orange); }
+.cn-bell-badge {
+    position: absolute; top: -4px; right: -4px;
+    background: var(--orange); color: #fff; font-size: 9px; font-weight: 800;
+    border-radius: 20px; padding: 1px 5px; min-width: 16px; text-align: center;
+    font-family: monospace; border: 1.5px solid var(--surface); display: none;
+}
+.cn-bell-badge.show { display: block; }
+.cn-dropdown {
+    display: none; position: absolute; top: calc(100% + 10px); right: 0;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r); box-shadow: var(--shadow-lg);
+    width: 310px; z-index: 600; overflow: hidden; animation: dropIn .18s ease;
+}
+.cn-dropdown.open { display: block; }
+.cn-drop-hd {
+    padding: 11px 14px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--grey);
+}
+.cn-drop-title { font-size: 13px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 6px; }
+.cn-drop-total { background: var(--orange); color: #fff; font-size: 10px; font-weight: 700; border-radius: 20px; padding: 1px 8px; }
+.cn-drop-list { max-height: 340px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+.cn-drop-list::-webkit-scrollbar { width: 4px; }
+.cn-drop-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.cn-notif-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 14px; border-bottom: 1px solid #f3f6f9;
+    cursor: pointer; transition: background .12s;
+}
+.cn-notif-item:hover { background: var(--grey); }
+.cn-notif-item:last-child { border-bottom: none; }
+.cn-notif-ico { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.cn-notif-ico.msg   { background: #dbeafe; color: #1d4ed8; }
+.cn-notif-ico.c-ok  { background: #d1fae5; color: #065f46; }
+.cn-notif-ico.c-del { background: #fef3c7; color: #92400e; }
+.cn-notif-ico.c-done{ background: #ede9fe; color: #5b21b6; }
+.cn-notif-body { flex: 1; min-width: 0; }
+.cn-notif-txt { font-size: 12.5px; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cn-notif-sub { font-size: 10.5px; color: var(--muted); margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+.cn-notif-dismiss { width: 22px; height: 22px; border-radius: 50%; border: none; background: none; cursor: pointer; color: var(--muted); font-size: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all .12s; }
+.cn-notif-dismiss:hover { background: #fee2e2; color: #e53e3e; }
+.cn-drop-empty { padding: 24px; text-align: center; color: var(--muted); font-size: 12.5px; }
+.cn-drop-ft { padding: 8px 14px; border-top: 1px solid var(--border); }
+.cn-drop-ft a { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: var(--r-sm); font-size: 11.5px; font-weight: 700; text-decoration: none; background: var(--orange-lt); color: var(--orange); border: 1px solid var(--orange); transition: all .15s; }
+.cn-drop-ft a:hover { background: var(--orange); color: #fff; }
+@media(max-width:400px){ .cn-dropdown { width: calc(100vw - 20px); right: auto; left: 50%; transform: translateX(-50%); } }
 </style>
 @endpush
 
 @section('content')
+
+@php
+/* ════════════════════════════════════
+   LIBRAIRIE ICÔNES SVG PREMIUM (Lucide)
+   ════════════════════════════════════ */
+$_p = [
+  // UI
+  'x'          => '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  'check'      => '<polyline points="20 6 9 17 4 12"/>',
+  'arrow-l'    => '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
+  'send'       => '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+  'search'     => '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  'chevron-r'  => '<polyline points="9 18 15 12 9 6"/>',
+  // Navigation
+  'home'       => '<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+  'store'      => '<path d="M3 9h18v10a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M3 9l2-6h14l2 6"/><line x1="12" y1="9" x2="12" y2="21"/>',
+  'grid'       => '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',
+  'package'    => '<line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>',
+  'chat'       => '<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>',
+  'user'       => '<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  'users'      => '<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>',
+  'logout'     => '<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
+  // Commerce
+  'truck'      => '<rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>',
+  'bag'        => '<path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>',
+  'tag'        => '<path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
+  'box'        => '<path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>',
+  'party'      => '<path d="M5.8 11.3L2 22l10.7-3.79"/><path d="M22 2l-7.64 19.64a.5.5 0 01-.91.01L11 13 2.36 9.55a.5.5 0 01.01-.91z"/>',
+  // Hero badges
+  'shield-ok'  => '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>',
+  'lock'       => '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>',
+  'headset'    => '<path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3z"/><path d="M3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/>',
+  // Cartes boutique
+  'pin'        => '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>',
+  'star-o'     => '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  'heart'      => '<path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>',
+  'verified'   => '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>',
+  'trending'   => '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>',
+  // Catégories
+  'utensils'   => '<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>',
+  'cart'       => '<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67l1.63-9.33H6"/>',
+  'bread'      => '<path d="M6 20h12"/><path d="M3.5 10h17a1 1 0 01.95 1.316l-1.5 5A2 2 0 0118 18H6a2 2 0 01-1.95-1.684l-1.5-5A1 1 0 013.5 10z"/><path d="M8 10V8a4 4 0 118 0v2"/>',
+  'shirt'      => '<path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/>',
+  'gem'        => '<polygon points="6 3 18 3 22 9 12 22 2 9 6 3"/><line x1="2" y1="9" x2="22" y2="9"/><polyline points="12 3 6 9 12 22 18 9 12 3"/>',
+  'smartphone' => '<rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>',
+  'monitor'    => '<rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
+  'phone-call' => '<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.67a19.79 19.79 0 01-3.07-8.62A2 2 0 012 .01h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/>',
+  'sparkles'   => '<path d="M12 3l1.68 5.17L19 9l-3.85 3.75.91 5.32L12 15.27 7.94 18.07l.91-5.32L5 9l5.32-.83z"/>',
+  'medical'    => '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>',
+  'flower'     => '<circle cx="12" cy="12" r="3"/><circle cx="12" cy="5" r="2"/><circle cx="17.6" cy="8.4" r="2"/><circle cx="17.6" cy="15.6" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="6.4" cy="15.6" r="2"/><circle cx="6.4" cy="8.4" r="2"/>',
+  'car'        => '<path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v9a2 2 0 01-2 2h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>',
+  'activity'   => '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+  'book'       => '<path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>',
+  'music'      => '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+  'leaf'       => '<path d="M11 20A7 7 0 014 13c0-5 3.5-9.3 8-11 4.5 1.7 8 6 8 11a7 7 0 01-9 7z"/><path d="M11 20c0-5.5 2.5-10 6-13"/>',
+  'wheat'      => '<path d="M2 22L16 8"/><path d="M3.5 12.5l8-8"/><path d="M7 9a4.5 4.5 0 006.5-6.5"/><path d="M10.5 18.5l5-5"/><path d="M13 16a4.5 4.5 0 006.5-6.5"/>',
+  'health'     => '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+  'wrench'     => '<path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>',
+  'shoe'       => '<path d="M2 18l5.5-11 3.5 4 3-3.5L21 18H2z"/><line x1="2" y1="18" x2="22" y2="18"/>',
+  'handbag'    => '<path d="M16 11V7a4 4 0 00-8 0v4"/><rect x="3" y="7" width="18" height="13" rx="2" ry="2"/>',
+  'globe'      => '<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>',
+];
+// Icône outline
+$si = function(string $k, int $sz=18) use ($_p): string {
+    return '<svg class="si" width="'.$sz.'" height="'.$sz.'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'.($_p[$k]??'').'</svg>';
+};
+// Icône remplie (étoile, etc.)
+$sif = function(string $k, int $sz=18) use ($_p): string {
+    return '<svg class="si" width="'.$sz.'" height="'.$sz.'" viewBox="0 0 24 24" fill="currentColor" stroke="none">'.($_p[$k]??'').'</svg>';
+};
+@endphp
 
 @php
     $user      = auth()->user();
@@ -811,29 +1675,30 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     ];
 
     $typeIco = [
-        'Alimentation' => ['🥩', 'bg-food'],    'Restaurant'  => ['🍽️', 'bg-food'],
-        'Épicerie'     => ['🛒', 'bg-food'],    'Boulangerie' => ['🥖', 'bg-food'],
-        'Vêtements'    => ['👗', 'bg-fashion'], 'Bijouterie'  => ['💎', 'bg-fashion'],
-        'Électronique' => ['📱', 'bg-tech'],    'Informatique'=> ['💻', 'bg-tech'],
-        'Téléphonie'   => ['📞', 'bg-tech'],    'Beauté & Cosmétiques' => ['💄', 'bg-beauty'],
-        'Pharmacie'    => ['💊', 'bg-beauty'],  'Parfumerie'  => ['🌸', 'bg-beauty'],
+        'Alimentation' => ['utensils','bg-food'],  'Restaurant'  => ['utensils','bg-food'],
+        'Épicerie'     => ['cart','bg-food'],       'Boulangerie' => ['bread','bg-food'],
+        'Vêtements'    => ['shirt','bg-fashion'],   'Bijouterie'  => ['gem','bg-fashion'],
+        'Électronique' => ['smartphone','bg-tech'], 'Informatique'=> ['monitor','bg-tech'],
+        'Téléphonie'   => ['phone-call','bg-tech'], 'Beauté & Cosmétiques' => ['sparkles','bg-beauty'],
+        'Pharmacie'    => ['medical','bg-beauty'],  'Parfumerie'  => ['flower','bg-beauty'],
     ];
 
     // Catégories à afficher seulement si des boutiques de ce type existent
     $allTypes = ['Alimentation','Restaurant','Épicerie','Boulangerie','Vêtements','Bijouterie',
                  'Électronique','Informatique','Téléphonie','Beauté & Cosmétiques','Pharmacie','Parfumerie'];
     $activeType = request('type', '');
+    $favCount   = count($favoriteIds ?? []);
 @endphp
 
 {{-- ══ DRAWER MESSAGES ══ --}}
 <div class="msg-overlay" id="msgOverlay" onclick="closeMsgDrawer()"></div>
 <div class="msg-drawer" id="msgDrawer">
     <div class="msg-drawer-hd">
-        <span class="msg-drawer-title">💬 Mes Messages</span>
+        <span class="msg-drawer-title">{!! $si('chat',18) !!} Mes Messages</span>
         @if($myUnread > 0)
         <span class="msg-drawer-badge">{{ $myUnread }} non lu{{ $myUnread > 1 ? 's' : '' }}</span>
         @endif
-        <button class="msg-drawer-close" onclick="closeMsgDrawer()">✕</button>
+        <button class="msg-drawer-close" onclick="closeMsgDrawer()">{!! $si('x',14) !!}</button>
     </div>
     <div class="msg-conv-list" id="msgConvList">
         @forelse($myMessages as $convKey => $msgs)
@@ -880,7 +1745,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
             </div>
             <div class="msg-conv-info">
                 <div class="msg-conv-name">{{ $vName }}</div>
-                @if($product)<div class="msg-conv-prod">🏷️ {{ Str::limit($product->name, 28) }}</div>@endif
+                @if($product)<div class="msg-conv-prod">{!! $si('tag',11) !!} {{ Str::limit($product->name, 28) }}</div>@endif
                 <div class="msg-conv-preview">{{ Str::limit($lastMsg->body, 42) }}</div>
             </div>
             <div class="msg-conv-meta">
@@ -890,10 +1755,38 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
         </div>
         @empty
         <div class="msg-conv-empty">
-            <span class="msg-conv-empty-ico">💬</span>
+            <span class="msg-conv-empty-ico">{!! $si('chat',40) !!}</span>
             <div class="msg-conv-empty-txt">Aucune conversation pour l'instant.<br>Posez une question depuis une boutique !</div>
         </div>
         @endforelse
+    </div>
+</div>
+
+{{-- ══ DRAWER FAVORIS ══ --}}
+<div class="fav-overlay" id="favOverlay" onclick="closeFavDrawer()"></div>
+<div class="fav-drawer" id="favDrawer">
+    <div class="fav-drawer-hd">
+        <div class="fav-drawer-ico">{!! $si('heart',20) !!}</div>
+        <div>
+            <div class="fav-drawer-title">Mes Favoris</div>
+            <div class="fav-drawer-sub" id="favDrawerSub">{{ $favCount }} boutique{{ $favCount !== 1 ? 's' : '' }} sauvegardée{{ $favCount !== 1 ? 's' : '' }}</div>
+        </div>
+        <button class="fav-drawer-close" onclick="closeFavDrawer()">{!! $si('x',14) !!}</button>
+    </div>
+    <div class="fav-list" id="favList">
+        <div class="fav-empty" id="favEmptyState" style="{{ $favCount > 0 ? 'display:none' : '' }}">
+            <div class="fav-empty-ico">{!! $si('heart',32) !!}</div>
+            <div class="fav-empty-title">Aucun favori</div>
+            <div class="fav-empty-sub">Cliquez sur le cœur d'une boutique<br>pour la sauvegarder ici.</div>
+        </div>
+        <div id="favShopsContainer">
+            {{-- Rempli dynamiquement via JS --}}
+        </div>
+    </div>
+    <div class="fav-drawer-footer" id="favDrawerFooter" style="{{ $favCount === 0 ? 'display:none' : '' }}">
+        <a href="#boutiques" onclick="closeFavDrawer()" class="fav-visit-all-btn">
+            {!! $si('store',16) !!} Explorer toutes les boutiques
+        </a>
     </div>
 </div>
 
@@ -901,16 +1794,16 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 <div class="msg-modal-overlay" id="msgModalOverlay">
     <div class="msg-modal" id="msgModal">
         <div class="msg-modal-hd">
-            <button class="msg-modal-back" onclick="closeMsgModal()" title="Retour">←</button>
+            <button class="msg-modal-back" onclick="closeMsgModal()" title="Retour">{!! $si('arrow-l',15) !!}</button>
             <div class="msg-modal-av" id="mmAv">??</div>
             <div class="msg-modal-info">
                 <div class="msg-modal-name" id="mmName">Vendeur</div>
                 <div class="msg-modal-prod" id="mmProd"></div>
             </div>
-            <button class="msg-modal-close" onclick="closeMsgModal(); closeMsgDrawer()">✕</button>
+            <button class="msg-modal-close" onclick="closeMsgModal(); closeMsgDrawer()">{!! $si('x',14) !!}</button>
         </div>
         <div class="msg-prod-bar" id="mmProdBar" style="display:none">
-            <div class="msg-prod-ph" id="mmProdImgPh">🏷️</div>
+            <div class="msg-prod-ph" id="mmProdImgPh">{!! $si('tag',18) !!}</div>
             <img class="msg-prod-img" id="mmProdImg" src="" alt="" style="display:none">
             <div>
                 <div class="msg-prod-name" id="mmProdName"></div>
@@ -931,7 +1824,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     placeholder="Écrire au vendeur…" rows="1" required
                     onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg(event)}"
                     oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
-                <button type="submit" class="msg-send-btn">➤</button>
+                <button type="submit" class="msg-send-btn">{!! $si('send',16) !!}</button>
             </form>
         </div>
     </div>
@@ -945,27 +1838,61 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     </a>
 
     <div class="nav-links">
-        <a href="{{ route('client.dashboard') }}" class="nav-link active">🏠 Accueil</a>
-        <a href="#boutiques" class="nav-link">🏪 Boutiques</a>
-        <a href="#categories" class="nav-link">📦 Catégories</a>
+        <a href="{{ route('client.dashboard') }}" class="nav-link active">{!! $si('home',17) !!} Accueil</a>
+        <a href="#boutiques" class="nav-link">{!! $si('store',17) !!} Boutiques</a>
+        <a href="#categories" class="nav-link">{!! $si('grid',17) !!} Catégories</a>
     </div>
 
     <div class="nav-search">
         <input type="text" id="globalSearch" placeholder="Que recherchez-vous ?">
-        <button class="nav-search-btn" onclick="doSearch()">🔍</button>
+        <button class="nav-search-btn" onclick="doSearch()">{!! $si('search',16) !!}</button>
     </div>
 
     <div class="nav-actions">
-        {{-- Bouton messages → hub dédié --}}
+        {{-- ══ CLOCHE NOTIFICATIONS ══ --}}
+        <div class="cn-bell-wrap" id="cnBellWrap">
+            <button class="cn-bell-btn" id="cnBellBtn" onclick="cnToggle()" title="Notifications">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                <span class="cn-bell-badge" id="cnBadge"></span>
+            </button>
+            <div class="cn-dropdown" id="cnDropdown">
+                <div class="cn-drop-hd">
+                    <span class="cn-drop-title">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        Notifications
+                    </span>
+                    <span class="cn-drop-total" id="cnTotal">0</span>
+                </div>
+                <div class="cn-drop-list" id="cnList">
+                    <div class="cn-drop-empty">Aucune notification</div>
+                </div>
+                <div class="cn-drop-ft">
+                    <a href="{{ route('client.orders.index') }}">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                        Voir mes commandes
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {{-- Bouton favoris --}}
+        <button class="nav-fav-btn" id="navFavBtn" onclick="openFavDrawer()" title="Mes boutiques favorites">
+            {!! $si('heart',20) !!}
+            <span class="nav-fav-badge {{ $favCount > 0 ? 'show' : '' }}" id="navFavBadge">{{ $favCount > 0 ? $favCount : '' }}</span>
+        </button>
+
         <a href="{{ route('client.messages.hub') }}" class="nav-msg-btn" title="Mes messages" style="text-decoration:none">
-            💬
+            {!! $si('chat',20) !!}
             <span class="nav-msg-badge {{ $myUnread > 0 ? 'show' : '' }}" id="navMsgBadge">
                 {{ $myUnread > 0 ? $myUnread : '' }}
             </span>
         </a>
 
         <a href="{{ route('client.orders.index') }}" class="nav-orders-btn">
-            📦 <span>Mes commandes</span>
+            {!! $si('package',16) !!} <span>Mes commandes</span>
         </a>
         <div class="nav-av-wrap">
             <div style="position:relative;cursor:pointer" onclick="toggleAvatarMenu()">
@@ -989,193 +1916,403 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     </div>
                     @endif
                 </div>
-                <a href="#" onclick="openProfileModal();return false;">👤 Modifier mon profil</a>
-                <a href="{{ route('client.orders.index') }}">📦 Mes commandes</a>
+                <a href="#" onclick="openProfileModal();return false;">{!! $si('user',15) !!} Modifier mon profil</a>
+                <a href="{{ route('client.orders.index') }}">{!! $si('package',15) !!} Mes commandes</a>
                 <div class="sep"></div>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="logout">⎋ Se déconnecter</button>
+                    <button type="submit" class="logout">{!! $si('logout',15) !!} Se déconnecter</button>
                 </form>
             </div>
         </div>
     </div>
 </nav>
 
-{{-- ══ HERO BANNER ══ --}}
-<div class="hero">
-    <div class="hero-text">
-        <h1 class="hero-title">
-            Bonjour, {{ $firstName }} @if($countryFlag)<span style="font-size:.7em">{{ $countryFlag }}</span>@endif !<br>
-            <span style="font-size:.55em;font-weight:600;color:rgba(255,255,255,.65)">
-                @if($countryName)Boutiques disponibles en {{ $countryName }}@else Faites vos achats en quelques clics !@endif
-            </span>
-        </h1>
-        <div class="hero-btns">
-            <a href="#boutiques" class="hero-btn-primary">🏪 Voir les Boutiques</a>
-            <a href="{{ route('client.orders.index') }}" class="hero-btn-secondary">📦 Mes Commandes</a>
-        </div>
-    </div>
-    <div class="hero-right">
-        <div class="hero-icon-box">🛒</div>
-        <div class="hero-icon-box">🚚</div>
-        <div class="hero-icon-box">🛍️</div>
-    </div>
-</div>
+{{-- ══ PAGE WRAP ══ --}}
+<div class="page-wrap">
 
-{{-- ══ ÉTAPES ══ --}}
-<div class="steps">
-    <div class="step">
-        <div class="step-ico">🛍️</div>
-        <div class="step-text">
-            <div class="step-title">Choisissez une Boutique</div>
-            <div class="step-sub">Parcourez nos boutiques</div>
-        </div>
-    </div>
-    <div class="step-arrow">›</div>
-    <div class="step">
-        <div class="step-ico">🏷️</div>
-        <div class="step-text">
-            <div class="step-title">Sélectionnez un Produit</div>
-            <div class="step-sub">Choisissez vos articles</div>
-        </div>
-    </div>
-    <div class="step-arrow">›</div>
-    <div class="step">
-        <div class="step-ico">📋</div>
-        <div class="step-text">
-            <div class="step-title">Validez votre Commande</div>
-            <div class="step-sub">Confirmez vos informations</div>
-        </div>
-    </div>
-    <div class="step-arrow">›</div>
-    <div class="step">
-        <div class="step-ico">🚚</div>
-        <div class="step-text">
-            <div class="step-title">Recevez votre Livraison</div>
-            <div class="step-sub">Livraison rapide chez vous</div>
-        </div>
-    </div>
-</div>
+{{-- ══ SIDEBAR ══ --}}
+<aside class="sidebar">
 
-{{-- ══ MAIN ══ --}}
-<div class="c-main">
+    {{-- Explorer catégories --}}
+    @if(isset($categories) && $categories->isNotEmpty())
+    <div class="sb-card">
+        <div class="sb-hd">{!! $si('grid',15) !!} Explorer</div>
+        <button class="sb-cat-item active" data-cat-type="" onclick="filterByCat('')">
+            <span class="sb-cat-ico">{!! $si('store',17) !!}</span>
+            <span class="sb-cat-name">Toutes les boutiques</span>
+            <span class="sb-cat-cnt">{{ $shopCount ?? $shops->total() }}</span>
+        </button>
+        @php
+            $sbIcoMap = [
+                'alimentation'=>'utensils','restaurant'=>'utensils','épicerie'=>'cart','epicerie'=>'cart',
+                'boulangerie'=>'bread','pâtisserie'=>'bread','patisserie'=>'bread',
+                'vêtements'=>'shirt','vetements'=>'shirt','mode'=>'shirt',
+                'bijouterie'=>'gem','bijoux'=>'gem',
+                'électronique'=>'smartphone','electronique'=>'smartphone','informatique'=>'monitor',
+                'téléphonie'=>'phone-call','telephonie'=>'phone-call',
+                'beauté & cosmétiques'=>'sparkles','beaute & cosmetiques'=>'sparkles',
+                'beauté'=>'sparkles','beaute'=>'sparkles','cosmétiques'=>'sparkles','cosmetiques'=>'sparkles',
+                'pharmacie'=>'medical','parfumerie'=>'flower',
+                'auto & moto'=>'car','automobile'=>'car',
+                'sport'=>'activity','maison'=>'home','décoration'=>'home','decoration'=>'home',
+                'librairie'=>'book','musique'=>'music','jardin'=>'leaf',
+                'agriculture'=>'wheat','santé'=>'health','sante'=>'health',
+                'construction'=>'wrench','quincaillerie'=>'wrench',
+                'supermarché'=>'cart','supermarche'=>'cart',
+                'chaussures'=>'shoe','accessoires'=>'handbag','sacs'=>'handbag',
+            ];
+            $getSbEmoji = function(string $t) use ($sbIcoMap, $si): string {
+                $k = mb_strtolower(trim($t));
+                if (isset($sbIcoMap[$k])) return $si($sbIcoMap[$k], 17);
+                foreach ($sbIcoMap as $key => $icoKey) { if (str_contains($k, $key)) return $si($icoKey, 17); }
+                return $si('store', 17);
+            };
+        @endphp
+        @foreach($categories as $cat)
+        <button class="sb-cat-item" data-cat-type="{{ $cat->type }}" onclick="filterByCat(this.dataset.catType)">
+            <span class="sb-cat-ico">{!! $getSbEmoji($cat->type) !!}</span>
+            <span class="sb-cat-name">{{ $cat->type }}</span>
+            <span class="sb-cat-cnt">{{ $cat->shop_count }}</span>
+        </button>
+        @endforeach
+    </div>
+    @endif
 
-    @foreach(['success','danger'] as $t)
-        @if(session($t))<div class="c-flash c-flash-{{ $t }}"><span>{{ $t === 'success' ? '✓' : '✕' }}</span>{{ session($t) }}</div>@endif
-    @endforeach
-
-    {{-- Commandes récentes --}}
-    @if(isset($recentOrders) && $recentOrders->isNotEmpty())
-    <div style="margin-bottom:28px">
-        <div class="sec-hd">
-            <div class="sec-title"><strong>Mes</strong> Commandes Récentes</div>
-            <a href="{{ route('client.orders.index') }}" class="sec-link">Voir tout →</a>
-        </div>
-        <div class="orders-card" id="rtOrdersCard">
-            <div class="orders-card-hd">
-                <span class="orders-card-title">Historique</span>
-                <span style="font-size:11px;color:var(--muted)" id="rtOrderCount">{{ $recentOrders->count() }} commande(s)</span>
+    {{-- Localisation --}}
+    @if($countryName)
+    <div class="sb-card" style="padding:12px 14px">
+        <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Où souhaitez-vous être livré ?</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;background:var(--grey);border:1px solid var(--border);border-radius:8px;padding:8px 12px">
+            <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:18px">{{ $countryFlag ?: '📍' }}</span>
+                <span style="font-size:12.5px;font-weight:700;color:var(--text)">{{ $countryName }}</span>
             </div>
-            <div id="rtOrdersList">
-            @foreach($recentOrders as $order)
-            @php
-                $st   = $statusMap[$order->status] ?? ['pill-pending', ucfirst($order->status)];
-                $oIco = match($order->status) {
-                    'livrée'                     => ['🎉', 'background:#d1fae5'],
-                    'en_livraison','en livraison' => ['🚴', 'background:#dbeafe'],
-                    'annulée','cancelled'          => ['✕',  'background:#fee2e2'],
-                    default                       => ['📦', 'background:#fef3c7'],
-                    
-                };
-            @endphp
-            <a href="{{ route('client.orders.index') }}" class="order-row" data-order-id="{{ $order->id }}" data-order-status="{{ $order->status }}">
-                <div class="order-ico" id="oIco{{ $order->id }}" style="{{ $oIco[1] }}">{{ $oIco[0] }}</div>
-                <div class="order-info">
-                    <div class="order-ref">#{{ $order->id }}</div>
-                    <div class="order-shop">{{ $order->shop?->name ?? 'Boutique' }}</div>
-                </div>
-                <span class="order-pill {{ $st[0] }}" id="oPill{{ $order->id }}">{{ $st[1] }}</span>
-                <div class="order-amount">{{ number_format($order->total, 0, ',', ' ') }} <span style="font-size:10px;font-weight:400;color:var(--muted)">{{ $order->shop?->currency ?? 'GNF' }}</span></div>
-            </a>
-            @endforeach
-            </div>
+            <span style="color:var(--muted);font-size:13px">→</span>
         </div>
     </div>
     @endif
 
-    {{-- Catégories — TOUS les types créés par les boutiques --}}
-    <div id="categories" style="scroll-margin-top:80px">
-        <div class="cats" id="catFilter">
+   
+
+    {{-- Top boutiques --}}
+    @if(isset($topShops) && $topShops->isNotEmpty())
+    <div class="sb-card">
+        <div class="sb-hd">🏆 Meilleures boutiques</div>
+        @foreach($topShops as $i => $ts)
+        @php
+            $sbParts = explode(' ', $ts->name);
+            $sbInit  = strtoupper(substr($sbParts[0],0,1)) . strtoupper(substr($sbParts[1] ?? 'X',0,1));
+            $sbGrads = [
+                'linear-gradient(135deg,#667eea,#764ba2)',
+                'linear-gradient(135deg,#f5576c,#f093fb)',
+                'linear-gradient(135deg,#4facfe,#00c6fb)',
+                'linear-gradient(135deg,#cc2b5e,#753a88)',
+                'linear-gradient(135deg,#ee0979,#ff6a00)',
+                'linear-gradient(135deg,#24c6dc,#514a9d)',
+                'linear-gradient(135deg,#11998e,#38ef7d)',
+                'linear-gradient(135deg,#f59e0b,#f97316)',
+            ];
+            $sbGrad = $sbGrads[abs(crc32($ts->name)) % count($sbGrads)];
+        @endphp
+        <a href="{{ route('client.shops.show', $ts) }}" class="sb-top-shop" data-shop-id="{{ $ts->id }}">
+            <span class="sb-top-num">{{ $i + 1 }}</span>
+            <div class="sb-top-av" style="background:{{ $sbGrad }}">{{ $sbInit }}</div>
+            <div class="sb-top-info">
+                <div class="sb-top-name">{{ $ts->name }}</div>
+                <div class="sb-top-rating">
+                    ⭐ {{ $ts->avg_rating ? number_format($ts->avg_rating, 1) : '—' }}
+                    <span style="color:var(--muted);font-weight:400"> · +{{ number_format($ts->sales_count ?? 0) }} ventes</span>
+                </div>
+            </div>
+        </a>
+        @endforeach
+        <a href="#boutiques" style="display:flex;align-items:center;justify-content:center;gap:5px;padding:9px 14px;font-size:12px;font-weight:700;color:var(--orange);text-decoration:none;border-top:1px solid var(--grey)">
+            Voir le classement →
+        </a>
+    </div>
+    @endif
+
+</aside>
+
+{{-- ══ MAIN COLUMN ══ --}}
+<div class="main-col">
+
+{{-- Hero --}}
+<div class="hero">
+    {{-- Image de fond téléphone (droite, sans recadrage) --}}
+    {{-- Carte rating flottante en haut à droite --}}
+    <div class="hero-rating-card">
+        <div class="hero-rating-stars" style="display:flex;gap:2px;justify-content:center">{!! $sif('star-o',13).$sif('star-o',13).$sif('star-o',13).$sif('star-o',13).$sif('star-o',13) !!}</div>
+        <div class="hero-rating-val">4.8<span style="font-size:13px;font-weight:600;color:rgba(255,255,255,.6)">/5</span></div>
+        <div class="hero-rating-lbl">Note moyenne</div>
+        <div class="hero-rating-reviews">+{{ number_format(($shopCount ?? 0) * 12) }} avis clients</div>
+    </div>
+
+    {{-- Contenu texte par-dessus l'image de fond --}}
+    <div class="hero-content">
+        <div class="hero-welcome">Bienvenue sur Shopio 👋</div>
+        <h1 class="hero-title">
+            Le meilleur des boutiques de<br>
+            <span class="country">{{ $countryName ?: 'Guinée' }}</span>, au même endroit.
+        </h1>
+        <p class="hero-subtitle">
+            Découvrez des boutiques vérifiées, des produits de qualité
+            et une livraison rapide <strong>dans tout le pays.</strong>
+        </p>
+        <div class="hero-badges">
+            <span class="hero-badge">
+                <span class="hero-badge-ico">{!! $si('shield-ok',15) !!}</span>
+                <span class="hero-badge-txt">
+                    <span class="hero-badge-label">Boutiques vérifiées</span>
+                    <span class="hero-badge-sub">Sélectionnées avec soin</span>
+                </span>
+            </span>
+            <span class="hero-badge">
+                <span class="hero-badge-ico">{!! $si('truck',15) !!}</span>
+                <span class="hero-badge-txt">
+                    <span class="hero-badge-label">Livraison rapide</span>
+                    <span class="hero-badge-sub">Partout en {{ $countryName ?: 'Guinée' }}</span>
+                </span>
+            </span>
+            <span class="hero-badge">
+                <span class="hero-badge-ico">{!! $si('lock',15) !!}</span>
+                <span class="hero-badge-txt">
+                    <span class="hero-badge-label">Paiement sécurisé</span>
+                    <span class="hero-badge-sub">100% sécurisé</span>
+                </span>
+            </span>
+            <span class="hero-badge">
+                <span class="hero-badge-ico">{!! $si('headset',15) !!}</span>
+                <span class="hero-badge-txt">
+                    <span class="hero-badge-label">Support 24/7</span>
+                    <span class="hero-badge-sub">Toujours disponible</span>
+                </span>
+            </span>
+        </div>
+    </div>
+</div>
+
+{{-- Stats --}}
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-ico s1">{!! $si('store',22) !!}</div>
+        <div>
+            <div class="stat-val">{{ number_format($shopCount ?? 0) }}+</div>
+            <div class="stat-lbl">Boutiques actives</div>
+            <div class="stat-sub">Vérifiées et fiables</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-ico s2">{!! $si('bag',22) !!}</div>
+        <div>
+            <div class="stat-val">{{ number_format($productCount ?? 0) }}+</div>
+            <div class="stat-lbl">Produits disponibles</div>
+            <div class="stat-sub">Dans toutes les catégories</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-ico s3">{!! $si('truck',22) !!}</div>
+        <div>
+            <div class="stat-val">{{ number_format($deliveredCount ?? 0) }}+</div>
+            <div class="stat-lbl">Livraisons réussies</div>
+            <div class="stat-sub">Dans les délais</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-ico s4">{!! $si('users',22) !!}</div>
+        <div>
+            <div class="stat-val">{{ number_format($clientCount ?? 0) }}+</div>
+            <div class="stat-lbl">Clients satisfaits</div>
+            <div class="stat-sub">Rejoignez-les !</div>
+        </div>
+    </div>
+</div>
+
+{{-- Flash --}}
+@foreach(['success','danger'] as $t)
+    @if(session($t))<div class="c-flash c-flash-{{ $t }}"><span>{{ $t === 'success' ? '✓' : '✕' }}</span>{{ session($t) }}</div>@endif
+@endforeach
+
+{{-- Commandes récentes --}}
+@if(isset($recentOrders) && $recentOrders->isNotEmpty())
+<div>
+    <div class="sec-hd">
+        <div class="sec-title"><strong>Mes</strong> Commandes Récentes</div>
+        <a href="{{ route('client.orders.index') }}" class="sec-link">Voir tout →</a>
+    </div>
+    <div class="orders-card" id="rtOrdersCard">
+        <div class="orders-card-hd">
+            <span class="orders-card-title">Historique</span>
+            <span style="font-size:11px;color:var(--muted)" id="rtOrderCount">{{ $recentOrders->count() }} commande(s)</span>
+        </div>
+        <div id="rtOrdersList">
+        @foreach($recentOrders as $order)
+        @php
+            $st   = $statusMap[$order->status] ?? ['pill-pending', ucfirst($order->status)];
+            $oIcoSvg = match($order->status) {
+                'livrée'                     => [$si('check',14),  'background:#d1fae5;color:#059669'],
+                'en_livraison','en livraison' => [$si('truck',14),  'background:#dbeafe;color:#3b82f6'],
+                'annulée','cancelled'          => [$si('x',14),     'background:#fee2e2;color:#e53e3e'],
+                default                       => [$si('box',14),   'background:#fef3c7;color:#d97706'],
+            };
+        @endphp
+        <a href="{{ route('client.orders.index') }}" class="order-row" data-order-id="{{ $order->id }}" data-order-status="{{ $order->status }}">
+            <div class="order-ico" id="oIco{{ $order->id }}" style="{{ $oIcoSvg[1] }}">{!! $oIcoSvg[0] !!}</div>
+            <div class="order-info">
+                <div class="order-ref">#{{ $order->id }}</div>
+                <div class="order-shop">{{ $order->shop?->name ?? 'Boutique' }}</div>
+            </div>
+            <span class="order-pill {{ $st[0] }}" id="oPill{{ $order->id }}">{{ $st[1] }}</span>
+            <div class="order-amount">{{ number_format($order->total, 0, ',', ' ') }} <span style="font-size:10px;font-weight:400;color:var(--muted)">{{ $order->shop?->currency ?? 'GNF' }}</span></div>
+        </a>
+        @endforeach
+        </div>
+    </div>
+</div>
+@endif
+
+{{-- Catégories populaires --}}
+@if(isset($categories) && $categories->isNotEmpty())
+<div id="categories" style="scroll-margin-top:80px">
+   
+    <div class="pop-cats-row">
+        <button class="pop-cat-chip active" data-cat-type="" onclick="filterByCat('')">
+            <span class="pop-cat-ico">{!! $si('store',22) !!}</span>
+            <span class="pop-cat-name">Toutes</span>
+            <span class="pop-cat-cnt">{{ $shopCount ?? $shops->total() }} boutiques</span>
+        </button>
+        @foreach($categories as $cat)
+        <button class="pop-cat-chip" data-cat-type="{{ $cat->type }}" onclick="filterByCat(this.dataset.catType)">
+            <span class="pop-cat-ico">{!! $getSbEmoji($cat->type) !!}</span>
+            <span class="pop-cat-name">{{ $cat->type }}</span>
+            <span class="pop-cat-cnt">{{ $cat->shop_count }} boutique{{ $cat->shop_count > 1 ? 's' : '' }}</span>
+        </button>
+        @endforeach
+    </div>
+</div>
+@endif
+
+{{-- Boutiques populaires --}}
+@if(isset($topShops) && $topShops->isNotEmpty())
+<div>
+    <div class="sec-hd">
+        <div class="sec-title">
+            <strong>Boutiques</strong> populaires
+            <span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:500;color:var(--muted);font-family:var(--font)">{!! $si('trending',14) !!} Tendances cette semaine</span>
+        </div>
+        <a href="#boutiques" class="sec-link">Voir toutes les boutiques →</a>
+    </div>
+    <div class="top-shops-grid">
+        @foreach($topShops as $ts)
+        @php
+            [$tsIcoKey, $tsBg] = $typeIco[$ts->type ?? ''] ?? ['bag', 'bg-default'];
+            $tsParts  = explode(' ', $ts->name);
+            $tsInit   = strtoupper(substr($tsParts[0],0,1)) . strtoupper(substr($tsParts[1] ?? 'X',0,1));
+            $avGrads  = [
+                'linear-gradient(135deg,#667eea,#764ba2)',
+                'linear-gradient(135deg,#f5576c,#f093fb)',
+                'linear-gradient(135deg,#4facfe,#00c6fb)',
+                'linear-gradient(135deg,#cc2b5e,#753a88)',
+                'linear-gradient(135deg,#ee0979,#ff6a00)',
+                'linear-gradient(135deg,#24c6dc,#514a9d)',
+                'linear-gradient(135deg,#11998e,#38ef7d)',
+                'linear-gradient(135deg,#fc4a1a,#f7b733)',
+            ];
+            $tsGrad = $avGrads[abs(crc32($ts->name)) % count($avGrads)];
+        @endphp
+        <div class="top-shop-card" data-shop-id="{{ $ts->id }}">
+            {{-- Image --}}
+            <div class="top-shop-img">
+                @if($ts->image)
+                    <img src="{{ \App\Services\ImageOptimizer::url($ts->image, 'medium') }}" alt="{{ $ts->name }}" loading="lazy">
+                @else
+                    <div class="top-shop-img-ph">{!! $si($tsIcoKey, 36) !!}</div>
+                @endif
+                <span class="top-shop-open-badge">● Ouvert</span>
+                <button class="top-shop-heart {{ in_array($ts->id, $favoriteIds) ? 'favorited' : '' }}"
+                        data-shop-id="{{ $ts->id }}"
+                        onclick="event.preventDefault();toggleFavorite({{ $ts->id }}, this)"
+                        title="{{ in_array($ts->id, $favoriteIds) ? 'Retirer des favoris' : 'Ajouter aux favoris' }}">
+                    {!! $si('heart',14) !!}
+                </button>
+            </div>
+            {{-- Body --}}
+            <div class="top-shop-body">
+                <div class="top-shop-body-row">
+                    <div class="shop-av" style="background:{{ $tsGrad }};width:50px;height:50px;font-size:15px">{{ $tsInit }}</div>
+                    <div style="flex:1;min-width:0;padding-top:2px">
+                        @if($ts->type)
+                        <span class="top-shop-tag">{{ strtoupper($ts->type) }}</span>
+                        @endif
+                        <div style="display:flex;align-items:flex-start;gap:4px;margin:2px 0 4px">
+                            <span class="shop-name-clamp top-shop-name" style="font-size:13.5px;flex:1;min-width:0">{{ $ts->name }}</span>
+                            <span class="top-shop-verified" style="margin-top:1px;flex-shrink:0" title="Boutique vérifiée">{!! $si('verified',14) !!}</span>
+                        </div>
+                        <p class="top-shop-desc">{{ $ts->description ?? 'Boutique vérifiée sur Shopio.' }}</p>
+                        <div class="top-shop-loc">
+                            {!! $si('pin',12) !!}
+                            {{ $ts->address ?? ($ts->city ?? $ts->country ?? 'Guinée') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{-- Footer --}}
+            <div class="top-shop-footer">
+                <div class="top-shop-stats">
+                    <div class="top-shop-rating">
+                        {!! $sif('star-o',13) !!} {{ $ts->avg_rating ? number_format($ts->avg_rating, 1) : '—' }}
+                        <span style="color:var(--muted);font-weight:400;font-size:10px"> ({{ $ts->reviews_count ?? 0 }} avis)</span>
+                    </div>
+                    <div class="top-shop-sales">{!! $si('bag',12) !!} +{{ number_format($ts->sales_count ?? 0) }} ventes</div>
+                </div>
+                <a href="{{ route('client.shops.show', $ts) }}" class="top-shop-btn">Visiter la boutique →</a>
+            </div>
+        </div>
+        @endforeach
+    </div>
+</div>
+@endif
+
+{{-- Catégories filtre pills + grille boutiques --}}
+<div id="boutiques" style="scroll-margin-top:80px">
+    <div class="sec-hd">
+        <div class="sec-title">
+            <strong>Toutes</strong> les Boutiques
+            <span style="font-size:14px;font-weight:500;color:var(--muted);font-family:var(--font)">
+                (<span id="shopCount">{{ $shops->total() }}</span>)
+            </span>
+        </div>
+    </div>
+
+    <div class="cats" id="catFilter">
             @php
                 /* ── Emojis prédéfinis (extensible) ── */
-                $catEmojis = [
-                    'alimentation'          => '🍽️',
-                    'restaurant'            => '🍽️',
-                    'épicerie'              => '🛒',
-                    'epicerie'              => '🛒',
-                    'boulangerie'           => '🥖',
-                    'pâtisserie'            => '🎂',
-                    'patisserie'            => '🎂',
-                    'vêtements'             => '👗',
-                    'vetements'             => '👗',
-                    'mode'                  => '👗',
-                    'bijouterie'            => '💎',
-                    'bijoux'                => '💎',
-                    'électronique'          => '📱',
-                    'electronique'          => '📱',
-                    'informatique'          => '💻',
-                    'téléphonie'            => '📞',
-                    'telephonie'            => '📞',
-                    'beauté & cosmétiques'  => '💄',
-                    'beaute & cosmetiques'  => '💄',
-                    'beauté'                => '💄',
-                    'beaute'                => '💄',
-                    'cosmétiques'           => '💄',
-                    'cosmetiques'           => '💄',
-                    'pharmacie'             => '💊',
-                    'parfumerie'            => '🌸',
-                    'auto & moto'           => '🚗',
-                    'auto'                  => '🚗',
-                    'moto'                  => '🏍️',
-                    'automobile'            => '🚗',
-                    'sport'                 => '⚽',
-                    'sport & loisirs'       => '⚽',
-                    'jouets'                => '🧸',
-                    'enfants'               => '🧸',
-                    'maison'                => '🏠',
-                    'décoration'            => '🏠',
-                    'decoration'            => '🏠',
-                    'mobilier'              => '🛋️',
-                    'librairie'             => '📚',
-                    'livres'                => '📚',
-                    'musique'               => '🎵',
-                    'téléphone'             => '📱',
-                    'telephone'             => '📱',
-                    'high-tech'             => '🖥️',
-                    'high tech'             => '🖥️',
-                    'jardin'                => '🌿',
-                    'agriculture'           => '🌾',
-                    'animalerie'            => '🐾',
-                    'voyage'                => '✈️',
-                    'artisanat'             => '🎨',
-                    'art'                   => '🎨',
-                    'santé'                 => '🏥',
-                    'sante'                 => '🏥',
-                    'médical'               => '🏥',
-                    'medical'               => '🏥',
-                    'construction'          => '🏗️',
-                    'quincaillerie'         => '🔧',
-                    'outillage'             => '🔧',
-                    'fournitures'           => '✏️',
-                    'bureau'                => '✏️',
-                    'supermarché'           => '🛒',
-                    'supermarche'           => '🛒',
-                    'épices'                => '🌶️',
-                    'épice'                 => '🌶️',
-                    'boissons'              => '🥤',
-                    'chaussures'            => '👟',
-                    'accessoires'           => '👜',
-                    'sacs'                  => '👜',
+                $catIcoMap = [
+                    'alimentation'=>'utensils','restaurant'=>'utensils','épicerie'=>'cart','epicerie'=>'cart',
+                    'boulangerie'=>'bread','pâtisserie'=>'bread','patisserie'=>'bread',
+                    'vêtements'=>'shirt','vetements'=>'shirt','mode'=>'shirt',
+                    'bijouterie'=>'gem','bijoux'=>'gem',
+                    'électronique'=>'smartphone','electronique'=>'smartphone',
+                    'informatique'=>'monitor','téléphonie'=>'phone-call','telephonie'=>'phone-call',
+                    'beauté & cosmétiques'=>'sparkles','beaute & cosmetiques'=>'sparkles',
+                    'beauté'=>'sparkles','beaute'=>'sparkles','cosmétiques'=>'sparkles','cosmetiques'=>'sparkles',
+                    'pharmacie'=>'medical','parfumerie'=>'flower',
+                    'auto & moto'=>'car','auto'=>'car','automobile'=>'car','moto'=>'car',
+                    'sport'=>'activity','sport & loisirs'=>'activity',
+                    'jouets'=>'heart','enfants'=>'heart',
+                    'maison'=>'home','décoration'=>'home','decoration'=>'home','mobilier'=>'home',
+                    'librairie'=>'book','livres'=>'book',
+                    'musique'=>'music','téléphone'=>'smartphone','telephone'=>'smartphone',
+                    'high-tech'=>'monitor','high tech'=>'monitor',
+                    'jardin'=>'leaf','agriculture'=>'wheat',
+                    'animalerie'=>'heart','voyage'=>'globe','artisanat'=>'sparkles','art'=>'sparkles',
+                    'santé'=>'health','sante'=>'health','médical'=>'medical','medical'=>'medical',
+                    'construction'=>'wrench','quincaillerie'=>'wrench','outillage'=>'wrench',
+                    'fournitures'=>'tag','bureau'=>'tag',
+                    'supermarché'=>'cart','supermarche'=>'cart',
+                    'épices'=>'utensils','épice'=>'utensils','boissons'=>'utensils',
+                    'chaussures'=>'shoe','accessoires'=>'handbag','sacs'=>'handbag',
                 ];
 
                 /* Récupère TOUS les types distincts des boutiques approuvées du pays */
@@ -1188,23 +2325,18 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     ->pluck('type')
                     ->toArray();
 
-                /* Fonction : trouver l'emoji pour un type (clé normalisée) */
-                $getEmoji = function(string $type) use ($catEmojis): string {
+                $getEmoji = function(string $type) use ($catIcoMap, $si): string {
                     $key = mb_strtolower(trim($type));
-                    // Correspondance exacte d'abord
-                    if (isset($catEmojis[$key])) return $catEmojis[$key];
-                    // Correspondance partielle (ex: "Auto & Moto occasion" → 'auto')
-                    foreach ($catEmojis as $k => $e) {
-                        if (str_contains($key, $k)) return $e;
-                    }
-                    return '🏪'; // fallback
+                    if (isset($catIcoMap[$key])) return $si($catIcoMap[$key], 15);
+                    foreach ($catIcoMap as $k => $icoKey) { if (str_contains($key, $k)) return $si($icoKey, 15); }
+                    return $si('store', 15);
                 };
             @endphp
 
             {{-- Pill "Toutes" --}}
             <button class="cat-pill {{ $activeType === '' ? 'active' : '' }}"
                     onclick="filterByType('', this)">
-                🏪 Toutes <span class="cat-pill-cnt" id="catCntAll">{{ $shops->total() }}</span>
+                {!! $si('store',15) !!} Toutes <span class="cat-pill-cnt" id="catCntAll">{{ $shops->total() }}</span>
             </button>
 
             {{-- Une pill par type existant en base --}}
@@ -1212,29 +2344,35 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
             <button class="cat-pill {{ $activeType === $t ? 'active' : '' }}"
                     data-type-val="{{ $t }}"
                     onclick="filterByType(this.dataset.typeVal, this)">
-                {{ $getEmoji($t) }} {{ $t }}
+                {!! $getEmoji($t) !!} {{ $t }}
                 <span class="cat-pill-cnt" data-cat="{{ $t }}">…</span>
             </button>
             @endforeach
         </div>
     </div>
 
-    {{-- Boutiques --}}
-    <div id="boutiques" style="scroll-margin-top:80px">
-        <div class="sec-hd">
-            <div class="sec-title">
-                <strong>Boutiques</strong> Populaires
-                <span style="font-size:14px;font-weight:500;color:var(--muted);font-family:var(--font)">
-                    (<span id="shopCount">{{ $shops->total() }}</span>)
-                </span>
-            </div>
-        </div>
-
         <div class="shops-grid" id="shopsGrid">
             @forelse($shops as $shop)
             @php
-                [$ico, $bgClass] = $typeIco[$shop->type ?? ''] ?? ['🛍️', 'bg-default'];
-                $isNew = $shop->created_at->diffInDays(now()) <= 7;
+                [$icoKey, $bgClass] = $typeIco[$shop->type ?? ''] ?? ['bag', 'bg-default'];
+                $isNew   = $shop->created_at->diffInDays(now()) <= 7;
+                $sParts  = explode(' ', $shop->name);
+                $sInit   = strtoupper(substr($sParts[0],0,1)) . strtoupper(substr($sParts[1] ?? 'X',0,1));
+                $sGrads  = [
+                    'linear-gradient(135deg,#667eea,#764ba2)',
+                    'linear-gradient(135deg,#f5576c,#f093fb)',
+                    'linear-gradient(135deg,#4facfe,#00c6fb)',
+                    'linear-gradient(135deg,#cc2b5e,#753a88)',
+                    'linear-gradient(135deg,#ee0979,#ff6a00)',
+                    'linear-gradient(135deg,#24c6dc,#514a9d)',
+                    'linear-gradient(135deg,#0f2027,#203a43,#2c5364)',
+                    'linear-gradient(135deg,#c94b4b,#4b134f)',
+                    'linear-gradient(135deg,#11998e,#38ef7d)',
+                    'linear-gradient(135deg,#fc4a1a,#f7b733)',
+                    'linear-gradient(135deg,#1a1a2e,#e94560)',
+                    'linear-gradient(135deg,#2c3e50,#4ca1af)',
+                ];
+                $sGrad = $sGrads[abs(crc32($shop->name)) % count($sGrads)];
             @endphp
             <a href="{{ route('client.shops.show', $shop) }}"
                class="shop-card"
@@ -1250,40 +2388,63 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                              alt="{{ $shop->name }}"
                              loading="lazy" decoding="async" width="220" height="160">
                     @else
-                        <div class="shop-card-placeholder {{ $bgClass }}">{{ $ico }}</div>
+                        <div class="shop-card-placeholder {{ $bgClass }}">{!! $si($icoKey, 40) !!}</div>
                     @endif
                     @if($isNew)
                         <span class="shop-card-badge badge-new">✨ Nouveau</span>
                     @else
                         <span class="shop-card-badge badge-open">Ouvert</span>
                     @endif
+                    <button class="shop-card-fav-btn {{ in_array($shop->id, $favoriteIds) ? 'favorited' : '' }}"
+                            data-shop-id="{{ $shop->id }}"
+                            onclick="event.preventDefault();event.stopPropagation();toggleFavorite({{ $shop->id }}, this)"
+                            title="{{ in_array($shop->id, $favoriteIds) ? 'Retirer des favoris' : 'Ajouter aux favoris' }}">
+                        {!! $si('heart',15) !!}
+                    </button>
                 </div>
 
                 <div class="shop-card-body">
-                    @if($shop->type)<div class="shop-card-type">{{ $shop->type }}</div>@endif
-                    <div class="shop-card-name">{{ $shop->name }}</div>
-                    @if($shop->description)<p class="shop-card-desc">{{ $shop->description }}</p>@endif
-                    <div class="shop-card-meta">
-                        @if($shop->address ?? false)
-                        <span class="shop-card-chip">📍 {{ Str::limit($shop->address, 18) }}</span>
-                        @endif
-                        @if(($shop->products_count ?? 0) > 0)
-                        <span class="shop-card-chip">🏷️ {{ $shop->products_count }} produit{{ $shop->products_count > 1 ? 's' : '' }}</span>
-                        @endif
+                    {{-- Ligne avatar + nom + icône vérifié --}}
+                    <div style="display:flex;gap:11px;align-items:flex-start;margin-bottom:7px">
+                        <div class="shop-av" style="background:{{ $sGrad }}">{{ $sInit }}</div>
+                        <div style="flex:1;min-width:0;padding-top:2px">
+                            @if($shop->type)
+                            <div class="shop-card-type" style="margin-bottom:2px">{{ strtoupper($shop->type) }}</div>
+                            @endif
+                            <div style="display:flex;align-items:flex-start;gap:4px">
+                                <div class="shop-name-clamp" style="flex:1;min-width:0">{{ $shop->name }}</div>
+                                <span style="color:#3b82f6;flex-shrink:0;margin-top:1px" title="Boutique approuvée">{!! $si('verified',14) !!}</span>
+                            </div>
+                        </div>
                     </div>
+                    {{-- Description --}}
+                    @if($shop->description)
+                    <p class="shop-card-desc">{{ $shop->description }}</p>
+                    @endif
+                    {{-- Adresse --}}
+                    @if($shop->address ?? false)
+                    <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);margin-top:4px">
+                        {!! $si('pin',11) !!} {{ Str::limit($shop->address, 24) }}
+                    </div>
+                    @endif
                 </div>
 
                 <div class="shop-card-footer">
-                    <div class="shop-card-rating">
-                        ⭐ {{ $shop->avg_rating ? number_format($shop->avg_rating, 1) : '—' }}
-                        <small>({{ $shop->reviews_count ?? 0 }} avis)</small>
+                    <div style="display:flex;flex-direction:column;gap:3px">
+                        <div class="shop-card-rating">
+                            {!! $sif('star-o',13) !!} {{ $shop->avg_rating ? number_format($shop->avg_rating, 1) : '—' }}
+                            <small>({{ $shop->reviews_count ?? 0 }} avis)</small>
+                        </div>
+                        <div style="font-size:10.5px;color:var(--muted);display:flex;align-items:center;gap:3px">
+                            {!! $si('bag',11) !!} +{{ number_format($shop->sales_count ?? 0) }} ventes
+                        </div>
                     </div>
-                    <span class="shop-card-cta">Commander →</span>
+                    <span class="shop-card-cta">Visiter →</span>
                 </div>
             </a>
             @empty
             <div class="c-empty">
-                <span class="c-empty-ico">🏪</span>
+                <span class="c-empty-ico">{!! $si('store',48) !!}</span>
                 <div class="c-empty-title">Aucune boutique disponible</div>
                 <p class="c-empty-sub">Revenez bientôt.</p>
             </div>
@@ -1291,9 +2452,9 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
         </div>
 
         <div class="c-pagination">{{ $shops->links() }}</div>
-    </div>
 
-</div>
+</div>{{-- /.main-col --}}
+</div>{{-- /.page-wrap --}}
 
 {{-- ══ MODALE PROFIL (3 onglets) ══ --}}
 <div id="profileOverlay" onclick="if(event.target===this)closeProfileModal()"
@@ -1834,6 +2995,133 @@ function closeMsgDrawer() {
 }
 
 /* ══════════════════════════════════════════
+   FAVORIS
+══════════════════════════════════════════ */
+const _favRouteBase  = '{{ route("client.favorites.index") }}';
+const _favToggleBase = '{{ url("/client/favorites") }}';
+let   _favoriteIds   = new Set({{ json_encode($favoriteIds) }});
+
+function openFavDrawer() {
+    loadFavList();
+    document.getElementById('favDrawer').classList.add('open');
+    document.getElementById('favOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closeFavDrawer() {
+    document.getElementById('favDrawer').classList.remove('open');
+    document.getElementById('favOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+function toggleFavorite(shopId, btn) {
+    // Feedback visuel immédiat (optimistic UI)
+    btn.style.opacity = '0.5';
+    btn.disabled = true;
+
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+    fetch(`${_favToggleBase}/${shopId}/toggle`, {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json', 'Content-Type': 'application/json' }
+    })
+    .then(r => {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+    })
+    .then(data => {
+        if (data.favorited) {
+            _favoriteIds.add(shopId);
+        } else {
+            _favoriteIds.delete(shopId);
+        }
+        // Met à jour TOUS les boutons cœur liés à cette boutique
+        document.querySelectorAll(`[data-shop-id="${shopId}"]`).forEach(b => {
+            if (b.classList.contains('top-shop-heart') || b.classList.contains('shop-card-fav-btn')) {
+                b.disabled = false;
+                b.style.opacity = '';
+                if (data.favorited) {
+                    b.classList.add('favorited');
+                    b.title = 'Retirer des favoris';
+                } else {
+                    b.classList.remove('favorited');
+                    b.title = 'Ajouter aux favoris';
+                }
+            }
+        });
+        // Badge navbar
+        const badge = document.getElementById('navFavBadge');
+        if (badge) {
+            if (data.count > 0) {
+                badge.textContent = data.count;
+                badge.classList.add('show');
+            } else {
+                badge.textContent = '';
+                badge.classList.remove('show');
+            }
+        }
+        // Sous-titre drawer
+        const sub = document.getElementById('favDrawerSub');
+        if (sub) sub.textContent = data.count + ' boutique' + (data.count !== 1 ? 's' : '') + ' sauvegardée' + (data.count !== 1 ? 's' : '');
+        // Footer
+        const footer = document.getElementById('favDrawerFooter');
+        if (footer) footer.style.display = data.count === 0 ? 'none' : '';
+        // Si le drawer est ouvert, rafraîchir
+        if (document.getElementById('favDrawer').classList.contains('open')) {
+            loadFavList();
+        }
+    })
+    .catch(err => {
+        console.error('Erreur favoris:', err);
+        btn.style.opacity = '';
+        btn.disabled = false;
+    });
+}
+
+function loadFavList() {
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+    fetch(_favRouteBase, { headers: { 'Accept': 'application/json' } })
+    .then(r => r.json())
+    .then(data => {
+        const container = document.getElementById('favShopsContainer');
+        const empty     = document.getElementById('favEmptyState');
+        const footer    = document.getElementById('favDrawerFooter');
+        if (!container) return;
+        container.innerHTML = '';
+        if (!data.shops || data.shops.length === 0) {
+            empty.style.display = '';
+            if (footer) footer.style.display = 'none';
+            return;
+        }
+        empty.style.display = 'none';
+        if (footer) footer.style.display = '';
+        data.shops.forEach(s => {
+            const shopUrl = `{{ url('/client/shops') }}/${s.id}`;
+            const imgHtml = s.image
+                ? `<img src="/storage/${s.image}" alt="${s.name}" loading="lazy">`
+                : `<div class="fav-shop-img-ph" style="background:linear-gradient(135deg,#f4f6f8,#e8ecf0)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8a9bb0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18v10a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M3 9l2-6h14l2 6"/><line x1="12" y1="9" x2="12" y2="21"/></svg></div>`;
+            const card = document.createElement('div');
+            card.style.cssText = 'display:flex;position:relative';
+            card.innerHTML = `
+                <a href="${shopUrl}" class="fav-shop-card" style="flex:1;text-decoration:none;color:inherit">
+                    <div class="fav-shop-img">${imgHtml}</div>
+                    <div class="fav-shop-info">
+                        ${s.type ? `<div class="fav-shop-type">${s.type}</div>` : ''}
+                        <div class="fav-shop-name">${s.name}</div>
+                        <div class="fav-shop-meta">
+                            ${s.products_count > 0 ? `<span class="fav-shop-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> ${s.products_count} produit${s.products_count > 1 ? 's' : ''}</span>` : ''}
+                            ${s.sales_count > 0 ? `<span class="fav-shop-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg> +${s.sales_count} ventes</span>` : ''}
+                        </div>
+                    </div>
+                </a>
+                <button class="fav-shop-rm" onclick="toggleFavorite(${s.id}, this)" title="Retirer des favoris">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>`;
+            container.appendChild(card);
+        });
+    })
+    .catch(() => {});
+}
+
+/* ══════════════════════════════════════════
    MODAL DISCUSSION
 ══════════════════════════════════════════ */
 let _currentProductId = null;
@@ -2279,6 +3567,35 @@ document.head.appendChild(_pulseStyle);
 setInterval(pollClientMessages, 3000);
 
 /* ══════════════════════════════════════════
+   FILTRE PAR CATÉGORIE (sidebar + pop-cats)
+══════════════════════════════════════════ */
+function filterByCat(type) {
+    /* Trouver la pill correspondante et déléguer à filterByType */
+    let pill;
+    if (!type) {
+        pill = document.querySelector('#catFilter .cat-pill');
+    } else {
+        pill = document.querySelector(`#catFilter .cat-pill[data-type-val="${type.replace(/"/g,'&quot;')}"]`);
+    }
+    if (pill) filterByType(type, pill);
+
+    /* Sync états actifs sidebar + pop-cats + pop-cat-chips */
+    document.querySelectorAll('.sb-cat-item').forEach(el => {
+        el.classList.toggle('active', el.dataset.catType === type);
+    });
+    document.querySelectorAll('.pop-cat-chip').forEach(el => {
+        el.classList.toggle('active', el.dataset.catType === type);
+    });
+    document.querySelectorAll('.pop-cat-card').forEach(el => {
+        el.classList.toggle('active', el.dataset.catType === type);
+    });
+
+    /* Scroll vers la grille */
+    const boutiques = document.getElementById('boutiques');
+    if (boutiques) boutiques.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ══════════════════════════════════════════
    ANIMATIONS ENTRÉE BOUTIQUES
 ══════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
@@ -2410,6 +3727,224 @@ document.addEventListener('DOMContentLoaded', () => {
         @keyframes rtPulse { 0%{transform:scale(1)} 40%{transform:scale(1.12)} 100%{transform:scale(1)} }
     `;
     document.head.appendChild(s);
+})();
+</script>
+
+{{-- ══════════════════════════════════════════════════
+     CLOCHE NOTIFICATIONS CLIENT — polling temps réel
+══════════════════════════════════════════════════ --}}
+<script>
+(function () {
+    const POLL_URL  = @json(route('client.notifications.poll'));
+    const MSG_URL   = @json(route('client.orders.index'));
+    const CSRF      = document.querySelector('meta[name=csrf-token]')?.content ?? '';
+    const _UID      = @json(auth()->id());
+    const _KEY      = 'cn_alerts_' + _UID;
+    const _KEY_MSG  = 'cn_last_msg_' + _UID;
+    const _KEY_ORD  = 'cn_last_ord_' + _UID;
+
+    /* ── État ── */
+    let _open    = false;
+    let _seq     = 0;
+    let _alerts  = [];
+    let _lastMsg = parseInt(localStorage.getItem(_KEY_MSG) || '0', 10);
+    let _lastOrd = {};
+    try { _lastOrd = JSON.parse(localStorage.getItem(_KEY_ORD) || '{}'); } catch(e) {}
+
+    /* Restaurer alertes depuis localStorage + dédupliquer messages par sender */
+    try {
+        const raw = JSON.parse(localStorage.getItem(_KEY) || '[]');
+        const seenSenders = {};
+        _alerts = raw.filter(a => {
+            if (a.type === 'msg') {
+                if (seenSenders[a.senderId]) return false;
+                seenSenders[a.senderId] = true;
+            }
+            return true;
+        });
+    } catch(e) {}
+
+    /* ── Son (Web Audio API — aucun fichier externe) ── */
+    function playBeep() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.4, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.3);
+        } catch(e) {}
+    }
+
+    /* ── Sauvegarder ── */
+    function save() {
+        try { localStorage.setItem(_KEY, JSON.stringify(_alerts.slice(0, 30))); } catch(e) {}
+    }
+
+    /* ── Badge cloche ── */
+    function updateBadge() {
+        const btn   = document.getElementById('cnBellBtn');
+        const badge = document.getElementById('cnBadge');
+        const total = document.getElementById('cnTotal');
+        const n = _alerts.length;
+        if (badge) {
+            badge.textContent = n > 99 ? '99+' : n;
+            badge.classList.toggle('show', n > 0);
+        }
+        if (btn)   btn.classList.toggle('has-notif', n > 0);
+        if (total) total.textContent = n;
+    }
+
+    /* ── Rendre le dropdown ── */
+    function render() {
+        const list = document.getElementById('cnList');
+        if (!list) return;
+        if (!_alerts.length) {
+            list.innerHTML = '<div class="cn-drop-empty">🔕 Aucune notification</div>';
+            return;
+        }
+        list.innerHTML = _alerts.slice(0, 25).map(a => {
+            let icoClass = 'msg', ico = '💬';
+            if (a.type === 'order_ok')   { icoClass = 'c-ok';   ico = '✅'; }
+            if (a.type === 'order_del')  { icoClass = 'c-del';  ico = '🚴'; }
+            if (a.type === 'order_done') { icoClass = 'c-done'; ico = '🎉'; }
+            return `
+            <div class="cn-notif-item" onclick="cnGoTo('${a.url || '#'}',${a.id})">
+                <div class="cn-notif-ico ${icoClass}">${ico}</div>
+                <div class="cn-notif-body">
+                    <div class="cn-notif-txt">${a.txt}</div>
+                    <div class="cn-notif-sub">${a.sub || ''} <span style="margin-left:auto">${a.time || ''}</span></div>
+                </div>
+                <button class="cn-notif-dismiss" onclick="event.stopPropagation();cnDismiss(${a.id})" title="Supprimer">×</button>
+            </div>`;
+        }).join('');
+    }
+
+    /* ── Ouvrir/fermer ── */
+    window.cnToggle = function() {
+        _open = !_open;
+        document.getElementById('cnDropdown')?.classList.toggle('open', _open);
+        if (_open) render();
+    };
+    document.addEventListener('click', e => {
+        if (!e.target.closest('#cnBellWrap')) {
+            _open = false;
+            document.getElementById('cnDropdown')?.classList.remove('open');
+        }
+    });
+
+    /* ── Naviguer + dismiss ── */
+    window.cnGoTo = function(url, id) {
+        cnDismiss(id);
+        if (url && url !== '#') window.location.href = url;
+    };
+    window.cnDismiss = function(id) {
+        _alerts = _alerts.filter(a => a.id !== id);
+        save(); updateBadge(); render();
+    };
+
+    /* ── Ajouter une alerte (messages — groupé par sender) ── */
+    function pushMsg(senderId, senderName, shopName, count, time) {
+        const txt = count > 1
+            ? `${senderName} — ${count} messages non lus`
+            : `${senderName} — nouveau message`;
+        const sub = shopName ? `📦 ${shopName}` : '💬 Message';
+        const existing = _alerts.find(a => a.type === 'msg' && a.senderId === senderId);
+        if (existing) { existing.txt = txt; existing.sub = sub; existing.time = time; }
+        else { _alerts.unshift({ id: ++_seq, type: 'msg', txt, sub, time, senderId, url: @json(route('client.messages.hub')) }); }
+        save();
+    }
+
+    /* ── Ajouter une alerte commande ── */
+    function pushOrder(orderId, status, shopName, time) {
+        const map = {
+            'confirmée':    { type: 'order_ok',   txt: `Commande #${orderId} confirmée ✅`, sub: `🏪 ${shopName}` },
+            'en_livraison': { type: 'order_del',  txt: `Commande #${orderId} en livraison 🚴`, sub: `🏪 ${shopName}` },
+            'livrée':       { type: 'order_done', txt: `Commande #${orderId} livrée ! 🎉`, sub: `🏪 ${shopName}` },
+        };
+        const info = map[status]; if (!info) return;
+        const key  = `${orderId}_${status}`;
+        if (_alerts.find(a => a.orderKey === key)) return;
+        _alerts.unshift({ id: ++_seq, ...info, time, orderKey: key, url: @json(route('client.orders.index')) });
+        if (_alerts.length > 30) _alerts.pop();
+        save();
+    }
+
+    /* ── Polling principal ── */
+    let _firstPoll = true;
+    async function poll() {
+        try {
+            const res = await fetch(POLL_URL, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }
+            });
+            if (!res.ok) return;
+            const d = await res.json();
+            let hasNew = false;
+
+            /* — Messages clients — */
+            if (Array.isArray(d.latest_messages) && d.latest_messages.length) {
+                const newMsgs = d.latest_messages.filter(m => m.id > _lastMsg);
+                if (newMsgs.length) {
+                    /* Grouper par sender */
+                    const bySender = {};
+                    newMsgs.forEach(m => {
+                        if (!bySender[m.sender_id]) bySender[m.sender_id] = { ...m, count: 0 };
+                        bySender[m.sender_id].count++;
+                        bySender[m.sender_id].time = m.time;
+                    });
+                    Object.values(bySender).forEach(g => {
+                        pushMsg(g.sender_id, g.sender_name, g.shop_name, g.count, g.time);
+                    });
+                    _lastMsg = d.latest_messages[0].id;
+                    try { localStorage.setItem(_KEY_MSG, _lastMsg); } catch(e) {}
+                    if (!_firstPoll) hasNew = true;
+                }
+            }
+
+            /* — Commandes — */
+            if (Array.isArray(d.order_updates)) {
+                d.order_updates.forEach(o => {
+                    const key = `${o.id}_${o.status}`;
+                    if (!_lastOrd[key]) {
+                        _lastOrd[key] = true;
+                        if (!_firstPoll) {
+                            pushOrder(o.id, o.status, o.shop_name, new Date(o.updated_at).toLocaleTimeString('fr', {hour:'2-digit',minute:'2-digit'}));
+                            hasNew = true;
+                        } else {
+                            /* Premier poll : enregistrer sans notifier */
+                            pushOrder(o.id, o.status, o.shop_name, new Date(o.updated_at).toLocaleTimeString('fr', {hour:'2-digit',minute:'2-digit'}));
+                        }
+                    }
+                });
+                try { localStorage.setItem(_KEY_ORD, JSON.stringify(_lastOrd)); } catch(e) {}
+            }
+
+            /* — Badge message navbar — */
+            const msgBadge = document.getElementById('navMsgBadge');
+            if (msgBadge) {
+                const n = d.messages_unread || 0;
+                msgBadge.textContent = n > 0 ? n : '';
+                msgBadge.classList.toggle('show', n > 0);
+            }
+
+            /* — Son + badge — */
+            if (hasNew) playBeep();
+            updateBadge();
+            if (_open) render();
+            _firstPoll = false;
+
+        } catch(e) {}
+    }
+
+    /* ── Init ── */
+    updateBadge();
+    poll();
+    setInterval(poll, 7000);
 })();
 </script>
 @endpush

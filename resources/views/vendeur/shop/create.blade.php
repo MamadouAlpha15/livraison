@@ -440,14 +440,143 @@ textarea.field-input { resize: vertical; min-height: 90px; }
     border-radius: 3px; transition: width .4s cubic-bezier(.23,1,.32,1);
 }
 
+/* ── Sélecteur type boutique (pills) ── */
+.type-pills {
+    display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px;
+}
+.type-pill {
+    padding: 7px 14px; border-radius: 50px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    font-size: 12.5px; font-weight: 600;
+    color: var(--text-2); cursor: pointer;
+    transition: all .15s; font-family: var(--font);
+    display: inline-flex; align-items: center; gap: 5px;
+    white-space: nowrap;
+}
+.type-pill:hover { border-color: var(--brand); color: var(--brand-dk); background: var(--brand-mlt); }
+.type-pill.selected {
+    border-color: var(--brand-dk); background: var(--brand);
+    color: #fff; box-shadow: 0 2px 8px rgba(99,102,241,.3);
+}
+.type-pill-add {
+    border-style: dashed; border-color: var(--brand);
+    color: var(--brand); background: transparent;
+    font-weight: 700;
+}
+.type-pill-add:hover { background: var(--brand-mlt); }
+.type-custom-wrap {
+    display: flex; align-items: center; gap: 8px; margin-top: 10px;
+}
+.type-custom-wrap .field-input { flex: 1; margin: 0; }
+.type-custom-ok {
+    padding: 9px 14px; border-radius: var(--r-sm);
+    background: var(--brand); color: #fff;
+    border: none; font-weight: 700; cursor: pointer;
+    font-family: var(--font); font-size: 13px;
+    transition: background .15s; flex-shrink: 0;
+}
+.type-custom-ok:hover { background: var(--brand-dk); }
+.type-custom-cancel {
+    padding: 9px 12px; border-radius: var(--r-sm);
+    background: var(--bg); color: var(--muted);
+    border: 1.5px solid var(--border); font-size: 13px;
+    cursor: pointer; transition: all .15s; flex-shrink: 0;
+}
+.type-custom-cancel:hover { border-color: var(--danger); color: var(--danger); }
+
+/* ── Aperçu mobile (uniquement ≤ 900px) ── */
+.mobile-preview-card {
+    display: none;
+    align-items: center; gap: 14px;
+    background: linear-gradient(135deg, #111168 0%, #1e1b4b 100%);
+    border-radius: var(--r);
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(255,255,255,.07);
+    box-shadow: 0 4px 20px rgba(0,0,0,.2);
+}
+.mobile-pv-avatar {
+    width: 52px; height: 52px; border-radius: 13px; flex-shrink: 0;
+    background: rgba(255,255,255,.08);
+    border: 2px solid rgba(255,255,255,.12);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; overflow: hidden; position: relative;
+}
+.mobile-pv-avatar img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%; object-fit: cover; display: none;
+}
+.mobile-pv-info { flex: 1; min-width: 0; }
+.mobile-pv-name {
+    font-size: 14px; font-weight: 800; color: #fff;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-bottom: 6px; letter-spacing: -.2px;
+}
+.mobile-pv-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.mobile-pv-badge {
+    font-size: 10px; font-weight: 700;
+    background: rgba(99,102,241,.25); color: #a5b4fc;
+    border: 1px solid rgba(99,102,241,.35);
+    padding: 2px 8px; border-radius: 20px;
+}
+.mobile-pv-type {
+    font-size: 10.5px; color: rgba(255,255,255,.5); display: none;
+}
+.mobile-pv-currency {
+    font-size: 10.5px; color: rgba(255,255,255,.4);
+    font-family: var(--mono);
+}
+/* ── Bandeau étapes (mobile uniquement) ── */
+.mobile-steps-bar {
+    display: none;
+    align-items: center; gap: 10px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 12px 16px;
+    margin-bottom: 18px; box-shadow: var(--shadow-sm);
+}
+.mobile-step-indicator {
+    background: var(--brand); color: #fff;
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; flex-shrink: 0;
+}
+.mobile-step-txt { font-size: 13px; font-weight: 700; color: var(--text); flex: 1; }
+.mobile-step-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
 /* ── Responsive ── */
 @media (max-width: 900px) {
     .form-page { grid-template-columns: 1fr; }
     .form-sidebar { display: none; }
-    .form-main { padding: 28px 20px; }
+    .form-main { padding: 28px 24px; }
+    .mobile-steps-bar { display: flex; }
+    .mobile-preview-card { display: flex; }
+}
+@media (max-width: 640px) {
+    .form-main { padding: 20px 16px; }
+    .step-tab { font-size: 11px; padding: 10px 4px; gap: 3px; }
+    .step-tab .tab-num { width: 16px; height: 16px; font-size: 9px; }
+    .section-hd h2 { font-size: 16px; }
+    .form-nav { flex-direction: column-reverse; gap: 10px; }
+    .form-nav .btn-back,
+    .form-nav .btn-next,
+    .form-nav .btn-submit { width: 100%; justify-content: center; text-align: center; }
+    .type-pills { gap: 6px; }
+    .type-pill { padding: 6px 11px; font-size: 12px; }
 }
 @media (max-width: 480px) {
+    .form-main { padding: 16px 12px; }
     .field-row { grid-template-columns: 1fr; }
+    .form-steps-tabs { border-radius: var(--r-sm); }
+    .step-tab span:not(.tab-num) { display: none; }
+    .step-tab { padding: 11px 6px; }
+    .type-custom-wrap { flex-direction: column; align-items: stretch; }
+    .type-custom-ok, .type-custom-cancel { width: 100%; }
+}
+@media (max-width: 360px) {
+    .form-main { padding: 12px 10px; }
+    .section-hd h2 { font-size: 15px; }
+    .btn-next, .btn-submit { padding: 11px 16px; font-size: 13px; }
 }
 </style>
 @endpush
@@ -529,6 +658,31 @@ textarea.field-input { resize: vertical; min-height: 90px; }
         <div class="flash flash-info"><span>ℹ</span> {{ session('info') }}</div>
         @endif
 
+        {{-- Aperçu boutique mobile (caché sur desktop) --}}
+        <div class="mobile-preview-card">
+            <div class="mobile-pv-avatar" id="mobilePvAvatar">
+                <span id="mobilePvEmoji">🛍️</span>
+                <img id="mobilePvImg" src="" alt="">
+            </div>
+            <div class="mobile-pv-info">
+                <div class="mobile-pv-name"     id="mobilePvName">Nom de votre boutique</div>
+                <div class="mobile-pv-meta">
+                    <span class="mobile-pv-badge">✓ Boutique</span>
+                    <span class="mobile-pv-type"     id="mobilePvType"></span>
+                    <span class="mobile-pv-currency" id="mobilePvCurrency">GNF</span>
+                </div>
+            </div>
+        </div>
+
+        {{-- Bandeau étapes (mobile) --}}
+        <div class="mobile-steps-bar" id="mobileStepsBar">
+            <div class="mobile-step-indicator" id="mobileStepNum">1</div>
+            <div>
+                <div class="mobile-step-txt" id="mobileStepTxt">Informations générales</div>
+                <div class="mobile-step-sub" id="mobileStepSub">Étape 1 sur 4</div>
+            </div>
+        </div>
+
         {{-- Barre de progression --}}
         <div class="progress-bar-wrap">
             <div class="progress-bar-fill" id="progressBar" style="width:25%"></div>
@@ -575,22 +729,34 @@ textarea.field-input { resize: vertical; min-height: 90px; }
                 </div>
 
                 <div class="field-row">
-                    <div class="field-group">
-                        <label class="field-label" for="type">Type de boutique</label>
-                        <div class="field-wrap">
-                            <span class="field-icon">🏷️</span>
-                            <select name="type" id="type" class="field-input">
-                                <option value="">Sélectionner…</option>
-                                @foreach([
-                                    'Alimentation','Restaurant','Pharmacie','Vêtements','Électronique',
-                                    'Beauté & Cosmétiques','Meubles & Décoration','Sport & Loisirs',
-                                    'Librairie','Boulangerie','Épicerie','Bijouterie','Auto & Moto',
-                                    'Informatique','Téléphonie','Jouets','Fleurs','Autre'
-                                ] as $t)
-                                <option value="{{ $t }}" {{ old('type') === $t ? 'selected' : '' }}>{{ $t }}</option>
-                                @endforeach
-                            </select>
+                    <div class="field-group" style="grid-column: 1 / -1">
+                        <label class="field-label">🏷️ Type de boutique</label>
+                        <input type="hidden" name="type" id="type" value="{{ old('type') }}">
+                        <div class="type-pills" id="typePills">
+                            @foreach([
+                                ['🍽️','Alimentation'],['🍴','Restaurant'],['💊','Pharmacie'],
+                                ['👗','Vêtements'],['📱','Électronique'],['💄','Beauté & Cosmétiques'],
+                                ['🪑','Meubles & Décoration'],['⚽','Sport & Loisirs'],
+                                ['📚','Librairie'],['🥐','Boulangerie'],['🛒','Épicerie'],
+                                ['💍','Bijouterie'],['🚗','Auto & Moto'],['💻','Informatique'],
+                                ['📞','Téléphonie'],['🧸','Jouets'],['🌸','Fleurs'],
+                            ] as [$ico, $t])
+                            <button type="button" class="type-pill {{ old('type') === $t ? 'selected' : '' }}"
+                                    data-value="{{ $t }}"
+                                    onclick="selectType('{{ $t }}', this)">{{ $ico }} {{ $t }}</button>
+                            @endforeach
+                            <button type="button" class="type-pill type-pill-add" id="typeAddBtn" onclick="showCustomType()">
+                                ＋ Autre catégorie
+                            </button>
                         </div>
+                        <div class="type-custom-wrap" id="typeCustomWrap" style="display:none">
+                            <input type="text" class="field-input" id="typeCustomInput"
+                                   placeholder="Ex : Boucherie, Quincaillerie, Textile…"
+                                   maxlength="50">
+                            <button type="button" class="type-custom-ok" onclick="confirmCustomType()">✓ Valider</button>
+                            <button type="button" class="type-custom-cancel" onclick="hideCustomType()">✕</button>
+                        </div>
+                        <div class="field-hint" id="typeHint" style="margin-top:8px">Sélectionnez une catégorie ou créez la vôtre.</div>
                     </div>
 
                     <div class="field-group">
@@ -642,16 +808,7 @@ textarea.field-input { resize: vertical; min-height: 90px; }
                                    placeholder="+224 6XX XXX XXX">
                         </div>
                     </div>
-                    <div class="field-group">
-                        <label class="field-label" for="whatsapp">WhatsApp</label>
-                        <div class="field-wrap">
-                            <span class="field-icon">💬</span>
-                            <input type="tel" name="whatsapp" id="whatsapp"
-                                   class="field-input"
-                                   value="{{ old('whatsapp') }}"
-                                   placeholder="+224 6XX XXX XXX">
-                        </div>
-                    </div>
+                   
                 </div>
 
                 <div class="field-group">
@@ -888,6 +1045,15 @@ function goToStep(step) {
     /* Mettre à jour la barre de progression */
     document.getElementById('progressBar').style.width = (step / totalSteps * 100) + '%';
 
+    /* Mettre à jour le bandeau mobile */
+    const stepLabels = ['Informations générales','Contact & localisation','Devise','Image & finalisation'];
+    const mNum = document.getElementById('mobileStepNum');
+    const mTxt = document.getElementById('mobileStepTxt');
+    const mSub = document.getElementById('mobileStepSub');
+    if (mNum) mNum.textContent = step;
+    if (mTxt) mTxt.textContent = stepLabels[step - 1];
+    if (mSub) mSub.textContent = 'Étape ' + step + ' sur ' + totalSteps;
+
     /* Mettre à jour le récapitulatif à l'étape 4 */
     if (step === 4) updateRecap();
 
@@ -931,6 +1097,9 @@ function selectCurrency(code, name, flag) {
     document.getElementById('currencyDisplay').value  = `${flag}  ${code} — ${name}`;
     document.getElementById('currencyDropdown').classList.remove('open');
     document.getElementById('previewCurrency').textContent = code;
+    /* Mobile preview */
+    const mc = document.getElementById('mobilePvCurrency');
+    if (mc) mc.textContent = code;
     renderCurrencies();
 }
 
@@ -983,11 +1152,17 @@ function showPreview(file) {
     uploadPreview.style.display = 'block';
     uploadPlaceholder.style.display = 'none';
 
-    /* Mettre à jour la preview dans la sidebar */
+    /* Sidebar preview */
     const sidebarImg = document.getElementById('sidebarPreviewImg');
     sidebarImg.src = url;
     sidebarImg.style.display = 'block';
     sidebarImg.previousElementSibling?.style && (document.querySelector('.preview-placeholder').style.display = 'none');
+
+    /* Mobile preview */
+    const mImg   = document.getElementById('mobilePvImg');
+    const mEmoji = document.getElementById('mobilePvEmoji');
+    if (mImg) { mImg.src = url; mImg.style.display = 'block'; }
+    if (mEmoji) mEmoji.style.display = 'none';
 }
 
 removeImg.addEventListener('click', () => {
@@ -1019,15 +1194,94 @@ document.getElementById('name').addEventListener('input', e => {
     const v = e.target.value || 'Nom de votre boutique';
     document.getElementById('previewName').textContent = v;
     document.getElementById('recapName').textContent   = v;
+    const mn = document.getElementById('mobilePvName');
+    if (mn) mn.textContent = v;
 });
 
-document.getElementById('type').addEventListener('change', e => {
-    const v = e.target.value;
+/* ════════════════════════════════════════════════════════════════
+   SÉLECTEUR TYPE BOUTIQUE — pills
+════════════════════════════════════════════════════════════════ */
+function selectType(value, btn) {
+    /* Déselectionner tout */
+    document.querySelectorAll('.type-pill:not(.type-pill-add)').forEach(p => p.classList.remove('selected'));
+    /* Sélectionner le pill cliqué */
+    if (btn) btn.classList.add('selected');
+    /* Mettre à jour l'input caché */
+    document.getElementById('type').value = value;
+    /* Masquer le champ custom si on sélectionne une pill normale */
+    hideCustomType();
+    /* Sidebar preview + récap */
     const el = document.getElementById('previewType');
-    el.textContent   = v;
-    el.style.display = v ? 'inline' : 'none';
-    document.getElementById('recapType').textContent = v || '—';
+    el.textContent   = value;
+    el.style.display = value ? 'inline' : 'none';
+    document.getElementById('recapType').textContent = value || '—';
+    /* Mobile preview */
+    const mt = document.getElementById('mobilePvType');
+    if (mt) { mt.textContent = value; mt.style.display = value ? 'inline' : 'none'; }
+    /* Hint */
+    const hint = document.getElementById('typeHint');
+    if (hint) hint.textContent = '✓ Catégorie sélectionnée : ' + value;
+}
+
+function showCustomType() {
+    document.getElementById('typeCustomWrap').style.display = 'flex';
+    document.getElementById('typeCustomInput').focus();
+    document.getElementById('typeAddBtn').style.display = 'none';
+}
+
+function hideCustomType() {
+    document.getElementById('typeCustomWrap').style.display = 'none';
+    document.getElementById('typeAddBtn').style.display = '';
+    document.getElementById('typeCustomInput').value = '';
+}
+
+function confirmCustomType() {
+    const val = document.getElementById('typeCustomInput').value.trim();
+    if (!val) { document.getElementById('typeCustomInput').focus(); return; }
+
+    /* Déselectionner les autres pills */
+    document.querySelectorAll('.type-pill:not(.type-pill-add)').forEach(p => p.classList.remove('selected'));
+
+    /* Ajouter/réutiliser une pill custom */
+    let existing = document.querySelector(`.type-pill[data-value="${CSS.escape(val)}"]`);
+    if (!existing) {
+        const pill = document.createElement('button');
+        pill.type = 'button';
+        pill.className = 'type-pill selected';
+        pill.dataset.value = val;
+        pill.textContent = '🏷️ ' + val;
+        pill.onclick = function() { selectType(val, this); };
+        /* Insérer avant le bouton "+" */
+        const addBtn = document.getElementById('typeAddBtn');
+        addBtn.parentNode.insertBefore(pill, addBtn);
+        existing = pill;
+    }
+    existing.classList.add('selected');
+
+    /* Appliquer */
+    document.getElementById('type').value = val;
+    hideCustomType();
+
+    const el = document.getElementById('previewType');
+    el.textContent   = val;
+    el.style.display = 'inline';
+    document.getElementById('recapType').textContent = val;
+    const hint = document.getElementById('typeHint');
+    if (hint) hint.textContent = '✓ Catégorie personnalisée : ' + val;
+}
+
+/* Valider avec Entrée */
+document.getElementById('typeCustomInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); confirmCustomType(); }
+    if (e.key === 'Escape') hideCustomType();
 });
+
+/* Initialiser la pill sélectionnée au chargement (pour old()) */
+const _oldType = document.getElementById('type').value;
+if (_oldType) {
+    const _oldPill = document.querySelector(`.type-pill[data-value="${CSS.escape(_oldType)}"]`);
+    if (_oldPill) _oldPill.classList.add('selected');
+}
 
 document.getElementById('email').addEventListener('input', e => {
     document.getElementById('recapEmail').textContent = e.target.value || '—';
@@ -1042,7 +1296,7 @@ document.getElementById('phone').addEventListener('input', e => {
 ════════════════════════════════════════════════════════════════ */
 function updateRecap() {
     document.getElementById('recapName').textContent       = document.getElementById('name').value || '—';
-    document.getElementById('recapType').textContent       = document.getElementById('type').value || '—';
+    document.getElementById('recapType').textContent       = document.getElementById('type').value  || '—';
     document.getElementById('recapEmail').textContent      = document.getElementById('email').value || '—';
     document.getElementById('recapPhone').textContent      = document.getElementById('phone').value || '—';
     document.getElementById('recapCurrency').textContent   = document.getElementById('currency_hidden').value || 'GNF';

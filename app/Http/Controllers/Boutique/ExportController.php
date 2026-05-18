@@ -16,25 +16,50 @@ use App\Models\Payment;
 class ExportController extends Controller
 {
     /**
-     * Récupère l'ID de la boutique de l'utilisateur connecté.
+     * Récupère l'ID de la boutique active pour cet export.
+     *
+     * Priorité :
+     *   1. Paramètre ?shop_id= dans la requête (passé explicitement par le dashboard)
+     *   2. session('current_shop_id') — boutique active dans le dashboard
+     *   3. users.shop_id — boutique principale de l'utilisateur
+     *   4. Première boutique dont l'utilisateur est owner (fallback)
+     *
+     * Sécurité : on vérifie que la boutique trouvée appartient bien à l'utilisateur
+     * (via shop.user_id OU users.shop_id) avant de la retourner.
      */
     protected function getCurrentUserShopId(Request $request): ?int
     {
         $user = $request->user();
 
-        if (isset($user->shop_id) && $user->shop_id) {
+        // 1. Paramètre explicite passé depuis le dashboard
+        if ($request->filled('shop_id')) {
+            $id = (int) $request->input('shop_id');
+            // Vérifie que la boutique existe et est accessible à cet utilisateur
+            $shop = Shop::find($id);
+            if ($shop && ($shop->user_id === $user->id || $user->shop_id === $id)) {
+                return $id;
+            }
+        }
+
+        // 2. Session current_shop_id (boutique active dans le dashboard multi-boutique)
+        if (session()->has('current_shop_id')) {
+            $id = (int) session('current_shop_id');
+            $shop = Shop::find($id);
+            if ($shop && ($shop->user_id === $user->id || $user->shop_id === $id)) {
+                return $id;
+            }
+            // Session stale (après migrate:fresh etc.) → on l'efface
+            session()->forget('current_shop_id');
+        }
+
+        // 3. FK users.shop_id
+        if ($user->shop_id) {
             return (int) $user->shop_id;
         }
 
-        try {
-            if (method_exists($user, 'shop')) {
-                $shopRel = $user->shop()->first();
-                if ($shopRel) return (int) $shopRel->id;
-            }
-        } catch (\Throwable $e) {}
-
+        // 4. Première boutique dont l'utilisateur est propriétaire
         $shop = Shop::where('user_id', $user->id)->first();
-        return $shop ? (int)$shop->id : null;
+        return $shop ? (int) $shop->id : null;
     }
 
     /**
@@ -84,22 +109,24 @@ class ExportController extends Controller
      */
     public function exportOrdersPdf(Request $request)
     {
+        $user  = $request->user();
+        $shop  = $user->shop;
+        if (!$shop) abort(403, 'Aucune boutique trouvée.');
+
+        $shopId  = (int) $shop->id;
         $filters = $request->only(['date_from','date_to','status','livreur_id']);
-        $shopId = $this->getCurrentUserShopId($request);
-        if (!$shopId) abort(403, 'Aucune boutique trouvée.');
-        $filters['shop_id'] = $shopId;
 
         $query = Order::query()->where('shop_id', $shopId);
+        if (!empty($filters['status']))     $query->where('status', $filters['status']);
+        if (!empty($filters['date_from']))  $query->whereDate('created_at', '>=', $filters['date_from']);
+        if (!empty($filters['date_to']))    $query->whereDate('created_at', '<=', $filters['date_to']);
+        if (!empty($filters['livreur_id'])) $query->where('livreur_id', $filters['livreur_id']);
 
-        if (!empty($filters['status'])) $query->where('status', $filters['status']);
-        if (!empty($filters['date_from'])) $query->whereDate('created_at','>=',$filters['date_from']);
-        if (!empty($filters['date_to'])) $query->whereDate('created_at','<=',$filters['date_to']);
-        if (!empty($filters['livreur_id'])) $query->where('livreur_id',$filters['livreur_id']);
+        $orders = $query->with(['client', 'livreur', 'items.product'])->orderByDesc('created_at')->get();
 
-        $orders = $query->with(['client', 'livreur', 'shop'])->orderByDesc('created_at')->get();
-
-        $pdf = Pdf::loadView('exports.orders_pdf', compact('orders','filters'));
-        return $pdf->download('orders_shop_'.$shopId.'_'.now()->format('Ymd_His').'.pdf');
+        $pdf = Pdf::loadView('exports.orders_pdf', compact('orders', 'filters', 'shop'));
+        $pdf->setPaper('A4', 'landscape');
+        return $pdf->download('commandes_'.$shopId.'_'.now()->format('Ymd_His').'.pdf');
     }
 
     /**

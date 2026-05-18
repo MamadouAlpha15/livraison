@@ -223,6 +223,111 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
 .chat-flash { padding: 10px 14px; border-radius: var(--r); border: 1px solid; font-size: 13px; font-weight: 500; margin-bottom: 10px; }
 .chat-flash-success { background: #d1fae5; border-color: #6ee7b7; color: #065f46; }
 
+/* ── Grille images dans un message ── */
+.msg-img-grid { display: flex; flex-wrap: wrap; gap: 3px; max-width: 260px; }
+.msg-img-thumb {
+    width: calc(50% - 2px); aspect-ratio: 1/1; object-fit: cover;
+    border-radius: 8px; cursor: pointer; transition: opacity .15s;
+    border: 1px solid rgba(0,0,0,.06);
+}
+.msg-img-thumb:hover { opacity: .88; }
+.msg-img-grid.count-1 .msg-img-thumb { width: 100%; max-width: 220px; aspect-ratio: 4/3; border-radius: 10px; }
+.msg-img-grid.count-3 .msg-img-thumb:first-child { width: 100%; aspect-ratio: 16/9; }
+
+/* traitement en cours */
+.msg-img-processing {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px; background: rgba(0,0,0,.06);
+    border-radius: 10px; min-width: 140px;
+    font-size: 12px; color: var(--muted);
+}
+.msg-img-spinner {
+    width: 15px; height: 15px; flex-shrink: 0;
+    border: 2px solid var(--border); border-top-color: var(--orange);
+    border-radius: 50%; animation: imgSpin .75s linear infinite;
+}
+@keyframes imgSpin { to { transform: rotate(360deg); } }
+
+/* ── Bouton photo ── */
+.chat-photo-btn {
+    width: 42px; height: 42px; border-radius: 50%;
+    border: 1.5px solid var(--border); background: var(--surface);
+    color: var(--muted); cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 19px; transition: all .15s;
+}
+.chat-photo-btn:hover { border-color: var(--orange); color: var(--orange); background: #fff8f0; }
+
+/* ── Preview avant envoi ── */
+.chat-img-preview {
+    display: flex; gap: 6px; padding: 8px 14px;
+    overflow-x: auto; background: #fff8ef;
+    border: 1px solid #fde68a; border-bottom: none;
+    border-radius: var(--r) var(--r) 0 0;
+    scrollbar-width: none;
+}
+.chat-img-preview::-webkit-scrollbar { display: none; }
+.chat-img-preview.hidden { display: none; }
+.chat-img-preview-item { position: relative; flex-shrink: 0; }
+.chat-img-preview-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 7px; border: 1px solid var(--border); display: block; }
+.chat-img-preview-rm {
+    position: absolute; top: -5px; right: -5px;
+    width: 17px; height: 17px; border-radius: 50%;
+    background: var(--red); color: #fff; font-size: 10px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; border: 1.5px solid #fff; line-height: 1; font-weight: 700;
+}
+
+/* ── Lightbox ── */
+.img-lightbox {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.93); z-index: 9999;
+    align-items: center; justify-content: center;
+    user-select: none;
+}
+.img-lightbox.open { display: flex; }
+.img-lightbox-img {
+    max-width: min(92vw, 900px); max-height: 85vh;
+    object-fit: contain; border-radius: 6px;
+    transition: opacity .18s;
+}
+.img-lightbox-close {
+    position: absolute; top: 14px; right: 14px;
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(255,255,255,.15); border: none; color: #fff;
+    font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background .15s; z-index: 2;
+}
+.img-lightbox-close:hover { background: rgba(255,255,255,.28); }
+.img-lb-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 46px; height: 46px; border-radius: 50%;
+    background: rgba(255,255,255,.13); border: none; color: #fff;
+    font-size: 28px; font-weight: 300; cursor: pointer; z-index: 2;
+    display: none; align-items: center; justify-content: center;
+    transition: background .15s;
+}
+.img-lb-nav:hover { background: rgba(255,255,255,.26); }
+.img-lb-nav.visible { display: flex; }
+.img-lb-prev { left: 14px; }
+.img-lb-next { right: 14px; }
+.img-lb-counter {
+    position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,.45); color: rgba(255,255,255,.85);
+    font-size: 12.5px; font-weight: 600; padding: 4px 14px; border-radius: 20px;
+    display: none; z-index: 2;
+}
+.img-lb-counter.visible { display: block; }
+.img-lb-dots {
+    position: absolute; bottom: 52px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 5px; z-index: 2;
+}
+.img-lb-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: rgba(255,255,255,.35); transition: background .15s; cursor: pointer;
+}
+.img-lb-dot.active { background: #fff; }
+
 /* RESPONSIVE */
 @media (max-width: 600px) {
     .chat-wrap { margin: 12px auto; padding: 0 8px 70px; }
@@ -230,6 +335,32 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
     .msg-row { max-width: 90%; }
     .chat-prod-header { padding: 10px 12px; gap: 10px; flex-wrap: wrap; }
     .price-card { max-width: 100%; }
+}
+
+@media (max-width: 400px) {
+    /* Entête produit : image plus petite, bouton pleine largeur */
+    .chat-prod-img,
+    .chat-prod-img-ph { width: 44px; height: 44px; font-size: 18px; }
+    .chat-prod-name  { font-size: 13.5px; }
+    .chat-prod-price { font-size: 15px; }
+    .btn-propose-price { width: 100%; justify-content: center; margin-top: 4px; font-size: 12px; padding: 7px 12px; }
+
+    /* Panel proposition : champs + boutons empilés */
+    .propose-panel { padding: 12px 12px; }
+    .propose-panel-row { flex-direction: column; align-items: stretch; }
+    .propose-input { min-width: 0; width: 100%; }
+    .propose-devise { display: none; }
+    .btn-send-propose,
+    .btn-cancel-propose { width: 100%; text-align: center; justify-content: center; }
+
+    /* Carte prix : montant plus lisible */
+    .price-card-amount { font-size: 18px; }
+    .price-card-body   { padding: 10px; }
+
+    /* Thread */
+    .chat-thread { padding: 10px 8px; }
+    .chat-input-zone { padding: 8px 10px; }
+    .chat-textarea { font-size: 13px; }
 }
 </style>
 @endpush
@@ -306,7 +437,42 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
             $msgType    = $msg->type ?? 'text';
         @endphp
 
-        @if(in_array($msgType, ['price_proposal', 'price_offer', 'order_created']))
+        @if($msgType === 'images')
+            {{-- ══ PHOTOS ══ --}}
+            @php
+                $imgUrls = collect($msg->images ?? [])->map(fn($p) =>
+                    \App\Services\ImageOptimizer::url($p, 'large') ?? asset('storage/'.$p)
+                )->toArray();
+                $imgCount = count($imgUrls);
+            @endphp
+            <div class="msg-row {{ $isMine ? 'mine' : 'theirs' }}" data-msg-id="{{ $msg->id }}">
+                @if(!$isMine)<div class="msg-av">{{ $sInit }}</div>@endif
+                <div class="msg-content">
+                    @if(!$isMine)<div class="msg-sender">{{ $senderName }}</div>@endif
+                    <div class="msg-img-grid count-{{ $imgCount }}"
+                         id="imgGrid_{{ $msg->id }}"
+                         data-status="{{ $msg->image_status ?? 'ready' }}">
+                        @if(($msg->image_status ?? 'ready') === 'processing' || $imgCount === 0)
+                            <div class="msg-img-processing">
+                                <div class="msg-img-spinner"></div>
+                                <span>Traitement en cours…</span>
+                            </div>
+                        @else
+                            @foreach($imgUrls as $i => $imgUrl)
+                            <img src="{{ $imgUrl }}" class="msg-img-thumb"
+                                 onclick="openLightbox({{ json_encode($imgUrls) }}, {{ $i }})"
+                                 alt="Photo {{ $i + 1 }}">
+                            @endforeach
+                        @endif
+                    </div>
+                    <div class="msg-meta">
+                        <span class="msg-time">{{ $msg->created_at->format('d/m H:i') }}</span>
+                        @if($isMine && $msg->read_at)<span class="msg-read">✓✓</span>@endif
+                    </div>
+                </div>
+            </div>
+
+        @elseif(in_array($msgType, ['price_proposal', 'price_offer', 'order_created']))
             {{-- ══ CARTE NÉGOCIATION ══ --}}
             <div class="msg-row {{ $isMine ? 'mine' : 'theirs' }}" data-msg-id="{{ $msg->id }}">
                 <div class="msg-av">{{ $isMine ? $initials : $sInit }}</div>
@@ -422,21 +588,26 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
     </div>
 
     {{-- ZONE DE SAISIE --}}
+    <input type="file" id="photoFileInput" accept="image/*" multiple
+           style="display:none" onchange="onFilesSelected(event)">
+    <div class="chat-img-preview hidden" id="imgPreviewStrip"></div>
     <div class="chat-input-zone">
+        <button type="button" class="chat-photo-btn" onclick="document.getElementById('photoFileInput').click()" title="Envoyer des photos">
+            📷
+        </button>
         <form method="POST"
               action="{{ route('client.messages.store', $product) }}"
               id="chatForm"
-              style="display:flex;gap:10px;align-items:flex-end;width:100%">
+              style="display:flex;gap:10px;align-items:flex-end;flex:1">
             @csrf
             <textarea name="body"
                       id="chatInput"
                       class="chat-textarea"
-                      placeholder="Écrire un message au vendeur…"
+                      placeholder="Écrire un message ou envoyer une photo…"
                       rows="1"
-                      required
-                      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"
+                      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();handleSendBtn()}"
                       oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
-            <button type="button" onclick="sendMessage()" class="chat-send-btn" title="Envoyer">➤</button>
+            <button type="button" onclick="handleSendBtn()" class="chat-send-btn" title="Envoyer">➤</button>
         </form>
     </div>
 
@@ -445,31 +616,52 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
 {{-- Toast global --}}
 <div class="chat-toast" id="chatToast"></div>
 
+{{-- Lightbox --}}
+<div class="img-lightbox" id="imgLightbox" onclick="closeLightbox()">
+    <button class="img-lightbox-close" onclick="closeLightbox()">✕</button>
+    <button class="img-lb-nav img-lb-prev" id="lbPrevBtn" onclick="event.stopPropagation();lbPrev()">&#8249;</button>
+    <img class="img-lightbox-img" id="lbImg" src="" alt="" onclick="event.stopPropagation()">
+    <button class="img-lb-nav img-lb-next" id="lbNextBtn" onclick="event.stopPropagation();lbNext()">&#8250;</button>
+    <div class="img-lb-dots" id="lbDots"></div>
+    <div class="img-lb-counter" id="lbCounter"></div>
+</div>
+
 @endsection
 
 @push('scripts')
 <script>
-const CSRF      = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
-const DEVISE    = '{{ $devise }}';
-const INITIALS  = '{{ $initials }}';
-const STORE_URL = '{{ route("client.messages.store", $product) }}';
-const POLL_URL  = '{{ route("client.messages.index", $product) }}';
-const CONFIRM_URL = '{{ url("client/messages/confirm-offer") }}';
-const PROPOSE_URL = '{{ route("client.messages.propose") }}';
-const PRODUCT_ID  = {{ $product->id }};
-const PRODUCT_PRICE = {{ $product->price }};
+const CSRF             = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+const DEVISE           = '{{ $devise }}';
+const INITIALS         = '{{ $initials }}';
+const STORE_URL        = '{{ route("client.messages.store", $product) }}';
+const POLL_URL         = '{{ route("client.messages.index", $product) }}';
+const CONFIRM_URL      = '{{ url("client/messages/confirm-offer") }}';
+const PROPOSE_URL      = '{{ route("client.messages.propose") }}';
+const SEND_IMAGES_URL  = '{{ route("client.messages.client.send-images", $product) }}';
+const IMAGE_STATUS_URL = '{{ url("client/messages/image-status") }}';
+const PRODUCT_ID       = {{ $product->id }};
+const PRODUCT_PRICE    = {{ $product->price }};
 
-/* Dernier ID message connu — pour ne pas dupliquer */
-let _lastMsgId = {{ $messages->isNotEmpty() ? $messages->last()->id : 0 }};
+let _lastMsgId     = {{ $messages->isNotEmpty() ? $messages->last()->id : 0 }};
+let _selectedFiles = [];   // photos en attente d'envoi
 
-/* ── Auto-scroll au chargement ── */
-document.addEventListener('DOMContentLoaded', () => scrollBottom());
+/* ════════════════════════════════════
+   UTILITAIRES
+   ════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+    scrollBottom();
+    /* Lancer le polling image-status pour les messages "processing" déjà en page */
+    document.querySelectorAll('.msg-img-grid[data-status="processing"]').forEach(grid => {
+        const row = grid.closest('[data-msg-id]');
+        if (row) pollImageStatus(parseInt(row.dataset.msgId), grid);
+    });
+});
+
 function scrollBottom() {
     const t = document.getElementById('chatThread');
     if (t) t.scrollTop = t.scrollHeight;
 }
 
-/* ── Toast ── */
 function showToast(msg, type = 'success') {
     const el = document.getElementById('chatToast');
     el.textContent = msg;
@@ -481,32 +673,123 @@ function escHtml(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-/* ── Panneau proposition ── */
-function toggleProposePanel() {
-    const panel = document.getElementById('proposePanel');
-    panel.classList.toggle('open');
-    if (panel.classList.contains('open')) document.getElementById('proposePriceInput').focus();
+function nowTime() {
+    const d = new Date();
+    return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
 }
 
-/* ── Construire une bulle texte simple ── */
+/* ════════════════════════════════════
+   LIGHTBOX avec navigation galerie
+   ════════════════════════════════════ */
+let _lbImages = [];
+let _lbIndex  = 0;
+let _lbTouchX = 0;
+
+function openLightbox(images, index = 0) {
+    if (typeof images === 'string') images = [images];
+    _lbImages = images;
+    _lbIndex  = index;
+    _renderLightbox();
+    document.getElementById('imgLightbox').classList.add('open');
+}
+
+function _renderLightbox() {
+    const total = _lbImages.length;
+    document.getElementById('lbImg').src = _lbImages[_lbIndex];
+
+    /* flèches */
+    const show = total > 1;
+    document.getElementById('lbPrevBtn').classList.toggle('visible', show);
+    document.getElementById('lbNextBtn').classList.toggle('visible', show);
+
+    /* compteur */
+    const counter = document.getElementById('lbCounter');
+    counter.textContent = total > 1 ? (_lbIndex + 1) + ' / ' + total : '';
+    counter.classList.toggle('visible', total > 1);
+
+    /* dots */
+    const dotsEl = document.getElementById('lbDots');
+    dotsEl.innerHTML = '';
+    if (total > 1 && total <= 10) {
+        _lbImages.forEach((_, i) => {
+            const d = document.createElement('div');
+            d.className = 'img-lb-dot' + (i === _lbIndex ? ' active' : '');
+            d.onclick = e => { e.stopPropagation(); _lbIndex = i; _renderLightbox(); };
+            dotsEl.appendChild(d);
+        });
+    }
+}
+
+function lbPrev() { _lbIndex = (_lbIndex - 1 + _lbImages.length) % _lbImages.length; _renderLightbox(); }
+function lbNext() { _lbIndex = (_lbIndex + 1) % _lbImages.length; _renderLightbox(); }
+
+function closeLightbox() {
+    document.getElementById('imgLightbox').classList.remove('open');
+}
+
+/* clavier */
+document.addEventListener('keydown', e => {
+    const open = document.getElementById('imgLightbox').classList.contains('open');
+    if (!open) return;
+    if (e.key === 'Escape')      closeLightbox();
+    if (e.key === 'ArrowLeft')   lbPrev();
+    if (e.key === 'ArrowRight')  lbNext();
+});
+
+/* swipe mobile */
+document.getElementById('imgLightbox').addEventListener('touchstart', e => {
+    _lbTouchX = e.touches[0].clientX;
+}, { passive: true });
+document.getElementById('imgLightbox').addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - _lbTouchX;
+    if (Math.abs(dx) > 50) { dx < 0 ? lbNext() : lbPrev(); }
+}, { passive: true });
+
+/* ════════════════════════════════════
+   SÉLECTION & PREVIEW PHOTOS
+   ════════════════════════════════════ */
+function onFilesSelected(e) {
+    const files = Array.from(e.target.files).slice(0, 20 - _selectedFiles.length);
+    _selectedFiles = [..._selectedFiles, ...files];
+    renderPreview();
+    e.target.value = '';
+}
+
+function renderPreview() {
+    const strip = document.getElementById('imgPreviewStrip');
+    strip.innerHTML = '';
+    if (!_selectedFiles.length) { strip.classList.add('hidden'); return; }
+    strip.classList.remove('hidden');
+    _selectedFiles.forEach((file, idx) => {
+        const item = document.createElement('div');
+        item.className = 'chat-img-preview-item';
+        const img = document.createElement('img');
+        img.className = 'chat-img-preview-thumb';
+        img.src = URL.createObjectURL(file);
+        const rm = document.createElement('div');
+        rm.className = 'chat-img-preview-rm';
+        rm.textContent = '×';
+        rm.onclick = () => { _selectedFiles.splice(idx, 1); renderPreview(); };
+        item.appendChild(img); item.appendChild(rm);
+        strip.appendChild(item);
+    });
+}
+
+/* ════════════════════════════════════
+   CONSTRUIRE LES LIGNES DE MESSAGE
+   ════════════════════════════════════ */
 function buildTextRow(msg) {
     const row = document.createElement('div');
     row.className = 'msg-row ' + (msg.mine ? 'mine' : 'theirs');
     if (msg.id) row.dataset.msgId = msg.id;
-
-    const tick = msg.mine
-        ? (msg.read ? '<span class="msg-read">✓✓</span>' : '')
-        : '';
-
+    const tick = msg.mine ? (msg.read ? '<span class="msg-read">✓✓</span>' : '') : '';
     if (msg.mine) {
-        /* CLIENT — droite : pas d'avatar, pas de nom */
         row.innerHTML =
             '<div class="msg-content">' +
                 '<div class="msg-bubble">' + escHtml(msg.body) + '</div>' +
                 '<div class="msg-meta"><span class="msg-time">' + escHtml(msg.time) + '</span>' + tick + '</div>' +
             '</div>';
     } else {
-        /* VENDEUR — gauche : avatar + nom */
         row.innerHTML =
             '<div class="msg-av">' + escHtml(msg.sender_init || '?') + '</div>' +
             '<div class="msg-content">' +
@@ -518,15 +801,62 @@ function buildTextRow(msg) {
     return row;
 }
 
-/* ── Envoyer un message texte en AJAX ── */
+function buildImageRow(msg) {
+    const row = document.createElement('div');
+    row.className = 'msg-row ' + (msg.mine ? 'mine' : 'theirs');
+    if (msg.id) row.dataset.msgId = msg.id;
+
+    const imgs  = msg.images || [];
+    const grid  = document.createElement('div');
+    grid.className   = 'msg-img-grid count-' + imgs.length;
+    grid.id          = 'imgGrid_' + (msg.id || ('tmp_' + Date.now()));
+    grid.dataset.status = msg.image_status || 'processing';
+
+    if (msg.image_status === 'processing' || !imgs.length) {
+        grid.innerHTML = '<div class="msg-img-processing"><div class="msg-img-spinner"></div><span>Traitement en cours…</span></div>';
+    } else {
+        imgs.forEach((url, idx) => {
+            const im = document.createElement('img');
+            im.src = url; im.className = 'msg-img-thumb';
+            im.onclick = () => openLightbox(imgs, idx);
+            grid.appendChild(im);
+        });
+    }
+
+    const meta    = document.createElement('div');
+    meta.className = 'msg-meta';
+    meta.innerHTML = '<span class="msg-time">' + escHtml(msg.time || nowTime()) + '</span>';
+
+    const content    = document.createElement('div');
+    content.className = 'msg-content';
+    content.appendChild(grid);
+    content.appendChild(meta);
+
+    if (!msg.mine) {
+        const av = document.createElement('div');
+        av.className = 'msg-av';
+        av.textContent = msg.sender_init || '?';
+        row.appendChild(av);
+    }
+    row.appendChild(content);
+    return row;
+}
+
+/* ════════════════════════════════════
+   ENVOI
+   ════════════════════════════════════ */
+async function handleSendBtn() {
+    if (_selectedFiles.length) await sendPhotos();
+    const text = document.getElementById('chatInput').value.trim();
+    if (text) await sendMessage();
+}
+
 async function sendMessage() {
     const input = document.getElementById('chatInput');
     const body  = input.value.trim();
     if (!body) return;
-
     const btn = document.querySelector('.chat-send-btn');
     if (btn) btn.disabled = true;
-
     try {
         const res  = await fetch(STORE_URL, {
             method: 'POST',
@@ -534,23 +864,12 @@ async function sendMessage() {
             body: JSON.stringify({ body }),
         });
         const data = await res.json();
-
         if (data.sent) {
-            input.value = '';
-            input.style.height = 'auto';
-
-            const now  = new Date();
-            const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
-            const fakeMsg = { mine: true, body, time, read: false, id: data.message_id || 0 };
-
+            input.value = ''; input.style.height = 'auto';
             if (data.message_id) _lastMsgId = Math.max(_lastMsgId, data.message_id);
-
             const thread = document.getElementById('chatThread');
-            /* Retirer le message "vide" si présent */
-            const empty = thread.querySelector('.chat-empty');
-            if (empty) empty.remove();
-
-            thread.appendChild(buildTextRow(fakeMsg));
+            thread.querySelector('.chat-empty')?.remove();
+            thread.appendChild(buildTextRow({ mine: true, body, time: nowTime(), read: false, id: data.message_id || 0 }));
             scrollBottom();
         }
     } catch(e) {
@@ -560,12 +879,79 @@ async function sendMessage() {
     }
 }
 
-/* ── Envoyer une proposition de prix ── */
+async function sendPhotos() {
+    if (!_selectedFiles.length) return;
+    const formData = new FormData();
+    _selectedFiles.forEach(f => formData.append('images[]', f));
+    _selectedFiles = [];
+    renderPreview();
+
+    const thread = document.getElementById('chatThread');
+    thread.querySelector('.chat-empty')?.remove();
+    const row = buildImageRow({ mine: true, images: [], image_status: 'processing', time: nowTime() });
+    thread.appendChild(row);
+    scrollBottom();
+
+    try {
+        const res  = await fetch(SEND_IMAGES_URL, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            body: formData,
+        });
+        const data = await res.json();
+        if (data.success && data.message_id) {
+            row.dataset.msgId = data.message_id;
+            _lastMsgId = Math.max(_lastMsgId, data.message_id);
+            pollImageStatus(data.message_id, row.querySelector('.msg-img-grid'));
+        }
+    } catch(e) {
+        row.remove();
+        showToast('❌ Erreur envoi photo. Réessayez.', 'error');
+    }
+}
+
+/* ════════════════════════════════════
+   POLLING IMAGE STATUS
+   ════════════════════════════════════ */
+function pollImageStatus(msgId, gridEl) {
+    if (!gridEl) return;
+    const check = async () => {
+        try {
+            const res  = await fetch(IMAGE_STATUS_URL + '/' + msgId, {
+                headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const data = await res.json();
+            if (data.status === 'ready' && data.images?.length) {
+                gridEl.innerHTML = '';
+                gridEl.className = 'msg-img-grid count-' + data.images.length;
+                data.images.forEach((url, idx) => {
+                    const im = document.createElement('img');
+                    im.src = url; im.className = 'msg-img-thumb';
+                    im.onclick = () => openLightbox(data.images, idx);
+                    gridEl.appendChild(im);
+                });
+                gridEl.dataset.status = 'ready';
+            } else {
+                setTimeout(check, 2500);
+            }
+        } catch(e) { setTimeout(check, 3000); }
+    };
+    setTimeout(check, 2000);
+}
+
+/* ════════════════════════════════════
+   PROPOSITION DE PRIX
+   ════════════════════════════════════ */
+function toggleProposePanel() {
+    const panel = document.getElementById('proposePanel');
+    panel.classList.toggle('open');
+    if (panel.classList.contains('open')) document.getElementById('proposePriceInput').focus();
+}
+
 async function sendPriceProposal() {
     const input = document.getElementById('proposePriceInput');
     const price = parseFloat(input.value);
     if (!price || price < 1) { showToast('❌ Veuillez entrer un prix valide.', 'error'); return; }
-
     try {
         const res = await fetch(PROPOSE_URL, {
             method: 'POST',
@@ -577,16 +963,15 @@ async function sendPriceProposal() {
         document.getElementById('proposePanel').classList.remove('open');
         input.value = '';
         setTimeout(() => location.reload(), 1200);
-    } catch(e) {
-        showToast('❌ Erreur lors de l\'envoi. Réessayez.', 'error');
-    }
+    } catch(e) { showToast('❌ Erreur lors de l\'envoi. Réessayez.', 'error'); }
 }
 
-/* ── Confirmer une offre vendeur ── */
+/* ════════════════════════════════════
+   CONFIRMER OFFRE VENDEUR
+   ════════════════════════════════════ */
 async function confirmOffer(messageId, btn) {
     if (!confirm('Confirmer cette offre et créer la commande ?')) return;
-    btn.disabled = true;
-    btn.classList.add('loading');
+    btn.disabled = true; btn.classList.add('loading');
     btn.textContent = '⏳ Création de la commande…';
     try {
         const res  = await fetch(CONFIRM_URL + '/' + messageId, {
@@ -599,14 +984,15 @@ async function confirmOffer(messageId, btn) {
             setTimeout(() => location.reload(), 1500);
         } else throw new Error();
     } catch(e) {
-        btn.disabled = false;
-        btn.classList.remove('loading');
+        btn.disabled = false; btn.classList.remove('loading');
         btn.textContent = '✓ Confirmer cette offre et commander';
         showToast('❌ Erreur. Réessayez.', 'error');
     }
 }
 
-/* ── Polling toutes les 3s — ajoute les nouveaux messages sans recharger ── */
+/* ════════════════════════════════════
+   POLLING MESSAGES (toutes les 3s)
+   ════════════════════════════════════ */
 async function pollMessages() {
     try {
         const res = await fetch(POLL_URL, {
@@ -619,24 +1005,38 @@ async function pollMessages() {
         const newMsgs = msgs.filter(m => m.id > _lastMsgId);
 
         for (const msg of newMsgs) {
-            /* Éviter les doublons */
             if (thread.querySelector('[data-msg-id="' + msg.id + '"]')) continue;
 
-            /* Cartes de négociation → reload pour afficher les boutons PHP */
-            if (msg.type && msg.type !== 'text') {
-                location.reload();
-                return;
-            }
-
-            /* Message texte du vendeur → on l'ajoute directement */
-            if (!msg.mine) {
-                const empty = thread.querySelector('.chat-empty');
-                if (empty) empty.remove();
-
-                /* Calculer les initiales du vendeur depuis le nom */
+            /* Photos du vendeur → on les affiche directement */
+            if (msg.type === 'images') {
+                thread.querySelector('.chat-empty')?.remove();
                 const parts = (msg.sender || '').split(' ');
                 msg.sender_init = (parts[0]?.[0] ?? '?').toUpperCase() + (parts[1]?.[0] ?? '').toUpperCase();
+                const row = buildImageRow({ ...msg, mine: false });
+                thread.appendChild(row);
+                scrollBottom();
+                if (msg.image_status !== 'ready' || !msg.images?.length) {
+                    pollImageStatus(msg.id, row.querySelector('.msg-img-grid'));
+                } else {
+                    /* images déjà prêtes : brancher le lightbox */
+                    row.querySelectorAll('.msg-img-thumb').forEach((im, idx) => {
+                        im.onclick = () => openLightbox(msg.images, idx);
+                    });
+                }
+                _lastMsgId = Math.max(_lastMsgId, msg.id);
+                continue;
+            }
 
+            /* Cartes de négociation → reload */
+            if (msg.type && msg.type !== 'text') {
+                location.reload(); return;
+            }
+
+            /* Texte du vendeur */
+            if (!msg.mine) {
+                thread.querySelector('.chat-empty')?.remove();
+                const parts = (msg.sender || '').split(' ');
+                msg.sender_init = (parts[0]?.[0] ?? '?').toUpperCase() + (parts[1]?.[0] ?? '').toUpperCase();
                 thread.appendChild(buildTextRow(msg));
                 scrollBottom();
             }
@@ -647,7 +1047,7 @@ async function pollMessages() {
 
 setInterval(pollMessages, 3000);
 
-/* ── Polling badge navbar (toutes les 3s) ── */
+/* ── Polling badge navbar ── */
 async function pollBadge() {
     try {
         const res = await fetch('{{ route("client.messages.client.poll") }}', {
@@ -657,13 +1057,8 @@ async function pollBadge() {
         const data = await res.json();
         const badge = document.getElementById('navMsgBadge');
         if (!badge) return;
-        if (data.unread > 0) {
-            badge.textContent = data.unread;
-            badge.classList.add('show');
-        } else {
-            badge.textContent = '';
-            badge.classList.remove('show');
-        }
+        if (data.unread > 0) { badge.textContent = data.unread; badge.classList.add('show'); }
+        else { badge.textContent = ''; badge.classList.remove('show'); }
     } catch(e) {}
 }
 setInterval(pollBadge, 3000);

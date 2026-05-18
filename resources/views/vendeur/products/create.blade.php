@@ -270,15 +270,93 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 }
 .upload-uploading-txt { font-size: 12px; font-weight: 700; color: var(--brand-dk); }
 
+/* ── Aperçu produit mobile (visible uniquement ≤ 900px) ── */
+.mobile-product-preview {
+    display: none;
+    align-items: center; gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow-sm);
+    position: relative; overflow: hidden;
+}
+.mobile-product-preview::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--brand), #a855f7);
+}
+.mpv-img {
+    width: 60px; height: 60px; border-radius: 10px; flex-shrink: 0;
+    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; overflow: hidden; position: relative;
+    border: 1.5px solid var(--border);
+}
+.mpv-img img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%; object-fit: cover; display: none;
+}
+.mpv-info { flex: 1; min-width: 0; }
+.mpv-cat {
+    font-size: 10px; font-weight: 700; color: var(--brand);
+    text-transform: uppercase; letter-spacing: .5px;
+    margin-bottom: 3px;
+}
+.mpv-name {
+    font-size: 14px; font-weight: 800; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-bottom: 4px;
+}
+.mpv-price-row { display: flex; align-items: baseline; gap: 7px; }
+.mpv-price {
+    font-size: 16px; font-weight: 800; color: var(--brand);
+    font-family: var(--mono);
+}
+.mpv-orig {
+    font-size: 11px; color: var(--muted);
+    text-decoration: line-through; font-family: var(--mono);
+    display: none;
+}
+.mpv-devise { font-size: 10px; color: var(--muted); font-weight: 600; }
+
 /* ── Responsive ── */
 @media (max-width: 900px) {
     .product-form-wrap { grid-template-columns: 1fr; }
     .sidebar-col { display: none; }
     .field-row-3 { grid-template-columns: 1fr 1fr; }
+    .mobile-product-preview { display: flex; }
 }
-@media (max-width: 560px) {
-    .product-form-wrap { padding: 14px 12px 40px; }
+@media (max-width: 640px) {
+    .product-form-wrap { padding: 16px 14px 48px; gap: 14px; }
+    .form-card-hd { padding: 12px 16px; }
+    .form-card-body { padding: 16px; }
+    .form-card-sub { display: none; }
+    .form-actions {
+        flex-direction: column-reverse; gap: 8px;
+    }
+    .btn-submit, .btn-cancel {
+        width: 100%; justify-content: center; text-align: center;
+    }
+}
+@media (max-width: 480px) {
+    .product-form-wrap { padding: 12px 10px 40px; }
     .field-row, .field-row-3 { grid-template-columns: 1fr; }
+    .form-card-hd-ico { width: 24px; height: 24px; font-size: 12px; border-radius: 6px; }
+    .form-card-title { font-size: 12.5px; }
+    .upload-gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .toggle-field { padding: 10px 0; }
+    .toggle-field-lbl { font-size: 12.5px; }
+}
+@media (max-width: 360px) {
+    .product-form-wrap { padding: 10px 8px 36px; }
+    .form-card-hd { padding: 10px 12px; gap: 7px; }
+    .form-card-body { padding: 12px; }
+    .field-lbl { font-size: 11px; }
+    .field-input, .field-select, .field-textarea { font-size: 13px; padding: 9px 11px; }
+    .upload-gallery-grid { grid-template-columns: repeat(2, 1fr); }
+    .btn-submit { padding: 12px 16px; font-size: 13.5px; }
 }
 </style>
 @endpush
@@ -289,15 +367,18 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
     {{-- ═══ COLONNE PRINCIPALE ═══ --}}
     <div class="main-col">
 
-        {{-- Breadcrumb --}}
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;font-size:12.5px;color:var(--muted)">
-            <a href="{{ route('products.index') }}" style="color:var(--muted);text-decoration:none;font-weight:600">
-                ← Catalogue
-            </a>
-            <span>/</span>
-            <span style="color:var(--text);font-weight:600">
-                {{ $isEdit ? 'Modifier · ' . Str::limit($product->name, 30) : 'Ajouter un produit' }}
-            </span>
+        {{-- Breadcrumb + titre page --}}
+        <div style="margin-bottom:20px">
+            <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:6px">
+                <a href="{{ route('products.index') }}" style="color:var(--muted);text-decoration:none;font-weight:600">← Catalogue</a>
+                <span>/</span>
+                <span style="color:var(--text);font-weight:600">
+                    {{ $isEdit ? Str::limit($product->name, 28) : 'Ajouter un produit' }}
+                </span>
+            </div>
+            <h1 style="font-size:20px;font-weight:800;color:var(--text);margin:0;letter-spacing:-.4px;line-height:1.2">
+                {{ $isEdit ? '✏️ Modifier le produit' : '🚀 Ajouter un produit' }}
+            </h1>
         </div>
 
         {{-- Flash --}}
@@ -310,6 +391,23 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
             </div>
         </div>
         @endif
+
+        {{-- Aperçu produit mobile (caché sur desktop) --}}
+        <div class="mobile-product-preview">
+            <div class="mpv-img" id="mpvImgWrap">
+                <span id="mpvEmoji">🏷️</span>
+                <img id="mpvImg" src="" alt="">
+            </div>
+            <div class="mpv-info">
+                <div class="mpv-cat"  id="mpvCat">{{ $isEdit ? ($product->category ?? '') : 'Catégorie' }}</div>
+                <div class="mpv-name" id="mpvName">{{ $isEdit ? $product->name : 'Nom du produit' }}</div>
+                <div class="mpv-price-row">
+                    <span class="mpv-price"  id="mpvPrice">{{ $isEdit ? number_format($product->price, 0, ',', ' ') : '0' }}</span>
+                    <span class="mpv-devise">{{ $devise }}</span>
+                    <span class="mpv-orig"   id="mpvOrig">{{ $isEdit && ($product->original_price ?? false) ? number_format($product->original_price, 0, ',', ' ') : '' }}</span>
+                </div>
+            </div>
+        </div>
 
         <form action="{{ $isEdit ? route('products.update', $product) : route('products.store') }}"
               method="POST"
@@ -748,6 +846,11 @@ function showMainPreview(url) {
         previewImgEl.style.display = 'block';
         if (previewImgPlaceholder) previewImgPlaceholder.style.display = 'none';
     }
+    /* Mobile preview image */
+    const mi = document.getElementById('mpvImg');
+    const me = document.getElementById('mpvEmoji');
+    if (mi) { mi.src = url; mi.style.display = 'block'; }
+    if (me) me.style.display = 'none';
 }
 
 function removeMainImage() {
@@ -863,7 +966,9 @@ function previewFmt(n) {
 }
 
 document.getElementById('name').addEventListener('input', e => {
-    document.getElementById('previewName').textContent = e.target.value || 'Nom du produit';
+    const v = e.target.value || 'Nom du produit';
+    document.getElementById('previewName').textContent = v;
+    const mn = document.getElementById('mpvName'); if (mn) mn.textContent = v;
 });
 document.getElementById('description').addEventListener('input', e => {
     const txt = e.target.value.substring(0, 80) + (e.target.value.length > 80 ? '…' : '');
@@ -889,35 +994,40 @@ function onCategorySelect(val) {
         customInput.value = '';
         hidden.value = val;
         document.getElementById('previewCat').textContent = val;
+        const mc = document.getElementById('mpvCat'); if (mc) mc.textContent = val;
     }
 }
 
 function onCustomCategoryInput(val) {
-    /* Synchroniser en temps réel vers le champ caché + preview */
     document.getElementById('categoryHidden').value = val;
     document.getElementById('previewCat').textContent = val;
+    const mc = document.getElementById('mpvCat'); if (mc) mc.textContent = val;
 }
 
 function cancelCustomCategory() {
-    /* Revenir à la liste */
     document.getElementById('categoryCustomWrap').style.display = 'none';
     document.getElementById('categoryCustomInput').value = '';
     document.getElementById('categoryHidden').value = '';
     document.getElementById('categorySelect').value = '';
     document.getElementById('previewCat').textContent = '';
+    const mc = document.getElementById('mpvCat'); if (mc) mc.textContent = '';
 }
 document.getElementById('price').addEventListener('input', e => {
+    const fmt = previewFmt(e.target.value);
     document.getElementById('previewPrice').innerHTML =
-        previewFmt(e.target.value) +
-        ' <span style="font-size:11px;font-weight:600;color:var(--muted)">{{ $devise }}</span>';
+        fmt + ' <span style="font-size:11px;font-weight:600;color:var(--muted)">{{ $devise }}</span>';
+    const mp = document.getElementById('mpvPrice'); if (mp) mp.textContent = fmt || '0';
 });
 document.getElementById('original_price').addEventListener('input', e => {
     const el = document.getElementById('previewOrig');
+    const mo = document.getElementById('mpvOrig');
     if (e.target.value) {
-        el.textContent = previewFmt(e.target.value);
-        el.style.display = '';
+        const fmt = previewFmt(e.target.value);
+        el.textContent = fmt; el.style.display = '';
+        if (mo) { mo.textContent = fmt; mo.style.display = ''; }
     } else {
         el.style.display = 'none';
+        if (mo) mo.style.display = 'none';
     }
 });
 document.getElementById('stock').addEventListener('input', e => {

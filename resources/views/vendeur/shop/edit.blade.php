@@ -426,14 +426,99 @@ textarea.field-input { resize: vertical; min-height: 90px; }
     border-radius: 3px; transition: width .4s cubic-bezier(.23,1,.32,1);
 }
 
+/* ── Sélecteur type boutique (pills) ── */
+.type-pills {
+    display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px;
+}
+.type-pill {
+    padding: 7px 14px; border-radius: 50px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    font-size: 12.5px; font-weight: 600;
+    color: var(--text-2); cursor: pointer;
+    transition: all .15s; font-family: var(--font);
+    display: inline-flex; align-items: center; gap: 5px;
+    white-space: nowrap;
+}
+.type-pill:hover { border-color: var(--brand); color: var(--brand-dk); background: var(--brand-mlt); }
+.type-pill.selected {
+    border-color: var(--brand-dk); background: var(--brand);
+    color: #fff; box-shadow: 0 2px 8px rgba(99,102,241,.3);
+}
+.type-pill-add {
+    border-style: dashed; border-color: var(--brand);
+    color: var(--brand); background: transparent; font-weight: 700;
+}
+.type-pill-add:hover { background: var(--brand-mlt); }
+.type-custom-wrap {
+    display: flex; align-items: center; gap: 8px; margin-top: 10px;
+}
+.type-custom-wrap .field-input { flex: 1; margin: 0; }
+.type-custom-ok {
+    padding: 9px 14px; border-radius: var(--r-sm);
+    background: var(--brand); color: #fff;
+    border: none; font-weight: 700; cursor: pointer;
+    font-family: var(--font); font-size: 13px;
+    transition: background .15s; flex-shrink: 0;
+}
+.type-custom-ok:hover { background: var(--brand-dk); }
+.type-custom-cancel {
+    padding: 9px 12px; border-radius: var(--r-sm);
+    background: var(--bg); color: var(--muted);
+    border: 1.5px solid var(--border); font-size: 13px;
+    cursor: pointer; transition: all .15s; flex-shrink: 0;
+}
+.type-custom-cancel:hover { border-color: var(--danger); color: var(--danger); }
+
+/* ── Bandeau étapes (mobile uniquement) ── */
+.mobile-steps-bar {
+    display: none;
+    align-items: center; gap: 10px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 12px 16px;
+    margin-bottom: 18px; box-shadow: var(--shadow-sm);
+}
+.mobile-step-indicator {
+    background: var(--brand); color: #fff;
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; flex-shrink: 0;
+}
+.mobile-step-txt { font-size: 13px; font-weight: 700; color: var(--text); flex: 1; }
+.mobile-step-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
 /* ── Responsive ── */
 @media (max-width: 900px) {
     .form-page { grid-template-columns: 1fr; }
     .form-sidebar { display: none; }
-    .form-main { padding: 28px 20px; }
+    .form-main { padding: 28px 24px; }
+    .mobile-steps-bar { display: flex; }
+}
+@media (max-width: 640px) {
+    .form-main { padding: 20px 16px; }
+    .step-tab { font-size: 11px; padding: 10px 4px; gap: 3px; }
+    .step-tab .tab-num { width: 16px; height: 16px; font-size: 9px; }
+    .section-hd h2 { font-size: 16px; }
+    .form-nav { flex-direction: column-reverse; gap: 10px; }
+    .form-nav .btn-back,
+    .form-nav .btn-next,
+    .form-nav .btn-submit { width: 100%; justify-content: center; text-align: center; }
+    .type-pills { gap: 6px; }
+    .type-pill { padding: 6px 11px; font-size: 12px; }
 }
 @media (max-width: 480px) {
+    .form-main { padding: 16px 12px; }
     .field-row { grid-template-columns: 1fr; }
+    .form-steps-tabs { border-radius: var(--r-sm); }
+    .step-tab span:not(.tab-num) { display: none; }
+    .step-tab { padding: 11px 6px; }
+    .type-custom-wrap { flex-direction: column; align-items: stretch; }
+    .type-custom-ok, .type-custom-cancel { width: 100%; }
+}
+@media (max-width: 360px) {
+    .form-main { padding: 12px 10px; }
+    .section-hd h2 { font-size: 15px; }
+    .btn-next, .btn-submit { padding: 11px 16px; font-size: 13px; }
 }
 </style>
 @endpush
@@ -523,6 +608,15 @@ textarea.field-input { resize: vertical; min-height: 90px; }
         <div class="flash flash-info"><span>ℹ</span> {{ session('info') }}</div>
         @endif
 
+        {{-- Bandeau étapes mobile --}}
+        <div class="mobile-steps-bar" id="mobileStepsBar">
+            <div class="mobile-step-indicator" id="mobileStepNum">1</div>
+            <div>
+                <div class="mobile-step-txt" id="mobileStepTxt">Informations générales</div>
+                <div class="mobile-step-sub" id="mobileStepSub">Étape 1 sur 4</div>
+            </div>
+        </div>
+
         {{-- Barre de progression --}}
         <div class="progress-bar-wrap">
             <div class="progress-bar-fill" id="progressBar" style="width:25%"></div>
@@ -572,40 +666,49 @@ textarea.field-input { resize: vertical; min-height: 90px; }
                     @error('name')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
                 </div>
 
-                <div class="field-row">
-                    <div class="field-group">
-                        <label class="field-label" for="type">Type de boutique</label>
-                        <div class="field-wrap">
-                            <span class="field-icon">🏷️</span>
-                            <select name="type" id="type" class="field-input">
-                                <option value="">Sélectionner…</option>
-                                @foreach([
-                                    'Alimentation','Restaurant','Pharmacie','Vêtements','Électronique',
-                                    'Beauté & Cosmétiques','Meubles & Décoration','Sport & Loisirs',
-                                    'Librairie','Boulangerie','Épicerie','Bijouterie','Auto & Moto',
-                                    'Informatique','Téléphonie','Jouets','Fleurs','Autre'
-                                ] as $t)
-                                <option value="{{ $t }}"
-                                    {{ old('type', $shop->type) === $t ? 'selected' : '' }}>
-                                    {{ $t }}
-                                </option>
-                                @endforeach
-                            </select>
-                        </div>
+                <div class="field-group">
+                    <label class="field-label">Type de boutique 🏷️</label>
+                    <input type="hidden" name="type" id="type" value="{{ old('type', $shop->type) }}">
+                    <div class="type-pills" id="typePills">
+                        <button type="button" class="type-pill" data-val="Alimentation"         onclick="selectType('Alimentation')">🍎 Alimentation</button>
+                        <button type="button" class="type-pill" data-val="Restaurant"           onclick="selectType('Restaurant')">🍽️ Restaurant</button>
+                        <button type="button" class="type-pill" data-val="Pharmacie"            onclick="selectType('Pharmacie')">💊 Pharmacie</button>
+                        <button type="button" class="type-pill" data-val="Vêtements"            onclick="selectType('Vêtements')">👗 Vêtements</button>
+                        <button type="button" class="type-pill" data-val="Électronique"         onclick="selectType('Électronique')">📱 Électronique</button>
+                        <button type="button" class="type-pill" data-val="Beauté & Cosmétiques" onclick="selectType('Beauté & Cosmétiques')">💄 Beauté & Cosmétiques</button>
+                        <button type="button" class="type-pill" data-val="Meubles & Décoration" onclick="selectType('Meubles & Décoration')">🛋️ Meubles & Décoration</button>
+                        <button type="button" class="type-pill" data-val="Sport & Loisirs"      onclick="selectType('Sport & Loisirs')">⚽ Sport & Loisirs</button>
+                        <button type="button" class="type-pill" data-val="Librairie"            onclick="selectType('Librairie')">📚 Librairie</button>
+                        <button type="button" class="type-pill" data-val="Boulangerie"          onclick="selectType('Boulangerie')">🥐 Boulangerie</button>
+                        <button type="button" class="type-pill" data-val="Épicerie"             onclick="selectType('Épicerie')">🛒 Épicerie</button>
+                        <button type="button" class="type-pill" data-val="Bijouterie"           onclick="selectType('Bijouterie')">💎 Bijouterie</button>
+                        <button type="button" class="type-pill" data-val="Auto & Moto"          onclick="selectType('Auto & Moto')">🚗 Auto & Moto</button>
+                        <button type="button" class="type-pill" data-val="Informatique"         onclick="selectType('Informatique')">💻 Informatique</button>
+                        <button type="button" class="type-pill" data-val="Téléphonie"           onclick="selectType('Téléphonie')">📞 Téléphonie</button>
+                        <button type="button" class="type-pill" data-val="Jouets"               onclick="selectType('Jouets')">🧸 Jouets</button>
+                        <button type="button" class="type-pill" data-val="Fleurs"               onclick="selectType('Fleurs')">🌸 Fleurs</button>
+                        <button type="button" class="type-pill" data-val="Autre"                onclick="selectType('Autre')">✨ Autre</button>
+                        <button type="button" class="type-pill type-pill-add"                   onclick="showCustomType()">＋ Autre catégorie</button>
                     </div>
+                    <div class="type-custom-wrap" id="typeCustomWrap" style="display:none">
+                        <input type="text" id="typeCustomInput" class="field-input"
+                               placeholder="Ex : Quincaillerie, Librairie…" maxlength="60">
+                        <button type="button" class="type-custom-ok"     onclick="confirmCustomType()">✓ Valider</button>
+                        <button type="button" class="type-custom-cancel" onclick="hideCustomType()">✕</button>
+                    </div>
+                </div>
 
-                    <div class="field-group">
-                        <label class="field-label" for="email">Email boutique <span>*</span></label>
-                        <div class="field-wrap">
-                            <span class="field-icon">✉️</span>
-                            <input type="email" name="email" id="email"
-                                   class="field-input {{ $errors->has('email') ? 'error' : '' }}"
-                                   value="{{ old('email', $shop->email) }}"
-                                   placeholder="boutique@email.com"
-                                   required>
-                        </div>
-                        @error('email')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
+                <div class="field-group">
+                    <label class="field-label" for="email">Email boutique <span>*</span></label>
+                    <div class="field-wrap">
+                        <span class="field-icon">✉️</span>
+                        <input type="email" name="email" id="email"
+                               class="field-input {{ $errors->has('email') ? 'error' : '' }}"
+                               value="{{ old('email', $shop->email) }}"
+                               placeholder="boutique@email.com"
+                               required>
                     </div>
+                    @error('email')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="field-group">
@@ -645,16 +748,7 @@ textarea.field-input { resize: vertical; min-height: 90px; }
                         </div>
                         @error('phone')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
                     </div>
-                    <div class="field-group">
-                        <label class="field-label" for="whatsapp">WhatsApp</label>
-                        <div class="field-wrap">
-                            <span class="field-icon">💬</span>
-                            <input type="tel" name="whatsapp" id="whatsapp"
-                                   class="field-input"
-                                   value="{{ old('whatsapp', $shop->whatsapp ?? '') }}"
-                                   placeholder="+224 6XX XXX XXX">
-                        </div>
-                    </div>
+                   
                 </div>
 
                 <div class="field-group">
@@ -943,6 +1037,7 @@ const CURRENCIES = [
 ════════════════════════════════════════════════════════════════ */
 let currentStep = 1;
 const totalSteps = 4;
+const stepNames  = ['Informations générales', 'Contact & localisation', 'Devise', 'Image & finalisation'];
 
 function goToStep(step) {
     document.getElementById(`section-${currentStep}`).classList.remove('active');
@@ -964,6 +1059,14 @@ function goToStep(step) {
     currentStep = step;
     document.getElementById(`section-${step}`).classList.add('active');
     document.getElementById('progressBar').style.width = (step / totalSteps * 100) + '%';
+
+    /* Mobile steps bar */
+    const mobileNum = document.getElementById('mobileStepNum');
+    const mobileTxt = document.getElementById('mobileStepTxt');
+    const mobileSub = document.getElementById('mobileStepSub');
+    if (mobileNum) mobileNum.textContent = step;
+    if (mobileTxt) mobileTxt.textContent = stepNames[step - 1];
+    if (mobileSub) mobileSub.textContent = `Étape ${step} sur ${totalSteps}`;
 
     if (step === 4) updateRecap();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1093,13 +1196,78 @@ document.getElementById('name').addEventListener('input', e => {
     document.getElementById('recapName').textContent   = e.target.value || '—';
 });
 
-document.getElementById('type').addEventListener('change', e => {
-    const v  = e.target.value;
+/* ════════════════════════════════════════════════════════════════
+   TYPE DE BOUTIQUE — sélecteur pills
+════════════════════════════════════════════════════════════════ */
+function selectType(value) {
+    document.getElementById('type').value = value;
+    document.querySelectorAll('#typePills .type-pill:not(.type-pill-add)').forEach(p => {
+        p.classList.toggle('selected', p.dataset.val === value);
+    });
     const el = document.getElementById('previewType');
-    el.textContent   = v;
-    el.style.display = v ? 'inline' : 'none';
-    document.getElementById('recapType').textContent = v || '—';
+    el.textContent   = value;
+    el.style.display = value ? 'inline' : 'none';
+    document.getElementById('recapType').textContent = value || '—';
+}
+
+function showCustomType() {
+    document.getElementById('typeCustomWrap').style.display = 'flex';
+    document.getElementById('typeCustomInput').focus();
+}
+
+function hideCustomType() {
+    document.getElementById('typeCustomWrap').style.display = 'none';
+    document.getElementById('typeCustomInput').value = '';
+}
+
+function confirmCustomType() {
+    const val = document.getElementById('typeCustomInput').value.trim();
+    if (!val) return;
+    /* Remove any previous custom pill */
+    const prev = document.querySelector('#typePills .type-pill[data-custom]');
+    if (prev) prev.remove();
+    /* Create a custom pill */
+    const pill = document.createElement('button');
+    pill.type = 'button';
+    pill.className = 'type-pill selected';
+    pill.dataset.val = val;
+    pill.dataset.custom = '1';
+    pill.textContent = '✏️ ' + val;
+    pill.onclick = () => selectType(val);
+    document.querySelector('.type-pill-add').insertAdjacentElement('beforebegin', pill);
+    selectType(val);
+    hideCustomType();
+}
+
+document.getElementById('typeCustomInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter')  { e.preventDefault(); confirmCustomType(); }
+    if (e.key === 'Escape') hideCustomType();
 });
+
+/* Pré-sélectionner le type actuel de la boutique */
+(function () {
+    const currentType = document.getElementById('type').value;
+    if (!currentType) return;
+    const knownPill = document.querySelector(`#typePills .type-pill[data-val="${CSS.escape(currentType)}"]`);
+    if (knownPill) {
+        knownPill.classList.add('selected');
+        /* Sync preview */
+        const el = document.getElementById('previewType');
+        if (el) { el.textContent = currentType; el.style.display = 'inline'; }
+    } else {
+        /* Type personnalisé — ajouter une pill custom */
+        const pill = document.createElement('button');
+        pill.type = 'button';
+        pill.className = 'type-pill selected';
+        pill.dataset.val = currentType;
+        pill.dataset.custom = '1';
+        pill.textContent = '✏️ ' + currentType;
+        pill.onclick = () => selectType(currentType);
+        document.querySelector('.type-pill-add').insertAdjacentElement('beforebegin', pill);
+        const el = document.getElementById('previewType');
+        if (el) { el.textContent = currentType; el.style.display = 'inline'; }
+    }
+})();
 
 document.getElementById('email').addEventListener('input', e => {
     document.getElementById('recapEmail').textContent = e.target.value || '—';

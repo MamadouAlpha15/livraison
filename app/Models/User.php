@@ -92,6 +92,11 @@ class User extends Authenticatable
         return $this->hasOne(DeliveryCompany::class, 'user_id');
     }
 
+    public function favorites()
+    {
+        return $this->belongsToMany(Shop::class, 'shop_favorites');
+    }
+
     /* =========================
      | Helper: boutique courante
      |=========================*/

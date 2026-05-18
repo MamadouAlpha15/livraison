@@ -1132,16 +1132,16 @@ $I = [
 
                 {{-- Export grand écran --}}
                 <div class="topbar-export-group">
-                    <a href="{{ route('boutique.export.orders.excel') }}" class="btn btn-sm" style="gap:4px">{!! $I['download'] !!} Excel</a>
-                    <a href="{{ route('boutique.export.orders.pdf') }}" class="btn btn-sm" style="gap:4px">{!! $I['download'] !!} PDF</a>
+                    <a href="{{ route('boutique.export.orders.excel', ['shop_id' => $shop->id]) }}" class="btn btn-sm" style="gap:4px">{!! $I['download'] !!} Excel</a>
+                    <a href="{{ route('boutique.export.orders.pdf',   ['shop_id' => $shop->id]) }}" class="btn btn-sm" style="gap:4px">{!! $I['download'] !!} PDF</a>
                 </div>
 
                 {{-- Export petit écran : dropdown --}}
                 <div class="topbar-export-dropdown">
                     <button class="export-dropdown-btn" onclick="toggleExportMenu(this)" type="button" style="gap:4px">{!! $I['download'] !!} ▾</button>
                     <div class="export-menu" id="exportMenu">
-                        <a href="{{ route('boutique.export.orders.excel') }}" style="gap:8px">{!! $I['table_sm'] !!} Excel</a>
-                        <a href="{{ route('boutique.export.orders.pdf') }}" style="gap:8px">{!! $I['file_sm'] !!} PDF</a>
+                        <a href="{{ route('boutique.export.orders.excel', ['shop_id' => $shop->id]) }}" style="gap:8px">{!! $I['table_sm'] !!} Excel</a>
+                        <a href="{{ route('boutique.export.orders.pdf',   ['shop_id' => $shop->id]) }}" style="gap:8px">{!! $I['file_sm'] !!} PDF</a>
                     </div>
                 </div>
 
@@ -2024,7 +2024,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let _alerts = [];
     try {
         const saved = localStorage.getItem(_KEY_ALERTS);
-        if (saved) _alerts = JSON.parse(saved);
+        if (saved) {
+            const raw = JSON.parse(saved);
+            /* Dédupliquer les alertes 'msg' par senderName — garde la plus récente */
+            const seen = {};
+            _alerts = raw.filter(a => {
+                if (a.type !== 'msg' || !a.senderName) return true;
+                if (seen[a.senderName]) return false;
+                seen[a.senderName] = true;
+                return true;
+            });
+        }
     } catch(e) {}
 
     function _saveAlerts() {
@@ -2209,12 +2219,30 @@ document.addEventListener('DOMContentLoaded', () => {
                         const n = newMsgs.length;
                         showToast(`${_SVG.msg} <div>${n} nouveau${n>1?'x':''} message${n>1?'s':''} non lu${n>1?'s':''}</div>`, 'msg');
                     }
-                    /* Alertes individuelles (du plus ancien au plus récent dans la cloche) */
-                    [...newMsgs].reverse().forEach(m => {
-                        const label = m.product_name
-                            ? `${m.sender_name} · ${m.product_name} — message non lu`
-                            : `${m.sender_name} — message non lu`;
-                        pushAlert(_SVG.msg, label, '{{ route("boutique.messages.hub") }}', 'msg', '', m.time);
+                    /* Grouper par expéditeur — une seule alerte par client dans la cloche */
+                    const bySender = {};
+                    newMsgs.forEach(m => {
+                        const key = m.sender_name;
+                        if (!bySender[key]) bySender[key] = { sender_name: key, count: 0, time: m.time, product_name: m.product_name };
+                        bySender[key].count++;
+                        bySender[key].time = m.time;
+                    });
+                    Object.values(bySender).forEach(g => {
+                        const label = g.count > 1
+                            ? `${g.sender_name} — ${g.count} messages non lus`
+                            : g.product_name
+                                ? `${g.sender_name} · ${g.product_name} — message non lu`
+                                : `${g.sender_name} — message non lu`;
+                        const existing = _alerts.find(a => a.type === 'msg' && a.senderName === g.sender_name);
+                        if (existing) {
+                            existing.msg  = label;
+                            existing.time = g.time;
+                            _saveAlerts();
+                        } else {
+                            _alerts.unshift({ id: ++_alertIdSeq, ico: _SVG.msg, msg: label, url: '{{ route("boutique.messages.hub") }}', time: g.time, type: 'msg', body: '', companyId: null, companyName: '', senderName: g.sender_name });
+                            if (_alerts.length > 30) _alerts.pop();
+                            _saveAlerts();
+                        }
                     });
                     _lastSeenMsgId = newMsgs[0].id;
                     try { localStorage.setItem(_KEY_MSG, _lastSeenMsgId); } catch(e) {}

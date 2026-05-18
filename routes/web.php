@@ -101,6 +101,7 @@ use App\Http\Controllers\Admin\DashboardController;
 /*contrôleur pour les clients* message */
  
 use App\Http\Controllers\Client\ShopMessageController;
+use App\Http\Controllers\Client\FavoriteController;
 
 use App\Http\Controllers\Boutique\BoutiqueMessageController;
 use App\Http\Controllers\Client\ProductController as ClientProductController;
@@ -669,7 +670,7 @@ Route::middleware(['auth', 'role:client'])
             Route::post('/messages/refuse-offer/{message}',   [ShopMessageController::class, 'refuseOffer'])  ->name('messages.refuse-offer');
             Route::post('/messages/counter-offer',             [ShopMessageController::class, 'counterOffer']) ->name('messages.counter-offer');
             Route::get('/messages/poll',                       [ShopMessageController::class, 'poll'])          ->name('messages.client.poll');
-            Route::get('/notifications/poll',                  [ShopMessageController::class, 'pollAll'])       ->name('client.notifications.poll');
+            Route::get('/notifications/poll',                  [ShopMessageController::class, 'pollAll'])       ->name('notifications.poll');
             Route::post('/messages/images/{product?}',         [ShopMessageController::class, 'sendImages'])    ->name('messages.client.send-images');
             Route::get('/messages/image-status/{message}',     [ShopMessageController::class, 'imageStatus'])   ->name('messages.client.image-status');
 
@@ -694,6 +695,10 @@ Route::middleware(['auth', 'role:client'])
 
         Route::get('/produit/{product}', [ClientProductController::class, 'show'])
     ->name('products.show');
+
+        /* Favoris */
+        Route::post('/favorites/{shop}/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
+        Route::get('/favorites',                [FavoriteController::class, 'index']) ->name('favorites.index');
     });
 
 

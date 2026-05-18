@@ -429,39 +429,52 @@ class ShopMessageController extends Controller
     {
         $client = Auth::user();
 
+        /* ── Messages non lus ── */
         $messagesUnread = ShopMessage::where('receiver_id', $client->id)
             ->whereNull('read_at')
             ->count();
 
-        $orders = \App\Models\Order::where('user_id', $client->id)
-            ->with('shop:id,name,image')
-            ->latest('updated_at')
-            ->take(5)
+        /* ── Derniers messages non lus (pour la cloche) ── */
+        $latestMessages = ShopMessage::where('receiver_id', $client->id)
+            ->whereNull('read_at')
+            ->with(['sender:id,name', 'product:id,name,shop_id', 'product.shop:id,name'])
+            ->orderByDesc('created_at')
+            ->take(20)
             ->get()
-            ->map(fn($o) => [
-                'id'           => $o->id,
-                'status'       => $o->status,
-                'updated_at'   => $o->updated_at->toIso8601String(),
-                'shop_name'    => $o->shop?->name ?? 'Boutique',
-                'total'        => $o->total,
+            ->map(fn($m) => [
+                'id'          => $m->id,
+                'sender_name' => $m->sender?->name ?? 'Vendeur',
+                'sender_id'   => $m->sender_id,
+                'shop_name'   => $m->product?->shop?->name ?? null,
+                'product_name'=> $m->product?->name ?? null,
+                'body'        => \Illuminate\Support\Str::limit($m->body ?? '', 40),
+                'time'        => $m->created_at->format('H:i'),
             ]);
 
-        $popularShops = \App\Models\Shop::where('is_approved', true)
-            ->withCount(['orders as orders_count' => fn($q) => $q->where('status','livrée')])
-            ->orderByDesc('orders_count')
-            ->take(5)
+        /* ── Mises à jour de commandes (confirmée / en_livraison / livrée) ── */
+        $orderUpdates = \App\Models\Order::where('user_id', $client->id)
+            ->whereIn('status', [
+                \App\Models\Order::STATUS_CONFIRMEE,
+                \App\Models\Order::STATUS_EN_LIVRAISON,
+                \App\Models\Order::STATUS_LIVREE,
+            ])
+            ->where('updated_at', '>=', now()->subHours(48))
+            ->with('shop:id,name')
+            ->orderByDesc('updated_at')
+            ->take(10)
             ->get()
-            ->map(fn($s) => [
-                'id'          => $s->id,
-                'name'        => $s->name,
-                'orders_count'=> $s->orders_count,
-                'image'       => $s->image ? asset('storage/'.$s->image) : null,
+            ->map(fn($o) => [
+                'id'         => $o->id,
+                'status'     => $o->status,
+                'shop_name'  => $o->shop?->name ?? 'Boutique',
+                'total'      => $o->total,
+                'updated_at' => $o->updated_at->toIso8601String(),
             ]);
 
         return response()->json([
             'messages_unread' => $messagesUnread,
-            'orders'          => $orders,
-            'popular_shops'   => $popularShops,
+            'latest_messages' => $latestMessages,
+            'order_updates'   => $orderUpdates,
         ]);
     }
 

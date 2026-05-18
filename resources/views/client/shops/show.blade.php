@@ -4,6 +4,7 @@
 @extends('layouts.app')
 @section('title', $shop->name . ' — Produits')
 
+
 @push('styles')
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -133,49 +134,122 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .amz-view-btn.active { background: var(--amazon-lt); border-color: var(--amazon); color: var(--amazon-dk); }
 
 /* ══ GRILLE ══ */
-.amz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+.amz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
 .amz-grid.list-view { grid-template-columns: 1fr; }
-.amz-grid.list-view .amz-card { flex-direction: row; min-height: 150px; }
-.amz-grid.list-view .amz-card-img { width: 150px; height: 150px; flex-shrink: 0; }
+.amz-grid.list-view .amz-card { flex-direction: row; min-height: 160px; }
+.amz-grid.list-view .amz-card-img { width: 170px; height: 160px; flex-shrink: 0; }
 .amz-grid.list-view .amz-card-body { flex: 1; padding: 12px 16px; }
 .amz-grid.list-view .amz-card-footer { border-top: none; border-left: 1px solid var(--border); width: 160px; flex-shrink: 0; padding: 12px; display: flex; flex-direction: column; justify-content: center; gap: 8px; }
 
 /* ══ CARD ══ */
-.amz-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow-sm); transition: box-shadow .2s, border-color .2s; display: flex; flex-direction: column; position: relative; }
-.amz-card:hover { box-shadow: var(--shadow); border-color: #aaa; }
-.amz-card-img { height: 190px; overflow: hidden; position: relative; background: #f9f9f9; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.amz-card-img img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform .3s; padding: 8px; }
-.amz-card:hover .amz-card-img img { transform: scale(1.04); }
-.amz-card-img-ph { font-size: 44px; opacity: .25; }
-.amz-card-badge { position: absolute; top: 8px; left: 8px; display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 3px; white-space: nowrap; }
-.badge-promo   { background: #cc0c39; color: #fff; }
+.amz-card {
+    background: var(--surface);
+    border: 1px solid rgba(0,0,0,.07);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,.07);
+    transition: box-shadow .28s, transform .28s, border-color .28s;
+    display: flex; flex-direction: column; position: relative;
+}
+.amz-card:hover {
+    box-shadow: 0 14px 40px rgba(0,0,0,.16);
+    transform: translateY(-5px);
+    border-color: rgba(249,144,0,.35);
+}
+.amz-card-img {
+    height: 250px;
+    overflow: hidden; position: relative;
+    background: linear-gradient(135deg, #f6f6f6, #ececec);
+    flex-shrink: 0; cursor: pointer;
+}
+.amz-card-img img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform .45s ease;
+    display: block;
+}
+.amz-card:hover .amz-card-img img { transform: scale(1.08); }
+.amz-card-img::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 65px;
+    background: linear-gradient(transparent, rgba(0,0,0,.18));
+    pointer-events: none;
+}
+.amz-card-img-ph {
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; height: 100%; font-size: 60px; opacity: .16;
+}
+.amz-card-badge {
+    position: absolute; top: 10px; left: 10px; z-index: 2;
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 10.5px; font-weight: 700;
+    padding: 4px 10px; border-radius: 50px; white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+.badge-promo   { background: #e63946; color: #fff; }
 .badge-nouveau { background: var(--amazon); color: var(--navy); }
-.badge-vedette { background: var(--navy-2); color: var(--amazon); }
-.badge-rupture { background: #888; color: #fff; }
-.amz-quick-view { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,.65); color: #fff; border: none; border-radius: 4px; padding: 5px 10px; font-size: 11px; font-weight: 700; cursor: pointer; opacity: 0; transition: opacity .2s; font-family: var(--font); }
-.amz-card:hover .amz-quick-view { opacity: 1; }
-.amz-card-body { padding: 10px 12px 6px; flex: 1; display: flex; flex-direction: column; gap: 5px; }
-.amz-card-cat { font-size: 11px; color: var(--blue); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
-.amz-card-name { font-size: 13px; color: var(--text); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-weight: 500; cursor: pointer; }
+.badge-vedette { background: rgba(19,25,33,.88); color: var(--amazon); }
+.badge-rupture { background: rgba(0,0,0,.55); color: #eee; }
+.amz-quick-view {
+    position: absolute; bottom: 0; left: 0; right: 0; z-index: 3;
+    background: rgba(0,0,0,.78); backdrop-filter: blur(3px);
+    color: #fff; border: none; padding: 11px 10px;
+    font-size: 12.5px; font-weight: 700; letter-spacing: .3px;
+    cursor: pointer; font-family: var(--font); text-align: center;
+    opacity: 0; transform: translateY(100%);
+    transition: opacity .22s, transform .22s;
+}
+.amz-card:hover .amz-quick-view { opacity: 1; transform: translateY(0); }
+.amz-card-body { padding: 13px 14px 8px; flex: 1; display: flex; flex-direction: column; gap: 5px; }
+.amz-card-cat {
+    display: inline-flex; align-items: center; align-self: flex-start;
+    font-size: 10px; font-weight: 700; color: var(--blue);
+    text-transform: uppercase; letter-spacing: .5px;
+    background: #e8f4f8; padding: 2px 8px; border-radius: 20px;
+}
+.amz-card-name {
+    font-size: 14px; color: var(--text); line-height: 1.45; font-weight: 600;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; cursor: pointer;
+}
 .amz-card-name:hover { color: var(--amazon-dk); }
 .amz-stars { display: flex; align-items: center; gap: 4px; }
-.amz-stars-ico { color: var(--amazon); font-size: 12px; letter-spacing: 1px; }
-.amz-stars-count { font-size: 11px; color: var(--blue); }
-.amz-price-wrap { margin-top: 4px; }
-.amz-price-main { font-size: 18px; font-weight: 700; color: var(--red); letter-spacing: -.5px; }
-.amz-price-devise { font-size: 11px; color: var(--muted); font-weight: 400; }
-.amz-price-orig { font-size: 11px; color: var(--muted); text-decoration: line-through; }
-.amz-price-remise { font-size: 11px; color: var(--red); font-weight: 600; }
-.amz-delivery { font-size: 11px; color: var(--green); }
+.amz-stars-ico { color: #f5a623; font-size: 13px; letter-spacing: 1px; }
+.amz-stars-count { font-size: 11px; color: var(--muted); }
+.amz-price-wrap { margin-top: 3px; }
+.amz-price-main { font-size: 21px; font-weight: 800; color: #c0392b; letter-spacing: -.5px; }
+.amz-price-devise { font-size: 11px; color: var(--muted); font-weight: 500; }
+.amz-price-orig { font-size: 12px; color: var(--muted); text-decoration: line-through; }
+.amz-price-remise { font-size: 11px; font-weight: 700; color: #e63946; background: #fff0f0; padding: 1px 7px; border-radius: 4px; }
+.amz-delivery { font-size: 11px; color: var(--green); font-weight: 500; }
 .amz-stock-ok  { font-size: 11px; color: var(--green); font-weight: 600; }
-.amz-stock-low { font-size: 11px; color: var(--amazon-dk); font-weight: 600; }
+.amz-stock-low { font-size: 11px; color: #e67e22; font-weight: 600; }
 .amz-stock-out { font-size: 11px; color: var(--red); font-weight: 600; }
-.amz-card-footer { padding: 10px 12px; border-top: 1px solid var(--grey-2); }
-.amz-btn-order { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 9px 10px; border-radius: 20px; font-size: 12.5px; font-weight: 700; font-family: var(--font); background: var(--amazon); color: var(--navy); border: 1px solid var(--amazon-dk); cursor: pointer; text-decoration: none; transition: all .15s; margin-bottom: 6px; }
-.amz-btn-order:hover { background: var(--amazon-dk); color: #fff; }
-.amz-btn-order.out { background: var(--grey-2); color: var(--muted); border-color: var(--border); cursor: not-allowed; }
-.amz-btn-msg { display: flex; align-items: center; justify-content: center; gap: 5px; width: 100%; padding: 7px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; font-family: var(--font); background: var(--surface); color: var(--text); border: 1px solid var(--border); cursor: pointer; text-decoration: none; transition: all .15s; }
-.amz-btn-msg:hover { background: var(--grey-2); border-color: #999; }
+.amz-card-footer { padding: 10px 14px 13px; border-top: 1px solid var(--grey-2); display: flex; flex-direction: column; gap: 7px; }
+.amz-btn-order {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    width: 100%; padding: 11px 10px; border-radius: 10px;
+    font-size: 13px; font-weight: 700; font-family: var(--font);
+    background: linear-gradient(135deg, #ffba3a, #f90);
+    color: var(--navy); border: none;
+    cursor: pointer; text-decoration: none; transition: all .2s;
+    box-shadow: 0 3px 10px rgba(249,144,0,.32);
+}
+.amz-btn-order:hover {
+    background: linear-gradient(135deg, #f90, #e47911);
+    color: #fff; box-shadow: 0 6px 18px rgba(249,144,0,.48);
+    transform: translateY(-1px);
+}
+.amz-btn-order.out { background: var(--grey-2); color: var(--muted); border: 1px solid var(--border); cursor: not-allowed; box-shadow: none; transform: none; }
+.amz-btn-msg {
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    width: 100%; padding: 9px 10px; border-radius: 10px;
+    font-size: 12px; font-weight: 600; font-family: var(--font);
+    background: transparent; color: var(--text-2);
+    border: 1.5px solid var(--border);
+    cursor: pointer; text-decoration: none; transition: all .15s;
+}
+.amz-btn-msg:hover { background: var(--grey-2); border-color: #aaa; color: var(--text); }
 
 /* ══ FLASH ══ */
 .amz-flash { padding: 10px 14px; border-radius: var(--r); border: 1px solid; font-size: 13px; font-weight: 500; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
@@ -303,6 +377,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 @media (max-width: 768px) {
     .amz-nav-right { display: none; }
     .amz-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .amz-card-img { height: 210px; }
     /* Modal : galerie en haut, infos en bas */
     .prod-modal { max-height: 98vh; }
     .prod-modal-body { flex-direction: column; overflow-y: auto; }
@@ -319,14 +394,14 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     .amz-nav { padding: 0 10px; gap: 8px; }
     .amz-nav-logo { font-size: 17px; }
     .amz-back { font-size: 12px; padding: 5px 8px; }
-    .amz-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    .amz-card-img { height: 150px; }
-    .amz-card-name { font-size: 12px; -webkit-line-clamp: 2; }
-    .amz-price-main { font-size: 15px; }
-    .amz-card-body { padding: 8px 10px 4px; gap: 4px; }
-    .amz-card-footer { padding: 8px 10px; }
-    .amz-btn-order { font-size: 11.5px; padding: 8px 8px; }
-    .amz-btn-msg { font-size: 11px; padding: 6px 8px; }
+    .amz-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .amz-card-img { height: 185px; }
+    .amz-card-name { font-size: 12.5px; -webkit-line-clamp: 2; }
+    .amz-price-main { font-size: 16px; }
+    .amz-card-body { padding: 9px 11px 6px; gap: 4px; }
+    .amz-card-footer { padding: 8px 11px 10px; }
+    .amz-btn-order { font-size: 12px; padding: 9px 8px; }
+    .amz-btn-msg { font-size: 11px; padding: 7px 8px; }
     .shop-banner { padding: 10px 12px; gap: 10px; }
     .shop-banner-logo { width: 44px; height: 44px; font-size: 20px; }
     .shop-banner-name { font-size: 15px; }
@@ -343,15 +418,23 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     .amz-results-bar { padding: 8px 10px; gap: 8px; }
     .amz-sort-label { display: none; }
     .amz-sort-select { font-size: 11.5px; max-width: 120px; }
+    /* Vue liste inutilisable sur mobile — forcer la grille */
+    .amz-view-btns { display: none; }
+    .amz-grid.list-view { grid-template-columns: repeat(2, 1fr); }
+    .amz-grid.list-view .amz-card { flex-direction: column; min-height: auto; }
+    .amz-grid.list-view .amz-card-img { width: 100%; }
+    .amz-grid.list-view .amz-card-footer { width: 100%; border-left: none; }
+    /* Pagination scrollable */
+    .amz-pagination { overflow-x: auto; padding: 12px 0 8px; }
 }
 
 /* Mobile petit */
 @media (max-width: 400px) {
-    .amz-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
-    .amz-card-img { height: 130px; }
+    .amz-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .amz-card-img { height: 155px; }
     .amz-card-name { font-size: 11.5px; }
-    .amz-price-main { font-size: 14px; }
-    .amz-btn-order { font-size: 11px; padding: 7px 6px; }
+    .amz-price-main { font-size: 15px; }
+    .amz-btn-order { font-size: 11px; padding: 8px 6px; }
     .amz-btn-msg { display: none; } /* caché sur très petit écran */
     .shop-banner-name { font-size: 13px; }
     .amz-layout { padding: 8px 8px 40px; }
@@ -361,7 +444,24 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 /* Swipe tactile modal */
 @media (hover: none) {
-    .amz-quick-view { opacity: 1; }
+    .amz-quick-view { opacity: 1; transform: translateY(0); }
+    .amz-card:hover { transform: none; }
+}
+
+/* Très petit écran — 360px */
+@media (max-width: 360px) {
+    .amz-nav { gap: 6px; padding: 0 8px; }
+    .amz-nav-logo { font-size: 13px; }
+    .amz-nav-logo img { height: 36px !important; }
+    .amz-back { display: none; }
+    .shop-banner { padding: 8px 10px; gap: 8px; }
+    .shop-banner-logo { width: 36px; height: 36px; font-size: 16px; }
+    .shop-banner-chip { font-size: 10px; }
+    .amz-card-footer { padding: 6px 8px; }
+    .amz-btn-order { font-size: 10.5px; padding: 7px 6px; }
+    .prod-modal-main-img { height: 160px; }
+    .prod-modal-ft { flex-direction: column; }
+    .prod-modal-btn-order, .prod-modal-btn-msg { width: 100%; justify-content: center; }
 }
 </style>
 @endpush
@@ -417,7 +517,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
         </div>
         <div class="prod-modal-ft">
             <a href="#" class="prod-modal-btn-order" id="modalBtnOrder">🛒 Commander maintenant</a>
-            <a href="#" class="prod-modal-btn-msg" id="modalBtnMsg">💬 Poser une question</a>
+            <a href="#" class="prod-modal-btn-msg" id="modalBtnMsg">💬 Contactez-nous</a>
         </div>
     </div>
 </div>
@@ -608,19 +708,19 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
                 <div class="amz-card-img" onclick='openModal(JSON.parse(this.closest(".amz-card").dataset.prod))'>
                     @if($product->image)
-                        <img src="{{ \App\Services\ImageOptimizer::url($product->image, 'thumb') }}"
+                        <img src="{{ \App\Services\ImageOptimizer::url($product->image, 'medium') }}"
                              srcset="{{ \App\Services\ImageOptimizer::url($product->image, 'thumb') }} 300w,
                                      {{ \App\Services\ImageOptimizer::url($product->image, 'medium') }} 800w"
-                             sizes="(max-width:600px) 45vw, 200px"
-                             alt="{{ $product->name }}" loading="lazy" decoding="async" width="200" height="200">
+                             sizes="(max-width:600px) 47vw, 280px"
+                             alt="{{ $product->name }}" loading="lazy" decoding="async" width="280" height="250">
                     @else
                         <div class="amz-card-img-ph">🏷️</div>
                     @endif
-                    @if($hasPromo)<span class="amz-card-badge badge-promo">-{{ $remise }}%</span>
-                    @elseif($isNew)<span class="amz-card-badge badge-nouveau">Nouveau</span>
-                    @elseif($product->is_featured)<span class="amz-card-badge badge-vedette">⭐</span>
+                    @if($hasPromo)<span class="amz-card-badge badge-promo">🔥 -{{ $remise }}%</span>
+                    @elseif($isNew)<span class="amz-card-badge badge-nouveau">✨ Nouveau</span>
+                    @elseif($product->is_featured)<span class="amz-card-badge badge-vedette">⭐ Vedette</span>
                     @elseif($stockOut)<span class="amz-card-badge badge-rupture">Rupture</span>@endif
-                    <button class="amz-quick-view" onclick='event.stopPropagation();openModal(JSON.parse(this.closest(".amz-card").dataset.prod))'>👁 Détails</button>
+                    <button class="amz-quick-view" onclick='event.stopPropagation();openModal(JSON.parse(this.closest(".amz-card").dataset.prod))'>👁 Voir le détail</button>
                 </div>
 
                 <div class="amz-card-body">
@@ -652,7 +752,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                             @else
                             <div class="amz-btn-order out">❌ Indisponible</div>
                             @endif
-                            <a href="{{ route('client.messages.index', $product) }}" class="amz-btn-msg">💬 Question</a>
+                            <a href="{{ route('client.messages.index', $product) }}" class="amz-btn-msg">💬 Contactez-nous</a>
                         @endif
                     @else
                         <a href="{{ route('register') }}" class="amz-btn-order">S'inscrire</a>
@@ -814,8 +914,10 @@ function setSort(val, el) {
     activeSort = val;
     document.getElementById('sortSelectTop').value = val;
     document.querySelectorAll('[id^="sort-item-"]').forEach(e => e.classList.remove('active-filter'));
-    if (el) el.classList.add('active-filter');
+    const sideItem = document.getElementById('sort-item-' + val);
+    if (sideItem) sideItem.classList.add('active-filter');
     applyFilters();
+    updateFiltersBadge();
 }
 function setView(type) {
     const g = document.getElementById('prodGrid');
@@ -828,16 +930,15 @@ function applyFilters() {
     let visible = cards.filter(c => {
         const n = c.dataset.name||'', ct = c.dataset.cat||'';
         const p = parseFloat(c.dataset.price)||0, s = c.dataset.stock;
-        return (!activeCat||ct===activeCat) && (!searchQ||n.includes(searchQ)) && (!stockOnly||s==='in') && (p>=priceMin&&p<=priceMax);
+        const featured = parseInt(c.dataset.featured) === 1;
+        return (!activeCat||ct===activeCat) && (!searchQ||n.includes(searchQ)) && (!stockOnly||s==='in') && (p>=priceMin&&p<=priceMax) && (activeSort!=='featured'||featured);
     });
     cards.forEach(c => c.style.display = 'none');
     visible.sort((a,b) => {
         const pa=parseFloat(a.dataset.price), pb=parseFloat(b.dataset.price);
-        const fa=parseInt(a.dataset.featured), fb=parseInt(b.dataset.featured);
         if (activeSort==='price_asc')  return pa-pb;
         if (activeSort==='price_desc') return pb-pa;
         if (activeSort==='name')       return (a.dataset.name||'').localeCompare(b.dataset.name||'');
-        if (activeSort==='featured')   return fb-fa;
         return 0;
     });
     const grid = document.getElementById('prodGrid');
@@ -849,6 +950,7 @@ function updateFiltersBadge() {
     if (activeCat) n++;
     if (stockOnly) n++;
     if (priceMin > 0 || priceMax < Infinity) n++;
+    if (activeSort === 'featured') n++;
     const el = document.getElementById('activeFiltersCount');
     if (n > 0) { el.textContent = n; el.style.display = ''; }
     else el.style.display = 'none';
