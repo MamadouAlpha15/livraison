@@ -44,6 +44,10 @@ $I = [
 'hero_coin'      => '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s1.' stroke-linecap="round" stroke-linejoin="round" style="color:rgba(255,255,255,.9)"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
 /* ── empty state 40px ── */
 'card_empty'     => '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s1.' stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+/* ── export 12px ── */
+'download'    => '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+'table_sm'    => '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>',
+'file_sm'     => '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
 /* ── inline 11–12px ── */
 'phone_lnk'    => '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.28h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.27v.65z"/></svg>',
 'cash_method'  => '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="22" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg>',
@@ -305,6 +309,49 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 /* Pagination */
 .pagination-wrap { display: flex; justify-content: center; padding: 14px 0 2px; }
 
+/* ── Boutons export topbar ── */
+.topbar-export-group { display: flex; gap: 6px; align-items: center; }
+.btn-export-tb {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 12px; border-radius: var(--r-sm);
+    font-size: 12px; font-weight: 700; font-family: var(--font);
+    border: 1px solid var(--border-dk); cursor: pointer;
+    text-decoration: none; white-space: nowrap; transition: all .15s;
+}
+.btn-export-tb.excel { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+.btn-export-tb.excel:hover { background: #dcfce7; border-color: #86efac; }
+.btn-export-tb.pdf   { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+.btn-export-tb.pdf:hover   { background: #fee2e2; border-color: #fca5a5; }
+
+.topbar-export-dropdown { display: none; position: relative; }
+.export-dd-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 11px; border-radius: var(--r-sm);
+    font-size: 12px; font-weight: 700; font-family: var(--font);
+    background: var(--surface); color: var(--text-2);
+    border: 1px solid var(--border-dk); cursor: pointer;
+}
+.export-dd-btn:hover { background: var(--bg); border-color: var(--brand); color: var(--brand); }
+.export-dd-menu {
+    position: absolute; top: calc(100% + 6px); right: 0;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r-sm); box-shadow: var(--shadow);
+    min-width: 140px; z-index: 200; display: none; flex-direction: column; overflow: hidden;
+}
+.export-dd-menu.open { display: flex; }
+.export-dd-menu a {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px; font-size: 12.5px; font-weight: 600;
+    color: var(--text-2); text-decoration: none; transition: background .12s;
+}
+.export-dd-menu a:hover { background: var(--bg); }
+.export-dd-menu .sep { height: 1px; background: var(--border); margin: 2px 0; }
+
+@media (max-width: 680px) {
+    .topbar-export-group    { display: none; }
+    .topbar-export-dropdown { display: block; }
+}
+
 /* ══ RESPONSIVE ══ */
 
 /* Cartes mobiles paiements */
@@ -471,6 +518,21 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <div class="tb-title" style="display:flex;align-items:center;gap:6px">{!! $I['coin_tb'] !!} Revenus & Paiements</div>
             <div class="tb-sub">{{ $shop->name }} · <span style="font-family:var(--mono);font-size:10px;background:var(--brand-mlt);color:var(--brand-dk);padding:1px 7px;border-radius:10px;border:1px solid var(--brand-lt)">{{ $devise }}</span></div>
         </div>
+
+        {{-- Export grand écran --}}
+        <div class="topbar-export-group">
+            <a href="{{ route('boutique.export.payments.excel', ['shop_id' => $shop->id]) }}" class="btn-export-tb excel">{!! $I['table_sm'] !!} Excel</a>
+            <a href="{{ route('boutique.export.payments.pdf',   ['shop_id' => $shop->id]) }}" class="btn-export-tb pdf">{!! $I['file_sm'] !!} PDF</a>
+        </div>
+
+        {{-- Export petit écran : dropdown --}}
+        <div class="topbar-export-dropdown">
+            <button class="export-dd-btn" onclick="toggleExportDd(this)" type="button">{!! $I['download'] !!} &#9662;</button>
+            <div class="export-dd-menu" id="payExportMenu">
+                <a href="{{ route('boutique.export.payments.excel', ['shop_id' => $shop->id]) }}">{!! $I['table_sm'] !!} &nbsp;Excel</a>
+                <a href="{{ route('boutique.export.payments.pdf',   ['shop_id' => $shop->id]) }}">{!! $I['file_sm'] !!} &nbsp;PDF</a>
+            </div>
+        </div>
     </div>
 
 <div class="page-wrap">
@@ -537,10 +599,20 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     <div class="pay-card pay-table">
         <div class="pay-card-hd">
             <span class="pay-card-title">Historique des paiements</span>
-            <span style="font-size:11px;color:var(--muted)">
-                Page {{ $payments->currentPage() }}/{{ $payments->lastPage() }}
-                · {{ $payments->total() }} paiement(s)
-            </span>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                <span style="font-size:11px;color:var(--muted)">
+                    Page {{ $payments->currentPage() }}/{{ $payments->lastPage() }}
+                    &nbsp;&bull;&nbsp; {{ $payments->total() }} paiement(s)
+                </span>
+                <a href="{{ route('boutique.export.payments.excel', ['shop_id' => $shop->id]) }}"
+                   style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;padding:3px 9px;border-radius:6px;text-decoration:none">
+                   {!! $I['table_sm'] !!} Excel
+                </a>
+                <a href="{{ route('boutique.export.payments.pdf', ['shop_id' => $shop->id]) }}"
+                   style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;padding:3px 9px;border-radius:6px;text-decoration:none">
+                   {!! $I['file_sm'] !!} PDF
+                </a>
+            </div>
         </div>
 
         @if($payments->isEmpty())
@@ -691,6 +763,15 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 @push('scripts')
 <script>
+function toggleExportDd(btn) {
+    document.getElementById('payExportMenu')?.classList.toggle('open');
+}
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.topbar-export-dropdown')) {
+        document.getElementById('payExportMenu')?.classList.remove('open');
+    }
+});
+
 function toggleGroup(btn) {
     const sub    = btn.nextElementSibling;
     const isOpen = sub.classList.contains('open');

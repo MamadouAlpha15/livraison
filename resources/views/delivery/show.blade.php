@@ -389,6 +389,7 @@ a{text-decoration:none;color:inherit;}
     .banner-logo{width:54px;height:54px;font-size:24px;}
     .company-img-wrap img{height:220px;}
     .drivers-grid{grid-template-columns:1fr;}
+    textarea[name="comment"]{font-size:16px !important;}
 }
 </style>
 @endpush

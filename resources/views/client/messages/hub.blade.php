@@ -90,7 +90,7 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 .hub-propose-cancel { padding:9px 12px; border-radius:20px; background:transparent; color:#92400e; border:1.5px solid var(--yellow); font-size:12px; font-weight:600; cursor:pointer; font-family:var(--font); }
 
 /* Thread */
-.hub-thread { flex:1; overflow-y:auto; padding:16px 12px; display:flex; flex-direction:column; gap:4px; background:#efeae2 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Ccircle cx='40' cy='40' r='1.5' fill='%23c8b89a' opacity='.18'/%3E%3C/svg%3E"); }
+.hub-thread { flex:1; overflow-y:auto; padding:16px 12px; display:flex; flex-direction:column; gap:4px; background:#efeae2 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Ccircle cx='40' cy='40' r='1.5' fill='%23c8b89a' opacity='.18'/%3E%3C/svg%3E"); scroll-behavior:smooth; }
 .hub-thread::-webkit-scrollbar { width:5px; }
 .hub-thread::-webkit-scrollbar-thumb { background:#c5c5c5; border-radius:5px; }
 
@@ -99,7 +99,8 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 .hub-date-sep span { background:#fff; color:var(--muted); font-size:11.5px; font-weight:600; padding:4px 12px; border-radius:20px; box-shadow:0 1px 3px rgba(0,0,0,.1); }
 
 /* Bulles texte */
-.hub-msg-row { display:flex; gap:6px; max-width:72%; margin-bottom:2px; }
+@keyframes msgIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+.hub-msg-row { display:flex; gap:6px; max-width:72%; margin-bottom:2px; animation:msgIn .18s ease both; }
 .hub-msg-row.mine { margin-left:auto; flex-direction:row-reverse; }
 .hub-msg-bubble { padding:9px 13px; border-radius:8px; font-size:13.5px; line-height:1.55; word-break:break-word; max-width:100%; box-shadow:0 1px 2px rgba(0,0,0,.13); }
 .hub-msg-row.mine   .hub-msg-bubble { background:#dcf8c6; color:#111; border-bottom-right-radius:2px; }
@@ -222,6 +223,31 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 .lb-thumb.active { opacity:1; border-color:var(--orange); }
 .lb-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
 
+/* ══ FLUIDITÉ GLOBALE ══ */
+a, button, [onclick], .hub-conv-item {
+    -webkit-tap-highlight-color: transparent;
+}
+.hub-conv-item, .hub-back-dash, .hub-send-btn,
+.hub-attach-btn, .hub-propose-btn, .hub-prod-link,
+.hub-propose-send, .hub-propose-cancel,
+.nego-confirm-btn, .nego-card-btn {
+    will-change: transform;
+}
+.hub-thread, .hub-conv-list {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+}
+.hub-textarea { touch-action: manipulation; }
+
+/* Tap feedback sur mobile */
+@media (hover:none) {
+    .hub-conv-item:active  { background:#e9edef !important; }
+    .hub-send-btn:active   { transform:scale(.93) !important; }
+    .hub-attach-btn:active { transform:scale(.93) !important; }
+    .hub-back-dash:active  { transform:scale(.90) !important; }
+    .nego-card-btn:active  { transform:scale(.96) !important; }
+}
+
 /* ── Tablette large (≤1024px) ── */
 @media (max-width:1024px) {
     :root { --sidebar-w:300px; }
@@ -240,12 +266,38 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
     .nego-wrap { max-width:82%; }
 }
 
-/* ── Mobile (≤640px) — sidebar cachée, toggle WhatsApp ── */
+/* ── Mobile (≤640px) — sidebar plein écran, toggle WhatsApp ── */
 @media (max-width:640px) {
     :root { --sidebar-w:100%; }
+
+    /* position:fixed ancre le hub au viewport — il ne remonte plus quand iOS scroll la page
+       pour tenter de centrer le champ de saisie. Le JS ajuste top+height via visualViewport. */
+    .hub {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Vue liste : sidebar occupe tout, main caché */
     .hub-main { display:none; }
-    .hub.conv-open .hub-sidebar { display:none; }
-    .hub.conv-open .hub-main { display:flex; }
+
+    /* Vue conversation : sidebar glisse à gauche, main glisse depuis la droite */
+    .hub-sidebar {
+        transition: transform .25s cubic-bezier(.23,1,.32,1),
+                    opacity  .22s ease;
+    }
+    .hub-main {
+        transition: transform .25s cubic-bezier(.23,1,.32,1),
+                    opacity  .22s ease;
+    }
+    .hub.conv-open .hub-sidebar {
+        display:none;
+    }
+    .hub.conv-open .hub-main {
+        display:flex;
+        width:100%;
+    }
     .hub-back-btn { display:flex !important; }
 
     /* Bulles */
@@ -255,36 +307,57 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
     .nego-amount { font-size:20px; }
     .nego-confirm-btn { font-size:13px; padding:10px; }
 
-    /* En-tête */
+    /* En-tête chat */
     .hub-chat-head { padding:8px 10px; gap:8px; }
-    .hub-chat-av { width:36px; height:36px; font-size:11px; }
-    .hub-chat-name { font-size:13px; }
-    .hub-chat-sub { font-size:11px; }
+    .hub-chat-av { width:38px; height:38px; font-size:12px; }
+    .hub-chat-name { font-size:13.5px; }
+    .hub-chat-sub { font-size:11px; max-width:200px; }
 
     /* Strip produit */
-    .hub-prod-strip { padding:7px 10px; gap:8px; flex-wrap:nowrap; }
+    .hub-prod-strip { padding:7px 10px; gap:8px; flex-wrap:nowrap; overflow:hidden; }
     .hub-prod-img { width:42px; height:42px; }
     .hub-prod-img-ph { width:42px; height:42px; font-size:18px; }
-    .hub-prod-name { font-size:12px; }
+    .hub-prod-info { min-width:0; }
+    .hub-prod-name { font-size:12.5px; }
     .hub-prod-price { font-size:11.5px; }
-    .hub-strip-actions { flex-direction:column; gap:4px; align-items:flex-end; }
-    .hub-prod-link, .hub-propose-btn { padding:4px 9px; font-size:10.5px; }
+    .hub-strip-actions { flex-direction:row; gap:5px; align-items:center; flex-shrink:0; }
+    .hub-prod-link, .hub-propose-btn { padding:5px 9px; font-size:10.5px; white-space:nowrap; }
 
     /* Panneau proposition */
     .hub-propose-panel { padding:10px 12px; gap:6px; }
+    .hub-propose-label { font-size:11px; }
     .hub-propose-input { font-size:13px; padding:8px 12px; min-width:90px; }
     .hub-propose-send { padding:8px 13px; font-size:12px; }
     .hub-propose-cancel { padding:8px 10px; font-size:11px; }
 
-    /* Zone saisie */
-    .hub-input-zone { padding:7px 8px; gap:7px; }
+    /* Zone saisie — safe area iOS (home indicator) */
+    .hub-input-zone {
+        padding:7px 8px;
+        padding-bottom: calc(7px + env(safe-area-inset-bottom, 0px));
+        gap:7px;
+    }
     .hub-input-row { gap:7px; }
-    .hub-textarea { font-size:13px; padding:8px 13px; }
-    .hub-send-btn { width:40px; height:40px; font-size:16px; }
-    .hub-attach-btn { width:40px; height:40px; font-size:16px; }
+    /* ≥16px obligatoire pour éviter le zoom automatique iOS */
+    .hub-textarea, .hub-search, .hub-propose-input,
+    .nego-counter-input, .hub-counter-input { font-size: 16px; }
+    .hub-textarea { padding:9px 13px; }
+    .hub-send-btn { width:42px; height:42px; font-size:18px; }
+    .hub-attach-btn { width:42px; height:42px; font-size:18px; }
 
     /* Thread */
     .hub-thread { padding:12px 8px; }
+
+    /* Sidebar head sur mobile */
+    .hub-sidebar-head { padding:12px 14px; }
+    .hub-sidebar-title { font-size:17px; }
+
+    /* Conversation items plus généreux au toucher */
+    .hub-conv-item { padding:12px 14px; }
+    .hub-conv-av { width:46px; height:46px; font-size:14px; }
+
+    /* Carte négociation */
+    .nego-card { border-radius:12px; }
+    .nego-body { padding:12px; }
 }
 
 /* ── Très petit mobile (≤400px) ── */
@@ -295,14 +368,23 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
     .hub-prod-name { font-size:11.5px; }
     .hub-prod-price { font-size:11px; }
     .hub-prod-link { display:none; }
-    .hub-propose-btn { font-size:10px; padding:4px 8px; }
+    .hub-propose-btn { font-size:10.5px; padding:5px 8px; }
     .hub-msg-row { max-width:92%; }
     .nego-wrap { max-width:94%; }
-    .hub-input-zone { padding:6px 6px; gap:4px; }
+    .hub-input-zone { padding:6px 6px; padding-bottom:calc(6px + env(safe-area-inset-bottom, 0px)); gap:4px; }
     .hub-input-row { gap:5px; }
-    .hub-send-btn { width:36px; height:36px; font-size:15px; }
-    .hub-attach-btn { width:36px; height:36px; font-size:15px; }
+    .hub-send-btn { width:38px; height:38px; font-size:16px; }
+    .hub-attach-btn { width:38px; height:38px; font-size:16px; }
     .hub-img-thumb-wrap { width:56px; height:56px; }
+}
+
+/* ── Très petit mobile (≤360px) ── */
+@media (max-width:360px) {
+    .hub-chat-sub { display:none; }
+    .hub-prod-strip { padding:5px 7px; gap:5px; }
+    .hub-propose-btn { display:none; }
+    .hub-input-zone { padding:5px; }
+    .hub-send-btn, .hub-attach-btn { width:36px; height:36px; }
 }
 </style>
 @endpush
@@ -472,15 +554,25 @@ let _pollTimer    = null;
 let _prodData     = {};
 let _pendingFiles = [];
 
-/* ── Filtrer ── */
+/* ── Filtrer conversations (fade doux) ── */
 function filterConvs(q) {
-    const lq = q.toLowerCase();
-    document.querySelectorAll('.hub-conv-item').forEach(el => {
-        el.style.display = el.dataset.search?.includes(lq) ? '' : 'none';
-    });
+    const lq   = q.toLowerCase();
+    const list = document.getElementById('convList');
+    list.style.opacity = '0';
+    list.style.transition = 'opacity .15s ease';
+    setTimeout(() => {
+        document.querySelectorAll('.hub-conv-item').forEach(el => {
+            el.style.display = el.dataset.search?.includes(lq) ? '' : 'none';
+        });
+        list.style.opacity = '1';
+    }, 150);
 }
 
-function backToList() { document.getElementById('hub').classList.remove('conv-open'); }
+function backToList() {
+    const hub = document.getElementById('hub');
+    hub.classList.remove('conv-open');
+    stopPoll();
+}
 
 /* ── Sélectionner conversation ── */
 async function selectConv(productId, el) {
@@ -520,6 +612,14 @@ async function selectConv(productId, el) {
     stopPoll();
     await loadConv();
     startPoll();
+
+    /* Focus textarea (sauf sur mobile où le clavier serait gênant) */
+    if (window.innerWidth > 640) {
+        setTimeout(() => document.getElementById('hubInput')?.focus(), 80);
+    }
+    /* Scroll fluide vers le bas du thread */
+    const thread = document.getElementById('hubThread');
+    if (thread) thread.scrollTop = thread.scrollHeight;
 }
 
 /* ── Bande produit ── */
@@ -587,7 +687,7 @@ async function sendPriceProposal() {
 async function loadConv() {
     if (!_productId) return;
     try {
-        const res = await fetch(`/client/products/${_productId}/messages`, {
+        const res = await fetch(`/client/products/${_productId}/messages?_t=${Date.now()}`, {
             headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }
         });
         if (!res.ok) return;
@@ -619,7 +719,7 @@ function stopPoll()  { clearInterval(_pollTimer); _pollTimer = null; }
 async function pollConv() {
     if (!_productId) return;
     try {
-        const res = await fetch(`/client/products/${_productId}/messages`, {
+        const res = await fetch(`/client/products/${_productId}/messages?poll=1&_t=${Date.now()}`, {
             headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }
         });
         if (!res.ok) return;
@@ -1184,5 +1284,27 @@ async function refuseClientOffer(msgId, btn) {
 function fmtPrice(n, devise) {
     return new Intl.NumberFormat('fr-FR').format(Math.round(n||0)) + ' ' + (devise||'GNF');
 }
+
+/* ── Clavier virtuel mobile ──
+   visualViewport.offsetTop = distance que iOS a scrollé la page pour centrer le champ.
+   On repositionne le hub pour annuler ce scroll et réduire sa hauteur au visible. ── */
+(function () {
+    const hub = document.getElementById('hub');
+    if (!hub || !window.visualViewport) return;
+    function adjustHub() {
+        if (window.innerWidth > 640) { hub.style.top = ''; hub.style.height = ''; return; }
+        const vv = window.visualViewport;
+        hub.style.top    = vv.offsetTop + 'px';   /* annule le scroll iOS */
+        hub.style.height = vv.height    + 'px';   /* réduit pour le clavier */
+    }
+    window.visualViewport.addEventListener('resize', adjustHub);
+    window.visualViewport.addEventListener('scroll', adjustHub);
+})();
+
+/* ── Thread scroll au bas quand le champ est focusé ── */
+document.getElementById('hubInput')?.addEventListener('focus', function () {
+    const thread = document.getElementById('hubThread');
+    setTimeout(() => { if (thread) thread.scrollTop = thread.scrollHeight; }, 300);
+});
 </script>
 @endpush

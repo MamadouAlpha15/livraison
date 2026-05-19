@@ -376,6 +376,16 @@ main.app-main{
     .om-header{padding:14px 16px 11px;}
     .om-body{padding:10px;}
     .msg-row{max-width:90%;}
+
+    /* Fix : champ de saisie toujours visible + anti-zoom iOS */
+    html, body { overflow:hidden !important; height:100% !important; }
+    .chat-area {
+        position:fixed;
+        top:60px; left:0; right:0; bottom:0;
+        display:flex; flex-direction:column; overflow:hidden;
+    }
+    .chat-textarea { font-size:16px !important; }
+    .zone-select, #zoneModalSearch, .zone-panel-search { font-size:16px !important; }
 }
 @media(max-width:380px){
     .chat-hd-sub{display:none;}
@@ -861,6 +871,26 @@ document.addEventListener('keydown', e => {
     if (e.key === 'Escape') { closeOrderModal(); closeDrawer(); }
 });
 
+input.addEventListener('focus', function() {
+    const msgs = document.getElementById('bcMessages');
+    setTimeout(() => { if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 300);
+});
+
+})();
+
+/* visualViewport : ajuste .chat-area quand le clavier iOS s'ouvre */
+(function(){
+    const area = document.querySelector('.chat-area');
+    if (!area || !window.visualViewport) return;
+    function adjust() {
+        if (window.innerWidth > 600) { area.style.top = ''; area.style.height = ''; return; }
+        const vv = window.visualViewport;
+        area.style.top    = (vv.offsetTop + 60) + 'px';
+        area.style.height = (vv.height - 60) + 'px';
+    }
+    window.visualViewport.addEventListener('resize', adjust);
+    window.visualViewport.addEventListener('scroll', adjust);
+    adjust();
 })();
 </script>
 @endpush

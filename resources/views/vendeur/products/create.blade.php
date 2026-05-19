@@ -333,12 +333,10 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
     .form-card-hd { padding: 12px 16px; }
     .form-card-body { padding: 16px; }
     .form-card-sub { display: none; }
-    .form-actions {
-        flex-direction: column-reverse; gap: 8px;
-    }
-    .btn-submit, .btn-cancel {
-        width: 100%; justify-content: center; text-align: center;
-    }
+    .form-actions { flex-direction: column-reverse; gap: 8px; }
+    .btn-submit, .btn-cancel { width: 100%; justify-content: center; text-align: center; }
+    /* iOS anti-zoom : font-size < 16px déclenche un zoom automatique au focus */
+    .field-input, .field-select, .field-textarea, .tag-real-input { font-size: 16px !important; }
 }
 @media (max-width: 480px) {
     .product-form-wrap { padding: 12px 10px 40px; }
@@ -354,7 +352,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
     .form-card-hd { padding: 10px 12px; gap: 7px; }
     .form-card-body { padding: 12px; }
     .field-lbl { font-size: 11px; }
-    .field-input, .field-select, .field-textarea { font-size: 13px; padding: 9px 11px; }
+    .field-input, .field-select, .field-textarea { font-size: 16px !important; padding: 9px 11px; }
     .upload-gallery-grid { grid-template-columns: repeat(2, 1fr); }
     .btn-submit { padding: 12px 16px; font-size: 13.5px; }
 }

@@ -267,8 +267,13 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .btn-cancel-confirm:hover{background:#b91c1c;color:#fff;}
 
 /* ── CHAT MODAL ── */
-.chat-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;align-items:center;justify-content:center;padding:16px;}
-.chat-overlay.open{display:flex;}
+.chat-overlay{
+    display:flex;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;
+    align-items:center;justify-content:center;padding:16px;
+    visibility:hidden;opacity:0;pointer-events:none;
+    transition:opacity .2s,visibility .2s;
+}
+.chat-overlay.open{visibility:visible;opacity:1;pointer-events:all;}
 .chat-panel{
     background:#fff;border-radius:16px;width:100%;max-width:520px;
     display:flex;flex-direction:column;height:90vh;max-height:680px;
@@ -289,14 +294,21 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 
 /* Bloc contexte commande */
 .chat-order-ctx{
-    padding:10px 14px;flex-shrink:0;
+    padding:8px 14px;flex-shrink:0;
     background:#eff6ff;border-bottom:1px solid #bfdbfe;
-    display:flex;align-items:flex-start;gap:12px;
+    display:flex;align-items:center;gap:10px;
 }
-.chat-order-num{font-size:11px;font-weight:800;color:#1d4ed8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+.chat-order-num{font-size:11px;font-weight:800;color:#1d4ed8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;}
 .chat-order-client{font-size:13px;font-weight:700;color:#1e40af;}
-.chat-order-meta{font-size:11.5px;color:#3b82f6;margin-top:2px;}
-.chat-ctx-ico{width:34px;height:34px;border-radius:9px;background:#dbeafe;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.chat-order-meta{font-size:11px;color:#3b82f6;margin-top:1px;}
+.chat-ctx-ico{width:30px;height:30px;border-radius:8px;background:#dbeafe;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+@media(max-width:640px){
+    .chat-order-ctx{padding:6px 12px;gap:8px;}
+    .chat-ctx-ico{display:none;}
+    .chat-order-num,.chat-order-client{display:inline;font-size:11.5px;}
+    .chat-order-num::after{content:" · ";}
+    .chat-order-meta{display:none;}
+}
 
 /* Messages */
 .chat-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:8px;background:#f8fafc;scrollbar-width:thin;scrollbar-color:#c7d2fe transparent;}
@@ -341,6 +353,22 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 }
 .chat-send-btn:hover{background:var(--brand-dk);}
 .chat-send-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+/* ── Zone autocomplete ── */
+.zone-result{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;border:1.5px solid #e2e8f0;background:#fff;cursor:pointer;transition:border-color .12s,background .12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.zone-result:active,.zone-result:hover{background:#f0fdf4;border-color:#6ee7b7;}
+.zone-result-dot{width:9px;height:9px;border-radius:50%;background:#059669;flex-shrink:0;}
+.zone-result-name{font-size:13.5px;font-weight:700;color:#0f172a;flex:1;min-width:0;}
+.zone-result-right{text-align:right;flex-shrink:0;}
+.zone-result-price{font-size:12px;font-weight:800;color:#059669;}
+.zone-result-delay{font-size:10px;color:#9ca3af;margin-top:1px;}
+.zone-chip{display:flex;align-items:center;gap:10px;background:#f0fdf4;border:1.5px solid #6ee7b7;border-radius:10px;padding:10px 12px;}
+.zone-chip-dot{width:10px;height:10px;border-radius:50%;background:#059669;flex-shrink:0;}
+.zone-chip-info{flex:1;min-width:0;}
+.zone-chip-name{font-size:13px;font-weight:800;color:#065f46;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.zone-chip-details{font-size:11px;color:#047857;margin-top:2px;}
+.zone-chip-change{flex-shrink:0;padding:5px 11px;border-radius:7px;border:1px solid #6ee7b7;background:#fff;color:#059669;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;touch-action:manipulation;}
+.zone-empty{text-align:center;padding:14px;font-size:12px;color:#9ca3af;border-radius:9px;background:#f9fafb;}
 
 /* Bouton message sur chaque entreprise */
 .btn-msg-company{
@@ -408,8 +436,14 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
     .filter-search-wrap{min-width:0;width:100%;}
     .filter-row{flex-wrap:wrap;}
     .btn-filter-apply,.btn-filter-reset{width:100%;justify-content:center;}
-    .chat-panel{border-radius:16px 16px 0 0;}
+    .chat-panel{
+        border-radius:16px 16px 0 0;
+        height:82vh;max-height:82vh;
+        height:80dvh;max-height:80dvh;
+    }
     .chat-overlay{padding:0;align-items:flex-end;}
+    .chat-textarea{font-size:16px !important;}
+    #zoneSearch{font-size:16px !important;}
 }
 @media(max-width:360px){
     .topbar{padding:0 8px;}
@@ -669,18 +703,21 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 
             {{-- Sélecteur de zone (affiché si l'entreprise a des zones) --}}
             <div id="zonePickerWrap" style="display:none;margin-bottom:8px;">
-                <label style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.4px;display:flex;align-items:center;gap:4px;margin-bottom:5px;">{!! $I['pin_lbl'] !!} Zone de livraison</label>
-                <input type="text" id="zoneSearch" placeholder="🔍 Rechercher une zone…" autocomplete="off"
-                       oninput="filterZoneSelect(this,'zonePicker')"
-                       style="width:100%;padding:7px 10px;border:1.5px solid #bbf7d0;border-radius:8px;font-size:12px;font-family:inherit;background:#fff;color:#0f172a;outline:none;margin-bottom:6px;box-sizing:border-box;">
-                <select id="zonePicker"
-                    style="width:100%;padding:9px 12px;border:1.5px solid #bbf7d0;border-radius:9px;font-size:13px;font-family:inherit;background:#fff;color:#0f172a;outline:none;cursor:pointer;"
-                    onchange="onZonePick(this)">
-                    <option value="">— Choisir une zone —</option>
-                </select>
-                <div id="zonePriceHint" style="display:none;margin-top:5px;padding:7px 10px;background:#f0fdf4;border-radius:7px;font-size:12px;font-weight:700;color:#065f46;">
-                    {!! $I['coin_lbl'] !!} Prix : <span id="zonePriceVal"></span> · {!! $I['clock_lbl'] !!} <span id="zoneDelayVal"></span> min
+                <label style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.4px;display:flex;align-items:center;gap:4px;margin-bottom:8px;">{!! $I['pin_lbl'] !!} Zone de livraison</label>
+                {{-- Champ de recherche --}}
+                <div id="zoneSearchBox">
+                    <div style="position:relative;display:flex;align-items:center;margin-bottom:6px;">
+                        <span style="position:absolute;left:10px;pointer-events:none;font-size:14px;color:#9ca3af;">🔍</span>
+                        <input type="text" id="zoneSearch" placeholder="Tapez le nom d'une zone…" autocomplete="off"
+                               oninput="filterZones(this.value)"
+                               style="width:100%;padding:10px 34px 10px 34px;border:1.5px solid #bbf7d0;border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:#0f172a;outline:none;box-sizing:border-box;transition:border-color .15s;"
+                               onfocus="this.style.borderColor='#059669'" onblur="this.style.borderColor='#bbf7d0'">
+                        <button id="zoneSearchClear" onclick="zoneClearSearch()" style="display:none;position:absolute;right:8px;background:none;border:none;cursor:pointer;color:#9ca3af;font-size:18px;padding:4px;line-height:1;touch-action:manipulation;">✕</button>
+                    </div>
+                    <div id="zoneResults" style="display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#86efac #f0fdf4;"></div>
                 </div>
+                {{-- Zone sélectionnée (chip) --}}
+                <div id="zoneSelectedChip" style="display:none;"></div>
             </div>
 
             <button class="btn-confier" id="btnConfier" onclick="confierLivraison()">
@@ -1173,7 +1210,9 @@ let _shopId    = '';
 let _chatInterval  = null;
 let _lastMsgTime   = null;
 let _currentCompanyId = null;
-let _confierDone   = false;
+let _confierDone      = false;
+let _zonesAll         = [];
+let _selectedZone     = null;
 
 /* ── Ouvre le modal de sélection d'entreprise ── */
 function openCompanyModal(btn) {
@@ -1243,18 +1282,51 @@ function openChatFromCompany(btn) {
     closeCompanyModal();
     document.getElementById('chatModal').classList.add('open');
     document.body.style.overflow = 'hidden';
-    document.getElementById('chatInput').focus();
+    _adjustChatPanel();
+    const _ci = document.getElementById('chatInput');
+    _ci.focus();
+    _ci.addEventListener('focus', _scrollChatBottom, { once: false });
 
     /* Charger messages + démarrer polling */
     loadMessages(true);
     _chatInterval = setInterval(() => loadMessages(false), 3000);
 }
 
+/* ── Ajuste le panel selon le viewport réel (clavier iOS) ── */
+function _adjustChatPanel() {
+    if (window.innerWidth > 640) return;
+    const overlay = document.getElementById('chatModal');
+    const panel   = overlay?.querySelector('.chat-panel');
+    if (!overlay || !panel) return;
+    const vv = window.visualViewport || { offsetTop: 0, height: window.innerHeight };
+    overlay.style.top    = vv.offsetTop + 'px';
+    overlay.style.height = vv.height + 'px';
+    overlay.style.bottom = 'auto';
+    const h = Math.floor(vv.height * 0.82);
+    panel.style.height    = h + 'px';
+    panel.style.maxHeight = h + 'px';
+}
+if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', _adjustChatPanel);
+    window.visualViewport.addEventListener('scroll', _adjustChatPanel);
+}
+
+function _scrollChatBottom() {
+    const msgs = document.getElementById('chatMsgList');
+    setTimeout(() => { if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 300);
+}
+
 /* ── Ferme le chat ── */
 function closeChatModal() {
     clearInterval(_chatInterval);
     _chatInterval = null;
-    document.getElementById('chatModal').classList.remove('open');
+    const overlay = document.getElementById('chatModal');
+    overlay.classList.remove('open');
+    overlay.style.top    = '';
+    overlay.style.height = '';
+    overlay.style.bottom = '';
+    const panel = overlay?.querySelector('.chat-panel');
+    if (panel) { panel.style.height = ''; panel.style.maxHeight = ''; }
     document.body.style.overflow = '';
 }
 document.getElementById('chatModal')?.addEventListener('click', function(e) {
@@ -1388,16 +1460,10 @@ function sendMsg() {
 
 /* ── Charge les zones d'une entreprise ── */
 function loadCompanyZones(companyId) {
-    const wrap    = document.getElementById('zonePickerWrap');
-    const picker  = document.getElementById('zonePicker');
-    const hint    = document.getElementById('zonePriceHint');
-
-    wrap.style.display  = 'none';
-    hint.style.display  = 'none';
-    picker.innerHTML    = '<option value="">— Choisir une zone —</option>';
-    const srch = document.getElementById('zoneSearch');
-    if (srch) srch.value = '';
-
+    const wrap = document.getElementById('zonePickerWrap');
+    wrap.style.display = 'none';
+    clearZoneSelection();
+    _zonesAll = [];
     if (!companyId) return;
 
     fetch(`/company-zones/${companyId}`, {
@@ -1406,52 +1472,99 @@ function loadCompanyZones(companyId) {
     .then(r => r.json())
     .then(zones => {
         if (!zones.length) return;
-        zones.forEach(z => {
-            const opt = document.createElement('option');
-            opt.value        = z.id;
-            opt.textContent  = z.name + ' — ' + new Intl.NumberFormat('fr-FR').format(z.price) + ' ' + DEVISE;
-            opt.dataset.price   = z.price;
-            opt.dataset.minutes = z.estimated_minutes;
-            picker.appendChild(opt);
-        });
+        _zonesAll = zones;
+        filterZones('');
         wrap.style.display = 'block';
+        requestAnimationFrame(() => {
+            const ml = document.getElementById('chatMsgList');
+            if (ml) ml.scrollTop = ml.scrollHeight;
+        });
     })
     .catch(() => {});
 }
 
-function filterZoneSelect(input, selectId) {
-    const q   = input.value.toLowerCase().trim();
-    const sel = document.getElementById(selectId);
-    if (!sel) return;
-    Array.from(sel.options).forEach(opt => {
-        if (!opt.value) return;
-        opt.hidden = q.length > 0 && !opt.text.toLowerCase().includes(q);
-    });
-    const cur = sel.options[sel.selectedIndex];
-    if (cur && cur.value && cur.hidden) {
-        sel.value = '';
-        sel.dispatchEvent(new Event('change'));
+/* ── Filtre et affiche les zones en temps réel ── */
+function filterZones(raw) {
+    const q       = (raw || '').toLowerCase().trim();
+    const results = document.getElementById('zoneResults');
+    const clrBtn  = document.getElementById('zoneSearchClear');
+    if (!results) return;
+    if (clrBtn) clrBtn.style.display = q ? 'block' : 'none';
+    const list = q ? _zonesAll.filter(z => z.name.toLowerCase().includes(q)) : _zonesAll;
+    if (!list.length) {
+        results.innerHTML = `<div class="zone-empty">Aucune zone trouvée pour "<strong>${q}</strong>"</div>`;
+        return;
     }
+    results.innerHTML = '';
+    list.forEach(z => {
+        const item = document.createElement('div');
+        item.className = 'zone-result';
+        const color = z.color || '#059669';
+        const price = new Intl.NumberFormat('fr-FR').format(z.price);
+        item.innerHTML =
+            `<span class="zone-result-dot" style="background:${color};box-shadow:0 0 5px ${color}88;"></span>` +
+            `<span class="zone-result-name">${z.name}</span>` +
+            `<div class="zone-result-right">` +
+                `<div class="zone-result-price">${price} ${DEVISE}</div>` +
+                `<div class="zone-result-delay">~${z.estimated_minutes} min</div>` +
+            `</div>`;
+        item.addEventListener('click', () => selectZone(z));
+        item.addEventListener('touchend', e => { e.preventDefault(); selectZone(z); });
+        results.appendChild(item);
+    });
 }
 
-function onZonePick(sel) {
-    const hint     = document.getElementById('zonePriceHint');
-    const priceEl  = document.getElementById('zonePriceVal');
-    const delayEl  = document.getElementById('zoneDelayVal');
-    const opt      = sel.options[sel.selectedIndex];
-    if (!sel.value) { hint.style.display = 'none'; return; }
-    priceEl.textContent = new Intl.NumberFormat('fr-FR').format(opt.dataset.price) + ' ' + DEVISE;
-    delayEl.textContent = opt.dataset.minutes;
-    hint.style.display  = 'block';
+/* ── Sélectionne une zone et affiche la fiche ── */
+function selectZone(z) {
+    _selectedZone = z;
+    const searchBox = document.getElementById('zoneSearchBox');
+    const chip      = document.getElementById('zoneSelectedChip');
+    if (searchBox) searchBox.style.display = 'none';
+    if (!chip) return;
+    const color = z.color || '#059669';
+    const price = new Intl.NumberFormat('fr-FR').format(z.price);
+    chip.innerHTML =
+        `<div class="zone-chip">` +
+            `<span class="zone-chip-dot" style="background:${color};box-shadow:0 0 5px ${color}88;"></span>` +
+            `<div class="zone-chip-info">` +
+                `<div class="zone-chip-name">${z.name}</div>` +
+                `<div class="zone-chip-details">💰 ${price} ${DEVISE} &nbsp;·&nbsp; ⏱ ~${z.estimated_minutes} min</div>` +
+            `</div>` +
+            `<button class="zone-chip-change" onclick="clearZoneSelection()">Changer</button>` +
+        `</div>`;
+    chip.style.display = 'block';
+}
+
+/* ── Efface la sélection et revient à la recherche ── */
+function clearZoneSelection() {
+    _selectedZone = null;
+    const searchBox = document.getElementById('zoneSearchBox');
+    const chip      = document.getElementById('zoneSelectedChip');
+    const input     = document.getElementById('zoneSearch');
+    const clrBtn    = document.getElementById('zoneSearchClear');
+    if (chip)     { chip.style.display = 'none'; chip.innerHTML = ''; }
+    if (input)    input.value = '';
+    if (clrBtn)   clrBtn.style.display = 'none';
+    if (searchBox) searchBox.style.display = 'block';
+    filterZones('');
+    setTimeout(() => input?.focus(), 50);
+}
+
+/* ── Vide le champ de recherche (bouton ✕) ── */
+function zoneClearSearch() {
+    const input  = document.getElementById('zoneSearch');
+    const clrBtn = document.getElementById('zoneSearchClear');
+    if (input)  input.value = '';
+    if (clrBtn) clrBtn.style.display = 'none';
+    filterZones('');
+    input?.focus();
 }
 
 /* ── Confie la livraison à l'entreprise ── */
 function confierLivraison() {
     if (!_orderId || !_currentCompanyId || _confierDone) return;
 
-    const picker = document.getElementById('zonePicker');
-    const zoneId = picker?.value || null;
-    const zoneOpt = zoneId ? picker.options[picker.selectedIndex] : null;
+    const zoneId = _selectedZone?.id || null;
 
     const btn = document.getElementById('btnConfier');
     btn.disabled = true;
@@ -1461,8 +1574,8 @@ function confierLivraison() {
     const formData = new FormData();
     formData.append('_method', 'PUT');
     formData.append('delivery_company_id', _currentCompanyId);
-    if (zoneId)                         formData.append('delivery_zone_id', zoneId);
-    if (zoneOpt?.dataset?.price)        formData.append('delivery_fee', zoneOpt.dataset.price);
+    if (zoneId)                 formData.append('delivery_zone_id', zoneId);
+    if (_selectedZone?.price)   formData.append('delivery_fee', _selectedZone.price);
 
     fetch(`/employe/orders/${_orderId}/send-to-company`, {
         method: 'POST',

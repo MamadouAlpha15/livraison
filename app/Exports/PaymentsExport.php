@@ -39,13 +39,13 @@ class PaymentsExport implements FromCollection, WithHeadings, ShouldAutoSize
 
         return $payments->map(function($p) {
             return [
-                'ID' => $p->id,
-                'Commande' => $p->order->id ?? '—',
-                'Client' => $p->order->client->name ?? '—',
-                'Livreur' => $p->order->livreur->name ?? '—',
-                'Shop' => $p->order->shop->name ?? '—',
-                'Montant' => $p->amount,
-                'Date' => optional($p->created_at)->format('d/m/Y H:i')
+                'ID'       => $p->id,
+                'Commande' => $p->order?->id ?? '—',
+                'Client'   => $p->order?->client?->name ?? '—',
+                'Livreur'  => $p->order?->livreur?->name ?? '—',
+                'Shop'     => $p->order?->shop?->name ?? '—',
+                'Montant'  => $p->amount,
+                'Date'     => optional($p->created_at)->format('d/m/Y H:i'),
             ];
         });
     }

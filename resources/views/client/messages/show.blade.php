@@ -330,11 +330,30 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
 
 /* RESPONSIVE */
 @media (max-width: 600px) {
-    .chat-wrap { margin: 12px auto; padding: 0 8px 70px; }
-    .chat-thread { max-height: 400px; padding: 14px 12px; }
+    /* ── Mise en page fixe : empêche iOS de remonter la page au focus ── */
+    html, body { overflow: hidden; height: 100%; }
+    .chat-wrap {
+        position: fixed;
+        top: var(--nav-h);
+        left: 0; right: 0; bottom: 0;
+        margin: 0; padding: 0;
+        max-width: 100%;
+        display: flex; flex-direction: column;
+        overflow: hidden;
+    }
+    .chat-prod-header { flex-shrink: 0; border-radius: 0; }
+    .propose-panel    { flex-shrink: 0; }
+    .chat-thread {
+        flex: 1; min-height: 0; max-height: none;
+        padding: 14px 12px;
+        overflow-y: auto; -webkit-overflow-scrolling: touch;
+    }
+    .chat-img-preview { flex-shrink: 0; }
+    .chat-input-zone  { flex-shrink: 0; border-radius: 0; }
     .msg-row { max-width: 90%; }
-    .chat-prod-header { padding: 10px 12px; gap: 10px; flex-wrap: wrap; }
     .price-card { max-width: 100%; }
+    /* iOS anti-zoom : font-size < 16px déclenche un zoom automatique au focus */
+    .chat-textarea, .propose-input { font-size: 16px !important; }
 }
 
 @media (max-width: 400px) {
@@ -360,7 +379,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
     /* Thread */
     .chat-thread { padding: 10px 8px; }
     .chat-input-zone { padding: 8px 10px; }
-    .chat-textarea { font-size: 13px; }
+    .chat-textarea { font-size: 16px !important; }
 }
 </style>
 @endpush
@@ -995,7 +1014,7 @@ async function confirmOffer(messageId, btn) {
    ════════════════════════════════════ */
 async function pollMessages() {
     try {
-        const res = await fetch(POLL_URL, {
+        const res = await fetch(`${POLL_URL}?poll=1&_t=${Date.now()}`, {
             headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }
         });
         if (!res.ok) return;
@@ -1050,11 +1069,12 @@ setInterval(pollMessages, 3000);
 /* ── Polling badge navbar ── */
 async function pollBadge() {
     try {
-        const res = await fetch('{{ route("client.messages.client.poll") }}', {
+        const res = await fetch(`{{ route("client.messages.client.poll") }}?_t=${Date.now()}`, {
             headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' }
         });
         if (!res.ok) return;
         const data = await res.json();
+        if (typeof data.unread === 'undefined') return;
         const badge = document.getElementById('navMsgBadge');
         if (!badge) return;
         if (data.unread > 0) { badge.textContent = data.unread; badge.classList.add('show'); }
@@ -1062,5 +1082,25 @@ async function pollBadge() {
     } catch(e) {}
 }
 setInterval(pollBadge, 3000);
+
+/* ── Empêche iOS de remonter la page quand le clavier s'ouvre ── */
+(function () {
+    const wrap = document.querySelector('.chat-wrap');
+    if (!wrap || !window.visualViewport) return;
+    function adjust() {
+        if (window.innerWidth > 600) { wrap.style.top = ''; wrap.style.height = ''; return; }
+        const vv = window.visualViewport;
+        wrap.style.top    = (vv.offsetTop + 60) + 'px';
+        wrap.style.height = (vv.height  - 60) + 'px';
+    }
+    window.visualViewport.addEventListener('resize', adjust);
+    window.visualViewport.addEventListener('scroll', adjust);
+})();
+
+/* ── Scroll en bas du thread quand le clavier s'ouvre ── */
+document.getElementById('chatInput')?.addEventListener('focus', function () {
+    const thread = document.getElementById('chatThread');
+    setTimeout(() => { if (thread) thread.scrollTop = thread.scrollHeight; }, 300);
+});
 </script>
 @endpush

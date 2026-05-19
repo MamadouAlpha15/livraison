@@ -285,6 +285,10 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 @media (max-width: 560px) {
     .product-form-wrap { padding: 14px 12px 40px; }
     .field-row, .field-row-3 { grid-template-columns: 1fr; }
+    .field-input, .field-select, .field-textarea, .tag-real-input { font-size: 16px !important; }
+}
+@media (max-width: 360px) {
+    .field-input, .field-select, .field-textarea { font-size: 16px !important; padding: 9px 11px; }
 }
 </style>
 @endpush

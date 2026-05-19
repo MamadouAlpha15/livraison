@@ -2,6 +2,7 @@
 
 @extends('layouts.app')
 
+
 @section('title', 'Rapports · ' . ($shop->name ?? 'Boutique'))
 
 @php $bodyClass = 'is-dashboard'; @endphp

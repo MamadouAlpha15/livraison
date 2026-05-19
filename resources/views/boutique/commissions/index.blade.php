@@ -555,6 +555,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
     }
     .td-comm::before { margin-bottom: 2px; }
     .comm-input { width: 100%; box-sizing: border-box; }
+    .payout-input, .comm-input { font-size: 16px !important; }
 }
 
 /* Petits mobiles */
@@ -575,6 +576,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
     .tbl tbody td { padding: 9px 10px; }
     .payout-bar { padding: 10px; }
     .kpi-val { font-size: 16px; }
+    .payout-input, .comm-input { font-size: 16px !important; }
 }
 </style>
 @endpush

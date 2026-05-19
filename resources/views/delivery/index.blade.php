@@ -360,6 +360,7 @@ a{text-decoration:none;color:inherit;}
     .banner-title{font-size:21px;}
     .card-actions{grid-template-columns:1fr;}
     .page-banner{padding:22px 0 20px;}
+    .search-wrap input{font-size:16px !important;}
 }
 </style>
 @endpush

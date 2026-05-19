@@ -860,6 +860,78 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .sb-top-name { font-size: 12px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sb-top-rating { font-size: 10.5px; color: var(--orange); font-weight: 600; }
 
+/* ══ MODALE CLASSEMENT ══ */
+.rank-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.55); z-index: 800;
+    align-items: center; justify-content: center;
+    padding: 16px; backdrop-filter: blur(4px);
+    animation: fadeOverlay .2s ease;
+}
+@keyframes fadeOverlay { from{opacity:0} to{opacity:1} }
+.rank-overlay.open { display: flex; }
+.rank-modal {
+    background: var(--surface); border-radius: 20px;
+    width: 100%; max-width: 480px; max-height: 88vh;
+    display: flex; flex-direction: column;
+    box-shadow: 0 24px 80px rgba(0,0,0,.3);
+    animation: slideUpModal .28s cubic-bezier(.23,1,.32,1);
+    overflow: hidden;
+}
+@keyframes slideUpModal { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+.rank-modal-head {
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid var(--grey);
+    display: flex; align-items: center; gap: 10px;
+    flex-shrink: 0;
+}
+.rank-modal-title { font-size: 17px; font-weight: 800; color: var(--text); flex: 1; }
+.rank-modal-close {
+    width: 32px; height: 32px; border-radius: 50%; border: none;
+    background: var(--grey); color: var(--text); font-size: 16px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+}
+.rank-modal-close:hover { background: var(--border); }
+.rank-modal-body { flex: 1; overflow-y: auto; padding: 8px 0; }
+.rank-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 20px; border-bottom: 1px solid var(--grey);
+    text-decoration: none; color: inherit; transition: background .12s;
+}
+.rank-row:last-child { border-bottom: none; }
+.rank-row:hover { background: var(--grey); }
+.rank-pos {
+    font-size: 18px; font-weight: 900; font-family: var(--display);
+    width: 30px; text-align: center; flex-shrink: 0;
+    color: var(--orange);
+}
+.rank-pos.gold   { color: #f59e0b; font-size: 22px; }
+.rank-pos.silver { color: #94a3b8; font-size: 22px; }
+.rank-pos.bronze { color: #cd7c3c; font-size: 22px; }
+.rank-av {
+    width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 900; color: #fff;
+    overflow: hidden; border: 2px solid rgba(255,255,255,.8);
+    box-shadow: 0 3px 10px rgba(0,0,0,.2);
+}
+.rank-av img { width: 100%; height: 100%; object-fit: cover; }
+.rank-info { flex: 1; min-width: 0; }
+.rank-name { font-size: 13.5px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rank-stats { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+.rank-stats strong { color: var(--orange); }
+.rank-link {
+    flex-shrink: 0; padding: 6px 13px; border-radius: 20px;
+    background: var(--orange); color: #fff;
+    font-size: 11.5px; font-weight: 700; text-decoration: none;
+    transition: background .15s;
+}
+.rank-link:hover { background: var(--orange-dk); }
+
+/* Wrapper catégories sidebar — transparent sur desktop, flex horizontal sur mobile */
+.sb-cat-wrap-mob { display: contents; }
+
 /* ══ MAIN COLUMN ══ */
 .main-col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 18px; }
 
@@ -1261,210 +1333,322 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     .shops-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
 }
 
-/* ── Grand téléphone (≤ 640px) ── */
+/* ══════════════════════════════════════════
+   MOBILE (≤ 640px) — body.is-dashboard + !important = priorité absolue
+══════════════════════════════════════════ */
 @media (max-width: 640px) {
-    /* Nav */
-    .nav { padding: 0 12px; gap: 8px; }
-    .nav-search { flex: 1; max-width: none; }
-    /* "Mes commandes" : on cache le texte dès 640px pour libérer la nav */
-    .nav-orders-btn span { display: none; }
-    .nav-orders-btn { padding: 7px 10px; }
-    .nav-actions { gap: 7px; }
 
-    /* Layout */
-    .page-wrap { padding: 10px 10px 60px; gap: 12px; }
-    .sidebar { grid-template-columns: 1fr; }
+    /* ── Navbar ── */
+    body.is-dashboard .nav { padding: 0 10px !important; gap: 6px !important; flex-wrap: nowrap !important; height: var(--nav-h) !important; }
+    body.is-dashboard .nav-logo img { height: 38px !important; width: auto !important; max-width: 90px !important; object-fit: contain !important; }
+    body.is-dashboard .nav-links { display: none !important; }
+    body.is-dashboard .nav-search { flex: 1 !important; min-width: 0 !important; max-width: 120px !important; }
+    body.is-dashboard .nav-search input { font-size: 16px !important; } /* évite le zoom automatique iOS */
+    body.is-dashboard .nav-orders-btn { display: none !important; }
+    body.is-dashboard .nav-actions { gap: 4px !important; flex-shrink: 0 !important; }
+    body.is-dashboard .nav-av { width: 32px !important; height: 32px !important; font-size: 11px !important; }
+    body.is-dashboard .cn-bell-btn,
+    body.is-dashboard .nav-fav-btn,
+    body.is-dashboard .nav-msg-btn { width: 32px !important; height: 32px !important; }
 
-    /* ── HERO MOBILE : texte à gauche, image visible à droite ── */
-    .hero {
-        height: 260px !important;
+    /* ── Layout ── */
+    body.is-dashboard .page-wrap { flex-direction: column !important; padding: 10px 10px 70px !important; gap: 14px !important; }
+    body.is-dashboard .main-col { gap: 14px !important; order: 1 !important; }
+
+    /* ── Sidebar : on cache les cartes inutiles, on garde 🏆 top boutiques ── */
+    body.is-dashboard .sidebar { display: flex !important; flex-direction: column !important; order: 2 !important; width: 100% !important; gap: 0 !important; position: static !important; max-height: none !important; overflow-y: visible !important; }
+    body.is-dashboard .sb-card-explorer { display: none !important; }
+    body.is-dashboard .sidebar > .sb-card:not(.sb-card-topshops):not(.sb-card-explorer) { display: none !important; }
+    body.is-dashboard .sb-card-topshops { display: block !important; border-radius: 10px !important; overflow: hidden !important; }
+
+    /* ── Hero — phone.png visible avec cover ── */
+    body.is-dashboard .hero {
+        height: 200px !important;
         background:
             linear-gradient(to right,
-                #07111f      0%,
-                #07111f     40%,
-                rgba(7,17,31,.88) 54%,
-                rgba(7,17,31,.28) 68%,
-                transparent  78%
+                rgba(7,17,31,1)   0%,
+                rgba(7,17,31,.97) 30%,
+                rgba(7,17,31,.75) 50%,
+                rgba(7,17,31,.20) 68%,
+                transparent       80%
             ),
-            url('/images/phone.png') right center / auto 100% no-repeat,
+            url('/images/phone.png') center center / cover no-repeat,
             #07111f !important;
         flex-direction: row !important;
-        align-items: center;
-        padding: 0;
-    }
-
-    /* Carte rating : absolue compacte */
-    .hero-rating-card {
-        position: absolute !important;
-        top: 10px; right: 10px;
-        padding: 8px 11px;
-        min-width: 88px;
-        border-radius: 10px;
-        text-align: center;
-        flex-direction: column;
-    }
-    .hero-rating-stars { font-size: 11px; letter-spacing: 1px; margin-bottom: 2px; }
-    .hero-rating-val   { font-size: 17px; }
-    .hero-rating-lbl   { font-size: 8.5px; margin-top: 2px; }
-    .hero-rating-reviews { font-size: 9.5px; margin-top: 3px; }
-
-    /* Contenu texte limité à gauche */
-    .hero-content {
-        padding: 18px 14px;
-        max-width: 62%;
-        position: relative; z-index: 2;
-    }
-    .hero-welcome { font-size: 10px; padding: 3px 9px; margin-bottom: 7px; }
-    .hero-title   { font-size: 17px; letter-spacing: -.3px; margin-bottom: 7px; }
-    .hero-subtitle {
-        font-size: 11px;
-        max-width: 100%;
-        margin-bottom: 10px;
-        display: block !important;
-    }
-    /* Badges : 2 par ligne */
-    .hero-badges {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr;
-        gap: 5px;
-    }
-    .hero-badge { padding: 5px 7px; gap: 5px; border-radius: 7px; }
-    .hero-badge-ico { font-size: 12px; }
-    .hero-badge-label { font-size: 9.5px; }
-    .hero-badge-sub { display: none; }
-
-    /* Stats */
-    .stats-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    .stat-card { padding: 12px 13px; gap: 10px; }
-    .stat-ico { width: 38px; height: 38px; font-size: 17px; border-radius: 10px; }
-    .stat-val { font-size: 18px; }
-    .stat-lbl { font-size: 11px; }
-    .stat-sub { display: none; }
-
-    /* Catégories chips */
-    .pop-cat-chip { min-width: 75px; padding: 9px 10px; }
-    .pop-cat-ico { font-size: 20px; }
-    .pop-cat-name { font-size: 10px; }
-    .pop-cat-cnt { display: none; }
-
-    /* Top shops */
-    .top-shops-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-    .top-shop-img { height: 110px; }
-    .top-shop-av-circle { width: 40px; height: 40px; font-size: 13px; }
-    .top-shop-name { font-size: 12px; }
-    .top-shop-desc { -webkit-line-clamp: 1; }
-    .top-shop-btn { padding: 6px 10px; font-size: 10.5px; }
-
-    /* Commandes récentes : compact sur téléphone */
-    .order-row { padding: 10px 14px; gap: 8px; }
-    .order-ico { width: 34px; height: 34px; font-size: 13px; border-radius: 8px; }
-    .order-ref { font-size: 12px; }
-    .order-shop { font-size: 10.5px; }
-    .order-amount { font-size: 12px; }
-    .order-pill { font-size: 9px; padding: 2px 6px; }
-
-    /* Boutiques grid */
-    .shops-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .shop-card-img { height: 130px; }
-
-    /* Shop card internals — 2-col narrow cards */
-    .shop-card-body { padding: 9px 11px; gap: 3px; }
-    .shop-card-footer { padding: 7px 11px; }
-    .shop-av { width: 36px; height: 36px; font-size: 11px; }
-    .shop-card-name { font-size: 12px; }
-    .shop-card-type { font-size: 9.5px; padding: 2px 6px; }
-    .shop-card-desc { font-size: 10.5px; }
-    .shop-card-cta { padding: 6px 9px; font-size: 10px; }
-    .shop-card-rating { font-size: 10px; gap: 3px; }
-
-    /* Top shop card internals at 2-col */
-    .top-shop-body { padding: 8px 10px 7px; }
-    .top-shop-footer { padding: 7px 10px 9px; }
-    .top-shop-stats { gap: 5px; font-size: 10px; }
-
-    /* Drawer messages */
-    .msg-drawer { width: 100vw; }
-
-    /* Section headers : cache le sous-titre inline à partir de 640px */
-    .sec-title > span { display: none; }
-    .sec-hd { gap: 8px; }
-    .sec-link { white-space: nowrap; font-size: 11.5px; flex-shrink: 0; }
-}
-
-/* ── Téléphone standard (≤ 480px) ── */
-@media (max-width: 480px) {
-    /* Nav */
-    .nav-search { max-width: 130px; }
-    .nav-orders-btn { padding: 7px 10px; }
-
-    /* Hero : dégradé pur, sans image téléphone (plus de place) */
-    .hero {
-        background: linear-gradient(135deg, #07111f 0%, #1a2744 55%, #0d1b35 100%) !important;
-        height: 200px !important;
+        align-items: center !important;
         padding: 0 !important;
     }
-    .hero-content { max-width: 100% !important; padding: 18px 16px !important; }
-    .hero-welcome { font-size: 9.5px; padding: 3px 8px; margin-bottom: 6px; }
-    .hero-title { font-size: 17px; margin-bottom: 6px; letter-spacing: -.3px; }
-    .hero-subtitle { display: none !important; }
-    .hero-badges { grid-template-columns: 1fr 1fr; gap: 4px; }
-    .hero-badge { padding: 4px 6px; gap: 4px; }
-    .hero-badge-label { font-size: 9px; }
+    body.is-dashboard .hero-content { padding: 16px 14px !important; max-width: 62% !important; z-index: 2 !important; position: relative !important; }
+    body.is-dashboard .hero-welcome { font-size: 9px !important; padding: 2px 7px !important; margin-bottom: 5px !important; }
+    body.is-dashboard .hero-title { font-size: 18px !important; letter-spacing: -.3px !important; margin-bottom: 5px !important; line-height: 1.2 !important; }
+    body.is-dashboard .hero-subtitle { font-size: 11px !important; line-height: 1.4 !important; margin-bottom: 6px !important; display: block !important; }
+    body.is-dashboard .hero-badges { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 3px !important; }
+    body.is-dashboard .hero-badge { padding: 3px 5px !important; gap: 2px !important; border-radius: 5px !important; }
+    body.is-dashboard .hero-badge-ico { font-size: 9px !important; }
+    body.is-dashboard .hero-badge-label { font-size: 8px !important; }
+    body.is-dashboard .hero-badge-sub { display: none !important; }
+    body.is-dashboard .hero-rating-card { display: none !important; }
 
-    /* Stats */
-    .stats-row { gap: 6px; }
-    .stat-card { padding: 10px 11px; gap: 8px; }
-    .stat-ico { width: 34px; height: 34px; font-size: 15px; border-radius: 9px; }
-    .stat-val { font-size: 15px; }
-    .stat-lbl { font-size: 10px; }
+    /* ── Stats 2×2 ── */
+    body.is-dashboard .stats-row { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+    body.is-dashboard .stat-card { padding: 12px 10px !important; gap: 8px !important; flex-direction: row !important; align-items: center !important; }
+    body.is-dashboard .stat-ico { width: 36px !important; height: 36px !important; font-size: 16px !important; border-radius: 9px !important; flex-shrink: 0 !important; }
+    body.is-dashboard .stat-val { font-size: 16px !important; }
+    body.is-dashboard .stat-lbl { font-size: 10.5px !important; white-space: normal !important; overflow: visible !important; text-overflow: clip !important; }
+    body.is-dashboard .stat-sub { display: block !important; font-size: 8.5px !important; white-space: normal !important; overflow: visible !important; }
 
-    /* Commandes récentes */
-    .order-row { padding: 9px 12px; gap: 7px; }
-    .order-ico { width: 32px; height: 32px; font-size: 12px; border-radius: 7px; }
-    .order-ref { font-size: 11.5px; }
-    .order-shop { font-size: 10px; }
-    .order-amount { font-size: 11.5px; }
-    .order-pill { font-size: 8.5px; padding: 2px 5px; }
+    /* ── Catégories — scroll horizontal ── */
+    body.is-dashboard .pop-cat-extra { display: flex !important; }
+    body.is-dashboard #popCatsMoreBtn { display: none !important; }
+    body.is-dashboard .pop-cats-row { -webkit-overflow-scrolling: touch !important; }
+    body.is-dashboard .pop-cat-chip { min-width: 72px !important; padding: 8px 10px !important; flex-shrink: 0 !important; }
+    body.is-dashboard .pop-cat-ico { font-size: 20px !important; }
+    body.is-dashboard .pop-cat-name { font-size: 10px !important; }
+    body.is-dashboard .pop-cat-cnt { display: none !important; }
 
-    /* Top shops en 1 colonne */
-    .top-shops-grid { grid-template-columns: 1fr; }
-    .top-shop-img { height: 140px; }
-    .top-shop-av-circle { width: 46px; height: 46px; font-size: 15px; }
-    .top-shop-name { font-size: 13px; }
+    /* ── Boutiques populaires — carousel horizontal ── */
+    body.is-dashboard .top-shops-grid { display: flex !important; flex-direction: row !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; gap: 10px !important; padding-bottom: 8px !important; scrollbar-width: none !important; }
+    body.is-dashboard .top-shops-grid::-webkit-scrollbar { display: none !important; }
+    body.is-dashboard .top-shop-card { flex-shrink: 0 !important; width: 165px !important; min-width: 165px !important; max-width: 165px !important; }
+    body.is-dashboard .top-shop-img { height: 100px !important; }
+    body.is-dashboard .top-shop-body { padding: 7px 8px !important; }
+    body.is-dashboard .top-shop-name { font-size: 11.5px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+    body.is-dashboard .top-shop-desc { display: none !important; }
+    body.is-dashboard .top-shop-loc { display: none !important; }
+    body.is-dashboard .top-shop-tag { font-size: 8px !important; padding: 1px 5px !important; }
+    body.is-dashboard .shop-av { width: 30px !important; height: 30px !important; font-size: 10px !important; flex-shrink: 0 !important; }
+    body.is-dashboard .top-shop-footer { padding: 5px 8px 8px !important; display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 4px !important; }
+    body.is-dashboard .top-shop-stats { font-size: 9px !important; gap: 2px !important; }
+    body.is-dashboard .top-shop-sales { display: none !important; }
+    body.is-dashboard .top-shop-btn { padding: 4px 8px !important; font-size: 9.5px !important; white-space: nowrap !important; flex-shrink: 0 !important; }
 
-    /* Boutiques : 1 colonne */
-    .shops-grid { grid-template-columns: 1fr; gap: 10px; }
-    .shop-card-img { height: 170px; }
-    .shop-card-body { padding: 12px 14px; }
-    .shop-card-footer { padding: 10px 14px; }
+    /* ── Commandes récentes ── */
+    body.is-dashboard .orders-card { margin-bottom: 0 !important; }
+    body.is-dashboard .order-row { padding: 10px 12px !important; gap: 8px !important; }
+    body.is-dashboard .order-ico { width: 34px !important; height: 34px !important; font-size: 13px !important; border-radius: 8px !important; flex-shrink: 0 !important; }
+    body.is-dashboard .order-ref { font-size: 12px !important; }
+    body.is-dashboard .order-shop { font-size: 10.5px !important; }
+    body.is-dashboard .order-amount { font-size: 12px !important; white-space: nowrap !important; }
+    body.is-dashboard .order-pill { font-size: 9px !important; padding: 2px 6px !important; }
 
-    /* Sidebar en 1 colonne */
-    .sidebar { grid-template-columns: 1fr; }
+    /* ── Filtres catégories ── */
+    body.is-dashboard .cats { flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; gap: 6px !important; padding-bottom: 6px !important; margin-bottom: 0 !important; }
+    body.is-dashboard .cat-pill { padding: 6px 12px !important; font-size: 11px !important; flex-shrink: 0 !important; }
+
+    /* ── Grille boutiques 2 colonnes ── */
+    body.is-dashboard .shops-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+    body.is-dashboard .shop-card-img { height: 110px !important; }
+    body.is-dashboard .shop-card-body { padding: 7px 8px !important; gap: 2px !important; }
+    body.is-dashboard .shop-card-footer { padding: 6px 8px !important; display: flex !important; align-items: center !important; justify-content: space-between !important; }
+    body.is-dashboard .shop-card-name { font-size: 11.5px !important; line-height: 1.2 !important; }
+    body.is-dashboard .shop-card-type { font-size: 9px !important; }
+    body.is-dashboard .shop-card-desc { display: none !important; }
+    body.is-dashboard .shop-card-cta { padding: 4px 7px !important; font-size: 9.5px !important; display: inline-flex !important; flex-shrink: 0 !important; white-space: nowrap !important; }
+    body.is-dashboard .shop-card-rating { font-size: 9px !important; gap: 2px !important; flex: 1 !important; min-width: 0 !important; }
+    body.is-dashboard .shop-card-rating small { display: none !important; }
+
+    /* ── Titres ── */
+    body.is-dashboard .sec-title { font-size: 15px !important; letter-spacing: -.2px !important; }
+    body.is-dashboard .sec-title > span { display: none !important; }
+    body.is-dashboard .sec-hd { margin-bottom: 10px !important; gap: 8px !important; }
+    body.is-dashboard .sec-link { font-size: 11.5px !important; flex-shrink: 0 !important; white-space: nowrap !important; }
+
+    /* ── Notifications ── */
+    body.is-dashboard .cn-dropdown { position: fixed !important; top: calc(var(--nav-h) + 6px) !important; left: 8px !important; right: 8px !important; width: auto !important; transform: none !important; }
+
+    /* ── Drawers ── */
+    body.is-dashboard .msg-drawer { width: 100vw !important; }
+    body.is-dashboard .fav-drawer { width: 100vw !important; }
 }
 
-/* ── Très petit écran (≤ 360px) ── */
+/* ── 390px ── */
+@media (max-width: 390px) {
+    body.is-dashboard .nav-search { max-width: 90px !important; }
+    body.is-dashboard .hero { height: 185px !important; }
+    body.is-dashboard .hero-content { max-width: 58% !important; padding: 13px 12px !important; }
+    body.is-dashboard .hero-title { font-size: 16px !important; }
+    body.is-dashboard .hero-subtitle { font-size: 10px !important; }
+    body.is-dashboard .stat-val { font-size: 15px !important; }
+    body.is-dashboard .stat-sub { font-size: 8px !important; }
+    body.is-dashboard .top-shop-card { width: 150px !important; min-width: 150px !important; max-width: 150px !important; }
+    body.is-dashboard .top-shop-img { height: 90px !important; }
+    body.is-dashboard .shops-grid { gap: 6px !important; }
+    body.is-dashboard .shop-card-img { height: 95px !important; }
+    body.is-dashboard .page-wrap { padding-bottom: 70px !important; }
+}
+
+/* ── 360px ── */
 @media (max-width: 360px) {
-    .nav { padding: 0 8px; gap: 6px; justify-content: space-between; }
-    .nav-search { display: none; }
-    .nav-actions { gap: 5px; }
-    .nav-orders-btn { padding: 6px 8px; }
+    body.is-dashboard .nav { padding: 0 8px !important; }
+    body.is-dashboard .nav-search { display: none !important; }
+    body.is-dashboard .page-wrap { padding: 8px 8px 74px !important; }
+    body.is-dashboard .hero { height: 168px !important; }
+    body.is-dashboard .hero-content { max-width: 60% !important; padding: 11px 10px !important; }
+    body.is-dashboard .hero-title { font-size: 15px !important; }
+    body.is-dashboard .top-shop-card { width: 135px !important; min-width: 135px !important; max-width: 135px !important; }
+    body.is-dashboard .top-shop-img { height: 80px !important; }
+    body.is-dashboard .shops-grid { gap: 5px !important; }
+    body.is-dashboard .shop-card-img { height: 95px !important; }
+    body.is-dashboard .shop-card-footer { flex-direction: column !important; gap: 4px !important; align-items: stretch !important; }
+    body.is-dashboard .shop-card-cta { text-align: center !important; justify-content: center !important; width: 100% !important; }
+    body.is-dashboard .order-ico { width: 30px !important; height: 30px !important; font-size: 12px !important; }
+    body.is-dashboard .order-pill { display: none !important; }
+    body.is-dashboard .order-amount { font-size: 11px !important; }
+}
 
-    .page-wrap { padding: 8px 8px 60px; }
-    .hero-title { font-size: 18px; }
-    .stats-row { grid-template-columns: 1fr 1fr; }
-    .stat-card { flex-direction: column; align-items: flex-start; gap: 4px; padding: 10px; }
-    .shops-grid { grid-template-columns: 1fr; }
-    .shop-card-footer { flex-direction: column; gap: 5px; align-items: stretch; }
-    .shop-card-cta { text-align: center; justify-content: center; }
-    .shop-card-rating { justify-content: center; }
+/* ══ BARRE NAVIGATION BAS — MOBILE ══ */
+.mob-bottom-nav {
+    display: none;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: 58px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -2px 14px rgba(0,0,0,.09);
+    z-index: 200;
+    padding: 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.mob-bottom-nav-inner {
+    display: flex; align-items: stretch;
+    height: 58px;
+}
+.mob-nav-item {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 2px; color: var(--muted);
+    text-decoration: none; border: none; background: none;
+    font-size: 9.5px; font-weight: 700; font-family: var(--font);
+    border-radius: 0; cursor: pointer;
+    transition: color .15s, background .15s;
+    padding: 4px 2px 4px;
+    -webkit-tap-highlight-color: transparent;
+}
+.mob-nav-item svg { flex-shrink: 0; }
+.mob-nav-item.active { color: var(--orange); }
+.mob-nav-item:hover { color: var(--orange); }
+.mob-nav-item.active svg { stroke: var(--orange); }
+.mob-nav-badge {
+    position: absolute; top: 4px; right: calc(50% - 18px);
+    background: var(--orange); color: #fff;
+    font-size: 8px; font-weight: 800;
+    border-radius: 10px; padding: 1px 4px;
+    min-width: 14px; text-align: center;
+    font-family: monospace; border: 1.5px solid var(--surface);
+    display: none; line-height: 1.4;
+}
+.mob-nav-badge.show { display: block; }
+.mob-nav-item-wrap { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; }
 
-    /* Commandes récentes : compact sur très petit écran */
-    .order-row { gap: 6px; padding: 9px 10px; }
-    .order-ico { width: 30px; height: 30px; font-size: 12px; border-radius: 7px; flex-shrink: 0; }
-    .order-ref { font-size: 11px; }
-    .order-shop { font-size: 9.5px; }
-    .order-pill { display: none; }
-    .order-amount { font-size: 11.5px; white-space: nowrap; }
+@media (max-width: 640px) {
+    .mob-bottom-nav { display: block; }
+
+    /* Shop card body — légèrement plus compact */
+    body.is-dashboard .shop-card-body > div:first-child { gap: 7px !important; margin-bottom: 4px !important; }
+
+    /* Order row — lisibilité */
+    body.is-dashboard .order-info { min-width: 0; overflow: hidden; }
+
+    /* Empêcher tout débordement horizontal */
+    body.is-dashboard .main-col,
+    body.is-dashboard .sidebar { max-width: 100%; overflow-x: hidden; }
+
+    /* Pagination responsive */
+    body.is-dashboard .c-pagination .pagination { flex-wrap: wrap; gap: 4px; justify-content: center; }
+    body.is-dashboard .c-pagination .page-item .page-link { padding: 6px 10px; font-size: 12px; }
+}
+
+/* ══════════════════════════════════════
+   FLUIDITÉ — GPU, TOUCH, SCROLL
+══════════════════════════════════════ */
+
+/* Préparer les couches GPU pour les éléments animés */
+.shop-card,
+.top-shop-card,
+.pop-cat-chip,
+.cat-pill,
+.mob-bottom-nav,
+.msg-drawer,
+.fav-drawer {
+    will-change: transform;
+}
+.shop-card-img img,
+.top-shop-img img {
+    will-change: transform;
+}
+
+/* Supprimer le flash bleu au tap sur tout élément interactif */
+a, button, [role="button"],
+.shop-card, .top-shop-card,
+.sb-cat-item, .sb-top-shop,
+.cat-pill, .pop-cat-chip,
+.order-row, .msg-conv-item {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Scroll interne plus réactif sur iOS */
+.msg-conv-list, .msg-thread,
+.fav-list, .pop-cats-row,
+.top-shops-grid, .cats,
+.sidebar, .cn-drop-list {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Éviter le rebond de page (overscroll) sur mobile */
+html, body { overscroll-behavior-y: none; }
+
+/* Scroll snap sur le carousel boutiques populaires (mobile) */
+@media (max-width: 640px) {
+    body.is-dashboard .top-shops-grid {
+        scroll-snap-type: x mandatory !important;
+        scroll-padding: 0 10px !important;
+    }
+    body.is-dashboard .top-shop-card {
+        scroll-snap-align: start !important;
+    }
+}
+
+/* Animation d'entrée des cartes boutiques au chargement */
+@keyframes cardFadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.shops-grid .shop-card {
+    animation: cardFadeIn .3s ease both;
+}
+.shops-grid .shop-card:nth-child(1)  { animation-delay: .03s; }
+.shops-grid .shop-card:nth-child(2)  { animation-delay: .06s; }
+.shops-grid .shop-card:nth-child(3)  { animation-delay: .09s; }
+.shops-grid .shop-card:nth-child(4)  { animation-delay: .12s; }
+.shops-grid .shop-card:nth-child(5)  { animation-delay: .15s; }
+.shops-grid .shop-card:nth-child(6)  { animation-delay: .18s; }
+.shops-grid .shop-card:nth-child(7)  { animation-delay: .21s; }
+.shops-grid .shop-card:nth-child(8)  { animation-delay: .24s; }
+.shops-grid .shop-card:nth-child(n+9){ animation-delay: .27s; }
+
+/* Fade du conteneur lors du filtrage */
+#shopsGrid { transition: opacity .18s ease; }
+
+/* Stat cards — légère animation d'entrée */
+@keyframes statIn {
+    from { opacity: 0; transform: scale(.95); }
+    to   { opacity: 1; transform: scale(1); }
+}
+.stat-card {
+    animation: statIn .35s ease both;
+}
+.stat-card:nth-child(1) { animation-delay: .05s; }
+.stat-card:nth-child(2) { animation-delay: .10s; }
+.stat-card:nth-child(3) { animation-delay: .15s; }
+.stat-card:nth-child(4) { animation-delay: .20s; }
+
+/* Touch feedback visuel sur les cartes (mobile) */
+@media (hover: none) {
+    .shop-card:active  { transform: scale(.98) !important; box-shadow: var(--shadow-sm) !important; }
+    .top-shop-card:active { transform: scale(.97) !important; }
+    .cat-pill:active, .pop-cat-chip:active { transform: scale(.96) !important; }
+    .hero-btn-primary:active, .hero-btn-secondary:active { transform: scale(.97) !important; }
+    .shop-card-cta:active, .top-shop-btn:active { transform: scale(.96) !important; }
+    .mob-nav-item:active { background: var(--orange-lt) !important; }
 }
 
 /* ══ CLOCHE NOTIFICATION CLIENT ══ */
@@ -1521,7 +1705,6 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .cn-drop-ft { padding: 8px 14px; border-top: 1px solid var(--border); }
 .cn-drop-ft a { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: var(--r-sm); font-size: 11.5px; font-weight: 700; text-decoration: none; background: var(--orange-lt); color: var(--orange); border: 1px solid var(--orange); transition: all .15s; }
 .cn-drop-ft a:hover { background: var(--orange); color: #fff; }
-@media(max-width:400px){ .cn-dropdown { width: calc(100vw - 20px); right: auto; left: 50%; transform: translateX(-50%); } }
 </style>
 @endpush
 
@@ -1936,11 +2119,12 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 
     {{-- Explorer catégories --}}
     @if(isset($categories) && $categories->isNotEmpty())
-    <div class="sb-card">
+    <div class="sb-card sb-card-explorer">
         <div class="sb-hd">{!! $si('grid',15) !!} Explorer</div>
+        <div class="sb-cat-wrap-mob">
         <button class="sb-cat-item active" data-cat-type="" onclick="filterByCat('')">
             <span class="sb-cat-ico">{!! $si('store',17) !!}</span>
-            <span class="sb-cat-name">Toutes les boutiques</span>
+            <span class="sb-cat-name">Toutes</span>
             <span class="sb-cat-cnt">{{ $shopCount ?? $shops->total() }}</span>
         </button>
         @php
@@ -1976,6 +2160,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
             <span class="sb-cat-cnt">{{ $cat->shop_count }}</span>
         </button>
         @endforeach
+        </div>
     </div>
     @endif
 
@@ -1997,8 +2182,11 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 
     {{-- Top boutiques --}}
     @if(isset($topShops) && $topShops->isNotEmpty())
-    <div class="sb-card">
-        <div class="sb-hd">🏆 Meilleures boutiques</div>
+    <div class="sb-card sb-card-topshops">
+        <div class="sb-hd" style="justify-content:space-between">
+            <span>🏆 Meilleures boutiques</span>
+            <button onclick="openRankingModal()" style="background:var(--orange);color:#fff;border:none;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font);flex-shrink:0">Classement →</button>
+        </div>
         @foreach($topShops as $i => $ts)
         @php
             $sbParts = explode(' ', $ts->name);
@@ -2027,9 +2215,6 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
             </div>
         </a>
         @endforeach
-        <a href="#boutiques" style="display:flex;align-items:center;justify-content:center;gap:5px;padding:9px 14px;font-size:12px;font-weight:700;color:var(--orange);text-decoration:none;border-top:1px solid var(--grey)">
-            Voir le classement →
-        </a>
     </div>
     @endif
 
@@ -2176,20 +2361,37 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 @if(isset($categories) && $categories->isNotEmpty())
 <div id="categories" style="scroll-margin-top:80px">
    
-    <div class="pop-cats-row">
+    <div class="pop-cats-row" id="popCatsRow">
         <button class="pop-cat-chip active" data-cat-type="" onclick="filterByCat('')">
             <span class="pop-cat-ico">{!! $si('store',22) !!}</span>
             <span class="pop-cat-name">Toutes</span>
             <span class="pop-cat-cnt">{{ $shopCount ?? $shops->total() }} boutiques</span>
         </button>
-        @foreach($categories as $cat)
+        @foreach($categories->take(6) as $cat)
         <button class="pop-cat-chip" data-cat-type="{{ $cat->type }}" onclick="filterByCat(this.dataset.catType)">
             <span class="pop-cat-ico">{!! $getSbEmoji($cat->type) !!}</span>
             <span class="pop-cat-name">{{ $cat->type }}</span>
             <span class="pop-cat-cnt">{{ $cat->shop_count }} boutique{{ $cat->shop_count > 1 ? 's' : '' }}</span>
         </button>
         @endforeach
+        @if($categories->count() > 6)
+        @foreach($categories->skip(6) as $cat)
+        <button class="pop-cat-chip pop-cat-extra" data-cat-type="{{ $cat->type }}" onclick="filterByCat(this.dataset.catType)" style="display:none">
+            <span class="pop-cat-ico">{!! $getSbEmoji($cat->type) !!}</span>
+            <span class="pop-cat-name">{{ $cat->type }}</span>
+            <span class="pop-cat-cnt">{{ $cat->shop_count }} boutique{{ $cat->shop_count > 1 ? 's' : '' }}</span>
+        </button>
+        @endforeach
+        @endif
     </div>
+    @if($categories->count() > 6)
+    <div style="text-align:center;margin-top:10px">
+        <button id="popCatsMoreBtn" onclick="togglePopCats(this)" data-count="{{ $categories->count() - 6 }}"
+            style="display:inline-flex;align-items:center;gap:6px;padding:7px 18px;border-radius:20px;border:1.5px solid var(--orange);background:var(--orange-lt);color:var(--orange);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s">
+            ＋ Voir les {{ $categories->count() - 6 }} autres catégories
+        </button>
+    </div>
+    @endif
 </div>
 @endif
 
@@ -2201,7 +2403,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
             <strong>Boutiques</strong> populaires
             <span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:500;color:var(--muted);font-family:var(--font)">{!! $si('trending',14) !!} Tendances cette semaine</span>
         </div>
-        <a href="#boutiques" class="sec-link">Voir toutes les boutiques →</a>
+        <button onclick="openRankingModal()" style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:var(--orange);color:#fff;border:none;border-radius:50px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 3px 10px rgba(240,106,15,.3);transition:background .15s,transform .1s;flex-shrink:0" onmouseover="this.style.background='var(--orange-dk)'" onmouseout="this.style.background='var(--orange)'">🏆 Voir le classement</button>
     </div>
     <div class="top-shops-grid">
         @foreach($topShops as $ts)
@@ -2456,7 +2658,88 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 </div>{{-- /.main-col --}}
 </div>{{-- /.page-wrap --}}
 
+{{-- ══ BARRE NAVIGATION MOBILE (bas d'écran) ══ --}}
+<nav class="mob-bottom-nav" aria-label="Navigation principale">
+    <div class="mob-bottom-nav-inner">
+        <a href="{{ route('client.dashboard') }}" class="mob-nav-item active">
+            <div class="mob-nav-item-wrap">
+                {!! $si('home', 21) !!}
+                <span>Accueil</span>
+            </div>
+        </a>
+        <a href="#boutiques" class="mob-nav-item" onclick="document.querySelectorAll('.mob-nav-item').forEach(i=>i.classList.remove('active'));this.classList.add('active')">
+            <div class="mob-nav-item-wrap">
+                {!! $si('store', 21) !!}
+                <span>Boutiques</span>
+            </div>
+        </a>
+        <a href="{{ route('client.orders.index') }}" class="mob-nav-item">
+            <div class="mob-nav-item-wrap">
+                {!! $si('package', 21) !!}
+                <span>Commandes</span>
+            </div>
+        </a>
+        <button class="mob-nav-item" onclick="openProfileModal()" title="Profil">
+            <div class="mob-nav-item-wrap">
+                {!! $si('user', 21) !!}
+                <span>Profil</span>
+            </div>
+        </button>
+    </div>
+</nav>
+
 {{-- ══ MODALE PROFIL (3 onglets) ══ --}}
+{{-- ══ MODALE CLASSEMENT ══ --}}
+@if(isset($topShops) && $topShops->isNotEmpty())
+<div class="rank-overlay" id="rankOverlay" onclick="if(event.target===this)closeRankingModal()">
+    <div class="rank-modal">
+        <div class="rank-modal-head">
+            <span class="rank-modal-title">🏆 Classement des boutiques</span>
+            <button class="rank-modal-close" onclick="closeRankingModal()">✕</button>
+        </div>
+        <div class="rank-modal-body">
+            @foreach($topShops as $i => $ts)
+            @php
+                $rParts = explode(' ', $ts->name);
+                $rInit  = strtoupper(substr($rParts[0],0,1)) . strtoupper(substr($rParts[1] ?? 'X',0,1));
+                $rGrads = [
+                    'linear-gradient(135deg,#667eea,#764ba2)',
+                    'linear-gradient(135deg,#f5576c,#f093fb)',
+                    'linear-gradient(135deg,#4facfe,#00c6fb)',
+                    'linear-gradient(135deg,#cc2b5e,#753a88)',
+                    'linear-gradient(135deg,#ee0979,#ff6a00)',
+                    'linear-gradient(135deg,#24c6dc,#514a9d)',
+                    'linear-gradient(135deg,#11998e,#38ef7d)',
+                    'linear-gradient(135deg,#f59e0b,#f97316)',
+                ];
+                $rGrad = $rGrads[abs(crc32($ts->name)) % count($rGrads)];
+                $medal = $i === 0 ? '🥇' : ($i === 1 ? '🥈' : ($i === 2 ? '🥉' : null));
+                $posClass = $i === 0 ? 'gold' : ($i === 1 ? 'silver' : ($i === 2 ? 'bronze' : ''));
+            @endphp
+            <a href="{{ route('client.shops.show', $ts) }}" class="rank-row">
+                <div class="rank-pos {{ $posClass }}">{{ $medal ?? ($i + 1) }}</div>
+                <div class="rank-av" style="background:{{ $rGrad }}">
+                    @if($ts->image)
+                        <img src="{{ \App\Services\ImageOptimizer::url($ts->image, 'thumb') }}" alt="{{ $ts->name }}">
+                    @else
+                        {{ $rInit }}
+                    @endif
+                </div>
+                <div class="rank-info">
+                    <div class="rank-name">{{ $ts->name }}</div>
+                    <div class="rank-stats">
+                        ⭐ <strong>{{ $ts->avg_rating ? number_format($ts->avg_rating, 1) : '—' }}</strong>
+                        &nbsp;·&nbsp; {{ number_format($ts->sales_count ?? 0) }} ventes
+                    </div>
+                </div>
+                <span class="rank-link">Voir →</span>
+            </a>
+            @endforeach
+        </div>
+    </div>
+</div>
+@endif
+
 <div id="profileOverlay" onclick="if(event.target===this)closeProfileModal()"
      style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:700;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px)">
     <div style="background:#fff;border-radius:20px;width:100%;max-width:500px;max-height:90vh;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.3);animation:slideUp .28s cubic-bezier(.23,1,.32,1);display:flex;flex-direction:column">
@@ -2913,15 +3196,25 @@ document.addEventListener('click', e => {
    RECHERCHE BOUTIQUES (JS côté client)
 ══════════════════════════════════════════ */
 function doSearch() {
-    const q = document.getElementById('globalSearch').value.toLowerCase().trim();
-    let count = 0;
-    document.querySelectorAll('.shop-card').forEach(card => {
-        const match = !q || card.dataset.name.includes(q) || card.dataset.type.includes(q);
-        card.style.display = match ? '' : 'none';
-        if (match) count++;
-    });
-    const sc = document.getElementById('shopCount');
-    if (sc) sc.textContent = count;
+    const q    = document.getElementById('globalSearch').value.toLowerCase().trim();
+    const grid = document.getElementById('shopsGrid');
+    if (!grid) return;
+    grid.style.opacity = '0';
+    setTimeout(() => {
+        let count = 0, firstMatch = null;
+        document.querySelectorAll('#shopsGrid .shop-card').forEach(card => {
+            const match = !q || card.dataset.name.includes(q) || card.dataset.type.includes(q);
+            card.style.display = match ? '' : 'none';
+            if (match) { count++; if (!firstMatch) firstMatch = card; }
+        });
+        const sc = document.getElementById('shopCount');
+        if (sc) sc.textContent = count;
+        grid.style.opacity = '1';
+        /* Scroll fluide vers le premier résultat */
+        if (q && firstMatch) {
+            setTimeout(() => firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' }), 80);
+        }
+    }, 180);
 }
 document.getElementById('globalSearch')?.addEventListener('input', doSearch);
 document.getElementById('globalSearch')?.addEventListener('keydown', e => {
@@ -2955,29 +3248,28 @@ document.getElementById('globalSearch')?.addEventListener('keydown', e => {
 })();
 
 function filterByType(type, pillEl) {
-    /* 1. Pills actives */
-    document.querySelectorAll('#catFilter .cat-pill').forEach(p => p.classList.remove('active'));
+    const grid = document.getElementById('shopsGrid');
+
+    /* 1. Pills actives — aussi dans la sidebar */
+    document.querySelectorAll('#catFilter .cat-pill, .sb-cat-item').forEach(p => p.classList.remove('active'));
     pillEl.classList.add('active');
+    document.querySelectorAll(`.sb-cat-item[data-cat-type="${type}"]`).forEach(s => s.classList.add('active'));
 
-    /* 2. Filtre cartes — comparaison exacte (insensible à la casse) */
-    let count = 0;
-    document.querySelectorAll('#shopsGrid .shop-card').forEach(card => {
-        const cardType = (card.dataset.type || '').toLowerCase();
-        const filterKey = type.toLowerCase();
-        const match = !type || cardType === filterKey;
-        card.style.display = match ? '' : 'none';
-        if (match) count++;
-    });
-
-    /* 3. Mise à jour compteur global */
-    const sc = document.getElementById('shopCount');
-    if (sc) sc.textContent = count;
-
-    /* 4. Mise à jour compteur "Toutes" */
-    const allEl = document.getElementById('catCntAll');
-    if (allEl && !type) {
-        allEl.textContent = document.querySelectorAll('#shopsGrid .shop-card').length;
-    }
+    /* 2. Fade + filtrage */
+    if (grid) grid.style.opacity = '0';
+    setTimeout(() => {
+        let count = 0;
+        document.querySelectorAll('#shopsGrid .shop-card').forEach(card => {
+            const match = !type || (card.dataset.type || '').toLowerCase() === type.toLowerCase();
+            card.style.display = match ? '' : 'none';
+            if (match) count++;
+        });
+        const sc = document.getElementById('shopCount');
+        if (sc) sc.textContent = count;
+        const allEl = document.getElementById('catCntAll');
+        if (allEl && !type) allEl.textContent = document.querySelectorAll('#shopsGrid .shop-card').length;
+        if (grid) grid.style.opacity = '1';
+    }, 180);
 }
 
 /* ══════════════════════════════════════════
@@ -3210,7 +3502,7 @@ function startClientModalPolling() {
     _modalPollTimer = setInterval(async function() {
         if (!_currentProductId) return;
         try {
-            const res = await fetch(`/client/products/${_currentProductId}/messages`, {
+            const res = await fetch(`/client/products/${_currentProductId}/messages?poll=1&_t=${Date.now()}`, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Accept':           'application/json',
@@ -3284,7 +3576,7 @@ function escHtml(s) {
 async function markMessagesRead(productId, convKey) {
     try {
         /* Appel AJAX GET sur la route existante — elle marque les msgs lus */
-        await fetch(`/client/products/${productId}/messages`, {
+        await fetch(`/client/products/${productId}/messages?_t=${Date.now()}`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Accept':           'application/json',
@@ -3310,27 +3602,8 @@ async function markMessagesRead(productId, convKey) {
 }
 
 function updateNavBadge() {
-    /* Compte les items qui ont encore des non-lus */
-    const remaining = document.querySelectorAll('.msg-conv-item.has-unread').length;
-    const badge = document.getElementById('navMsgBadge');
-    const drawerBadge = document.querySelector('.msg-drawer-badge');
-
-    if (remaining > 0) {
-        badge.textContent = remaining;
-        badge.classList.add('show');
-    } else {
-        badge.textContent = '';
-        badge.classList.remove('show');
-    }
-
-    if (drawerBadge) {
-        if (remaining > 0) {
-            drawerBadge.textContent = remaining + ' non lu' + (remaining > 1 ? 's' : '');
-            drawerBadge.style.display = '';
-        } else {
-            drawerBadge.style.display = 'none';
-        }
-    }
+    /* L'utilisateur vient d'explicitement lire des messages → forceIfZero=true */
+    pollClientMessages(true);
 }
 
 /* ══════════════════════════════════════════
@@ -3420,6 +3693,20 @@ function closeProfileModal() {
     document.getElementById('profileOverlay').style.display = 'none';
     document.body.style.overflow = '';
 }
+
+function openRankingModal() {
+    const el = document.getElementById('rankOverlay');
+    if (!el) return;
+    el.classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closeRankingModal() {
+    const el = document.getElementById('rankOverlay');
+    if (!el) return;
+    el.classList.remove('open');
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeRankingModal(); });
 
 /* ── Onglets ── */
 function switchProfileTab(name) {
@@ -3516,11 +3803,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ══════════════════════════════════════════
    POLLING NOTIFICATIONS MESSAGES (toutes les 3s)
-   Met à jour le badge sans recharger la page
 ══════════════════════════════════════════ */
-async function pollClientMessages() {
+let _badgeSetAt   = 0;        /* timestamp où le badge est apparu */
+const _BADGE_MIN  = 12000;    /* 12 s minimum avant qu'un poll puisse effacer le badge */
+
+/* Si la page s'est chargée avec le badge déjà visible (rendu PHP),
+   on active la protection immédiatement pour éviter qu'un premier poll
+   avec réponse en cache efface le badge avant même d'avoir pollé le serveur. */
+if (document.getElementById('navMsgBadge')?.classList.contains('show')) {
+    _badgeSetAt = Date.now();
+}
+
+async function pollClientMessages(forceIfZero = false) {
     try {
-        const res = await fetch('{{ route("client.messages.client.poll") }}', {
+        /* ?_t= évite la mise en cache agressive des navigateurs mobiles (iOS Safari) */
+        const res = await fetch(`{{ route("client.messages.client.poll") }}?_t=${Date.now()}`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRF-TOKEN': _csrfToken,
@@ -3530,31 +3827,40 @@ async function pollClientMessages() {
         if (!res.ok) return;
         const data = await res.json();
 
-        /* ── Mettre à jour le badge de l'icône 💬 dans la navbar ── */
+        /* Sécurité : si la réponse ne contient pas "unread", on ignore */
+        if (typeof data.unread === 'undefined') return;
+
         const badge = document.getElementById('navMsgBadge');
-        if (badge) {
-            if (data.unread > 0) {
-                badge.textContent = data.unread;
-                badge.classList.add('show');
-            } else {
+        if (!badge) return;
+
+        if (data.unread > 0) {
+            /* Nouveau message : afficher et mémoriser le moment */
+            if (!_badgeSetAt) _badgeSetAt = Date.now();
+            badge.textContent = data.unread;
+            badge.classList.add('show');
+        } else {
+            /* Zéro non-lus : n'effacer que si l'utilisateur a explicitement lu
+               OU si le badge est affiché depuis plus de 12 s (vraiment lus ailleurs) */
+            if (forceIfZero || Date.now() - _badgeSetAt >= _BADGE_MIN) {
+                _badgeSetAt = 0;
                 badge.textContent = '';
                 badge.classList.remove('show');
             }
+            /* Sinon : on garde le badge, c'est peut-être un faux 0 transitoire */
         }
 
-        /* ── Si nouveau message reçu, faire pulser l'icône ── */
+        /* Pulse si nouveau message très récent */
         if (data.has_new) {
             const btn = document.querySelector('.nav-msg-btn');
             if (btn) {
                 btn.style.animation = 'none';
-                btn.offsetHeight; /* forcer reflow */
+                btn.offsetHeight;
                 btn.style.animation = 'msgPulse .6s ease 3';
             }
         }
     } catch(e) {}
 }
 
-/* Animation pulse sur le bouton message */
 const _pulseStyle = document.createElement('style');
 _pulseStyle.textContent = `
 @keyframes msgPulse {
@@ -3563,12 +3869,26 @@ _pulseStyle.textContent = `
 }`;
 document.head.appendChild(_pulseStyle);
 
-/* Démarrer le polling dès le chargement */
 setInterval(pollClientMessages, 3000);
 
 /* ══════════════════════════════════════════
    FILTRE PAR CATÉGORIE (sidebar + pop-cats)
 ══════════════════════════════════════════ */
+/* ── Toggle catégories pop-cats ── */
+function togglePopCats(btn) {
+    const extras = document.querySelectorAll('.pop-cat-extra');
+    const row    = document.getElementById('popCatsRow');
+    const open   = extras.length > 0 && extras[0].style.display !== 'none';
+    if (open) {
+        extras.forEach(el => el.style.display = 'none');
+        btn.innerHTML = '＋ ' + btn.dataset.count + ' catégories';
+    } else {
+        extras.forEach(el => el.style.display = '');
+        btn.innerHTML = '✕ Réduire';
+        setTimeout(() => row.scrollLeft = row.scrollWidth, 50);
+    }
+}
+
 function filterByCat(type) {
     /* Trouver la pill correspondante et déléguer à filterByType */
     let pill;
@@ -3595,20 +3915,7 @@ function filterByCat(type) {
     if (boutiques) boutiques.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-/* ══════════════════════════════════════════
-   ANIMATIONS ENTRÉE BOUTIQUES
-══════════════════════════════════════════ */
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.shop-card').forEach((card, i) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(18px)';
-        setTimeout(() => {
-            card.style.transition = 'opacity .35s ease, transform .35s ease';
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, 50 + i * 35);
-    });
-});
+/* Animation d'entrée gérée en CSS (cardFadeIn) — plus performante que JS */
 </script>
 
 {{-- ══════════════════════════════════════════════════
@@ -3668,14 +3975,13 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ── Polling ── */
     async function pollClientNotifs() {
         try {
-            const res = await fetch('/client/notifications/poll', {
+            const res = await fetch(`/client/notifications/poll?_t=${Date.now()}`, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }
             });
             if (!res.ok) return;
             const d = await res.json();
 
-            /* Messages badge */
-            setMsgBadge(d.messages_unread);
+            /* Badge géré exclusivement par pollClientMessages — pas de conflit */
             if (d.messages_unread > _prevMsg && _prevMsg >= 0) {
                 const n = d.messages_unread - _prevMsg;
                 showClientToast(`💬 <div>${n} nouveau${n>1?'x':''} message${n>1?'s':''} de vendeur</div>`, 'msg');
@@ -3879,7 +4185,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let _firstPoll = true;
     async function poll() {
         try {
-            const res = await fetch(POLL_URL, {
+            const res = await fetch(`${POLL_URL}?_t=${Date.now()}`, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }
             });
             if (!res.ok) return;
@@ -3924,13 +4230,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 try { localStorage.setItem(_KEY_ORD, JSON.stringify(_lastOrd)); } catch(e) {}
             }
 
-            /* — Badge message navbar — */
-            const msgBadge = document.getElementById('navMsgBadge');
-            if (msgBadge) {
-                const n = d.messages_unread || 0;
-                msgBadge.textContent = n > 0 ? n : '';
-                msgBadge.classList.toggle('show', n > 0);
-            }
+            /* Badge géré exclusivement par pollClientMessages */
 
             /* — Son + badge — */
             if (hasNew) playBeep();

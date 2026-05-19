@@ -94,14 +94,16 @@ class ShopMessageController extends Controller
                     'image_status'        => $m->image_status ?? 'ready',
                 ]);
 
-            // On marque tous les messages reçus par ce client comme lus
-            ShopMessage::where('shop_id', $shop->id)
-                ->where('product_id', $product->id)
-                ->where('receiver_id', $client->id)  // Destinataire = ce client
-                ->whereNull('read_at')               // Pas encore lus
-                ->update(['read_at' => now()]);       // On met la date/heure de lecture
+            // On marque comme lus uniquement si ce n'est pas un simple polling
+            // (le polling passe ?poll=1 pour ne pas déclencher le marquage)
+            if (!request()->boolean('poll')) {
+                ShopMessage::where('shop_id', $shop->id)
+                    ->where('product_id', $product->id)
+                    ->where('receiver_id', $client->id)
+                    ->whereNull('read_at')
+                    ->update(['read_at' => now()]);
+            }
 
-            // On retourne les messages en JSON pour JavaScript
             return response()->json($messages);
         }
 

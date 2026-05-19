@@ -5,6 +5,7 @@
 @php $bodyClass = 'is-dashboard'; @endphp
 
 
+
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -318,9 +319,23 @@ html, body {
     .topbar-info h1 { font-size: 14.5px; }
     .topbar-badge { display: none; }
     .page { padding: 20px 12px 60px; }
-    .map-livreur-overlay { bottom: 12px; padding: 7px 14px 7px 8px; }
-    .mlo-name { font-size: 12px; }
     .progress-card { padding: 16px; }
+
+    /* Header carte : réduit pour tenir sur petit écran */
+    .map-header { padding: 10px 14px; gap: 8px; flex-wrap: wrap; }
+    .map-title { font-size: 12.5px; }
+    .last-update-txt { font-size: 10.5px; }
+    .live-pill { padding: 2px 8px; font-size: 10.5px; }
+
+    /* Overlay livreur : en bas à gauche sur mobile pour ne pas cacher l'attribution Leaflet */
+    .map-livreur-overlay {
+        bottom: 10px; left: 12px; transform: none;
+        padding: 6px 12px 6px 8px;
+        max-width: calc(100% - 24px);
+        white-space: normal;
+    }
+    .mlo-name { font-size: 12px; }
+    .mlo-av   { width: 28px; height: 28px; font-size: 12px; }
 }
 
 /* Bootstrap impose max-width:100%;height:auto sur toutes les <img> — ça casse les tuiles Leaflet */
@@ -680,6 +695,7 @@ $init = fn(string $n): string =>
     0%   { transform: scale(1);   opacity: .35; }
     100% { transform: scale(2.8); opacity: 0; }
 }
+@keyframes gps-spin { to { transform: rotate(360deg); } }
 .moto-searching { animation: moto-search 1.6s ease-in-out infinite; }
 .halo-ring {
     position: absolute; inset: -5px; border-radius: 50%;
@@ -742,6 +758,10 @@ $init = fn(string $n): string =>
     setTimeout(() => map.invalidateSize(), 150);
     setTimeout(() => map.invalidateSize(), 700);
     window.addEventListener('load', () => map.invalidateSize());
+    /* Recalcul taille carte quand l'onglet redevient actif (retour arrière-plan mobile) */
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') map.invalidateSize();
+    });
 
     /* ── Icône moto ── */
     function makeMotoIcon(searching) {
@@ -1033,6 +1053,23 @@ $init = fn(string $n): string =>
         } catch (e) { setOnline(false); }
     }
 
+    /* ── Hint mobile "2 doigts pour défiler" ── */
+    if (window.innerWidth <= 640) {
+        const _hintWrap = document.createElement('div');
+        _hintWrap.style.cssText = 'position:absolute;inset:0;z-index:600;pointer-events:none;display:flex;align-items:center;justify-content:center';
+        const _hintBubble = document.createElement('div');
+        _hintBubble.style.cssText = 'background:rgba(0,0,0,.62);color:#fff;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:600;font-family:var(--font);opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none';
+        _hintBubble.textContent = '☝️ 2 doigts pour défiler la page';
+        _hintWrap.appendChild(_hintBubble);
+        document.getElementById('gpsMap').parentElement.appendChild(_hintWrap);
+        let _hintTimer = null;
+        map.on('dragstart', () => {
+            _hintBubble.style.opacity = '1';
+            clearTimeout(_hintTimer);
+            _hintTimer = setTimeout(() => { _hintBubble.style.opacity = '0'; }, 1800);
+        });
+    }
+
     /* ── Démarrage ── */
     if (IS_DELIVERED) {
         setOnline(false);
@@ -1166,27 +1203,59 @@ $init = fn(string $n): string =>
 
     /* ── Démarrage partage ── */
     function startSharing() {
+        /* Géolocalisation indisponible sur cet appareil/navigateur */
         if (!('geolocation' in navigator)) {
-            if (shareSubEl) shareSubEl.textContent = 'Géolocalisation non disponible';
+            if (shareSubEl) {
+                shareSubEl.style.color = 'var(--red)';
+                shareSubEl.textContent = '❌ Géolocalisation non disponible sur cet appareil';
+            }
             return;
         }
+
+        /* État "en cours de localisation" pendant que le GPS se fixe */
+        if (shareBtn) {
+            shareBtn.disabled = true;
+            shareBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="animation:gps-spin .8s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Localisation…`;
+        }
+        if (shareSubEl) {
+            shareSubEl.style.color = 'var(--muted)';
+            shareSubEl.textContent = '🔍 Recherche du signal GPS…';
+        }
+
+        let _firstFix = true;
         watchId = navigator.geolocation.watchPosition(
             pos => {
                 const { latitude: clat, longitude: clng } = pos.coords;
                 clientLat = clat; clientLng = clng;
+                if (_firstFix) {
+                    _firstFix = false;
+                    if (shareBtn) shareBtn.disabled = false;
+                    setShareUI(true);
+                }
                 sendClientLocation(clat, clng);
                 updateClientMarker(clat, clng);
                 scheduleRouteUpdate();
             },
             err => {
-                if (err.code === 1) { /* permission refusée */
-                    if (shareSubEl) shareSubEl.textContent = 'Permission refusée — activez la localisation';
-                    stopSharing(false);
+                if (shareBtn) shareBtn.disabled = false;
+                stopSharing(false);
+                let msg;
+                if (err.code === 1) {
+                    /* Permission refusée : donner des instructions claires selon l'OS */
+                    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                    msg = isIOS
+                        ? '❌ Bloqué — Réglages → Confidentialité → Service de localisation → Safari → Autoriser'
+                        : '❌ Bloqué — Paramètres du navigateur → Autorisations → Localisation → Autoriser ce site';
+                } else {
+                    msg = '❌ Signal GPS indisponible — réessayez en extérieur';
+                }
+                if (shareSubEl) {
+                    shareSubEl.style.color = 'var(--red)';
+                    shareSubEl.textContent = msg;
                 }
             },
             { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
         );
-        setShareUI(true);
     }
 
     /* ── Arrêt partage ── */

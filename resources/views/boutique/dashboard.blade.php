@@ -580,8 +580,13 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .resume-item-lbl { font-size:10.5px; color:var(--muted); margin-top:2px; font-weight:600; }
 
 /* ── Chat boutique ↔ entreprise (modal depuis cloche) ── */
-.bq-chat-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;padding:16px;}
-.bq-chat-overlay.open{display:flex;}
+.bq-chat-overlay{
+    display:flex;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;
+    align-items:center;justify-content:center;padding:16px;
+    visibility:hidden;opacity:0;pointer-events:none;
+    transition:opacity .2s,visibility .2s;
+}
+.bq-chat-overlay.open{visibility:visible;opacity:1;pointer-events:all;}
 .bq-chat-panel{background:#fff;border-radius:16px;width:100%;max-width:520px;display:flex;flex-direction:column;height:88vh;max-height:660px;box-shadow:0 28px 80px rgba(0,0,0,.22);overflow:hidden;animation:bqModalIn .2s ease;}
 @keyframes bqModalIn{from{opacity:0;transform:scale(.95) translateY(-8px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .bq-chat-hd{padding:14px 18px;border-bottom:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;}
@@ -640,6 +645,22 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 #bqOrdersList::-webkit-scrollbar-thumb{background:#86efac;border-radius:6px;}
 #bqOrdersList::-webkit-scrollbar-thumb:hover{background:#4ade80;}
 .bq-confier-hint{font-size:11px;color:#059669;font-weight:600;margin-bottom:6px;}
+
+/* ── Zone autocomplete ── */
+.bq-zone-result{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;border:1.5px solid #e2e8f0;background:#fff;cursor:pointer;transition:border-color .12s,background .12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.bq-zone-result:active,.bq-zone-result:hover{background:#f0fdf4;border-color:#6ee7b7;}
+.bq-zone-result-dot{width:9px;height:9px;border-radius:50%;background:#059669;flex-shrink:0;}
+.bq-zone-result-name{font-size:13.5px;font-weight:700;color:#0f172a;flex:1;min-width:0;}
+.bq-zone-result-right{text-align:right;flex-shrink:0;}
+.bq-zone-result-price{font-size:12px;font-weight:800;color:#059669;}
+.bq-zone-result-delay{font-size:10px;color:#9ca3af;margin-top:1px;}
+.bq-zone-chip{display:flex;align-items:center;gap:10px;background:#f0fdf4;border:1.5px solid #6ee7b7;border-radius:10px;padding:10px 12px;}
+.bq-zone-chip-dot{width:10px;height:10px;border-radius:50%;background:#059669;flex-shrink:0;}
+.bq-zone-chip-info{flex:1;min-width:0;}
+.bq-zone-chip-name{font-size:13px;font-weight:800;color:#065f46;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bq-zone-chip-details{font-size:11px;color:#047857;margin-top:2px;}
+.bq-zone-chip-change{flex-shrink:0;padding:5px 11px;border-radius:7px;border:1px solid #6ee7b7;background:#fff;color:#059669;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;touch-action:manipulation;}
+.bq-zone-empty{text-align:center;padding:14px;font-size:12px;color:#9ca3af;border-radius:9px;background:#f9fafb;}
 
 /* ══════════════════════════════════════════════════
    CORRECTIFS RESPONSIVE COMPLÉMENTAIRES
@@ -726,9 +747,17 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 /* Bq chat panel : plein écran sur mobile */
 @media(max-width:560px){
     .bq-chat-overlay{padding:0;align-items:flex-end;}
-    .bq-chat-panel{border-radius:20px 20px 0 0;max-height:90vh;max-width:100%;}
+    .bq-chat-panel{
+        border-radius:20px 20px 0 0;max-width:100%;
+        /* dvh = hauteur visible réelle (iOS 16+), vh comme fallback */
+        height:82vh;max-height:82vh;
+        height:80dvh;max-height:80dvh;
+    }
     .bq-confier-row{flex-wrap:wrap;}
     .bq-btn-confier{width:100%;justify-content:center;}
+    /* Anti-zoom iOS : font-size >= 16px sur tous les champs */
+    .bq-chat-textarea{font-size:16px !important;}
+    #bqZoneSearch,#bqZonePicker,.bq-order-select{font-size:16px !important;}
 }
 
 /* Résumé rapide : compact sur mobile */
@@ -992,16 +1021,21 @@ $I = [
             </div>
             <div id="bqOrdersList" style="display:flex;flex-direction:column;gap:5px;max-height:150px;overflow-y:auto;margin-bottom:8px;scrollbar-width:thin;scrollbar-color:#86efac #f0fdf4;"></div>
             <div id="bqZonePickerWrap" style="display:none;margin-bottom:8px;">
-                <label style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.4px;display:flex;align-items:center;gap:5px;margin-bottom:5px;">{!! $I['pin_zone'] !!} Zone de livraison</label>
-                <input type="text" id="bqZoneSearch" placeholder="🔍 Rechercher une zone…" autocomplete="off"
-                       oninput="filterZoneSelect(this,'bqZonePicker')"
-                       style="width:100%;padding:7px 10px;border:1.5px solid #bbf7d0;border-radius:8px;font-size:12px;font-family:inherit;background:#fff;color:#0f172a;outline:none;margin-bottom:6px;box-sizing:border-box;">
-                <select id="bqZonePicker" style="width:100%;padding:9px 12px;border:1.5px solid #bbf7d0;border-radius:9px;font-size:13px;font-family:inherit;background:#fff;color:#0f172a;outline:none;cursor:pointer;" onchange="bqOnZonePick(this)">
-                    <option value="">— Choisir une zone —</option>
-                </select>
-                <div id="bqZonePriceHint" style="display:none;margin-top:5px;padding:7px 10px;background:#f0fdf4;border-radius:7px;font-size:12px;font-weight:700;color:#065f46;">
-                    <span style="display:inline-flex;align-items:center;gap:4px">{!! $I['dollar_zn'] !!} Prix :</span> <span id="bqZonePriceVal"></span> · <span style="display:inline-flex;align-items:center;gap:4px">{!! $I['clock_zn'] !!}</span> <span id="bqZoneDelayVal"></span> min
+                <label style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.4px;display:flex;align-items:center;gap:5px;margin-bottom:8px;">{!! $I['pin_zone'] !!} Zone de livraison</label>
+                {{-- Champ de recherche --}}
+                <div id="bqZoneSearchBox">
+                    <div style="position:relative;display:flex;align-items:center;margin-bottom:6px;">
+                        <span style="position:absolute;left:10px;pointer-events:none;font-size:14px;color:#9ca3af;">🔍</span>
+                        <input type="text" id="bqZoneSearch" placeholder="Tapez le nom d'une zone…" autocomplete="off"
+                               oninput="bqFilterZones(this.value)"
+                               style="width:100%;padding:10px 34px 10px 34px;border:1.5px solid #bbf7d0;border-radius:10px;font-size:16px;font-family:inherit;background:#fff;color:#0f172a;outline:none;box-sizing:border-box;transition:border-color .15s;"
+                               onfocus="this.style.borderColor='#059669'" onblur="this.style.borderColor='#bbf7d0'">
+                        <button id="bqZoneSearchClear" onclick="bqZoneClearSearch()" style="display:none;position:absolute;right:8px;background:none;border:none;cursor:pointer;color:#9ca3af;font-size:18px;padding:4px;line-height:1;touch-action:manipulation;">✕</button>
+                    </div>
+                    <div id="bqZoneResults" style="display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#86efac #f0fdf4;"></div>
                 </div>
+                {{-- Zone sélectionnée (chip) --}}
+                <div id="bqZoneSelectedChip" style="display:none;"></div>
             </div>
             <button class="bq-btn-confier" id="bqBtnConfier" onclick="bqConfierLivraison()" style="gap:6px">
                 {!! $I['box_conf'] !!} Confier la livraison à cette entreprise
@@ -2404,6 +2438,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let _bqInterval       = null;
     let _bqConfierDone    = false;
     let _bqSelectedOrderIds = new Set();
+    let _bqZonesAll       = [];
+    let _bqSelectedZone   = null;
 
     /* ── Ouvre le chat pour une entreprise donnée ── */
     window.bqOpenCompanyChat = function(companyId, companyName) {
@@ -2434,8 +2470,18 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('bqConfierZone').style.display  = 'none';
         document.getElementById('bqOrdersList').innerHTML        = '';
         document.getElementById('bqZonePickerWrap').style.display = 'none';
-        document.getElementById('bqZonePriceHint').style.display  = 'none';
-        document.getElementById('bqZonePicker').innerHTML         = '<option value="">— Choisir une zone —</option>';
+        _bqZonesAll     = [];
+        _bqSelectedZone = null;
+        const _bqSrch = document.getElementById('bqZoneSearch');
+        if (_bqSrch) _bqSrch.value = '';
+        const _bqRes  = document.getElementById('bqZoneResults');
+        if (_bqRes)  _bqRes.innerHTML = '';
+        const _bqChip = document.getElementById('bqZoneSelectedChip');
+        if (_bqChip) { _bqChip.style.display = 'none'; _bqChip.innerHTML = ''; }
+        const _bqClr  = document.getElementById('bqZoneSearchClear');
+        if (_bqClr)  _bqClr.style.display = 'none';
+        const _bqSBox = document.getElementById('bqZoneSearchBox');
+        if (_bqSBox) _bqSBox.style.display = 'block';
         const btnC = document.getElementById('bqBtnConfier');
         btnC.disabled  = false;
         btnC.classList.remove('done');
@@ -2444,6 +2490,7 @@ document.addEventListener('DOMContentLoaded', () => {
         /* Ouvrir */
         document.getElementById('bqChatModal').classList.add('open');
         document.body.style.overflow = 'hidden';
+        _bqAdjustPanel();
         document.getElementById('bqChatInput').focus();
 
         /* Charger messages + commandes */
@@ -2534,7 +2581,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (document.getElementById('bqZonePickerWrap').style.display === 'none') bqLoadZones();
         } else {
             document.getElementById('bqZonePickerWrap').style.display = 'none';
-            document.getElementById('bqZonePriceHint').style.display  = 'none';
         }
     };
 
@@ -2552,7 +2598,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const nowEmpty = _bqSelectedOrderIds.size === 0;
         if (!wasEmpty && nowEmpty) {
             document.getElementById('bqZonePickerWrap').style.display = 'none';
-            document.getElementById('bqZonePriceHint').style.display  = 'none';
         } else if (wasEmpty && !nowEmpty) {
             bqLoadZones();
         }
@@ -2560,15 +2605,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* ── Charge les zones de l'entreprise ── */
     function bqLoadZones() {
-        const wrap   = document.getElementById('bqZonePickerWrap');
-        const picker = document.getElementById('bqZonePicker');
-        const hint   = document.getElementById('bqZonePriceHint');
-
+        const wrap = document.getElementById('bqZonePickerWrap');
         wrap.style.display = 'none';
-        hint.style.display = 'none';
-        picker.innerHTML   = '<option value="">— Choisir une zone —</option>';
-        const bqSrch = document.getElementById('bqZoneSearch');
-        if (bqSrch) bqSrch.value = '';
+        bqClearZoneSelection();
 
         if (!_bqCompanyId) return;
 
@@ -2578,45 +2617,88 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(r => r.json())
         .then(zones => {
             if (!zones || !zones.length) return;
-            zones.forEach(z => {
-                const opt = document.createElement('option');
-                opt.value           = z.id;
-                opt.textContent     = `${z.name} — ${new Intl.NumberFormat('fr-FR').format(z.price)} ${DEVISE}`;
-                opt.dataset.price   = z.price;
-                opt.dataset.minutes = z.estimated_minutes;
-                picker.appendChild(opt);
-            });
+            _bqZonesAll = zones;
+            bqFilterZones('');
             wrap.style.display = 'block';
         })
         .catch(() => {});
     }
 
-    /* ── Recherche dans un select de zones ── */
-    window.filterZoneSelect = function(input, selectId) {
-        const q   = input.value.toLowerCase().trim();
-        const sel = document.getElementById(selectId);
-        if (!sel) return;
-        Array.from(sel.options).forEach(opt => {
-            if (!opt.value) return;
-            opt.hidden = q.length > 0 && !opt.text.toLowerCase().includes(q);
-        });
-        const cur = sel.options[sel.selectedIndex];
-        if (cur && cur.value && cur.hidden) {
-            sel.value = '';
-            sel.dispatchEvent(new Event('change'));
+    /* ── Filtre et affiche les zones en temps réel ── */
+    window.bqFilterZones = function(raw) {
+        const q       = (raw || '').toLowerCase().trim();
+        const results = document.getElementById('bqZoneResults');
+        const clrBtn  = document.getElementById('bqZoneSearchClear');
+        if (!results) return;
+        if (clrBtn) clrBtn.style.display = q ? 'block' : 'none';
+        const list = q ? _bqZonesAll.filter(z => z.name.toLowerCase().includes(q)) : _bqZonesAll;
+        if (!list.length) {
+            results.innerHTML = `<div class="bq-zone-empty">Aucune zone trouvée pour "<strong>${q}</strong>"</div>`;
+            return;
         }
+        results.innerHTML = '';
+        list.forEach(z => {
+            const item = document.createElement('div');
+            item.className = 'bq-zone-result';
+            const color = z.color || '#059669';
+            const price = new Intl.NumberFormat('fr-FR').format(z.price);
+            item.innerHTML =
+                `<span class="bq-zone-result-dot" style="background:${color};box-shadow:0 0 5px ${color}88;"></span>` +
+                `<span class="bq-zone-result-name">${z.name}</span>` +
+                `<div class="bq-zone-result-right">` +
+                    `<div class="bq-zone-result-price">${price} ${DEVISE}</div>` +
+                    `<div class="bq-zone-result-delay">~${z.estimated_minutes} min</div>` +
+                `</div>`;
+            item.addEventListener('click', () => bqSelectZone(z));
+            item.addEventListener('touchend', e => { e.preventDefault(); bqSelectZone(z); });
+            results.appendChild(item);
+        });
     };
 
-    /* ── Zone sélectionnée ── */
-    window.bqOnZonePick = function(sel) {
-        const hint    = document.getElementById('bqZonePriceHint');
-        const priceEl = document.getElementById('bqZonePriceVal');
-        const delayEl = document.getElementById('bqZoneDelayVal');
-        const opt     = sel.options[sel.selectedIndex];
-        if (!sel.value) { hint.style.display = 'none'; return; }
-        priceEl.textContent = new Intl.NumberFormat('fr-FR').format(opt.dataset.price) + ' ' + DEVISE;
-        delayEl.textContent = opt.dataset.minutes;
-        hint.style.display  = 'block';
+    /* ── Sélectionne une zone et affiche la fiche ── */
+    window.bqSelectZone = function(z) {
+        _bqSelectedZone = z;
+        const searchBox = document.getElementById('bqZoneSearchBox');
+        const chip      = document.getElementById('bqZoneSelectedChip');
+        if (searchBox) searchBox.style.display = 'none';
+        if (!chip) return;
+        const color = z.color || '#059669';
+        const price = new Intl.NumberFormat('fr-FR').format(z.price);
+        chip.innerHTML =
+            `<div class="bq-zone-chip">` +
+                `<span class="bq-zone-chip-dot" style="background:${color};box-shadow:0 0 5px ${color}88;"></span>` +
+                `<div class="bq-zone-chip-info">` +
+                    `<div class="bq-zone-chip-name">${z.name}</div>` +
+                    `<div class="bq-zone-chip-details">💰 ${price} ${DEVISE} &nbsp;·&nbsp; ⏱ ~${z.estimated_minutes} min</div>` +
+                `</div>` +
+                `<button class="bq-zone-chip-change" onclick="bqClearZoneSelection()">Changer</button>` +
+            `</div>`;
+        chip.style.display = 'block';
+    };
+
+    /* ── Efface la sélection et revient à la recherche ── */
+    window.bqClearZoneSelection = function() {
+        _bqSelectedZone = null;
+        const searchBox = document.getElementById('bqZoneSearchBox');
+        const chip      = document.getElementById('bqZoneSelectedChip');
+        const input     = document.getElementById('bqZoneSearch');
+        const clrBtn    = document.getElementById('bqZoneSearchClear');
+        if (chip)    { chip.style.display = 'none'; chip.innerHTML = ''; }
+        if (input)   input.value = '';
+        if (clrBtn)  clrBtn.style.display = 'none';
+        if (searchBox) searchBox.style.display = 'block';
+        bqFilterZones('');
+        setTimeout(() => input?.focus(), 50);
+    };
+
+    /* ── Vide le champ de recherche (bouton ✕) ── */
+    window.bqZoneClearSearch = function() {
+        const input  = document.getElementById('bqZoneSearch');
+        const clrBtn = document.getElementById('bqZoneSearchClear');
+        if (input)  input.value = '';
+        if (clrBtn) clrBtn.style.display = 'none';
+        bqFilterZones('');
+        input?.focus();
     };
 
     /* ── Confie les commandes sélectionnées ── */
@@ -2634,9 +2716,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled  = true;
         btn.innerHTML = _SVG.clock + ' Envoi…';
 
-        const picker  = document.getElementById('bqZonePicker');
-        const zoneId  = picker?.value || null;
-        const zoneOpt = zoneId ? picker.options[picker.selectedIndex] : null;
+        const zoneId = _bqSelectedZone?.id || null;
 
         const ids = Array.from(_bqSelectedOrderIds);
         let successCount = 0;
@@ -2647,7 +2727,7 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append('_method', 'PUT');
             formData.append('delivery_company_id', _bqCompanyId);
             if (zoneId)                  formData.append('delivery_zone_id', zoneId);
-            if (zoneOpt?.dataset?.price) formData.append('delivery_fee', zoneOpt.dataset.price);
+            if (_bqSelectedZone?.price)  formData.append('delivery_fee', _bqSelectedZone.price);
             try {
                 const r    = await fetch(`/employe/orders/${orderId}/send-to-company`, {
                     method: 'POST',
@@ -2686,11 +2766,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    /* ── Ajuste la hauteur du panel selon le viewport réel (iOS keyboard) ── */
+    function _bqAdjustPanel() {
+        if (window.innerWidth > 560) return;
+        const overlay = document.getElementById('bqChatModal');
+        const panel   = document.querySelector('.bq-chat-panel');
+        if (!overlay || !panel) return;
+        const vv = window.visualViewport || { offsetTop: 0, height: window.innerHeight };
+        /* Déplace l'overlay pour ne couvrir que la zone visible (au-dessus du clavier) */
+        overlay.style.top    = vv.offsetTop + 'px';
+        overlay.style.height = vv.height + 'px';
+        overlay.style.bottom = 'auto';
+        /* Ajuste la hauteur du panel dans cette zone visible */
+        const h = Math.floor(vv.height * 0.82);
+        panel.style.height    = h + 'px';
+        panel.style.maxHeight = h + 'px';
+    }
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', _bqAdjustPanel);
+        window.visualViewport.addEventListener('scroll', _bqAdjustPanel);
+    }
+
     /* ── Ferme le chat ── */
     window.bqCloseChatModal = function() {
         clearInterval(_bqInterval);
         _bqInterval = null;
-        document.getElementById('bqChatModal').classList.remove('open');
+        const overlay = document.getElementById('bqChatModal');
+        overlay.classList.remove('open');
+        overlay.style.top    = '';
+        overlay.style.height = '';
+        overlay.style.bottom = '';
+        const panel = overlay.querySelector('.bq-chat-panel');
+        if (panel) { panel.style.height = ''; panel.style.maxHeight = ''; }
         document.body.style.overflow = '';
     };
 

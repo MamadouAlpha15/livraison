@@ -36,6 +36,7 @@
     <div class="rp-section">
         <div class="rp-title">📍 Zones & Tarifs</div>
         <input type="text"
+               class="zone-panel-search"
                placeholder="🔍 Rechercher une zone…"
                autocomplete="off"
                oninput="filterZonePills(this)"
