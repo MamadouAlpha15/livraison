@@ -324,6 +324,47 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .msg-meta{font-size:10px;color:#94a3b8;margin-top:2px;padding:0 2px;}
 .chat-empty{text-align:center;padding:32px 16px;color:#94a3b8;font-size:13px;}
 
+/* Toggle livraison (mobile only) */
+.chat-confier-toggle{
+    display:none;
+}
+@media(max-width:480px){
+    .chat-confier-toggle{
+        display:flex;align-items:center;justify-content:space-between;
+        padding:9px 14px;flex-shrink:0;
+        background:#ecfdf5;border-top:1.5px solid #bbf7d0;
+        cursor:pointer;border:none;width:100%;font-family:var(--font);
+        touch-action:manipulation;user-select:none;
+    }
+    .chat-confier-toggle-left{display:flex;align-items:center;gap:7px;}
+    .chat-confier-toggle-label{font-size:12.5px;font-weight:700;color:#059669;}
+    .chat-confier-toggle-badge{
+        display:none;background:#059669;color:#fff;
+        font-size:9.5px;font-weight:800;padding:1px 7px;border-radius:20px;
+        animation:pulse-badge 1.6s ease infinite;
+    }
+    .chat-confier-toggle-badge.visible{display:inline-block;}
+    @keyframes pulse-badge{0%,100%{opacity:1;}50%{opacity:.55;}}
+    .chat-confier-toggle-arrow{
+        font-size:13px;color:#059669;transition:transform .28s ease;
+    }
+    .chat-confier-toggle.zone-open .chat-confier-toggle-arrow{transform:rotate(180deg);}
+
+    /* Zone collapsible */
+    .chat-confier-zone{
+        overflow:hidden;
+        max-height:0;
+        padding-top:0 !important;padding-bottom:0 !important;
+        border-top:none;
+        transition:max-height .3s ease, padding .3s ease;
+    }
+    .chat-confier-zone.zone-open{
+        max-height:420px;
+        padding-top:10px !important;padding-bottom:10px !important;
+        border-top:1.5px solid #bbf7d0;
+    }
+}
+
 /* Bouton confier */
 .chat-confier-zone{padding:10px 14px;flex-shrink:0;background:#f0fdf4;border-top:1.5px solid #bbf7d0;}
 .btn-confier{
@@ -697,6 +738,16 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
         <div class="chat-msgs" id="chatMsgList">
             <div class="chat-empty" id="chatEmpty">Aucun message. Commencez la discussion !</div>
         </div>
+
+        {{-- Toggle livraison (mobile only) --}}
+        <button class="chat-confier-toggle" id="chatConfierToggle" onclick="toggleConfierZone()" type="button">
+            <span class="chat-confier-toggle-left">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                <span class="chat-confier-toggle-label">Livraison</span>
+                <span class="chat-confier-toggle-badge" id="chatConfierBadge">Zones dispo</span>
+            </span>
+            <span class="chat-confier-toggle-arrow">▾</span>
+        </button>
 
         {{-- Zone selector + Bouton Confier --}}
         <div class="chat-confier-zone" id="chatConfierZone">
@@ -1280,6 +1331,7 @@ function openChatFromCompany(btn) {
 
     /* Fermer le modal entreprise, ouvrir le chat */
     closeCompanyModal();
+    _resetConfierToggle();
     document.getElementById('chatModal').classList.add('open');
     document.body.style.overflow = 'hidden';
     _adjustChatPanel();
@@ -1314,6 +1366,29 @@ if (window.visualViewport) {
 function _scrollChatBottom() {
     const msgs = document.getElementById('chatMsgList');
     setTimeout(() => { if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 300);
+}
+
+/* ── Toggle zone livraison (mobile) ── */
+function toggleConfierZone() {
+    const zone   = document.getElementById('chatConfierZone');
+    const toggle = document.getElementById('chatConfierToggle');
+    const badge  = document.getElementById('chatConfierBadge');
+    if (!zone || !toggle) return;
+    const opening = !zone.classList.contains('zone-open');
+    zone.classList.toggle('zone-open', opening);
+    toggle.classList.toggle('zone-open', opening);
+    if (opening) {
+        if (badge) badge.classList.remove('visible');
+        setTimeout(_scrollChatBottom, 320);
+    }
+}
+function _resetConfierToggle() {
+    const zone   = document.getElementById('chatConfierZone');
+    const toggle = document.getElementById('chatConfierToggle');
+    const badge  = document.getElementById('chatConfierBadge');
+    if (zone)   zone.classList.remove('zone-open');
+    if (toggle) toggle.classList.remove('zone-open');
+    if (badge)  badge.classList.remove('visible');
 }
 
 /* ── Ferme le chat ── */
@@ -1475,6 +1550,9 @@ function loadCompanyZones(companyId) {
         _zonesAll = zones;
         filterZones('');
         wrap.style.display = 'block';
+        /* Signaler la disponibilité des zones via le badge (mobile) */
+        const _badge = document.getElementById('chatConfierBadge');
+        if (_badge && window.innerWidth <= 480) _badge.classList.add('visible');
         requestAnimationFrame(() => {
             const ml = document.getElementById('chatMsgList');
             if (ml) ml.scrollTop = ml.scrollHeight;
@@ -1592,6 +1670,7 @@ function confierLivraison() {
             _confierDone = true;
             btn.classList.add('done');
             btn.innerHTML = _SVG.check + ' Livraison confiée ! Statut : En attente';
+            _resetConfierToggle();
 
             /* Message de confirmation local */
             renderMessages([{

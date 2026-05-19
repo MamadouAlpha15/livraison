@@ -620,6 +620,9 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .bq-chat-send-btn{width:38px;height:38px;border-radius:10px;border:none;cursor:pointer;background:#6366f1;color:#fff;font-size:17px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .14s;}
 .bq-chat-send-btn:hover{background:#4f46e5;}
 .bq-chat-send-btn:disabled{opacity:.5;cursor:not-allowed;}
+/* Toggle livraison boutique (mobile only) */
+.bq-confier-toggle{display:none;}
+
 .bq-confier-zone{padding:10px 14px;flex-shrink:0;background:#f0fdf4;border-bottom:1.5px solid #bbf7d0;}
 .bq-confier-row{display:flex;gap:8px;align-items:center;}
 .bq-order-select{flex:1;padding:8px 10px;border:1.5px solid #86efac;border-radius:9px;font-size:12.5px;font-family:var(--font);color:var(--text);background:#fff;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;background-size:14px;padding-right:28px;transition:border-color .14s;}
@@ -758,6 +761,40 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     /* Anti-zoom iOS : font-size >= 16px sur tous les champs */
     .bq-chat-textarea{font-size:16px !important;}
     #bqZoneSearch,#bqZonePicker,.bq-order-select{font-size:16px !important;}
+
+    /* ── Toggle livraison ── */
+    .bq-confier-toggle{
+        display:flex;align-items:center;justify-content:space-between;
+        padding:9px 14px;flex-shrink:0;
+        background:#ecfdf5;border-bottom:1.5px solid #bbf7d0;
+        cursor:pointer;border:none;width:100%;font-family:var(--font);
+        touch-action:manipulation;user-select:none;
+    }
+    .bq-ct-left{display:flex;align-items:center;gap:7px;}
+    .bq-ct-label{font-size:12.5px;font-weight:700;color:#059669;}
+    .bq-ct-badge{
+        display:none;background:#059669;color:#fff;
+        font-size:9.5px;font-weight:800;padding:1px 7px;border-radius:20px;
+        animation:bqPulseBadge 1.6s ease infinite;
+    }
+    .bq-ct-badge.visible{display:inline-block;}
+    @keyframes bqPulseBadge{0%,100%{opacity:1;}50%{opacity:.55;}}
+    .bq-ct-arrow{font-size:13px;color:#059669;transition:transform .28s ease;}
+    .bq-confier-toggle.zone-open .bq-ct-arrow{transform:rotate(180deg);}
+
+    /* Zone collapsible sur mobile */
+    .bq-confier-zone{
+        overflow:hidden;
+        max-height:0;
+        padding-top:0 !important;padding-bottom:0 !important;
+        border-bottom:none;
+        transition:max-height .3s ease, padding .3s ease;
+    }
+    .bq-confier-zone.zone-open{
+        max-height:520px;
+        padding-top:10px !important;padding-bottom:10px !important;
+        border-bottom:1.5px solid #bbf7d0;
+    }
 }
 
 /* Résumé rapide : compact sur mobile */
@@ -1011,6 +1048,16 @@ $I = [
             </div>
             <button class="bq-chat-close" onclick="bqCloseChatModal()">{!! $I['close_chat'] !!}</button>
         </div>
+        {{-- Toggle livraison (mobile only) --}}
+        <button class="bq-confier-toggle" id="bqConfierToggle" onclick="bqToggleConfierZone()" type="button" style="display:none;">
+            <span class="bq-ct-left">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                <span class="bq-ct-label">Livraison</span>
+                <span class="bq-ct-badge" id="bqConfierBadge">Commandes dispo</span>
+            </span>
+            <span class="bq-ct-arrow">▾</span>
+        </button>
+
         {{-- Zone confier la livraison (au-dessus des messages pour ne pas masquer le dernier) --}}
         <div class="bq-confier-zone" id="bqConfierZone" style="display:none;">
             <div class="bq-confier-hint" style="display:flex;align-items:flex-start;gap:6px">
@@ -2467,7 +2514,7 @@ document.addEventListener('DOMContentLoaded', () => {
             '<div class="bq-chat-empty" id="bqChatEmpty">Chargement…</div>';
 
         /* Reset zone confier */
-        document.getElementById('bqConfierZone').style.display  = 'none';
+        _bqHideConfierZone();
         document.getElementById('bqOrdersList').innerHTML        = '';
         document.getElementById('bqZonePickerWrap').style.display = 'none';
         _bqZonesAll     = [];
@@ -2491,7 +2538,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('bqChatModal').classList.add('open');
         document.body.style.overflow = 'hidden';
         _bqAdjustPanel();
-        document.getElementById('bqChatInput').focus();
+        const _bqCi = document.getElementById('bqChatInput');
+        _bqCi.focus();
+        _bqCi.addEventListener('focus', _bqScrollMsgsBottom, { once: false });
 
         /* Charger messages + commandes */
         bqLoadMessages(true);
@@ -2511,7 +2560,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(orders => {
             list.innerHTML = '';
             _bqSelectedOrderIds = new Set();
-            if (!orders.length) { zone.style.display = 'none'; return; }
+            if (!orders.length) { _bqHideConfierZone(); return; }
 
             /* ── "Tout sélectionner" bar (only when >1 orders) ── */
             if (orders.length > 1) {
@@ -2545,14 +2594,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.addEventListener('click', () => bqSelectOrderCard(card, o.id));
                 list.appendChild(card);
             });
-            zone.style.display = 'block';
+            _bqShowConfierZone();
             /* La zone vient d'apparaître et a réduit la zone messages → re-scroller en bas */
             requestAnimationFrame(() => {
                 const ml = document.getElementById('bqChatMsgList');
-                ml.scrollTop = ml.scrollHeight;
+                if (ml) ml.scrollTop = ml.scrollHeight;
             });
         })
-        .catch(() => { document.getElementById('bqConfierZone').style.display = 'none'; });
+        .catch(() => { _bqHideConfierZone(); });
     }
 
     /* ── Met à jour le bouton confier ── */
@@ -2747,7 +2796,7 @@ document.addEventListener('DOMContentLoaded', () => {
             _bqConfierDone = true;
             btn.classList.add('done');
             btn.innerHTML = _SVG.check + ' Confiée !';
-            document.getElementById('bqConfierZone').style.display = 'none';
+            _bqHideConfierZone();
 
             bqRenderMessages([{
                 id: 'local-' + Date.now(),
@@ -2765,6 +2814,45 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Erreur lors de la soumission. Veuillez réessayer.');
         }
     };
+
+    /* ── Toggle / helpers zone livraison (mobile) ── */
+    function _bqShowConfierZone() {
+        const zone   = document.getElementById('bqConfierZone');
+        const toggle = document.getElementById('bqConfierToggle');
+        const badge  = document.getElementById('bqConfierBadge');
+        if (!zone) return;
+        zone.style.display = 'block';
+        if (window.innerWidth <= 560 && toggle) {
+            toggle.style.display = 'flex';
+            if (badge) badge.classList.add('visible');
+        }
+    }
+    function _bqHideConfierZone() {
+        const zone   = document.getElementById('bqConfierZone');
+        const toggle = document.getElementById('bqConfierToggle');
+        if (zone)   { zone.style.display = 'none'; zone.classList.remove('zone-open'); }
+        if (toggle) { toggle.style.display = 'none'; toggle.classList.remove('zone-open'); }
+        const badge = document.getElementById('bqConfierBadge');
+        if (badge)  badge.classList.remove('visible');
+    }
+    window.bqToggleConfierZone = function() {
+        const zone   = document.getElementById('bqConfierZone');
+        const toggle = document.getElementById('bqConfierToggle');
+        const badge  = document.getElementById('bqConfierBadge');
+        if (!zone || !toggle) return;
+        const opening = !zone.classList.contains('zone-open');
+        zone.classList.toggle('zone-open', opening);
+        toggle.classList.toggle('zone-open', opening);
+        if (opening && badge) badge.classList.remove('visible');
+    };
+    function _bqResetConfierToggle() {
+        const zone   = document.getElementById('bqConfierZone');
+        const toggle = document.getElementById('bqConfierToggle');
+        if (zone)   zone.classList.remove('zone-open');
+        if (toggle) toggle.classList.remove('zone-open');
+        const badge = document.getElementById('bqConfierBadge');
+        if (badge)  badge.classList.remove('visible');
+    }
 
     /* ── Ajuste la hauteur du panel selon le viewport réel (iOS keyboard) ── */
     function _bqAdjustPanel() {
@@ -2785,6 +2873,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', _bqAdjustPanel);
         window.visualViewport.addEventListener('scroll', _bqAdjustPanel);
+    }
+
+    function _bqScrollMsgsBottom() {
+        const msgs = document.getElementById('bqChatMsgList');
+        setTimeout(() => { if (msgs) msgs.scrollTop = msgs.scrollHeight; }, 300);
     }
 
     /* ── Ferme le chat ── */
