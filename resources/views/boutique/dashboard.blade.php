@@ -673,6 +673,22 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 .tbl-wrap .tbl{min-width:420px;}
 
+/* ── Cartes commandes mobiles ── */
+.orders-mobile{display:none;flex-direction:column;gap:8px;padding:10px 14px;}
+.om-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:11px 13px;display:flex;align-items:center;gap:11px;text-decoration:none;color:inherit;transition:border-color .13s,box-shadow .13s;}
+.om-card:active{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-mlt);}
+.om-card-av{width:36px;height:36px;border-radius:9px;background:var(--brand-mlt);border:1.5px solid var(--brand-lt);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--brand);flex-shrink:0;font-family:var(--mono);}
+.om-card-body{flex:1;min-width:0;}
+.om-card-ref{font-size:11px;font-weight:700;color:var(--muted);font-family:var(--mono);}
+.om-card-client{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.om-card-right{text-align:right;flex-shrink:0;}
+.om-card-amt{font-size:13px;font-weight:800;color:var(--text);}
+.om-card-devise{font-size:9.5px;color:var(--muted);font-weight:500;}
+@media(max-width:600px){
+    .tbl-wrap{display:none;}
+    .orders-mobile{display:flex;}
+}
+
 /* Notification dropdown : ne déborde pas sur petits écrans */
 @media(max-width:400px){
     #notifDropdown{width:calc(100vw - 24px);right:auto;left:50%;transform:translateX(-50%);}
@@ -1562,6 +1578,7 @@ $I = [
             <div class="content-grid">
                 <div class="card">
                     <div class="card-hd"><span class="card-title">{{ __('app.recent_orders') }}</span><a href="{{ route('boutique.orders.index') }}" class="btn-ghost btn btn-sm">{{ __('app.see_all') }}</a></div>
+                    {{-- Desktop : tableau --}}
                     <div class="tbl-wrap" style="padding:0 18px">
                         @if($recentOrders->isEmpty())<div style="padding:28px 0;text-align:center;font-size:13px;color:var(--muted)">Aucune commande pour le moment.</div>
                         @else
@@ -1580,6 +1597,31 @@ $I = [
                         </table>
                         @endif
                     </div>
+
+                    {{-- Mobile : cartes --}}
+                    @if($recentOrders->isEmpty())
+                    <div class="orders-mobile" style="padding:28px 14px;text-align:center;font-size:13px;color:var(--muted);">Aucune commande pour le moment.</div>
+                    @else
+                    <div class="orders-mobile">
+                        @foreach($recentOrders as $order)
+                        @php $st = $statusMap[$order->status] ?? ['label'=>ucfirst($order->status),'cls'=>'p-muted']; @endphp
+                        <a href="{{ route('boutique.orders.index') }}" class="om-card">
+                            <div class="om-card-av">#{{ substr($order->id, -2) }}</div>
+                            <div class="om-card-body">
+                                <div class="om-card-ref">#{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</div>
+                                <div class="om-card-client">{{ $order->user->name ?? 'Client inconnu' }}</div>
+                            </div>
+                            <div class="om-card-right">
+                                <span class="pill {{ $st['cls'] }}" style="font-size:10px;padding:3px 8px;">{{ $st['label'] }}</span>
+                                <div class="om-card-amt" style="margin-top:4px;">
+                                    {{ number_format($order->total,0,',',' ') }}
+                                    <span class="om-card-devise">{{ $devise }}</span>
+                                </div>
+                            </div>
+                        </a>
+                        @endforeach
+                    </div>
+                    @endif
                 </div>
                 <div class="right-col">
                     @if($hasLivreurs)

@@ -11,10 +11,21 @@ class PublicShopController extends Controller
         $search = $request->input('q');
         $type   = $request->input('type');
 
-        $query = Shop::where('is_approved', true)->withCount('products');
+        $query = Shop::where('is_approved', true)
+            ->withCount('products')
+            ->with(['products' => function ($q) {
+                $q->select('id', 'shop_id', 'name', 'category');
+            }]);
 
         if ($search) {
-            $query->where('name', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->where('name',    'like', "%{$search}%")
+                  ->orWhere('type',  'like', "%{$search}%")
+                  ->orWhereHas('products', function ($pq) use ($search) {
+                      $pq->where('name',     'like', "%{$search}%")
+                         ->orWhere('category','like', "%{$search}%");
+                  });
+            });
         }
         if ($type) {
             $query->where('type', $type);

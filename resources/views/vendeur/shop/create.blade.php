@@ -563,6 +563,7 @@ textarea.field-input { resize: vertical; min-height: 90px; }
     .form-nav .btn-submit { width: 100%; justify-content: center; text-align: center; }
     .type-pills { gap: 6px; }
     .type-pill { padding: 6px 11px; font-size: 12px; }
+    .field-input { font-size: 16px !important; }
 }
 @media (max-width: 480px) {
     .form-main { padding: 16px 12px; }
@@ -572,11 +573,13 @@ textarea.field-input { resize: vertical; min-height: 90px; }
     .step-tab { padding: 11px 6px; }
     .type-custom-wrap { flex-direction: column; align-items: stretch; }
     .type-custom-ok, .type-custom-cancel { width: 100%; }
+    .field-input { font-size: 16px !important; }
 }
 @media (max-width: 360px) {
     .form-main { padding: 12px 10px; }
     .section-hd h2 { font-size: 15px; }
     .btn-next, .btn-submit { padding: 11px 16px; font-size: 13px; }
+    .field-input { font-size: 16px !important; }
 }
 </style>
 @endpush

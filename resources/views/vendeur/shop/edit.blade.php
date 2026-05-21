@@ -493,6 +493,14 @@ textarea.field-input { resize: vertical; min-height: 90px; }
     .form-sidebar { display: none; }
     .form-main { padding: 28px 24px; }
     .mobile-steps-bar { display: flex; }
+
+    /* Anti-zoom iOS — font-size < 16px déclenche le zoom automatique */
+    .field-input,
+    textarea.field-input,
+    select.field-input,
+    .currency-search-box,
+    .currency-search-input,
+    #typeCustomInput { font-size: 16px !important; }
 }
 @media (max-width: 640px) {
     .form-main { padding: 20px 16px; }

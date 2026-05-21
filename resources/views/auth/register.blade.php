@@ -70,6 +70,11 @@ $countries = [
 
 /* ── Hint ── */
 .f-hint{font-size:11.5px;color:#9ca3af;margin-top:5px}
+
+/* ── Anti-zoom iOS ── */
+@media(max-width:600px){
+    .f-input,.f-select{font-size:16px !important;}
+}
 </style>
 
 {{-- Titre --}}

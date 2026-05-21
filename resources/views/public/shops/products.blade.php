@@ -452,38 +452,66 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
    RESPONSIVE
 ══════════════════════════════ */
 @media (max-width: 960px) {
-    .amz-sidebar { display: none; }
-    .mobile-bar  { display: flex; }
-    .amz-layout  { padding: 14px 14px 50px; }
-    .amz-nav-right { display: none; }
+    .amz-sidebar  { display: none; }
+    .mobile-bar   { display: flex; }
+    .amz-layout   { padding: 14px 14px 50px; }
+    .amz-nav-right{ display: none; }
+    /* anti-zoom iOS sur recherche desktop visible ≤960 */
+    .amz-nav-search input { font-size: 16px !important; }
+    /* forcer grille sur mobile (vue liste trop large) */
+    .amz-grid.list-view {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .amz-grid.list-view .amz-card { flex-direction: column; min-height: unset; }
+    .amz-grid.list-view .amz-card-img { width: 100%; min-height: unset; height: 170px; }
+    .amz-grid.list-view .amz-card-footer { border-left: none; border-top: 1px solid var(--border); width: 100%; flex-direction: row; gap: 8px; padding: 10px 12px; }
 }
 @media (max-width: 640px) {
     .amz-nav { padding: 0 12px; gap: 8px; height: 56px; }
     :root { --nav-h: 56px; }
-    .nav-logo-img { width: 32px; height: 32px; }
+    .nav-logo-img   { width: 32px; height: 32px; }
     .nav-brand-name { font-size: 14px; }
-    .amz-back-home { padding: 6px 10px; font-size: 12px; }
-    .amz-back { display: none; }
+    .amz-back-home  { padding: 6px 10px; font-size: 12px; }
+    .amz-back       { display: none; }
     .amz-nav-search { display: none; }
+    /* anti-zoom iOS sur tous les inputs */
+    .mobile-search-wrap input { font-size: 16px !important; }
+    .amz-price-input           { font-size: 16px !important; }
+    .amz-sort-select           { font-size: 16px !important; }
     .amz-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .amz-card-img { height: 148px; }
+    .amz-grid.list-view { grid-template-columns: repeat(2, 1fr); }
+    .amz-card-img  { height: 148px; }
     .amz-card-body { padding: 9px 10px 6px; }
     .amz-card-name { font-size: 12px; -webkit-line-clamp: 2; }
     .amz-price-main { font-size: 15px; }
+    .amz-btn-msg { display: none; } /* trop encombrant sur mobile */
     .shop-banner { padding: 16px 14px; gap: 12px; }
     .shop-banner-logo { width: 52px; height: 52px; font-size: 22px; }
     .shop-banner-name { font-size: 17px; margin-bottom: 6px; }
     .amz-results-bar { padding: 9px 12px; }
-    .amz-sort-label { display: none; }
+    .amz-sort-label  { display: none; }
+    .amz-view-btns   { display: none; } /* cache grille/liste sur mobile */
     .amz-layout { padding: 10px 10px 48px; }
 }
 @media (max-width: 400px) {
     .amz-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .amz-back-home .txt { display: none; }
     .amz-card-footer { padding: 7px 9px 11px; }
-    .amz-btn-order { font-size: 11.5px; padding: 8px 6px; }
+    .amz-btn-order   { font-size: 11.5px; padding: 8px 6px; }
     .shop-banner-chip { display: none; }
     .shop-banner-chip:first-of-type { display: inline-flex; }
+    .amz-price-main { font-size: 14px; }
+}
+@media (max-width: 360px) {
+    /* 1 colonne sur très petit écran */
+    .amz-grid { grid-template-columns: 1fr; gap: 12px; }
+    .amz-card-img { height: 200px; }
+    .amz-card-name { font-size: 13px; -webkit-line-clamp: 3; }
+    .amz-price-main { font-size: 17px; }
+    .amz-btn-order  { font-size: 13px; padding: 11px; }
+    .amz-btn-msg    { display: flex; } /* réafficher sur 1-col */
+    .shop-banner-name { font-size: 15px; }
+    .amz-layout { padding: 8px 8px 40px; }
 }
 </style>
 @endpush
@@ -593,9 +621,13 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                 <input type="radio" name="sort_m" id="msort-pd">
                 <label for="msort-pd">Prix décroissant</label>
             </div>
+            <div class="amz-filter-item" onclick="setSort('name', this, true)">
+                <input type="radio" name="sort_m" id="msort-name">
+                <label for="msort-name">Nom A → Z</label>
+            </div>
             <div class="amz-filter-item" onclick="setSort('featured', this, true)">
                 <input type="radio" name="sort_m" id="msort-feat">
-                <label for="msort-feat">Meilleures ventes</label>
+                <label for="msort-feat">⭐ Vedettes en premier</label>
             </div>
         </div>
 
@@ -684,9 +716,13 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                 <input type="radio" name="sort_d" id="dsort-pd">
                 <label for="dsort-pd">Prix décroissant</label>
             </div>
+            <div class="amz-filter-item" onclick="setSort('name', this, false)">
+                <input type="radio" name="sort_d" id="dsort-name">
+                <label for="dsort-name">Nom A → Z</label>
+            </div>
             <div class="amz-filter-item" onclick="setSort('featured', this, false)">
                 <input type="radio" name="sort_d" id="dsort-feat">
-                <label for="dsort-feat">Meilleures ventes</label>
+                <label for="dsort-feat">⭐ Vedettes en premier</label>
             </div>
         </div>
     </aside>
@@ -708,10 +744,10 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     <span class="amz-sort-label">Trier :</span>
                     <select class="amz-sort-select" id="sortSelectTop" onchange="setSort(this.value, null, false)">
                         <option value="default">Pertinence</option>
-                        <option value="price_asc">Prix ↑</option>
-                        <option value="price_desc">Prix ↓</option>
-                        <option value="name">Nom A→Z</option>
-                        <option value="featured">Vedettes</option>
+                        <option value="price_asc">Prix croissant</option>
+                        <option value="price_desc">Prix décroissant</option>
+                        <option value="name">Nom A → Z</option>
+                        <option value="featured">⭐ Vedettes en premier</option>
                     </select>
                 </div>
                 <div class="amz-view-btns">
@@ -817,86 +853,72 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 @push('scripts')
 <script>
 /* ── État global des filtres ── */
-let state = { cat: '', sort: 'default', stockOnly: false, priceMin: 0, priceMax: Infinity, search: '' };
+var state = { cat: '', sort: 'default', stockOnly: false, priceMin: 0, priceMax: Infinity, search: '' };
 
 /* ── Navigation produit ── */
 function goToProduct(url) { window.location.href = url; }
 
+/*
+ * ── Sync visuelle GLOBALE (sidebar + drawer) ──
+ * Parcourt tous les .amz-filter-item et active ceux dont le 1er argument
+ * de onclick correspond à la valeur attendue.
+ * Corrige le bug : sélection dans sidebar ne mettait pas à jour le drawer, et vice versa.
+ */
+function _syncRadios(fnName, activeVal) {
+    var re = new RegExp(fnName.replace('.', '\\.') + "\\(([^,)]+)");
+    document.querySelectorAll('.amz-filter-item').forEach(function(item) {
+        var oc = item.getAttribute('onclick') || '';
+        if (!oc.includes(fnName)) return;
+        var m = oc.match(re);
+        if (!m) return;
+        var raw   = m[1].trim().replace(/'/g, '');  // retire les guillemets simples
+        var match = (raw === String(activeVal));
+        item.classList.toggle('active', match);
+        var r = item.querySelector('input[type=radio]');
+        if (r) r.checked = match;
+    });
+}
+
 /* ── Catégorie ── */
-function filterCat(cat, el) {
+function filterCat(cat) {
     state.cat = cat;
-    /* Mettre à jour visuellement les items du même groupe */
-    if (el) {
-        const parent = el.closest('.amz-sidebar, .drawer-body');
-        if (parent) {
-            parent.querySelectorAll('.amz-filter-item').forEach(function(item) {
-                if (item.getAttribute('onclick') && item.getAttribute('onclick').includes('filterCat')) {
-                    item.classList.remove('active');
-                    item.querySelector('input[type=radio]').checked = false;
-                }
-            });
-            el.classList.add('active');
-            const radio = el.querySelector('input[type=radio]');
-            if (radio) radio.checked = true;
-        }
-    }
+    _syncRadios('filterCat', cat);
     updateBadge();
     applyFilters();
 }
 
 /* ── Stock ── */
-function filterStock(onlyIn, el) {
+function filterStock(onlyIn) {
     state.stockOnly = onlyIn;
-    if (el) {
-        const parent = el.closest('.amz-sidebar, .drawer-body');
-        if (parent) {
-            parent.querySelectorAll('.amz-filter-item').forEach(function(item) {
-                if (item.getAttribute('onclick') && item.getAttribute('onclick').includes('filterStock')) {
-                    item.classList.remove('active');
-                    item.querySelector('input[type=radio]').checked = false;
-                }
-            });
-            el.classList.add('active');
-            const radio = el.querySelector('input[type=radio]');
-            if (radio) radio.checked = true;
-        }
-    }
+    _syncRadios('filterStock', onlyIn);
     updateBadge();
     applyFilters();
 }
 
-/* ── Prix ── */
+/* ── Prix desktop (sidebar) ── */
 function filterPrice() {
-    var minD = parseFloat(document.getElementById('dPriceMin').value) || 0;
-    var maxD = parseFloat(document.getElementById('dPriceMax').value) || Infinity;
-    state.priceMin = minD;
-    state.priceMax = maxD;
+    var minEl = document.getElementById('dPriceMin');
+    var maxEl = document.getElementById('dPriceMax');
+    /* Bug fix : 0 est falsy donc on utilise une vérification explicite */
+    state.priceMin = minEl.value !== '' ? parseFloat(minEl.value) : 0;
+    state.priceMax = maxEl.value !== '' ? parseFloat(maxEl.value) : Infinity;
+    /* Sync vers les inputs mobiles du drawer */
+    var mMin = document.getElementById('mPriceMin');
+    var mMax = document.getElementById('mPriceMax');
+    if (mMin) mMin.value = minEl.value;
+    if (mMax) mMax.value = maxEl.value;
     updateBadge();
     applyFilters();
 }
 
-/* ── Tri ── (fromDrawer = true pour ne pas masquer le drawer) */
+/* ── Tri ── */
 function setSort(val, el, fromDrawer) {
     state.sort = val;
-    /* Sync select desktop */
+    /* Sync le select du haut */
     var sel = document.getElementById('sortSelectTop');
     if (sel) sel.value = val;
-    /* Mise à jour visuelle du groupe radio */
-    if (el) {
-        var parent = el.closest('.amz-sidebar, .drawer-body');
-        if (parent) {
-            parent.querySelectorAll('.amz-filter-item').forEach(function(item) {
-                if (item.getAttribute('onclick') && item.getAttribute('onclick').includes('setSort')) {
-                    item.classList.remove('active');
-                    var r = item.querySelector('input[type=radio]');
-                    if (r) r.checked = false;
-                }
-            });
-            el.classList.add('active');
-            var radio = el.querySelector('input[type=radio]');
-            if (radio) radio.checked = true;
-        }
-    }
+    /* Sync les radios dans les deux panneaux */
+    _syncRadios('setSort', val);
     updateBadge();
     applyFilters();
 }
@@ -915,7 +937,9 @@ function setView(type) {
     }
 }
 
-/* ── Application des filtres ── */
+/* ── Application des filtres ──
+ * Note : filtre uniquement les produits de la page courante.
+ * Les produits sur d'autres pages (pagination) ne sont pas accessibles côté client. */
 function applyFilters() {
     var cards = Array.from(document.querySelectorAll('.amz-card'));
     var visible = cards.filter(function(c) {
@@ -923,9 +947,9 @@ function applyFilters() {
         var cat   = (c.dataset.cat   || '').toLowerCase();
         var price = parseFloat(c.dataset.price) || 0;
         var stock = c.dataset.stock;
-        return (!state.cat      || cat === state.cat)
-            && (!state.search   || name.includes(state.search))
-            && (!state.stockOnly|| stock === 'in')
+        return (!state.cat       || cat === state.cat)
+            && (!state.search    || name.includes(state.search))
+            && (!state.stockOnly || stock === 'in')
             && price >= state.priceMin
             && price <= state.priceMax;
     });
@@ -946,8 +970,8 @@ function applyFilters() {
 /* ── Badge compteur de filtres actifs ── */
 function updateBadge() {
     var count = 0;
-    if (state.cat)      count++;
-    if (state.stockOnly)count++;
+    if (state.cat)       count++;
+    if (state.stockOnly) count++;
     if (state.priceMin > 0 || state.priceMax < Infinity) count++;
     if (state.sort !== 'default') count++;
     var badge = document.getElementById('filterBadge');
@@ -960,21 +984,12 @@ function updateBadge() {
 /* ── Réinitialiser les filtres ── */
 function resetFilters() {
     state = { cat: '', sort: 'default', stockOnly: false, priceMin: 0, priceMax: Infinity, search: state.search };
-    /* Reset inputs */
     ['mPriceMin','mPriceMax','dPriceMin','dPriceMax'].forEach(function(id) {
         var el = document.getElementById(id); if (el) el.value = '';
     });
-    /* Reset radios visuels */
-    document.querySelectorAll('.amz-filter-item').forEach(function(item) {
-        item.classList.remove('active');
-        var r = item.querySelector('input[type=radio]');
-        if (r) r.checked = false;
-    });
-    /* Recocher "Tous" et "Pertinence" */
-    ['mcat-all','dcat-all','mstock-all','dstock-all','msort-def','dsort-def'].forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) { el.checked = true; el.closest('.amz-filter-item').classList.add('active'); }
-    });
+    _syncRadios('filterCat',   '');
+    _syncRadios('filterStock', 'false');
+    _syncRadios('setSort',     'default');
     var sel = document.getElementById('sortSelectTop');
     if (sel) sel.value = 'default';
     updateBadge();
@@ -993,11 +1008,18 @@ function closeDrawer() {
     document.body.style.overflow = '';
 }
 function applyAndClose() {
-    /* Sync prix depuis les inputs mobiles */
-    var minM = parseFloat(document.getElementById('mPriceMin').value) || 0;
-    var maxM = parseFloat(document.getElementById('mPriceMax').value) || Infinity;
-    state.priceMin = minM;
-    state.priceMax = maxM;
+    var minEl = document.getElementById('mPriceMin');
+    var maxEl = document.getElementById('mPriceMax');
+    /* Bug fix : n'écraser le prix que si l'utilisateur a saisi quelque chose dans le drawer */
+    if (minEl.value !== '' || maxEl.value !== '') {
+        state.priceMin = minEl.value !== '' ? parseFloat(minEl.value) : 0;
+        state.priceMax = maxEl.value !== '' ? parseFloat(maxEl.value) : Infinity;
+        /* Sync vers les inputs desktop */
+        var dMin = document.getElementById('dPriceMin');
+        var dMax = document.getElementById('dPriceMax');
+        if (dMin) dMin.value = minEl.value;
+        if (dMax) dMax.value = maxEl.value;
+    }
     updateBadge();
     applyFilters();
     closeDrawer();
@@ -1006,7 +1028,6 @@ function applyAndClose() {
 /* ── Recherche (desktop + mobile synchro) ── */
 function handleSearch(val) {
     state.search = val.toLowerCase().trim();
-    /* Synchroniser les deux inputs */
     var d = document.getElementById('prodSearch');
     var m = document.getElementById('prodSearchMobile');
     if (d && d.value.toLowerCase().trim() !== state.search) d.value = val;

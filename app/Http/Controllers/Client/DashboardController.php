@@ -22,6 +22,9 @@ class DashboardController extends Controller
         $query = Shop::where('is_approved', true)
             ->withCount(['products as products_count' => fn($q) => $q->where('is_active', true)])
             ->withCount(['orders as sales_count'])
+            ->with(['products' => function ($q) {
+                $q->select('id', 'shop_id', 'name', 'category')->where('is_active', true);
+            }])
             ->addSelect(DB::raw('
                 (SELECT AVG(r.rating)  FROM reviews r INNER JOIN orders o ON o.id = r.order_id WHERE o.shop_id = shops.id) as avg_rating,
                 (SELECT COUNT(r.id)    FROM reviews r INNER JOIN orders o ON o.id = r.order_id WHERE o.shop_id = shops.id) as reviews_count
@@ -62,7 +65,7 @@ class DashboardController extends Controller
         /* ── Top boutiques sidebar ── */
         $topQuery = Shop::where('is_approved', true);
         if ($user->country) $topQuery->where('country', $user->country);
-        $topShops = $topQuery
+        $allTopShops = $topQuery
             ->withCount(['orders as sales_count'])
             ->addSelect(DB::raw('
                 (SELECT AVG(r.rating) FROM reviews r INNER JOIN orders o ON o.id = r.order_id WHERE o.shop_id = shops.id) as avg_rating,
@@ -70,8 +73,8 @@ class DashboardController extends Controller
             '))
             ->orderByDesc(DB::raw('COALESCE(avg_rating, 0)'))
             ->orderByDesc('sales_count')
-            ->take(4)
             ->get();
+        $topShops = $allTopShops->take(4);
 
         /* ── Commandes récentes ── */
         $recentOrders = Order::where('user_id', $user->id)
@@ -97,7 +100,7 @@ class DashboardController extends Controller
         return view('dashboards.client', compact(
             'shops', 'recentOrders', 'myMessages', 'myUnread',
             'shopCount', 'productCount', 'deliveredCount', 'clientCount',
-            'categories', 'topShops', 'favoriteIds'
+            'categories', 'topShops', 'allTopShops', 'favoriteIds'
         ));
     }
 }

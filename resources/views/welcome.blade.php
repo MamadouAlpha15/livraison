@@ -16,6 +16,14 @@ Variables injectées depuis WelcomeController :
 <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
+/* Welcome page : annuler le container Bootstrap injecté par layouts.app */
+main.app-main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
 /* ════════════════════════════════════════════════════════════════
    VARIABLES & BASE
 ════════════════════════════════════════════════════════════════ */
@@ -865,19 +873,47 @@ body {
    RESPONSIVE — MOBILE (≤ 640px)
 ════════════════════════════════════════════════════════════════ */
 @media (max-width: 640px) {
-    /* Hero */
-    .hero-section { padding: 80px 16px 52px; }
-    .hero-title   { letter-spacing: -1px; }
-    .hero-sub     { font-size: 15px; }
-    .hero-cta     { flex-direction: column; align-items: stretch; width: 100%; }
-    .cta-btn      { justify-content: center; padding: 14px 20px; }
-    .hero-stats   { gap: 16px; }
-    .hero-stat-sep { display: none; }
-    .hero-stat-val { font-size: 22px; }
+    /* Hero : compresser le padding vertical, coller l'image aux bords */
+    .hero-section {
+        padding: 76px 16px 0;
+        min-height: auto;
+    }
+    .hero-badge   { font-size: 11px; padding: 5px 12px; margin-bottom: 18px; }
+    .hero-title   { letter-spacing: -1px; margin-bottom: 14px; }
+    .hero-sub     { font-size: 14.5px; margin-bottom: 28px; }
+    .hero-cta     { flex-direction: column; align-items: stretch; width: 100%; gap: 9px; }
+    .cta-btn      { justify-content: center; padding: 14px 20px; font-size: 14px; }
 
-    /* Mockup bar */
-    .mockup-url   { max-width: 160px; font-size: 9px; }
-    .mockup-actions { display: none; }
+    /* Stats : horizontaux sur 2 colonnes */
+    .hero-stats   { gap: 0; margin-top: 32px; width: 100%; display: grid; grid-template-columns: 1fr 1fr 1fr; }
+    .hero-stat-sep { display: none; }
+    .hero-stat    { padding: 14px 8px; border-top: 1px solid rgba(255,255,255,.08); }
+    .hero-stat-val { font-size: 20px; }
+    .hero-stat-lbl { font-size: 10.5px; }
+
+    /* Mockup : plein bord, pas de padding latéral superflu */
+    .hero-mockup {
+        padding: 0;
+        margin-top: 28px;
+        /* Sortir des 16px de padding de la section pour être bord à bord */
+        margin-left: -16px;
+        margin-right: -16px;
+        width: calc(100% + 32px);
+        max-width: calc(100% + 32px);
+    }
+    .hero-mockup-inner { border-radius: 0; }
+    .hero-mockup-bar   { height: 34px; padding: 0 12px; border-radius: 0; }
+    .mockup-url        { max-width: 160px; font-size: 9px; }
+    .mockup-actions    { display: none; }
+    .mockup-dot        { width: 9px; height: 9px; }
+    /* Fade bas de l'image pour transition douce vers la section suivante */
+    .hero-mockup-inner::after {
+        content: '';
+        position: absolute; bottom: 0; left: 0; right: 0;
+        height: 80px;
+        background: linear-gradient(to bottom, transparent, rgba(10,6,35,.95));
+        pointer-events: none; z-index: 2;
+    }
 
     /* Grilles */
     .features-grid { grid-template-columns: 1fr; gap: 12px; }
@@ -909,16 +945,15 @@ body {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   RESPONSIVE — PETIT MOBILE (≤ 400px)
+   RESPONSIVE — PETIT MOBILE (≤ 420px)
 ════════════════════════════════════════════════════════════════ */
-@media (max-width: 400px) {
-    .hero-section  { padding: 74px 14px 44px; }
-    .nav-logo-img  { width: 32px; height: 32px; border-radius: 8px; }
+@media (max-width: 420px) {
+    .hero-section   { padding: 70px 14px 0; }
+    .hero-mockup    { margin-left: -14px; margin-right: -14px; width: calc(100% + 28px); max-width: calc(100% + 28px); }
+    .hero-stats     { grid-template-columns: 1fr 1fr 1fr; }
+    .nav-logo-img   { width: 32px; height: 32px; border-radius: 8px; }
     .nav-brand-name { font-size: 14px; }
-    .hero-mockup-bar { height: 32px; }
-    .mockup-dot    { width: 8px; height: 8px; }
-    .mockup-url    { display: none; }
-    .hero-stats    { flex-direction: column; align-items: center; gap: 14px; }
+    .mockup-url     { display: none; }
 }
 </style>
 @endpush
@@ -1292,7 +1327,7 @@ body {
  {{-- ══════════════════════════════════════════
      TARIFS
 ══════════════════════════════════════════ --}}
- <!-- <section class="section pricing-section" id="pricing">
+ <section class="section pricing-section" id="pricing">
     <div class="section-inner">
         <div style="text-align:center;margin-bottom:48px">
             <div class="section-badge">Tarification</div>
@@ -1353,7 +1388,7 @@ body {
         </div>
     </div>
 </section>
-!-->
+
 
 {{-- ══════════════════════════════════════════
      CTA ENTREPRISE LIVRAISON

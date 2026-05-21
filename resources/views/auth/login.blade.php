@@ -1,5 +1,11 @@
 <x-guest-layout>
 
+<style>
+@media(max-width:600px){
+    .f-input{font-size:16px !important;}
+}
+</style>
+
     <div class="ab-title">Bon retour 👋</div>
     <p class="ab-sub">Connectez-vous à votre compte Shopio</p>
 

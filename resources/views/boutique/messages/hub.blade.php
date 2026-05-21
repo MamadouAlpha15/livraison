@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+   
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -530,8 +531,12 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     /* Thread & saisie */
     .hub-thread { padding: 12px 8px; }
     .hub-input-zone { padding: 7px 8px; gap: 7px; }
-    .hub-textarea { font-size: 13px; padding: 8px 13px; }
+    .hub-textarea { font-size: 16px !important; padding: 8px 13px; }
     .hub-send-btn { width: 40px; height: 40px; font-size: 16px; }
+    .hub-offer-input { font-size: 16px !important; }
+
+    /* dvh = exclut le clavier iOS (fallback 100vh déjà défini globalement) */
+    .hub { height: calc(100dvh - var(--nav-h)); }
 }
 
 /* ── Très petit mobile (≤400px) ── */
@@ -1772,6 +1777,42 @@ function buildOrderCard(msg) {
         </div>`;
     return wrap;
 }
+
+/* ── Ajustement hauteur hub quand clavier iOS s'ouvre ── */
+(function () {
+    const hub    = document.getElementById('hub');
+    const thread = document.getElementById('hubThread');
+    if (!hub || !window.visualViewport) return;
+
+    function _scrollBottom() {
+        if (thread) thread.scrollTop = thread.scrollHeight;
+    }
+
+    function _adjustHub() {
+        if (window.innerWidth > 640) {
+            hub.style.height = '';
+            return;
+        }
+        const vv      = window.visualViewport;
+        const topbarH = document.querySelector('.topbar')?.offsetHeight || 50;
+        hub.style.height = (vv.offsetTop + vv.height - topbarH) + 'px';
+        window.scrollTo(0, 0);
+        /* Après redimensionnement du hub, scroller les messages en bas */
+        requestAnimationFrame(_scrollBottom);
+    }
+
+    window.visualViewport.addEventListener('resize', _adjustHub);
+    window.visualViewport.addEventListener('scroll', _adjustHub);
+
+    const input = document.getElementById('hubInput');
+    if (input) {
+        input.addEventListener('focus', function () {
+            /* Double délai : le premier attrape la fin de l'animation clavier iOS */
+            setTimeout(_scrollBottom, 200);
+            setTimeout(_scrollBottom, 450);
+        });
+    }
+})();
 </script>
 </body>
 </html>

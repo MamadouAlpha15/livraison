@@ -223,6 +223,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 /* KPI GRIDS */
 .kpi-grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 14px; }
 .kpi-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 22px; }
+.kpi-grid-1 { display: grid; grid-template-columns: 1fr; gap: 14px; margin-bottom: 22px; max-width: 420px; }
 .kpi-grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; margin-bottom: 22px; }
 
 .kpi { background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--kc, var(--brand)); border-radius: var(--r); padding: 16px 18px; box-shadow: var(--shadow-sm); transition: box-shadow .2s; }
@@ -501,9 +502,9 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     <div class="sec-title">{!! $I['chart_sec'] !!} Pipeline commandes — période</div>
     <div class="kpi-grid-4" style="margin-bottom:22px">
         <div class="kpi" style="--kc:#6b7280">
-            <div class="kpi-ico">{!! $I['archive_kpi'] !!}</div><div class="kpi-lbl">Total (all time)</div>
-            <div class="kpi-val">{{ $totalOrders }}</div>
-            <div class="kpi-unit">depuis le début</div>
+            <div class="kpi-ico">{!! $I['archive_kpi'] !!}</div><div class="kpi-lbl">Total — période</div>
+            <div class="kpi-val">{{ $allOrdersPeriod }}</div>
+            <div class="kpi-unit">toutes commandes incluses</div>
         </div>
         <div class="kpi" style="--kc:#f59e0b">
             <div class="kpi-ico">{!! $I['clock_kpi'] !!}</div><div class="kpi-lbl">En attente</div>
@@ -577,57 +578,60 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         </div>
     </div>
 
-    {{-- SECTION 5 : FINANCES --}}
-    <div class="sec-title">{!! $I['card_sec'] !!} Finances globales</div>
+    {{-- SECTION 5 : FINANCES PÉRIODE --}}
+    <div class="sec-title">{!! $I['card_sec'] !!} Finances — {{ $periodLabel }}</div>
     <div class="kpi-grid-3">
         <div class="kpi" style="--kc:#6366f1">
-            <div class="kpi-ico">{!! $I['money_kpi'] !!}</div><div class="kpi-lbl">Revenu net total</div>
-            <div class="kpi-val" title="{{ number_format($totalRevenue, 0, ',', ' ') }} {{ $devise }}">
-                {{ $fmt($totalRevenue) }}
+            <div class="kpi-ico">{!! $I['money_kpi'] !!}</div><div class="kpi-lbl">Revenu net — période</div>
+            <div class="kpi-val" title="{{ number_format($revenueThisMonth, 0, ',', ' ') }} {{ $devise }}">
+                {{ $fmt($revenueThisMonth) }}
             </div>
-            @if($totalRevenue >= 1_000_000)
-            <div class="kpi-full">= {{ number_format($totalRevenue, 0, ',', ' ') }} {{ $devise }}</div>
+            @if($revenueThisMonth >= 1_000_000)
+            <div class="kpi-full">= {{ number_format($revenueThisMonth, 0, ',', ' ') }} {{ $devise }}</div>
             @endif
             <div class="kpi-unit">{{ $devise }}</div>
-            <div class="kpi-explain">CA livré - commissions payées. Votre vrai revenu net.</div>
+            <div class="kpi-explain">CA livré - commissions payées sur la période.</div>
         </div>
         <div class="kpi" style="--kc:#f59e0b">
-            <div class="kpi-ico">{!! $I['clock_kpi'] !!}</div><div class="kpi-lbl">Commissions à payer</div>
-            <div class="kpi-val" title="{{ number_format($commissionsPending, 0, ',', ' ') }} {{ $devise }}">
-                {{ $fmt($commissionsPending) }}
+            <div class="kpi-ico">{!! $I['clock_kpi'] !!}</div><div class="kpi-lbl">Commissions à payer — période</div>
+            <div class="kpi-val" title="{{ number_format($commissionsPendingPeriod, 0, ',', ' ') }} {{ $devise }}">
+                {{ $fmt($commissionsPendingPeriod) }}
             </div>
-            @if($commissionsPending >= 1_000_000)
-            <div class="kpi-full">= {{ number_format($commissionsPending, 0, ',', ' ') }} {{ $devise }}</div>
+            @if($commissionsPendingPeriod >= 1_000_000)
+            <div class="kpi-full">= {{ number_format($commissionsPendingPeriod, 0, ',', ' ') }} {{ $devise }}</div>
             @endif
             <div class="kpi-unit">{{ $devise }} · à régler</div>
             <div class="kpi-explain">
-                <a href="{{ route('boutique.commissions.index') }}" style="color:var(--brand);font-weight:600">Payer maintenant →</a>
+                Solde total impayé : {{ $fmt($commissionsPending) }} {{ $devise }} &nbsp;·&nbsp;
+                <a href="{{ route('boutique.commissions.index') }}" style="color:var(--brand);font-weight:600">Payer →</a>
             </div>
         </div>
         <div class="kpi" style="--kc:#3b82f6">
-            <div class="kpi-ico">{!! $I['check_kpi'] !!}</div><div class="kpi-lbl">Commissions payées</div>
-            <div class="kpi-val" title="{{ number_format($commissionsPaid, 0, ',', ' ') }} {{ $devise }}">
-                {{ $fmt($commissionsPaid) }}
+            <div class="kpi-ico">{!! $I['check_kpi'] !!}</div><div class="kpi-lbl">Commissions payées — période</div>
+            <div class="kpi-val" title="{{ number_format($commissionsPaidPeriod, 0, ',', ' ') }} {{ $devise }}">
+                {{ $fmt($commissionsPaidPeriod) }}
             </div>
-            @if($commissionsPaid >= 1_000_000)
-            <div class="kpi-full">= {{ number_format($commissionsPaid, 0, ',', ' ') }} {{ $devise }}</div>
+            @if($commissionsPaidPeriod >= 1_000_000)
+            <div class="kpi-full">= {{ number_format($commissionsPaidPeriod, 0, ',', ' ') }} {{ $devise }}</div>
             @endif
-            <div class="kpi-unit">{{ $devise }} · réglés</div>
+            <div class="kpi-unit">{{ $devise }} · réglés sur la période</div>
         </div>
     </div>
 
     {{-- SECTION 6 : ÉQUIPE --}}
     <div class="sec-title">{!! $I['users_sec'] !!} Équipe</div>
-    <div class="kpi-grid-2" style="margin-bottom:22px">
+    <div class="{{ $isSuper ? 'kpi-grid-2' : 'kpi-grid-1' }}" style="margin-bottom:22px">
+        @if($isSuper)
         <div class="kpi" style="--kc:#2563eb">
-            <div class="kpi-ico">{!! $I['user_kpi'] !!}</div><div class="kpi-lbl">Vendeurs actifs</div>
+            <div class="kpi-ico">{!! $I['user_kpi'] !!}</div><div class="kpi-lbl">Vendeurs (toutes boutiques)</div>
             <div class="kpi-val">{{ $vendors }}</div>
-            <div class="kpi-unit">vendeurs rattachés</div>
+            <div class="kpi-unit">vendeurs actifs</div>
         </div>
+        @endif
         <div class="kpi" style="--kc:#7c3aed">
-            <div class="kpi-ico">{!! $I['bike_kpi'] !!}</div><div class="kpi-lbl">Livreurs actifs</div>
+            <div class="kpi-ico">{!! $I['bike_kpi'] !!}</div><div class="kpi-lbl">Livreurs actifs — période</div>
             <div class="kpi-val">{{ $livreurs }}</div>
-            <div class="kpi-unit">livreurs rattachés</div>
+            <div class="kpi-unit">ont livré sur cette période</div>
         </div>
     </div>
 

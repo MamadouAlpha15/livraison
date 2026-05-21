@@ -6,6 +6,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
+/* Annuler le container Bootstrap de layouts.app */
+main.app-main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
 /* ═══════════════════════════════════════════
    VARIABLES
 ═══════════════════════════════════════════ */
@@ -224,6 +232,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 }
 
 .shop-card {
+    scroll-margin-top: calc(var(--top-nav-h, 64px) + 12px);
     background: var(--surf);
     border: 1px solid var(--border);
     border-radius: 20px;
@@ -359,6 +368,40 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 }
 .shops-pag .page-link:hover { background: var(--gr-mlt) !important; }
 
+/* ── Badge "produit trouvé" ── */
+.sc-prod-match {
+    display: none;
+    align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 700;
+    color: var(--gr-dk); background: var(--gr-mlt);
+    border: 1px solid var(--gr-lt);
+    padding: 3px 9px; border-radius: 20px;
+    width: fit-content; margin-bottom: 8px;
+}
+.shop-card.prod-match .sc-prod-match { display: inline-flex; }
+
+/* ── Recherche live ── */
+#liveSearchInfo {
+    margin-top: 10px; font-size: 13px;
+    color: rgba(255,255,255,.55); display: none;
+    animation: fadeIn .2s ease;
+}
+#liveSearchInfo strong { color: rgba(255,255,255,.85); }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.sc-name mark {
+    background: rgba(99,102,241,.22); color: var(--gr-dk);
+    border-radius: 3px; padding: 0 2px;
+    font-style: normal;
+}
+#liveEmpty {
+    display: none; text-align: center; padding: 3rem 1rem;
+    background: var(--surf); border-radius: var(--r);
+    border: 1px dashed var(--border); margin-bottom: 24px;
+}
+#liveEmpty .ico { font-size: 3rem; display: block; margin-bottom: .75rem; }
+#liveEmpty h3  { font-size: 1.1rem; font-weight: 700; color: var(--txt); margin: 0 0 .4rem; }
+#liveEmpty p   { color: var(--txt2); font-size: .88rem; margin: 0; }
+
 /* ── Back to top ── */
 .back-top {
     display: inline-flex; align-items: center; gap: .4rem;
@@ -382,6 +425,57 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 .mini-footer a:hover { color: #fff; }
 
 /* ════════════════════════════════════════════
+   HAMBURGER MOBILE
+════════════════════════════════════════════ */
+.nav-hamburger {
+    display: none;
+    flex-direction: column; justify-content: center; align-items: center;
+    gap: 5px; width: 40px; height: 40px;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12);
+    border-radius: 8px; cursor: pointer; padding: 0;
+    flex-shrink: 0;
+}
+.nav-hamburger span {
+    display: block; width: 18px; height: 2px;
+    background: #fff; border-radius: 2px;
+    transition: transform .25s, opacity .25s;
+}
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.nav-mobile-menu {
+    display: none;
+    position: fixed; top: 64px; left: 0; right: 0; z-index: 99;
+    background: rgba(10,10,30,.98);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    padding: 12px 16px 16px;
+    flex-direction: column; gap: 4px;
+}
+.nav-mobile-menu.open { display: flex; }
+.nav-mobile-link {
+    display: block; padding: 12px 16px; border-radius: 10px;
+    font-size: 14px; font-weight: 600; text-decoration: none;
+    color: rgba(255,255,255,.75); transition: all .15s;
+}
+.nav-mobile-link:hover { background: rgba(255,255,255,.08); color: #fff; }
+.nav-mobile-divider { height: 1px; background: rgba(255,255,255,.08); margin: 6px 0; }
+.nav-mobile-btn {
+    display: block; padding: 13px 16px; border-radius: 10px;
+    font-size: 14px; font-weight: 700; text-decoration: none;
+    text-align: center; margin-top: 4px; transition: all .15s;
+}
+.nav-mobile-btn-outline {
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.15);
+    color: rgba(255,255,255,.8);
+}
+.nav-mobile-btn-indigo {
+    background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff;
+    box-shadow: 0 4px 14px rgba(99,102,241,.35);
+}
+
+/* ════════════════════════════════════════════
    RESPONSIVE
 ════════════════════════════════════════════ */
 @media (max-width: 1100px) {
@@ -390,17 +484,40 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 @media (max-width: 768px) {
     .shops-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
     .top-nav { padding: 0 16px; }
-    .nav-links .nav-link-item { display: none; }
+    .nav-links { display: none; }
+    .nav-hamburger { display: flex; }
     .shops-hero { padding: 88px 16px 48px; }
     .shops-main { padding: 32px 16px 60px; }
     .sc-img { height: 150px; }
+    .type-filters {
+        flex-wrap: nowrap; overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 4px;
+        scrollbar-width: none;
+    }
+    .type-filters::-webkit-scrollbar { display: none; }
+    .mini-footer { padding: 24px 16px; }
+    .search-input { font-size: 16px !important; }
 }
 @media (max-width: 480px) {
     .shops-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
     .sc-img { height: 120px; }
     .sc-name { font-size: 13.5px; }
-    .sc-body { padding: 14px 15px 16px; }
-    .sc-btn { font-size: .78rem; padding: .55rem; }
+    .sc-body { padding: 12px 13px 14px; }
+    .sc-btn { font-size: .75rem; padding: .5rem .6rem; }
+    .sc-meta { gap: 6px; margin-bottom: 10px; }
+    .sc-meta-item { font-size: 11px; padding: 2px 7px; }
+    .sc-stars { font-size: 10px; margin-bottom: 8px; }
+    .sc-type { font-size: 10px; }
+    .shops-hero h1 { letter-spacing: -1px; }
+    .back-top { font-size: .78rem; }
+}
+@media (max-width: 380px) {
+    .shops-grid { grid-template-columns: 1fr; gap: 12px; }
+    .sc-img { height: 180px; }
+    .sc-name { font-size: 15px; }
+    .sc-body { padding: 14px 16px 16px; }
+    .sc-btn { font-size: .83rem; padding: .65rem 1rem; }
 }
 </style>
 @endpush
@@ -410,8 +527,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 {{-- ══════════ NAVBAR ══════════ --}}
 <nav class="top-nav">
     <a href="{{ url('/') }}" class="nav-brand">
-         <div class="sb-logo-icon"><img src="/images/Shopio2.jpeg" alt="Shopio" style="width:40px;height:40px;object-fit:cover;border-radius:9px"></div>
-                
+        <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width:40px;height:40px;object-fit:cover;border-radius:9px"></div>
         {{ config('app.name', 'ShopManager') }}
     </a>
     <div class="nav-links">
@@ -429,7 +545,28 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
         @endif
         @endguest
     </div>
+    <button class="nav-hamburger" id="shopsHamburger" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+    </button>
 </nav>
+
+{{-- Menu mobile --}}
+<div class="nav-mobile-menu" id="shopsMobileMenu">
+    <a href="{{ url('/') }}" class="nav-mobile-link">← Accueil</a>
+    <div class="nav-mobile-divider"></div>
+    @guest
+    <a href="{{ route('login') }}"    class="nav-mobile-btn nav-mobile-btn-outline">Se connecter</a>
+    <a href="{{ route('register') }}" class="nav-mobile-btn nav-mobile-btn-indigo">🚀 S'inscrire — Gratuit</a>
+    @else
+    @php
+        $role3 = Auth::user()->role;
+        $map3  = ['superadmin'=>'admin.dashboard','admin'=>'boutique.dashboard','vendeur'=>'vendeur.dashboard','client'=>'client.dashboard','company'=>'company.dashboard','livreur'=>'livreur.dashboard'];
+    @endphp
+    @if(isset($map3[$role3]))
+    <a href="{{ route($map3[$role3]) }}" class="nav-mobile-btn nav-mobile-btn-indigo">Mon dashboard →</a>
+    @endif
+    @endguest
+</div>
 
 {{-- ══════════ HERO ══════════ --}}
 <div class="shops-hero">
@@ -449,12 +586,16 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
             <input type="hidden" name="type" value="{{ $type }}">
         @endif
         <input type="text"
+               id="shopsSearch"
                name="q"
                class="search-input"
                placeholder="Rechercher une boutique, un type..."
-               value="{{ $q }}">
+               value="{{ $q }}"
+               autocomplete="off">
         <button type="submit" class="search-btn">🔍</button>
     </form>
+
+    <div id="liveSearchInfo"></div>
 
     @if($q)
         <div class="search-result-info">
@@ -506,10 +647,18 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 
     {{-- Grille boutiques --}}
     @if($shops->count() > 0)
-    <div class="shops-grid">
+    <div class="shops-grid" id="shopsGrid">
         @foreach($shops as $i => $shop)
+        @php
+            $prodKeywords = $shop->products
+                ->map(function($p){ return strtolower($p->name.' '.($p->category ?? '')); })
+                ->implode(' ');
+        @endphp
         <a href="{{ route('public.shops.products', $shop) }}"
            class="shop-card"
+           data-name="{{ strtolower($shop->name) }}"
+           data-type="{{ strtolower($shop->type ?? '') }}"
+           data-products="{{ $prodKeywords }}"
            style="animation-delay: {{ ($i % 12) * 55 }}ms">
 
             {{-- Image --}}
@@ -544,6 +693,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
                     @endif
                 </div>
 
+                <span class="sc-prod-match">📦 A ce produit</span>
+
                 <span class="sc-btn">
                     Visiter la boutique
                     <span style="font-size:15px">→</span>
@@ -551,6 +702,13 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
             </div>
         </a>
         @endforeach
+    </div>
+
+    {{-- Empty live search --}}
+    <div id="liveEmpty">
+        <span class="ico">🔍</span>
+        <h3>Aucune boutique trouvée</h3>
+        <p id="liveEmptyMsg">Aucun résultat pour votre recherche.</p>
     </div>
 
     {{-- Pagination --}}
@@ -591,20 +749,138 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    /* Reveal au scroll */
+
+    /* ── Reveal au scroll ── */
     const obs = new IntersectionObserver(entries => {
-        entries.forEach((e, i) => {
+        entries.forEach(e => {
             if (e.isIntersecting) {
-                e.target.style.opacity  = '1';
+                e.target.style.opacity   = '1';
                 e.target.style.transform = 'translateY(0)';
                 obs.unobserve(e.target);
             }
         });
     }, { threshold: 0.08 });
+    document.querySelectorAll('.shop-card').forEach(el => obs.observe(el));
 
-    document.querySelectorAll('.shop-card').forEach(el => {
-        obs.observe(el);
+    /* ── Hamburger ── */
+    const ham  = document.getElementById('shopsHamburger');
+    const menu = document.getElementById('shopsMobileMenu');
+    if (ham && menu) {
+        ham.addEventListener('click', () => {
+            const open = menu.classList.toggle('open');
+            ham.classList.toggle('open', open);
+            ham.setAttribute('aria-expanded', open);
+        });
+        document.addEventListener('click', e => {
+            if (!ham.contains(e.target) && !menu.contains(e.target)) {
+                menu.classList.remove('open');
+                ham.classList.remove('open');
+                ham.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    /* ════════════════════════════════
+       RECHERCHE LIVE
+    ════════════════════════════════ */
+    const searchInput = document.getElementById('shopsSearch');
+    const liveInfo    = document.getElementById('liveSearchInfo');
+    const liveEmpty   = document.getElementById('liveEmpty');
+    const liveMsg     = document.getElementById('liveEmptyMsg');
+    const navH        = () => (document.querySelector('.top-nav')?.offsetHeight || 64) + 16;
+
+    if (!searchInput) return;
+
+    /* Échappe les caractères spéciaux regex */
+    function escRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+    /* Surligne le texte qui correspond à la recherche */
+    function hlText(text, q) {
+        if (!q) return text;
+        return text.replace(new RegExp('(' + escRe(q) + ')', 'gi'), '<mark>$1</mark>');
+    }
+
+    /* Scroll vers un élément en tenant compte de la navbar fixe */
+    function scrollTo(el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    let timer;
+    searchInput.addEventListener('input', function () {
+        clearTimeout(timer);
+        timer = setTimeout(() => liveSearch(this.value.trim()), 180);
     });
+
+    /* Empêche le rechargement de page si l'utilisateur appuie Entrée (la recherche est déjà live) */
+    searchInput.closest('form')?.addEventListener('submit', e => {
+        const q = searchInput.value.trim();
+        if (q) {
+            /* Laisse le formulaire soumettre normalement pour que la pagination
+               et les filtres de type fonctionnent aussi côté serveur */
+        }
+    });
+
+    function liveSearch(q) {
+        const cards = Array.from(document.querySelectorAll('.shop-card'));
+        const ql    = q.toLowerCase();
+        let visible = 0;
+        let firstCard = null;
+
+        cards.forEach(card => {
+            const name     = card.dataset.name     || '';
+            const type     = card.dataset.type     || '';
+            const products = card.dataset.products || '';
+
+            const matchShop = !ql || name.includes(ql) || type.includes(ql);
+            const matchProd = !matchShop && ql && products.includes(ql);
+            const match     = matchShop || matchProd;
+
+            card.style.display = match ? '' : 'none';
+
+            /* Badge "A ce produit" — visible seulement si trouvé via produit */
+            card.classList.toggle('prod-match', matchProd);
+
+            /* Surlignage dans le nom de boutique */
+            const nameEl = card.querySelector('.sc-name');
+            if (nameEl) {
+                if (!card.dataset.origName) card.dataset.origName = nameEl.textContent.trim();
+                nameEl.innerHTML = ql ? hlText(card.dataset.origName, q) : card.dataset.origName;
+            }
+
+            if (match) { visible++; if (!firstCard) firstCard = card; }
+        });
+
+        /* Info live sous la barre de recherche */
+        if (ql) {
+            liveInfo.innerHTML = visible > 0
+                ? `${visible} boutique${visible > 1 ? 's' : ''} pour <strong>"${q}"</strong>`
+                : `Aucun résultat pour <strong>"${q}"</strong>`;
+            liveInfo.style.display = 'block';
+        } else {
+            liveInfo.style.display = 'none';
+            /* Retirer tous les badges prod-match */
+            cards.forEach(c => c.classList.remove('prod-match'));
+        }
+
+        /* Empty state live */
+        if (liveEmpty) {
+            liveEmpty.style.display = (visible === 0 && ql) ? 'block' : 'none';
+            if (liveMsg) liveMsg.textContent = `Aucun résultat pour "${q}". Essayez un autre terme.`;
+        }
+
+        /* Scroll vers la première carte trouvée */
+        if (ql.length >= 1 && firstCard) {
+            setTimeout(() => scrollTo(firstCard), 50);
+        } else if (!ql) {
+            const grid = document.getElementById('shopsGrid');
+            if (grid) setTimeout(() => scrollTo(grid), 50);
+        }
+    }
+
+    /* Si la page est chargée avec un ?q= déjà défini, lancer la recherche live */
+    if (searchInput.value.trim()) {
+        liveSearch(searchInput.value.trim());
+    }
 });
 </script>
 @endpush

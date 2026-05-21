@@ -334,19 +334,23 @@ main.app-main{
 .om-footer{padding:14px 16px 18px;border-top:1px solid var(--border);flex-shrink:0;}
 .zone-select-wrap{margin-bottom:10px;}
 .zone-select-lbl{font-size:10.5px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;}
-.zone-select{
-    width:100%;padding:9px 12px;border-radius:var(--r-sm);
-    border:1.5px solid var(--border);
-    background:var(--surface2);color:var(--text);
-    font-size:13px;font-family:inherit;outline:none;cursor:pointer;
-    transition:border-color .15s;
-}
-.zone-select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(124,58,237,.1);}
-.zone-price-hint{
-    display:none;padding:8px 12px;border-radius:var(--r-xs);
-    background:#f0fdf4;border:1px solid #86efac;
-    font-size:12px;font-weight:700;color:#15803d;margin-top:6px;
-}
+
+/* Autocomplete zone order-modal */
+.om-zone-result{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;transition:all .13s;}
+.om-zone-result:hover{border-color:#059669;background:#f0fdf4;}
+.om-zone-result-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.om-zone-result-name{font-size:12.5px;font-weight:700;color:var(--text);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.om-zone-result-right{text-align:right;flex-shrink:0;}
+.om-zone-result-price{font-size:12px;font-weight:800;color:#059669;}
+.om-zone-result-delay{font-size:10px;color:var(--muted);}
+.om-zone-chip{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;border:1.5px solid #86efac;background:#f0fdf4;}
+.om-zone-chip-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.om-zone-chip-info{flex:1;min-width:0;}
+.om-zone-chip-name{font-size:12.5px;font-weight:800;color:#065f46;}
+.om-zone-chip-details{font-size:11px;color:#047857;margin-top:1px;}
+.om-zone-chip-change{background:none;border:none;cursor:pointer;font-size:11px;color:#059669;font-weight:700;padding:3px 6px;border-radius:5px;white-space:nowrap;touch-action:manipulation;}
+.om-zone-chip-change:hover{background:#d1fae5;}
+.om-zone-empty{font-size:12px;color:var(--muted);text-align:center;padding:8px 0;}
 .btn-confirm-assign{
     width:100%;padding:13px;border-radius:var(--r-sm);border:none;cursor:pointer;
     background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;
@@ -583,23 +587,21 @@ main.app-main{
             @if($zones->isNotEmpty())
             <div class="zone-select-wrap">
                 <label class="zone-select-lbl">📍 Zone de livraison</label>
-                <input type="text" id="zoneModalSearch" placeholder="🔍 Rechercher une zone…" autocomplete="off"
-                       oninput="filterZoneModal(this)"
-                       style="width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;margin-bottom:6px;box-sizing:border-box;transition:border-color .15s;"
-                       onfocus="this.style.borderColor='var(--brand)'" onblur="this.style.borderColor='var(--border)'">
-                <select class="zone-select" id="zoneSelectModal" onchange="onZoneChange(this)">
-                    <option value="">— Choisir une zone (optionnel) —</option>
-                    @foreach($zones as $zone)
-                    <option value="{{ $zone->id }}"
-                            data-price="{{ $zone->price }}"
-                            data-minutes="{{ $zone->estimated_minutes }}">
-                        {{ $zone->name }} — {{ number_format($zone->price,0,',',' ') }} {{ $devise }} · ~{{ $zone->estimated_minutes }} min
-                    </option>
-                    @endforeach
-                </select>
-                <div class="zone-price-hint" id="zonePriceHint">
-                    💰 Frais : <span id="zonePriceDisplay"></span>
+                {{-- Recherche --}}
+                <div id="omZoneSearchBox">
+                    <div style="position:relative;display:flex;align-items:center;margin-bottom:6px;">
+                        <span style="position:absolute;left:10px;pointer-events:none;font-size:14px;color:#9ca3af;">🔍</span>
+                        <input type="text" id="omZoneSearch" placeholder="Tapez le nom d'une zone…" autocomplete="off"
+                               oninput="omFilterZones(this.value)"
+                               style="width:100%;padding:10px 34px 10px 34px;border:1.5px solid var(--border);border-radius:10px;font-size:16px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;box-sizing:border-box;transition:border-color .15s;"
+                               onfocus="this.style.borderColor='var(--brand)'" onblur="this.style.borderColor='var(--border)'">
+                        <button id="omZoneSearchClear" onclick="omZoneClearSearch()" type="button"
+                                style="display:none;position:absolute;right:8px;background:none;border:none;cursor:pointer;color:#9ca3af;font-size:18px;padding:4px;line-height:1;touch-action:manipulation;">✕</button>
+                    </div>
+                    <div id="omZoneResults" style="display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto;scrollbar-width:thin;"></div>
                 </div>
+                {{-- Zone sélectionnée (chip) --}}
+                <div id="omZoneSelectedChip" style="display:none;"></div>
             </div>
             @endif
             <button class="btn-confirm-assign" id="btnConfirmAssign" onclick="confirmAssign()" disabled>
@@ -613,6 +615,16 @@ main.app-main{
 
 @endsection
 
+@php
+$omZonesData = $zones->map(fn($z) => [
+    'id'                => $z->id,
+    'name'              => $z->name,
+    'price'             => $z->price,
+    'estimated_minutes' => $z->estimated_minutes,
+    'color'             => $z->color ?? '#059669',
+])->values();
+@endphp
+
 @push('scripts')
 <script>
 (function(){
@@ -625,6 +637,8 @@ const cIni      = @json($cIni);
 
 let lastAt = null;
 let _selectedOrderIds = new Set();
+let _omZonesAll = @json($omZonesData);
+let _omSelectedZone = null;
 
 const box   = document.getElementById('bcMessages');
 const input = document.getElementById('bcInput');
@@ -739,6 +753,8 @@ window.closeDrawer = function() {
 /* ── ORDER MODAL ── */
 window.openOrderModal = function() {
     closeDrawer();
+    omClearZoneSelection();
+    omFilterZones('');
     document.getElementById('orderModal').classList.add('open');
     document.body.style.overflow = 'hidden';
 };
@@ -746,6 +762,7 @@ window.closeOrderModal = function() {
     document.getElementById('orderModal').classList.remove('open');
     document.body.style.overflow = '';
     _selectedOrderIds.clear();
+    omClearZoneSelection();
     const btn = document.getElementById('btnConfirmAssign');
     if (btn) { btn.disabled = true; btn.querySelector('.btn-label').textContent = 'Confier cette commande'; }
     const chk = document.getElementById('omSelectAll');
@@ -793,37 +810,79 @@ window.selectOrder = function(el, orderId) {
     omUpdateBtn();
 };
 
-window.filterZoneModal = function(input) {
-    const q   = input.value.toLowerCase().trim();
-    const sel = document.getElementById('zoneSelectModal');
-    if (!sel) return;
-    Array.from(sel.options).forEach(opt => {
-        if (!opt.value) return;
-        opt.hidden = q.length > 0 && !opt.text.toLowerCase().includes(q);
-    });
-    const cur = sel.options[sel.selectedIndex];
-    if (cur && cur.value && cur.hidden) {
-        sel.value = '';
-        sel.dispatchEvent(new Event('change'));
+window.omFilterZones = function(raw) {
+    const q       = (raw || '').toLowerCase().trim();
+    const results = document.getElementById('omZoneResults');
+    const clrBtn  = document.getElementById('omZoneSearchClear');
+    if (!results) return;
+    if (clrBtn) clrBtn.style.display = q ? 'block' : 'none';
+    const list = q ? _omZonesAll.filter(z => z.name.toLowerCase().includes(q)) : _omZonesAll;
+    if (!list.length) {
+        results.innerHTML = `<div class="om-zone-empty">Aucune zone trouvée pour "<strong>${q}</strong>"</div>`;
+        return;
     }
+    results.innerHTML = '';
+    list.forEach(z => {
+        const item = document.createElement('div');
+        item.className = 'om-zone-result';
+        const color = z.color || '#059669';
+        const price = new Intl.NumberFormat('fr-FR').format(z.price);
+        item.innerHTML =
+            `<span class="om-zone-result-dot" style="background:${color};box-shadow:0 0 5px ${color}88;"></span>` +
+            `<span class="om-zone-result-name">${z.name}</span>` +
+            `<div class="om-zone-result-right">` +
+                `<div class="om-zone-result-price">${price} ${DEVISE}</div>` +
+                `<div class="om-zone-result-delay">~${z.estimated_minutes} min</div>` +
+            `</div>`;
+        item.addEventListener('click', () => omSelectZone(z));
+        results.appendChild(item);
+    });
 };
 
-window.onZoneChange = function(sel) {
-    const hint    = document.getElementById('zonePriceHint');
-    const display = document.getElementById('zonePriceDisplay');
-    const opt     = sel.options[sel.selectedIndex];
-    if (!sel.value) { hint.style.display = 'none'; return; }
-    display.textContent = new Intl.NumberFormat('fr-FR').format(opt.dataset.price) + ' ' + DEVISE + ' · ~' + opt.dataset.minutes + ' min';
-    hint.style.display = 'block';
+window.omSelectZone = function(z) {
+    _omSelectedZone = z;
+    const searchBox = document.getElementById('omZoneSearchBox');
+    const chip      = document.getElementById('omZoneSelectedChip');
+    if (searchBox) searchBox.style.display = 'none';
+    if (!chip) return;
+    const color = z.color || '#059669';
+    const price = new Intl.NumberFormat('fr-FR').format(z.price);
+    chip.innerHTML =
+        `<div class="om-zone-chip">` +
+            `<span class="om-zone-chip-dot" style="background:${color};box-shadow:0 0 5px ${color}88;"></span>` +
+            `<div class="om-zone-chip-info">` +
+                `<div class="om-zone-chip-name">${z.name}</div>` +
+                `<div class="om-zone-chip-details">${price} ${DEVISE} · ~${z.estimated_minutes} min</div>` +
+            `</div>` +
+            `<button class="om-zone-chip-change" onclick="omClearZoneSelection()" type="button">✕ Changer</button>` +
+        `</div>`;
+    chip.style.display = 'block';
+};
+
+window.omClearZoneSelection = function() {
+    _omSelectedZone = null;
+    const searchBox = document.getElementById('omZoneSearchBox');
+    const chip      = document.getElementById('omZoneSelectedChip');
+    const input     = document.getElementById('omZoneSearch');
+    if (chip)      { chip.style.display = 'none'; chip.innerHTML = ''; }
+    if (searchBox) searchBox.style.display = 'block';
+    if (input)     { input.value = ''; }
+    const clrBtn = document.getElementById('omZoneSearchClear');
+    if (clrBtn) clrBtn.style.display = 'none';
+    omFilterZones('');
+};
+
+window.omZoneClearSearch = function() {
+    const input = document.getElementById('omZoneSearch');
+    if (input) input.value = '';
+    omFilterZones('');
 };
 
 window.confirmAssign = async function() {
     if (_selectedOrderIds.size === 0) return;
-    const btn     = document.getElementById('btnConfirmAssign');
-    const zoneSel = document.getElementById('zoneSelectModal');
-    const zoneId  = zoneSel?.value || null;
-    const zoneOpt = zoneId ? zoneSel.options[zoneSel.selectedIndex] : null;
-    const token   = document.querySelector('meta[name="csrf-token"]').content;
+    const btn    = document.getElementById('btnConfirmAssign');
+    const zoneId = _omSelectedZone?.id || null;
+    const token  = document.querySelector('meta[name="csrf-token"]').content;
 
     btn.disabled = true;
     btn.querySelector('.btn-label').textContent = '⏳ Assignation…';
@@ -836,8 +895,8 @@ window.confirmAssign = async function() {
         const fd = new FormData();
         fd.append('_method', 'PUT');
         fd.append('delivery_company_id', companyId);
-        if (zoneId)                  fd.append('delivery_zone_id', zoneId);
-        if (zoneOpt?.dataset?.price) fd.append('delivery_fee', zoneOpt.dataset.price);
+        if (zoneId)                   fd.append('delivery_zone_id', zoneId);
+        if (_omSelectedZone?.price)   fd.append('delivery_fee', _omSelectedZone.price);
         try {
             const res  = await fetch(`/employe/orders/${orderId}/send-to-company`, {
                 method:'POST',
@@ -851,7 +910,7 @@ window.confirmAssign = async function() {
 
     if (successCount > 0) {
         closeOrderModal();
-        const zoneSuffix = zoneOpt ? '\nZone : ' + zoneOpt.textContent.split('—')[0].trim() : '';
+        const zoneSuffix = _omSelectedZone ? '\nZone : ' + _omSelectedZone.name : '';
         renderMsg({
             sender_role:'system',
             body: successCount === 1

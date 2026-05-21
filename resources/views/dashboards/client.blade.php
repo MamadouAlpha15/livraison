@@ -659,6 +659,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 /* ══ CARD BOUTIQUE ══ */
 .shop-card {
+    scroll-margin-top: calc(var(--nav-h, 64px) + 12px);
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--r); overflow: hidden;
     box-shadow: var(--shadow-sm);
@@ -928,6 +929,19 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     transition: background .15s;
 }
 .rank-link:hover { background: var(--orange-dk); }
+.rank-modal-foot {
+    padding: 10px 16px; border-top: 1px solid var(--grey); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.rank-pg-info { font-size: 12px; color: var(--muted); font-weight: 600; }
+.rank-pg-btns { display: flex; gap: 6px; }
+.rank-pg-btn {
+    padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border);
+    background: var(--surface); color: var(--text); font-size: 12px; font-weight: 700;
+    cursor: pointer; font-family: var(--font); transition: all .15s;
+}
+.rank-pg-btn:hover:not(:disabled) { border-color: var(--orange); color: var(--orange); }
+.rank-pg-btn:disabled { opacity: .35; cursor: not-allowed; }
 
 /* Wrapper catégories sidebar — transparent sur desktop, flex horizontal sur mobile */
 .sb-cat-wrap-mob { display: contents; }
@@ -1628,6 +1642,35 @@ html, body { overscroll-behavior-y: none; }
 /* Fade du conteneur lors du filtrage */
 #shopsGrid { transition: opacity .18s ease; }
 
+/* ── Recherche live — badge produit + highlight + info + empty ── */
+.shop-prod-match {
+    display: none; align-items: center; gap: 4px;
+    font-size: 10.5px; font-weight: 700;
+    color: var(--orange); background: rgba(240,106,15,.08);
+    border: 1px solid rgba(240,106,15,.25);
+    padding: 2px 8px; border-radius: 20px;
+    margin-top: 4px; width: fit-content;
+}
+.shop-card.prod-match .shop-prod-match { display: inline-flex; }
+.shop-name-clamp mark {
+    background: rgba(240,106,15,.18); color: var(--orange-dk);
+    border-radius: 3px; padding: 0 2px; font-style: normal;
+}
+#searchLiveInfo {
+    font-size: 12px; color: var(--muted);
+    padding: 4px 0 0; display: none;
+    animation: fadeIn .2s ease;
+}
+#searchLiveInfo strong { color: var(--text); }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+#shopsLiveEmpty {
+    display: none; text-align: center; padding: 2.5rem 1rem;
+    background: var(--surface); border-radius: var(--r);
+    border: 1px dashed var(--border); margin-bottom: 20px;
+}
+#shopsLiveEmpty .ico { font-size: 2.5rem; display: block; margin-bottom: .6rem; }
+#shopsLiveEmpty p { color: var(--muted); font-size: .88rem; margin: 0; }
+
 /* Stat cards — légère animation d'entrée */
 @keyframes statIn {
     from { opacity: 0; transform: scale(.95); }
@@ -2026,9 +2069,12 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
         <a href="#categories" class="nav-link">{!! $si('grid',17) !!} Catégories</a>
     </div>
 
-    <div class="nav-search">
-        <input type="text" id="globalSearch" placeholder="Que recherchez-vous ?">
-        <button class="nav-search-btn" onclick="doSearch()">{!! $si('search',16) !!}</button>
+    <div style="flex:1;max-width:420px;display:flex;flex-direction:column;gap:0">
+        <div class="nav-search" style="max-width:100%">
+            <input type="text" id="globalSearch" placeholder="Que recherchez-vous ?" autocomplete="off">
+            <button class="nav-search-btn" onclick="doSearch()">{!! $si('search',16) !!}</button>
+        </div>
+        <div id="searchLiveInfo"></div>
     </div>
 
     <div class="nav-actions">
@@ -2576,10 +2622,16 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
                 ];
                 $sGrad = $sGrads[abs(crc32($shop->name)) % count($sGrads)];
             @endphp
+            @php
+                $dProdKw = $shop->products
+                    ->map(function($p){ return strtolower($p->name.' '.($p->category ?? '')); })
+                    ->implode(' ');
+            @endphp
             <a href="{{ route('client.shops.show', $shop) }}"
                class="shop-card"
                data-name="{{ strtolower($shop->name) }}"
-               data-type="{{ strtolower($shop->type ?? '') }}">
+               data-type="{{ strtolower($shop->type ?? '') }}"
+               data-products="{{ $dProdKw }}">
 
                 <div class="shop-card-img">
                     @if($shop->image)
@@ -2629,6 +2681,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
                         {!! $si('pin',11) !!} {{ Str::limit($shop->address, 24) }}
                     </div>
                     @endif
+                    <span class="shop-prod-match">📦 A ce produit</span>
                 </div>
 
                 <div class="shop-card-footer">
@@ -2651,6 +2704,10 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
                 <p class="c-empty-sub">Revenez bientôt.</p>
             </div>
             @endforelse
+        </div>
+        <div id="shopsLiveEmpty">
+            <span class="ico">🔍</span>
+            <p id="shopsLiveEmptyMsg">Aucun résultat pour votre recherche.</p>
         </div>
 
         <div class="c-pagination">{{ $shops->links() }}</div>
@@ -2690,33 +2747,35 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 
 {{-- ══ MODALE PROFIL (3 onglets) ══ --}}
 {{-- ══ MODALE CLASSEMENT ══ --}}
-@if(isset($topShops) && $topShops->isNotEmpty())
+@if(isset($allTopShops) && $allTopShops->isNotEmpty())
+@php
+$rGrads = [
+    'linear-gradient(135deg,#667eea,#764ba2)',
+    'linear-gradient(135deg,#f5576c,#f093fb)',
+    'linear-gradient(135deg,#4facfe,#00c6fb)',
+    'linear-gradient(135deg,#cc2b5e,#753a88)',
+    'linear-gradient(135deg,#ee0979,#ff6a00)',
+    'linear-gradient(135deg,#24c6dc,#514a9d)',
+    'linear-gradient(135deg,#11998e,#38ef7d)',
+    'linear-gradient(135deg,#f59e0b,#f97316)',
+];
+@endphp
 <div class="rank-overlay" id="rankOverlay" onclick="if(event.target===this)closeRankingModal()">
     <div class="rank-modal">
         <div class="rank-modal-head">
             <span class="rank-modal-title">🏆 Classement des boutiques</span>
             <button class="rank-modal-close" onclick="closeRankingModal()">✕</button>
         </div>
-        <div class="rank-modal-body">
-            @foreach($topShops as $i => $ts)
+        <div class="rank-modal-body" id="rankModalBody">
+            @foreach($allTopShops as $i => $ts)
             @php
-                $rParts = explode(' ', $ts->name);
-                $rInit  = strtoupper(substr($rParts[0],0,1)) . strtoupper(substr($rParts[1] ?? 'X',0,1));
-                $rGrads = [
-                    'linear-gradient(135deg,#667eea,#764ba2)',
-                    'linear-gradient(135deg,#f5576c,#f093fb)',
-                    'linear-gradient(135deg,#4facfe,#00c6fb)',
-                    'linear-gradient(135deg,#cc2b5e,#753a88)',
-                    'linear-gradient(135deg,#ee0979,#ff6a00)',
-                    'linear-gradient(135deg,#24c6dc,#514a9d)',
-                    'linear-gradient(135deg,#11998e,#38ef7d)',
-                    'linear-gradient(135deg,#f59e0b,#f97316)',
-                ];
-                $rGrad = $rGrads[abs(crc32($ts->name)) % count($rGrads)];
-                $medal = $i === 0 ? '🥇' : ($i === 1 ? '🥈' : ($i === 2 ? '🥉' : null));
+                $rParts   = explode(' ', $ts->name);
+                $rInit    = strtoupper(substr($rParts[0],0,1)) . strtoupper(substr($rParts[1] ?? 'X',0,1));
+                $rGrad    = $rGrads[abs(crc32($ts->name)) % count($rGrads)];
+                $medal    = $i === 0 ? '🥇' : ($i === 1 ? '🥈' : ($i === 2 ? '🥉' : null));
                 $posClass = $i === 0 ? 'gold' : ($i === 1 ? 'silver' : ($i === 2 ? 'bronze' : ''));
             @endphp
-            <a href="{{ route('client.shops.show', $ts) }}" class="rank-row">
+            <a href="{{ route('client.shops.show', $ts) }}" class="rank-row" data-rank-idx="{{ $i }}">
                 <div class="rank-pos {{ $posClass }}">{{ $medal ?? ($i + 1) }}</div>
                 <div class="rank-av" style="background:{{ $rGrad }}">
                     @if($ts->image)
@@ -2735,6 +2794,13 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
                 <span class="rank-link">Voir →</span>
             </a>
             @endforeach
+        </div>
+        <div class="rank-modal-foot" id="rankModalFoot" style="display:none;">
+            <span class="rank-pg-info" id="rankPgInfo"></span>
+            <div class="rank-pg-btns">
+                <button class="rank-pg-btn" id="rankPgPrev" onclick="rankChangePage(-1)">← Préc.</button>
+                <button class="rank-pg-btn" id="rankPgNext" onclick="rankChangePage(1)">Suiv. →</button>
+            </div>
         </div>
     </div>
 </div>
@@ -3195,31 +3261,80 @@ document.addEventListener('click', e => {
 /* ══════════════════════════════════════════
    RECHERCHE BOUTIQUES (JS côté client)
 ══════════════════════════════════════════ */
-function doSearch() {
-    const q    = document.getElementById('globalSearch').value.toLowerCase().trim();
-    const grid = document.getElementById('shopsGrid');
-    if (!grid) return;
-    grid.style.opacity = '0';
-    setTimeout(() => {
-        let count = 0, firstMatch = null;
-        document.querySelectorAll('#shopsGrid .shop-card').forEach(card => {
-            const match = !q || card.dataset.name.includes(q) || card.dataset.type.includes(q);
+(function () {
+    const inp       = document.getElementById('globalSearch');
+    const grid      = document.getElementById('shopsGrid');
+    const liveInfo  = document.getElementById('searchLiveInfo');
+    const liveEmpty = document.getElementById('shopsLiveEmpty');
+    const liveMsg   = document.getElementById('shopsLiveEmptyMsg');
+    if (!inp || !grid) return;
+
+    function escRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+    function hlText(text, q) {
+        if (!q) return text;
+        return text.replace(new RegExp('(' + escRe(q) + ')', 'gi'), '<mark>$1</mark>');
+    }
+    function scrollToEl(el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function doSearch() {
+        const q  = inp.value.trim();
+        const ql = q.toLowerCase();
+
+        /* ── 1. Filtrage SYNCHRONE (avant toute animation) ── */
+        const cards = Array.from(grid.querySelectorAll('.shop-card'));
+        let visible = 0, firstCard = null;
+        cards.forEach(card => {
+            const name     = card.dataset.name     || '';
+            const type     = card.dataset.type     || '';
+            const products = card.dataset.products || '';
+            const matchShop = !ql || name.includes(ql) || type.includes(ql);
+            const matchProd = !matchShop && !!ql && products.includes(ql);
+            const match     = matchShop || matchProd;
             card.style.display = match ? '' : 'none';
-            if (match) { count++; if (!firstMatch) firstMatch = card; }
+            card.classList.toggle('prod-match', matchProd);
+            const nameEl = card.querySelector('.shop-name-clamp');
+            if (nameEl) {
+                if (!card.dataset.origName) card.dataset.origName = nameEl.textContent.trim();
+                nameEl.innerHTML = ql ? hlText(card.dataset.origName, q) : card.dataset.origName;
+            }
+            if (match) { visible++; if (!firstCard) firstCard = card; }
         });
-        const sc = document.getElementById('shopCount');
-        if (sc) sc.textContent = count;
-        grid.style.opacity = '1';
-        /* Scroll fluide vers le premier résultat */
-        if (q && firstMatch) {
-            setTimeout(() => firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' }), 80);
+
+        /* ── 2. Mise à jour UI ── */
+        if (liveInfo) {
+            if (ql) {
+                liveInfo.innerHTML = visible > 0
+                    ? `${visible} boutique${visible > 1 ? 's' : ''} pour <strong>"${q}"</strong>`
+                    : `Aucun résultat pour <strong>"${q}"</strong>`;
+                liveInfo.style.display = 'block';
+            } else {
+                liveInfo.style.display = 'none';
+                cards.forEach(c => c.classList.remove('prod-match'));
+            }
         }
-    }, 180);
-}
-document.getElementById('globalSearch')?.addEventListener('input', doSearch);
-document.getElementById('globalSearch')?.addEventListener('keydown', e => {
-    if (e.key === 'Enter') doSearch();
-});
+        const sc = document.getElementById('shopCount');
+        if (sc) sc.textContent = visible;
+        if (liveEmpty) {
+            liveEmpty.style.display = (visible === 0 && ql) ? 'block' : 'none';
+            if (liveMsg) liveMsg.textContent = `Aucun résultat pour "${q}". Essayez un autre terme.`;
+        }
+
+        /* ── 3. Scroll après reflow complet ── */
+        if (ql) {
+            const target = firstCard || liveEmpty;
+            if (target) setTimeout(() => scrollToEl(target), 50);
+        } else {
+            setTimeout(() => scrollToEl(grid), 50);
+        }
+    }
+
+    let timer;
+    inp.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(doSearch, 200); });
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { clearTimeout(timer); doSearch(); } });
+    window.doSearch = doSearch;
+})();
 
 /* ══════════════════════════════════════════
    FILTRE CATÉGORIES
@@ -3694,9 +3809,44 @@ function closeProfileModal() {
     document.body.style.overflow = '';
 }
 
+/* ── Pagination classement ── */
+const RANK_PER_PAGE = 10;
+let _rankPage = 0;
+
+function _rankRender() {
+    const rows = document.querySelectorAll('#rankModalBody .rank-row');
+    const total = rows.length;
+    const pages = Math.ceil(total / RANK_PER_PAGE);
+    const start = _rankPage * RANK_PER_PAGE;
+    const end   = start + RANK_PER_PAGE;
+    rows.forEach((r, i) => { r.style.display = (i >= start && i < end) ? '' : 'none'; });
+    const foot = document.getElementById('rankModalFoot');
+    const info = document.getElementById('rankPgInfo');
+    const prev = document.getElementById('rankPgPrev');
+    const next = document.getElementById('rankPgNext');
+    if (total > RANK_PER_PAGE) {
+        foot.style.display = '';
+        info.textContent   = `Page ${_rankPage + 1} / ${pages}  ·  ${total} boutiques`;
+        prev.disabled = _rankPage === 0;
+        next.disabled = _rankPage >= pages - 1;
+    } else {
+        foot.style.display = 'none';
+    }
+    document.getElementById('rankModalBody').scrollTop = 0;
+}
+
+function rankChangePage(dir) {
+    const total = document.querySelectorAll('#rankModalBody .rank-row').length;
+    const pages = Math.ceil(total / RANK_PER_PAGE);
+    _rankPage = Math.max(0, Math.min(pages - 1, _rankPage + dir));
+    _rankRender();
+}
+
 function openRankingModal() {
     const el = document.getElementById('rankOverlay');
     if (!el) return;
+    _rankPage = 0;
+    _rankRender();
     el.classList.add('open');
     document.body.style.overflow = 'hidden';
 }

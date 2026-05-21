@@ -47,6 +47,7 @@ class ReportController extends Controller
         $totalRevenue   = max(0, $totalRevGross - $totalCommPaid);
 
         /* ── Pipeline période ── */
+        $allOrdersPeriod  = (clone $periodQ)->count();
         $ordersThisMonth  = (clone $periodValid)->count();
         $pendingOrders    = (clone $periodQ)->where('status', Order::STATUS_EN_ATTENTE)->count();
         $deliveringOrders = (clone $periodQ)->where('status', Order::STATUS_EN_LIVRAISON)->count();
@@ -57,6 +58,10 @@ class ReportController extends Controller
         $revGross         = (float)(clone $periodLivrees)->sum('total');
         $commPaidPeriod   = $this->sumComm($isSuper, $shopId, $dateFrom, $dateTo);
         $revenueThisMonth = max(0, $revGross - $commPaidPeriod);
+
+        /* ── Commissions période ── */
+        $commissionsPaidPeriod    = $commPaidPeriod;
+        $commissionsPendingPeriod = $this->sumComm($isSuper, $shopId, $dateFrom, $dateTo, 'en_attente');
 
         /* ── Delta vs période précédente ── */
         $prevLivrees  = (clone $baseQ)->where('status', 'livrée')->whereBetween('created_at', [$prevFrom, $prevTo]);
@@ -74,17 +79,17 @@ class ReportController extends Controller
             ? round(($cancelledOrders / $totalInPeriod) * 100, 1) : 0;
         $panierMoyen    = $deliveredOrders > 0 ? round($revenueThisMonth / $deliveredOrders) : 0;
 
-        /* ── Commissions ── */
+        /* ── Commissions globales (solde courant) ── */
         $commissionsPending = $this->sumComm($isSuper, $shopId, null, null, 'en_attente');
         $commissionsPaid    = $this->sumComm($isSuper, $shopId, null, null, 'payée');
 
-        /* ── Graphique 6 mois ── */
+        /* ── Graphique — toujours 6 mois glissants (contexte historique) ── */
         $chartMois = collect(range(5, 0))->map(function ($i) use ($allLivrees, $allValid, $now, $shopId, $isSuper) {
-            $mois    = $now->copy()->subMonths($i);
-            $mStart  = $mois->copy()->startOfMonth();
-            $mEnd    = $mois->copy()->endOfMonth();
-            $revG    = (float)(clone $allLivrees)->whereBetween('created_at', [$mStart, $mEnd])->sum('total');
-            $comm    = $this->sumComm($isSuper, $shopId, $mStart, $mEnd);
+            $mois   = $now->copy()->subMonths($i);
+            $mStart = $mois->copy()->startOfMonth();
+            $mEnd   = $mois->copy()->endOfMonth();
+            $revG   = (float)(clone $allLivrees)->whereBetween('created_at', [$mStart, $mEnd])->sum('total');
+            $comm   = $this->sumComm($isSuper, $shopId, $mStart, $mEnd);
             return [
                 'label'   => $mois->isoFormat('MMM YY'),
                 'orders'  => (clone $allValid)->whereBetween('created_at', [$mStart, $mEnd])->count(),
@@ -95,16 +100,21 @@ class ReportController extends Controller
         $maxRevenue = $chartMois->max('revenue') ?: 1;
         $maxOrders  = $chartMois->max('orders')  ?: 1;
 
-        /* ── Équipe ── */
+        /* ── Équipe active sur la période ── */
         if ($isSuper) {
             $vendors  = User::where('role', 'vendeur')->count();
-            $livreurs = User::where('role', 'livreur')->orWhere('role_in_shop', 'livreur')->count();
+            $livreurs = User::where(fn($q) => $q->where('role', 'livreur')->orWhere('role_in_shop', 'livreur'))->count();
         } else {
-            $vendors = User::where('role', 'vendeur')
-                ->whereIn('id', fn($s) => $s->select('user_id')->from('orders')->where('shop_id', $shopId)->groupBy('user_id'))
-                ->count();
+            $vendors = $shopId
+                ? User::where('shop_id', $shopId)->where(fn($q) => $q->where('role', 'vendeur')->orWhere('role_in_shop', 'vendeur'))->count()
+                : 0;
             $livreurs = User::where(fn($q) => $q->where('role', 'livreur')->orWhere('role_in_shop', 'livreur'))
-                ->whereIn('id', fn($s) => $s->select('livreur_id')->from('orders')->where('shop_id', $shopId)->whereNotNull('livreur_id')->groupBy('livreur_id'))
+                ->whereIn('id', fn($s) => $s->select('livreur_id')
+                    ->from('orders')
+                    ->where('shop_id', $shopId)
+                    ->whereNotNull('livreur_id')
+                    ->whereBetween('created_at', [$dateFrom, $dateTo])
+                    ->groupBy('livreur_id'))
                 ->count();
         }
 
@@ -148,11 +158,13 @@ class ReportController extends Controller
 
         return view('admin.reports.index', compact(
             'totalOrders', 'totalRevenue',
+            'allOrdersPeriod',
             'pendingOrders', 'deliveringOrders', 'deliveredOrders', 'cancelledOrders',
             'tauxLivraison', 'tauxAnnulation', 'panierMoyen',
             'ordersThisMonth', 'revenueThisMonth', 'revenueDelta',
             'chartMois', 'maxRevenue', 'maxOrders',
             'commissionsPending', 'commissionsPaid',
+            'commissionsPaidPeriod', 'commissionsPendingPeriod',
             'vendors', 'livreurs',
             'topProducts', 'topLivreurs', 'clientStats',
             'shopId', 'isSuper', 'shop', 'devise',
