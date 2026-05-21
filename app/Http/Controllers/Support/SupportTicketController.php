@@ -35,7 +35,7 @@ class SupportTicketController extends Controller
                 });
             }
 
-            $tickets = $query->paginate(25)->withQueryString();
+            $tickets = $query->limit(150)->get();
 
             $stats = [
                 'total'   => SupportTicket::count(),
@@ -51,20 +51,33 @@ class SupportTicketController extends Controller
             return view('admin.support.index', compact('tickets', 'stats', 'shops'));
         }
 
-        $shop = null;
+        $shop   = null;
+        $ticket = null;
 
         if (in_array($u->role, ['admin', 'employe', 'vendeur']) || $u->role_in_shop) {
-            $shop    = $u->shop;
-            $tickets = SupportTicket::with('shop', 'creator')
-                ->withCount('messages')
-                ->where('shop_id', $u->shop_id)->latest()->paginate(20);
+            $shop   = $u->shop;
+            $ticket = SupportTicket::where('shop_id', $u->shop_id)->latest()->first();
+            if (!$ticket) {
+                $ticket = SupportTicket::create([
+                    'shop_id' => $u->shop_id,
+                    'user_id' => $u->id,
+                    'subject' => 'Support · ' . ($shop->name ?? 'Boutique'),
+                    'status'  => 'open',
+                ]);
+            }
         } else {
-            $tickets = SupportTicket::with('shop', 'creator')
-                ->withCount('messages')
-                ->where('user_id', $u->id)->latest()->paginate(20);
+            $ticket = SupportTicket::where('user_id', $u->id)->latest()->first();
+            if (!$ticket) {
+                $ticket = SupportTicket::create([
+                    'user_id' => $u->id,
+                    'subject' => 'Support',
+                    'status'  => 'open',
+                ]);
+            }
         }
 
-        return view('support.index', compact('tickets', 'shop'));
+        $messages = $ticket->messages()->with('author:id,name,role')->oldest()->get();
+        return view('support.index', compact('ticket', 'shop', 'messages'));
     }
 
     public function create()

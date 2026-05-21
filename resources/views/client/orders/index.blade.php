@@ -219,6 +219,7 @@ html, body {
 .orders-list { display: flex; flex-direction: column; gap: 14px; }
 
 .order-card {
+    scroll-margin-top: 80px;
     background: var(--surface);
     border: 1.5px solid var(--border);
     border-radius: var(--r);
@@ -230,6 +231,15 @@ html, body {
     transform: translateY(-2px);
     box-shadow: var(--shadow);
     border-color: var(--orange-bd);
+}
+.order-card:target {
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(240,106,15,.18);
+    animation: orderHighlight 1.8s ease forwards;
+}
+@keyframes orderHighlight {
+    0%   { background: rgba(240,106,15,.12); }
+    100% { background: var(--surface); }
 }
 
 /* Card top strip coloré selon le statut */
@@ -698,7 +708,7 @@ $groups = $orders->getCollection()
             $fillPct = $step >= 0 ? min(($step / 3) * 100, 100) : 0;
         @endphp
 
-        <div class="order-card">
+        <div class="order-card" id="order-{{ $order->id }}">
             {{-- Strip coloré --}}
             <div class="order-card-strip {{ $cfg['strip'] }}"></div>
 

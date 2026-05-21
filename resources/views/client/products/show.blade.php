@@ -10,6 +10,7 @@
 @extends('layouts.app')
 @section('title', $product->name . ' — ' . $shop->name)
 
+
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -55,7 +56,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .prod-wrap { max-width: 1400px; margin: 0 auto; display: flex; gap: 20px; padding: 20px 16px 60px; align-items: flex-start; }
 .prod-gallery { width: 420px; flex-shrink: 0; }
 .prod-main-img-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; height: 400px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; cursor: zoom-in; position: relative; }
-.prod-main-img { max-width: 100%; max-height: 100%; object-fit: contain; padding: 16px; transition: transform .3s; }
+.prod-main-img { max-width: 100%; max-height: 100%; object-fit: contain; padding: 16px; transition: opacity .18s ease, transform .3s; }
 .prod-main-img-wrap:hover .prod-main-img { transform: scale(1.05); }
 .prod-main-img-ph { font-size: 72px; opacity: .2; }
 .prod-thumbnails { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -266,7 +267,12 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 <script>
 function switchPhoto(src, thumb) {
     const img = document.getElementById('mainImg');
-    if (img) img.src = src;
+    if (!img) return;
+    img.style.opacity = '0';
+    setTimeout(() => {
+        img.src = src;
+        img.style.opacity = '1';
+    }, 180);
     document.querySelectorAll('.prod-thumb').forEach(t => t.classList.remove('active'));
     thumb.classList.add('active');
 }

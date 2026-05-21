@@ -70,15 +70,38 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .prod-layout { display: flex; gap: 20px; align-items: flex-start; }
 .prod-gallery-col { flex-shrink: 0; }
 
-.prod-main-img { width: 220px; height: 220px; border-radius: var(--r); overflow: hidden; background: var(--grey); border: 1px solid var(--border); cursor: zoom-in; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; transition: box-shadow .2s; }
+.prod-gallery-col { flex-shrink: 0; width: 240px; }
+.prod-main-img { width: 100%; height: 240px; border-radius: var(--r); overflow: hidden; background: var(--grey); border: 1px solid var(--border); cursor: zoom-in; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; transition: box-shadow .2s; position: relative; }
 .prod-main-img:hover { box-shadow: var(--shadow); }
-.prod-main-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
-.prod-main-img:hover img { transform: scale(1.05); }
+.prod-main-img img { width: 100%; height: 100%; object-fit: cover; transition: opacity .18s ease, transform .3s; }
+.prod-main-img:hover img { transform: scale(1.04); }
 .prod-main-img-ph { font-size: 52px; opacity: .22; }
 
-.prod-thumbs { display: flex; gap: 6px; flex-wrap: wrap; }
-.prod-thumb { width: 48px; height: 48px; border-radius: var(--r-sm); object-fit: cover; border: 2px solid transparent; cursor: pointer; transition: all .15s; opacity: .65; }
-.prod-thumb:hover, .prod-thumb.active { border-color: var(--orange); opacity: 1; transform: scale(1.08); }
+/* Flèches navigation galerie */
+.prod-nav-btn {
+    position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: rgba(0,0,0,.48); backdrop-filter: blur(4px);
+    border: none; color: #fff; font-size: 20px; line-height: 1;
+    cursor: pointer; display: none; align-items: center; justify-content: center;
+    transition: background .15s; padding: 0; font-family: sans-serif;
+}
+.prod-nav-btn:active { background: rgba(0,0,0,.78); }
+.prod-nav-prev { left: 8px; }
+.prod-nav-next { right: 8px; }
+
+/* Bande miniatures — défilement horizontal */
+.prod-thumbs-wrap { position: relative; }
+.prod-thumbs {
+    display: flex; gap: 7px; overflow-x: auto; flex-wrap: nowrap;
+    padding-bottom: 4px; scroll-snap-type: x mandatory;
+    scrollbar-width: thin; scrollbar-color: var(--orange) var(--grey-2);
+}
+.prod-thumbs::-webkit-scrollbar { height: 4px; }
+.prod-thumbs::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 4px; }
+.prod-thumbs::-webkit-scrollbar-track { background: var(--grey-2); border-radius: 4px; }
+.prod-thumb { flex-shrink: 0; width: 52px; height: 52px; border-radius: var(--r-sm); object-fit: cover; border: 2.5px solid transparent; cursor: pointer; transition: all .15s; opacity: .6; scroll-snap-align: start; }
+.prod-thumb:hover, .prod-thumb.active { border-color: var(--orange); opacity: 1; transform: scale(1.06); }
 
 .prod-info { flex: 1; min-width: 0; }
 .prod-cat { font-size: 10.5px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 5px; }
@@ -144,11 +167,16 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .submit-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 
 /* ══ LIGHTBOX ══ */
-.lb-overlay { display: none; position: fixed; inset: 0; z-index: 9000; background: rgba(0,0,0,.95); align-items: center; justify-content: center; }
+.lb-overlay { display: none; position: fixed; inset: 0; z-index: 9000; background: rgba(0,0,0,.96); align-items: center; justify-content: center; }
 .lb-overlay.open { display: flex; }
-.lb-overlay img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: var(--r); }
+.lb-overlay img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: var(--r); transition: opacity .18s ease; }
 .lb-close { position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .lb-close:hover { background: rgba(255,255,255,.2); }
+.lb-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); color: #fff; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .15s; font-family: sans-serif; }
+.lb-nav:hover { background: rgba(255,255,255,.22); }
+.lb-prev { left: 14px; }
+.lb-next { right: 14px; }
+.lb-counter { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,.5); color: rgba(255,255,255,.8); font-size: 12px; padding: 4px 14px; border-radius: 20px; font-family: monospace; }
 
 /* ══ CHAMPS ADRESSE / TÉLÉPHONE ══ */
 .field-group { margin-bottom: 14px; }
@@ -164,12 +192,14 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 @media (max-width: 580px) {
     .prod-layout { flex-direction: column; }
     .prod-gallery-col { width: 100%; }
-    .prod-main-img { width: 100%; height: 260px; }
-    .prod-thumbs { justify-content: center; }
+    .prod-main-img { height: 280px; }
+    .prod-nav-btn { display: flex !important; }
     .prod-name { font-size: 18px; }
     .prod-price { font-size: 22px; }
     .nav-title { display: none; }
     .page-wrap { padding: 14px 12px 60px; }
+    /* Anti-zoom iOS */
+    .field-input, .qty-input { font-size: 16px !important; }
 }
 @media (max-width: 380px) {
     .prod-main-img { height: 210px; }
@@ -199,9 +229,12 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 @endphp
 
 {{-- LIGHTBOX --}}
-<div class="lb-overlay" id="lbOverlay" onclick="this.classList.remove('open')">
-    <button class="lb-close" onclick="event.stopPropagation();document.getElementById('lbOverlay').classList.remove('open')">✕</button>
+<div class="lb-overlay" id="lbOverlay" onclick="if(event.target===this)closeLb()">
+    <button class="lb-close" onclick="closeLb()">✕</button>
+    <button class="lb-nav lb-prev" id="lbPrev" onclick="lbNav(-1)">&#8249;</button>
     <img id="lbImg" src="" alt="">
+    <button class="lb-nav lb-next" id="lbNext" onclick="lbNav(1)">&#8250;</button>
+    <div class="lb-counter" id="lbCounter"></div>
 </div>
 
 {{-- NAVBAR --}}
@@ -232,7 +265,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
                 {{-- Galerie --}}
                 <div class="prod-gallery-col">
-                    <div class="prod-main-img" id="mainImgWrap">
+                    <div class="prod-main-img" id="mainImgWrap" onclick="openLb()">
                         @if($product->image)
                             <img src="{{ \App\Services\ImageOptimizer::url($product->image, 'medium') ?? asset('storage/'.$product->image) }}"
                                  srcset="{{ \App\Services\ImageOptimizer::url($product->image, 'medium') }} 800w,
@@ -242,14 +275,20 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                         @else
                             <div class="prod-main-img-ph">🏷️</div>
                         @endif
+                        @if(count($allPhotos) > 1)
+                        <button class="prod-nav-btn prod-nav-prev" id="photoPrev" onclick="event.stopPropagation();navPhoto(-1)">&#8249;</button>
+                        <button class="prod-nav-btn prod-nav-next" id="photoNext" onclick="event.stopPropagation();navPhoto(1)">&#8250;</button>
+                        @endif
                     </div>
                     @if(count($allPhotos) > 1)
-                    <div class="prod-thumbs">
-                        @foreach($allPhotos as $i => $photo)
-                        <img src="{{ $photo }}" class="prod-thumb {{ $i === 0 ? 'active' : '' }}"
-                             onclick="switchPhoto('{{ $photo }}', this)"
-                             alt="Photo {{ $i+1 }}" loading="lazy">
-                        @endforeach
+                    <div class="prod-thumbs-wrap">
+                        <div class="prod-thumbs" id="thumbsStrip">
+                            @foreach($allPhotos as $i => $photo)
+                            <img src="{{ $photo }}" class="prod-thumb {{ $i === 0 ? 'active' : '' }}"
+                                 onclick="setPhoto({{ $i }})"
+                                 alt="Photo {{ $i+1 }}" loading="{{ $i === 0 ? 'eager' : 'lazy' }}">
+                            @endforeach
+                        </div>
                     </div>
                     @endif
                 </div>
@@ -447,29 +486,81 @@ function updateTotal() {
     if (sq) sq.textContent = qty;
 }
 
-/* Galerie */
-function switchPhoto(url, thumb) {
+/* ══ GALERIE ══ */
+const PHOTOS = @json($allPhotos);
+let photoIdx = 0, lbIdx = 0;
+
+function setPhoto(idx) {
+    photoIdx = Math.max(0, Math.min(PHOTOS.length - 1, idx));
     const img = document.getElementById('mainImg');
-    if (img) img.src = url;
-    document.querySelectorAll('.prod-thumb').forEach(t => t.classList.remove('active'));
-    thumb.classList.add('active');
-    document.getElementById('mainImgWrap').onclick = () => openLb(url);
-    openLb(url);
+    if (img) {
+        img.style.opacity = '0';
+        setTimeout(() => { img.src = PHOTOS[photoIdx]; img.style.opacity = '1'; }, 170);
+    }
+    document.querySelectorAll('.prod-thumb').forEach((t, i) => {
+        t.classList.toggle('active', i === photoIdx);
+        if (i === photoIdx) t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    });
+    const prev = document.getElementById('photoPrev');
+    const next = document.getElementById('photoNext');
+    if (prev) prev.style.display = PHOTOS.length > 1 ? 'flex' : 'none';
+    if (next) next.style.display = PHOTOS.length > 1 ? 'flex' : 'none';
 }
 
-/* Lightbox */
-function openLb(url) {
-    if (!url) return;
-    document.getElementById('lbImg').src = url;
+function navPhoto(dir) { setPhoto(photoIdx + dir); }
+
+/* ══ LIGHTBOX ══ */
+function openLb() {
+    if (!PHOTOS.length) return;
+    lbIdx = photoIdx;
+    _lbRender();
     document.getElementById('lbOverlay').classList.add('open');
 }
-document.getElementById('mainImgWrap')?.addEventListener('click', function() {
-    const img = document.getElementById('mainImg');
-    if (img) openLb(img.src);
-});
+function closeLb() { document.getElementById('lbOverlay').classList.remove('open'); }
+function lbNav(dir) {
+    lbIdx = Math.max(0, Math.min(PHOTOS.length - 1, lbIdx + dir));
+    _lbRender();
+}
+function _lbRender() {
+    const img = document.getElementById('lbImg');
+    img.style.opacity = '0';
+    setTimeout(() => { img.src = PHOTOS[lbIdx]; img.style.opacity = '1'; }, 170);
+    const prev = document.getElementById('lbPrev');
+    const next = document.getElementById('lbNext');
+    if (prev) prev.style.display = lbIdx === 0 ? 'none' : 'flex';
+    if (next) next.style.display = lbIdx >= PHOTOS.length - 1 ? 'none' : 'flex';
+    const counter = document.getElementById('lbCounter');
+    if (counter) counter.textContent = (lbIdx + 1) + ' / ' + PHOTOS.length;
+    if (PHOTOS.length <= 1 && counter) counter.style.display = 'none';
+}
+
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') document.getElementById('lbOverlay')?.classList.remove('open');
+    const lb = document.getElementById('lbOverlay');
+    if (!lb?.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLb();
+    if (e.key === 'ArrowLeft')  lbNav(-1);
+    if (e.key === 'ArrowRight') lbNav(1);
 });
+
+/* ══ SWIPE TACTILE ══ */
+let tsX = 0, tsY = 0;
+const mw = document.getElementById('mainImgWrap');
+if (mw) {
+    mw.addEventListener('touchstart', e => { tsX = e.touches[0].clientX; tsY = e.touches[0].clientY; }, {passive:true});
+    mw.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].clientX - tsX;
+        const dy = e.changedTouches[0].clientY - tsY;
+        if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) && PHOTOS.length > 1) navPhoto(dx < 0 ? 1 : -1);
+    }, {passive:true});
+}
+
+/* Init flèches */
+if (PHOTOS.length > 1) {
+    const prev = document.getElementById('photoPrev');
+    const next = document.getElementById('photoNext');
+    if (prev) prev.style.display = 'flex';
+    if (next) next.style.display = 'flex';
+}
 
 /* Submit */
 document.getElementById('orderForm')?.addEventListener('submit', () => {

@@ -35,6 +35,9 @@ class SupportMessageController extends Controller
             $u->notify(new NewSupportMessage($msg));
         }
 
+        if ($r->wantsJson()) {
+            return response()->json(['ok' => true, 'msg' => $msg->load('author:id,name,role')]);
+        }
         return back()->with('success','Message envoyé.');
     }
 

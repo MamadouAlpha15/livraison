@@ -144,6 +144,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 /* ══ CARD ══ */
 .amz-card {
+    scroll-margin-top: calc(var(--nav-h) + 12px);
     background: var(--surface);
     border: 1px solid rgba(0,0,0,.07);
     border-radius: 14px;
@@ -151,6 +152,12 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     box-shadow: 0 2px 10px rgba(0,0,0,.07);
     transition: box-shadow .28s, transform .28s, border-color .28s;
     display: flex; flex-direction: column; position: relative;
+}
+#liveEmpty {
+    display: none;
+    padding: 48px 20px; text-align: center;
+    background: var(--surface); border-radius: var(--r);
+    border: 1px solid var(--border); margin-top: 8px;
 }
 .amz-card:hover {
     box-shadow: 0 14px 40px rgba(0,0,0,.16);
@@ -294,7 +301,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 /* Galerie */
 .prod-modal-gallery { width: 360px; flex-shrink: 0; padding: 18px; display: flex; flex-direction: column; gap: 10px; border-right: 1px solid var(--border); background: #fafafa; overflow-y: auto; }
 .prod-modal-main-img { width: 100%; height: 300px; border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: zoom-in; position: relative; flex-shrink: 0; }
-.prod-modal-main-img img { max-width: 100%; max-height: 100%; object-fit: contain; padding: 10px; transition: transform .3s; }
+.prod-modal-main-img img { max-width: 100%; max-height: 100%; object-fit: contain; padding: 10px; transition: opacity .18s ease, transform .3s; }
 .prod-modal-main-img:hover img { transform: scale(1.06); }
 .prod-modal-main-img-ph { font-size: 60px; opacity: .2; }
 .prod-modal-badge { position: absolute; top: 10px; left: 10px; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 4px; }
@@ -349,6 +356,28 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .fs-prev { left: 12px; }
 .fs-next { right: 12px; }
 .fs-counter { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,.5); color: rgba(255,255,255,.8); font-size: 12px; padding: 4px 14px; border-radius: 20px; font-family: monospace; }
+
+/* Flèches navigation photo modale */
+.modal-photo-nav {
+    position: absolute; top: 50%; transform: translateY(-50%); z-index: 4;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(0,0,0,.48); backdrop-filter: blur(4px);
+    border: none; color: #fff; font-size: 20px; line-height: 1;
+    cursor: pointer; display: none; align-items: center; justify-content: center;
+    transition: background .15s; padding: 0; font-family: sans-serif;
+}
+.modal-photo-nav:active { background: rgba(0,0,0,.75); }
+.modal-photo-prev { left: 8px; }
+.modal-photo-next { right: 8px; }
+/* Bouton fermer flottant (mobile bottom-sheet) */
+.modal-close-float {
+    display: none; position: absolute; top: 14px; right: 14px; z-index: 9020;
+    width: 42px; height: 42px; border-radius: 50%;
+    background: rgba(0,0,0,.65); backdrop-filter: blur(6px);
+    border: 1.5px solid rgba(255,255,255,.35); color: #fff; font-size: 20px;
+    cursor: pointer; align-items: center; justify-content: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,.45);
+}
 
 /* ══════════════════════════════════════════
    RESPONSIVE COMPLET
@@ -410,6 +439,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     /* Modal bottom sheet sur mobile */
     .prod-modal-overlay { padding: 0; align-items: flex-end; }
     .prod-modal { border-radius: 16px 16px 0 0; max-height: 96vh; }
+    .modal-close-float { display: flex; }
     .prod-modal-main-img { height: 220px; }
     .prod-modal-name { font-size: 16px; }
     .prod-modal-price { font-size: 20px; }
@@ -419,6 +449,10 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     .amz-results-bar { padding: 8px 10px; gap: 8px; }
     .amz-sort-label { display: none; }
     .amz-sort-select { font-size: 11.5px; max-width: 120px; }
+    /* Anti-zoom iOS */
+    .amz-nav-search input,
+    .amz-price-input,
+    .amz-sort-select { font-size: 16px !important; }
     /* Vue liste inutilisable sur mobile — forcer la grille */
     .amz-view-btns { display: none; }
     .amz-grid.list-view { grid-template-columns: repeat(2, 1fr); }
@@ -474,6 +508,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 {{-- MODAL DÉTAIL PRODUIT --}}
 <div class="prod-modal-overlay" id="prodModal" onclick="if(event.target===this)closeModal()">
+    <button class="modal-close-float" onclick="closeModal()">✕</button>
     <div class="prod-modal">
         <div class="prod-modal-hd">
             <div class="prod-modal-hd-shop">🛍️ &nbsp;<strong>{{ $shop->name }}</strong></div>
@@ -485,6 +520,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     <img src="" id="modalMainImg" alt="">
                     <div class="prod-modal-main-img-ph" id="modalMainPh" style="display:none">🏷️</div>
                     <div class="prod-modal-badge badge-promo" id="modalBadge" style="display:none"></div>
+                    <button class="modal-photo-nav modal-photo-prev" id="modalPhotoPrev" onclick="event.stopPropagation();modalNavPhoto(-1)">&#8249;</button>
+                    <button class="modal-photo-nav modal-photo-next" id="modalPhotoNext" onclick="event.stopPropagation();modalNavPhoto(1)">&#8250;</button>
                 </div>
                 <div class="prod-modal-thumbs" id="modalThumbs"></div>
             </div>
@@ -770,6 +807,12 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
         </div>
 
         <div class="amz-pagination">{{ $products->links() }}</div>
+
+        <div id="liveEmpty">
+            <div style="font-size:48px;opacity:.3;margin-bottom:12px">🔍</div>
+            <div style="font-size:18px;font-weight:700;margin-bottom:6px;color:var(--text)">Produit non trouvé</div>
+            <p style="color:var(--muted);font-size:14px">Aucun produit ne correspond à "<strong id="liveEmptyQ"></strong>" dans cette boutique.</p>
+        </div>
     </div>
 </div>
 
@@ -847,10 +890,13 @@ function buildModalGallery() {
     const mi = document.getElementById('modalMainImg');
     const ph = document.getElementById('modalMainPh');
     const tb = document.getElementById('modalThumbs');
-    if (modalPhotos.length > 0) { mi.src=modalPhotos[0]; mi.style.display=''; ph.style.display='none'; }
+    if (modalPhotos.length > 0) { mi.src=modalPhotos[0]; mi.style.opacity='1'; mi.style.display=''; ph.style.display='none'; }
     else { mi.style.display='none'; ph.style.display=''; }
     tb.innerHTML = '';
-    if (modalPhotos.length > 1) {
+    const multi = modalPhotos.length > 1;
+    document.getElementById('modalPhotoPrev').style.display = multi ? 'flex' : 'none';
+    document.getElementById('modalPhotoNext').style.display = multi ? 'flex' : 'none';
+    if (multi) {
         modalPhotos.forEach((url,i) => {
             const d = document.createElement('div');
             d.className = 'prod-modal-thumb'+(i===0?' active':'');
@@ -860,10 +906,22 @@ function buildModalGallery() {
         });
     }
 }
+function modalNavPhoto(dir) {
+    const newIdx = Math.max(0, Math.min(modalPhotos.length - 1, modalIdx + dir));
+    if (newIdx === modalIdx) return;
+    const thumbs = document.querySelectorAll('.prod-modal-thumb');
+    switchModalPhoto(modalPhotos[newIdx], newIdx, thumbs[newIdx] || {classList:{remove:()=>{},add:()=>{}}});
+}
 function switchModalPhoto(url, idx, el) {
-    document.getElementById('modalMainImg').src = url;
+    const img = document.getElementById('modalMainImg');
+    img.style.opacity = '0';
+    setTimeout(() => {
+        img.src = url;
+        img.style.opacity = '1';
+    }, 180);
     document.querySelectorAll('.prod-modal-thumb').forEach(t => t.classList.remove('active'));
-    el.classList.add('active'); modalIdx = idx;
+    el.classList.add('active');
+    modalIdx = idx;
 }
 function closeModal() {
     document.getElementById('prodModal').classList.remove('open');
@@ -925,7 +983,25 @@ function setView(type) {
     if (type === 'list') { g.classList.add('list-view'); document.getElementById('btnList').classList.add('active'); document.getElementById('btnGrid').classList.remove('active'); }
     else { g.classList.remove('list-view'); document.getElementById('btnGrid').classList.add('active'); document.getElementById('btnList').classList.remove('active'); }
 }
-function doSearch() { searchQ = document.getElementById('prodSearch').value.toLowerCase().trim(); applyFilters(); }
+function _afterSearch(raw) {
+    const liveEmpty = document.getElementById('liveEmpty');
+    const visible = Array.from(document.querySelectorAll('.amz-card')).filter(c => c.style.display !== 'none');
+    if (raw && visible.length === 0) {
+        document.getElementById('liveEmptyQ').textContent = raw;
+        liveEmpty.style.display = 'block';
+    } else {
+        liveEmpty.style.display = 'none';
+        if (raw && visible.length > 0) {
+            setTimeout(() => visible[0].scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+        }
+    }
+}
+function doSearch() {
+    const raw = document.getElementById('prodSearch').value.trim();
+    searchQ = raw.toLowerCase();
+    applyFilters();
+    _afterSearch(raw);
+}
 function applyFilters() {
     const cards = Array.from(document.querySelectorAll('.amz-card'));
     let visible = cards.filter(c => {
@@ -970,24 +1046,28 @@ document.addEventListener('keydown', e => {
 let st;
 document.getElementById('prodSearch').addEventListener('input', e => {
     clearTimeout(st);
-    st = setTimeout(() => { searchQ = e.target.value.toLowerCase().trim(); applyFilters(); }, 250);
+    st = setTimeout(() => {
+        const raw = e.target.value.trim();
+        searchQ = raw.toLowerCase();
+        applyFilters();
+        _afterSearch(raw);
+    }, 250);
 });
 document.getElementById('prodSearch').addEventListener('keydown', e => {
     if (e.key === 'Enter') { clearTimeout(st); doSearch(); }
 });
 
 /* ══ SWIPE TACTILE MODAL ══ */
-let touchStartX = 0;
-document.getElementById('prodModal').addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive:true});
-document.getElementById('prodModal').addEventListener('touchend', e => {
+let touchStartX = 0, touchStartY = 0;
+document.getElementById('modalMainWrap').addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+}, {passive:true});
+document.getElementById('modalMainWrap').addEventListener('touchend', e => {
     const dx = e.changedTouches[0].clientX - touchStartX;
-    if (Math.abs(dx) > 60 && modalPhotos.length > 1) {
-        const newIdx = Math.max(0, Math.min(modalPhotos.length-1, modalIdx + (dx < 0 ? 1 : -1)));
-        if (newIdx !== modalIdx) {
-            modalIdx = newIdx;
-            document.getElementById('modalMainImg').src = modalPhotos[modalIdx];
-            document.querySelectorAll('.prod-modal-thumb').forEach((t,i) => t.classList.toggle('active', i===modalIdx));
-        }
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) && modalPhotos.length > 1) {
+        modalNavPhoto(dx < 0 ? 1 : -1);
     }
 }, {passive:true});
 

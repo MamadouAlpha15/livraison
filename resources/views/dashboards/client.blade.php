@@ -2388,7 +2388,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
                 default                       => [$si('box',14),   'background:#fef3c7;color:#d97706'],
             };
         @endphp
-        <a href="{{ route('client.orders.index') }}" class="order-row" data-order-id="{{ $order->id }}" data-order-status="{{ $order->status }}">
+        <a href="{{ route('client.orders.index') }}#order-{{ $order->id }}" class="order-row" data-order-id="{{ $order->id }}" data-order-status="{{ $order->status }}">
             <div class="order-ico" id="oIco{{ $order->id }}" style="{{ $oIcoSvg[1] }}">{!! $oIcoSvg[0] !!}</div>
             <div class="order-info">
                 <div class="order-ref">#{{ $order->id }}</div>
@@ -4221,19 +4221,45 @@ function filterByCat(type) {
     } catch(e) {}
 
     /* ── Son (Web Audio API — aucun fichier externe) ── */
-    function playBeep() {
+    let _audioCtx = null;
+
+    /* iOS/Android bloquent l'audio sans geste utilisateur.
+       On crée le contexte au premier tap et on le garde actif. */
+    function _initAudio() {
+        if (_audioCtx) return;
         try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain); gain.connect(ctx.destination);
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(880, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.15);
-            gain.gain.setValueAtTime(0.4, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-            osc.start(ctx.currentTime);
-            osc.stop(ctx.currentTime + 0.3);
+            _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        } catch(e) {}
+    }
+    document.addEventListener('touchstart', _initAudio, { once: true, passive: true });
+    document.addEventListener('click',      _initAudio, { once: true });
+
+    async function playBeep() {
+        try {
+            if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (_audioCtx.state === 'suspended') await _audioCtx.resume();
+
+            const t = _audioCtx.currentTime;
+
+            /* 1er bip */
+            const o1 = _audioCtx.createOscillator();
+            const g1 = _audioCtx.createGain();
+            o1.connect(g1); g1.connect(_audioCtx.destination);
+            o1.type = 'triangle';
+            o1.frequency.setValueAtTime(1000, t);
+            g1.gain.setValueAtTime(1, t);
+            g1.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+            o1.start(t); o1.stop(t + 0.25);
+
+            /* 2e bip */
+            const o2 = _audioCtx.createOscillator();
+            const g2 = _audioCtx.createGain();
+            o2.connect(g2); g2.connect(_audioCtx.destination);
+            o2.type = 'triangle';
+            o2.frequency.setValueAtTime(1300, t + 0.28);
+            g2.gain.setValueAtTime(1, t + 0.28);
+            g2.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+            o2.start(t + 0.28); o2.stop(t + 0.55);
         } catch(e) {}
     }
 

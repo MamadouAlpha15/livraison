@@ -2176,6 +2176,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    /* ── Son notification (Web Audio API — aucun fichier externe) ── */
+    let _audioCtx = null;
+    function _initAudio() {
+        if (_audioCtx) return;
+        try { _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+    }
+    document.addEventListener('touchstart', _initAudio, { once: true, passive: true });
+    document.addEventListener('click',      _initAudio, { once: true });
+
+    async function playBeep() {
+        try {
+            if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (_audioCtx.state === 'suspended') await _audioCtx.resume();
+            const t = _audioCtx.currentTime;
+            const o1 = _audioCtx.createOscillator(), g1 = _audioCtx.createGain();
+            o1.connect(g1); g1.connect(_audioCtx.destination);
+            o1.type = 'triangle';
+            o1.frequency.setValueAtTime(1000, t);
+            g1.gain.setValueAtTime(1, t);
+            g1.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+            o1.start(t); o1.stop(t + 0.25);
+            const o2 = _audioCtx.createOscillator(), g2 = _audioCtx.createGain();
+            o2.connect(g2); g2.connect(_audioCtx.destination);
+            o2.type = 'triangle';
+            o2.frequency.setValueAtTime(1300, t + 0.28);
+            g2.gain.setValueAtTime(1, t + 0.28);
+            g2.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+            o2.start(t + 0.28); o2.stop(t + 0.55);
+        } catch(e) {}
+    }
+
     /* ── Toast bas d'écran ── */
     function showToast(msg, type) {
         const t = document.createElement('div');
@@ -2191,6 +2222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         t.innerHTML = msg;
         t.onclick   = () => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); };
         document.body.appendChild(t);
+        playBeep();
         setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(120%)';
             t.style.transition='all .3s'; setTimeout(()=>t.remove(),300); }, 5000);
     }
@@ -2465,7 +2497,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             pushAlert(
                                 _SVG.hdp,
                                 `SuperAdmin a répondu : « ${m.ticket_subject} »`,
-                                '/support/' + m.ticket_id,
+                                '/support',
                                 'support',
                                 m.body,
                                 m.time

@@ -9,191 +9,127 @@
 @endphp
 
 <style>
-    body {
-        background: #f6f7fb;
-    }
+*, *::before, *::after { box-sizing: border-box; }
+body { background: #f6f7fb; }
 
-    /* WRAPPER */
-    .product-page {
-        max-width: 1100px;
-        margin: 25px auto;
-        background: #fff;
-        border-radius: 18px;
-        overflow: hidden;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.08);
-        display: flex;
-        flex-wrap: wrap;
-        position: relative;
-    }
-
-    /* CLOSE BTN */
-    .close-btn {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
-        border: none;
-        background: #ff6a00;
-        color: #fff;
-        font-size: 20px;
-        cursor: pointer;
-        z-index: 10;
-        transition: 0.2s;
-    }
-
-    .close-btn:hover {
-        background: #e85f00;
-        transform: scale(1.05);
-    }
-
-    /* LEFT IMAGE SECTION */
-    .left {
-        flex: 1;
-        min-width: 320px;
-        background: #fafafa;
-        padding: 15px;
-    }
-
-    .main-image {
-    width: 100%;
-    flex: 1;              /* 🔥 remplit tout l’espace */
-    height: 300px;           /* hauteur fixe */
-    min-height: 420px;    /* fallback */
-    object-fit: cover;    /* image propre pleine zone */
-    border-radius: 12px;
+/* ── WRAPPER ── */
+.product-page {
+    max-width: 1100px;
+    margin: 25px auto;
     background: #fff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,.08);
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
 }
 
-    /* IMAGE WRAP */
-    .main-img-wrap {
-        position: relative; display: flex; align-items: center; justify-content: center;
-        background: #fafafa; border-radius: 12px; overflow: hidden; margin-bottom: 10px;
+/* ── CLOSE ── */
+.close-btn {
+    position: absolute; top: 15px; right: 15px; z-index: 10;
+    width: 42px; height: 42px; border-radius: 50%;
+    border: none; background: #ff6a00; color: #fff; font-size: 20px;
+    cursor: pointer; transition: .2s;
+    display: flex; align-items: center; justify-content: center;
+}
+.close-btn:hover { background: #e85f00; transform: scale(1.05); }
+
+/* ── LEFT — image ── */
+.left {
+    flex: 1; min-width: 320px;
+    background: #fafafa; padding: 15px;
+}
+
+.main-img-wrap {
+    position: relative; display: flex; align-items: center; justify-content: center;
+    background: #fafafa; border-radius: 12px; overflow: hidden; margin-bottom: 10px;
+}
+
+.main-image {
+    width: 100%; height: 420px;
+    object-fit: cover; border-radius: 12px;
+    transition: opacity .18s ease;
+    display: block;
+}
+
+/* ── FLÈCHES ── */
+.gal-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(0,0,0,.42); color: #fff; border: none; border-radius: 50%;
+    width: 38px; height: 38px; font-size: 22px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s, opacity .2s; z-index: 2; line-height: 1;
+    opacity: 0;
+}
+.main-img-wrap:hover .gal-arrow { opacity: 1; }
+@media (hover: none) { .gal-arrow { opacity: 1; } }
+.gal-arrow:hover { background: rgba(0,0,0,.7); }
+.gal-arrow-l { left: 8px; }
+.gal-arrow-r { right: 8px; }
+.gal-counter {
+    position: absolute; bottom: 8px; right: 10px;
+    background: rgba(0,0,0,.5); color: #fff; font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 20px; pointer-events: none;
+}
+
+/* ── MINIATURES ── */
+.gallery {
+    display: flex; gap: 8px; margin-top: 10px;
+    overflow-x: auto; padding-bottom: 4px;
+    scroll-snap-type: x mandatory;
+}
+.gallery::-webkit-scrollbar { height: 4px; }
+.gallery::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+.gal-thumb {
+    width: 70px; height: 70px; border-radius: 10px;
+    object-fit: cover; cursor: pointer; flex-shrink: 0;
+    border: 2px solid transparent; transition: .2s;
+    scroll-snap-align: start;
+}
+.gal-thumb:hover { border-color: #ff6a00; transform: scale(1.05); }
+.gal-thumb.active { border-color: #ff6a00; box-shadow: 0 0 0 2px #ffe0cc; }
+
+/* ── RIGHT — infos ── */
+.right { flex: 1; min-width: 320px; padding: 25px; }
+.title { font-size: 26px; font-weight: 700; color: #222; }
+.price-box { margin: 12px 0; }
+.price { font-size: 28px; font-weight: bold; color: #ff6a00; }
+.old-price { font-size: 16px; text-decoration: line-through; color: #aaa; margin-left: 8px; }
+.badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+.badge { background: #fff3e6; color: #ff6a00; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+.desc { margin-top: 18px; line-height: 1.7; color: #555; font-size: 14px; }
+
+/* ── MOBILE ── */
+@media (max-width: 640px) {
+    .product-page {
+        flex-direction: column;
+        margin: 0;
+        border-radius: 0;
+        min-height: 100dvh;
     }
+    .left, .right { min-width: 0; width: 100%; flex: none; }
+    .left { padding: 0; background: #fff; }
+    .main-img-wrap { border-radius: 0; margin-bottom: 0; }
+    .main-image { height: 280px; border-radius: 0; }
+    .gallery { padding: 10px 12px 6px; margin-top: 0; background: #fafafa; }
+    .gal-thumb { width: 60px; height: 60px; }
+    .gal-arrow { opacity: 1; width: 34px; height: 34px; font-size: 20px; }
+    .gal-arrow-l { left: 6px; }
+    .gal-arrow-r { right: 6px; }
+    .right { padding: 16px 14px 24px; }
+    .title { font-size: 20px; padding-right: 40px; }
+    .price { font-size: 24px; }
+    .old-price { font-size: 14px; }
+    .close-btn { width: 36px; height: 36px; font-size: 17px; top: 10px; right: 10px; }
+}
 
-    /* GALLERY THUMBS */
-    .gallery {
-        display: flex;
-        gap: 8px;
-        margin-top: 10px;
-        overflow-x: auto;
-        padding-bottom: 4px;
-    }
-    .gallery::-webkit-scrollbar { height: 4px; }
-    .gallery::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
-
-    .gal-thumb {
-        width: 70px;
-        height: 70px;
-        border-radius: 10px;
-        object-fit: cover;
-        cursor: pointer;
-        border: 2px solid transparent;
-        flex-shrink: 0;
-        transition: 0.2s;
-    }
-    .gal-thumb:hover { border-color: #ff6a00; transform: scale(1.05); }
-    .gal-thumb.active { border-color: #ff6a00; box-shadow: 0 0 0 2px #ffe0cc; }
-
-    /* ARROWS */
-    .gal-arrow {
-        position: absolute; top: 50%; transform: translateY(-50%);
-        background: rgba(0,0,0,.42); color: #fff; border: none; border-radius: 50%;
-        width: 38px; height: 38px; font-size: 22px; cursor: pointer;
-        display: flex; align-items: center; justify-content: center;
-        transition: background .15s; z-index: 2; line-height: 1;
-    }
-    .gal-arrow:hover { background: rgba(0,0,0,.7); }
-    .gal-arrow-l { left: 8px; }
-    .gal-arrow-r { right: 8px; }
-    .gal-counter {
-        position: absolute; bottom: 8px; right: 10px;
-        background: rgba(0,0,0,.5); color: #fff; font-size: 11px; font-weight: 700;
-        padding: 2px 8px; border-radius: 20px; pointer-events: none;
-    }
-
-    /* RIGHT CONTENT */
-    .right {
-        flex: 1;
-        min-width: 320px;
-        padding: 25px;
-    }
-
-    .title {
-        font-size: 26px;
-        font-weight: 700;
-        color: #222;
-    }
-
-    .price-box {
-        margin: 12px 0;
-    }
-
-    .price {
-        font-size: 28px;
-        font-weight: bold;
-        color: #ff6a00;
-    }
-
-    .old-price {
-        font-size: 16px;
-        text-decoration: line-through;
-        color: #aaa;
-        margin-left: 8px;
-    }
-
-    .badges {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 15px;
-    }
-
-    .badge {
-        background: #fff3e6;
-        color: #ff6a00;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 500;
-    }
-
-    .desc {
-        margin-top: 18px;
-        line-height: 1.7;
-        color: #555;
-        font-size: 14px;
-    }
-
-    /* MOBILE */
-    @media (max-width: 768px) {
-        .product-page {
-            flex-direction: column;
-            margin: 10px;
-        }
-
-        .main-image {
-            height: 280px;
-        }
-
-        .right {
-            padding: 15px;
-        }
-
-        .title {
-            font-size: 20px;
-        }
-
-        .price {
-            font-size: 22px;
-        }
-
-        .gallery img {
-            width: 60px;
-            height: 60px;
-        }
-    }
+@media (max-width: 400px) {
+    .main-image { height: 240px; }
+    .title { font-size: 18px; }
+    .price { font-size: 21px; }
+    .gal-thumb { width: 54px; height: 54px; }
+}
 </style>
 
 <div class="product-page">
@@ -268,63 +204,97 @@
 <script>
 /* ── Photos ── */
 const _allPhotos = @json($allPhotos);
-let _curIdx = 0;
+let _curIdx = 0, _swipeActive = false;
 
+/* Met à jour miniatures + compteur sans toucher à l'image */
+function _syncMeta(idx) {
+    document.querySelectorAll('.gal-thumb').forEach((t, i) => {
+        t.classList.toggle('active', i === idx);
+        if (i === idx) t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    });
+    const ctr = document.getElementById('galCounter');
+    if (ctr && _allPhotos.length > 1) ctr.textContent = `${idx + 1} / ${_allPhotos.length}`;
+}
+
+/* Changement de photo via clic miniature ou flèches → fade simple */
 function switchIdx(idx) {
     if (!_allPhotos.length) return;
     _curIdx = ((idx % _allPhotos.length) + _allPhotos.length) % _allPhotos.length;
-    document.getElementById('mainImage').src = _allPhotos[_curIdx];
-
-    /* miniatures */
-    document.querySelectorAll('.gal-thumb').forEach((t, i) => {
-        t.classList.toggle('active', i === _curIdx);
-        if (i === _curIdx) t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-    });
-
-    /* compteur */
-    const ctr = document.getElementById('galCounter');
-    if (ctr && _allPhotos.length > 1) ctr.textContent = `${_curIdx + 1} / ${_allPhotos.length}`;
+    const img = document.getElementById('mainImage');
+    img.style.transition = 'opacity .18s ease';
+    img.style.opacity = '0';
+    setTimeout(() => { img.src = _allPhotos[_curIdx]; img.style.opacity = '1'; }, 170);
+    _syncMeta(_curIdx);
 }
 
-/* Lightbox plein écran */
+/* ── Swipe sur l'image principale ── */
+document.addEventListener('DOMContentLoaded', () => {
+    if (_allPhotos.length > 1) {
+        const ctr = document.getElementById('galCounter');
+        if (ctr) ctr.textContent = `1 / ${_allPhotos.length}`;
+    }
+    if (_allPhotos.length <= 1) return;
+
+    const wrap = document.getElementById('mainImgWrap');
+    let startX = 0, startY = 0;
+
+    wrap.addEventListener('touchstart', e => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+    }, { passive: true });
+
+    wrap.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].clientX - startX;
+        const dy = e.changedTouches[0].clientY - startY;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+            switchIdx(_curIdx + (dx < 0 ? 1 : -1));
+        }
+    }, { passive: true });
+});
+
+/* ── Lightbox plein écran ── */
 function openLightbox(startIdx) {
     if (!_allPhotos.length) return;
-    let idx = startIdx || _curIdx;
+    let idx = (startIdx != null ? startIdx : _curIdx);
 
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:9999;display:flex;align-items:center;justify-content:center;';
 
     const img = document.createElement('img');
-    img.style.cssText = 'max-width:92%;max-height:92%;object-fit:contain;border-radius:10px;user-select:none;';
+    img.style.cssText = 'max-width:92%;max-height:82%;object-fit:contain;border-radius:8px;user-select:none;pointer-events:none;transition:opacity .17s;';
 
     const setImg = (i) => {
         idx = ((i % _allPhotos.length) + _allPhotos.length) % _allPhotos.length;
-        img.src = _allPhotos[idx];
+        img.style.opacity = '0';
+        setTimeout(() => { img.src = _allPhotos[idx]; img.style.opacity = '1'; }, 170);
         ctr.textContent = _allPhotos.length > 1 ? `${idx + 1} / ${_allPhotos.length}` : '';
     };
 
     const ctr = document.createElement('div');
-    ctr.style.cssText = 'position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:#fff;font-size:13px;font-weight:700;background:rgba(0,0,0,.5);padding:4px 14px;border-radius:20px;';
+    ctr.style.cssText = 'position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);left:50%;transform:translateX(-50%);color:#fff;font-size:13px;font-weight:700;background:rgba(0,0,0,.55);padding:4px 14px;border-radius:20px;white-space:nowrap;';
 
     const close = document.createElement('button');
     close.textContent = '✕';
-    close.style.cssText = 'position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:20px;width:40px;height:40px;border-radius:50%;cursor:pointer;';
-    close.onclick = () => document.body.removeChild(overlay);
+    close.style.cssText = 'position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:16px;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:20px;width:42px;height:42px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;';
+    close.onclick = () => { document.body.removeChild(overlay); document.removeEventListener('keydown', onKey); };
 
-    let touchX = 0;
-    overlay.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; });
+    let _ltsx = 0, _ltsy = 0;
+    overlay.addEventListener('touchstart', e => {
+        _ltsx = e.touches[0].clientX; _ltsy = e.touches[0].clientY;
+    }, { passive: true });
     overlay.addEventListener('touchend', e => {
-        const dx = e.changedTouches[0].clientX - touchX;
-        if (Math.abs(dx) > 40) setImg(idx + (dx < 0 ? 1 : -1));
-    });
-    overlay.addEventListener('click', e => { if (e.target === overlay) document.body.removeChild(overlay); });
+        const dx = e.changedTouches[0].clientX - _ltsx;
+        const dy = e.changedTouches[0].clientY - _ltsy;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) setImg(idx + (dx < 0 ? 1 : -1));
+    }, { passive: true });
+    overlay.addEventListener('click', e => { if (e.target === overlay) close.onclick(); });
 
     if (_allPhotos.length > 1) {
-        const mkArrow = (dir, label) => {
+        const mkArrow = (side, label) => {
             const btn = document.createElement('button');
             btn.textContent = label;
-            btn.style.cssText = `position:absolute;top:50%;transform:translateY(-50%);${dir}:16px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:28px;width:48px;height:48px;border-radius:50%;cursor:pointer;`;
-            btn.onclick = (e) => { e.stopPropagation(); setImg(idx + (dir === 'left' ? -1 : 1)); };
+            btn.style.cssText = `position:absolute;top:50%;transform:translateY(-50%);${side}:14px;background:rgba(255,255,255,.15);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:30px;width:46px;height:46px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;`;
+            btn.onclick = (e) => { e.stopPropagation(); setImg(idx + (side === 'left' ? -1 : 1)); };
             return btn;
         };
         overlay.appendChild(mkArrow('left', '‹'));
@@ -338,20 +308,12 @@ function openLightbox(startIdx) {
     setImg(idx);
 
     const onKey = (e) => {
-        if (e.key === 'Escape') { document.body.removeChild(overlay); document.removeEventListener('keydown', onKey); }
+        if (e.key === 'Escape') close.onclick();
         if (e.key === 'ArrowLeft')  setImg(idx - 1);
         if (e.key === 'ArrowRight') setImg(idx + 1);
     };
     document.addEventListener('keydown', onKey);
 }
-
-/* Initialiser le compteur au chargement */
-document.addEventListener('DOMContentLoaded', () => {
-    if (_allPhotos.length > 1) {
-        const ctr = document.getElementById('galCounter');
-        if (ctr) ctr.textContent = `1 / ${_allPhotos.length}`;
-    }
-});
 
 function goBack() {
     if (window.history.length > 1) window.history.back();
