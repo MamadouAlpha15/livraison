@@ -398,10 +398,17 @@ a{text-decoration:none;color:inherit;}
 <div class="pw">
 
     {{-- Back --}}
-    <a href="{{route('boutique.dashboard') }}" class="back">
+    @auth
+    <a href="{{ route('boutique.dashboard') }}" class="back">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         Retour au dashboard
     </a>
+    @else
+    <a href="{{ route('welcome') }}" class="back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Retour à l'accueil
+    </a>
+    @endauth
 
     {{-- Flash messages --}}
     @foreach(['success'=>'flash-success','danger'=>'flash-danger','info'=>'flash-info','warning'=>'flash-warning'] as $k=>$cls)

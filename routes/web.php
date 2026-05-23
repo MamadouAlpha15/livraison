@@ -146,6 +146,12 @@ Route::get('/suivi/{order}/data', [SuiviController::class, 'data'])
 Route::post('/suivi/{order}/client-location', [SuiviController::class, 'updateClientLocation'])
     ->name('suivi.client-location');
 
+/* Liste publique des entreprises de livraison (accessible sans connexion) */
+Route::get('/delivery-companies', [DeliveryCompanyController::class, 'index'])
+    ->name('delivery.companies.index');
+Route::get('/delivery-companies/{company}', [DeliveryCompanyController::class, 'show'])
+    ->name('delivery.companies.show');
+
 
 /* ══════════════════════════════════════════════════════════════════════════
 |  3. AUTH / PROFIL
@@ -227,9 +233,7 @@ Route::middleware('auth')->group(function () {
     |  Requiert : auth
     ════════════════════════════════════════════════════════════════════ */
 
-    /* Listing public des entreprises (tout utilisateur connecté) */
-    Route::get('/delivery-companies',                       [DeliveryCompanyController::class, 'index'])      ->name('delivery.companies.index');
-    Route::get('/delivery-companies/{company}',             [DeliveryCompanyController::class, 'show'])       ->name('delivery.companies.show');
+    /* Avis sur une entreprise (requiert auth) */
     Route::post('/delivery-companies/{company}/reviews',    [DeliveryCompanyController::class, 'storeReview'])->name('delivery.companies.review');
     Route::get('/company-zones/{company}',                  [DeliveryCompanyController::class, 'zonesJson'])  ->name('company.zones.json');
 

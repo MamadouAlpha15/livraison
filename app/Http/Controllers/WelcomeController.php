@@ -26,10 +26,12 @@ class WelcomeController extends Controller
             ->latest()
             ->paginate(12);
 
-        /* ── Entreprises de livraison ── */
+        /* ── Entreprises de livraison (les plus actives d'abord) ── */
         $companies = DeliveryCompany::where('approved', true)
             ->where('active', true)
-            ->latest()
+            ->withCount('orders')
+            ->orderByDesc('orders_count')
+            ->orderByDesc('id')
             ->get();
 
         /* ── Stats sociales (compteurs animés dans le hero) ── */

@@ -568,35 +568,140 @@ body {
 }
 
 /* ════════════════════════════════════════════════════════════════
+   ENTREPRISES PARTENAIRES — VITRINE
+════════════════════════════════════════════════════════════════ */
+.companies-section { background: #f0f2ff; }
+
+.companies-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 24px; margin-bottom: 40px;
+}
+.company-card {
+    background: #fff;
+    border: 1px solid rgba(99,102,241,.1);
+    border-radius: 20px;
+    padding: 28px 24px 24px;
+    transition: all .25s cubic-bezier(.23,1,.32,1);
+    display: flex; flex-direction: column;
+    box-shadow: 0 2px 12px rgba(99,102,241,.06);
+    text-decoration: none; color: inherit;
+}
+.company-card:hover {
+    box-shadow: 0 20px 52px rgba(99,102,241,.15);
+    border-color: rgba(99,102,241,.3);
+    transform: translateY(-6px);
+}
+.company-card-head {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 18px;
+}
+.company-logo {
+    width: 54px; height: 54px; border-radius: 14px;
+    object-fit: cover; flex-shrink: 0;
+    border: 1px solid rgba(99,102,241,.12);
+}
+.company-logo-placeholder {
+    width: 54px; height: 54px; border-radius: 14px; flex-shrink: 0;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 19px; font-weight: 800; color: #fff; letter-spacing: -.5px;
+}
+.company-verified {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(99,102,241,.09); color: #6366f1;
+    border: 1px solid rgba(99,102,241,.18);
+    border-radius: 20px; padding: 3px 9px;
+    font-size: 10px; font-weight: 700; letter-spacing: .3px;
+    white-space: nowrap;
+}
+.company-card-name {
+    font-size: 15px; font-weight: 700; color: #111827;
+    margin-bottom: 5px;
+}
+.company-card-desc {
+    font-size: 13.5px; color: #6b7280; line-height: 1.6;
+    margin-bottom: 18px; flex: 1;
+}
+.company-card-meta {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    font-size: 12px; color: #9ca3af;
+    margin-bottom: 20px;
+}
+.company-card-meta span {
+    display: inline-flex; align-items: center; gap: 4px;
+}
+.company-card-cta {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 16px; border-radius: 10px;
+    font-size: 13px; font-weight: 700;
+    background: rgba(99,102,241,.08); color: #6366f1;
+    border: 1.5px solid rgba(99,102,241,.18);
+    transition: all .15s; align-self: flex-start;
+}
+.company-card:hover .company-card-cta {
+    background: #6366f1; color: #fff; border-color: #6366f1;
+}
+
+/* ════════════════════════════════════════════════════════════════
    TÉMOIGNAGES / SOCIAL PROOF
 ════════════════════════════════════════════════════════════════ */
-.proof-section { background: var(--dark); padding: 80px 24px; }
+.proof-section {
+    background: linear-gradient(180deg, #eef0ff 0%, #f4f6ff 50%, #f8fafc 100%);
+    padding: 100px 24px 96px;
+    position: relative;
+}
+.proof-section::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent 5%, rgba(99,102,241,.35) 40%, rgba(139,92,246,.35) 60%, transparent 95%);
+}
 
 .proof-grid {
     display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 20px; max-width: 1100px; margin: 0 auto;
+    gap: 24px; max-width: 1100px; margin: 0 auto;
 }
 .proof-card {
-    background: rgba(255,255,255,.04);
-    border: 1px solid rgba(255,255,255,.07);
-    border-radius: var(--r);
-    padding: 24px 22px;
-    transition: background .2s;
+    background: #fff;
+    border: 1px solid rgba(99,102,241,.1);
+    border-radius: 20px;
+    padding: 34px 28px;
+    box-shadow: 0 4px 20px rgba(99,102,241,.07), 0 1px 4px rgba(0,0,0,.04);
+    transition: all .25s cubic-bezier(.23,1,.32,1);
+    position: relative; overflow: hidden;
 }
-.proof-card:hover { background: rgba(255,255,255,.07); }
-.proof-stars { color: #fbbf24; font-size: 14px; margin-bottom: 12px; }
+.proof-card::before {
+    content: '\201C';
+    position: absolute; top: 12px; right: 20px;
+    font-size: 88px; line-height: 1; font-family: Georgia, 'Times New Roman', serif;
+    color: rgba(99,102,241,.07); pointer-events: none; user-select: none;
+}
+.proof-card::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    opacity: 0; transition: opacity .25s;
+}
+.proof-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 56px rgba(99,102,241,.14), 0 4px 16px rgba(0,0,0,.06);
+    border-color: rgba(99,102,241,.25);
+}
+.proof-card:hover::after { opacity: 1; }
+.proof-stars { color: #f59e0b; font-size: 14px; margin-bottom: 18px; letter-spacing: 3px; }
 .proof-text {
-    font-size: 14px; color: rgba(255,255,255,.7);
-    line-height: 1.65; margin-bottom: 16px; font-style: italic;
+    font-size: 14.5px; color: #374151;
+    line-height: 1.72; margin-bottom: 24px; font-style: italic;
+    position: relative; z-index: 1;
 }
-.proof-author { display: flex; align-items: center; gap: 10px; }
+.proof-author { display: flex; align-items: center; gap: 12px; }
 .proof-av {
-    width: 36px; height: 36px; border-radius: 50%;
+    width: 44px; height: 44px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
+    font-size: 14px; font-weight: 800; color: #fff; flex-shrink: 0;
+    box-shadow: 0 3px 12px rgba(0,0,0,.2);
 }
-.proof-name  { font-size: 13px; font-weight: 700; color: #fff; }
-.proof-role  { font-size: 11px; color: rgba(255,255,255,.4); margin-top: 1px; }
+.proof-name  { font-size: 14px; font-weight: 700; color: #111827; }
+.proof-role  { font-size: 12px; color: #6b7280; margin-top: 2px; }
 
 /* ════════════════════════════════════════════════════════════════
    PRIX / PLANS
@@ -664,22 +769,34 @@ body {
    CTA ENTREPRISE DE LIVRAISON
 ════════════════════════════════════════════════════════════════ */
 .company-cta {
-    background: linear-gradient(135deg, #0a0a1e 0%, #0f0f3a 60%, #10103a 100%);
-    border: 1px solid rgba(99,102,241,.2);
-    border-radius: 20px;
-    padding: 56px 40px;
-    display: flex; align-items: center;
-    justify-content: space-between; gap: 32px;
-    flex-wrap: wrap;
+    background: linear-gradient(160deg, #07071c 0%, #0e0e38 55%, #12103e 100%);
+    border: 1px solid rgba(99,102,241,.22);
+    border-radius: 24px;
+    padding: 56px 48px 0;
+    display: flex; flex-direction: column; gap: 0;
     position: relative; overflow: hidden;
     margin: 0 24px;
-    box-shadow: 0 8px 40px rgba(99,102,241,.15);
+    box-shadow: 0 8px 48px rgba(99,102,241,.18), 0 0 0 1px rgba(255,255,255,.03) inset;
 }
 .company-cta::before {
     content: '';
-    position: absolute; right: -80px; top: -80px;
-    width: 300px; height: 300px;
-    background: radial-gradient(circle, rgba(99,102,241,.2) 0%, rgba(139,92,246,.08) 50%, transparent 70%);
+    position: absolute; right: -100px; top: -100px;
+    width: 420px; height: 420px;
+    background: radial-gradient(circle, rgba(99,102,241,.22) 0%, rgba(139,92,246,.1) 45%, transparent 70%);
+    pointer-events: none;
+}
+.company-cta::after {
+    content: '';
+    position: absolute; left: -60px; bottom: 30%;
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, rgba(139,92,246,.14) 0%, transparent 65%);
+    pointer-events: none;
+}
+.company-cta-top {
+    display: flex; align-items: center;
+    justify-content: space-between; gap: 32px;
+    flex-wrap: wrap; position: relative; z-index: 1;
+    padding-bottom: 44px;
 }
 .company-cta-txt h2 {
     font-family: var(--display);
@@ -688,6 +805,58 @@ body {
 }
 .company-cta-txt p { font-size: 14.5px; color: rgba(255,255,255,.55); margin: 0; }
 .company-cta-actions { display: flex; gap: 12px; flex-shrink: 0; flex-wrap: wrap; }
+
+/* ── Screenshot dashboard ── */
+.cta-dash-scene {
+    position: relative; z-index: 1;
+    margin: 0 -48px;
+}
+.cta-dash-glow {
+    position: absolute; inset: -60px;
+    background: radial-gradient(ellipse at 50% 0%,
+        rgba(99,102,241,.5) 0%, rgba(139,92,246,.22) 35%, transparent 65%);
+    pointer-events: none; z-index: 0;
+}
+.cta-dash-grid {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+        linear-gradient(rgba(99,102,241,.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99,102,241,.07) 1px, transparent 1px);
+    background-size: 36px 36px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,.6) 0%, transparent 70%);
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.6) 0%, transparent 70%);
+}
+.cta-dash-frame {
+    position: relative; z-index: 1;
+    background: #090d1f;
+    border-radius: 12px 12px 0 0;
+    border: 1px solid rgba(99,102,241,.4);
+    border-bottom: none;
+    box-shadow: 0 -8px 48px rgba(99,102,241,.35), 0 0 0 1px rgba(255,255,255,.04) inset;
+    overflow: hidden;
+    margin: 20px 20px 0;
+}
+.cta-dash-bar {
+    height: 36px;
+    background: linear-gradient(90deg, #0a0d20, #0d1128);
+    border-bottom: 1px solid rgba(255,255,255,.07);
+    display: flex; align-items: center;
+    padding: 0 16px; gap: 7px;
+}
+.cta-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+.cta-url-pill {
+    flex: 1; max-width: 220px; margin: 0 12px;
+    background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+    border-radius: 6px; height: 22px;
+    display: flex; align-items: center; padding: 0 10px;
+    font-size: 10px; color: rgba(255,255,255,.28); font-family: monospace;
+    gap: 5px; letter-spacing: .2px;
+}
+.cta-dash-frame img {
+    width: 100%; display: block;
+    mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+}
 
 /* ════════════════════════════════════════════════════════════════
    FAQ
@@ -821,7 +990,9 @@ body {
 @media (max-width: 1024px) {
     .hero-mockup { padding: 0 12px; }
     .pricing-grid { grid-template-columns: repeat(2,1fr); }
-    .company-cta  { padding: 44px 32px; }
+    .company-cta  { padding: 44px 32px 0; }
+    .cta-dash-scene { margin: 0 -32px; }
+    .cta-dash-frame { margin: 16px 16px 0; }
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -849,8 +1020,10 @@ body {
     .features-grid { grid-template-columns: repeat(2,1fr); gap: 14px; }
     .steps-grid    { grid-template-columns: repeat(2,1fr); gap: 36px 20px; }
     .steps-grid::before { display: none; }
-    .shops-grid    { grid-template-columns: repeat(2,1fr); gap: 16px; }
-    .proof-grid    { grid-template-columns: repeat(2,1fr); }
+    .shops-grid     { grid-template-columns: repeat(2,1fr); gap: 16px; }
+    .companies-grid { grid-template-columns: repeat(2,1fr); gap: 16px; }
+    .proof-grid     { grid-template-columns: repeat(2,1fr); gap: 16px; }
+    .proof-section  { padding: 80px 20px 72px; }
     .pricing-grid  { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
     .faq-grid      { grid-template-columns: 1fr; }
 
@@ -859,10 +1032,10 @@ body {
     .section-sub { margin-bottom: 32px; }
 
     /* CTA entreprise */
-    .company-cta {
-        margin: 0; flex-direction: column;
-        align-items: flex-start; padding: 36px 28px; border-radius: 16px;
-    }
+    .company-cta { margin: 0; padding: 36px 28px 0; border-radius: 16px; }
+    .company-cta-top { align-items: flex-start; }
+    .cta-dash-scene { margin: 0 -28px; }
+    .cta-dash-frame { margin: 14px 14px 0; }
 
     /* Footer */
     .footer-inner { gap: 24px; }
@@ -918,8 +1091,11 @@ body {
     /* Grilles */
     .features-grid { grid-template-columns: 1fr; gap: 12px; }
     .steps-grid    { grid-template-columns: 1fr; gap: 28px; }
-    .shops-grid    { grid-template-columns: 1fr; gap: 14px; }
-    .proof-grid    { grid-template-columns: 1fr; }
+    .shops-grid     { grid-template-columns: 1fr; gap: 14px; }
+    .companies-grid { grid-template-columns: 1fr; gap: 14px; }
+    .proof-grid     { grid-template-columns: 1fr; gap: 14px; }
+    .proof-section { padding: 64px 16px 60px; }
+    .proof-card    { padding: 26px 22px; }
 
     /* Cards */
     .feature-card  { padding: 22px 18px; }
@@ -930,10 +1106,13 @@ body {
     .section-title { letter-spacing: -.5px; margin-bottom: 10px; }
 
     /* CTA Livraison */
-    .company-cta  { margin: 0; padding: 28px 20px; border-radius: 14px; }
+    .company-cta  { margin: 0; padding: 28px 20px 0; border-radius: 14px; }
+    .company-cta-top { padding-bottom: 28px; }
     .company-cta-txt h2 { font-size: 22px; }
     .company-cta-actions { width: 100%; flex-direction: column; }
     .company-cta-actions .cta-btn { justify-content: center; }
+    .cta-dash-scene { margin: 0 -20px; }
+    .cta-dash-frame { margin: 10px 10px 0; }
 
     /* Pricing */
     .pricing-grid  { max-width: 100%; }
@@ -983,7 +1162,7 @@ footer.app-footer { display: none !important; }
         <a href="#features"  class="nav-link-item">Fonctionnalités</a>
         <a href="#how"       class="nav-link-item">Comment ça marche</a>
         <a href="#shops"     class="nav-link-item">Boutiques</a>
-        <a href="#pricing"   class="nav-link-item">Tarifs</a>
+       <!-- <a href="#pricing"   class="nav-link-item">Tarifs</a> !-->
         @guest
         <a href="{{ route('login') }}"    class="cta-btn nav-btn nav-btn-outline" style="padding:8px 16px;font-size:13px">Connexion</a>
         <a href="{{ route('register') }}" class="cta-btn nav-btn" style="padding:8px 16px;font-size:13px">S'inscrire</a>
@@ -1279,13 +1458,79 @@ footer.app-footer { display: none !important; }
 @endif
 
 {{-- ══════════════════════════════════════════
+     ENTREPRISES PARTENAIRES
+══════════════════════════════════════════ --}}
+@if(isset($companies) && $companies->count() > 0)
+<section class="section companies-section">
+    <div class="section-inner">
+        <div class="section-badge" style="background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.22);color:#6366f1">Nos partenaires</div>
+        <h2 class="section-title">Entreprises de livraison <span style="color:#6366f1">partenaires</span></h2>
+        <p class="section-sub">Des entreprises vérifiées, prêtes à livrer vos commandes partout dans la ville.</p>
+
+        <div class="companies-grid">
+            @foreach($companies->take(3) as $company)
+            <a href="{{ route('delivery.companies.show', $company) }}" class="company-card">
+
+                {{-- Logo ou avatar initiales --}}
+                <div class="company-card-head">
+                    @if(!empty($company->logo))
+                        <img src="{{ asset('storage/'.$company->logo) }}" alt="{{ $company->name }}" class="company-logo">
+                    @else
+                        <div class="company-logo-placeholder">{{ strtoupper(substr($company->name, 0, 2)) }}</div>
+                    @endif
+                    <div>
+                        <div class="company-card-name">{{ $company->name }}</div>
+                        <span class="company-verified">
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            Partenaire vérifié
+                        </span>
+                    </div>
+                </div>
+
+                {{-- Description --}}
+                @if($company->description)
+                <p class="company-card-desc">{{ Str::limit($company->description, 95) }}</p>
+                @else
+                <p class="company-card-desc">Entreprise de livraison partenaire de la plateforme Shopio.</p>
+                @endif
+
+                {{-- Méta : ville + commission --}}
+                <div class="company-card-meta">
+                    @if($company->address)
+                    <span>
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        {{ Str::limit($company->address, 24) }}
+                    </span>
+                    @endif
+                </div>
+
+                <span class="company-card-cta">Voir les détails →</span>
+
+            </a>
+            @endforeach
+        </div>
+
+        <div style="text-align:center">
+            <a href="{{ route('delivery.companies.index') }}" class="cta-btn cta-primary"
+               style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-color:#4f46e5;box-shadow:0 4px 18px rgba(99,102,241,.35)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 4v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                Voir toutes les entreprises
+                <span style="background:rgba(255,255,255,.22);padding:2px 9px;border-radius:20px;font-size:12px">{{ $companies->count() }}+</span>
+            </a>
+        </div>
+    </div>
+</section>
+@endif
+
+{{-- ══════════════════════════════════════════
      TÉMOIGNAGES
 ══════════════════════════════════════════ --}}
-<section style="background:var(--dark);padding:80px 24px">
+<section class="proof-section">
     <div style="max-width:1100px;margin:0 auto">
-        <div style="text-align:center;margin-bottom:48px">
-            <div class="section-badge" style="background:rgba(99,102,241,.14);border-color:rgba(99,102,241,.3);color:#a5b4fc">Ils nous font confiance</div>
-            <h2 class="section-title" style="color:#fff">Ce que disent<br><span>nos utilisateurs</span></h2>
+        <div style="text-align:center;margin-bottom:60px">
+            <div class="section-badge" style="background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.22);color:#6366f1">Ils nous font confiance</div>
+            <h2 class="section-title" style="margin-bottom:12px">Ce que disent<br><span style="color:#6366f1">nos utilisateurs</span></h2>
+            <p style="font-size:15px;color:#6b7280;margin:0 auto;max-width:480px;line-height:1.6">Des boutiques et entreprises qui font confiance à Shopio chaque jour.</p>
         </div>
         <div class="proof-grid">
             <div class="proof-card">
@@ -1395,20 +1640,42 @@ footer.app-footer { display: none !important; }
 {{-- ══════════════════════════════════════════
      CTA ENTREPRISE LIVRAISON
 ══════════════════════════════════════════ --}}
-<div style="padding:0 0 80px">
+<div style="padding:72px 0 80px;background:linear-gradient(180deg,#f8fafc 0%,#fff 50%)">
     <div class="company-cta">
-        <div class="company-cta-txt">
-            <h2>Vous avez une entreprise de livraison ?</h2>
-            <p>Rejoignez notre réseau de partenaires. Accédez aux boutiques qui ont besoin de livreurs et développez votre activité.</p>
+
+        {{-- Texte + boutons --}}
+        <div class="company-cta-top">
+            <div class="company-cta-txt">
+                <h2>Vous avez une entreprise de livraison ?</h2>
+                <p>Rejoignez notre réseau de partenaires. Accédez aux boutiques qui ont besoin de livreurs et développez votre activité.</p>
+            </div>
+            <div class="company-cta-actions">
+                <a href="{{ route('register', ['role'=>'company']) }}" class="cta-btn cta-primary">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 4v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                    Rejoindre comme entreprise de livraison
+                </a>
+               
+            </div>
         </div>
-        <div class="company-cta-actions">
-            <a href="{{ route('register', ['role'=>'company']) }}" class="cta-btn cta-primary">
-                🚚 Rejoindre comme partenaire
-            </a>
-            <a href="{{ route('delivery.companies.index') }}" class="cta-btn cta-secondary">
-                Voir les partenaires →
-            </a>
+
+        {{-- Screenshot dashboard --}}
+        <div class="cta-dash-scene">
+            <div class="cta-dash-glow"></div>
+            <div class="cta-dash-grid"></div>
+            <div class="cta-dash-frame">
+                <div class="cta-dash-bar">
+                    <span class="cta-dot" style="background:#ff5f57;box-shadow:0 0 5px #ff5f57"></span>
+                    <span class="cta-dot" style="background:#febc2e;box-shadow:0 0 5px #febc2e"></span>
+                    <span class="cta-dot" style="background:#28c840;box-shadow:0 0 5px #28c840"></span>
+                    <div class="cta-url-pill">
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        dashboard.shopio.com
+                    </div>
+                </div>
+                <img src="/images/company.png" alt="Dashboard entreprise de livraison Shopio">
+            </div>
         </div>
+
     </div>
 </div>
 
