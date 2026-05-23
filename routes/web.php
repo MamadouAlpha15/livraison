@@ -179,6 +179,39 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile',  [ProfileController::class, 'update']) ->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    /* ── Sync état notifications cross-device ── */
+    Route::get('/user/notif-state', fn(\Illuminate\Http\Request $r) =>
+        response()->json($r->user()->notif_state ?? [])
+    )->name('user.notif.get');
+    Route::post('/user/notif-state', function (\Illuminate\Http\Request $r) {
+        $data = $r->validate([
+            'msg_id'     => 'sometimes|integer|min:0',
+            'co_msg_id'  => 'sometimes|integer|min:0',
+            'support_id' => 'sometimes|integer|min:0',
+            'ord'        => 'sometimes|array',
+            'seen_at'    => 'sometimes|integer|min:0',
+            'chat_seen'  => 'sometimes|array',
+        ]);
+        $cur = $r->user()->notif_state ?? [];
+        foreach (['msg_id','co_msg_id','support_id'] as $k) {
+            if (isset($data[$k])) $cur[$k] = max((int)($cur[$k] ?? 0), (int)$data[$k]);
+        }
+        if (!empty($data['ord'])) {
+            foreach ($data['ord'] as $oid => $status) $cur['ord'][(string)$oid] = $status;
+        }
+        if (isset($data['seen_at'])) {
+            $cur['seen_at'] = max((int)($cur['seen_at'] ?? 0), (int)$data['seen_at']);
+        }
+        if (!empty($data['chat_seen'])) {
+            if (!isset($cur['chat_seen'])) $cur['chat_seen'] = [];
+            foreach ($data['chat_seen'] as $shopId => $cnt) {
+                $k = (string)$shopId;
+                $cur['chat_seen'][$k] = max((int)($cur['chat_seen'][$k] ?? 0), (int)$cnt);
+            }
+        }
+        $r->user()->update(['notif_state' => $cur]);
+        return response()->json(['ok' => true]);
+    })->name('user.notif.set');
 
     /* ════════════════════════════════════════════════════════════════════
     |  4. NOTIFICATIONS
@@ -224,6 +257,7 @@ Route::middleware('auth')->group(function () {
 
         /* Commandes (vue globale entreprise de livraison) */
         Route::get('/orders',                           [CompanyOrderController::class, 'index'])            ->name('company.orders.index');
+        Route::get('/orders/live-stats',               [CompanyOrderController::class, 'liveStats'])        ->name('company.orders.live-stats');
         Route::get('/orders/notifications',             [CompanyOrderController::class, 'notifications'])    ->name('company.orders.notifications');
         Route::post('/orders/{order}/assign',           [CompanyOrderController::class, 'assign'])           ->name('company.orders.assign');
         Route::post('/orders/{order}/status',           [CompanyOrderController::class, 'updateStatus'])     ->name('company.orders.status');

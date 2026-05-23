@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\DeliveryCompany;
 use App\Models\DeliveryCompanyReview;
 use App\Models\Order;
-use App\Models\CourierCommission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -160,13 +159,13 @@ class DeliveryCompanyController extends Controller
     $deliveredToday = $baseOrders()->where('status', Order::STATUS_LIVREE)->whereDate('updated_at', $today)->count();
     $deliveredYday  = $baseOrders()->where('status', Order::STATUS_LIVREE)->whereDate('updated_at', $yesterday)->count();
 
-    // ── Revenus : commissions payées par les boutiques à cette entreprise ──
-    $baseComm = fn() => CourierCommission::whereHas('order', fn($q) => $q->where('delivery_company_id', $company->id))
-                        ->where('status', CourierCommission::STATUS_PAYEE);
+    // ── Revenus : delivery_fee des commandes livrées (automatique dès livraison) ──
+    $baseRev = fn() => Order::where('delivery_company_id', $company->id)
+                             ->where('status', Order::STATUS_LIVREE);
 
-    $revenus      = $baseComm()->sum('amount');
-    $revenusToday = $baseComm()->whereDate('paid_at', $today)->sum('amount');
-    $revenusYday  = $baseComm()->whereDate('paid_at', $yesterday)->sum('amount');
+    $revenus      = $baseRev()->sum('delivery_fee');
+    $revenusToday = $baseRev()->whereDate('updated_at', $today)->sum('delivery_fee');
+    $revenusYday  = $baseRev()->whereDate('updated_at', $yesterday)->sum('delivery_fee');
 
     // ── Pipeline ──
     $totalOrders = max($baseOrders()->count(), 1);
@@ -188,7 +187,7 @@ class DeliveryCompanyController extends Controller
 
     // ── Graphique revenus : 30 derniers jours ──
     $revenueChart = collect(range(29, 0))->map(
-        fn($d) => $baseComm()->whereDate('paid_at', now()->subDays($d)->toDateString())->sum('amount')
+        fn($d) => (int) $baseRev()->whereDate('updated_at', now()->subDays($d)->toDateString())->sum('delivery_fee')
     )->values();
 
     // ── Graphique commandes : 30 derniers jours (sélecteur de période) ──
@@ -198,7 +197,7 @@ class DeliveryCompanyController extends Controller
 
     // ── Graphique revenus : 7 derniers jours (sélecteur de période) ──
     $revenueChart7 = collect(range(6, 0))->map(
-        fn($d) => $baseComm()->whereDate('paid_at', now()->subDays($d)->toDateString())->sum('amount')
+        fn($d) => (int) $baseRev()->whereDate('updated_at', now()->subDays($d)->toDateString())->sum('delivery_fee')
     )->values();
 
     // ── Performance réelle ──
@@ -284,8 +283,8 @@ class DeliveryCompanyController extends Controller
         $devise    = $company->currency ?? 'GNF';
 
         $baseOrders = fn() => Order::where('delivery_company_id', $company->id);
-        $baseComm   = fn() => CourierCommission::whereHas('order', fn($q) => $q->where('delivery_company_id', $company->id))
-                              ->where('status', CourierCommission::STATUS_PAYEE);
+        $baseRev    = fn() => Order::where('delivery_company_id', $company->id)
+                                   ->where('status', Order::STATUS_LIVREE);
 
         $pending          = $baseOrders()->where('status', Order::STATUS_EN_ATTENTE)->count();
         $pendingToday     = $baseOrders()->where('status', Order::STATUS_EN_ATTENTE)->whereDate('created_at', $today)->count();
@@ -301,8 +300,8 @@ class DeliveryCompanyController extends Controller
         $deliveredToday   = $baseOrders()->where('status', Order::STATUS_LIVREE)->whereDate('updated_at', $today)->count();
         $deliveredYday    = $baseOrders()->where('status', Order::STATUS_LIVREE)->whereDate('updated_at', $yesterday)->count();
 
-        $revenus          = $baseComm()->sum('amount');
-        $revenusToday     = $baseComm()->whereDate('paid_at', $today)->sum('amount');
+        $revenus          = $baseRev()->sum('delivery_fee');
+        $revenusToday     = $baseRev()->whereDate('updated_at', $today)->sum('delivery_fee');
 
         $totalOrders = max($baseOrders()->count(), 1);
         $pipe = [
@@ -335,8 +334,8 @@ class DeliveryCompanyController extends Controller
 
         $orders7  = collect(range(6, 0))->map(fn($d) => $baseOrders()->whereDate('created_at', now()->subDays($d)->toDateString())->count())->values();
         $orders30 = collect(range(29, 0))->map(fn($d) => $baseOrders()->whereDate('created_at', now()->subDays($d)->toDateString())->count())->values();
-        $revenue7  = collect(range(6, 0))->map(fn($d) => (int) $baseComm()->whereDate('paid_at', now()->subDays($d)->toDateString())->sum('amount'))->values();
-        $revenue30 = collect(range(29, 0))->map(fn($d) => (int) $baseComm()->whereDate('paid_at', now()->subDays($d)->toDateString())->sum('amount'))->values();
+        $revenue7  = collect(range(6, 0))->map(fn($d) => (int) $baseRev()->whereDate('updated_at', now()->subDays($d)->toDateString())->sum('delivery_fee'))->values();
+        $revenue30 = collect(range(29, 0))->map(fn($d) => (int) $baseRev()->whereDate('updated_at', now()->subDays($d)->toDateString())->sum('delivery_fee'))->values();
 
         return response()->json([
             'pending'        => $pending,
@@ -350,7 +349,7 @@ class DeliveryCompanyController extends Controller
             'revenus_fmt'    => number_format($revenus, 0, ',', ' '),
             'rev_trend'      => $revenusToday > 0
                 ? '+' . number_format($revenusToday, 0, ',', ' ') . ' aujourd\'hui · ' . $devise
-                : $devise . ' · Total commissions reçues',
+                : $devise . ' · Frais de livraison cumulés',
             'pipe'           => $pipe,
             'drivers'        => $drivers,
             'orders_7'       => $orders7,

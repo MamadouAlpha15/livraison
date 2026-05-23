@@ -82,6 +82,11 @@ body.is-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .cx-nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:linear-gradient(180deg,#a78bfa,#7c3aed);border-radius:0 3px 3px 0;box-shadow:2px 0 12px rgba(167,139,250,.7)}
 .cx-nav-ico{width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .22s cubic-bezier(.23,1,.32,1)}
 .cx-nav-item.active .cx-nav-ico{background:rgba(139,92,246,.3);border-color:rgba(139,92,246,.4);box-shadow:0 0 10px rgba(139,92,246,.4)}
+.cx-nav-ico svg{display:block;}
+.stat-ico svg{display:block;}
+.stat-ico.purple{color:#a78bfa;}
+.stat-ico.green{color:var(--cx-green);}
+.stat-ico.amber{color:var(--cx-amber);}
 .cx-nav-item.active:hover{background:linear-gradient(90deg,rgba(124,58,237,.45) 0%,rgba(99,102,241,.3) 100%);box-shadow:0 4px 20px rgba(124,58,237,.35),inset 0 1px 0 rgba(255,255,255,.1)}
 .cx-nav-badge{margin-left:auto;background:var(--cx-brand);color:#fff;font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:20px;min-width:18px;text-align:center}
 
@@ -137,12 +142,13 @@ body.cx-light .cx-topbar{background:#fff;border-bottom-color:rgba(0,0,0,.07);box
 /* Shop card */
 .shop-card{background:var(--cx-surface);border:1px solid var(--cx-border);border-radius:var(--r);overflow:hidden;transition:transform .2s,box-shadow .2s;display:flex;flex-direction:column;}
 .shop-card:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.2),0 0 0 1px rgba(124,58,237,.15);}
-.shop-banner{height:80px;background:linear-gradient(135deg,#1e1b4b 0%,#312e81 50%,#1e1b4b 100%);position:relative;overflow:hidden;flex-shrink:0;}
-.shop-banner-img{width:100%;height:100%;object-fit:cover;}
-.shop-banner-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,.5));}
-.shop-avatar{position:absolute;bottom:-18px;left:16px;width:48px;height:48px;border-radius:10px;border:2px solid var(--cx-surface);background:var(--cx-surface2);display:flex;align-items:center;justify-content:center;font-size:20px;overflow:hidden;flex-shrink:0;}
+.shop-banner{height:140px;background:linear-gradient(135deg,#1e1b4b 0%,#312e81 50%,#1e1b4b 100%);position:relative;overflow:hidden;flex-shrink:0;}
+.shop-banner-img{width:100%;height:100%;object-fit:cover;object-position:center;}
+.shop-banner-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.08) 0%,rgba(0,0,0,.18) 50%,rgba(0,0,0,.55) 100%);}
+.shop-banner-name{position:absolute;bottom:28px;left:80px;right:12px;font-size:13px;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.shop-avatar{position:absolute;bottom:-22px;left:14px;width:60px;height:60px;border-radius:12px;border:3px solid var(--cx-surface);background:linear-gradient(135deg,#312e81,#1e1b4b);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,.4);}
 .shop-avatar img{width:100%;height:100%;object-fit:cover;}
-.shop-body{padding:26px 16px 16px;flex:1;display:flex;flex-direction:column;}
+.shop-body{padding:32px 16px 16px;flex:1;display:flex;flex-direction:column;}
 .shop-name{font-size:14.5px;font-weight:800;color:var(--cx-text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .shop-meta{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
 .shop-type{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.2);color:#a78bfa;}
@@ -174,10 +180,12 @@ body.cx-light .cx-topbar{background:#fff;border-bottom-color:rgba(0,0,0,.07);box
 
 /* Light mode */
 body.cx-light .shop-card{background:#fff;border-color:rgba(0,0,0,.07);}
-body.cx-light .shop-banner{background:linear-gradient(135deg,#e0e7ff 0%,#c7d2fe 100%);}
+body.cx-light .shop-banner{background:linear-gradient(135deg,#c7d2fe 0%,#818cf8 100%);}
+body.cx-light .shop-avatar{border-color:#fff;background:linear-gradient(135deg,#818cf8,#6366f1);}
 body.cx-light .shop-stat{background:#f5f7fa;}
 body.cx-light .stat-card{background:#fff;}
 body.cx-light .toolbar .search-box{background:#fff;}
+body.cx-light .shop-banner-name{text-shadow:0 1px 3px rgba(0,0,0,.5);}
 
 /* ══ RESPONSIVE ══ */
 @media(max-width:900px){
@@ -185,18 +193,37 @@ body.cx-light .toolbar .search-box{background:#fff;}
     .cx-sidebar.open{transform:translateX(0);}
     .cx-wrap{padding-left:0;}
     .cx-hamburger{display:flex;}
+    .cx-close-btn{display:flex;}
 }
 @media(max-width:768px){
-    .cx-content{padding:16px 14px 40px;}
+    .cx-content{padding:16px 12px 40px;}
     .stats-bar{grid-template-columns:1fr 1fr;}
-    .cx-tb-uname,.cx-tb-urole{display:none;}
-    .cx-topbar{padding:0 14px;}
+    .stats-bar .stat-card:last-child{grid-column:1/-1;}
+    .cx-tb-uname,.cx-tb-urole,.cx-topbar-sub{display:none;}
+    .cx-topbar{padding:0 12px;overflow:hidden;}
+    .shops-grid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
 }
 @media(max-width:540px){
-    .stats-bar{grid-template-columns:1fr;}
+    .stats-bar{grid-template-columns:1fr 1fr;}
+    .stats-bar .stat-card:last-child{grid-column:1/-1;}
     .shops-grid{grid-template-columns:1fr;}
     .toolbar{flex-direction:column;align-items:stretch;}
     .search-box{min-width:0;}
+    .shop-banner{height:190px;}
+    .shop-avatar{width:64px;height:64px;bottom:-24px;border-radius:14px;}
+    .shop-body{padding:36px 14px 14px;}
+    .shop-banner-name{font-size:14px;bottom:32px;left:88px;}
+    .cx-content{padding:14px 10px 40px;}
+}
+@media(max-width:380px){
+    .stats-bar{grid-template-columns:1fr;}
+    .stats-bar .stat-card:last-child{grid-column:auto;}
+    .shops-grid{grid-template-columns:1fr;}
+    .shop-banner{height:170px;}
+    .shop-avatar{width:56px;height:56px;bottom:-20px;left:12px;}
+    .shop-body{padding:32px 12px 12px;}
+    .shop-banner-name{font-size:13px;bottom:28px;left:78px;}
+    .cx-topbar-title{font-size:13px;}
 }
 .cx-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1100;}
 .cx-overlay.open{display:block;}
@@ -217,7 +244,7 @@ body.cx-light .toolbar .search-box{background:#fff;}
                 <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
                 <span>{{ Str::limit($company->name, 14) }}</span>
             </a>
-            <button class="cx-close-btn" id="cxClose">✕</button>
+            <button class="cx-close-btn" id="cxClose"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
         <div class="cx-sys-badge"><span class="cx-sys-dot"></span> Système actif</div>
     </div>
@@ -225,45 +252,44 @@ body.cx-light .toolbar .search-box{background:#fff;}
     <nav class="cx-nav">
         <div class="cx-nav-sec">Principal</div>
         <a href="{{ route('company.dashboard') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">⊞</span> Tableau de bord
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span> Tableau de bord
         </a>
         <a href="{{ route('company.chat.inbox') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">💬</span> Demandes (Chat)
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span> Demandes (Chat)
         </a>
         <a href="{{ route('company.orders.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">📦</span> Commandes
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Commandes
         </a>
         <a href="{{ route('company.livraisons.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">🚚</span> Livraisons
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span> Livraisons
         </a>
         <a href="{{ route('company.carte.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">🗺️</span> Carte en direct
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span> Carte en direct
         </a>
         <a href="{{ route('company.drivers.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">🚴</span> Chauffeurs
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></span> Chauffeurs
         </a>
         <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item active">
-            <span class="cx-nav-ico">🏪</span> Boutiques
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9l1-5h16l1 5"/><path d="M3 9a2 2 0 0 0 4 0m4 0a2 2 0 0 0 4 0m4 0a2 2 0 0 0-4 0m-8 0a2 2 0 0 0-4 0"/><path d="M5 9v12h14V9"/><path d="M10 14h4v6h-4z"/></svg></span> Boutiques
         </a>
         <a href="{{ route('company.clients.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">👥</span> Clients
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Clients
         </a>
         <div class="cx-nav-sec">Gestion</div>
         <a href="{{route('company.zones.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">📍</span> Zone de livraison
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span> Zone de livraison
         </a>
-       
         <a href="{{ route('company.historique.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">📊</span> Historique
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span> Historique
         </a>
-        <a href="{{ route('company.rapport.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📈</span> Rapport</a>
+        <a href="{{ route('company.rapport.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span> Rapport</a>
 
         <div class="cx-nav-sec">Configuration</div>
         <a href="{{ route('company.parametre.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">⚙️</span> Paramètres
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Paramètres
         </a>
         <a href="{{ route('company.users.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">👤</span> Utilisateurs
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Utilisateurs
         </a>
 
     </nav>
@@ -275,7 +301,7 @@ body.cx-light .toolbar .search-box{background:#fff;}
             background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);
             color:rgba(255,255,255,.75);font-size:12.5px;font-weight:600;
             cursor:pointer;transition:background .15s;text-align:left;font-family:inherit;">
-            <span id="themeIco" style="font-size:15px;">🌙</span>
+            <span id="themeIco" style="display:flex;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>
             <span id="themeLbl">Mode sombre</span>
         </button>
         <div class="cx-user-row">
@@ -286,7 +312,7 @@ body.cx-light .toolbar .search-box{background:#fff;}
             </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="cx-logout-btn" title="Déconnexion">↩</button>
+                <button type="submit" class="cx-logout-btn" title="Déconnexion"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
             </form>
         </div>
     </div>
@@ -299,9 +325,9 @@ body.cx-light .toolbar .search-box{background:#fff;}
 <main class="cx-main">
 
     <div class="cx-topbar">
-        <button class="cx-hamburger" id="cxHamburger">☰</button>
+        <button class="cx-hamburger" id="cxHamburger"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
         <div>
-            <div class="cx-topbar-title">🏪 Boutiques partenaires</div>
+            <div class="cx-topbar-title" style="display:flex;align-items:center;gap:7px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9l1-5h16l1 5"/><path d="M3 9a2 2 0 0 0 4 0m4 0a2 2 0 0 0 4 0m4 0a2 2 0 0 0-4 0m-8 0a2 2 0 0 0-4 0"/><path d="M5 9v12h14V9"/><path d="M10 14h4v6h-4z"/></svg> Boutiques partenaires</div>
             <div class="cx-topbar-sub">{{ $company->name }}</div>
         </div>
         <div class="cx-tb-right">
@@ -320,21 +346,21 @@ body.cx-light .toolbar .search-box{background:#fff;}
         {{-- Stats --}}
         <div class="stats-bar">
             <div class="stat-card">
-                <div class="stat-ico purple">🏪</div>
+                <div class="stat-ico purple"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l1-5h16l1 5"/><path d="M3 9a2 2 0 0 0 4 0m4 0a2 2 0 0 0 4 0m4 0a2 2 0 0 0-4 0m-8 0a2 2 0 0 0-4 0"/><path d="M5 9v12h14V9"/><path d="M10 14h4v6h-4z"/></svg></div>
                 <div>
                     <div class="stat-val">{{ $stats['total_boutiques'] }}</div>
                     <div class="stat-lbl">Boutiques partenaires</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-ico green">✅</div>
+                <div class="stat-ico green"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
                 <div>
                     <div class="stat-val">{{ number_format($stats['total_livrees']) }}</div>
                     <div class="stat-lbl">Livraisons réussies</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-ico amber">💰</div>
+                <div class="stat-ico amber"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
                 <div>
                     <div class="stat-val">{{ number_format($stats['total_revenus'], 0, ',', ' ') }} {{ $company->currency ?? 'GNF' }}</div>
                     <div class="stat-lbl">Revenus de livraison</div>
@@ -349,10 +375,10 @@ body.cx-light .toolbar .search-box{background:#fff;}
             </div>
             <form method="GET" action="{{ route('company.boutiques.index') }}" style="display:flex;gap:8px;flex-wrap:wrap;">
                 <div class="search-box">
-                    <button class="btn-search" type="submit">🔍</button>
+                    <button class="btn-search" type="submit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
                     <input type="text" name="search" value="{{ $search }}" placeholder="Rechercher une boutique…">
                     @if($search)
-                        <a href="{{ route('company.boutiques.index') }}" style="color:var(--cx-muted);font-size:14px;line-height:1;">✕</a>
+                        <a href="{{ route('company.boutiques.index') }}" style="color:var(--cx-muted);display:flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></a>
                     @endif
                 </div>
             </form>
@@ -366,14 +392,15 @@ body.cx-light .toolbar .search-box{background:#fff;}
                 {{-- Banner --}}
                 <div class="shop-banner">
                     @if($shop->image)
-                        <img src="{{ asset('storage/' . $shop->image) }}" alt="" class="shop-banner-img">
+                        <img src="{{ asset('storage/' . $shop->image) }}" alt="{{ $shop->name }}" class="shop-banner-img">
                     @endif
                     <div class="shop-banner-overlay"></div>
+                    <div class="shop-banner-name">{{ $shop->name }}</div>
                     <div class="shop-avatar">
                         @if($shop->image)
-                            <img src="{{ asset('storage/' . $shop->image) }}" alt="">
+                            <img src="{{ asset('storage/' . $shop->image) }}" alt="{{ $shop->name }}">
                         @else
-                            🏪
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1.4"><path d="M3 9l1-5h16l1 5"/><path d="M3 9a2 2 0 0 0 4 0m4 0a2 2 0 0 0 4 0m4 0a2 2 0 0 0-4 0m-8 0a2 2 0 0 0-4 0"/><path d="M5 9v12h14V9"/><path d="M10 14h4v6h-4z"/></svg>
                         @endif
                     </div>
                 </div>
@@ -386,11 +413,11 @@ body.cx-light .toolbar .search-box{background:#fff;}
                             <span class="shop-type">{{ $shop->type }}</span>
                         @endif
                         @if($shop->country)
-                            <span class="shop-country">🌍 {{ $shop->country }}</span>
+                            <span class="shop-country" style="display:inline-flex;align-items:center;gap:3px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> {{ $shop->country }}</span>
                         @endif
                     </div>
                     @if($shop->address)
-                        <div class="shop-addr">📍 {{ $shop->address }}</div>
+                        <div class="shop-addr" style="display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="flex-shrink:0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> {{ $shop->address }}</div>
                     @endif
 
                     {{-- Stats commandes --}}
@@ -411,22 +438,22 @@ body.cx-light .toolbar .search-box{background:#fff;}
 
                     {{-- Revenus --}}
                     <div class="shop-revenue">
-                        <span class="shop-revenue-lbl">💰 Revenus générés</span>
+                        <span class="shop-revenue-lbl" style="display:inline-flex;align-items:center;gap:5px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Revenus générés</span>
                         <span class="shop-revenue-val">{{ number_format($shop->revenus ?? 0, 0, ',', ' ') }} {{ $company->currency ?? 'GNF' }}</span>
                     </div>
 
                     {{-- Actions --}}
                     <div class="shop-actions">
                         <a href="{{ route('company.orders.index', ['boutique' => $shop->id]) }}" class="btn-shop primary">
-                            📦 Commandes
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Commandes
                         </a>
                         @if($shop->en_cours > 0)
                             <a href="{{ route('company.livraisons.index') }}" class="btn-shop" style="position:relative;">
-                                🚚 En cours
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg> En cours
                                 <span style="position:absolute;top:-5px;right:-5px;background:#7c3aed;color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;">{{ $shop->en_cours }}</span>
                             </a>
                         @else
-                            <a href="{{ route('company.historique.index', ['shop_id' => $shop->id]) }}" class="btn-shop">📊 Historique</a>
+                            <a href="{{ route('company.historique.index', ['shop_id' => $shop->id]) }}" class="btn-shop" style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg> Historique</a>
                         @endif
                     </div>
                 </div>
@@ -443,7 +470,7 @@ body.cx-light .toolbar .search-box{background:#fff;}
 
         @else
         <div class="empty-state">
-            <div class="empty-ico">🏪</div>
+            <div class="empty-ico"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity:.35"><path d="M3 9l1-5h16l1 5"/><path d="M3 9a2 2 0 0 0 4 0m4 0a2 2 0 0 0 4 0m4 0a2 2 0 0 0-4 0m-8 0a2 2 0 0 0-4 0"/><path d="M5 9v12h14V9"/><path d="M10 14h4v6h-4z"/></svg></div>
             <div class="empty-title">Aucune boutique partenaire</div>
             <div class="empty-sub">
                 @if($search)
@@ -485,7 +512,9 @@ function updateThemeBtn(isLight) {
     const ico = document.getElementById('themeIco');
     const lbl = document.getElementById('themeLbl');
     if (!ico || !lbl) return;
-    ico.textContent = isLight ? '🌙' : '☀️';
+    const moonSvg = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+    const sunSvg  = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+    ico.innerHTML = isLight ? moonSvg : sunSvg;
     lbl.textContent = isLight ? 'Mode sombre' : 'Mode clair';
 }
 </script>

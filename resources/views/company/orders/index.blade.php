@@ -86,6 +86,7 @@ a{text-decoration:none;color:inherit;}
 .cx-nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:linear-gradient(180deg,#a78bfa,#7c3aed);border-radius:0 3px 3px 0;box-shadow:2px 0 12px rgba(167,139,250,.7);}
 .cx-nav-ico{width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .22s cubic-bezier(.23,1,.32,1);}
 .cx-nav-item.active .cx-nav-ico{background:rgba(139,92,246,.3);border-color:rgba(139,92,246,.4);box-shadow:0 0 10px rgba(139,92,246,.4);}
+.cx-nav-ico svg,.cx-toast-ico svg{display:block;}
 .cx-nav-item.active:hover{background:linear-gradient(90deg,rgba(124,58,237,.45) 0%,rgba(99,102,241,.3) 100%);box-shadow:0 4px 20px rgba(124,58,237,.35),inset 0 1px 0 rgba(255,255,255,.1);}
 
 /* User foot */
@@ -560,6 +561,13 @@ body.cx-dark .mc-amount-total .mc-amount-val{color:var(--cx-text)}
     .btn-action,.btn-action-cancel,.btn-action-restore{padding:6px 10px;font-size:11.5px;}
 }
 
+/* ── Temps réel ── */
+@keyframes slideDown{from{opacity:0;transform:translateX(-50%) translateY(-12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes pulse-dot{0%,100%{transform:scale(1)}50%{transform:scale(1.4)}}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#34d399;display:inline-block;animation:pulse-dot 1.6s ease-in-out infinite;flex-shrink:0;}
+.live-banner{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:2000;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;padding:10px 22px;border-radius:30px;font-size:13px;font-weight:800;box-shadow:0 4px 24px rgba(124,58,237,.55);cursor:pointer;display:flex;align-items:center;gap:9px;animation:slideDown .3s cubic-bezier(.23,1,.32,1);white-space:nowrap;}
+.live-banner:hover{background:linear-gradient(135deg,#6d28d9,#5b21b6);}
+
 /* ══ TOGGLE MODE SOMBRE ══ */
 .cx-dark-row{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;cursor:pointer;border-radius:var(--r-sm);transition:background .14s;}
 .cx-dark-row:hover{background:rgba(255,255,255,.04);}
@@ -675,7 +683,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                  <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
                 <span class="sb-shop-name">{{ $company->name }}</span>
             </a>
-            <button class="cx-close-btn" id="cxClose">✕</button>
+            <button class="cx-close-btn" id="cxClose"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
         <div class="cx-sys-badge">
             <span class="cx-sys-dot"></span> Système actif
@@ -685,46 +693,46 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
     <nav class="cx-nav">
         <div class="cx-nav-sec">Principal</div>
         <a href="{{ route('company.dashboard') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">⊞</span> Tableau de bord
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span> Tableau de bord
         </a>
         <a href="{{ route('company.chat.inbox') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">💬</span> Demandes (Chat)
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span> Demandes (Chat)
         </a>
         <a href="{{ route('company.orders.index') }}" class="cx-nav-item active">
-            <span class="cx-nav-ico">📦</span> Commandes
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Commandes
         </a>
         <a href="{{ route('company.livraisons.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">🚚</span> Livraisons
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span> Livraisons
         </a>
         <a href="{{ route('company.carte.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">🗺️</span> Carte en direct
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span> Carte en direct
         </a>
         <a href="{{ route('company.drivers.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">🚴</span> Chauffeurs
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></span> Chauffeurs
         </a>
         <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">🏪</span> Boutiques
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span> Boutiques
         </a>
         <a href="{{route('company.clients.index')}}" class="cx-nav-item">
-            <span class="cx-nav-ico">👥</span> Clients
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Clients
         </a>
 
         <div class="cx-nav-sec">Gestion</div>
         <a href="{{route('company.zones.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">📍</span> Zone de livraison
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span> Zone de livraison
         </a>
        
         <a href="{{ route('company.historique.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">📊</span> Historique
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span> Historique
         </a>
-        <a href="{{ route('company.rapport.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📈</span> Rapport</a>
+        <a href="{{ route('company.rapport.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span> Rapport</a>
 
         <div class="cx-nav-sec">Configuration</div>
         <a href="{{ route('company.parametre.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">⚙️</span> Paramètres
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Paramètres
         </a>
         <a href="{{ route('company.users.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">👤</span> Utilisateurs
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Utilisateurs
         </a>
 
     </nav>
@@ -761,10 +769,10 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
 
     {{-- TOPBAR --}}
     <div class="cx-topbar">
-        <button class="cx-hamburger" id="cxHamburger">☰</button>
-        <div class="cx-topbar-title">📦 <span>{{ $shopFilter ? 'Commandes · '.$shopFilter->name : 'Commandes' }}</span></div>
+        <button class="cx-hamburger" id="cxHamburger"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <div class="cx-topbar-title" style="display:flex;align-items:center;gap:7px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg><span>{{ $shopFilter ? 'Commandes · '.$shopFilter->name : 'Commandes' }}</span></div>
         <div class="cx-tb-right">
-            <a href="{{ route('company.chat.inbox') }}" class="cx-tb-btn" title="Chat">💬</a>
+            <a href="{{ route('company.chat.inbox') }}" class="cx-tb-btn" title="Chat"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></a>
             <div class="cx-tb-user">
                 <div class="cx-tb-av">{{ $ini }}</div>
                 <div>
@@ -781,7 +789,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
     <div class="banner-inner">
         <div class="banner-top">
             <div>
-                <div class="banner-title">📦 Mes commandes</div>
+                <div class="banner-title" style="display:flex;align-items:center;gap:8px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>Mes commandes</div>
                 <div class="banner-sub">
                     @if($shopFilter)
                         {{ $shopFilter->name }} · Commandes de cette boutique
@@ -831,13 +839,13 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
     {{-- BADGE BOUTIQUE FILTRÉE --}}
     @if($shopFilter)
     <div style="background:linear-gradient(90deg,rgba(124,58,237,.15),rgba(99,102,241,.08));border:1px solid rgba(124,58,237,.2);border-radius:var(--r-sm);padding:10px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-        <span style="font-size:18px;">🏪</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         <div>
             <div style="font-size:13px;font-weight:800;color:#a78bfa;">Filtré par boutique : {{ $shopFilter->name }}</div>
             <div style="font-size:11.5px;color:var(--cx-text2);">Affichage des commandes uniquement pour cette boutique</div>
         </div>
         <a href="{{ route('company.orders.index') }}" style="margin-left:auto;font-size:12px;padding:5px 12px;border:1px solid rgba(124,58,237,.3);border-radius:6px;background:rgba(124,58,237,.1);color:#c4b5fd;white-space:nowrap;">
-            ✕ Voir toutes les commandes
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:4px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Voir toutes les commandes
         </a>
     </div>
     @endif
@@ -894,7 +902,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
             </button>
             <button class="btn-sel-annuler" onclick="bulkCancelOrders()">🚫 Annuler</button>
             <button class="btn-sel-restaurer" onclick="bulkRestoreOrders()">♻️ Restaurer</button>
-            <button class="btn-sel-cancel" onclick="clearSelection()">✕ Effacer</button>
+            <button class="btn-sel-cancel" onclick="clearSelection()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:3px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Effacer</button>
         </div>
     </div>
 
@@ -953,15 +961,15 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                             <div class="client-name">{{ $order->client->name ?? '—' }}</div>
                             @php $cPhone = $order->client_phone ?: ($order->client->phone ?? null); @endphp
                             @if($cPhone)
-                            <a href="tel:{{ $cPhone }}" class="client-phone" style="text-decoration:none;color:var(--cx-muted)">📞 {{ $cPhone }}</a>
+                            <a href="tel:{{ $cPhone }}" class="client-phone" style="text-decoration:none;color:var(--cx-muted);display:inline-flex;align-items:center;gap:3px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.03 6.03l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>{{ $cPhone }}</a>
                             @endif
                         </div>
                     </td>
                     <td data-label="Boutique">
                         <div>
-                            <span class="shop-badge">🏪 {{ $order->shop->name ?? '—' }}</span>
+                            <span class="shop-badge" style="display:inline-flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>{{ $order->shop->name ?? '—' }}</span>
                             @if($order->shop?->address)
-                            <div class="shop-addr">📍 {{ $order->shop->address }}</div>
+                            <div class="shop-addr" style="display:flex;align-items:center;gap:3px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>{{ $order->shop->address }}</div>
                             @endif
                         </div>
                     </td>
@@ -996,7 +1004,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                     <td data-label="Frais">
                         <div class="fee-val">{{ $displayFee ? $fmt($displayFee) : '—' }}</div>
                         @if(!$order->delivery_fee && $order->deliveryZone)
-                        <div style="font-size:10px;color:var(--cx-muted);margin-top:2px;">📍 {{ $order->deliveryZone->name }}</div>
+                        <div style="font-size:10px;color:var(--cx-muted);margin-top:2px;display:flex;align-items:center;gap:2px"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>{{ $order->deliveryZone->name }}</div>
                         @endif
                     </td>
                     <td data-label="Montant"><div class="amount-val">{{ $fmt($order->total) }}</div></td>
@@ -1017,7 +1025,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                                     data-shop-addr="{{ $order->shop->address ?? '' }}"
                                     data-client-addr="{{ $order->client->address ?? '' }}"
                                     onclick="openAssign(this)">
-                                🚴 Assigner
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>Assigner
                             </button>
                             @endif
                             @if(!in_array($order->status, ['livrée','annulée']))
@@ -1038,7 +1046,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                 @empty
                 <tr><td colspan="11">
                     <div class="empty-state">
-                        <div class="empty-ico">📦</div>
+                        <div class="empty-ico"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="opacity:.35"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
                         <div class="empty-txt">Aucune commande assignée à votre entreprise</div>
                         <div class="empty-sub">Les boutiques vous confient leurs livraisons depuis leur tableau de bord.</div>
                     </div>
@@ -1090,11 +1098,11 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
         {{-- Montants en évidence --}}
         <div class="mc-amounts">
             <div class="mc-amount-box mc-amount-fee">
-                <div class="mc-amount-lbl">🚚 Frais liv.</div>
+                <div class="mc-amount-lbl" style="display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Frais liv.</div>
                 <div class="mc-amount-val">{{ $displayFee ? $fmt($displayFee) : '—' }}</div>
             </div>
             <div class="mc-amount-box mc-amount-total">
-                <div class="mc-amount-lbl">💰 Montant</div>
+                <div class="mc-amount-lbl" style="display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Montant</div>
                 <div class="mc-amount-val">{{ $fmt($order->total) }}</div>
             </div>
         </div>
@@ -1102,23 +1110,23 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
         {{-- Détails --}}
         <div class="mc-rows">
             <div class="mc-row">
-                <span class="mc-lbl">👤 Client</span>
+                <span class="mc-lbl" style="display:inline-flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Client</span>
                 <span class="mc-val">{{ $order->client->name ?? '—' }}
-                    @if($cPhone)<span style="color:var(--cx-muted);font-size:11.5px;display:block">📞 {{ $cPhone }}</span>@endif
+                    @if($cPhone)<span style="color:var(--cx-muted);font-size:11.5px;display:flex;align-items:center;gap:3px;margin-top:2px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.03 6.03l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>{{ $cPhone }}</span>@endif
                 </span>
             </div>
             <div class="mc-row">
-                <span class="mc-lbl">🏪 Boutique</span>
+                <span class="mc-lbl" style="display:inline-flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Boutique</span>
                 <span class="mc-val">{{ $order->shop->name ?? '—' }}</span>
             </div>
             @if($dest)
             <div class="mc-row">
-                <span class="mc-lbl">📍 Destination</span>
+                <span class="mc-lbl" style="display:inline-flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Destination</span>
                 <span class="mc-val">{{ $dest }}</span>
             </div>
             @endif
             <div class="mc-row">
-                <span class="mc-lbl">🚴 Chauffeur</span>
+                <span class="mc-lbl" style="display:inline-flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>Chauffeur</span>
                 <span class="mc-val">
                     @if($order->driver)
                         {{ $order->driver->name }}
@@ -1129,7 +1137,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                 </span>
             </div>
             <div class="mc-row" style="border-bottom:none">
-                <span class="mc-lbl">📅 Date</span>
+                <span class="mc-lbl" style="display:inline-flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Date</span>
                 <span class="mc-val" style="color:var(--cx-muted)">{{ \Carbon\Carbon::parse($order->created_at)->format('d/m/y H:i') }}</span>
             </div>
         </div>
@@ -1183,16 +1191,16 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
     <div class="cx-modal">
         <div class="cx-modal-hd">
             <div>
-                <div class="cx-modal-title">🚴 Assigner un chauffeur</div>
+                <div class="cx-modal-title" style="display:flex;align-items:center;gap:7px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>Assigner un chauffeur</div>
                 <div class="cx-modal-sub" id="assignModalSub">Sélectionnez un chauffeur disponible</div>
             </div>
-            <button class="cx-modal-close" data-close="assignModal">✕</button>
+            <button class="cx-modal-close" data-close="assignModal"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
         <div class="cx-modal-body">
 
             {{-- ── Multi-commandes (visible en mode bulk) ── --}}
             <div id="multiOrdersSection" style="display:none;margin-bottom:14px;">
-                <div class="form-label">📦 Commandes sélectionnées</div>
+                <div class="form-label" style="display:flex;align-items:center;gap:5px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Commandes sélectionnées</div>
                 <div class="multi-orders-list" id="multiOrdersList"></div>
                 <div id="multiDestInfo"></div>
                 <div id="multiDestNote" style="font-size:11.5px;color:var(--cx-muted);">Les frais saisis s'appliqueront à chaque commande.</div>
@@ -1203,12 +1211,12 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
             {{-- ── Blocs adresses (visible en mode simple) ── --}}
             <div class="addr-flow" id="addrFlow">
                 <div class="addr-box addr-pickup">
-                    <div class="addr-lbl">📦 Retrait — Boutique</div>
+                    <div class="addr-lbl" style="display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Retrait — Boutique</div>
                     <div class="addr-val" id="shopAddrVal">—</div>
                 </div>
                 <div class="addr-arrow">→</div>
                 <div class="addr-box addr-delivery">
-                    <div class="addr-lbl">📍 Livraison — Client</div>
+                    <div class="addr-lbl" style="display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Livraison — Client</div>
                     <div class="addr-val" id="clientAddrVal">—</div>
                 </div>
             </div>
@@ -1216,7 +1224,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
             {{-- Avertissement si aucun chauffeur disponible --}}
             @if($availCount === 0)
             <div class="no-avail-warn">
-                ⚠️ Aucun chauffeur disponible en ce moment
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:5px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Aucun chauffeur disponible en ce moment
             </div>
             @endif
 
@@ -1283,16 +1291,16 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
             </div>
 
             <div class="form-group" id="assignFeeGroup">
-                <label class="form-label">💰 Frais de livraison ({{ $devise }})</label>
+                <label class="form-label" style="display:flex;align-items:center;gap:5px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Frais de livraison ({{ $devise }})</label>
                 <input type="number" class="form-input" id="assignFee" placeholder="Ex: 50 000" min="0" step="500">
             </div>
             <div class="form-group" id="destGroup">
-                <label class="form-label">📍 Adresse de livraison (modifiable)</label>
+                <label class="form-label" style="display:flex;align-items:center;gap:5px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Adresse de livraison (modifiable)</label>
                 <input type="text" class="form-input" id="assignDest" placeholder="Adresse du client…">
                 <div style="font-size:11px;color:var(--cx-muted);margin-top:4px;">Pré-remplie avec l'adresse du client. Modifiez si besoin.</div>
             </div>
             <button class="btn-primary" id="assignBtn" onclick="submitAssign()">
-                🚴 Confirmer l'assignation
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:5px"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>Confirmer l'assignation
             </button>
         </div>
     </div>
@@ -1302,17 +1310,22 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
 <div class="modal-overlay" id="statusModal">
     <div class="cx-modal">
         <div class="cx-modal-hd">
-            <div class="cx-modal-title">✏️ Changer le statut</div>
-            <button class="cx-modal-close" data-close="statusModal">✕</button>
+            <div class="cx-modal-title" style="display:flex;align-items:center;gap:7px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Changer le statut</div>
+            <button class="cx-modal-close" data-close="statusModal"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
         <div class="cx-modal-body">
             <div class="form-group">
                 <div class="form-label">Nouveau statut</div>
                 <div class="status-radio" id="statusList">
-                    @foreach(['en_livraison'=>['🚴','En livraison','badge-deliv'],'livrée'=>['✅','Livrée','badge-done'],'annulée'=>['❌','Annulée','badge-cancel']] as $val=>[$ico,$lbl,$cls])
+                    @foreach(['en_livraison'=>['bike','En livraison','badge-deliv'],'livrée'=>['check','Livrée','badge-done'],'annulée'=>['x','Annulée','badge-cancel']] as $val=>[$ico,$lbl,$cls])
                     <label class="status-opt">
                         <input type="radio" name="status_val" value="{{ $val }}">
-                        <span class="badge {{ $cls }}">{{ $ico }} {{ $lbl }}</span>
+                        <span class="badge {{ $cls }}" style="display:inline-flex;align-items:center;gap:5px">
+                            @if($ico==='bike')<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>
+                            @elseif($ico==='check')<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            @else<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>@endif
+                            {{ $lbl }}
+                        </span>
                     </label>
                     @endforeach
                 </div>
@@ -1403,7 +1416,7 @@ function closeModal(id){
     var s=document.getElementById('selectedSummary'); if(s) s.classList.remove('show');
     /* Remettre le btn + champs en état normal */
     var btn=document.getElementById('assignBtn');
-    if(btn){ btn.disabled=false; btn.textContent='🚴 Confirmer l\'assignation'; }
+    if(btn){ btn.disabled=false; btn.textContent='Confirmer l\'assignation'; }
     var afg=document.getElementById('assignFeeGroup'); if(afg) afg.style.display='';
     var gfl=document.getElementById('groupedFeesList'); if(gfl){ gfl.style.display='none'; gfl.innerHTML=''; }
 }
@@ -1539,13 +1552,13 @@ function openMultiAssign(){
             card.style.cssText='padding:11px 13px;border-radius:9px;border:1.5px solid var(--cx-border);background:var(--cx-card2);';
             card.innerHTML=
                 '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;">'
-                    +'<div style="font-size:12.5px;font-weight:800;color:var(--cx-text);">👤 '+g.clientName+'</div>'
+                    +'<div style="font-size:12.5px;font-weight:800;color:var(--cx-text);">'+g.clientName+'</div>'
                     +'<span style="font-size:10.5px;font-weight:700;background:#eef2ff;color:#4f46e5;border:1.5px solid #c7d2fe;border-radius:6px;padding:2px 8px;white-space:nowrap;">'+g.orders.length+' commande'+(g.orders.length>1?'s':'')+' · 1 trajet</span>'
                 +'</div>'
-                +(g.dest ? '<div style="font-size:11.5px;color:var(--cx-muted);margin-bottom:6px;">📍 '+g.dest+'</div>' : '')
+                +(g.dest ? '<div style="font-size:11.5px;color:var(--cx-muted);margin-bottom:6px;">'+g.dest+'</div>' : '')
                 +'<div style="font-size:11px;color:var(--cx-muted);margin-bottom:5px;">'+nums+'</div>'
                 +'<div style="display:flex;align-items:center;gap:7px;">'
-                    +'<span style="font-size:11.5px;font-weight:700;color:var(--cx-text);white-space:nowrap;">💰 Frais :</span>'
+                    +'<span style="font-size:11.5px;font-weight:700;color:var(--cx-text);white-space:nowrap;">Frais :</span>'
                     +'<input type="number" id="group-fee-'+gi+'" value="'+feeVal+'" min="0" step="500" '
                         +'style="flex:1;padding:6px 10px;border:1.5px solid var(--cx-border);border-radius:7px;font-size:12.5px;font-family:inherit;background:var(--cx-card);color:var(--cx-text);" '
                         +'placeholder="Frais '+DEVISE+'">'
@@ -1558,7 +1571,7 @@ function openMultiAssign(){
         var totalEl = document.createElement('div');
         totalEl.style.cssText='padding:8px 12px;border-radius:8px;background:#f0fdf4;border:1.5px solid #bbf7d0;font-size:12px;font-weight:700;color:#065f46;';
         totalEl.id='groupFeeTotal';
-        totalEl.innerHTML='📊 '+totalClients+' trajets · Total frais : '+fmt(baseFee*totalClients)+' '+DEVISE;
+        totalEl.innerHTML=totalClients+' trajets · Total frais : '+fmt(baseFee*totalClients)+' '+DEVISE;
         groupedFeesEl.appendChild(totalEl);
 
         /* Recalcul total en live */
@@ -1568,11 +1581,11 @@ function openMultiAssign(){
                 _assignGroups.forEach(function(_, i){
                     total += parseFloat(document.getElementById('group-fee-'+i).value)||0;
                 });
-                document.getElementById('groupFeeTotal').innerHTML='📊 '+totalClients+' trajets · Total frais : '+fmt(total)+' '+DEVISE;
+                document.getElementById('groupFeeTotal').innerHTML=totalClients+' trajets · Total frais : '+fmt(total)+' '+DEVISE;
             });
         });
 
-        document.getElementById('assignBtn').textContent='🚴 Assigner les '+totalClients+' groupes';
+        document.getElementById('assignBtn').textContent='Assigner les '+totalClients+' groupes';
 
     } else {
         /* ══ UN SEUL CLIENT (ou destinations différentes) ══ */
@@ -1593,15 +1606,15 @@ function openMultiAssign(){
 
         var feeOnce = (allSameFee && fees[0]) ? fees[0] : 0;
         destInfoEl.innerHTML='<div class="multi-common-dest">'
-            +'<div class="multi-common-dest-lbl">👤 '+(g.clientName||'Client')+' · 📍 Destination</div>'
+            +'<div class="multi-common-dest-lbl">'+(g.clientName||'Client')+' · Destination</div>'
             +'<div class="multi-common-dest-val">'+(g.dest||'Non renseignée')+'</div>'
-            +(feeOnce ? '<div class="multi-common-dest-fee">💰 Frais de livraison : '+fmt(feeOnce)+' '+DEVISE+(orders.length>1?' <span style="font-size:10px;opacity:.7;">(1 seul trajet)</span>':'')+'</div>' : '')
+            +(feeOnce ? '<div class="multi-common-dest-fee">Frais de livraison : '+fmt(feeOnce)+' '+DEVISE+(orders.length>1?' <span style="font-size:10px;opacity:.7;">(1 seul trajet)</span>':'')+'</div>' : '')
             +'</div>';
         document.getElementById('assignFee').value = feeOnce||'';
-        destNoteEl.innerHTML = orders.length>1 ? '⚠️ Même client — frais appliqué <b>une seule fois</b>, pas par commande.' : '';
+        destNoteEl.innerHTML = orders.length>1 ? 'Même client — frais appliqué <b>une seule fois</b>, pas par commande.' : '';
         destNoteEl.style.cssText = orders.length>1 ? 'font-size:11.5px;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:5px 9px;margin-top:4px;' : '';
         destNoteEl.style.display = orders.length>1 ? '' : 'none';
-        document.getElementById('assignBtn').textContent='🚴 Confirmer l\'assignation';
+        document.getElementById('assignBtn').textContent='Confirmer l\'assignation';
     }
 
     document.getElementById('multiOrdersSection').style.display='block';
@@ -1758,7 +1771,7 @@ async function submitAssign(){
         closeModal('assignModal');
         clearSelection();
         if(ok>0){
-            toast('✅ '+ok+' commande'+(ok>1?'s':'')+' assignée'+(ok>1?'s':'')+' à '+document.getElementById('selectedDriverName').textContent,'success');
+            toast(ok+' commande'+(ok>1?'s':'')+' assignée'+(ok>1?'s':'')+' à '+document.getElementById('selectedDriverName').textContent,'success');
             setTimeout(function(){ location.reload(); },1500);
         } else {
             toast('Erreur lors de l\'assignation.','error');
@@ -1778,7 +1791,7 @@ async function submitAssign(){
         var r=await fetch('/company/orders/'+currentOrderId+'/assign',{method:'POST',body:fd});
         var data=await r.json();
         if(data.success){
-            toast('✅ '+data.driver_name+' assigné · '+data.delivery_fee+' '+DEVISE,'success');
+            toast(data.driver_name+' assigné · '+data.delivery_fee+' '+DEVISE,'success');
             closeModal('assignModal');
             setTimeout(function(){ location.reload(); },1200);
         } else {
@@ -1820,7 +1833,7 @@ function submitStatus(){
         .then(function(r){ return r.json(); })
         .then(function(data){
             if(data.success){
-                toast('✅ Statut mis à jour.','success');
+                toast('Statut mis à jour.','success');
                 closeModal('statusModal');
                 setTimeout(function(){ location.reload(); },1000);
             } else {
@@ -1897,6 +1910,63 @@ async function bulkRestoreOrders() {
         } else { toast('Erreur lors de la restauration.', 'error'); }
     } catch(e) { toast('Erreur réseau.', 'error'); }
 }
+
+/* ── Temps réel — polling 15s ── */
+(function(){
+    const LIVE_URL   = '{{ route("company.orders.live-stats") }}';
+    const fmtNum     = n => new Intl.NumberFormat('fr').format(n);
+    let knownLatestId = {{ $orders->isNotEmpty() ? $orders->first()->id : (App\Models\Order::where('delivery_company_id',$company->id)->max('id') ?? 0) }};
+    let knownAttente  = {{ $stats['en_attente'] }};
+    let bannerShown   = false;
+
+    const pills = document.querySelectorAll('.stat-pill');
+
+    function updatePills(d){
+        /* Met à jour uniquement les pills non filtrées (période = all) ou en_livraison / en_attente */
+        @if($period === 'all' && !request('search') && !request('boutique') && !request('status') || request('status') === 'all')
+        if(pills[0]) pills[0].querySelector('.stat-pill-val').textContent = d.total;
+        if(pills[1]) pills[1].querySelector('.stat-pill-val').textContent = d.en_attente;
+        if(pills[2]) pills[2].querySelector('.stat-pill-val').textContent = d.en_livraison;
+        if(pills[3]) pills[3].querySelector('.stat-pill-val').textContent = d.livrees;
+        if(pills[4]) pills[4].querySelector('.stat-pill-val').textContent = fmtNum(d.revenus) + ' ' + DEVISE;
+        @else
+        /* Filtre actif : met à jour seulement "En livraison" car c'est toujours global */
+        if(pills[2]) pills[2].querySelector('.stat-pill-val').textContent = d.en_livraison;
+        @endif
+    }
+
+    function showBanner(newCount){
+        if(bannerShown || document.getElementById('liveBanner')) return;
+        bannerShown = true;
+        const b = document.createElement('div');
+        b.id = 'liveBanner';
+        b.className = 'live-banner';
+        b.innerHTML =
+            '<span class="live-dot"></span>'
+            + newCount + ' nouvelle' + (newCount>1?'s':'') + ' commande' + (newCount>1?'s':'') + ' · Actualiser';
+        b.addEventListener('click', () => location.reload());
+        document.body.appendChild(b);
+    }
+
+    async function poll(){
+        /* Ne pas poller si un modal est ouvert ou si une sélection est en cours */
+        if(document.querySelector('.modal-overlay.open') || _bulkOrderIds.size > 0) return;
+        try{
+            const r = await fetch(LIVE_URL, { headers:{ 'Accept':'application/json', 'X-CSRF-TOKEN': CSRF } });
+            if(!r.ok) return;
+            const d = await r.json();
+            updatePills(d);
+            if(d.latest_id > knownLatestId){
+                const diff = d.en_attente - knownAttente;
+                if(diff > 0) showBanner(diff);
+                knownLatestId = d.latest_id;
+                knownAttente  = d.en_attente;
+            }
+        }catch(e){}
+    }
+
+    setInterval(poll, 15000);
+})();
 
 /* ── Toast ── */
 function toast(msg,type){

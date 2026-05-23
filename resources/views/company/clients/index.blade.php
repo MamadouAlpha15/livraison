@@ -74,8 +74,10 @@ body.is-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .cx-nav-item:hover{background:rgba(124,58,237,.18);color:#fff;border-color:rgba(124,58,237,.25);box-shadow:0 2px 12px rgba(124,58,237,.2),inset 0 1px 0 rgba(255,255,255,.06)}
 .cx-nav-item.active{background:linear-gradient(90deg,rgba(124,58,237,.35) 0%,rgba(99,102,241,.2) 100%);color:#fff;font-weight:700;border-color:rgba(139,92,246,.3);box-shadow:0 4px 16px rgba(124,58,237,.25),inset 0 1px 0 rgba(255,255,255,.08)}
 .cx-nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:linear-gradient(180deg,#a78bfa,#7c3aed);border-radius:0 3px 3px 0;box-shadow:2px 0 12px rgba(167,139,250,.7)}
-.cx-nav-ico{width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
-.cx-nav-item.active .cx-nav-ico{background:rgba(139,92,246,.3);border-color:rgba(139,92,246,.4);}
+.cx-nav-ico{width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .22s cubic-bezier(.23,1,.32,1);}
+.cx-nav-ico svg{display:block;}
+.cx-nav-item:hover .cx-nav-ico{background:rgba(139,92,246,.25);box-shadow:0 0 8px rgba(139,92,246,.3);}
+.cx-nav-item.active .cx-nav-ico{background:rgba(139,92,246,.3);border-color:rgba(139,92,246,.4);box-shadow:0 0 10px rgba(139,92,246,.4);}
 .cx-nav-badge{margin-left:auto;background:var(--cx-brand);color:#fff;font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:20px;min-width:18px;text-align:center}
 
 .cx-user-foot{padding:10px 10px 12px;border-top:1px solid rgba(255,255,255,.07);flex-shrink:0}
@@ -280,44 +282,47 @@ body.cx-dark .toolbar .search-box input{color:#e2e8f0;}
     <nav class="cx-nav">
         <div class="cx-nav-sec">Principal</div>
         <a href="{{ route('company.dashboard') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">⊞</span> Tableau de bord
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span> Tableau de bord
         </a>
         <a href="{{ route('company.chat.inbox') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">💬</span> Demandes (Chat)
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span> Demandes (Chat)
         </a>
         <a href="{{ route('company.orders.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">📦</span> Commandes
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Commandes
         </a>
         <a href="{{ route('company.livraisons.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">🚚</span> Livraisons
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span> Livraisons
         </a>
         <a href="{{ route('company.carte.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">🗺️</span> Carte en direct
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span> Carte en direct
         </a>
         <a href="{{ route('company.drivers.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">🚴</span> Chauffeurs
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></span> Chauffeurs
         </a>
         <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">🏪</span> Boutiques
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span> Boutiques
         </a>
         <a href="{{ route('company.clients.index') }}" class="cx-nav-item active">
-            <span class="cx-nav-ico">👥</span> Clients
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Clients
         </a>
-       <div class="cx-nav-sec">Gestion</div>
-        <a href="{{route('company.zones.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">📍</span> Zone de livraison
+
+        <div class="cx-nav-sec">Gestion</div>
+        <a href="{{ route('company.zones.index') }}" class="cx-nav-item">
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span> Zone de livraison
         </a>
         <a href="{{ route('company.historique.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">📊</span> Historique
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span> Historique
         </a>
-        <a href="{{ route('company.rapport.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📈</span> Rapport</a>
+        <a href="{{ route('company.rapport.index') }}" class="cx-nav-item">
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span> Rapport
+        </a>
 
         <div class="cx-nav-sec">Configuration</div>
         <a href="{{ route('company.parametre.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">⚙️</span> Paramètres
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Paramètres
         </a>
         <a href="{{ route('company.users.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">👤</span> Utilisateurs
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Utilisateurs
         </a>
 
     </nav>
@@ -355,7 +360,7 @@ body.cx-dark .toolbar .search-box input{color:#e2e8f0;}
     <div class="cx-topbar">
         <button class="cx-hamburger" id="cxHamburger">☰</button>
         <div>
-            <div class="cx-topbar-title">👥 Clients livrés</div>
+            <div class="cx-topbar-title">Clients livrés</div>
             <div class="cx-topbar-sub">{{ $company->name }}</div>
         </div>
         <div class="cx-tb-right">
@@ -374,21 +379,21 @@ body.cx-dark .toolbar .search-box input{color:#e2e8f0;}
         {{-- Stats --}}
         <div class="stats-bar">
             <div class="stat-card">
-                <div class="stat-ico purple">👥</div>
+                <div class="stat-ico purple"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
                 <div>
                     <div class="stat-val">{{ number_format($stats['total_clients']) }}</div>
                     <div class="stat-lbl">Clients uniques</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-ico green">✅</div>
+                <div class="stat-ico green"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
                 <div>
                     <div class="stat-val">{{ number_format($stats['total_livrees']) }}</div>
                     <div class="stat-lbl">Commandes livrées</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-ico amber">🏆</div>
+                <div class="stat-ico amber"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg></div>
                 <div>
                     @if($stats['top_client'])
                     <div class="stat-val" style="font-size:14px;">{{ Str::limit($stats['top_client']->name, 18) }}</div>
@@ -424,7 +429,7 @@ body.cx-dark .toolbar .search-box input{color:#e2e8f0;}
         <div class="cli-desktop">
         <div class="clients-table-wrap">
             <div class="clients-table-hd">
-                <span class="clients-table-title">👥 Clients livrés par {{ $company->name }}</span>
+                <span class="clients-table-title">Clients livrés par {{ $company->name }}</span>
                 <span class="clients-table-count">{{ $clients->total() }} client(s) · page {{ $clients->currentPage() }}/{{ $clients->lastPage() }}</span>
             </div>
 

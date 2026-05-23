@@ -272,6 +272,12 @@ body.cx-light .ic-empty-conv{color:var(--cx-text2)}
 body.cx-light .ic-mob-topbar{background:var(--cx-surface);border-bottom-color:rgba(0,0,0,.08)}
 .ic-mob-topbar-title{font-size:14px;font-weight:700;color:var(--cx-text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
+/* ── touch-action global : supprime le délai 300ms + double-tap zoom ── */
+button,input,textarea,select,
+.ic-conv,.ic-back,.ic-mob-btn,.ic-hd-btn,.ic-send{
+    touch-action:manipulation;
+}
+
 /* ── Responsive ── */
 
 /* Tablette (769 – 1080px) : sidebar rétrécie */
@@ -295,6 +301,13 @@ body.cx-light .ic-mob-topbar{background:var(--cx-surface);border-bottom-color:rg
         box-shadow:4px 0 30px rgba(0,0,0,.4);
     }
     .ic-sidebar.open{transform:translateX(0)}
+
+    /* Aucune conv sélectionnée → sidebar plein écran direct, sans hamburger */
+    .ic-wrap.no-conv .ic-sidebar{
+        transform:translateX(0);width:100%;box-shadow:none;z-index:1;
+    }
+    .ic-wrap.no-conv .ic-main{display:none!important}
+    .ic-wrap.no-conv .ic-overlay{display:none!important}
     .ic-overlay{
         display:none;position:fixed;inset:0;
         background:rgba(0,0,0,.55);z-index:39;
@@ -314,32 +327,41 @@ body.cx-light .ic-mob-topbar{background:var(--cx-surface);border-bottom-color:rg
         background:var(--cx-surface);border-bottom:1px solid var(--cx-border);
     }
     .ic-main-hd{padding:0 14px;gap:10px;height:56px}
-    .ic-messages{padding:14px 14px;gap:3px}
-    .msg-row{max-width:88%}
-    .ic-input-area{padding:10px 12px}
+    .ic-messages{padding:14px 12px;gap:3px}
+    .msg-row{max-width:90%}
+    .ic-input-area{padding:10px 12px;padding-bottom:max(10px,env(safe-area-inset-bottom))}
     .ic-input-hint{display:none}
     .ic-welcome .wico{font-size:44px}
     .ic-welcome h3{font-size:17px}
     .ic-welcome p{font-size:12px}
+
+    /* ── Anti-zoom iOS : font-size ≥ 16px sur tous les champs ── */
+    .ic-search-wrap input{font-size:16px}
+    .ic-textarea{font-size:16px}
 }
 
 /* Petit mobile (≤480px) */
 @media(max-width:480px){
     .ic-sidebar{width:100%}
     .msg-row{max-width:94%}
-    .msg-bubble{font-size:13px;padding:9px 12px}
+    .msg-bubble{font-size:13.5px;padding:9px 12px}
     .msg-av{width:26px;height:26px;font-size:9px}
     .ic-main-hd{padding:0 10px;gap:8px;height:52px}
     .ic-main-name{font-size:13.5px}
     .ic-main-av{width:34px;height:34px;font-size:12px}
-    .ic-messages{padding:12px 10px}
-    .ic-input-area{padding:8px 10px}
-    .ic-input-row{padding:8px 12px;border-radius:14px}
-    .ic-textarea{font-size:13px}
+    .ic-messages{padding:12px 8px}
+    .ic-input-area{padding:8px 10px;padding-bottom:max(8px,env(safe-area-inset-bottom))}
+    .ic-input-row{padding:8px 12px;border-radius:14px;gap:8px}
+    .ic-textarea{font-size:16px} /* 16px obligatoire anti-zoom iOS */
     .ic-send{width:36px;height:36px;font-size:15px}
     .ic-conv-av{width:40px;height:40px;font-size:12px;border-radius:10px}
     .ic-conv{padding:10px 12px;gap:8px}
     .ic-sb-hd{padding:12px 14px}
+    /* Carte commande : évite le débordement horizontal */
+    .msg-order-card{min-width:0;width:100%;max-width:calc(100vw - 80px)}
+    .moc-key{width:80px;font-size:10px}
+    .moc-val{font-size:12px}
+    .moc-num{font-size:13px}
 }
 
 /* ── Carte commande confiée ── */
@@ -389,7 +411,7 @@ body.cx-light .moc-val{color:#1e293b;}
 @endphp
 
 <div class="ic-overlay" id="icOverlay"></div>
-<div class="ic-wrap">
+<div class="ic-wrap {{ !$activeShopId ? 'no-conv' : '' }}" id="icWrap">
 
 {{-- ── SIDEBAR ── --}}
 <div class="ic-sidebar" id="icSidebar">
@@ -583,6 +605,7 @@ function fmtTime(dateStr) {
 }
 
 // DOM
+const icWrap    = document.getElementById('icWrap');
 const sidebar   = document.getElementById('icSidebar');
 const overlay   = document.getElementById('icOverlay');
 const mainHd    = document.getElementById('icMainHd');
@@ -627,6 +650,8 @@ window.selectConv = function(el) {
     activeBg     = bg;
     activeIni    = ini;
 
+    // Passer en mode "conversation active" sur mobile (retire la sidebar plein écran)
+    icWrap.classList.remove('no-conv');
     // Close sidebar on mobile
     sidebar.classList.remove('open');
     overlay.classList.remove('open');

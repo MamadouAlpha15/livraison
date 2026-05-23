@@ -849,6 +849,20 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 <script>
 const CSRF = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
+/* Signale au dashboard que ces messages ont été lus (sync cross-device) */
+let _syncMsgTimer = null;
+function _markMsgSeen(id) {
+    if (!id || id <= 0) return;
+    clearTimeout(_syncMsgTimer);
+    _syncMsgTimer = setTimeout(() => {
+        fetch('/user/notif-state', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
+            body: JSON.stringify({ msg_id: id }),
+        }).catch(() => {});
+    }, 800);
+}
+
 let _clientId  = null;
 let _productId = null;
 let _convEl    = null;
@@ -1089,6 +1103,7 @@ async function loadConv() {
         });
 
         _lastMsgId = Math.max(...msgs.map(m => m.id || 0));
+        _markMsgSeen(_lastMsgId);
         thread.scrollTop = thread.scrollHeight;
     } catch(e) {}
 }
@@ -1134,6 +1149,7 @@ async function pollConv() {
                 list.prepend(_convEl);
             }
         }
+        if (newMsgs.length) _markMsgSeen(_lastMsgId);
     } catch(e) {}
 }
 
@@ -1166,7 +1182,7 @@ async function sendHubMsg() {
         if (data.sent || data.success) {
             input.value = '';
             input.style.height = 'auto';
-            if (data.message_id) _lastMsgId = Math.max(_lastMsgId, data.message_id);
+            if (data.message_id) { _lastMsgId = Math.max(_lastMsgId, data.message_id); _markMsgSeen(_lastMsgId); }
 
             const thread = document.getElementById('hubThread');
             const empty  = thread.querySelector('.hub-thread-empty');
@@ -1500,7 +1516,7 @@ async function sendImagesMsg() {
             const now  = new Date();
             const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
 
-            if (data.message_id) _lastMsgId = Math.max(_lastMsgId, data.message_id);
+            if (data.message_id) { _lastMsgId = Math.max(_lastMsgId, data.message_id); _markMsgSeen(_lastMsgId); }
 
             if (data.image_status === 'processing') {
                 // Afficher bulle "optimisation en cours" et poller jusqu'à ce que ce soit prêt

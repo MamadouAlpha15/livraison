@@ -60,6 +60,8 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .cx-nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:linear-gradient(180deg,#a78bfa,#7c3aed);border-radius:0 3px 3px 0;box-shadow:2px 0 12px rgba(167,139,250,.7)}
 .cx-nav-ico{width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .22s cubic-bezier(.23,1,.32,1)}
 .cx-nav-item.active .cx-nav-ico{background:rgba(139,92,246,.3);border-color:rgba(139,92,246,.4);box-shadow:0 0 10px rgba(139,92,246,.4)}
+.cx-nav-ico svg,.lv-stat-ico svg{display:block;}
+.lv-stat-ico{color:var(--s-color,currentColor)}
 .cx-nav-item.active:hover{background:linear-gradient(90deg,rgba(124,58,237,.45) 0%,rgba(99,102,241,.3) 100%);box-shadow:0 4px 20px rgba(124,58,237,.35),inset 0 1px 0 rgba(255,255,255,.1)}
 .cx-nav-badge{margin-left:auto;background:var(--cx-brand);color:#fff;font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:20px;min-width:18px;text-align:center}
 .cx-user-foot{padding:10px 10px 12px;border-top:1px solid rgba(255,255,255,.07);flex-shrink:0}
@@ -260,29 +262,29 @@ body.cx-light .lv-mc-btn-cancel{background:rgba(239,68,68,.06);color:#b91c1c}
     <div class="cx-brand-hd">
         <div class="cx-brand-top">
             <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
-            <button class="cx-close-btn" id="cxCloseBtn">✕</button>
+            <button class="cx-close-btn" id="cxCloseBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
         <div class="cx-sys-badge"><span class="cx-sys-dot"></span> Système actif</div>
     </div>
     <nav class="cx-nav">
         <div class="cx-nav-sec">Principal</div>
-        <a href="{{ route('company.dashboard') }}"     class="cx-nav-item"><span class="cx-nav-ico">⊞</span> Tableau de bord</a>
-        <a href="{{ route('company.chat.inbox') }}"    class="cx-nav-item"><span class="cx-nav-ico">💬</span> Demandes (Chat)</a>
-        <a href="{{ route('company.orders.index') }}"  class="cx-nav-item"><span class="cx-nav-ico">📦</span> Commandes</a>
-        <a href="{{ route('company.drivers.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🚴</span> Chauffeurs</a>
-        <a href="{{ route('company.livraisons.index') }}" class="cx-nav-item active"><span class="cx-nav-ico">🚚</span> Livraisons</a>
-        <a href="{{ route('company.carte.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🗺️</span> Carte en direct</a>
-        <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🏪</span> Boutiques</a>
-        <a href="{{route('company.clients.index') }}" class="cx-nav-item"><span class="cx-nav-ico">👥</span> Clients</a>
+        <a href="{{ route('company.dashboard') }}"     class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span> Tableau de bord</a>
+        <a href="{{ route('company.chat.inbox') }}"    class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span> Demandes (Chat)</a>
+        <a href="{{ route('company.orders.index') }}"  class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Commandes</a>
+        <a href="{{ route('company.drivers.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></span> Chauffeurs</a>
+        <a href="{{ route('company.livraisons.index') }}" class="cx-nav-item active"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span> Livraisons</a>
+        <a href="{{ route('company.carte.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span> Carte en direct</a>
+        <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9l1-5h16l1 5"/><path d="M3 9a2 2 0 0 0 4 0m4 0a2 2 0 0 0 4 0m4 0a2 2 0 0 0-4 0m-8 0a2 2 0 0 0-4 0"/><path d="M5 9v12h14V9"/><path d="M10 14h4v6h-4z"/></svg></span> Boutiques</a>
+        <a href="{{route('company.clients.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Clients</a>
 
         <div class="cx-nav-sec">Gestion</div>
-        <a href="{{ route('company.zones.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📍</span> Zone de livraison</a>
-               <a href="{{ route('company.historique.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📊</span> Historique</a>
-               <a href="{{ route('company.rapport.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📈</span> Rapport</a>
+        <a href="{{ route('company.zones.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span> Zone de livraison</a>
+               <a href="{{ route('company.historique.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span> Historique</a>
+               <a href="{{ route('company.rapport.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span> Rapport</a>
 
         <div class="cx-nav-sec">Configuration</div>
-        <a href="{{ route('company.parametre.index') }}" class="cx-nav-item"><span class="cx-nav-ico">⚙️</span> Paramètres</a>
-        <a href="{{ route('company.users.index') }}" class="cx-nav-item"><span class="cx-nav-ico">👤</span> Utilisateurs</a>
+        <a href="{{ route('company.parametre.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Paramètres</a>
+        <a href="{{ route('company.users.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Utilisateurs</a>
             </nav>
     <div class="cx-user-foot">
         <div class="cx-user-row">
@@ -292,7 +294,7 @@ body.cx-light .lv-mc-btn-cancel{background:rgba(239,68,68,.06);color:#b91c1c}
                 <div class="cx-user-role">{{ $company->name }}</div>
             </div>
             <form method="POST" action="{{ route('logout') }}">@csrf
-                <button type="submit" class="cx-logout-btn" title="Déconnexion">⏻</button>
+                <button type="submit" class="cx-logout-btn" title="Déconnexion"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
             </form>
         </div>
         <div class="cx-dark-row" id="cxDarkToggle">
@@ -309,8 +311,8 @@ body.cx-light .lv-mc-btn-cancel{background:rgba(239,68,68,.06);color:#b91c1c}
 
     {{-- Topbar --}}
     <div class="cx-topbar">
-        <button class="cx-hamburger" id="cxHamburger">☰</button>
-        <span class="cx-topbar-title">🚚 Livraisons en cours</span>
+        <button class="cx-hamburger" id="cxHamburger"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <span class="cx-topbar-title" style="display:flex;align-items:center;gap:7px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg> Livraisons en cours</span>
         <span class="cx-topbar-sub">· {{ $company->name }}</span>
       
     </div>
@@ -318,21 +320,21 @@ body.cx-light .lv-mc-btn-cancel{background:rgba(239,68,68,.06);color:#b91c1c}
     {{-- Stats --}}
     <div class="lv-stats">
         <div class="lv-stat" style="--s-color:#f59e0b;--s-bg:rgba(245,158,11,.1)">
-            <div class="lv-stat-ico">🚚</div>
+            <div class="lv-stat-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
             <div>
                 <div class="lv-stat-val" id="statTotal">{{ $stats['total'] }}</div>
                 <div class="lv-stat-lbl">En cours total</div>
             </div>
         </div>
         <div class="lv-stat" style="--s-color:#3b82f6;--s-bg:rgba(59,130,246,.1)">
-            <div class="lv-stat-ico">✅</div>
+            <div class="lv-stat-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
             <div>
                 <div class="lv-stat-val" id="statConfirm">{{ $stats['confirmees'] }}</div>
                 <div class="lv-stat-lbl">Assignées (départ)</div>
             </div>
         </div>
         <div class="lv-stat" style="--s-color:#10b981;--s-bg:rgba(16,185,129,.1)">
-            <div class="lv-stat-ico">📍</div>
+            <div class="lv-stat-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
             <div>
                 <div class="lv-stat-val" id="statLiv">{{ $stats['en_livraison'] }}</div>
                 <div class="lv-stat-lbl">En route</div>
@@ -347,8 +349,8 @@ body.cx-light .lv-mc-btn-cancel{background:rgba(239,68,68,.06);color:#b91c1c}
             <input class="lv-search" type="text" id="lvSearch" placeholder="Rechercher boutique, chauffeur, destination…" oninput="filterRows()">
         </div>
         <button class="lv-filter-btn active" id="f-all"       onclick="setFilter('all')">Tous</button>
-        <button class="lv-filter-btn"        id="f-confirmée" onclick="setFilter('confirmée')">✅ Assignées</button>
-        <button class="lv-filter-btn"        id="f-en_livraison" onclick="setFilter('en_livraison')">🚚 En route</button>
+        <button class="lv-filter-btn"        id="f-confirmée" onclick="setFilter('confirmée')">Assignées</button>
+        <button class="lv-filter-btn"        id="f-en_livraison" onclick="setFilter('en_livraison')">En route</button>
         <div class="lv-pulse">
             <span class="lv-pulse-dot"></span> Temps réel
         </div>
@@ -415,7 +417,7 @@ body.cx-light .lv-mc-btn-cancel{background:rgba(239,68,68,.06);color:#b91c1c}
             @empty
             <tr><td colspan="8">
                 <div class="lv-empty">
-                    <div class="lv-empty-ico">🚚</div>
+                    <div class="lv-empty-ico"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity:.35"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
                     <div class="lv-empty-title">Aucune livraison en cours</div>
                     <div class="lv-empty-sub">Les livraisons assignées et en route apparaîtront ici.</div>
                 </div>
@@ -455,7 +457,7 @@ body.cx-light .lv-mc-btn-cancel{background:rgba(239,68,68,.06);color:#b91c1c}
 
             {{-- Frais --}}
             <div class="lv-mc-fee-box">
-                <span class="lv-mc-fee-lbl">🚚 Frais livraison</span>
+                <span class="lv-mc-fee-lbl" style="display:inline-flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg> Frais livraison</span>
                 <span class="lv-mc-fee-val">
                     {{ $order->delivery_fee ? number_format($order->delivery_fee,0,',',' ').' '.($company->currency ?? 'GNF') : '—' }}
                 </span>
@@ -464,21 +466,21 @@ body.cx-light .lv-mc-btn-cancel{background:rgba(239,68,68,.06);color:#b91c1c}
             {{-- Détails --}}
             <div class="lv-mc-rows">
                 <div class="lv-mc-row">
-                    <span class="lv-mc-lbl">🏪 Boutique</span>
+                    <span class="lv-mc-lbl" style="display:inline-flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9l1-5h16l1 5"/><path d="M3 9a2 2 0 0 0 4 0m4 0a2 2 0 0 0 4 0m4 0a2 2 0 0 0-4 0m-8 0a2 2 0 0 0-4 0"/><path d="M5 9v12h14V9"/><path d="M10 14h4v6h-4z"/></svg> Boutique</span>
                     <span class="lv-mc-val">{{ optional($order->shop)->name ?? '—' }}</span>
                 </div>
                 <div class="lv-mc-row">
-                    <span class="lv-mc-lbl">👤 Client</span>
+                    <span class="lv-mc-lbl" style="display:inline-flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Client</span>
                     <span class="lv-mc-val">{{ optional($order->client)->name ?? '—' }}</span>
                 </div>
                 @if($order->delivery_destination)
                 <div class="lv-mc-row">
-                    <span class="lv-mc-lbl">📍 Destination</span>
+                    <span class="lv-mc-lbl" style="display:inline-flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Destination</span>
                     <span class="lv-mc-val">{{ $order->delivery_destination }}</span>
                 </div>
                 @endif
                 <div class="lv-mc-row" style="border-bottom:none">
-                    <span class="lv-mc-lbl">🚴 Chauffeur</span>
+                    <span class="lv-mc-lbl" style="display:inline-flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg> Chauffeur</span>
                     <span class="lv-mc-val">
                         @if($order->driver)
                             <div style="display:flex;align-items:center;gap:7px;justify-content:flex-end">
@@ -498,7 +500,7 @@ body.cx-light .lv-mc-btn-cancel{background:rgba(239,68,68,.06);color:#b91c1c}
         </div>
         @empty
         <div class="lv-empty" style="background:var(--cx-surface);border:1px solid var(--cx-border);border-radius:var(--r-sm)">
-            <div class="lv-empty-ico">🚚</div>
+            <div class="lv-empty-ico"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity:.35"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
             <div class="lv-empty-title">Aucune livraison en cours</div>
             <div class="lv-empty-sub">Les livraisons assignées et en route apparaîtront ici.</div>
         </div>
@@ -579,10 +581,10 @@ async function updateStatus(orderId, status) {
         });
         const d = await res.json();
         if (d.success) {
-            showToast(status === 'livrée' ? '✅ Livraison terminée !' : '❌ Livraison annulée', status === 'livrée' ? 'green' : 'red');
+            showToast(status === 'livrée' ? 'Livraison terminée !' : 'Livraison annulée', status === 'livrée' ? 'green' : 'red');
             setTimeout(() => pollData(), 600);
         }
-    } catch(e) { showToast('❌ Erreur réseau', 'red'); }
+    } catch(e) { showToast('Erreur réseau', 'red'); }
 }
 
 /* ── Polling temps réel ── */
@@ -612,7 +614,7 @@ async function pollData() {
         if (!orders.length) {
             tbody.innerHTML = `<tr><td colspan="8">
                 <div class="lv-empty">
-                    <div class="lv-empty-ico">🚚</div>
+                    <div class="lv-empty-ico"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity:.35"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
                     <div class="lv-empty-title">Aucune livraison en cours</div>
                     <div class="lv-empty-sub">Les livraisons assignées et en route apparaîtront ici.</div>
                 </div>
@@ -652,7 +654,7 @@ async function pollData() {
         }).join('');
 
         filterRows();
-        if (isNew) showToast('🚚 Mise à jour des livraisons', 'blue');
+        if (isNew) showToast('Mise à jour des livraisons', 'blue');
 
     } catch(e) { /* silencieux */ }
 }

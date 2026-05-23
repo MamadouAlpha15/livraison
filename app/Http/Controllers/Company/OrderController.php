@@ -423,9 +423,12 @@ class OrderController extends Controller
     {
         $company = $this->company();
 
-        $orders = Order::with(['shop', 'client'])
-            ->where('delivery_company_id', $company->id)
-            ->where('status', Order::STATUS_EN_ATTENTE)
+        $base = Order::where('delivery_company_id', $company->id)
+            ->where('status', Order::STATUS_EN_ATTENTE);
+
+        $totalPending = (clone $base)->count();
+
+        $orders = $base->with(['shop', 'client'])
             ->latest()
             ->limit(10)
             ->get()
@@ -438,7 +441,23 @@ class OrderController extends Controller
                 'created_ts' => $o->created_at->timestamp,
             ]);
 
-        return response()->json(['ok' => true, 'orders' => $orders]);
+        return response()->json(['ok' => true, 'orders' => $orders, 'total_pending' => $totalPending]);
+    }
+
+    public function liveStats(): \Illuminate\Http\JsonResponse
+    {
+        $company = $this->company();
+
+        $base = fn() => Order::where('delivery_company_id', $company->id);
+
+        return response()->json([
+            'total'        => $base()->count(),
+            'en_attente'   => $base()->where('status', Order::STATUS_EN_ATTENTE)->count(),
+            'en_livraison' => $base()->where('status', Order::STATUS_EN_LIVRAISON)->count(),
+            'livrees'      => $base()->where('status', Order::STATUS_LIVREE)->count(),
+            'revenus'      => (int) $base()->where('status', Order::STATUS_LIVREE)->sum('delivery_fee'),
+            'latest_id'    => (int) ($base()->max('id') ?? 0),
+        ]);
     }
 
     /**

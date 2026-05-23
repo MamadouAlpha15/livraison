@@ -125,6 +125,11 @@
             justify-content: center;
             padding: 16px 0 4px;
         }
+
+        /* Empêche le zoom iOS sur les champs de saisie */
+        @media (max-width: 768px) {
+            input, select, textarea { font-size: 16px !important; }
+        }
     </style>
 
     @stack('styles')

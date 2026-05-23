@@ -59,6 +59,7 @@ body.cx-dashboard > main.app-main { padding:0 !important; margin:0 !important; m
 .cx-nav-item.active { background:linear-gradient(90deg,rgba(124,58,237,.35),rgba(99,102,241,.2)); color:#fff; font-weight:700; border-color:rgba(139,92,246,.3); }
 .cx-nav-item.active::before { content:''; position:absolute; left:0; top:50%; transform:translateY(-50%); width:3px; height:22px; background:linear-gradient(180deg,#a78bfa,#7c3aed); border-radius:0 3px 3px 0; }
 .cx-nav-ico { width:26px; height:26px; border-radius:7px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.07); display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+.cx-nav-ico svg { display:block; }
 .cx-user-foot { padding:10px 10px 12px; border-top:1px solid rgba(255,255,255,.07); flex-shrink:0; }
 .cx-user-row { display:flex; align-items:center; gap:9px; padding:7px 8px; border-radius:var(--r-xs); background:rgba(255,255,255,.04); cursor:pointer; transition:background .15s; margin-bottom:6px; }
 .cx-user-row:hover { background:rgba(255,255,255,.08); }
@@ -225,23 +226,23 @@ body.cx-light footer.app-footer { background:#eef1f7 !important; color:#6b7280 !
 
     <nav class="cx-nav">
         <div class="cx-nav-sec">Principal</div>
-        <a href="{{ route('company.dashboard') }}" class="cx-nav-item"><span class="cx-nav-ico">⊞</span> Tableau de bord</a>
-        <a href="{{ route('company.chat.inbox') }}" class="cx-nav-item"><span class="cx-nav-ico">💬</span> Demandes (Chat)</a>
-        <a href="{{ route('company.orders.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📦</span> Commandes</a>
-        <a href="{{ route('company.drivers.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🚴</span> Chauffeurs</a>
-        <a href="{{ route('company.livraisons.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🚚</span> Livraisons</a>
-        <a href="{{ route('company.carte.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🗺️</span> Carte en direct</a>
-        <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🏪</span> Boutiques</a>
-        <a href="{{ route('company.clients.index') }}" class="cx-nav-item"><span class="cx-nav-ico">👥</span> Clients</a>
+        <a href="{{ route('company.dashboard') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span> Tableau de bord</a>
+        <a href="{{ route('company.chat.inbox') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span> Demandes (Chat)</a>
+        <a href="{{ route('company.orders.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Commandes</a>
+        <a href="{{ route('company.drivers.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></span> Chauffeurs</a>
+        <a href="{{ route('company.livraisons.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span> Livraisons</a>
+        <a href="{{ route('company.carte.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span> Carte en direct</a>
+        <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span> Boutiques</a>
+        <a href="{{ route('company.clients.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Clients</a>
 
         <div class="cx-nav-sec">Gestion</div>
-        <a href="{{ route('company.zones.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📍</span> Zone de livraison</a>
-        <a href="{{ route('company.historique.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📊</span> Historique</a>
-        <a href="{{ route('company.rapport.index') }}" class="cx-nav-item active"><span class="cx-nav-ico">📈</span> Rapport</a>
+        <a href="{{ route('company.zones.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span> Zone de livraison</a>
+        <a href="{{ route('company.historique.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span> Historique</a>
+        <a href="{{ route('company.rapport.index') }}" class="cx-nav-item active"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span> Rapport</a>
 
         <div class="cx-nav-sec">Configuration</div>
-        <a href="{{ route('company.parametre.index') }}" class="cx-nav-item"><span class="cx-nav-ico">⚙️</span> Paramètres</a>
-        <a href="{{ route('company.users.index') }}" class="cx-nav-item"><span class="cx-nav-ico">👤</span> Utilisateurs</a>
+        <a href="{{ route('company.parametre.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Paramètres</a>
+        <a href="{{ route('company.users.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Utilisateurs</a>
     </nav>
 
     <div class="cx-user-foot">
@@ -253,7 +254,7 @@ body.cx-light footer.app-footer { background:#eef1f7 !important; color:#6b7280 !
             </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="cx-logout-btn" title="Déconnexion">⏻</button>
+                <button type="submit" class="cx-logout-btn" title="Déconnexion"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
             </form>
         </div>
         <div class="cx-dark-row" id="cxThemeRow">
@@ -271,7 +272,7 @@ body.cx-light footer.app-footer { background:#eef1f7 !important; color:#6b7280 !
     <div class="cx-topbar">
         <button class="cx-hamburger" id="cxHamburger">☰</button>
         <div>
-            <span class="cx-topbar-title">📈 Rapport général</span>
+            <span class="cx-topbar-title">Rapport général</span>
             <span class="cx-topbar-sub">· {{ $company->name }}</span>
         </div>
         <div class="cx-tb-right">
@@ -288,7 +289,7 @@ body.cx-light footer.app-footer { background:#eef1f7 !important; color:#6b7280 !
     <div class="rp-banner">
         <div class="rp-banner-inner">
             <div class="rp-banner-left">
-                <div class="rp-banner-ico">📈</div>
+                <div class="rp-banner-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
                 <div>
                     <div class="rp-banner-title">Rapport général</div>
                     <div class="rp-banner-sub">{{ $company->name }} · Période : {{ $days }} derniers jours</div>
@@ -309,14 +310,14 @@ body.cx-light footer.app-footer { background:#eef1f7 !important; color:#6b7280 !
         {{-- ── KPI COMMANDES ── --}}
         <div class="rp-kpi-grid">
             <div class="rp-kpi" style="--kpi-accent:#7c3aed;--kpi-bg:rgba(124,58,237,.1)">
-                <div class="rp-kpi-ico">📦</div>
+                <div class="rp-kpi-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
                 <div>
                     <div class="rp-kpi-val">{{ $totalOrders }}</div>
                     <div class="rp-kpi-lbl">Total commandes</div>
                 </div>
             </div>
             <div class="rp-kpi" style="--kpi-accent:#10b981;--kpi-bg:rgba(16,185,129,.1)">
-                <div class="rp-kpi-ico">✅</div>
+                <div class="rp-kpi-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
                 <div>
                     <div class="rp-kpi-val" style="color:#34d399">{{ $totalLivrees }}</div>
                     <div class="rp-kpi-lbl">Livrées</div>
@@ -326,14 +327,14 @@ body.cx-light footer.app-footer { background:#eef1f7 !important; color:#6b7280 !
                 </div>
             </div>
             <div class="rp-kpi" style="--kpi-accent:#ef4444;--kpi-bg:rgba(239,68,68,.08)">
-                <div class="rp-kpi-ico">❌</div>
+                <div class="rp-kpi-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
                 <div>
                     <div class="rp-kpi-val" style="color:#f87171">{{ $totalAnnulees }}</div>
                     <div class="rp-kpi-lbl">Annulées</div>
                 </div>
             </div>
             <div class="rp-kpi" style="--kpi-accent:#f59e0b;--kpi-bg:rgba(245,158,11,.1)">
-                <div class="rp-kpi-ico">🚚</div>
+                <div class="rp-kpi-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
                 <div>
                     <div class="rp-kpi-val" style="color:#fbbf24">{{ $totalEnCours }}</div>
                     <div class="rp-kpi-lbl">En cours</div>
@@ -349,7 +350,7 @@ body.cx-light footer.app-footer { background:#eef1f7 !important; color:#6b7280 !
             {{-- Revenus --}}
             <div class="rp-card">
                 <div class="rp-card-hd">
-                    <span class="rp-card-title">💰 Revenus (commissions)</span>
+                    <span class="rp-card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Revenus (commissions)</span>
                     <span class="rp-card-badge">{{ $days }}j</span>
                 </div>
                 <div class="rev-grid">
@@ -369,7 +370,7 @@ body.cx-light footer.app-footer { background:#eef1f7 !important; color:#6b7280 !
             {{-- Note --}}
             <div class="rp-card">
                 <div class="rp-card-hd">
-                    <span class="rp-card-title">⭐ Satisfaction clients</span>
+                    <span class="rp-card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Satisfaction clients</span>
                     <span class="rp-card-badge">{{ $ratingCount }} avis</span>
                 </div>
                 <div style="padding:24px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
@@ -397,7 +398,7 @@ body.cx-light footer.app-footer { background:#eef1f7 !important; color:#6b7280 !
         {{-- ── GRAPHE COMMANDES ── --}}
         <div class="rp-card">
             <div class="rp-card-hd">
-                <span class="rp-card-title">📊 Évolution des commandes ({{ min($days,30) }} derniers jours)</span>
+                <span class="rp-card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg> Évolution des commandes ({{ min($days,30) }} derniers jours)</span>
             </div>
             <div class="rp-chart-wrap">
                 <canvas id="rpChart"></canvas>
@@ -409,7 +410,7 @@ body.cx-light footer.app-footer { background:#eef1f7 !important; color:#6b7280 !
             {{-- Top livreurs --}}
             <div class="rp-card">
                 <div class="rp-card-hd">
-                    <span class="rp-card-title">🚴 Top livreurs</span>
+                    <span class="rp-card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg> Top livreurs</span>
                     <span class="rp-card-badge">{{ $topDrivers->count() }}</span>
                 </div>
                 @if($topDrivers->where('livrees','>',0)->count())
@@ -441,7 +442,7 @@ body.cx-light footer.app-footer { background:#eef1f7 !important; color:#6b7280 !
             {{-- Zones --}}
             <div class="rp-card">
                 <div class="rp-card-hd">
-                    <span class="rp-card-title">📍 Performance par zone</span>
+                    <span class="rp-card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Performance par zone</span>
                     <span class="rp-card-badge">{{ $zonePerf->count() }}</span>
                 </div>
                 @if($zonePerf->count())
@@ -470,7 +471,7 @@ body.cx-light footer.app-footer { background:#eef1f7 !important; color:#6b7280 !
         {{-- ── TOP BOUTIQUES ── --}}
         <div class="rp-card">
             <div class="rp-card-hd">
-                <span class="rp-card-title">🏪 Boutiques partenaires</span>
+                <span class="rp-card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Boutiques partenaires</span>
                 <span class="rp-card-badge">{{ $topShops->count() }}</span>
             </div>
             @if($topShops->count())
@@ -505,7 +506,7 @@ body.cx-light footer.app-footer { background:#eef1f7 !important; color:#6b7280 !
             @foreach($topShops as $s)
             @php $taux = $s['total'] > 0 ? round($s['livrees']/$s['total']*100) : 0; @endphp
             <div class="bp-mc-row">
-                <div class="bp-mc-name">🏪 {{ $s['name'] }}</div>
+                <div class="bp-mc-name">{{ $s['name'] }}</div>
                 <div class="bp-mc-grid">
                     <div class="bp-mc-box">
                         <div class="bp-mc-lbl">Commandes</div>

@@ -689,9 +689,94 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     .orders-mobile{display:flex;}
 }
 
-/* Notification dropdown : ne déborde pas sur petits écrans */
-@media(max-width:400px){
-    #notifDropdown{width:calc(100vw - 24px);right:auto;left:50%;transform:translateX(-50%);}
+/* ══ PANNEAU NOTIFICATIONS BOUTIQUE ══ */
+.bq-notif-backdrop {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,.4); backdrop-filter:blur(2px);
+    z-index:498;
+}
+.bq-notif-backdrop.active { display:block; }
+
+.bq-notif-panel {
+    position:absolute; top:calc(100% + 10px); right:0;
+    width:320px; background:#fff;
+    border:1px solid rgba(0,0,0,.09); border-radius:16px;
+    box-shadow:0 20px 60px rgba(0,0,0,.14);
+    z-index:500; overflow:hidden;
+    visibility:hidden; opacity:0; transform:translateY(-8px) scale(.97); pointer-events:none;
+    transition:opacity .22s cubic-bezier(.23,1,.32,1), transform .22s cubic-bezier(.23,1,.32,1), visibility 0s .22s;
+}
+.bq-notif-panel.open { visibility:visible; opacity:1; transform:translateY(0) scale(1); pointer-events:all; transition:opacity .22s cubic-bezier(.23,1,.32,1), transform .22s cubic-bezier(.23,1,.32,1), visibility 0s 0s; }
+
+.bq-np-hd {
+    padding:13px 16px 11px;
+    border-bottom:1px solid rgba(0,0,0,.06);
+    display:flex; align-items:center; justify-content:space-between;
+}
+.bq-np-title { font-size:13px; font-weight:800; color:#111827; display:flex; align-items:center; gap:6px; }
+.bq-np-cnt { background:var(--brand); color:#fff; font-size:10px; font-weight:800; padding:1px 8px; border-radius:20px; }
+
+.bq-np-list { max-height:340px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:#e2e8f0 transparent; }
+.bq-np-list::-webkit-scrollbar { width:3px; }
+.bq-np-list::-webkit-scrollbar-thumb { background:#e2e8f0; border-radius:3px; }
+
+.bq-np-section { padding:6px 12px 3px; font-size:9.5px; font-weight:800; letter-spacing:1.2px; color:#94a3b8; text-transform:uppercase; display:flex; align-items:center; gap:5px; }
+
+.bq-np-item {
+    display:flex; align-items:flex-start; gap:10px;
+    padding:11px 16px; cursor:pointer;
+    border-bottom:1px solid rgba(0,0,0,.04);
+    transition:background .14s; text-decoration:none; color:inherit;
+}
+.bq-np-item:hover { background:rgba(99,102,241,.04); }
+.bq-np-item:last-child { border-bottom:none; }
+
+.bq-np-av {
+    width:36px; height:36px; border-radius:10px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:800; color:#fff;
+}
+.bq-np-body { flex:1; min-width:0; }
+.bq-np-name { font-size:12px; font-weight:700; color:#111827; }
+.bq-np-msg { font-size:11.5px; color:#64748b; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; margin-top:2px; }
+.bq-np-meta { display:flex; align-items:center; justify-content:space-between; margin-top:4px; }
+.bq-np-time { font-size:10px; color:#94a3b8; }
+.bq-np-badge { font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:20px; }
+.bq-np-badge.order   { background:#fef3c7; color:#92400e; }
+.bq-np-badge.msg     { background:#ede9fe; color:#5b21b6; }
+.bq-np-badge.company { background:#eef2ff; color:#3730a3; }
+.bq-np-badge.support { background:#f0fdf4; color:#166534; }
+
+.bq-np-close-btn {
+    flex-shrink:0; width:24px; height:24px; border:none; background:none;
+    color:#cbd5e1; cursor:pointer; border-radius:6px; align-self:flex-start; margin-top:1px;
+    display:flex; align-items:center; justify-content:center;
+    transition:background .14s, color .14s;
+}
+.bq-np-close-btn:hover { background:#fee2e2; color:#dc2626; }
+
+.bq-np-empty { padding:32px 16px; text-align:center; color:#94a3b8; font-size:12.5px; }
+.bq-np-foot { padding:10px 14px; border-top:1px solid rgba(0,0,0,.06); display:flex; gap:6px; }
+.bq-np-foot .btn { flex:1; justify-content:center; font-size:11px; gap:4px; }
+
+/* ── Bottom-sheet sur mobile ── */
+@media(max-width:640px) {
+    .notif-bell-wrap { position:static !important; }
+    .bq-notif-panel {
+        position:fixed !important; top:auto !important; bottom:0 !important;
+        left:0 !important; right:0 !important;
+        width:100% !important; border-radius:18px 18px 0 0;
+        max-height:78vh; overflow-y:auto;
+        visibility:hidden; transform:translateY(102%); opacity:1;
+        transition:transform .3s cubic-bezier(.23,1,.32,1), visibility 0s .3s;
+    }
+    .bq-notif-panel.open { visibility:visible; transform:translateY(0); transition:transform .3s cubic-bezier(.23,1,.32,1), visibility 0s 0s; }
+    .bq-np-list { max-height:none; overflow-y:visible; }
+    .bq-notif-panel::before {
+        content:''; display:block; width:36px; height:4px;
+        background:rgba(0,0,0,.1); border-radius:2px;
+        margin:10px auto 0;
+    }
 }
 
 /* co-row (liste entreprises partenaires) : bouton passe en dessous sur très petit écran */
@@ -1205,20 +1290,24 @@ $I = [
                 <button class="tb-icon-btn" id="btnDarkMode" title="Mode sombre / clair">{!! $I['moon'] !!}</button>
 
                 {{-- Cloche notifications temps réel --}}
+                <div class="bq-notif-backdrop" id="bqNotifBackdrop"></div>
                 <div class="notif-bell-wrap" id="notifBellWrap" style="position:relative;display:inline-flex">
                     <button class="btn btn-sm" id="notifBellBtn" onclick="toggleNotifDropdown()" title="Notifications" style="position:relative;padding:6px 10px;display:inline-flex;align-items:center;gap:4px">
                         {!! $I['bell'] !!}
                         <span id="notifBellCount" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:#fff;font-size:9px;font-weight:800;min-width:16px;height:16px;border-radius:20px;padding:0 3px;align-items:center;justify-content:center;border:2px solid #fff"></span>
                     </button>
-                    <div id="notifDropdown" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);width:280px;z-index:500;overflow:hidden">
-                        <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;justify-content:space-between">
-                            <span style="display:flex;align-items:center;gap:6px">{!! $I['bell'] !!} Notifications</span>
-                            <span id="notifDropdownTotal" style="background:var(--brand-lt);color:var(--brand-dk);font-size:10px;padding:1px 7px;border-radius:20px">0</span>
+                    <div id="notifDropdown" class="bq-notif-panel">
+                        <div class="bq-np-hd">
+                            <div class="bq-np-title">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                                Notifications
+                            </div>
+                            <span class="bq-np-cnt" id="notifDropdownTotal" style="display:none">0</span>
                         </div>
-                        <div id="notifList" style="max-height:320px;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:#d1d5db #f9fafb"></div>
-                        <div style="padding:8px 14px;border-top:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap">
-                            <a href="{{ route('boutique.orders.index') }}" class="btn btn-sm" style="flex:1;justify-content:center;font-size:11px;gap:4px">{!! $I['box_sm'] !!} Commandes</a>
-                            <a href="{{ route('boutique.messages.hub') }}" class="btn btn-sm" style="flex:1;justify-content:center;font-size:11px;gap:4px">{!! $I['msg_sm'] !!} Messages</a>
+                        <div id="notifList" class="bq-np-list"></div>
+                        <div class="bq-np-foot">
+                            <a href="{{ route('boutique.orders.index') }}" class="btn btn-sm">{!! $I['box_sm'] !!} Commandes</a>
+                            <a href="{{ route('boutique.messages.hub') }}" class="btn btn-sm">{!! $I['msg_sm'] !!} Messages</a>
                             <a href="{{ route('support.index') }}" class="btn btn-sm" style="flex:1;justify-content:center;font-size:11px;gap:4px">{!! $I['hdp_sm'] !!} Support</a>
                         </div>
                     </div>
@@ -2143,6 +2232,30 @@ document.addEventListener('DOMContentLoaded', () => {
     let _lastSeenCompanyMsgId = parseInt(localStorage.getItem(_KEY_CO)  || '0', 10);
     let _lastSeenSupportId    = parseInt(localStorage.getItem(_KEY_SUP) || '0', 10);
 
+    /* ── Sync cross-device : charger l'état depuis le serveur au démarrage ── */
+    /* Retourne une promesse — le polling attend sa résolution avant de démarrer */
+    const _serverSyncReady = fetch('/user/notif-state', { headers: { 'Accept': 'application/json' } })
+        .then(r => r.json())
+        .then(state => {
+            if (state.msg_id     > _lastSeenMsgId)        { _lastSeenMsgId        = state.msg_id;     try { localStorage.setItem(_KEY_MSG, _lastSeenMsgId); } catch(e){} }
+            if (state.co_msg_id  > _lastSeenCompanyMsgId) { _lastSeenCompanyMsgId = state.co_msg_id;  try { localStorage.setItem(_KEY_CO,  _lastSeenCompanyMsgId); } catch(e){} }
+            if (state.support_id > _lastSeenSupportId)    { _lastSeenSupportId    = state.support_id; try { localStorage.setItem(_KEY_SUP, _lastSeenSupportId); } catch(e){} }
+        })
+        .catch(() => {});
+
+    /* ── Pousser l'état vers le serveur (debouncé 1.5s) ── */
+    let _syncTimer = null;
+    function _pushNotifState() {
+        clearTimeout(_syncTimer);
+        _syncTimer = setTimeout(() => {
+            fetch('/user/notif-state', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
+                body: JSON.stringify({ msg_id: _lastSeenMsgId, co_msg_id: _lastSeenCompanyMsgId, support_id: _lastSeenSupportId }),
+            }).catch(() => {});
+        }, 1500);
+    }
+
     /* Restaurer les alertes depuis localStorage (persiste entre sessions) */
     let _alerts = [];
     try {
@@ -2180,15 +2293,27 @@ document.addEventListener('DOMContentLoaded', () => {
     let _audioCtx = null;
     function _initAudio() {
         if (_audioCtx) return;
-        try { _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+        try {
+            _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (_audioCtx.state !== 'running') _audioCtx.resume();
+            const buf = _audioCtx.createBuffer(1, 1, 22050);
+            const src = _audioCtx.createBufferSource();
+            src.buffer = buf; src.connect(_audioCtx.destination); src.start(0);
+        } catch(e) {}
     }
     document.addEventListener('touchstart', _initAudio, { once: true, passive: true });
     document.addEventListener('click',      _initAudio, { once: true });
+    /* Relance l'audio quand la page revient en avant-plan (iOS interrupted state) */
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && _audioCtx && _audioCtx.state !== 'running') {
+            _audioCtx.resume().catch(() => {});
+        }
+    });
 
     async function playBeep() {
         try {
             if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (_audioCtx.state === 'suspended') await _audioCtx.resume();
+            if (_audioCtx.state !== 'running') await _audioCtx.resume();
             const t = _audioCtx.currentTime;
             const o1 = _audioCtx.createOscillator(), g1 = _audioCtx.createGain();
             o1.connect(g1); g1.connect(_audioCtx.destination);
@@ -2230,74 +2355,95 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ── Dropdown notifications ── */
     let _alertIdSeq = 0;
 
+    /* Initiales depuis un nom (ex: "Jean Dupont" → "JD") */
+    function _ini(name) {
+        if (!name) return '?';
+        return name.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    }
+
     function renderNotifList() {
         const list = document.getElementById('notifList');
+        const cntEl = document.getElementById('notifDropdownTotal');
         if (!list) return;
+
         if (!_alerts.length) {
-            list.innerHTML = `<div style="padding:20px;text-align:center;color:#9ca3af;font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:6px">${_SVG.check} Aucune alerte</div>`;
+            list.innerHTML = `<div class="bq-np-empty">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 8px;display:block;color:#cbd5e1"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                Aucune notification pour le moment
+            </div>`;
+            if (cntEl) cntEl.style.display = 'none';
             return;
         }
-        list.innerHTML = _alerts.slice(0, 20).map(a => {
-            const isOrder      = a.type === 'order';
-            const isCompanyMsg = a.type === 'company_msg';
-            const isSupport    = a.type === 'support';
-            /* Badge contextuel */
-            const badge = isOrder
-                ? `<span style="font-size:9px;font-weight:700;background:#fef3c7;color:#92400e;border:1px solid #fde68a;border-radius:20px;padding:1px 6px;white-space:nowrap;flex-shrink:0">En cours</span>`
-                : isCompanyMsg
-                ? `<span style="font-size:9px;font-weight:700;background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe;border-radius:20px;padding:1px 6px;white-space:nowrap;flex-shrink:0">Entreprise</span>`
-                : isSupport
-                ? `<span style="font-size:9px;font-weight:700;background:#f0fdf4;color:#166534;border:1px solid #86efac;border-radius:20px;padding:1px 6px;white-space:nowrap;flex-shrink:0">SuperAdmin</span>`
-                : '';
-            /* Bouton × pour messages uniquement */
+
+        const shown = _alerts.slice(0, 20);
+        if (cntEl) { cntEl.textContent = shown.length > 99 ? '99+' : shown.length; cntEl.style.display = ''; }
+
+        /* Grouper par type pour les sections */
+        const orders     = shown.filter(a => a.type === 'order');
+        const messages   = shown.filter(a => a.type === 'msg');
+        const companies  = shown.filter(a => a.type === 'company_msg');
+        const supports   = shown.filter(a => a.type === 'support');
+
+        const CLOSE_SVG = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+
+        function renderItem(a) {
+            const isOrder  = a.type === 'order';
+            const isCo     = a.type === 'company_msg';
+            const isSup    = a.type === 'support';
+
+            const avBg = isOrder ? 'linear-gradient(135deg,#f59e0b,#d97706)'
+                       : isCo   ? 'linear-gradient(135deg,#6366f1,#4f46e5)'
+                       : isSup  ? 'linear-gradient(135deg,#10b981,#059669)'
+                                : 'linear-gradient(135deg,#818cf8,#6366f1)';
+            const avLabel = isOrder ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>'
+                         : isCo  ? _ini(a.companyName)
+                         : isSup ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>'
+                                 : _ini(a.senderName || a.msg);
+
+            const badgeClass = isOrder ? 'order' : isCo ? 'company' : isSup ? 'support' : 'msg';
+            const badgeLabel = isOrder ? 'En attente' : isCo ? 'Entreprise' : isSup ? 'SuperAdmin' : 'Message';
+
+            const href = isCo && a.companyId ? '#' : (a.url || '#');
+            const onclick = isCo && a.companyId
+                ? `onclick="event.preventDefault();event.stopPropagation();bqOpenCompanyChat(${a.companyId},decodeURIComponent('${encodeURIComponent(a.companyName||'')}'));_dismissAlert(${a.id})"`
+                : !isOrder ? `onclick="event.stopPropagation();_dismissAlert(${a.id})"` : '';
+
             const closeBtn = !isOrder
-                ? `<button onclick="event.stopPropagation();_dismissAlert(${a.id})"
-                           title="Supprimer"
-                           style="flex-shrink:0;width:28px;height:28px;border:none;background:none;
-                                  color:#9ca3af;font-size:15px;cursor:pointer;border-radius:6px;
-                                  display:flex;align-items:center;justify-content:center;
-                                  margin-right:6px;transition:all .15s"
-                           onmouseover="this.style.background='#fee2e2';this.style.color='#dc2626'"
-                           onmouseout="this.style.background='none';this.style.color='#9ca3af'">×</button>`
+                ? `<button class="bq-np-close-btn" onclick="event.stopPropagation();event.preventDefault();_dismissAlert(${a.id})" title="Supprimer">${CLOSE_SVG}</button>`
                 : '';
-            /* onclick : entreprise → chat, support → aller au ticket, messages → dismiss, commandes → rien */
-            let rowClickHandler = '';
-            let rowHref = a.url || '#';
-            let rowTag = 'a';
-            if (isCompanyMsg && a.companyId) {
-                rowTag = 'div';
-                const _safeName = encodeURIComponent(a.companyName || '');
-                rowClickHandler = `onclick="bqOpenCompanyChat(${a.companyId},decodeURIComponent('${_safeName}'));_dismissAlert(${a.id})"`;
-            } else if (isSupport) {
-                rowClickHandler = `onclick="_dismissAlert(${a.id})"`;
-            } else if (!isOrder) {
-                rowClickHandler = `onclick="_dismissAlert(${a.id})"`;
-            }
-            const rowBg    = isOrder ? '#fffbeb' : isCompanyMsg ? '#f5f3ff' : isSupport ? '#f0fdf4' : '#fff';
-            const rowHover = isOrder ? '#fef9ec' : isCompanyMsg ? '#ede9fe' : isSupport ? '#dcfce7' : '#f9fafb';
 
-            const innerRow = isCompanyMsg && a.companyId
-                ? `<div ${rowClickHandler} style="display:flex;align-items:center;gap:10px;flex:1;padding:10px 12px;cursor:pointer;min-width:0">`
-                : `<a href="${rowHref}" ${rowClickHandler} style="display:flex;align-items:center;gap:10px;flex:1;padding:10px 12px;text-decoration:none;min-width:0">`;
-            const innerClose = isCompanyMsg && a.companyId ? `</div>` : `</a>`;
-
-            return `
-            <div style="display:flex;align-items:center;border-bottom:1px solid #f3f6f4;background:${rowBg};transition:background .12s"
-                 onmouseover="this.style.background='${rowHover}'" onmouseout="this.style.background='${rowBg}'">
-                ${innerRow}
-                    <span style="width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:.85">${a.ico}</span>
-                    <div style="flex:1;min-width:0">
-                        <div style="font-size:12.5px;font-weight:600;color:#111;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.msg}</div>
-                        <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
-                            <span style="font-size:10.5px;color:#9ca3af">${a.time}</span>
-                            ${badge}
-                        </div>
+            return `<a href="${href}" class="bq-np-item" ${onclick}>
+                <div class="bq-np-av" style="background:${avBg}">${avLabel}</div>
+                <div class="bq-np-body">
+                    <div class="bq-np-name">${a.msg.length > 40 ? a.msg.slice(0,40)+'…' : a.msg}</div>
+                    <div class="bq-np-msg">${a.body || ''}</div>
+                    <div class="bq-np-meta">
+                        <span class="bq-np-time">${a.time}</span>
+                        <span class="bq-np-badge ${badgeClass}">${badgeLabel}</span>
                     </div>
-                    <span style="font-size:13px;color:#d1d5db;flex-shrink:0;margin-left:4px">›</span>
-                ${innerClose}
+                </div>
                 ${closeBtn}
-            </div>`;
-        }).join('');
+            </a>`;
+        }
+
+        let html = '';
+        if (orders.length) {
+            html += `<div class="bq-np-section"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> Commandes</div>`;
+            html += orders.map(renderItem).join('');
+        }
+        if (messages.length) {
+            html += `<div class="bq-np-section"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Messages clients</div>`;
+            html += messages.map(renderItem).join('');
+        }
+        if (companies.length) {
+            html += `<div class="bq-np-section"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Entreprises</div>`;
+            html += companies.map(renderItem).join('');
+        }
+        if (supports.length) {
+            html += `<div class="bq-np-section"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/></svg> Support</div>`;
+            html += supports.map(renderItem).join('');
+        }
+        list.innerHTML = html;
     }
 
     /* ── Supprimer une alerte par son id (uniquement type message) ── */
@@ -2305,8 +2451,6 @@ document.addEventListener('DOMContentLoaded', () => {
         _alerts = _alerts.filter(a => a.id !== id);
         _saveAlerts();
         renderNotifList();
-        const totalEl = document.getElementById('notifDropdownTotal');
-        if (totalEl) totalEl.textContent = _alerts.length;
     };
 
     /* ── Retire toutes les alertes company_msg pour une entreprise donnée ── */
@@ -2319,20 +2463,34 @@ document.addEventListener('DOMContentLoaded', () => {
         /* badge sera recalculé au prochain poll */
     };
 
-    window.toggleNotifDropdown = function() {
-        _notifOpen = !_notifOpen;
+    function _openNotifPanel() {
+        _notifOpen = true;
         const dd = document.getElementById('notifDropdown');
-        if (dd) dd.style.display = _notifOpen ? 'block' : 'none';
-        if (_notifOpen) renderNotifList();
+        const bd = document.getElementById('bqNotifBackdrop');
+        if (dd) dd.classList.add('open');
+        if (bd) bd.classList.add('active');
+        renderNotifList();
+    }
+    function _closeNotifPanel() {
+        _notifOpen = false;
+        const dd = document.getElementById('notifDropdown');
+        const bd = document.getElementById('bqNotifBackdrop');
+        if (dd) dd.classList.remove('open');
+        if (bd) bd.classList.remove('active');
+    }
+    window._closeNotifPanel = _closeNotifPanel;
+
+    window.toggleNotifDropdown = function() {
+        _notifOpen ? _closeNotifPanel() : _openNotifPanel();
     };
 
+    document.getElementById('bqNotifBackdrop')?.addEventListener('click', _closeNotifPanel);
     document.addEventListener('click', e => {
-        if (!e.target.closest('#notifBellWrap')) {
-            _notifOpen = false;
-            const dd = document.getElementById('notifDropdown');
-            if (dd) dd.style.display = 'none';
+        if (_notifOpen && !e.target.closest('#notifBellWrap') && e.target.id !== 'bqNotifBackdrop') {
+            _closeNotifPanel();
         }
     });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') _closeNotifPanel(); });
 
     /* ── Push alerte dans la file ── */
     function pushAlert(ico, msg, url, type, body, time, companyId, companyName) {
@@ -2401,6 +2559,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     _lastSeenMsgId = newMsgs[0].id;
                     try { localStorage.setItem(_KEY_MSG, _lastSeenMsgId); } catch(e) {}
+                    _pushNotifState();
                 }
             }
             _prevMsg = d.messages_unread;
@@ -2442,6 +2601,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     _saveAlerts();
                     _lastSeenCompanyMsgId = newCMsgs[0].id;
                     try { localStorage.setItem(_KEY_CO, _lastSeenCompanyMsgId); } catch(e) {}
+                    _pushNotifState();
                 }
             }
             _prevCompanyMsg = d.company_messages_unread ?? 0;
@@ -2510,10 +2670,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     _lastSeenSupportId = Math.max(...d.support_replies.map(m => m.id));
                     localStorage.setItem(_KEY_SUP, _lastSeenSupportId);
                     _saveAlerts();
+                    _pushNotifState();
                 } else if (_lastSeenSupportId === 0 && d.support_replies.length) {
                     /* Premier poll : initialiser sans notifier */
                     _lastSeenSupportId = Math.max(...d.support_replies.map(m => m.id));
                     localStorage.setItem(_KEY_SUP, _lastSeenSupportId);
+                    _pushNotifState();
                 }
             }
 
@@ -2530,9 +2692,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch(e) {}
     }
 
-    /* ── Démarrage ── */
-    pollNotifications();
-    setInterval(pollNotifications, 6000);
+    /* ── Démarrage : attendre la sync serveur avant le 1er poll ── */
+    _serverSyncReady.then(() => {
+        pollNotifications();
+        setInterval(pollNotifications, 6000);
+    });
 
     /* ── Animation CSS + scrollbar notifList ── */
     const s = document.createElement('style');
@@ -2570,9 +2734,8 @@ document.addEventListener('DOMContentLoaded', () => {
         _bqConfierDone    = false;
         _bqSelectedOrderIds = new Set();
 
-        /* Ferme le dropdown notif */
-        const dd = document.getElementById('notifDropdown');
-        if (dd) dd.style.display = 'none';
+        /* Ferme le dropdown notif proprement (met à jour _notifOpen) */
+        if (typeof window._closeNotifPanel === 'function') window._closeNotifPanel();
 
         /* Dismiss la notification cloche pour cette entreprise */
         if (typeof window._bqRemoveCompanyAlert === 'function') {

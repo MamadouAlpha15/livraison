@@ -581,7 +581,7 @@ class BoutiqueMessageController extends Controller
             ]);
 
         $ordersPending = $shop->orders()
-            ->whereIn('status', ['pending','en_attente','en attente','confirmée','processing','nouvelle'])
+            ->whereIn('status', ['pending','en_attente','en attente','nouvelle'])
             ->count();
 
         $livreursAvailable = \App\Models\User::where('role', 'livreur')

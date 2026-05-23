@@ -52,17 +52,7 @@ html,body {
 }
 a { text-decoration:none; color:inherit; }
 
-/* Footer suit le thème du dashboard */
-body.cx-dashboard footer.app-footer {
-    background:var(--cx-surface) !important;
-    color:var(--cx-text2) !important;
-    border-top:1px solid rgba(255,255,255,.06);
-}
-body.cx-dashboard.cx-light footer.app-footer {
-    background:#eef1f7 !important;
-    color:#6b7280 !important;
-    border-top:1px solid rgba(0,0,0,.07);
-}
+body.cx-dashboard footer.app-footer { display:none !important; }
 
 /* Cacher la navbar du layout pour ce dashboard */
 body.cx-dashboard > nav,
@@ -167,6 +157,12 @@ body.cx-dashboard > main.app-main {
     font-size:13px; flex-shrink:0; transition:all .22s cubic-bezier(.23,1,.32,1);
 }
 .cx-nav-item.active .cx-nav-ico { background:rgba(139,92,246,.3); border-color:rgba(139,92,246,.4); box-shadow:0 0 10px rgba(139,92,246,.4); }
+/* SVG icon rendering */
+.cx-nav-ico svg { display:block; }
+.cx-stat-ico svg { display:block; }
+.cx-perf-ico svg { display:block; }
+.cx-toast-ico svg { display:block; }
+.cx-perf-ico { color:var(--cx-brand-lt); }
 .cx-nav-item.active:hover { background:linear-gradient(90deg,rgba(124,58,237,.45) 0%,rgba(99,102,241,.3) 100%); box-shadow:0 4px 20px rgba(124,58,237,.35),inset 0 1px 0 rgba(255,255,255,.1); }
 .cx-nav-badge {
     margin-left:auto; background:var(--cx-brand); color:#fff;
@@ -456,7 +452,7 @@ body.cx-light .cx-main { background:#F5F7FA; }
 .cx-content { padding:16px 16px 40px; display:flex; flex-direction:column; gap:14px; }
 
 /* ══ STATS ══ */
-.cx-stats { display:flex; gap:14px; }
+.cx-stats { display:grid; gap:14px; grid-template-columns:repeat(5,1fr); }
 .cx-stat {
     flex:1; min-width:0;
     background:var(--cx-surface); border:1px solid var(--cx-border);
@@ -475,6 +471,7 @@ body.cx-light .cx-main { background:#F5F7FA; }
     display:flex; align-items:center; justify-content:center;
     font-size:20px; flex-shrink:0;
     background:var(--s-ico-bg, rgba(124,58,237,.12));
+    color:var(--s-color, var(--cx-brand-lt));
 }
 .cx-stat-lbl { font-size:11px; font-weight:600; color:var(--cx-text2); margin-bottom:4px; }
 .cx-stat-val  { font-size:26px; font-weight:900; color:#fff; line-height:1.1; letter-spacing:-.5px; }
@@ -648,12 +645,11 @@ body.cx-light .cx-main { background:#F5F7FA; }
     .cx-main-grid { grid-template-columns:1fr 380px; }
 }
 
-/* ── 1200px : colonne droite réduite, stats 3/ligne, bottom 2 cols ── */
+/* ── 1200px : colonne droite réduite, bottom 2 cols ── */
 @media(max-width:1200px) {
     .cx-main-grid { grid-template-columns:1fr 280px; }
     .cx-bottom { grid-template-columns:1fr 1fr; }
     .cx-bottom > :last-child { grid-column:1/-1; }
-    .cx-stat { flex:0 0 calc(33.333% - 10px); }
 }
 
 /* ── 1024px : sidebar drawer, hamburger visible ── */
@@ -666,12 +662,12 @@ body.cx-light .cx-main { background:#F5F7FA; }
     .cx-main-grid { grid-template-columns:1fr 260px; }
 }
 
-/* ── 900px : grille principale → 1 colonne ── */
+/* ── 900px : grille principale → 1 colonne, stats 2 colonnes ── */
 @media(max-width:900px) {
     .cx-main-grid { grid-template-columns:1fr; }
-    #cxMap { min-height:300px; }
-    .cx-stats { flex-wrap:wrap; }
-    .cx-stat { flex:0 0 calc(50% - 7px); }
+    #cxMap { min-height:55vw; max-height:400px; }
+    .cx-stats { grid-template-columns:repeat(2,1fr); }
+    .cx-stats > .cx-stat:last-child { grid-column:1/-1; }
 }
 
 /* ── 768px : bottom 1 colonne, topbar simplifiée, padding réduit ── */
@@ -681,28 +677,38 @@ body.cx-light .cx-main { background:#F5F7FA; }
     .cx-content { padding:12px; gap:12px; }
     .cx-tb-status { display:none; }
     .cx-date-badge { display:none; }
-    #cxMap { min-height:250px; }
+    #cxMap { min-height:50vw; max-height:380px; }
     .cx-toasts { left:10px; right:10px; top:auto; bottom:14px; }
     .cx-toast { min-width:0; max-width:100%; }
-    .cx-notif-panel { width:calc(100vw - 24px); right:-60px; }
 }
 
 /* ── 600px : topbar compacte ── */
 @media(max-width:600px) {
-    .cx-stat { flex:0 0 calc(50% - 7px); }
+    .cx-stats { grid-template-columns:repeat(2,1fr); gap:10px; }
+    .cx-stats > .cx-stat:last-child { grid-column:1/-1; }
+    .cx-stat { padding:14px 12px 12px; gap:10px; }
+    .cx-stat-ico  { width:38px; height:38px; border-radius:10px; }
+    .cx-stat-ico svg { width:18px; height:18px; }
     .cx-stat-val { font-size:22px; }
-    .cx-stat-ico  { width:40px; height:40px; font-size:18px; }
+    .cx-stat-lbl { font-size:10.5px; }
     .cx-topbar { gap:8px; padding:0 12px; }
-    .cx-tb-btn { width:32px; height:32px; font-size:14px; }
+    .cx-tb-btn { width:32px; height:32px; }
     .cx-tb-user { padding:4px 6px; gap:6px; }
     .cx-tb-uname { font-size:11.5px; }
     .cx-tb-urole { display:none; }
+    .tb-greeting-sub { display:none; }
 }
 
-/* ── 480px : stats empilées, recherche masquée ── */
+/* ── 480px : stats compactes 2 colonnes, recherche masquée ── */
 @media(max-width:480px) {
-    .cx-stats { flex-direction:column; gap:10px; }
-    .cx-stat  { flex:none; width:100%; }
+    .cx-stats { grid-template-columns:repeat(2,1fr); gap:8px; }
+    .cx-stats > .cx-stat:last-child { grid-column:1/-1; }
+    .cx-stat { padding:12px 10px 10px; gap:9px; }
+    .cx-stat-ico { width:34px; height:34px; border-radius:8px; }
+    .cx-stat-ico svg { width:16px; height:16px; }
+    .cx-stat-val { font-size:20px; }
+    .cx-stat-lbl { font-size:10px; margin-bottom:2px; }
+    .cx-stat-trend { font-size:10px; margin-top:2px; }
     .cx-search { display:none; }
     .cx-content { padding:10px; gap:10px; }
     .cx-panel-hd  { padding:10px 14px 9px; }
@@ -711,9 +717,8 @@ body.cx-light .cx-main { background:#F5F7FA; }
     .cx-pipe-list { padding:10px 13px; }
     .cx-perf-list { padding:10px 12px; }
     .cx-chart-body{ padding:12px 13px 10px; }
-    #cxMap { min-height:200px; }
+    #cxMap { min-height:60vw; max-height:360px; }
     .cx-toasts { left:8px; right:8px; }
-    .cx-notif-panel { right:-40px; }
 }
 
 /* ── 375px : iPhone SE ── */
@@ -721,9 +726,16 @@ body.cx-light .cx-main { background:#F5F7FA; }
     :root { --cx-top-h:54px; }
     .cx-topbar { height:var(--cx-top-h); }
     .cx-tb-av { width:28px; height:28px; font-size:10px; }
-    .cx-stat-val { font-size:21px; }
-    #cxMap { min-height:180px; }
-    .cx-notif-panel { width:calc(100vw - 16px); right:-50px; }
+    .cx-tb-uname { display:none; }
+    .tb-info { display:none; }
+    .cx-stats { gap:7px; }
+    .cx-stat { padding:10px 8px 8px; gap:8px; }
+    .cx-stat-ico { width:30px; height:30px; border-radius:7px; }
+    .cx-stat-ico svg { width:14px; height:14px; }
+    .cx-stat-val { font-size:18px; }
+    .cx-stat-lbl { font-size:9.5px; }
+    .cx-stat-trend { font-size:9.5px; }
+    #cxMap { min-height:65vw; max-height:320px; }
 }
 
 /* ══ NOTIFICATION DROPDOWN ══ */
@@ -735,11 +747,10 @@ body.cx-light .cx-main { background:#F5F7FA; }
     border:1px solid rgba(255,255,255,.11); border-radius:16px;
     box-shadow:0 24px 64px rgba(0,0,0,.7);
     z-index:9000; overflow:hidden;
-    opacity:0; transform:translateY(-10px) scale(.97);
-    transition:opacity .2s cubic-bezier(.23,1,.32,1), transform .2s cubic-bezier(.23,1,.32,1);
-    pointer-events:none;
+    visibility:hidden; opacity:0; transform:translateY(-10px) scale(.97); pointer-events:none;
+    transition:opacity .2s cubic-bezier(.23,1,.32,1), transform .2s cubic-bezier(.23,1,.32,1), visibility 0s .2s;
 }
-.cx-notif-panel.open { opacity:1; transform:translateY(0) scale(1); pointer-events:all; }
+.cx-notif-panel.open { visibility:visible; opacity:1; transform:translateY(0) scale(1); pointer-events:all; transition:opacity .2s cubic-bezier(.23,1,.32,1), transform .2s cubic-bezier(.23,1,.32,1), visibility 0s 0s; }
 .cx-notif-panel-hd {
     padding:13px 16px 11px;
     border-bottom:1px solid rgba(255,255,255,.07);
@@ -772,7 +783,7 @@ body.cx-light .cx-main { background:#F5F7FA; }
 }
 .cx-notif-body { flex:1; min-width:0; }
 .cx-notif-name { font-size:12.5px; font-weight:700; color:#fff; }
-.cx-notif-msg { font-size:11.5px; color:var(--cx-text2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px; }
+.cx-notif-msg { font-size:11.5px; color:var(--cx-text2); overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; margin-top:2px; }
 .cx-notif-meta { display:flex; align-items:center; justify-content:space-between; margin-top:4px; }
 .cx-notif-time { font-size:10px; color:var(--cx-muted); }
 .cx-notif-unread { background:var(--cx-brand); color:#fff; font-size:10px; font-weight:800; padding:1px 6px; border-radius:20px; }
@@ -780,6 +791,35 @@ body.cx-light .cx-main { background:#F5F7FA; }
 .cx-notif-footer { padding:10px 16px; border-top:1px solid rgba(255,255,255,.07); text-align:center; }
 .cx-notif-footer a { font-size:12px; color:var(--cx-brand-lt); font-weight:600; }
 .cx-notif-footer a:hover { color:#fff; }
+
+/* ── Backdrop (mobile) ── */
+.cx-notif-backdrop {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,.5); backdrop-filter:blur(3px);
+    z-index:8998;
+}
+.cx-notif-backdrop.active { display:block; }
+
+/* ── Bottom-sheet sur téléphone ── */
+@media(max-width:640px) {
+    .cx-notif-wrap { position:static; }
+    .cx-notif-panel {
+        position:fixed; top:auto; bottom:0; left:0; right:0 !important;
+        width:100% !important; border-radius:18px 18px 0 0;
+        max-height:78vh; overflow-y:auto;
+        visibility:hidden; transform:translateY(102%); opacity:1;
+        transition:transform .3s cubic-bezier(.23,1,.32,1), visibility 0s .3s;
+    }
+    .cx-notif-panel.open { visibility:visible; transform:translateY(0); transition:transform .3s cubic-bezier(.23,1,.32,1), visibility 0s 0s; }
+    .cx-notif-list { max-height:none; overflow-y:visible; }
+    .cx-notif-msg { -webkit-line-clamp:3; }
+    .cx-notif-panel::before {
+        content:''; display:block; width:36px; height:4px;
+        background:rgba(255,255,255,.2); border-radius:2px;
+        margin:10px auto 0;
+    }
+    .cx-notif-panel-hd { padding:12px 18px 13px; }
+}
 
 /* ══ TOAST NOTIFICATIONS ══ */
 .cx-toasts {
@@ -842,7 +882,7 @@ body.cx-light .cx-chart-big { color:#111827; }
 .tb-info { flex: 1; min-width: 0; overflow: hidden; }
 /* Topbar greeting */
 .tb-greeting { font-size:14px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.tb-greeting-sub { font-size:11px; color:var(--muted); margin-top:1px; }
+.tb-greeting-sub { font-size:11px; color:var(--muted); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
 </style>
 @endpush
@@ -875,48 +915,48 @@ body.cx-light .cx-chart-big { color:#111827; }
     <nav class="cx-nav">
         <div class="cx-nav-sec">Principal</div>
         <a href="{{ route('company.dashboard') }}" class="cx-nav-item active">
-            <span class="cx-nav-ico">⊞</span> Tableau de bord
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span> Tableau de bord
         </a>
         <a href="{{ route('company.chat.inbox') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">💬</span> Demandes (Chat)
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span> Demandes (Chat)
             <span class="cx-nav-badge" id="navChatBadge" style="display:none"></span>
         </a>
         <a href="{{ route('company.orders.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">📦</span> Commandes
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Commandes
             <span class="cx-nav-badge" id="navOrderBadge" style="display:none"></span>
         </a>
         <a href="{{ route('company.livraisons.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">🚚</span> Livraisons
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span> Livraisons
         </a>
         <a href="{{ route('company.carte.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">🗺️</span> Carte en direct
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span> Carte en direct
         </a>
         <a href="{{ route('company.drivers.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">🚴</span> Chauffeurs
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></span> Chauffeurs
         </a>
         <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">🏪</span> Boutiques
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span> Boutiques
         </a>
         <a href="{{ route('company.clients.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">👥</span> Clients
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Clients
         </a>
 
         <div class="cx-nav-sec">Gestion</div>
         <a href="{{ route('company.zones.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">📍</span> Zone de livraison
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span> Zone de livraison
         </a>
        
         <a href="{{ route('company.historique.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">📊</span> Historique
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span> Historique
         </a>
-        <a href="{{ route('company.rapport.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📈</span> Rapport</a>
+        <a href="{{ route('company.rapport.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span> Rapport</a>
 
         <div class="cx-nav-sec">Configuration</div>
         <a href="{{ route('company.parametre.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">⚙️</span> Paramètres
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Paramètres
         </a>
         <a href="{{ route('company.users.index') }}" class="cx-nav-item">
-            <span class="cx-nav-ico">👤</span> Utilisateurs
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Utilisateurs
         </a>
 
     </nav>
@@ -953,9 +993,9 @@ body.cx-light .cx-chart-big { color:#111827; }
 
     {{-- TOPBAR --}}
     <div class="cx-topbar">
-        <button class="cx-hamburger" id="cxHamburger">☰</button>
+        <button class="cx-hamburger" id="cxHamburger"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
           <div class="tb-info">
-                <div class="tb-greeting">Bonjour, {{ auth()->user()->name }} 👋</div>
+                <div class="tb-greeting">Bonjour, {{ auth()->user()->name }}</div>
                 <div class="tb-greeting-sub">Voici ce qui se passe dans votre entreprise aujourd'hui.</div>
             </div>
         
@@ -964,14 +1004,15 @@ body.cx-light .cx-chart-big { color:#111827; }
                 <span class="cx-sys-dot"></span> Système actif
             </div>
             {{-- Bell : dropdown notifications --}}
+            <div class="cx-notif-backdrop" id="cxNotifBackdrop"></div>
             <div class="cx-notif-wrap" id="cxNotifWrap">
                 <button class="cx-tb-btn cx-notif-btn" id="cxNotifBtn" title="Notifications">
-                    🔔
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                     <span class="cx-notif-dot" id="topbarNotifBadge" style="display:none"></span>
                 </button>
                 <div class="cx-notif-panel" id="cxNotifPanel">
                     <div class="cx-notif-panel-hd">
-                        <div class="cx-notif-panel-title">🔔 Notifications</div>
+                        <div class="cx-notif-panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:5px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Notifications</div>
                         <span class="cx-notif-panel-cnt" id="notifPanelCnt" style="display:none"></span>
                     </div>
                     <div class="cx-notif-list" id="cxNotifList">
@@ -983,7 +1024,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                 </div>
             </div>
             <a href="{{ route('company.chat.inbox') }}" class="cx-tb-btn" title="Messages" style="text-decoration:none;position:relative">
-                💬
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 <span class="cx-notif-dot" id="topbarChatBadge" style="display:none"></span>
             </a>
             <div class="cx-tb-user">
@@ -992,10 +1033,11 @@ body.cx-light .cx-chart-big { color:#111827; }
                     <div class="cx-tb-uname">{{ Str::limit($u->name ?? 'Admin ShipXpress', 16) }}</div>
                     <div class="cx-tb-urole">{{$company->name}}</div>
                 </div>
-                <span style="color:var(--cx-muted);font-size:11px;margin-left:2px">▾</span>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--cx-muted);margin-left:2px"><polyline points="6 9 12 15 18 9"/></svg>
             </div>
             <div class="cx-date-badge">
-                📅 {{ now()->translatedFormat('d M Y') }}
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                {{ now()->translatedFormat('d M Y') }}
             </div>
         </div>
     </div>
@@ -1013,7 +1055,7 @@ body.cx-light .cx-chart-big { color:#111827; }
         @endphp
         <div class="cx-stats">
             <div class="cx-stat" style="--s-color:#f59e0b;--s-ico-bg:rgba(245,158,11,.12)">
-                <div class="cx-stat-ico">📋</div>
+                <div class="cx-stat-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg></div>
                 <div>
                     <div class="cx-stat-lbl">Commandes en attente</div>
                     <div class="cx-stat-val" id="kpi-pending-val">{{ $pendingOrders }}</div>
@@ -1021,7 +1063,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                 </div>
             </div>
             <div class="cx-stat" style="--s-color:#8b5cf6;--s-ico-bg:rgba(139,92,246,.12)">
-                <div class="cx-stat-ico">🚴</div>
+                <div class="cx-stat-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></div>
                 <div>
                     <div class="cx-stat-lbl">Chauffeurs disponibles</div>
                     <div class="cx-stat-val" id="kpi-avail-val">{{ $availableDrivers }}</div>
@@ -1031,7 +1073,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                 </div>
             </div>
             <div class="cx-stat" style="--s-color:#3b82f6;--s-ico-bg:rgba(59,130,246,.12)">
-                <div class="cx-stat-ico">🚚</div>
+                <div class="cx-stat-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
                 <div>
                     <div class="cx-stat-lbl">Livraisons en cours</div>
                     <div class="cx-stat-val" id="kpi-delivery-val">{{ $inDelivery }}</div>
@@ -1039,7 +1081,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                 </div>
             </div>
             <div class="cx-stat" style="--s-color:#10b981;--s-ico-bg:rgba(16,185,129,.12)">
-                <div class="cx-stat-ico">✅</div>
+                <div class="cx-stat-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
                 <div>
                     <div class="cx-stat-lbl">Livraisons terminées</div>
                     <div class="cx-stat-val" id="kpi-done-val">{{ $delivered }}</div>
@@ -1047,7 +1089,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                 </div>
             </div>
             <div class="cx-stat" style="--s-color:#7c3aed;--s-ico-bg:rgba(124,58,237,.12)">
-                <div class="cx-stat-ico">💳</div>
+                <div class="cx-stat-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
                 <div>
                     <div class="cx-stat-lbl">Revenus livraison</div>
                     <div class="cx-stat-val sm" id="kpi-rev-val">{{ number_format($revenus, 0, ',', ' ') }}</div>
@@ -1055,7 +1097,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                         @if($revenusToday > 0)
                             +{{ number_format($revenusToday, 0, ',', ' ') }} aujourd'hui · {{ $devise }}
                         @else
-                            {{ $devise }} · Total commissions reçues
+                            {{ $devise }} · Frais de livraison cumulés
                         @endif
                     </div>
                 </div>
@@ -1068,7 +1110,7 @@ body.cx-light .cx-chart-big { color:#111827; }
             {{-- ── GAUCHE : CARTE EN TEMPS RÉEL ── --}}
             <div class="cx-panel cx-map-panel">
                 <div class="cx-panel-hd">
-                    <div class="cx-panel-title">🗺️ Carte en temps réel</div>
+                    <div class="cx-panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:6px"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>Carte en temps réel</div>
                     <div style="display:flex;align-items:center;gap:6px">
                         <span class="cx-sys-dot"></span>
                         <span style="font-size:11px;color:var(--cx-green);font-weight:600">Live</span>
@@ -1076,7 +1118,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                 </div>
                 <div id="cxMap"></div>
                 <div class="cx-map-legend">
-                    <span class="cx-legend-item">🚴 Chaque marqueur = un chauffeur en mission</span>
+                    <span class="cx-legend-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:4px"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>Chaque marqueur = un chauffeur en mission</span>
                     <span class="cx-legend-item" style="margin-left:auto;color:var(--cx-muted)">Cliquer sur un marqueur pour les détails</span>
                 </div>
             </div>
@@ -1088,7 +1130,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                 <div class="cx-panel">
                     <div class="cx-panel-hd">
                         <div class="cx-panel-title">
-                            💬 Demandes (Chat)
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:6px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Demandes (Chat)
                             <span id="chatPanelBadge" style="display:none;background:rgba(239,68,68,.18);color:#f87171;border:1px solid rgba(239,68,68,.28);font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:20px"></span>
                         </div>
                         <a href="{{ route('company.chat.inbox') }}" class="cx-panel-link">Voir tout</a>
@@ -1102,7 +1144,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                 {{-- Pipeline des livraisons --}}
                 <div class="cx-panel">
                     <div class="cx-panel-hd">
-                        <div class="cx-panel-title">📊 Pipeline des livraisons</div>
+                        <div class="cx-panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:6px"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>Pipeline des livraisons</div>
                         <a href="{{ route('company.orders.index') }}" class="cx-panel-link">Commandes</a>
                     </div>
                     <div class="cx-pipe-list" id="cx-pipe-list">
@@ -1124,7 +1166,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                 {{-- Chauffeurs actifs --}}
                 <div class="cx-panel">
                     <div class="cx-panel-hd">
-                        <div class="cx-panel-title">🚴 Chauffeurs (<span id="kpi-total-drivers">{{ $totalDrivers }}</span>)</div>
+                        <div class="cx-panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:6px"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>Chauffeurs (<span id="kpi-total-drivers">{{ $totalDrivers }}</span>)</div>
                         <a href="{{ route('company.drivers.index') }}" class="cx-panel-link">Gérer</a>
                     </div>
                     <div id="cx-drivers-list">
@@ -1157,16 +1199,16 @@ body.cx-light .cx-chart-big { color:#111827; }
                         <div class="cx-driv-info">
                             <div class="cx-driv-name">{{ $drv->name }}</div>
                             @if($drv->phone)
-                            <div class="cx-driv-loc">📞 {{ $drv->phone }}</div>
+                            <div class="cx-driv-loc"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:3px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.03 6.03l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>{{ $drv->phone }}</div>
                             @endif
                         </div>
                         <div class="cx-driv-right">
                             <span class="cx-driv-status {{ $dStat['class'] }}">● {{ $dStat['label'] }}</span>
                         </div>
                         @if($drv->phone)
-                        <a href="tel:{{ $drv->phone }}" class="cx-driv-phone" title="Appeler">📞</a>
+                        <a href="tel:{{ $drv->phone }}" class="cx-driv-phone" title="Appeler"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.03 6.03l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></a>
                         @else
-                        <div class="cx-driv-phone" style="opacity:.35;cursor:default">📞</div>
+                        <div class="cx-driv-phone" style="opacity:.35;cursor:default"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.03 6.03l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
                         @endif
                     </div>
                     @empty
@@ -1189,7 +1231,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                 <div class="cx-chart-body">
                     <div class="cx-chart-hd2">
                         <div>
-                            <div class="cx-chart-title2">📈 Commandes</div>
+                            <div class="cx-chart-title2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:5px"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Commandes</div>
                             <div class="cx-chart-sub2" id="ordersChartSub">7 derniers jours</div>
                         </div>
                         <div class="cx-period-toggle">
@@ -1218,7 +1260,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                 <div class="cx-chart-body">
                     <div class="cx-chart-hd2">
                         <div>
-                            <div class="cx-chart-title2">💰 Revenus livraison</div>
+                            <div class="cx-chart-title2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:5px"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Revenus livraison</div>
                             <div class="cx-chart-sub2" id="revenueChartSub">30 derniers jours</div>
                         </div>
                         <div class="cx-period-toggle">
@@ -1266,13 +1308,13 @@ body.cx-light .cx-chart-big { color:#111827; }
             @endphp
             <div class="cx-panel">
                 <div class="cx-panel-hd">
-                    <div class="cx-panel-title">⚡ Performance réelle</div>
+                    <div class="cx-panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:6px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Performance réelle</div>
                 </div>
                 <div class="cx-perf-list">
 
                     {{-- Temps moyen traitement --}}
                     <div class="cx-perf-card">
-                        <div class="cx-perf-ico">🏍️</div>
+                        <div class="cx-perf-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
                         <div>
                             <div class="cx-perf-lbl">Temps moyen traitement</div>
                             @if($avgMins !== null)
@@ -1291,7 +1333,7 @@ body.cx-light .cx-chart-big { color:#111827; }
 
                     {{-- Taux de réussite --}}
                     <div class="cx-perf-card">
-                        <div class="cx-perf-ico">✅</div>
+                        <div class="cx-perf-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
                         <div>
                             <div class="cx-perf-lbl">Taux de réussite</div>
                             @if($tauxReussite !== null)
@@ -1310,7 +1352,7 @@ body.cx-light .cx-chart-big { color:#111827; }
 
                     {{-- Note moyenne --}}
                     <div class="cx-perf-card" style="flex-direction:row;align-items:center;gap:10px;flex-wrap:wrap;">
-                        <div class="cx-perf-ico">⭐</div>
+                        <div class="cx-perf-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
                         <div style="flex:1;min-width:0;">
                             <div class="cx-perf-lbl">Note moyenne clients</div>
                             @if($avgRating !== null && $ratingCount > 0)
@@ -1349,7 +1391,7 @@ body.cx-light .cx-chart-big { color:#111827; }
         {{-- Header --}}
         <div style="padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
             <div>
-                <div style="font-size:15px;font-weight:800;color:#fff;">⭐ Avis des vendeurs</div>
+                <div style="font-size:15px;font-weight:800;color:#fff;display:flex;align-items:center;gap:7px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Avis des vendeurs</div>
                 <div style="font-size:11.5px;color:#94a3b8;margin-top:2px;">{{ $ratingCount }} avis · Moyenne {{ $avgRating ?? '—' }}/5</div>
             </div>
             <button onclick="document.getElementById('cxReviewsModal').classList.remove('open')"
@@ -1466,6 +1508,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OpenStreetMap', maxZoom:19}).addTo(map);
     setTimeout(() => map.invalidateSize(), 60);
+    window.addEventListener('resize', () => map.invalidateSize());
+    screen.orientation?.addEventListener('change', () => { setTimeout(() => map.invalidateSize(), 150); });
     L.control.zoom({ position:'bottomright' }).addTo(map);
 
     const DASH_COLORS = ['#10b981','#f59e0b','#3b82f6','#ec4899','#8b5cf6','#06b6d4','#f97316','#ef4444','#a78bfa','#84cc16'];
@@ -1477,7 +1521,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function makePin(color) {
         return L.divIcon({
-            html:`<div style="width:28px;height:28px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:13px;border:2px solid rgba(255,255,255,.3);box-shadow:0 2px 10px rgba(0,0,0,.5)">🚴</div>`,
+            html:`<div style="width:32px;height:32px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;border:2.5px solid rgba(255,255,255,.5);box-shadow:0 3px 12px rgba(0,0,0,.55)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></div>`,
             className:'', iconSize:[28,28], iconAnchor:[14,14]
         });
     }
@@ -1866,10 +1910,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* ── Son alerte commande ── */
-    function playOrderSound() {
+    let _audioCtx = null;
+    function _initAudio() {
+        if (_audioCtx) return;
         try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            // Deux bips courts descendants
+            _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (_audioCtx.state !== 'running') _audioCtx.resume();
+            const buf = _audioCtx.createBuffer(1, 1, 22050);
+            const src = _audioCtx.createBufferSource();
+            src.buffer = buf; src.connect(_audioCtx.destination); src.start(0);
+        } catch(e) {}
+    }
+    document.addEventListener('touchstart', _initAudio, { once: true, passive: true });
+    document.addEventListener('click',      _initAudio, { once: true });
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && _audioCtx && _audioCtx.state !== 'running') {
+            _audioCtx.resume().catch(() => {});
+        }
+    });
+
+    async function playOrderSound() {
+        try {
+            if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (_audioCtx.state !== 'running') await _audioCtx.resume();
+            const ctx = _audioCtx;
             [[880, 0], [660, 0.18]].forEach(([freq, delay]) => {
                 const osc = ctx.createOscillator(), gain = ctx.createGain();
                 osc.connect(gain); gain.connect(ctx.destination);
@@ -1892,13 +1956,37 @@ document.addEventListener('DOMContentLoaded', () => {
         const toast = document.createElement('div');
         toast.className = 'cx-toast';
         toast.innerHTML = `
-            <div class="cx-toast-ico">📦</div>
+            <div class="cx-toast-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
             <div class="cx-toast-body">
                 <div class="cx-toast-shop">Nouvelle commande #${esc(String(order.id))}</div>
                 <div class="cx-toast-msg">${esc(order.shop_name)} · ${esc(order.client)}</div>
                 <div class="cx-toast-time">${esc(order.created_at)} · Cliquez pour gérer</div>
             </div>
-            <div class="cx-toast-close" title="Fermer">✕</div>
+            <div class="cx-toast-close" title="Fermer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+        `;
+        const url = '{{ route('company.orders.index') }}';
+        toast.addEventListener('click', () => { window.location.href = url; });
+        toast.querySelector('.cx-toast-close').addEventListener('click', e => {
+            e.stopPropagation(); dismissToast(toast);
+        });
+        container.appendChild(toast);
+        setTimeout(() => dismissToast(toast), 7000);
+    }
+
+    /* ── Toast résumé quand > 3 nouvelles commandes d'un coup ── */
+    function showBulkOrderToast(count) {
+        const container = document.getElementById('cxToasts');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = 'cx-toast';
+        toast.innerHTML = `
+            <div class="cx-toast-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+            <div class="cx-toast-body">
+                <div class="cx-toast-shop">${count} nouvelles commandes</div>
+                <div class="cx-toast-msg">Plusieurs boutiques · À traiter</div>
+                <div class="cx-toast-time">À l'instant · Cliquez pour gérer</div>
+            </div>
+            <div class="cx-toast-close" title="Fermer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
         `;
         const url = '{{ route('company.orders.index') }}';
         toast.addEventListener('click', () => { window.location.href = url; });
@@ -1935,7 +2023,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const shopGroups = Object.values(byShop);
 
-            html += `<div style="padding:6px 12px 2px;font-size:9.5px;font-weight:800;letter-spacing:1.2px;color:var(--cx-muted);text-transform:uppercase">📦 Commandes en attente</div>`;
+            html += `<div style="padding:6px 12px 2px;font-size:9.5px;font-weight:800;letter-spacing:1.2px;color:var(--cx-muted);text-transform:uppercase;display:flex;align-items:center;gap:5px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Commandes en attente</div>`;
             html += shopGroups.map(g => `
                 <div class="cx-notif-item" onclick="window.location.href='{{ route('company.orders.index') }}'">
                     <div class="cx-notif-av" style="background:linear-gradient(135deg,#f59e0b,#d97706)">${esc(getIni(g.shop_name))}</div>
@@ -1952,9 +2040,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Section messages chat non-lus
-        const shownChat = chatUnread.length ? chatUnread : (orderItems.length ? [] : convs.slice(0, 4));
+        const shownChat = chatUnread;
         if (shownChat.length) {
-            html += `<div style="padding:6px 12px 2px;font-size:9.5px;font-weight:800;letter-spacing:1.2px;color:var(--cx-muted);text-transform:uppercase">💬 Messages non lus</div>`;
+            html += `<div style="padding:6px 12px 2px;font-size:9.5px;font-weight:800;letter-spacing:1.2px;color:var(--cx-muted);text-transform:uppercase;display:flex;align-items:center;gap:5px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messages non lus</div>`;
             html += shownChat.map((c, i) => `
                 <div class="cx-notif-item" onclick="window.location.href='{{ route('company.chat.inbox') }}?shop_id=${encodeURIComponent(c.shop_id)}'">
                     <div class="cx-notif-av" style="background:${AV_COLORS[i % AV_COLORS.length]}">${esc(getIni(c.shop_name))}</div>
@@ -2008,19 +2096,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* ── Toast ── */
-    function showToast(shopName, lastMsg, shopId) {
+    async function showToast(shopName, lastMsg, shopId) {
         const container = document.getElementById('cxToasts');
         if (!container) return;
         const toast = document.createElement('div');
         toast.className = 'cx-toast';
         toast.innerHTML = `
-            <div class="cx-toast-ico">💬</div>
+            <div class="cx-toast-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
             <div class="cx-toast-body">
                 <div class="cx-toast-shop">${esc(shopName)}</div>
                 <div class="cx-toast-msg">${esc(lastMsg)}</div>
                 <div class="cx-toast-time">À l'instant · Cliquez pour répondre</div>
             </div>
-            <div class="cx-toast-close" title="Fermer">✕</div>
+            <div class="cx-toast-close" title="Fermer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
         `;
         const url = '{{ route('company.chat.inbox') }}?shop_id=' + encodeURIComponent(shopId);
         toast.addEventListener('click', () => { window.location.href = url; });
@@ -2030,7 +2118,9 @@ document.addEventListener('DOMContentLoaded', () => {
         container.appendChild(toast);
         setTimeout(() => dismissToast(toast), 6000);
         try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (_audioCtx.state !== 'running') await _audioCtx.resume();
+            const ctx = _audioCtx;
             const osc = ctx.createOscillator(), gain = ctx.createGain();
             osc.connect(gain); gain.connect(ctx.destination);
             osc.frequency.setValueAtTime(880, ctx.currentTime);
@@ -2050,13 +2140,45 @@ document.addEventListener('DOMContentLoaded', () => {
     let _chatUnreadCount  = 0;
     let _orderPendingCount = 0;
 
+    /* ── État "vu" cross-device — chargé depuis le serveur ── */
+    let _seenAt   = 0;   // unix timestamp : ordres créés AVANT ce ts = déjà vus
+    let _chatSeen = {};  // { shopId: dernierNbNonLuVu }
+
+    async function loadNotifState() {
+        try {
+            const r = await fetch('{{ route('user.notif.get') }}', { credentials: 'same-origin' });
+            if (!r.ok) return;
+            const s = await r.json();
+            _seenAt   = s.seen_at   || 0;
+            _chatSeen = s.chat_seen || {};
+        } catch(e) {}
+    }
+
+    async function saveSeenToServer() {
+        const chatPayload = {};
+        latestConvs.forEach(c => { if ((c.unread || 0) > 0) chatPayload[c.shop_id] = c.unread; });
+        Object.assign(_chatSeen, chatPayload);
+        try {
+            await fetch('{{ route('user.notif.set') }}', {
+                method: 'POST', credentials: 'same-origin',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_seen: chatPayload })
+            });
+        } catch(e) {}
+        updateGlobalBadge();
+    }
+
     function updateGlobalBadge() {
-        const total = _chatUnreadCount + _orderPendingCount;
-        setBadge('navChatBadge',     _chatUnreadCount);
-        setBadge('navOrderBadge',    _orderPendingCount);
-        setBadge('topbarChatBadge',  _chatUnreadCount);
-        setBadge('topbarNotifBadge', total);
-        setBadge('chatPanelBadge',   _chatUnreadCount);
+        // Sidebar & topbar chat : vrais compteurs bruts
+        setBadge('navChatBadge',    _chatUnreadCount);
+        setBadge('navOrderBadge',   _orderPendingCount);
+        setBadge('topbarChatBadge', _chatUnreadCount);
+        setBadge('chatPanelBadge',  _chatUnreadCount);
+        // Cloche commandes : toujours visible tant que non confirmée
+        const pendingOrders = latestOrders.length;
+        // Cloche chat : badge dès qu'il y a des messages non lus
+        const unseenChat = latestConvs.filter(c => (c.unread || 0) > 0).length;
+        setBadge('topbarNotifBadge', pendingOrders + unseenChat);
     }
 
     /* ── Polling chat ── */
@@ -2111,8 +2233,8 @@ document.addEventListener('DOMContentLoaded', () => {
             latestOrders = orders;
 
             const currentIds = new Set(orders.map(o => o.id));
-            // Badge = nombre total de commandes en attente (pas boutiques uniques)
-            _orderPendingCount = orders.length;
+            // Utilise le vrai total serveur (pas limité à 10)
+            _orderPendingCount = data.total_pending ?? orders.length;
             updateGlobalBadge();
 
             // Détecter les nouvelles commandes (IDs qui n'étaient pas là avant)
@@ -2120,7 +2242,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const newOrders = orders.filter(o => !prevOrderIds.has(o.id));
                 if (newOrders.length) {
                     playOrderSound();
-                    newOrders.forEach(o => showOrderToast(o));
+                    if (newOrders.length <= 3) {
+                        newOrders.forEach(o => showOrderToast(o));
+                    } else {
+                        // Trop de toasts simultanés → un seul résumé
+                        showBulkOrderToast(newOrders.length);
+                    }
                 }
             }
 
@@ -2134,26 +2261,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* ── Toggle cloche dropdown ── */
-    const notifBtn   = document.getElementById('cxNotifBtn');
-    const notifPanel = document.getElementById('cxNotifPanel');
-    const notifWrap  = document.getElementById('cxNotifWrap');
+    const notifBtn      = document.getElementById('cxNotifBtn');
+    const notifPanel    = document.getElementById('cxNotifPanel');
+    const notifWrap     = document.getElementById('cxNotifWrap');
+    const notifBackdrop = document.getElementById('cxNotifBackdrop');
+    function openNotif() {
+        notifPanel.classList.add('open');
+        if (notifBackdrop) notifBackdrop.classList.add('active');
+        saveSeenToServer();
+    }
+    function closeNotif() {
+        notifPanel.classList.remove('open');
+        if (notifBackdrop) notifBackdrop.classList.remove('active');
+    }
     if (notifBtn && notifPanel) {
         notifBtn.addEventListener('click', e => {
             e.stopPropagation();
-            notifPanel.classList.toggle('open');
+            notifPanel.classList.contains('open') ? closeNotif() : openNotif();
         });
+        if (notifBackdrop) notifBackdrop.addEventListener('click', closeNotif);
         document.addEventListener('click', e => {
-            if (notifWrap && !notifWrap.contains(e.target)) {
-                notifPanel.classList.remove('open');
+            if (notifWrap && !notifWrap.contains(e.target) && e.target !== notifBackdrop) {
+                closeNotif();
             }
+        });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeNotif();
         });
     }
 
-    // Commandes d'abord pour remplir latestOrders avant le 1er rendu chat
-    pollOrderNotifs();
-    pollChatNotifs();
-    setInterval(pollChatNotifs,  5000);
-    setInterval(pollOrderNotifs, 5000);
+    // Charger l'état "vu" depuis le serveur AVANT le premier poll (sync cross-device)
+    loadNotifState().then(() => {
+        pollOrderNotifs();
+        pollChatNotifs();
+        setInterval(pollChatNotifs,  5000);
+        setInterval(pollOrderNotifs, 5000);
+    });
 });
 
 /* ═══════════════════════════════════════════════════════

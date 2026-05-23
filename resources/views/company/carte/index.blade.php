@@ -61,6 +61,7 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .cx-nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:linear-gradient(180deg,#a78bfa,#7c3aed);border-radius:0 3px 3px 0;box-shadow:2px 0 12px rgba(167,139,250,.7)}
 .cx-nav-ico{width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .22s cubic-bezier(.23,1,.32,1)}
 .cx-nav-item.active .cx-nav-ico{background:rgba(139,92,246,.3);border-color:rgba(139,92,246,.4);box-shadow:0 0 10px rgba(139,92,246,.4)}
+.cx-nav-ico svg{display:block;}
 .cx-nav-item.active:hover{background:linear-gradient(90deg,rgba(124,58,237,.45) 0%,rgba(99,102,241,.3) 100%);box-shadow:0 4px 20px rgba(124,58,237,.35),inset 0 1px 0 rgba(255,255,255,.1)}
 .cx-user-foot{padding:10px 10px 12px;border-top:1px solid rgba(255,255,255,.07);flex-shrink:0}
 .cx-user-row{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:var(--r-xs);background:rgba(255,255,255,.04);cursor:pointer;transition:background .15s;margin-bottom:6px}
@@ -85,10 +86,10 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
     height:var(--cx-topbar-h);background:var(--cx-surface);
     border-bottom:1px solid var(--cx-border);
     display:flex;align-items:center;gap:10px;padding:0 16px;
-    flex-shrink:0;z-index:100;
+    flex-shrink:0;z-index:100;overflow:hidden;
 }
 .cx-hamburger{display:none;background:none;border:none;color:var(--cx-text2);font-size:18px;cursor:pointer;padding:4px 8px;border-radius:6px;flex-shrink:0}
-.cx-topbar-title{font-size:14px;font-weight:800;color:var(--cx-text);white-space:nowrap}
+.cx-topbar-title{font-size:14px;font-weight:800;color:var(--cx-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .cx-topbar-sub{font-size:12px;color:var(--cx-muted);margin-left:2px;white-space:nowrap}
 .cx-tb-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
 .cx-tb-btn{height:32px;padding:0 11px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid var(--cx-border);color:var(--cx-text2);font-size:12px;font-weight:600;cursor:pointer;transition:background .14s,color .14s;display:flex;align-items:center;gap:5px;white-space:nowrap}
@@ -284,6 +285,13 @@ body.cx-light .cx-panel-toggle{background:rgba(124,58,237,.08);border-color:rgba
 @media(max-width:380px){
     .map-count{display:none}
     .cx-topbar-title{font-size:12px}
+    /* bottom sheet moins haute pour laisser la carte visible */
+    .map-panel{max-height:50vh}
+}
+/* ── iPhone SE / 320px ── */
+@media(max-width:320px){
+    .cx-topbar-title span:last-child{display:none} /* masque le texte, garde l'icône */
+    .map-panel{max-height:45vh}
 }
 </style>
 @endpush
@@ -295,27 +303,27 @@ body.cx-light .cx-panel-toggle{background:rgba(124,58,237,.08);border-color:rgba
     <div class="cx-brand-hd">
         <div class="cx-brand-top">
             <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
-            <button class="cx-close-btn" id="cxCloseBtn">✕</button>
+            <button class="cx-close-btn" id="cxCloseBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
         <div class="cx-sys-badge"><span class="cx-sys-dot"></span> Système actif</div>
     </div>
     <nav class="cx-nav">
         <div class="cx-nav-sec">Principal</div>
-        <a href="{{ route('company.dashboard') }}"        class="cx-nav-item"><span class="cx-nav-ico">⊞</span> Tableau de bord</a>
-        <a href="{{ route('company.chat.inbox') }}"       class="cx-nav-item"><span class="cx-nav-ico">💬</span> Demandes (Chat)</a>
-        <a href="{{ route('company.orders.index') }}"     class="cx-nav-item"><span class="cx-nav-ico">📦</span> Commandes</a>
-        <a href="{{ route('company.drivers.index') }}"    class="cx-nav-item"><span class="cx-nav-ico">🚴</span> Chauffeurs</a>
-        <a href="{{ route('company.livraisons.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🚚</span> Livraisons</a>
-        <a href="{{ route('company.carte.index') }}"      class="cx-nav-item active"><span class="cx-nav-ico">🗺️</span> Carte en direct</a>
-        <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🏪</span> Boutiques</a>
-        <a href="{{ route('company.clients.index') }}" class="cx-nav-item"><span class="cx-nav-ico">👥</span> Clients</a>
+        <a href="{{ route('company.dashboard') }}"        class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span> Tableau de bord</a>
+        <a href="{{ route('company.chat.inbox') }}"       class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span> Demandes (Chat)</a>
+        <a href="{{ route('company.orders.index') }}"     class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Commandes</a>
+        <a href="{{ route('company.drivers.index') }}"    class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></span> Chauffeurs</a>
+        <a href="{{ route('company.livraisons.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span> Livraisons</a>
+        <a href="{{ route('company.carte.index') }}"      class="cx-nav-item active"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span> Carte en direct</a>
+        <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9l1-5h16l1 5"/><path d="M3 9a2 2 0 0 0 4 0m4 0a2 2 0 0 0 4 0m4 0a2 2 0 0 0-4 0m-8 0a2 2 0 0 0-4 0"/><path d="M5 9v12h14V9"/><path d="M10 14h4v6h-4z"/></svg></span> Boutiques</a>
+        <a href="{{ route('company.clients.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Clients</a>
         <div class="cx-nav-sec">Gestion</div>
-        <a href="{{ route('company.zones.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📍</span> Zone de livraison</a>
-               <a href="{{ route('company.historique.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📊</span> Historique</a>
-               <a href="{{ route('company.rapport.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📈</span> Rapport</a>
+        <a href="{{ route('company.zones.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span> Zone de livraison</a>
+               <a href="{{ route('company.historique.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span> Historique</a>
+               <a href="{{ route('company.rapport.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span> Rapport</a>
         <div class="cx-nav-sec">Configuration</div>
-        <a href="{{ route('company.parametre.index') }}" class="cx-nav-item"><span class="cx-nav-ico">⚙️</span> Paramètres</a>
-        <a href="{{ route('company.users.index') }}" class="cx-nav-item"><span class="cx-nav-ico">👤</span> Utilisateurs</a>
+        <a href="{{ route('company.parametre.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Paramètres</a>
+        <a href="{{ route('company.users.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Utilisateurs</a>
             </nav>
     <div class="cx-user-foot">
         <div class="cx-user-row">
@@ -325,7 +333,7 @@ body.cx-light .cx-panel-toggle{background:rgba(124,58,237,.08);border-color:rgba
                 <div class="cx-user-role">{{ $company->name }}</div>
             </div>
             <form method="POST" action="{{ route('logout') }}">@csrf
-                <button type="submit" class="cx-logout-btn" title="Déconnexion">⏻</button>
+                <button type="submit" class="cx-logout-btn" title="Déconnexion"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
             </form>
         </div>
         <div class="cx-dark-row" id="cxDarkToggle">
@@ -346,8 +354,8 @@ body.cx-light .cx-panel-toggle{background:rgba(124,58,237,.08);border-color:rgba
 
     {{-- Topbar --}}
     <div class="cx-topbar">
-        <button class="cx-hamburger" id="cxHamburger">☰</button>
-        <span class="cx-topbar-title">🗺️ Carte en direct</span>
+        <button class="cx-hamburger" id="cxHamburger"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <span class="cx-topbar-title" style="display:flex;align-items:center;gap:7px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg> Carte en direct</span>
         <span class="cx-topbar-sub">· {{ $company->name }}</span>
         <div class="cx-tb-right">
             <div class="cx-pulse">
@@ -355,8 +363,9 @@ body.cx-light .cx-panel-toggle{background:rgba(124,58,237,.08);border-color:rgba
                 <span class="cx-pulse-txt">Temps réel</span>
             </div>
             <span class="map-count" id="mapCount">0 en cours</span>
-            <button class="cx-panel-toggle" id="panelToggleBtn" onclick="togglePanel()">
-                🚴 <span id="panelToggleLbl">Chauffeurs</span>
+            <button class="cx-panel-toggle" id="panelToggleBtn" onclick="togglePanel()" style="display:flex">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>
+                <span id="panelToggleLbl">Chauffeurs</span>
             </button>
            
         </div>
@@ -369,14 +378,14 @@ body.cx-light .cx-panel-toggle{background:rgba(124,58,237,.08);border-color:rgba
             {{-- Drag handle (mobile) --}}
             <div class="map-panel-drag" id="panelDrag"></div>
             {{-- Bouton fermer (tablette + mobile) --}}
-            <button class="map-panel-close" onclick="togglePanel()" title="Fermer">✕</button>
+            <button class="map-panel-close" onclick="togglePanel()" title="Fermer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
             <div class="map-panel-hd">
-                <div class="map-panel-title">🚴 Chauffeurs en mission</div>
+                <div class="map-panel-title" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg> Chauffeurs en mission</div>
                 <div class="map-panel-sub" id="panelSub">Chargement…</div>
             </div>
             <div class="map-panel-list" id="mapPanelList">
                 <div class="mp-empty">
-                    <div class="mp-empty-ico">🗺️</div>
+                    <div class="mp-empty-ico"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity:.35"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></div>
                     <div class="mp-empty-title">Chargement de la carte…</div>
                 </div>
             </div>
@@ -388,12 +397,14 @@ body.cx-light .cx-panel-toggle{background:rgba(124,58,237,.08);border-color:rgba
 
             {{-- FAB mobile --}}
             <button class="map-fab" id="mapFab" onclick="togglePanel()">
-                🚴 <span id="fabLabel">Chauffeurs</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>
+                <span id="fabLabel">Chauffeurs</span>
                 <span class="map-fab-count" id="fabCount">0</span>
             </button>
 
-            <div class="map-no-signal" id="mapNoSignal">
-                📡 Aucun chauffeur avec GPS actif pour le moment
+            <div class="map-no-signal" id="mapNoSignal" style="display:flex;align-items:center;gap:7px">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                Aucun chauffeur avec GPS actif pour le moment
             </div>
         </div>
     </div>
@@ -484,7 +495,7 @@ function driverIcon(color, isMoving) {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
         ${pulse}
         <circle cx="20" cy="20" r="13" fill="${color}" stroke="#fff" stroke-width="2.5"/>
-        <text x="20" y="25" font-size="13" text-anchor="middle" fill="#fff" font-weight="900" font-family="Segoe UI,sans-serif">🚴</text>
+        <g transform="translate(12,12) scale(0.65)" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></g>
     </svg>`;
     return L.divIcon({ html:svg, iconSize:[40,40], iconAnchor:[20,20], popupAnchor:[0,-20], className:'' });
 }
@@ -533,7 +544,7 @@ function renderPanel(drivers) {
     if (fabL) fabL.textContent = n ? n + ' chauffeur' + (n>1?'s':'') : 'Aucun actif';
 
     if (!n) {
-        list.innerHTML = `<div class="mp-empty"><div class="mp-empty-ico">🚚</div><div class="mp-empty-title">Aucune livraison en cours</div><div style="font-size:12px;color:var(--cx-muted);margin-top:4px">Les livraisons assignées apparaîtront ici dès qu'elles démarrent.</div></div>`;
+        list.innerHTML = `<div class="mp-empty"><div class="mp-empty-ico"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity:.35"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div class="mp-empty-title">Aucune livraison en cours</div><div style="font-size:12px;color:var(--cx-muted);margin-top:4px">Les livraisons assignées apparaîtront ici dès qu'elles démarrent.</div></div>`;
         if (sub) sub.textContent = 'Aucune livraison active';
         return;
     }
@@ -548,9 +559,10 @@ function renderPanel(drivers) {
         const hasGps  = o.lat && o.lng;
         const pingAge = hasGps ? Date.now()/1000 - new Date(o.ping).getTime()/1000 : null;
         const pingCls = pingAge !== null && pingAge < 30 ? 'mp-ping-ok' : 'mp-ping-stale';
+        const sigSvg = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="flex-shrink:0"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>`;
         const gpsLine = hasGps
-            ? `<div class="mp-ping"><span class="${pingCls}">📡 ${o.ping_ago}</span></div>`
-            : `<div class="mp-no-gps">📡 GPS non encore reçu</div>`;
+            ? `<div class="mp-ping" style="display:flex;align-items:center;gap:4px"><span class="${pingCls}" style="display:flex;align-items:center;gap:3px">${sigSvg} ${o.ping_ago}</span></div>`
+            : `<div class="mp-no-gps" style="display:flex;align-items:center;gap:4px">${sigSvg} GPS non encore reçu</div>`;
         const sel = selectedId === o.driver_id ? ' selected' : '';
         const orderLabel = o.order_count > 1
             ? `<span class="mp-id">${o.order_count} cdes</span>`
@@ -562,8 +574,8 @@ function renderPanel(drivers) {
                 <span class="mp-shop">${esc(o.shop)}</span>
                 ${badge}
             </div>
-            <div class="mp-driver">🚴 ${esc(o.driver)}${o.driver_phone ? ' · '+esc(o.driver_phone) : ''}</div>
-            ${o.destination ? `<div class="mp-dest">📍 ${esc(o.destination)}</div>` : ''}
+            <div class="mp-driver" style="display:flex;align-items:center;gap:5px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" style="flex-shrink:0"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg> ${esc(o.driver)}${o.driver_phone ? ' · '+esc(o.driver_phone) : ''}</div>
+            ${o.destination ? `<div class="mp-dest" style="display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" style="flex-shrink:0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${esc(o.destination)}</div>` : ''}
             ${gpsLine}
         </div>`;
     }).join('');
@@ -620,7 +632,7 @@ function updateMap(drivers) {
                 if (clientMarkers[ord.id]) clientMarkers[ord.id].setLatLng(pos);
                 else clientMarkers[ord.id] = L.marker(pos, { icon: clientIcon() })
                     .addTo(map)
-                    .bindPopup(`<div style="font-family:system-ui;padding:2px 4px"><b style="font-size:12px">📍 ${esc(ord.client)}</b><br><span style="font-size:10.5px;color:#94a3b8">Position partagée</span></div>`);
+                    .bindPopup(`<div style="font-family:system-ui;padding:2px 4px"><b style="font-size:12px;display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${esc(ord.client)}</b><br><span style="font-size:10.5px;color:#94a3b8">Position partagée</span></div>`);
             }
         });
     });
@@ -653,7 +665,7 @@ function buildPopup(o) {
         ordersHtml = `<div class="lp-row"><span>Commande&nbsp;</span><strong>#${ord.id} · ${esc(ord.shop)}</strong></div>
             <div class="lp-row"><span>Client&nbsp;</span><strong>${esc(ord.client)}</strong></div>`;
     }
-    return `<div class="lp-title" style="color:${color}">🚴 ${esc(o.driver)}</div>
+    return `<div class="lp-title" style="color:${color};display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg> ${esc(o.driver)}</div>
         ${ordersHtml}
         ${o.destination ? `<div class="lp-row"><span>Destination&nbsp;</span><strong>${esc(o.destination)}</strong></div>` : ''}
         <div class="lp-row"><span>GPS&nbsp;</span><strong>${esc(o.ping_ago)}</strong></div>`;
@@ -688,7 +700,9 @@ function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&
 poll();
 setInterval(poll, 4000);
 
-// Recalcul taille carte si fenêtre redimensionnée
+// Recalcul taille carte si fenêtre redimensionnée ou rotation
 window.addEventListener('resize', () => map.invalidateSize());
+window.addEventListener('orientationchange', () => { setTimeout(() => map.invalidateSize(), 200); });
+screen.orientation?.addEventListener('change', () => { setTimeout(() => map.invalidateSize(), 200); });
 </script>
 @endpush

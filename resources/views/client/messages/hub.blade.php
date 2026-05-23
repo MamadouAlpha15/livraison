@@ -660,6 +660,20 @@ a, button, [onclick], .hub-conv-item {
 const CSRF     = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 const INITIALS = '{{ $initials }}';
 
+/* Signale au dashboard client que ces messages ont été lus (sync cross-device) */
+let _syncMsgTimer = null;
+function _markMsgSeen(id) {
+    if (!id || id <= 0) return;
+    clearTimeout(_syncMsgTimer);
+    _syncMsgTimer = setTimeout(() => {
+        fetch('/user/notif-state', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
+            body: JSON.stringify({ msg_id: id }),
+        }).catch(() => {});
+    }, 800);
+}
+
 let _productId    = null;
 let _convEl       = null;
 let _lastMsgId    = 0;
@@ -821,6 +835,7 @@ async function loadConv() {
         });
 
         _lastMsgId = Math.max(...msgs.map(m => m.id || 0));
+        _markMsgSeen(_lastMsgId);
         thread.scrollTop = thread.scrollHeight;
     } catch(e) {}
 }
@@ -860,6 +875,7 @@ async function pollConv() {
                 if (t) t.textContent = 'À l\'instant';
             }
         }
+        if (newMsgs.length) _markMsgSeen(_lastMsgId);
     } catch(e) {}
 }
 
@@ -888,7 +904,7 @@ async function sendHubMsg() {
         const data = await res.json();
         if (data.sent) {
             input.value = ''; input.style.height = 'auto';
-            if (data.message_id) _lastMsgId = Math.max(_lastMsgId, data.message_id);
+            if (data.message_id) { _lastMsgId = Math.max(_lastMsgId, data.message_id); _markMsgSeen(_lastMsgId); }
 
             const thread = document.getElementById('hubThread');
             thread.querySelector('.hub-thread-empty')?.remove();
@@ -983,7 +999,7 @@ async function sendImagesMsg() {
             thread.querySelector('.hub-thread-empty')?.remove();
             const now  = new Date();
             const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
-            if (data.message_id) _lastMsgId = Math.max(_lastMsgId, data.message_id);
+            if (data.message_id) { _lastMsgId = Math.max(_lastMsgId, data.message_id); _markMsgSeen(_lastMsgId); }
 
             if (data.image_status === 'processing') {
                 const row = buildProcessingRow(data.message_id, data.count, time);

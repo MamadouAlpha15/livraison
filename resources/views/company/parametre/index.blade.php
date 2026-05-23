@@ -78,7 +78,10 @@ body.cx-dashboard > main.app-main { padding:0 !important; margin:0 !important; m
 .cx-nav-item:hover { background:rgba(124,58,237,.18); color:#fff; border-color:rgba(124,58,237,.25); }
 .cx-nav-item.active { background:linear-gradient(90deg,rgba(124,58,237,.35),rgba(99,102,241,.2)); color:#fff; font-weight:700; border-color:rgba(139,92,246,.3); }
 .cx-nav-item.active::before { content:''; position:absolute; left:0; top:50%; transform:translateY(-50%); width:3px; height:22px; background:linear-gradient(180deg,#a78bfa,#7c3aed); border-radius:0 3px 3px 0; }
-.cx-nav-ico { font-size:14px; width:20px; text-align:center; flex-shrink:0; }
+.cx-nav-ico { width:26px; height:26px; border-radius:7px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.07); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .22s; }
+.cx-nav-ico svg { display:block; }
+.cx-nav-item:hover .cx-nav-ico { background:rgba(139,92,246,.25); box-shadow:0 0 8px rgba(139,92,246,.3); }
+.cx-nav-item.active .cx-nav-ico { background:rgba(139,92,246,.3); border-color:rgba(139,92,246,.4); box-shadow:0 0 10px rgba(139,92,246,.4); }
 .cx-user-foot { padding:10px 12px 14px; border-top:1px solid rgba(255,255,255,.07); flex-shrink:0; }
 .cx-user-row { display:flex; align-items:center; gap:9px; margin-bottom:10px; }
 .cx-user-av { width:32px; height:32px; border-radius:9px; background:linear-gradient(135deg,#7c3aed,#4f46e5); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; flex-shrink:0; }
@@ -110,6 +113,7 @@ body.cx-dashboard > main.app-main { padding:0 !important; margin:0 !important; m
     .cx-overlay { display:block; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:1100; opacity:0; pointer-events:none; transition:opacity .25s; }
     .cx-overlay.open { opacity:1; pointer-events:auto; }
     .cx-hamburger, .cx-close-btn { display:flex !important; align-items:center; }
+    input, select, textarea { font-size: 16px !important; }
 }
 @media (min-width:769px) {
     .cx-overlay { display:none !important; }
@@ -321,23 +325,23 @@ body.cx-light .pw-strength { background: #e5e7eb; }
 
     <nav class="cx-nav">
         <div class="cx-nav-sec">Principal</div>
-        <a href="{{ route('company.dashboard') }}" class="cx-nav-item"><span class="cx-nav-ico">⊞</span> Tableau de bord</a>
-        <a href="{{ route('company.chat.inbox') }}" class="cx-nav-item"><span class="cx-nav-ico">💬</span> Demandes (Chat)</a>
-        <a href="{{ route('company.orders.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📦</span> Commandes</a>
-        <a href="{{ route('company.drivers.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🚴</span> Chauffeurs</a>
-        <a href="{{ route('company.livraisons.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🚚</span> Livraisons</a>
-        <a href="{{ route('company.carte.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🗺️</span> Carte en direct</a>
-        <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item"><span class="cx-nav-ico">🏪</span> Boutiques</a>
-        <a href="{{ route('company.clients.index') }}" class="cx-nav-item"><span class="cx-nav-ico">👥</span> Clients</a>
+        <a href="{{ route('company.dashboard') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span> Tableau de bord</a>
+        <a href="{{ route('company.chat.inbox') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span> Demandes (Chat)</a>
+        <a href="{{ route('company.orders.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Commandes</a>
+        <a href="{{ route('company.drivers.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></span> Chauffeurs</a>
+        <a href="{{ route('company.livraisons.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span> Livraisons</a>
+        <a href="{{ route('company.carte.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span> Carte en direct</a>
+        <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span> Boutiques</a>
+        <a href="{{ route('company.clients.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Clients</a>
 
         <div class="cx-nav-sec">Gestion</div>
-        <a href="{{ route('company.zones.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📍</span> Zone de livraison</a>
-        <a href="{{ route('company.historique.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📊</span> Historique</a>
-        <a href="{{ route('company.rapport.index') }}" class="cx-nav-item"><span class="cx-nav-ico">📈</span> Rapport</a>
+        <a href="{{ route('company.zones.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span> Zone de livraison</a>
+        <a href="{{ route('company.historique.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span> Historique</a>
+        <a href="{{ route('company.rapport.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span> Rapport</a>
 
         <div class="cx-nav-sec">Configuration</div>
-        <a href="{{ route('company.parametre.index') }}" class="cx-nav-item active"><span class="cx-nav-ico">⚙️</span> Paramètres</a>
-        <a href="{{ route('company.users.index') }}" class="cx-nav-item"><span class="cx-nav-ico">👤</span> Utilisateurs</a>
+        <a href="{{ route('company.parametre.index') }}" class="cx-nav-item active"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Paramètres</a>
+        <a href="{{ route('company.users.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Utilisateurs</a>
     </nav>
 
     <div class="cx-user-foot">
@@ -349,7 +353,7 @@ body.cx-light .pw-strength { background: #e5e7eb; }
             </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="cx-logout-btn" title="Déconnexion">⏻</button>
+                <button type="submit" class="cx-logout-btn" title="Déconnexion"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
             </form>
         </div>
         <div class="cx-dark-row" id="cxThemeRow">
@@ -367,7 +371,7 @@ body.cx-light .pw-strength { background: #e5e7eb; }
     <div class="cx-topbar">
         <button class="cx-hamburger" id="cxHamburger">☰</button>
         <div>
-            <span class="cx-topbar-title">⚙️ Paramètres</span>
+            <span class="cx-topbar-title">Paramètres</span>
             <span class="cx-topbar-sub">· {{ $company->name }}</span>
         </div>
         <div class="cx-tb-right">
@@ -380,7 +384,7 @@ body.cx-light .pw-strength { background: #e5e7eb; }
 
         {{-- Banner --}}
         <div class="pm-banner">
-            <div class="pm-banner-ico">⚙️</div>
+            <div class="pm-banner-ico"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
             <div>
                 <div class="pm-banner-title">Paramètres de l'entreprise</div>
                 <div class="pm-banner-sub">Modifiez les informations, le pays et la sécurité de votre compte.</div>
@@ -390,7 +394,7 @@ body.cx-light .pw-strength { background: #e5e7eb; }
         {{-- ══ SECTION 1 : Informations ══ --}}
         <div class="pm-section">
             <div class="pm-section-head">
-                <div class="sh-icon" style="background:rgba(124,58,237,.15)">🏢</div>
+                <div class="sh-icon" style="background:rgba(124,58,237,.15)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg></div>
                 <div>
                     <h3>Informations de l'entreprise</h3>
                     <p>Nom, description, contacts et logo</p>
@@ -398,7 +402,7 @@ body.cx-light .pw-strength { background: #e5e7eb; }
             </div>
             <div class="pm-section-body">
                 @if(session('success_info'))
-                    <div class="pm-alert success">✅ {{ session('success_info') }}</div>
+                    <div class="pm-alert success"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> {{ session('success_info') }}</div>
                 @endif
 
                 <form action="{{ route('company.parametre.updateInfo') }}" method="POST" enctype="multipart/form-data">
@@ -471,7 +475,7 @@ body.cx-light .pw-strength { background: #e5e7eb; }
         {{-- ══ SECTION 2 : Pays & Devise ══ --}}
         <div class="pm-section">
             <div class="pm-section-head">
-                <div class="sh-icon" style="background:rgba(16,185,129,.12)">🌍</div>
+                <div class="sh-icon" style="background:rgba(16,185,129,.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
                 <div>
                     <h3>Pays & Devise</h3>
                     <p>La devise est automatiquement déduite du pays. Votre entreprise sera visible par les boutiques du même pays.</p>
@@ -479,7 +483,7 @@ body.cx-light .pw-strength { background: #e5e7eb; }
             </div>
             <div class="pm-section-body">
                 @if(session('success_country'))
-                    <div class="pm-alert success">✅ {{ session('success_country') }}</div>
+                    <div class="pm-alert success"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> {{ session('success_country') }}</div>
                 @endif
 
                 <form action="{{ route('company.parametre.updateCountry') }}" method="POST">
@@ -518,14 +522,14 @@ body.cx-light .pw-strength { background: #e5e7eb; }
                         <div style="flex-shrink:0;padding-bottom:.1rem">
                             <div style="font-size:.75rem;font-weight:600;color:var(--cx-text2);text-transform:uppercase;letter-spacing:.02em;margin-bottom:.45rem;">Devise automatique</div>
                             <div class="currency-badge" id="currencyBadge">
-                                <span class="cb-icon">💰</span>
+                                <span class="cb-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
                                 <span id="currencyText">{{ $company->currency ?? 'GNF' }}</span>
                             </div>
                         </div>
                     </div>
 
                     <div style="margin-top:.75rem;font-size:.78rem;color:var(--cx-text2);background:rgba(255,255,255,.04);border-radius:8px;padding:.65rem .85rem;border:1px solid rgba(255,255,255,.07)">
-                        ℹ️ En changeant de pays, votre entreprise disparaît des recherches de l'ancien pays et apparaît dans les recherches du nouveau pays. La devise est mise à jour immédiatement.
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> En changeant de pays, votre entreprise disparaît des recherches de l'ancien pays et apparaît dans les recherches du nouveau pays. La devise est mise à jour immédiatement.
                     </div>
 
                     <div class="pm-btn-actions" style="margin-top:1rem">
@@ -538,7 +542,7 @@ body.cx-light .pw-strength { background: #e5e7eb; }
         {{-- ══ SECTION 3 : Mot de passe ══ --}}
         <div class="pm-section">
             <div class="pm-section-head">
-                <div class="sh-icon" style="background:rgba(239,68,68,.1)">🔒</div>
+                <div class="sh-icon" style="background:rgba(239,68,68,.1)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
                 <div>
                     <h3>Sécurité — Mot de passe</h3>
                     <p>Modifiez le mot de passe de votre compte propriétaire</p>
@@ -546,10 +550,10 @@ body.cx-light .pw-strength { background: #e5e7eb; }
             </div>
             <div class="pm-section-body">
                 @if(session('success_password'))
-                    <div class="pm-alert success">✅ {{ session('success_password') }}</div>
+                    <div class="pm-alert success"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> {{ session('success_password') }}</div>
                 @endif
                 @if($errors->has('current_password'))
-                    <div class="pm-alert error">❌ {{ $errors->first('current_password') }}</div>
+                    <div class="pm-alert error"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> {{ $errors->first('current_password') }}</div>
                 @endif
 
                 <form action="{{ route('company.parametre.updatePassword') }}" method="POST">

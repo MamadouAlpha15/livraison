@@ -955,6 +955,7 @@ body {
     .nav-brand-name { font-size: 14px; }
     .mockup-url     { display: none; }
 }
+footer.app-footer { display: none !important; }
 </style>
 @endpush
 
@@ -1323,10 +1324,10 @@ body {
         </div>
     </div>
 </section>
-
+ <!-- 
  {{-- ══════════════════════════════════════════
-     TARIFS
-══════════════════════════════════════════ --}}
+   TARIFS
+══════════════════════════════════════════ --}} 
  <section class="section pricing-section" id="pricing">
     <div class="section-inner">
         <div style="text-align:center;margin-bottom:48px">
@@ -1388,6 +1389,7 @@ body {
         </div>
     </div>
 </section>
+ !-->
 
 
 {{-- ══════════════════════════════════════════

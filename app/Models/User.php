@@ -24,6 +24,7 @@ class User extends Authenticatable
         'is_available',          // pour les livreurs
         'must_change_password',  // forcé à changer son mot de passe à la 1ère connexion
         'company_id',            // FK vers delivery_companies (membres d'une entreprise)
+        'notif_state',           // JSON — derniers IDs vus (sync cross-device)
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -34,6 +35,7 @@ class User extends Authenticatable
             'email_verified_at'    => 'datetime',
             'password'             => 'hashed',
             'must_change_password' => 'boolean',
+            'notif_state'          => 'array',
         ];
     }
 

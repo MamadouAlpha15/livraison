@@ -1467,8 +1467,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     body.is-dashboard .sec-hd { margin-bottom: 10px !important; gap: 8px !important; }
     body.is-dashboard .sec-link { font-size: 11.5px !important; flex-shrink: 0 !important; white-space: nowrap !important; }
 
-    /* ── Notifications ── */
-    body.is-dashboard .cn-dropdown { position: fixed !important; top: calc(var(--nav-h) + 6px) !important; left: 8px !important; right: 8px !important; width: auto !important; transform: none !important; }
+    /* ── Notifications — bottom-sheet géré par la règle @media ci-dessous ── */
 
     /* ── Drawers ── */
     body.is-dashboard .msg-drawer { width: 100vw !important; }
@@ -1710,15 +1709,28 @@ html, body { overscroll-behavior-y: none; }
     font-family: monospace; border: 1.5px solid var(--surface); display: none;
 }
 .cn-bell-badge.show { display: block; }
+
+/* Backdrop (mobile) */
+.cn-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.38); backdrop-filter: blur(2px);
+    z-index: 598;
+}
+.cn-backdrop.active { display: block; }
+
+/* Panel */
 .cn-dropdown {
-    display: none; position: absolute; top: calc(100% + 10px); right: 0;
+    position: absolute; top: calc(100% + 10px); right: 0;
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--r); box-shadow: var(--shadow-lg);
-    width: 310px; z-index: 600; overflow: hidden; animation: dropIn .18s ease;
+    width: 310px; z-index: 600; overflow: hidden;
+    visibility: hidden; opacity: 0; transform: translateY(-8px) scale(.97); pointer-events: none;
+    transition: opacity .22s cubic-bezier(.23,1,.32,1), transform .22s cubic-bezier(.23,1,.32,1), visibility 0s .22s;
 }
-.cn-dropdown.open { display: block; }
+.cn-dropdown.open { visibility: visible; opacity: 1; transform: translateY(0) scale(1); pointer-events: all; transition: opacity .22s cubic-bezier(.23,1,.32,1), transform .22s cubic-bezier(.23,1,.32,1), visibility 0s 0s; }
+
 .cn-drop-hd {
-    padding: 11px 14px; border-bottom: 1px solid var(--border);
+    padding: 12px 14px 11px; border-bottom: 1px solid var(--border);
     display: flex; align-items: center; justify-content: space-between;
     background: var(--grey);
 }
@@ -1727,27 +1739,58 @@ html, body { overscroll-behavior-y: none; }
 .cn-drop-list { max-height: 340px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
 .cn-drop-list::-webkit-scrollbar { width: 4px; }
 .cn-drop-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
 .cn-notif-item {
-    display: flex; align-items: center; gap: 10px;
+    display: flex; align-items: flex-start; gap: 10px;
     padding: 11px 14px; border-bottom: 1px solid #f3f6f9;
-    cursor: pointer; transition: background .12s;
+    cursor: pointer; transition: background .12s; text-decoration: none; color: inherit;
 }
 .cn-notif-item:hover { background: var(--grey); }
 .cn-notif-item:last-child { border-bottom: none; }
-.cn-notif-ico { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-.cn-notif-ico.msg   { background: #dbeafe; color: #1d4ed8; }
-.cn-notif-ico.c-ok  { background: #d1fae5; color: #065f46; }
-.cn-notif-ico.c-del { background: #fef3c7; color: #92400e; }
-.cn-notif-ico.c-done{ background: #ede9fe; color: #5b21b6; }
+.cn-notif-section { padding: 6px 14px 3px; font-size: 9.5px; font-weight: 800; letter-spacing: 1.2px; color: #94a3b8; text-transform: uppercase; display: flex; align-items: center; gap: 5px; }
+.cn-notif-ico { width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; }
+.cn-notif-ico.msg   { background: linear-gradient(135deg, #818cf8, #6366f1); }
+.cn-notif-ico.c-ok  { background: linear-gradient(135deg, #22c55e, #16a34a); }
+.cn-notif-ico.c-del { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.cn-notif-ico.c-done{ background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
 .cn-notif-body { flex: 1; min-width: 0; }
-.cn-notif-txt { font-size: 12.5px; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cn-notif-sub { font-size: 10.5px; color: var(--muted); margin-top: 2px; display: flex; align-items: center; gap: 4px; }
-.cn-notif-dismiss { width: 22px; height: 22px; border-radius: 50%; border: none; background: none; cursor: pointer; color: var(--muted); font-size: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all .12s; }
+.cn-notif-name { font-size: 12px; font-weight: 700; color: var(--text); }
+.cn-notif-txt { font-size: 11.5px; color: #64748b; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-top: 2px; }
+.cn-notif-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+.cn-notif-time { font-size: 10px; color: #94a3b8; }
+.cn-notif-badge { font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 20px; }
+.cn-notif-badge.badge-msg  { background: #ede9fe; color: #5b21b6; }
+.cn-notif-badge.badge-ok   { background: #d1fae5; color: #065f46; }
+.cn-notif-badge.badge-del  { background: #fef3c7; color: #92400e; }
+.cn-notif-badge.badge-done { background: #ede9fe; color: #5b21b6; }
+.cn-notif-dismiss { width: 22px; height: 22px; border-radius: 6px; border: none; background: none; cursor: pointer; color: var(--muted); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all .12s; align-self: flex-start; margin-top: 1px; }
 .cn-notif-dismiss:hover { background: #fee2e2; color: #e53e3e; }
-.cn-drop-empty { padding: 24px; text-align: center; color: var(--muted); font-size: 12.5px; }
+.cn-drop-empty { padding: 28px 16px; text-align: center; color: var(--muted); font-size: 12.5px; }
 .cn-drop-ft { padding: 8px 14px; border-top: 1px solid var(--border); }
 .cn-drop-ft a { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: var(--r-sm); font-size: 11.5px; font-weight: 700; text-decoration: none; background: var(--orange-lt); color: var(--orange); border: 1px solid var(--orange); transition: all .15s; }
 .cn-drop-ft a:hover { background: var(--orange); color: #fff; }
+
+/* Bottom-sheet sur mobile */
+@media(max-width: 640px) {
+    .cn-bell-wrap { position: static !important; }
+    .cn-dropdown {
+        position: fixed !important; top: auto !important; bottom: 0 !important;
+        left: 0 !important; right: 0 !important;
+        width: 100% !important; border-radius: 18px 18px 0 0;
+        max-height: 78vh; overflow-y: auto;
+        visibility: hidden; transform: translateY(102%); opacity: 1;
+        transition: transform .3s cubic-bezier(.23,1,.32,1), visibility 0s .3s;
+        z-index: 9000;
+    }
+    .cn-dropdown.open { visibility: visible; transform: translateY(0); transition: transform .3s cubic-bezier(.23,1,.32,1), visibility 0s 0s; }
+    .cn-dropdown::before {
+        content: ''; display: block; width: 36px; height: 4px;
+        background: rgba(0,0,0,.1); border-radius: 2px;
+        margin: 10px auto 0;
+    }
+    .cn-drop-list { max-height: none; overflow-y: visible; }
+    .cn-backdrop { z-index: 8999; }
+}
 </style>
 @endpush
 
@@ -2079,6 +2122,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 
     <div class="nav-actions">
         {{-- ══ CLOCHE NOTIFICATIONS ══ --}}
+        <div class="cn-backdrop" id="cnBackdrop"></div>
         <div class="cn-bell-wrap" id="cnBellWrap">
             <button class="cn-bell-btn" id="cnBellBtn" onclick="cnToggle()" title="Notifications">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -4172,9 +4216,11 @@ function filterByCat(type) {
         } catch(e) {}
     }
 
-    /* ── Démarrage ── */
-    pollClientNotifs();
-    setInterval(pollClientNotifs, 8000);
+    /* ── Démarrage : attendre la sync serveur avant le 1er poll ── */
+    _serverSyncReady.then(() => {
+        pollClientNotifs();
+        setInterval(pollClientNotifs, 8000);
+    });
 
     /* ── CSS animations ── */
     const s = document.createElement('style');
@@ -4207,6 +4253,47 @@ function filterByCat(type) {
     let _lastOrd = {};
     try { _lastOrd = JSON.parse(localStorage.getItem(_KEY_ORD) || '{}'); } catch(e) {}
 
+    /* ── Sync cross-device : charger l'état depuis le serveur au démarrage ── */
+    const _serverSyncReady = fetch('/user/notif-state', { headers: { 'Accept': 'application/json' } })
+        .then(r => r.json())
+        .then(state => {
+            if (state.msg_id > _lastMsg) {
+                _lastMsg = state.msg_id;
+                try { localStorage.setItem(_KEY_MSG, _lastMsg); } catch(e) {}
+            }
+            if (state.ord) {
+                for (const [oid, st] of Object.entries(state.ord)) {
+                    if (!_lastOrd[oid]) { _lastOrd[oid] = st; }
+                }
+                try { localStorage.setItem(_KEY_ORD, JSON.stringify(_lastOrd)); } catch(e) {}
+            }
+            /* Purger les alertes 'msg' déjà lues (id ≤ _lastMsg) */
+            const before = _alerts.length;
+            _alerts = _alerts.filter(a => a.type !== 'msg');
+            if (_alerts.length !== before) {
+                try { localStorage.setItem(_KEY, JSON.stringify(_alerts)); } catch(e) {}
+                const totalEl = document.getElementById('notifCount');
+                if (totalEl) totalEl.textContent = _alerts.length || '';
+                if (!_alerts.length) {
+                    document.getElementById('notifBadge')?.classList.remove('show');
+                }
+            }
+        })
+        .catch(() => {});
+
+    /* ── Pousser l'état vers le serveur (debouncé 1.5s) ── */
+    let _syncTimer = null;
+    function _pushNotifState() {
+        clearTimeout(_syncTimer);
+        _syncTimer = setTimeout(() => {
+            fetch('/user/notif-state', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
+                body: JSON.stringify({ msg_id: _lastMsg, ord: _lastOrd }),
+            }).catch(() => {});
+        }, 1500);
+    }
+
     /* Restaurer alertes depuis localStorage + dédupliquer messages par sender */
     try {
         const raw = JSON.parse(localStorage.getItem(_KEY) || '[]');
@@ -4229,15 +4316,24 @@ function filterByCat(type) {
         if (_audioCtx) return;
         try {
             _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (_audioCtx.state !== 'running') _audioCtx.resume();
+            const buf = _audioCtx.createBuffer(1, 1, 22050);
+            const src = _audioCtx.createBufferSource();
+            src.buffer = buf; src.connect(_audioCtx.destination); src.start(0);
         } catch(e) {}
     }
     document.addEventListener('touchstart', _initAudio, { once: true, passive: true });
     document.addEventListener('click',      _initAudio, { once: true });
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && _audioCtx && _audioCtx.state !== 'running') {
+            _audioCtx.resume().catch(() => {});
+        }
+    });
 
     async function playBeep() {
         try {
             if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (_audioCtx.state === 'suspended') await _audioCtx.resume();
+            if (_audioCtx.state !== 'running') await _audioCtx.resume();
 
             const t = _audioCtx.currentTime;
 
@@ -4282,46 +4378,107 @@ function filterByCat(type) {
         if (total) total.textContent = n;
     }
 
+    /* ── Icônes SVG pour le panel ── */
+    const _ICO = {
+        msg:        `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`,
+        order_ok:   `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+        order_del:  `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>`,
+        order_done: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`,
+    };
+    const _DISMISS_SVG = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+
     /* ── Rendre le dropdown ── */
     function render() {
-        const list = document.getElementById('cnList');
+        const list  = document.getElementById('cnList');
+        const total = document.getElementById('cnTotal');
         if (!list) return;
         if (!_alerts.length) {
-            list.innerHTML = '<div class="cn-drop-empty">🔕 Aucune notification</div>';
+            list.innerHTML = `<div class="cn-drop-empty">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 8px;display:block;color:#d1d5db"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                Aucune notification
+            </div>`;
+            if (total) total.style.display = 'none';
             return;
         }
-        list.innerHTML = _alerts.slice(0, 25).map(a => {
-            let icoClass = 'msg', ico = '💬';
-            if (a.type === 'order_ok')   { icoClass = 'c-ok';   ico = '✅'; }
-            if (a.type === 'order_del')  { icoClass = 'c-del';  ico = '🚴'; }
-            if (a.type === 'order_done') { icoClass = 'c-done'; ico = '🎉'; }
-            return `
-            <div class="cn-notif-item" onclick="cnGoTo('${a.url || '#'}',${a.id})">
-                <div class="cn-notif-ico ${icoClass}">${ico}</div>
+        const shown = _alerts.slice(0, 25);
+        if (total) { total.textContent = shown.length > 99 ? '99+' : shown.length; total.style.display = ''; }
+
+        const orders   = shown.filter(a => a.type !== 'msg');
+        const messages = shown.filter(a => a.type === 'msg');
+
+        function renderItem(a) {
+            const isOk   = a.type === 'order_ok';
+            const isDel  = a.type === 'order_del';
+            const isDone = a.type === 'order_done';
+            const isMsg  = a.type === 'msg';
+
+            const avBg = isOk   ? 'linear-gradient(135deg,#22c55e,#16a34a)'
+                       : isDel  ? 'linear-gradient(135deg,#f59e0b,#d97706)'
+                       : isDone ? 'linear-gradient(135deg,#8b5cf6,#7c3aed)'
+                                : 'linear-gradient(135deg,#818cf8,#6366f1)';
+            const avIco = isMsg
+                ? _ICO.msg
+                : isOk   ? _ICO.order_ok
+                : isDel  ? _ICO.order_del
+                         : _ICO.order_done;
+
+            const badgeClass = isOk ? 'badge-ok' : isDel ? 'badge-del' : isDone ? 'badge-done' : 'badge-msg';
+            const badgeLabel = isOk ? 'Confirmée' : isDel ? 'En livraison' : isDone ? 'Livrée' : 'Message';
+
+            const subClean = (a.sub || '').replace(/📦|💬|🏪/g, '').trim();
+            const closeBtn = !isOk && !isDel && !isDone
+                ? `<button class="cn-notif-dismiss" onclick="event.stopPropagation();event.preventDefault();cnDismiss(${a.id})" title="Supprimer">${_DISMISS_SVG}</button>`
+                : '';
+
+            return `<a class="cn-notif-item" href="${a.url || '#'}" onclick="cnGoTo('${a.url || '#'}',${a.id},event)">
+                <div class="cn-notif-ico" style="background:${avBg}">${avIco}</div>
                 <div class="cn-notif-body">
-                    <div class="cn-notif-txt">${a.txt}</div>
-                    <div class="cn-notif-sub">${a.sub || ''} <span style="margin-left:auto">${a.time || ''}</span></div>
+                    <div class="cn-notif-name">${a.txt}</div>
+                    <div class="cn-notif-txt">${subClean}</div>
+                    <div class="cn-notif-meta">
+                        <span class="cn-notif-time">${a.time || ''}</span>
+                        <span class="cn-notif-badge ${badgeClass}">${badgeLabel}</span>
+                    </div>
                 </div>
-                <button class="cn-notif-dismiss" onclick="event.stopPropagation();cnDismiss(${a.id})" title="Supprimer">×</button>
-            </div>`;
-        }).join('');
+                ${closeBtn}
+            </a>`;
+        }
+
+        let html = '';
+        if (orders.length) {
+            html += `<div class="cn-notif-section"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> Commandes</div>`;
+            html += orders.map(renderItem).join('');
+        }
+        if (messages.length) {
+            html += `<div class="cn-notif-section"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Messages</div>`;
+            html += messages.map(renderItem).join('');
+        }
+        list.innerHTML = html;
     }
 
     /* ── Ouvrir/fermer ── */
-    window.cnToggle = function() {
-        _open = !_open;
-        document.getElementById('cnDropdown')?.classList.toggle('open', _open);
-        if (_open) render();
-    };
+    function _cnOpen() {
+        _open = true;
+        document.getElementById('cnDropdown')?.classList.add('open');
+        document.getElementById('cnBackdrop')?.classList.add('active');
+        render();
+    }
+    function _cnClose() {
+        _open = false;
+        document.getElementById('cnDropdown')?.classList.remove('open');
+        document.getElementById('cnBackdrop')?.classList.remove('active');
+    }
+    window.cnToggle = function() { _open ? _cnClose() : _cnOpen(); };
+
+    document.getElementById('cnBackdrop')?.addEventListener('click', _cnClose);
     document.addEventListener('click', e => {
-        if (!e.target.closest('#cnBellWrap')) {
-            _open = false;
-            document.getElementById('cnDropdown')?.classList.remove('open');
-        }
+        if (!e.target.closest('#cnBellWrap') && e.target.id !== 'cnBackdrop') _cnClose();
     });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') _cnClose(); });
 
     /* ── Naviguer + dismiss ── */
-    window.cnGoTo = function(url, id) {
+    window.cnGoTo = function(url, id, e) {
+        if (e) e.preventDefault();
         cnDismiss(id);
         if (url && url !== '#') window.location.href = url;
     };
@@ -4384,6 +4541,7 @@ function filterByCat(type) {
                     });
                     _lastMsg = d.latest_messages[0].id;
                     try { localStorage.setItem(_KEY_MSG, _lastMsg); } catch(e) {}
+                    _pushNotifState();
                     if (!_firstPoll) hasNew = true;
                 }
             }
@@ -4404,6 +4562,7 @@ function filterByCat(type) {
                     }
                 });
                 try { localStorage.setItem(_KEY_ORD, JSON.stringify(_lastOrd)); } catch(e) {}
+                _pushNotifState();
             }
 
             /* Badge géré exclusivement par pollClientMessages */
