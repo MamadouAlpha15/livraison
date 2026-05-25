@@ -156,16 +156,16 @@ class DeliveryCompanyController extends Controller
     $inDeliveryYday  = $baseOrders()->where('status', Order::STATUS_EN_LIVRAISON)->whereDate('updated_at', $yesterday)->count();
 
     $delivered      = $baseOrders()->where('status', Order::STATUS_LIVREE)->count();
-    $deliveredToday = $baseOrders()->where('status', Order::STATUS_LIVREE)->whereDate('updated_at', $today)->count();
-    $deliveredYday  = $baseOrders()->where('status', Order::STATUS_LIVREE)->whereDate('updated_at', $yesterday)->count();
+    $deliveredToday = $baseOrders()->where('status', Order::STATUS_LIVREE)->whereDate('delivered_at', $today)->count();
+    $deliveredYday  = $baseOrders()->where('status', Order::STATUS_LIVREE)->whereDate('delivered_at', $yesterday)->count();
 
-    // ── Revenus : delivery_fee des commandes livrées (automatique dès livraison) ──
+    // ── Revenus : delivery_fee des commandes livrées (basé sur delivered_at) ──
     $baseRev = fn() => Order::where('delivery_company_id', $company->id)
                              ->where('status', Order::STATUS_LIVREE);
 
     $revenus      = $baseRev()->sum('delivery_fee');
-    $revenusToday = $baseRev()->whereDate('updated_at', $today)->sum('delivery_fee');
-    $revenusYday  = $baseRev()->whereDate('updated_at', $yesterday)->sum('delivery_fee');
+    $revenusToday = $baseRev()->whereDate('delivered_at', $today)->sum('delivery_fee');
+    $revenusYday  = $baseRev()->whereDate('delivered_at', $yesterday)->sum('delivery_fee');
 
     // ── Pipeline ──
     $totalOrders = max($baseOrders()->count(), 1);
@@ -187,7 +187,7 @@ class DeliveryCompanyController extends Controller
 
     // ── Graphique revenus : 30 derniers jours ──
     $revenueChart = collect(range(29, 0))->map(
-        fn($d) => (int) $baseRev()->whereDate('updated_at', now()->subDays($d)->toDateString())->sum('delivery_fee')
+        fn($d) => (int) $baseRev()->whereDate('delivered_at', now()->subDays($d)->toDateString())->sum('delivery_fee')
     )->values();
 
     // ── Graphique commandes : 30 derniers jours (sélecteur de période) ──
@@ -197,7 +197,7 @@ class DeliveryCompanyController extends Controller
 
     // ── Graphique revenus : 7 derniers jours (sélecteur de période) ──
     $revenueChart7 = collect(range(6, 0))->map(
-        fn($d) => (int) $baseRev()->whereDate('updated_at', now()->subDays($d)->toDateString())->sum('delivery_fee')
+        fn($d) => (int) $baseRev()->whereDate('delivered_at', now()->subDays($d)->toDateString())->sum('delivery_fee')
     )->values();
 
     // ── Performance réelle ──
@@ -297,11 +297,11 @@ class DeliveryCompanyController extends Controller
         $inDeliveryYday   = $baseOrders()->where('status', Order::STATUS_EN_LIVRAISON)->whereDate('updated_at', $yesterday)->count();
 
         $delivered        = $baseOrders()->where('status', Order::STATUS_LIVREE)->count();
-        $deliveredToday   = $baseOrders()->where('status', Order::STATUS_LIVREE)->whereDate('updated_at', $today)->count();
-        $deliveredYday    = $baseOrders()->where('status', Order::STATUS_LIVREE)->whereDate('updated_at', $yesterday)->count();
+        $deliveredToday   = $baseOrders()->where('status', Order::STATUS_LIVREE)->whereDate('delivered_at', $today)->count();
+        $deliveredYday    = $baseOrders()->where('status', Order::STATUS_LIVREE)->whereDate('delivered_at', $yesterday)->count();
 
         $revenus          = $baseRev()->sum('delivery_fee');
-        $revenusToday     = $baseRev()->whereDate('updated_at', $today)->sum('delivery_fee');
+        $revenusToday     = $baseRev()->whereDate('delivered_at', $today)->sum('delivery_fee');
 
         $totalOrders = max($baseOrders()->count(), 1);
         $pipe = [
@@ -334,8 +334,8 @@ class DeliveryCompanyController extends Controller
 
         $orders7  = collect(range(6, 0))->map(fn($d) => $baseOrders()->whereDate('created_at', now()->subDays($d)->toDateString())->count())->values();
         $orders30 = collect(range(29, 0))->map(fn($d) => $baseOrders()->whereDate('created_at', now()->subDays($d)->toDateString())->count())->values();
-        $revenue7  = collect(range(6, 0))->map(fn($d) => (int) $baseRev()->whereDate('updated_at', now()->subDays($d)->toDateString())->sum('delivery_fee'))->values();
-        $revenue30 = collect(range(29, 0))->map(fn($d) => (int) $baseRev()->whereDate('updated_at', now()->subDays($d)->toDateString())->sum('delivery_fee'))->values();
+        $revenue7  = collect(range(6, 0))->map(fn($d) => (int) $baseRev()->whereDate('delivered_at', now()->subDays($d)->toDateString())->sum('delivery_fee'))->values();
+        $revenue30 = collect(range(29, 0))->map(fn($d) => (int) $baseRev()->whereDate('delivered_at', now()->subDays($d)->toDateString())->sum('delivery_fee'))->values();
 
         return response()->json([
             'pending'        => $pending,

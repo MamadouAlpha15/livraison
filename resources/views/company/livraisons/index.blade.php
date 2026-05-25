@@ -285,6 +285,7 @@ body.cx-light .lv-mc-btn-cancel{background:rgba(239,68,68,.06);color:#b91c1c}
         <div class="cx-nav-sec">Configuration</div>
         <a href="{{ route('company.parametre.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Paramètres</a>
         <a href="{{ route('company.users.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Utilisateurs</a>
+        <a href="{{ route('company.support.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span> Support</a>
             </nav>
     <div class="cx-user-foot">
         <div class="cx-user-row">
@@ -415,7 +416,7 @@ body.cx-light .lv-mc-btn-cancel{background:rgba(239,68,68,.06);color:#b91c1c}
                 </td>
             </tr>
             @empty
-            <tr><td colspan="8">
+            <tr><td colspan="7">
                 <div class="lv-empty">
                     <div class="lv-empty-ico"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity:.35"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
                     <div class="lv-empty-title">Aucune livraison en cours</div>
@@ -497,6 +498,23 @@ body.cx-light .lv-mc-btn-cancel{background:rgba(239,68,68,.06);color:#b91c1c}
                 </div>
             </div>
 
+            {{-- Boutons action --}}
+            <div style="display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--cx-border);">
+                @if($order->status === 'confirmée')
+                <button onclick="lv_updateStatus({{ $order->id }}, 'en_livraison', this)"
+                        style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:10px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:#fbbf24;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>
+                    Commencer
+                </button>
+                @elseif($order->status === 'en_livraison')
+                <button onclick="lv_updateStatus({{ $order->id }}, 'livrée', this)"
+                        style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:10px;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:#34d399;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Marquer livré
+                </button>
+                @endif
+            </div>
+
         </div>
         @empty
         <div class="lv-empty" style="background:var(--cx-surface);border:1px solid var(--cx-border);border-radius:var(--r-sm)">
@@ -569,6 +587,28 @@ function filterRows() {
     });
 }
 
+/* ── Mise à jour statut depuis les cartes livraisons (Commencer / Marquer livré) ── */
+async function lv_updateStatus(orderId, status, btn) {
+    const labels = { 'en_livraison': 'Commencer la livraison ?', 'livrée': 'Confirmer la livraison de cette commande ?' };
+    if (!confirm(labels[status] || 'Continuer ?')) return;
+    if (btn) { btn.disabled = true; btn.style.opacity = '.5'; }
+    try {
+        const res = await fetch(`/company/orders/${orderId}/status`, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': CSRF, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ status })
+        });
+        const d = await res.json();
+        if (d.success) {
+            showToast(status === 'livrée' ? 'Livraison terminée !' : 'Livraison démarrée !', status === 'livrée' ? 'green' : 'yellow');
+            setTimeout(() => location.reload(), 900);
+        } else {
+            showToast(d.message || 'Erreur.', 'red');
+            if (btn) { btn.disabled = false; btn.style.opacity = ''; }
+        }
+    } catch(e) { showToast('Erreur réseau', 'red'); if (btn) { btn.disabled = false; btn.style.opacity = ''; } }
+}
+
 /* ── Mise à jour statut ── */
 async function updateStatus(orderId, status) {
     const label = status === 'livrée' ? 'Marquer cette livraison comme livrée ?' : 'Annuler cette livraison ?';
@@ -612,7 +652,7 @@ async function pollData() {
         // Reconstruire le tbody
         const tbody = document.getElementById('lvBody');
         if (!orders.length) {
-            tbody.innerHTML = `<tr><td colspan="8">
+            tbody.innerHTML = `<tr><td colspan="7">
                 <div class="lv-empty">
                     <div class="lv-empty-ico"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity:.35"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
                     <div class="lv-empty-title">Aucune livraison en cours</div>

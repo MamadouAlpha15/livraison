@@ -29,6 +29,33 @@ class OrderTrackingController extends Controller
         ]);
     }
 
+    public function nav(Order $order)
+    {
+        $user = auth()->user();
+        abort_unless($user, 401);
+
+        // Autorisé : livreur boutique, chauffeur entreprise, admin, vendeur de la boutique
+        $authorized = in_array($user->role, ['superadmin', 'admin'])
+            || ($user->shop_id && $user->shop_id === $order->shop_id)
+            || $order->livreur_id === $user->id;
+
+        if (! $authorized) {
+            $driver = \App\Models\Driver::where('user_id', $user->id)->first();
+            if ($driver && (int) $order->driver_id === $driver->id) {
+                $authorized = true;
+            }
+        }
+        abort_unless($authorized, 403);
+
+        $order->load(['shop', 'client']);
+
+        // Phase active : avant en_livraison = aller chercher chez le vendeur
+        //                en_livraison       = livrer au client
+        $phase = ($order->status === Order::STATUS_EN_LIVRAISON) ? 2 : 1;
+
+        return view('orders.nav', compact('order', 'phase'));
+    }
+
     public function update(Request $request, Order $order)
     {
         $user = $request->user();
@@ -78,5 +105,47 @@ class OrderTrackingController extends Controller
         return response()->json(['ok' => true]);
     }
 
-    
+    public function driverUpdateStatus(Request $request, Order $order)
+    {
+        $user = $request->user();
+        abort_unless($user, 401);
+
+        // Seul le chauffeur assigné peut changer le statut
+        $authorized = $order->livreur_id === $user->id;
+        $driver = null;
+        if (! $authorized) {
+            $driver = \App\Models\Driver::where('user_id', $user->id)->first();
+            if ($driver && (int) $order->driver_id === $driver->id) {
+                $authorized = true;
+            }
+        }
+        abort_unless($authorized, 403, 'Réservé au chauffeur assigné.');
+
+        $data = $request->validate([
+            'status' => ['required', 'in:en_livraison,livrée'],
+        ]);
+
+        abort_unless(
+            ! in_array($order->status, [Order::STATUS_LIVREE, Order::STATUS_ANNULEE]),
+            422,
+            'Commande déjà terminée.'
+        );
+
+        $order->update(['status' => $data['status']]);
+
+        // Libérer le chauffeur si livraison terminée
+        if ($data['status'] === Order::STATUS_LIVREE && $driver) {
+            $otherActive = Order::where('driver_id', $driver->id)
+                ->whereIn('status', [Order::STATUS_CONFIRMEE, Order::STATUS_EN_LIVRAISON])
+                ->where('id', '!=', $order->id)
+                ->exists();
+            if (! $otherActive) {
+                $driver->update(['status' => 'available']);
+            }
+        } elseif ($data['status'] === Order::STATUS_EN_LIVRAISON && $driver) {
+            $driver->update(['status' => 'busy']);
+        }
+
+        return response()->json(['ok' => true, 'status' => $data['status']]);
+    }
 }

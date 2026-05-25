@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
-use App\Models\CourierCommission;
 use App\Models\DeliveryCompany;
 use App\Models\Driver;
 use App\Models\Order;
@@ -39,12 +38,22 @@ class RapportController extends Controller
             ? round($totalLivrees / ($totalLivrees + $totalAnnulees) * 100, 1)
             : null;
 
-        // ── Revenus (commissions)
-        $commBase   = CourierCommission::whereHas('order', fn($q) => $q->where('delivery_company_id', $company->id))
+        // ── Revenus : basé sur delivery_fee des commandes réelles
+        $ordersRevBase  = Order::where('delivery_company_id', $company->id)
             ->where('created_at', '>=', $from);
-        $revenusTotal   = (clone $commBase)->sum('amount');
-        $revenusEncaiss = (clone $commBase)->where('status', CourierCommission::STATUS_PAYEE)->sum('amount');
-        $revenusAttente = (clone $commBase)->where('status', CourierCommission::STATUS_EN_ATTENTE)->sum('amount');
+
+        // Encaissé = frais des commandes livrées (argent réellement reçu)
+        $revenusEncaiss = (clone $ordersRevBase)
+            ->where('status', Order::STATUS_LIVREE)
+            ->sum('delivery_fee');
+
+        // En attente = frais des commandes encore en cours (confirmées ou en livraison)
+        $revenusAttente = (clone $ordersRevBase)
+            ->whereIn('status', [Order::STATUS_CONFIRMEE, Order::STATUS_EN_LIVRAISON])
+            ->sum('delivery_fee');
+
+        // Total = encaissé + en attente
+        $revenusTotal = $revenusEncaiss + $revenusAttente;
 
         // ── Délai moyen
         $avgMins = Order::where('delivery_company_id', $company->id)

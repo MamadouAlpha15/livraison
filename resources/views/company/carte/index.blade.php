@@ -324,6 +324,7 @@ body.cx-light .cx-panel-toggle{background:rgba(124,58,237,.08);border-color:rgba
         <div class="cx-nav-sec">Configuration</div>
         <a href="{{ route('company.parametre.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Paramètres</a>
         <a href="{{ route('company.users.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Utilisateurs</a>
+        <a href="{{ route('company.support.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span> Support</a>
             </nav>
     <div class="cx-user-foot">
         <div class="cx-user-row">
@@ -402,7 +403,7 @@ body.cx-light .cx-panel-toggle{background:rgba(124,58,237,.08);border-color:rgba
                 <span class="map-fab-count" id="fabCount">0</span>
             </button>
 
-            <div class="map-no-signal" id="mapNoSignal" style="display:flex;align-items:center;gap:7px">
+            <div class="map-no-signal" id="mapNoSignal">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
                 Aucun chauffeur avec GPS actif pour le moment
             </div>
@@ -514,7 +515,9 @@ map.zoomControl.setPosition('bottomright');
 const markers      = {};
 const traces       = {};
 const polylines    = {};
+const routeLines   = {};
 const clientMarkers= {};
+const vendorMarkers= {};
 let   colorMap = {};
 let   colorIdx = 0;
 let   selectedId = null;
@@ -523,6 +526,13 @@ function clientIcon() {
     return L.divIcon({
         html: `<div style="width:16px;height:16px;border-radius:50%;background:#3b82f6;border:2px solid #fff;box-shadow:0 0 0 3px rgba(59,130,246,.25),0 2px 6px rgba(59,130,246,.4)"></div>`,
         iconSize:[16,16], iconAnchor:[8,8], className:''
+    });
+}
+
+function vendorIcon() {
+    return L.divIcon({
+        html: `<div style="width:26px;height:26px;border-radius:7px;background:#f59e0b;border:2px solid #fff;box-shadow:0 0 0 3px rgba(245,158,11,.25),0 2px 8px rgba(245,158,11,.5);display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1">🏪</div>`,
+        iconSize:[26,26], iconAnchor:[13,13], popupAnchor:[0,-14], className:''
     });
 }
 
@@ -554,8 +564,8 @@ function renderPanel(drivers) {
         const color   = getDriverColor(o.driver_id);
         const isLiv   = o.status === 'en_livraison';
         const badge   = isLiv
-            ? `<span class="mp-badge mp-badge-liv">En route</span>`
-            : `<span class="mp-badge mp-badge-conf">Assignée</span>`;
+            ? `<span class="mp-badge mp-badge-liv">→ Client</span>`
+            : `<span class="mp-badge mp-badge-conf">→ Boutique</span>`;
         const hasGps  = o.lat && o.lng;
         const pingAge = hasGps ? Date.now()/1000 - new Date(o.ping).getTime()/1000 : null;
         const pingCls = pingAge !== null && pingAge < 30 ? 'mp-ping-ok' : 'mp-ping-stale';
@@ -588,6 +598,7 @@ function updateMap(drivers) {
         if (!activeIds.has(parseInt(id))) {
             map.removeLayer(markers[id]); delete markers[id];
             if (polylines[id]) { map.removeLayer(polylines[id]); delete polylines[id]; }
+            if (routeLines[id]) { map.removeLayer(routeLines[id]); delete routeLines[id]; }
             delete traces[id];
         }
     });
@@ -608,18 +619,45 @@ function updateMap(drivers) {
         if (!last || last[0] !== pos[0] || last[1] !== pos[1]) traces[did].push(pos);
 
         if (traces[did].length > 1) {
-            if (polylines[did]) { polylines[did].setLatLngs(traces[did]); }
-            else { polylines[did] = L.polyline(traces[did], {color, weight:3, opacity:.75, dashArray:isMoving?null:'6,6'}).addTo(map); }
+            if (polylines[did]) {
+                polylines[did].setLatLngs(traces[did]);
+                polylines[did].setStyle({dashArray: isMoving ? null : '6,6'});
+            } else {
+                polylines[did] = L.polyline(traces[did], {color, weight:3, opacity:.75, dashArray:isMoving?null:'6,6'}).addTo(map);
+            }
         }
 
         if (markers[did]) {
             markers[did].setLatLng(pos);
             markers[did].setIcon(driverIcon(color, isMoving));
+            markers[did].bindPopup(() => buildPopup(o)); // rebind à chaque poll pour données fraîches
         } else {
-            markers[did] = L.marker(pos, {icon:driverIcon(color, isMoving)}).addTo(map).bindPopup(()=>buildPopup(o));
+            markers[did] = L.marker(pos, {icon:driverIcon(color, isMoving)}).addTo(map).bindPopup(() => buildPopup(o));
         }
         if (markers[did].isPopupOpen()) markers[did].setPopupContent(buildPopup(o));
         bounds.push(pos);
+
+        /* ── Ligne de route (driver → destination) ── */
+        let destPos = null;
+        if (o.phase === 2) {
+            const ord = (o.orders||[]).find(ord => ord.client_lat && ord.client_lng);
+            if (ord) destPos = [parseFloat(ord.client_lat), parseFloat(ord.client_lng)];
+        } else {
+            const ord = (o.orders||[]).find(ord => ord.vendor_lat && ord.vendor_lng);
+            if (ord) destPos = [parseFloat(ord.vendor_lat), parseFloat(ord.vendor_lng)];
+        }
+        if (destPos) {
+            const pts = [[o.lat, o.lng], destPos];
+            const rColor = o.phase === 2 ? '#10b981' : '#f59e0b';
+            if (routeLines[did]) {
+                routeLines[did].setLatLngs(pts);
+                routeLines[did].setStyle({color: rColor});
+            } else {
+                routeLines[did] = L.polyline(pts, {color:rColor, weight:3, opacity:.85, dashArray:'10 6', lineCap:'round'}).addTo(map);
+            }
+        } else if (routeLines[did]) {
+            map.removeLayer(routeLines[did]); delete routeLines[did];
+        }
     });
 
     /* ── Marqueurs clients (positions partagées) ── */
@@ -640,6 +678,30 @@ function updateMap(drivers) {
         if (!activeOrderIds.has(parseInt(id))) {
             map.removeLayer(clientMarkers[id]);
             delete clientMarkers[id];
+        }
+    });
+
+    /* ── Marqueurs boutiques / vendeurs (Phase 1 uniquement) ── */
+    const activeVendorIds = new Set();
+    drivers.forEach(o => {
+        (o.orders || []).forEach(ord => {
+            if (ord.vendor_lat && ord.vendor_lng && ord.status !== 'en_livraison') {
+                activeVendorIds.add(ord.id);
+                const pos = [parseFloat(ord.vendor_lat), parseFloat(ord.vendor_lng)];
+                if (vendorMarkers[ord.id]) {
+                    vendorMarkers[ord.id].setLatLng(pos);
+                } else {
+                    vendorMarkers[ord.id] = L.marker(pos, { icon: vendorIcon() })
+                        .addTo(map)
+                        .bindPopup(`<div style="font-family:system-ui;padding:2px 4px"><b style="font-size:12px;display:flex;align-items:center;gap:4px">🏪 ${esc(ord.shop)}</b><br><span style="font-size:10.5px;color:#94a3b8">Point de ramassage · commande #${ord.id}</span></div>`);
+                }
+            }
+        });
+    });
+    Object.keys(vendorMarkers).forEach(id => {
+        if (!activeVendorIds.has(parseInt(id))) {
+            map.removeLayer(vendorMarkers[id]);
+            delete vendorMarkers[id];
         }
     });
 
@@ -665,7 +727,11 @@ function buildPopup(o) {
         ordersHtml = `<div class="lp-row"><span>Commande&nbsp;</span><strong>#${ord.id} · ${esc(ord.shop)}</strong></div>
             <div class="lp-row"><span>Client&nbsp;</span><strong>${esc(ord.client)}</strong></div>`;
     }
+    const phaseLabel = o.phase === 2
+        ? '<span style="color:#10b981">🚚 Phase 2 · En livraison → Client</span>'
+        : '<span style="color:#f59e0b">🏪 Phase 1 · Récupération → Boutique</span>';
     return `<div class="lp-title" style="color:${color};display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg> ${esc(o.driver)}</div>
+        <div class="lp-row" style="margin-bottom:3px">${phaseLabel}</div>
         ${ordersHtml}
         ${o.destination ? `<div class="lp-row"><span>Destination&nbsp;</span><strong>${esc(o.destination)}</strong></div>` : ''}
         <div class="lp-row"><span>GPS&nbsp;</span><strong>${esc(o.ping_ago)}</strong></div>`;

@@ -308,6 +308,12 @@ Route::middleware('auth')->group(function () {
         Route::patch('/zones/{zone}/toggle',    [\App\Http\Controllers\Company\ZoneController::class, 'toggle']) ->name('company.zones.toggle');
         Route::delete('/zones/{zone}',          [\App\Http\Controllers\Company\ZoneController::class, 'destroy'])->name('company.zones.destroy');
 
+        /* Support entreprise → SuperAdmin */
+        Route::get('/support',                          [\App\Http\Controllers\Company\SupportController::class, 'index'])     ->name('company.support.index');
+        Route::post('/support/{ticket}/messages',       [\App\Http\Controllers\Company\SupportController::class, 'send'])      ->name('company.support.send');
+        Route::get('/support/{ticket}/messages.json',   [\App\Http\Controllers\Company\SupportController::class, 'poll'])      ->name('company.support.poll');
+        Route::get('/support/has-unread',               [\App\Http\Controllers\Company\SupportController::class, 'hasUnread']) ->name('company.support.hasUnread');
+
         /* Création de l'entreprise */
         Route::get('/delivery-company/create', [DeliveryCompanyController::class, 'create'])->name('delivery.company.create');
         Route::post('/delivery-company',        [DeliveryCompanyController::class, 'store']) ->name('delivery.company.store');
@@ -359,6 +365,14 @@ Route::middleware('auth')->group(function () {
     /* Simuler un déplacement GPS (dev/test uniquement) */
     Route::post('/orders/{order}/simulate-gps', [OrderTrackingTestController::class, 'simulate'])
         ->name('orders.simulate.gps');
+
+    /* Navigation intelligente livreur : Phase 1 → vendeur, Phase 2 → client */
+    Route::get('/orders/{order}/nav', [OrderTrackingController::class, 'nav'])
+        ->name('orders.nav');
+
+    /* Changement de statut par le chauffeur depuis la carte GPS */
+    Route::post('/orders/{order}/driver-status', [OrderTrackingController::class, 'driverUpdateStatus'])
+        ->name('orders.driver.status');
 
 }); // fin middleware('auth')
 
@@ -637,6 +651,7 @@ Route::middleware(['auth', 'role:employe,superadmin,admin,vendeur'])
         Route::put('orders/{order}/cancel',               [EmployeOrderController::class, 'cancel'])        ->name('orders.cancel');
         Route::put('orders/{order}/restore',              [EmployeOrderController::class, 'restore'])       ->name('orders.restore');
         Route::post('orders/{order}/rate-company',        [EmployeOrderController::class, 'rateCompany'])   ->name('orders.rate-company');
+        Route::post('orders/{order}/vendor-location',     [EmployeOrderController::class, 'shareVendorLocation'])->name('orders.vendor-location');
 
         /* Chat boutique ↔ entreprise de livraison */
         Route::post('companies/{company}/chat/send',     [\App\Http\Controllers\DeliveryChatController::class, 'send'])    ->name('delivery.chat.send');
@@ -663,7 +678,8 @@ Route::middleware(['auth', 'role:livreur'])
     ->group(function () {
 
         /* Tableau de bord */
-        Route::get('/dashboard', [LivreurDashboard::class, 'index'])->name('dashboard');
+        Route::get('/dashboard',      [LivreurDashboard::class, 'index'])->name('dashboard');
+        Route::get('/dashboard/data', [LivreurDashboard::class, 'data'])->name('dashboard.data');
 
         /* Commandes */
         Route::get('orders',                        [LivreurOrderController::class, 'index'])        ->name('orders.index');

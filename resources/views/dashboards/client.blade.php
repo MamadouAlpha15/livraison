@@ -4426,9 +4426,7 @@ function filterByCat(type) {
             const badgeLabel = isOk ? 'Confirmée' : isDel ? 'En livraison' : isDone ? 'Livrée' : 'Message';
 
             const subClean = (a.sub || '').replace(/📦|💬|🏪/g, '').trim();
-            const closeBtn = !isOk && !isDel && !isDone
-                ? `<button class="cn-notif-dismiss" onclick="event.stopPropagation();event.preventDefault();cnDismiss(${a.id})" title="Supprimer">${_DISMISS_SVG}</button>`
-                : '';
+            const closeBtn = `<button class="cn-notif-dismiss" onclick="event.stopPropagation();event.preventDefault();cnDismiss(${a.id})" title="Supprimer">${_DISMISS_SVG}</button>`;
 
             return `<a class="cn-notif-item" href="${a.url || '#'}" onclick="cnGoTo('${a.url || '#'}',${a.id},event)">
                 <div class="cn-notif-ico" style="background:${avBg}">${avIco}</div>

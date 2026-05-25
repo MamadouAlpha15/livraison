@@ -958,6 +958,9 @@ body.cx-light .cx-chart-big { color:#111827; }
         <a href="{{ route('company.users.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Utilisateurs
         </a>
+        <a href="{{ route('company.support.index') }}" class="cx-nav-item">
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span> Support
+        </a>
 
     </nav>
 
@@ -1541,8 +1544,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const ord = o.orders[0];
             ordersHtml = `<div style="color:${sub};font-size:11px">Commande #${ord.id} · ${esc(ord.shop)}</div>`;
         }
+        const phaseLabel = o.phase === 2
+            ? `<div style="color:#10b981;font-size:10.5px;font-weight:700;margin-bottom:3px">🚚 Phase 2 · En livraison → Client</div>`
+            : `<div style="color:#f59e0b;font-size:10.5px;font-weight:700;margin-bottom:3px">🏪 Phase 1 · Récupération → Boutique</div>`;
         return `<div style="background:${bg};border:1px solid ${bdr};border-radius:9px;padding:10px 14px;color:${txt};font-size:12px;min-width:185px;box-shadow:0 6px 20px rgba(0,0,0,.18)">
             <div style="font-weight:800;margin-bottom:4px">🚴 ${esc(o.driver)}</div>
+            ${phaseLabel}
             ${ordersHtml}
             ${o.destination ? `<div style="color:${sub};font-size:11px;margin-top:2px">📍 ${esc(o.destination)}</div>` : ''}
             ${o.ping_ago && o.ping_ago !== 'jamais' ? `<div style="color:#10b981;margin-top:5px;font-weight:700;font-size:11.5px">📡 ${esc(o.ping_ago)}</div>` : ''}
@@ -1551,6 +1558,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const dashMarkers       = {};
     const dashClientMarkers = {};
+    const dashVendorMarkers = {};
+    const dashRouteLines    = {};
     let mapInitialized = false;
 
     function clientPinIcon() {
@@ -1560,10 +1569,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function vendorPinIcon() {
+        return L.divIcon({
+            html: `<div style="width:24px;height:24px;border-radius:6px;background:#f59e0b;border:2px solid #fff;box-shadow:0 0 0 3px rgba(245,158,11,.25),0 2px 8px rgba(245,158,11,.5);display:flex;align-items:center;justify-content:center;font-size:12px;line-height:1">🏪</div>`,
+            iconSize:[24,24], iconAnchor:[12,12], popupAnchor:[0,-13], className:''
+        });
+    }
+
     function updateDashMap(drivers) {
         const activeIds = new Set(drivers.map(o => o.driver_id));
         Object.keys(dashMarkers).forEach(id => {
-            if (!activeIds.has(parseInt(id))) { map.removeLayer(dashMarkers[id]); delete dashMarkers[id]; }
+            if (!activeIds.has(parseInt(id))) {
+                map.removeLayer(dashMarkers[id]); delete dashMarkers[id];
+                if (dashRouteLines[id]) { map.removeLayer(dashRouteLines[id]); delete dashRouteLines[id]; }
+            }
         });
 
         const bounds = [];
@@ -1574,13 +1593,35 @@ document.addEventListener('DOMContentLoaded', () => {
             const did   = o.driver_id;
             if (dashMarkers[did]) {
                 dashMarkers[did].setLatLng(pos);
-                if (dashMarkers[did].isPopupOpen()) dashMarkers[did].setPopupContent(buildMapPopup(o));
+                dashMarkers[did].bindPopup(() => buildMapPopup(o)); // rebind à chaque poll
             } else {
                 dashMarkers[did] = L.marker(pos, {icon: makePin(color)})
                     .addTo(map)
                     .bindPopup(() => buildMapPopup(o));
             }
             bounds.push(pos);
+
+            // Ligne de route : Phase 1 → boutique (amber), Phase 2 → client (green)
+            let routeDest = null;
+            if (o.phase === 2) {
+                const ord = (o.orders || []).find(ord => ord.client_lat && ord.client_lng);
+                if (ord) routeDest = [parseFloat(ord.client_lat), parseFloat(ord.client_lng)];
+            } else {
+                const ord = (o.orders || []).find(ord => ord.vendor_lat && ord.vendor_lng);
+                if (ord) routeDest = [parseFloat(ord.vendor_lat), parseFloat(ord.vendor_lng)];
+            }
+            if (routeDest) {
+                const rPts   = [pos, routeDest];
+                const rColor = o.phase === 2 ? '#10b981' : '#f59e0b';
+                if (dashRouteLines[did]) {
+                    dashRouteLines[did].setLatLngs(rPts);
+                    dashRouteLines[did].setStyle({color: rColor});
+                } else {
+                    dashRouteLines[did] = L.polyline(rPts, {color:rColor, weight:3, opacity:.8, dashArray:'10 6', lineCap:'round'}).addTo(map);
+                }
+            } else if (dashRouteLines[did]) {
+                map.removeLayer(dashRouteLines[did]); delete dashRouteLines[did];
+            }
         });
 
         /* ── Marqueurs clients (positions partagées) ── */
@@ -1605,6 +1646,29 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!activeOrderIds.has(parseInt(id))) {
                 map.removeLayer(dashClientMarkers[id]);
                 delete dashClientMarkers[id];
+            }
+        });
+
+        /* ── Marqueurs boutiques (Phase 1 uniquement) ── */
+        const activeVendorOrderIds = new Set();
+        drivers.forEach(o => {
+            (o.orders || []).forEach(ord => {
+                if (ord.vendor_lat && ord.vendor_lng && ord.status !== 'en_livraison') {
+                    activeVendorOrderIds.add(ord.id);
+                    const vpos = [parseFloat(ord.vendor_lat), parseFloat(ord.vendor_lng)];
+                    if (dashVendorMarkers[ord.id]) {
+                        dashVendorMarkers[ord.id].setLatLng(vpos);
+                    } else {
+                        dashVendorMarkers[ord.id] = L.marker(vpos, { icon: vendorPinIcon() })
+                            .addTo(map)
+                            .bindPopup(`<div style="font-family:system-ui;padding:2px 4px"><b style="font-size:12px">🏪 ${esc(ord.shop)}</b><br><span style="font-size:10.5px;color:#94a3b8">Point de ramassage · Cde #${ord.id}</span></div>`);
+                    }
+                }
+            });
+        });
+        Object.keys(dashVendorMarkers).forEach(id => {
+            if (!activeVendorOrderIds.has(parseInt(id))) {
+                map.removeLayer(dashVendorMarkers[id]); delete dashVendorMarkers[id];
             }
         });
 
@@ -1863,6 +1927,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // État partagé pour le rendu du panneau
     let latestOrders   = [];
     let latestConvs    = [];
+    let latestSupport        = null; // { has_unread, msg_id, last_body, last_at }
+    let _lastSoundedSupport  = 0;   // ID du dernier message pour lequel le son a joué
 
     const AV_COLORS = [
         'linear-gradient(135deg,#7c3aed,#5b21b6)',
@@ -1945,6 +2011,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.22);
                 osc.start(ctx.currentTime + delay);
                 osc.stop(ctx.currentTime + delay + 0.25);
+            });
+        } catch(e) {}
+    }
+
+    async function playSupportSound() {
+        try {
+            if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (_audioCtx.state !== 'running') await _audioCtx.resume();
+            const ctx = _audioCtx;
+            // Double ding doux montant : 523 Hz (Do) puis 784 Hz (Sol)
+            [[523, 0], [784, 0.22]].forEach(([freq, delay]) => {
+                const osc = ctx.createOscillator(), gain = ctx.createGain();
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+                gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+                gain.gain.linearRampToValueAtTime(0.13, ctx.currentTime + delay + 0.015);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.32);
+                osc.start(ctx.currentTime + delay);
+                osc.stop(ctx.currentTime + delay + 0.35);
             });
         } catch(e) {}
     }
@@ -2058,6 +2144,26 @@ document.addEventListener('DOMContentLoaded', () => {
             `).join('');
         }
 
+        // Section support — un seul item si le superadmin a répondu
+        if (latestSupport && latestSupport.has_unread && !isSupportDismissed(latestSupport.msg_id)) {
+            const sId = latestSupport.msg_id;
+            html += `<div style="padding:6px 12px 2px;font-size:9.5px;font-weight:800;letter-spacing:1.2px;color:var(--cx-muted);text-transform:uppercase;display:flex;align-items:center;gap:5px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>Support</div>`;
+            html += `
+                <div class="cx-notif-item" style="position:relative;padding-right:32px" onclick="cxDismissSupport(${sId});window.location.href='{{ route('company.support.index') }}'">
+                    <div class="cx-notif-av" style="background:linear-gradient(135deg,#7c3aed,#4f46e5)">SA</div>
+                    <div class="cx-notif-body">
+                        <div class="cx-notif-name">SuperAdmin · Support</div>
+                        <div class="cx-notif-msg">${esc(latestSupport.last_body)}</div>
+                        <div class="cx-notif-meta">
+                            <span class="cx-notif-time">${esc(latestSupport.last_at)}</span>
+                            <span class="cx-notif-unread" style="background:#7c3aed">1</span>
+                        </div>
+                    </div>
+                    <button onclick="event.stopPropagation();cxDismissSupport(${sId})" title="Marquer comme vu" style="position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;color:#9ca3af;padding:2px;line-height:1"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                </div>
+            `;
+        }
+
         if (!html) {
             list.innerHTML = '<div class="cx-notif-empty">Aucune notification pour le moment</div>';
             return;
@@ -2136,6 +2242,40 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => toast.remove(), 320);
     }
 
+    /* ── Support : suivi "vu" via localStorage ── */
+    function isSupportDismissed(msgId) {
+        return parseInt(localStorage.getItem('cx_support_seen_id') || '0') >= msgId;
+    }
+
+    // Exposée globalement pour être appelée depuis les onclick inline du HTML injecté
+    window.cxDismissSupport = function(msgId) {
+        localStorage.setItem('cx_support_seen_id', String(msgId));
+        updateGlobalBadge();
+        renderNotifPanel();
+    };
+
+    /* ── Polling support ── */
+    async function pollSupportNotif() {
+        try {
+            const res = await fetch('{{ route('company.support.hasUnread') }}', {
+                credentials: 'same-origin',
+                headers: { 'Accept': 'application/json' }
+            });
+            if (!res.ok) return;
+            const data = await res.json();
+            latestSupport = data;
+
+            // Son dès qu'il y a un message non vu et non encore sonné
+            if (data.has_unread && data.msg_id !== _lastSoundedSupport && !isSupportDismissed(data.msg_id)) {
+                playSupportSound();
+                _lastSoundedSupport = data.msg_id;
+            }
+
+            updateGlobalBadge();
+            renderNotifPanel();
+        } catch(e) { /* silencieux */ }
+    }
+
     /* compteur global partagé entre les deux pollings */
     let _chatUnreadCount  = 0;
     let _orderPendingCount = 0;
@@ -2178,7 +2318,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const pendingOrders = latestOrders.length;
         // Cloche chat : badge dès qu'il y a des messages non lus
         const unseenChat = latestConvs.filter(c => (c.unread || 0) > 0).length;
-        setBadge('topbarNotifBadge', pendingOrders + unseenChat);
+        // Support : 1 si message superadmin non vu
+        const unseenSupport = (latestSupport?.has_unread && !isSupportDismissed(latestSupport.msg_id)) ? 1 : 0;
+        setBadge('topbarNotifBadge', pendingOrders + unseenChat + unseenSupport);
     }
 
     /* ── Polling chat ── */
@@ -2294,8 +2436,10 @@ document.addEventListener('DOMContentLoaded', () => {
     loadNotifState().then(() => {
         pollOrderNotifs();
         pollChatNotifs();
-        setInterval(pollChatNotifs,  5000);
-        setInterval(pollOrderNotifs, 5000);
+        pollSupportNotif();
+        setInterval(pollChatNotifs,    5000);
+        setInterval(pollOrderNotifs,   5000);
+        setInterval(pollSupportNotif, 10000);
     });
 });
 

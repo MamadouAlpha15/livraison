@@ -749,7 +749,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 .bq-np-close-btn {
     flex-shrink:0; width:24px; height:24px; border:none; background:none;
-    color:#cbd5e1; cursor:pointer; border-radius:6px; align-self:flex-start; margin-top:1px;
+    color:#9ca3af; cursor:pointer; border-radius:6px; align-self:flex-start; margin-top:1px;
     display:flex; align-items:center; justify-content:center;
     transition:background .14s, color .14s;
 }

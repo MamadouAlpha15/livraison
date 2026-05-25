@@ -146,6 +146,7 @@ class OrderController extends Controller
         $orders = Order::with(['shop', 'client', 'driver'])
             ->where('delivery_company_id', $company->id)
             ->whereIn('status', [Order::STATUS_CONFIRMEE, Order::STATUS_EN_LIVRAISON])
+            ->whereNotNull('driver_id')
             ->get();
 
         // One entry per driver — no duplicate markers for drivers with multiple orders
@@ -167,8 +168,11 @@ class OrderController extends Controller
                 'shop'        => optional($o->shop)->name   ?? '—',
                 'client'      => optional($o->client)->name ?? '—',
                 'destination' => $o->delivery_destination   ?? '',
+                'status'      => $o->status,
                 'client_lat'  => $o->client_lat,
                 'client_lng'  => $o->client_lng,
+                'vendor_lat'  => $o->vendor_lat,
+                'vendor_lng'  => $o->vendor_lng,
             ])->values()->all();
 
             $destination = $driverOrders->pluck('delivery_destination')
@@ -183,6 +187,7 @@ class OrderController extends Controller
                 'driver'       => $driver->name  ?? 'Non assigné',
                 'driver_phone' => $driver->phone ?? '',
                 'status'       => $status,
+                'phase'        => $status === Order::STATUS_EN_LIVRAISON ? 2 : 1,
                 'lat'          => $gpsOrder->current_lat,
                 'lng'          => $gpsOrder->current_lng,
                 'ping'         => $gpsOrder->last_ping_at?->toIso8601String(),

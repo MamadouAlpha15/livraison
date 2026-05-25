@@ -154,6 +154,15 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
 .lv-empty { padding:32px; text-align:center; color:var(--muted); font-size:13px; }
 .lv-empty-ico { font-size:36px; display:block; margin-bottom:10px; opacity:.4; }
 
+/* ─── PULSE INDICATOR ─── */
+@keyframes lvpulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%      { opacity:.4; transform:scale(1.4); }
+}
+
+/* ─── CLICKABLE ROWS ─── */
+.lv-order-row { cursor:pointer; }
+
 /* ─── RESPONSIVE ─── */
 @media(max-width:1024px) {
     .lv-kpi-wrap { grid-template-columns:repeat(2,1fr); margin-top:-36px; }
@@ -231,22 +240,22 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
 <div class="lv-kpi-wrap">
     <div class="lv-kpi blue">
         <span class="lv-kpi-ico">📦</span>
-        <div class="lv-kpi-val">{{ $totalAssigned }}</div>
+        <div class="lv-kpi-val" id="kpi-total">{{ $totalAssigned }}</div>
         <div class="lv-kpi-lbl">Total assignées</div>
     </div>
     <div class="lv-kpi orange">
         <span class="lv-kpi-ico">🚴</span>
-        <div class="lv-kpi-val">{{ $enCours }}</div>
+        <div class="lv-kpi-val" id="kpi-encours">{{ $enCours }}</div>
         <div class="lv-kpi-lbl">En cours</div>
     </div>
     <div class="lv-kpi green">
         <span class="lv-kpi-ico">✅</span>
-        <div class="lv-kpi-val">{{ $terminees }}</div>
+        <div class="lv-kpi-val" id="kpi-terminees">{{ $terminees }}</div>
         <div class="lv-kpi-lbl">Livrées</div>
     </div>
     <div class="lv-kpi purple">
         <span class="lv-kpi-ico">⏳</span>
-        <div class="lv-kpi-val">{{ $enAttente }}</div>
+        <div class="lv-kpi-val" id="kpi-attente">{{ $enAttente }}</div>
         <div class="lv-kpi-lbl">En attente</div>
     </div>
 </div>
@@ -258,8 +267,12 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
     <div class="lv-card">
         <div class="lv-card-hd">
             <span class="lv-card-title">🕐 Commandes récentes</span>
-            <a href="{{ route('livreur.orders.index') }}" class="lv-card-link">Voir toutes →</a>
+            <span style="display:flex;align-items:center;gap:10px;">
+                <span id="lv-pulse" style="width:7px;height:7px;border-radius:50%;background:#10b981;display:inline-block;animation:lvpulse 2s infinite;"></span>
+                <a href="{{ route('livreur.orders.index') }}" class="lv-card-link">Voir toutes →</a>
+            </span>
         </div>
+        <div id="recent-orders-list">
         @if($recentOrders->isEmpty())
         <div class="lv-empty">
             <span class="lv-empty-ico">📭</span>
@@ -268,11 +281,16 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
         @else
         @foreach($recentOrders as $group)
         @php
-            $order = $group['order'];
-            $st    = $statusMap[$group['status']] ?? ['label'=>ucfirst($group['status']),'cls'=>'s-other'];
+            $order  = $group['order'];
+            $st     = $statusMap[$group['status']] ?? ['label'=>ucfirst($group['status']),'cls'=>'s-other'];
+            $rowUrl = in_array($group['status'], ['delivering','en_livraison','shipped'])
+                ? route('orders.nav', $order)
+                : (in_array($group['status'], ['livrée','delivered','completed','annulée'])
+                    ? route('livreur.orders.index', ['status'=>'delivered'])
+                    : route('livreur.orders.index', ['status'=>'confirmed']));
         @endphp
-        <div class="lv-order-row">
-            <div class="lv-order-ico">{{ $group['count'] > 1 ? '📦' : '📦' }}</div>
+        <a href="{{ $rowUrl }}" class="lv-order-row" style="text-decoration:none;color:inherit;display:flex;">
+            <div class="lv-order-ico">📦</div>
             <div style="flex:1;min-width:0">
                 @if($group['count'] > 1)
                     <div class="lv-order-num">{{ $group['count'] }} commandes · 1 trajet</div>
@@ -283,9 +301,10 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
             </div>
             <div class="lv-order-amount">{{ $fmt($group['total']) }}</div>
             <span class="lv-order-status {{ $st['cls'] }}">{{ $st['label'] }}</span>
-        </div>
+        </a>
         @endforeach
         @endif
+        </div>
     </div>
 
     {{-- Colonne droite --}}
@@ -348,3 +367,73 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+const DASH_DATA_URL  = '{{ route('livreur.dashboard.data') }}';
+const NAV_BASE       = '{{ url('/orders') }}';
+const ORDERS_URL     = '{{ route('livreur.orders.index') }}';
+
+const STATUS_MAP = {
+    'en_attente':   { label: 'En attente',   cls: 's-ready' },
+    'confirmée':    { label: 'À récupérer',  cls: 's-ready' },
+    'confirmed':    { label: 'À récupérer',  cls: 's-ready' },
+    'delivering':   { label: 'En livraison', cls: 's-delivering' },
+    'en_livraison': { label: 'En livraison', cls: 's-delivering' },
+    'shipped':      { label: 'Expédiée',     cls: 's-delivering' },
+    'delivered':    { label: 'Livrée',       cls: 's-delivered' },
+    'livrée':       { label: 'Livrée',       cls: 's-delivered' },
+    'completed':    { label: 'Terminée',     cls: 's-delivered' },
+    'ready':        { label: 'Prête',        cls: 's-ready' },
+    'prête':        { label: 'Prête',        cls: 's-ready' },
+    'assigned':     { label: 'Assignée',     cls: 's-ready' },
+    'annulée':      { label: 'Annulée',      cls: 's-other' },
+};
+
+function pad(id) { return '#' + String(id).padStart(5, '0'); }
+
+function orderUrl(o) {
+    const active  = ['delivering','en_livraison','shipped'];
+    const done    = ['livrée','delivered','completed','annulée'];
+    if (active.includes(o.status))  return `${NAV_BASE}/${o.order_id}/nav`;
+    if (done.includes(o.status))    return `${ORDERS_URL}?status=delivered`;
+    return `${ORDERS_URL}?status=confirmed`;
+}
+
+function renderOrders(orders) {
+    if (!orders.length) {
+        return `<div class="lv-empty"><span class="lv-empty-ico">📭</span>Aucune commande assignée pour le moment.</div>`;
+    }
+    return orders.map(o => {
+        const st  = STATUS_MAP[o.status] ?? { label: o.status, cls: 's-other' };
+        const lbl = o.count > 1 ? `${o.count} commandes · 1 trajet` : `Commande ${pad(o.order_id)}`;
+        return `<a href="${orderUrl(o)}" class="lv-order-row" style="text-decoration:none;color:inherit;display:flex;">
+            <div class="lv-order-ico">📦</div>
+            <div style="flex:1;min-width:0">
+                <div class="lv-order-num">${lbl}</div>
+                <div class="lv-order-client">${o.client}</div>
+            </div>
+            <div class="lv-order-amount">${o.total}</div>
+            <span class="lv-order-status ${st.cls}">${st.label}</span>
+        </a>`;
+    }).join('');
+}
+
+async function pollDashboard() {
+    try {
+        const r = await fetch(DASH_DATA_URL, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        if (!r.ok) return;
+        const d = await r.json();
+
+        document.getElementById('kpi-total').textContent    = d.totalAssigned;
+        document.getElementById('kpi-encours').textContent  = d.enCours;
+        document.getElementById('kpi-terminees').textContent = d.terminees;
+        document.getElementById('kpi-attente').textContent  = d.enAttente;
+
+        document.getElementById('recent-orders-list').innerHTML = renderOrders(d.recentOrders);
+    } catch (_) {}
+}
+
+setInterval(pollDashboard, 15000);
+</script>
+@endpush

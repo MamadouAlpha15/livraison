@@ -724,11 +724,12 @@ $init = fn(string $n): string =>
     const DEV_FEE          = {{ $order->delivery_fee ?? 0 }};
     const DEVISE           = {!! json_encode($devise) !!};
     const IS_COMPANY_DRIVER = {{ $isCompanyDriver ? 'true' : 'false' }};
+    const IS_ONGOING        = {{ $isOngoing ? 'true' : 'false' }}; // Phase 2 uniquement
 
     /* ── État mutable ── */
     let lat           = {{ $lat0 }};
     let lng           = {{ $lng0 }};
-    let gpsFound      = HAS_GPS;
+    let gpsFound      = HAS_GPS && IS_ONGOING; // GPS visible seulement en Phase 2
     let currentStatus = {!! json_encode($order->status) !!};
     let lname         = {!! json_encode($gpsDriverName ?? '') !!};
     let pollId        = null;
@@ -781,7 +782,9 @@ $init = fn(string $n): string =>
     }
 
     /* ── Objets Leaflet ── */
-    const marker = L.marker([lat, lng], { icon: makeMotoIcon(!gpsFound) }).addTo(map);
+    // Le marker livreur n'est ajouté à la carte qu'en Phase 2 (en_livraison)
+    const marker = L.marker([lat, lng], { icon: makeMotoIcon(!gpsFound) });
+    if (IS_ONGOING) marker.addTo(map);
 
     function buildPopup() {
         return lname
@@ -800,7 +803,8 @@ $init = fn(string $n): string =>
         radius: gpsFound ? 65 : 200,
         weight: gpsFound ? 1.5 : 1,
         dashArray: gpsFound ? null : '5 5'
-    }).addTo(map);
+    });
+    if (IS_ONGOING) halo.addTo(map); // halo visible seulement en Phase 2
 
     const trailShadow = L.polyline([[lat,lng]], {
         color:'rgba(0,0,0,.15)', weight:7, opacity:1, lineCap:'round', lineJoin:'round'
@@ -997,14 +1001,17 @@ $init = fn(string $n): string =>
                 updateLivreurCard(d.livreur, d);
             }
 
-            /* Mise à jour GPS */
-            if (d.lat != null && d.lng != null) {
+            /* Mise à jour GPS — Phase 2 uniquement (livreur en route vers le client) */
+            if (d.lat != null && d.lng != null && d.is_ongoing) {
                 const nLat  = parseFloat(d.lat);
                 const nLng  = parseFloat(d.lng);
                 const delta = Math.abs(nLat - lat) + Math.abs(nLng - lng);
 
                 if (!gpsFound) {
                     gpsFound = true;
+                    // Premier GPS en Phase 2 : ajouter marker et halo à la carte
+                    if (!map.hasLayer(marker)) marker.addTo(map);
+                    if (!map.hasLayer(halo))   halo.addTo(map);
                     marker.setIcon(makeMotoIcon(false));
                     marker.setPopupContent(buildPopup());
                     halo.setStyle({ fillOpacity:.08, radius:65, dashArray:null });

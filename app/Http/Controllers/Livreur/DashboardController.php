@@ -16,6 +16,44 @@ class DashboardController extends Controller
         $driver  = Driver::where('user_id', $livreur->id)->first();
         $devise  = $shop?->currency ?? $driver?->company?->currency ?? 'GNF';
 
+        $data = $this->buildData($livreur, $driver);
+
+        $totalCommission = $livreur->courierCommissions()->sum('amount');
+
+        return view('dashboards.livreur', array_merge($data, compact(
+            'livreur', 'devise', 'shop', 'totalCommission'
+        )));
+    }
+
+    public function data()
+    {
+        $livreur = Auth::user();
+        $driver  = Driver::where('user_id', $livreur->id)->first();
+        $devise  = ($livreur->shop ?? $livreur->assignedShop)?->currency
+                   ?? $driver?->company?->currency
+                   ?? 'GNF';
+
+        $data = $this->buildData($livreur, $driver);
+
+        $fmt = fn($n) => number_format($n ?? 0, 0, ',', ' ') . ' ' . $devise;
+
+        return response()->json([
+            'totalAssigned' => $data['totalAssigned'],
+            'enCours'       => $data['enCours'],
+            'terminees'     => $data['terminees'],
+            'enAttente'     => $data['enAttente'],
+            'recentOrders'  => $data['recentOrders']->map(fn($g) => [
+                'order_id' => $g['order']->id,
+                'count'    => $g['count'],
+                'total'    => $fmt($g['total']),
+                'status'   => $g['status'],
+                'client'   => ($g['client'])?->name ?? 'Client',
+            ])->values(),
+        ]);
+    }
+
+    private function buildData($livreur, $driver): array
+    {
         $orders = Order::with(['client', 'user', 'shop'])
             ->where(function ($q) use ($livreur, $driver) {
                 $q->where('livreur_id', $livreur->id);
@@ -31,11 +69,9 @@ class DashboardController extends Controller
         $terminees     = $orders->whereIn('status', ['delivered', 'livrée', 'completed'])->count();
         $enAttente     = $orders->whereIn('status', ['ready', 'prête', 'assigned', 'confirmée', 'en_attente'])->count();
 
-        $totalCommission = $livreur->courierCommissions()->sum('amount');
-
-        // Grouper uniquement par delivery_batch_id (lot intentionnel) — sinon chaque commande est solo
         $statusPriority = ['en_attente' => 0, 'confirmée' => 1, 'en_livraison' => 2, 'livrée' => 3, 'annulée' => 4];
-        $recentOrders = $orders->groupBy(fn($o) => $o->delivery_batch_id ? 'batch_' . $o->delivery_batch_id : '__solo__' . $o->id)
+        $recentOrders = $orders
+            ->groupBy(fn($o) => $o->delivery_batch_id ? 'batch_' . $o->delivery_batch_id : '__solo__' . $o->id)
             ->map(function ($grp) use ($statusPriority) {
                 $first  = $grp->first();
                 $status = $grp->sortBy(fn($o) => $statusPriority[$o->status] ?? 99)->first()->status;
@@ -48,10 +84,6 @@ class DashboardController extends Controller
                 ];
             })->values()->take(5);
 
-        return view('dashboards.livreur', compact(
-            'livreur', 'devise', 'shop',
-            'totalAssigned', 'enCours', 'terminees', 'enAttente',
-            'totalCommission', 'recentOrders'
-        ));
+        return compact('totalAssigned', 'enCours', 'terminees', 'enAttente', 'recentOrders');
     }
 }

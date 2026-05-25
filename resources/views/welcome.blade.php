@@ -433,44 +433,6 @@ body {
     max-width: 520px; line-height: 1.7; margin: 0 0 48px;
 }
 
-/* ════════════════════════════════════════════════════════════════
-   FEATURES — GRILLE ALTERNÉE
-════════════════════════════════════════════════════════════════ */
-.features-section { background: #fff; }
-
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-}
-.feature-card {
-    background: #f8fafc;
-    border: 1px solid var(--border);
-    border-radius: var(--r);
-    padding: 28px 24px;
-    transition: box-shadow .2s, border-color .2s, transform .2s;
-    position: relative; overflow: hidden;
-}
-.feature-card:hover {
-    box-shadow: 0 8px 32px rgba(99,102,241,.1);
-    border-color: var(--green-lt);
-    transform: translateY(-3px);
-}
-.feature-card::after {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, #6366f1, #8b5cf6);
-    opacity: 0; transition: opacity .2s;
-}
-.feature-card:hover::after { opacity: 1; }
-.feature-ico {
-    width: 48px; height: 48px; border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px; margin-bottom: 16px;
-    background: var(--green-mlt); border: 1px solid var(--green-lt);
-}
-.feature-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
-.feature-desc  { font-size: 13.5px; color: var(--text-2); line-height: 1.6; margin: 0; }
 
 /* ════════════════════════════════════════════════════════════════
    COMMENT CA MARCHE — ÉTAPES
@@ -766,6 +728,98 @@ body {
 .pricing-btn-filled:hover { background: var(--green-dk); color: #fff; }
 
 /* ════════════════════════════════════════════════════════════════
+   CTA CLIENT — COMMANDER DANS LES BOUTIQUES
+════════════════════════════════════════════════════════════════ */
+.client-cta {
+    background: linear-gradient(160deg, #100c31 0%, #1a1155 55%, #211368 100%);
+    border: 1px solid rgba(139,92,246,.25);
+    border-radius: 24px;
+    padding: 56px 48px 0;
+    display: flex; flex-direction: column; gap: 0;
+    position: relative; overflow: hidden;
+    margin: 0 24px;
+    box-shadow: 0 8px 48px rgba(139,92,246,.2), 0 0 0 1px rgba(255,255,255,.03) inset;
+}
+.client-cta::before {
+    content: '';
+    position: absolute; right: -100px; top: -100px;
+    width: 420px; height: 420px;
+    background: radial-gradient(circle, rgba(139,92,246,.22) 0%, rgba(109,40,217,.08) 45%, transparent 70%);
+    pointer-events: none;
+}
+.client-cta::after {
+    content: '';
+    position: absolute; left: -60px; bottom: 30%;
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, rgba(167,139,250,.12) 0%, transparent 65%);
+    pointer-events: none;
+}
+.client-cta-top {
+    display: flex; align-items: center;
+    justify-content: space-between; gap: 32px;
+    flex-wrap: wrap; position: relative; z-index: 1;
+    padding-bottom: 44px;
+}
+.client-cta-txt h2 {
+    font-family: var(--display);
+    font-size: 30px; font-weight: 700; color: #fff;
+    letter-spacing: -.5px; margin: 0 0 8px;
+}
+.client-cta-txt p { font-size: 14.5px; color: rgba(255,255,255,.55); margin: 0; }
+.client-cta-actions { display: flex; gap: 12px; flex-shrink: 0; flex-wrap: wrap; }
+
+/* Mockup dashboard client */
+.cl-dash-scene {
+    position: relative; z-index: 1;
+    margin: 0 -48px;
+}
+.cl-dash-glow {
+    position: absolute; inset: -60px;
+    background: radial-gradient(ellipse at 50% 0%,
+        rgba(139,92,246,.5) 0%, rgba(99,102,241,.22) 35%, transparent 65%);
+    pointer-events: none; z-index: 0;
+}
+.cl-dash-grid {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+        linear-gradient(rgba(139,92,246,.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139,92,246,.07) 1px, transparent 1px);
+    background-size: 36px 36px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,.6) 0%, transparent 70%);
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.6) 0%, transparent 70%);
+}
+.cl-dash-frame {
+    position: relative; z-index: 1;
+    background: #0d0a25;
+    border-radius: 12px 12px 0 0;
+    border: 1px solid rgba(139,92,246,.4);
+    border-bottom: none;
+    box-shadow: 0 -8px 48px rgba(139,92,246,.35), 0 0 0 1px rgba(255,255,255,.04) inset;
+    overflow: hidden;
+    margin: 20px 20px 0;
+}
+.cl-dash-bar {
+    height: 36px;
+    background: linear-gradient(90deg, #0a0820, #0d0b28);
+    border-bottom: 1px solid rgba(255,255,255,.07);
+    display: flex; align-items: center;
+    padding: 0 16px; gap: 7px;
+}
+.cl-url-pill {
+    flex: 1; max-width: 220px; margin: 0 12px;
+    background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+    border-radius: 6px; height: 22px;
+    display: flex; align-items: center; padding: 0 10px;
+    font-size: 10px; color: rgba(255,255,255,.28); font-family: monospace;
+    gap: 5px; letter-spacing: .2px;
+}
+.cl-dash-frame img {
+    width: 100%; display: block;
+    mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+}
+
+/* ════════════════════════════════════════════════════════════════
    CTA ENTREPRISE DE LIVRAISON
 ════════════════════════════════════════════════════════════════ */
 .company-cta {
@@ -1017,7 +1071,7 @@ body {
     .hero-mockup-outer { transform: none !important; }
 
     /* Grilles */
-    .features-grid { grid-template-columns: repeat(2,1fr); gap: 14px; }
+
     .steps-grid    { grid-template-columns: repeat(2,1fr); gap: 36px 20px; }
     .steps-grid::before { display: none; }
     .shops-grid     { grid-template-columns: repeat(2,1fr); gap: 16px; }
@@ -1031,6 +1085,11 @@ body {
     .section { padding: 60px 20px; }
     .section-sub { margin-bottom: 32px; }
 
+    /* CTA client */
+    .client-cta { margin: 0; padding: 36px 28px 0; border-radius: 16px; }
+    .client-cta-top { align-items: flex-start; }
+    .cl-dash-scene { margin: 0 -28px; }
+    .cl-dash-frame { margin: 14px 14px 0; }
     /* CTA entreprise */
     .company-cta { margin: 0; padding: 36px 28px 0; border-radius: 16px; }
     .company-cta-top { align-items: flex-start; }
@@ -1089,7 +1148,7 @@ body {
     }
 
     /* Grilles */
-    .features-grid { grid-template-columns: 1fr; gap: 12px; }
+
     .steps-grid    { grid-template-columns: 1fr; gap: 28px; }
     .shops-grid     { grid-template-columns: 1fr; gap: 14px; }
     .companies-grid { grid-template-columns: 1fr; gap: 14px; }
@@ -1098,13 +1157,21 @@ body {
     .proof-card    { padding: 26px 22px; }
 
     /* Cards */
-    .feature-card  { padding: 22px 18px; }
+
     .shop-img-wrap { height: 160px; }
 
     /* Sections */
     .section       { padding: 48px 16px; }
     .section-title { letter-spacing: -.5px; margin-bottom: 10px; }
 
+    /* CTA client mobile */
+    .client-cta  { margin: 0; padding: 28px 20px 0; border-radius: 14px; }
+    .client-cta-top { padding-bottom: 28px; }
+    .client-cta-txt h2 { font-size: 22px; }
+    .client-cta-actions { width: 100%; flex-direction: column; }
+    .client-cta-actions .cta-btn { justify-content: center; }
+    .cl-dash-scene { margin: 0 -20px; }
+    .cl-dash-frame { margin: 10px 10px 0; }
     /* CTA Livraison */
     .company-cta  { margin: 0; padding: 28px 20px 0; border-radius: 14px; }
     .company-cta-top { padding-bottom: 28px; }
@@ -1336,48 +1403,52 @@ footer.app-footer { display: none !important; }
 </section>
 
 {{-- ══════════════════════════════════════════
-     FONCTIONNALITÉS
+     CTA CLIENT
 ══════════════════════════════════════════ --}}
-<section class="section features-section" id="features">
-    <div class="section-inner">
-        <div class="section-badge">Fonctionnalités</div>
-        <h2 class="section-title">Tout ce dont votre boutique<br><span>a besoin</span></h2>
-        <p class="section-sub">Une suite complète d'outils pour gérer, livrer et analyser votre activité au quotidien.</p>
+<div style="padding:72px 0 0;background:linear-gradient(180deg,#0a0a1e 0%,#f8fafc 50%)">
+    <div class="client-cta">
 
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-ico">📦</div>
-                <h3 class="feature-title">Gestion des commandes</h3>
-                <p class="feature-desc">Recevez, confirmez et suivez chaque commande en temps réel. Assignez un livreur en un clic.</p>
+        {{-- Texte + boutons --}}
+        <div class="client-cta-top">
+            <div class="client-cta-txt">
+                <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);border-radius:30px;padding:5px 14px;margin-bottom:18px">
+                    <span style="width:7px;height:7px;border-radius:50%;background:#a78bfa;box-shadow:0 0 6px #a78bfa;flex-shrink:0;display:inline-block"></span>
+                    <span style="font-size:11.5px;font-weight:700;color:#c4b5fd;letter-spacing:.4px">Vous êtes un client ?</span>
+                </div>
+                <h2>Trouvez les boutiques<br>de votre pays et commandez.</h2>
+                <p>Parcourez les boutiques locales, choisissez vos produits et faites-vous livrer directement chez vous. Paiement cash à la livraison, suivi en temps réel.</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-ico">🚴</div>
-                <h3 class="feature-title">Livraison GPS</h3>
-                <p class="feature-desc">Suivez vos livreurs en direct sur la carte. Le client est notifié à chaque étape de sa commande.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-ico">📊</div>
-                <h3 class="feature-title">Dashboard analytics</h3>
-                <p class="feature-desc">CA, panier moyen, taux de livraison, top clients — tout en un coup d'œil avec des graphiques clairs.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-ico">👥</div>
-                <h3 class="feature-title">Gestion d'équipe</h3>
-                <p class="feature-desc">Ajoutez  vos livreurs. Chaque rôle a son propre espace de travail dédié.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-ico">💳</div>
-                <h3 class="feature-title">Paiements & commissions</h3>
-                <p class="feature-desc">Suivez vos revenus, gérez les commissions livreurs et exportez vos rapports en Excel ou PDF.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-ico">🏢</div>
-                <h3 class="feature-title">Entreprises partenaires</h3>
-                <p class="feature-desc">Pas de livreurs ? Contactez directement une entreprise de livraison partenaire via le chat intégré.</p>
+            <div class="client-cta-actions">
+                <a href="{{ route('register') }}" class="cta-btn cta-primary">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                    Créer mon compte
+                </a>
+                <a href="{{ route('shops.index') }}" class="cta-btn cta-secondary">
+                    Voir les boutiques →
+                </a>
             </div>
         </div>
+
+        {{-- Screenshot dashboard client --}}
+        <div class="cl-dash-scene">
+            <div class="cl-dash-glow"></div>
+            <div class="cl-dash-grid"></div>
+            <div class="cl-dash-frame">
+                <div class="cl-dash-bar">
+                    <span class="cta-dot" style="background:#ff5f57;box-shadow:0 0 5px #ff5f57"></span>
+                    <span class="cta-dot" style="background:#febc2e;box-shadow:0 0 5px #febc2e"></span>
+                    <span class="cta-dot" style="background:#28c840;box-shadow:0 0 5px #28c840"></span>
+                    <div class="cl-url-pill">
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        shopio.com/commandes
+                    </div>
+                </div>
+                <img src="/images/client.png" alt="Espace client Shopio — suivez vos commandes">
+            </div>
+        </div>
+
     </div>
-</section>
+</div>
 
 {{-- ══════════════════════════════════════════
      COMMENT CA MARCHE
@@ -1846,7 +1917,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }, { threshold: 0.1 });
 
-    document.querySelectorAll('.feature-card, .step-item, .shop-card, .proof-card, .pricing-card, .faq-item').forEach(el => {
+    document.querySelectorAll('.step-item, .shop-card, .proof-card, .company-card, .faq-item').forEach(el => {
         el.style.opacity   = '0';
         el.style.transform = 'translateY(20px)';
         el.style.transition = 'opacity .5s ease, transform .5s ease';

@@ -100,6 +100,8 @@ class SuiviController extends Controller
             'client_location_age' => $order->client_location_shared_at
                 ? now()->diffInSeconds($order->client_location_shared_at)
                 : null,
+            'vendor_lat'          => $order->vendor_lat,
+            'vendor_lng'          => $order->vendor_lng,
         ]);
     }
 

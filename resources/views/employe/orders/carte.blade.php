@@ -279,7 +279,9 @@ window.addEventListener('resize', () => map.invalidateSize());
 const markers      = {};
 const traces       = {};
 const polylines    = {};
+const routeLines   = {};
 const clientMarkers= {}; /* keyed by order id */
+const vendorMarkers= {}; /* keyed by order id */
 let   selectedKey  = null;
 
 /* ── Icône client (bleu) ── */
@@ -287,6 +289,14 @@ function clientIcon() {
     return L.divIcon({
         html: `<div style="width:16px;height:16px;border-radius:50%;background:#3b82f6;border:2px solid #fff;box-shadow:0 0 0 3px rgba(59,130,246,.25),0 2px 6px rgba(59,130,246,.4)"></div>`,
         iconSize:[16,16], iconAnchor:[8,8], className:''
+    });
+}
+
+/* ── Icône boutique (amber) ── */
+function vendorIcon() {
+    return L.divIcon({
+        html: `<div style="width:26px;height:26px;border-radius:7px;background:#f59e0b;border:2px solid #fff;box-shadow:0 0 0 3px rgba(245,158,11,.25),0 2px 8px rgba(245,158,11,.5);display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1">🏪</div>`,
+        iconSize:[26,26], iconAnchor:[13,13], popupAnchor:[0,-14], className:''
     });
 }
 
@@ -313,8 +323,8 @@ function renderPanel(drivers) {
         const color  = getColor(o.key);
         const isLiv  = o.status === 'en_livraison';
         const badge  = isLiv
-            ? `<span class="cp-badge cp-badge-liv">En route</span>`
-            : `<span class="cp-badge cp-badge-conf">Assigné</span>`;
+            ? `<span class="cp-badge cp-badge-liv">→ Client</span>`
+            : `<span class="cp-badge cp-badge-conf">→ Boutique</span>`;
         const hasGps = o.lat && o.lng;
         const pingAge = hasGps ? Date.now()/1000 - new Date(o.ping).getTime()/1000 : null;
         const pingCls = pingAge !== null && pingAge < 30 ? 'cp-ping-ok' : 'cp-ping-stale';
@@ -361,7 +371,8 @@ function updateMap(drivers) {
     Object.keys(markers).forEach(k => {
         if (!activeKeys.has(k)) {
             map.removeLayer(markers[k]); delete markers[k];
-            if (polylines[k]) { map.removeLayer(polylines[k]); delete polylines[k]; }
+            if (polylines[k])  { map.removeLayer(polylines[k]);  delete polylines[k];  }
+            if (routeLines[k]) { map.removeLayer(routeLines[k]); delete routeLines[k]; }
             delete traces[k];
         }
     });
@@ -382,18 +393,46 @@ function updateMap(drivers) {
         if (!last || last[0] !== pos[0] || last[1] !== pos[1]) traces[k].push(pos);
 
         if (traces[k].length > 1) {
-            if (polylines[k]) { polylines[k].setLatLngs(traces[k]); }
-            else { polylines[k] = L.polyline(traces[k], {color, weight:3, opacity:.7, dashArray: isMoving ? null : '5,5'}).addTo(map); }
+            if (polylines[k]) {
+                polylines[k].setLatLngs(traces[k]);
+                polylines[k].setStyle({dashArray: isMoving ? null : '5,5'});
+            } else {
+                polylines[k] = L.polyline(traces[k], {color, weight:3, opacity:.7, dashArray: isMoving ? null : '5,5'}).addTo(map);
+            }
         }
 
         if (markers[k]) {
             markers[k].setLatLng(pos);
             markers[k].setIcon(driverIcon(color, isMoving));
+            markers[k].bindPopup(() => buildPopup(o)); // rebind à chaque poll
         } else {
             markers[k] = L.marker(pos, {icon: driverIcon(color, isMoving)}).addTo(map).bindPopup(() => buildPopup(o));
         }
         if (markers[k].isPopupOpen()) markers[k].setPopupContent(buildPopup(o));
         bounds.push(pos);
+
+        /* ── Ligne de route : Phase 1 → boutique (amber), Phase 2 → client (green) ── */
+        const allOrders = (o.trips || []).flatMap(t => t.orders || []).concat(o.orders || []);
+        let routeDest = null;
+        if (o.phase === 2) {
+            const ord = allOrders.find(ord => ord.client_lat && ord.client_lng);
+            if (ord) routeDest = [parseFloat(ord.client_lat), parseFloat(ord.client_lng)];
+        } else {
+            const ord = allOrders.find(ord => ord.vendor_lat && ord.vendor_lng);
+            if (ord) routeDest = [parseFloat(ord.vendor_lat), parseFloat(ord.vendor_lng)];
+        }
+        if (routeDest) {
+            const rPts   = [pos, routeDest];
+            const rColor = o.phase === 2 ? '#10b981' : '#f59e0b';
+            if (routeLines[k]) {
+                routeLines[k].setLatLngs(rPts);
+                routeLines[k].setStyle({color: rColor});
+            } else {
+                routeLines[k] = L.polyline(rPts, {color:rColor, weight:3, opacity:.85, dashArray:'10 6', lineCap:'round'}).addTo(map);
+            }
+        } else if (routeLines[k]) {
+            map.removeLayer(routeLines[k]); delete routeLines[k];
+        }
     });
 
     /* ── Marqueurs clients (positions partagées) ── */
@@ -434,6 +473,30 @@ function updateMap(drivers) {
         }
     });
 
+    /* ── Marqueurs boutiques (Phase 1 uniquement) ── */
+    const activeVendorIds = new Set();
+    drivers.forEach(o => {
+        const allOrds = (o.trips || []).flatMap(t => t.orders || []).concat(o.orders || []);
+        allOrds.forEach(ord => {
+            if (ord.vendor_lat && ord.vendor_lng && ord.status !== 'en_livraison') {
+                activeVendorIds.add(ord.id);
+                const vpos = [parseFloat(ord.vendor_lat), parseFloat(ord.vendor_lng)];
+                if (vendorMarkers[ord.id]) {
+                    vendorMarkers[ord.id].setLatLng(vpos);
+                } else {
+                    vendorMarkers[ord.id] = L.marker(vpos, { icon: vendorIcon() })
+                        .addTo(map)
+                        .bindPopup(`<div style="font-family:system-ui;padding:2px 4px"><b style="font-size:12px">🏪 Point de ramassage</b><br><span style="font-size:10.5px;color:#94a3b8">Cde #${ord.id} · ${esc(ord.client)}</span></div>`);
+                }
+            }
+        });
+    });
+    Object.keys(vendorMarkers).forEach(id => {
+        if (!activeVendorIds.has(parseInt(id))) {
+            map.removeLayer(vendorMarkers[id]); delete vendorMarkers[id];
+        }
+    });
+
     document.getElementById('crtNoSignal')?.classList.toggle('show', !hasGps && drivers.length > 0);
 
     if (bounds.length > 0 && selectedKey === null) {
@@ -471,8 +534,12 @@ function buildPopup(o) {
         ordersHtml = `<div class="lp-row"><span>Commande&nbsp;</span><strong>#${ord.id}</strong></div>
             <div class="lp-row"><span>Client&nbsp;</span><strong>${esc(ord.client)}</strong></div>`;
     }
+    const phaseLabel = o.phase === 2
+        ? `<span style="color:#10b981;font-weight:700">🚚 Phase 2 · En livraison → Client</span>`
+        : `<span style="color:#f59e0b;font-weight:700">🏪 Phase 1 · Récupération → Boutique</span>`;
     return `<div class="lp-title" style="color:${color}">🚴 ${esc(o.driver)}</div>
-        <div class="lp-row" style="margin-bottom:3px"><span style="font-size:10.5px;color:var(--muted)">${typeLabel}</span></div>
+        <div class="lp-row" style="margin-bottom:2px"><span style="font-size:10.5px;color:var(--muted)">${typeLabel}</span></div>
+        <div class="lp-row" style="margin-bottom:4px">${phaseLabel}</div>
         ${ordersHtml}
         <div class="lp-row" style="margin-top:4px"><span>GPS&nbsp;</span><strong>${esc(o.ping_ago)}</strong></div>`;
 }

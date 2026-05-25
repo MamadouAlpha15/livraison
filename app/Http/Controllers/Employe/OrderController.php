@@ -135,8 +135,11 @@ class OrderController extends Controller
                 'id'          => $o->id,
                 'client'      => optional($o->client)->name ?? '—',
                 'destination' => $o->delivery_destination   ?? '',
+                'status'      => $o->status,
                 'client_lat'  => $o->client_lat,
                 'client_lng'  => $o->client_lng,
+                'vendor_lat'  => $o->vendor_lat,
+                'vendor_lng'  => $o->vendor_lng,
             ])->values()->all();
 
             $destination = $driverOrders->pluck('delivery_destination')
@@ -155,8 +158,11 @@ class OrderController extends Controller
                             'id'          => $o->id,
                             'client'      => optional($o->client)->name ?? '—',
                             'destination' => $o->delivery_destination ?? '',
+                            'status'      => $o->status,
                             'client_lat'  => $o->client_lat,
                             'client_lng'  => $o->client_lng,
+                            'vendor_lat'  => $o->vendor_lat,
+                            'vendor_lng'  => $o->vendor_lng,
                         ])->values()->all(),
                     ];
                 })->values()->all();
@@ -167,6 +173,7 @@ class OrderController extends Controller
                 'driver_phone' => $driverPhone,
                 'type'         => $type,
                 'status'       => $status,
+                'phase'        => $status === Order::STATUS_EN_LIVRAISON ? 2 : 1,
                 'lat'          => $gpsOrder->current_lat,
                 'lng'          => $gpsOrder->current_lng,
                 'ping'         => $gpsOrder->last_ping_at?->toIso8601String(),
@@ -424,5 +431,26 @@ class OrderController extends Controller
         ]);
 
         return response()->json(['success' => true, 'message' => 'Avis enregistré !']);
+    }
+
+    public function shareVendorLocation(Request $request, Order $order)
+    {
+        $shopId = Auth::user()->currentShopId();
+        abort_unless($shopId && $order->shop_id === $shopId, 403);
+        abort_unless($order->delivery_company_id, 422, 'Aucune entreprise de livraison assignée.');
+        abort_unless(!in_array($order->status, [Order::STATUS_LIVREE, Order::STATUS_ANNULEE]), 422, 'Commande terminée.');
+
+        $data = $request->validate([
+            'lat' => ['required', 'numeric', 'between:-90,90'],
+            'lng' => ['required', 'numeric', 'between:-180,180'],
+        ]);
+
+        $order->update([
+            'vendor_lat'                => $data['lat'],
+            'vendor_lng'                => $data['lng'],
+            'vendor_location_shared_at' => now(),
+        ]);
+
+        return response()->json(['ok' => true]);
     }
 }

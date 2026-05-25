@@ -14,7 +14,8 @@ class Order extends Model
     // Ajoute 'livreur_id' si tu fais des fill/update dessus
     protected $fillable = ['user_id','shop_id','total','status','ordonnance','livreur_id','current_lat','current_lng','last_ping_at',
     'image','delivery_fee','delivery_destination','client_phone','delivery_company_id','driver_id','delivery_zone_id','delivery_batch_id',
-    'client_lat','client_lng','client_location_shared_at'];
+    'client_lat','client_lng','client_location_shared_at',
+    'vendor_lat','vendor_lng','vendor_location_shared_at','delivered_at'];
 
     /* Relations */
 
@@ -69,10 +70,17 @@ class Order extends Model
 
 
 protected $casts = [
-    'last_ping_at' => 'datetime',
-    'current_lat'  => 'float',
-    'current_lng'  => 'float',
-    'total'        => 'float',
+    'delivered_at'               => 'datetime',
+    'last_ping_at'               => 'datetime',
+    'current_lat'                => 'float',
+    'current_lng'                => 'float',
+    'total'                      => 'float',
+    'client_lat'                 => 'float',
+    'client_lng'                 => 'float',
+    'client_location_shared_at'  => 'datetime',
+    'vendor_lat'                 => 'float',
+    'vendor_lng'                 => 'float',
+    'vendor_location_shared_at'  => 'datetime',
 ];
 
 /* Statuts normalisés en français */
@@ -93,8 +101,13 @@ protected $casts = [
             'canceled'  => self::STATUS_ANNULEE,
         ];
 
-        $this->attributes['status'] = $map[$value] ?? $value;
+        $normalized = $map[$value] ?? $value;
+        $this->attributes['status'] = $normalized;
 
+        // Fixe delivered_at une seule fois quand le statut passe à "livrée"
+        if ($normalized === self::STATUS_LIVREE && empty($this->attributes['delivered_at'])) {
+            $this->attributes['delivered_at'] = now();
+        }
     }
 
     public function user()

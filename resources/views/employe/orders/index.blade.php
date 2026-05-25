@@ -539,6 +539,30 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .btn-rate-submit:disabled{opacity:.5;cursor:not-allowed;}
 .btn-noter{background:#fffbeb;border:1.5px solid #fcd34d;color:#92400e;padding:5px 10px;font-size:11.5px;font-weight:700;border-radius:var(--r-sm);cursor:pointer;font-family:var(--font);display:inline-flex;align-items:center;gap:4px;transition:all .14s;white-space:nowrap;}
 .btn-noter:hover{background:#fef3c7;border-color:#fbbf24;color:#78350f;}
+
+/* ── Vendor position modal ── */
+.vpos-overlay{position:fixed;inset:0;background:rgba(10,8,30,.72);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;}
+.vpos-overlay.open{opacity:1;pointer-events:all;}
+.vpos-modal{background:#fff;border-radius:20px;padding:32px 28px 28px;max-width:400px;width:100%;box-shadow:0 24px 60px rgba(99,102,241,.22);text-align:center;transform:translateY(16px) scale(.97);transition:transform .25s;}
+.vpos-overlay.open .vpos-modal{transform:none;}
+.vpos-icon-wrap{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;box-shadow:0 8px 24px rgba(99,102,241,.35);}
+.vpos-icon-wrap svg{width:34px;height:34px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.vpos-pulse{position:relative;}
+.vpos-pulse::before,.vpos-pulse::after{content:'';position:absolute;inset:-12px;border-radius:50%;border:2px solid rgba(99,102,241,.25);animation:vpulse 2s ease-out infinite;}
+.vpos-pulse::after{animation-delay:.7s;}
+@keyframes vpulse{0%{transform:scale(.85);opacity:.8;}100%{transform:scale(1.5);opacity:0;}}
+.vpos-title{font-size:18px;font-weight:800;color:#1e1b4b;margin-bottom:8px;font-family:var(--font);}
+.vpos-desc{font-size:13.5px;color:#64748b;line-height:1.55;margin-bottom:24px;font-family:var(--font);}
+.vpos-order-badge{display:inline-block;background:#eef0ff;border:1px solid rgba(99,102,241,.2);color:#4338ca;font-size:12px;font-weight:700;border-radius:20px;padding:3px 12px;margin-bottom:14px;font-family:var(--font);}
+.btn-vpos-share{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:14.5px;font-weight:800;font-family:var(--font);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;box-shadow:0 6px 20px rgba(99,102,241,.35);}
+.btn-vpos-share:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 10px 28px rgba(99,102,241,.45);}
+.btn-vpos-share:disabled{opacity:.6;cursor:not-allowed;}
+.btn-vpos-later{margin-top:10px;width:100%;padding:10px;border-radius:10px;border:none;background:transparent;color:#94a3b8;font-size:13px;font-family:var(--font);cursor:pointer;transition:color .15s;}
+.btn-vpos-later:hover{color:#475569;}
+.vpos-success{display:none;flex-direction:column;align-items:center;gap:8px;}
+.vpos-success-ico{font-size:42px;line-height:1;}
+.vpos-success-msg{font-size:14px;font-weight:700;color:#16a34a;font-family:var(--font);}
+.vpos-error{display:none;margin-top:10px;padding:10px 14px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;color:#dc2626;font-size:13px;font-family:var(--font);}
 </style>
 @endpush
 
@@ -574,7 +598,41 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
         $p = explode(' ',$name);
         return strtoupper(substr($p[0],0,1)).strtoupper(substr($p[1] ?? 'X',0,1));
     }
+    $ordersNeedingVendorPos = $col->filter(fn($o) =>
+        $o->delivery_company_id &&
+        !$o->vendor_lat &&
+        !in_array($o->status, ['livrée', 'annulée'])
+    );
+    $vposOrder = $ordersNeedingVendorPos->first();
 @endphp
+
+{{-- ══ MODAL PARTAGE POSITION VENDEUR ══ --}}
+@if($vposOrder)
+<div class="vpos-overlay" id="vposOverlay">
+    <div class="vpos-modal">
+        <div class="vpos-icon-wrap vpos-pulse">
+            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        </div>
+        <div class="vpos-order-badge">Commande #{{ $vposOrder->id }}</div>
+        <div class="vpos-title">Guider le livreur jusqu'à vous</div>
+        <div class="vpos-desc">Un livreur de <strong>{{ $vposOrder->deliveryCompany->name ?? 'l\'entreprise' }}</strong> prend en charge cette commande. Partagez votre position pour qu'il trouve votre boutique facilement.</div>
+
+        <div id="vposMain">
+            <button class="btn-vpos-share" id="btnVposShare" onclick="shareVendorPosition({{ $vposOrder->id }}, '{{ route('employe.orders.vendor-location', $vposOrder) }}')">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                Partager ma position
+            </button>
+            <button class="btn-vpos-later" onclick="closeVposModal()">Plus tard</button>
+            <div class="vpos-error" id="vposError"></div>
+        </div>
+
+        <div class="vpos-success" id="vposSuccess">
+            <div class="vpos-success-ico">📍</div>
+            <div class="vpos-success-msg">Position partagée ! Le livreur peut vous trouver.</div>
+        </div>
+    </div>
+</div>
+@endif
 
 {{-- ══ MODAL ENTREPRISE DE LIVRAISON ══ --}}
 <div class="modal-overlay" id="companyModal">
@@ -2423,6 +2481,83 @@ async function confirmBulkZone(skipZone) {
         confirmBtn.disabled = false; confirmBtn.textContent = origText;
     }
 }
+
+/* ── Vendor position sharing ── */
+function openVposModal() {
+    const overlay = document.getElementById('vposOverlay');
+    if (overlay) { overlay.classList.add('open'); }
+}
+function closeVposModal() {
+    const overlay = document.getElementById('vposOverlay');
+    if (overlay) { overlay.classList.remove('open'); }
+}
+
+function shareVendorPosition(orderId, url) {
+    const btn = document.getElementById('btnVposShare');
+    const errEl = document.getElementById('vposError');
+    errEl.style.display = 'none';
+
+    if (!navigator.geolocation) {
+        errEl.textContent = 'La géolocalisation n\'est pas supportée par votre navigateur.';
+        errEl.style.display = 'block';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Localisation…';
+
+    navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+            try {
+                const resp = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                });
+                if (resp.ok) {
+                    document.getElementById('vposMain').style.display = 'none';
+                    const suc = document.getElementById('vposSuccess');
+                    suc.style.display = 'flex';
+                    setTimeout(() => closeVposModal(), 2200);
+                } else {
+                    const d = await resp.json().catch(() => ({}));
+                    errEl.textContent = d.message || 'Erreur lors du partage.';
+                    errEl.style.display = 'block';
+                    btn.disabled = false;
+                    btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg> Réessayer';
+                }
+            } catch(e) {
+                errEl.textContent = 'Erreur réseau. Vérifiez votre connexion.';
+                errEl.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg> Réessayer';
+            }
+        },
+        (err) => {
+            const msgs = {
+                1: 'Accès à la géolocalisation refusé. Autorisez-le dans les paramètres du navigateur.',
+                2: 'Position indisponible. Réessayez dans un instant.',
+                3: 'Délai dépassé. Réessayez.',
+            };
+            errEl.textContent = msgs[err.code] || 'Erreur de géolocalisation.';
+            errEl.style.display = 'block';
+            btn.disabled = false;
+            btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg> Réessayer';
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+    );
+}
+
+// Auto-open vendor position modal on page load (after 800ms delay)
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('vposOverlay')) {
+        setTimeout(openVposModal, 800);
+    }
+});
 </script>
 @endpush
 
