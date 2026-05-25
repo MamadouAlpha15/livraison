@@ -19,7 +19,11 @@ class SupportTicketController extends Controller
         $u = Auth::user();
 
         if ($u->role === 'superadmin') {
-            $query = SupportTicket::with('shop', 'creator')->withCount('messages')->latest();
+            $adminRoles = ['superadmin'];
+            $query = SupportTicket::with('shop', 'creator')
+                ->withCount('messages')
+                ->withCount(['messages as unread_count' => fn($q) => $q->whereHas('author', fn($u) => $u->whereNotIn('role', $adminRoles))])
+                ->latest();
 
             if ($request->filled('status')) {
                 $query->where('status', $request->status);

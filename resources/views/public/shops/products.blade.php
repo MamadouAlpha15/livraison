@@ -831,7 +831,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                             <a href="{{ route('client.messages.index', $product) }}" class="amz-btn-msg">💬 Poser une question</a>
                         @endif
                     @else
-                        <a href="{{ route('register') }}" class="amz-btn-order">S'inscrire pour commander</a>
+                        <a href="{{ route('register', ['redirect' => route('client.orders.createFromProduct', $product)]) }}" class="amz-btn-order">S'inscrire pour commander</a>
                     @endauth
                 </div>
             </div>

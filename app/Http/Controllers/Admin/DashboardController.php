@@ -57,14 +57,56 @@ class DashboardController extends Controller
         $ordersTotal       = Order::count();
         $ordersDelivered   = Order::where('status', 'livrée')->count();
         $pendingAppr       = $compPending; // alias gardé pour compatibilité
-        $revMonth          = (float) Payment::where('status', 'payé')
-                                ->whereMonth('created_at', now()->month)
-                                ->whereYear('created_at', now()->year)
-                                ->sum('amount');
+        // ── Revenus plateforme : boutiques (total commandes) + livraison (delivery_fee)
+        $mergeRev = function (int $month, int $year): array {
+            $byDev = [];
+
+            // CA boutiques (commandes livrées)
+            $rows = \DB::table('orders')
+                ->join('shops', 'orders.shop_id', '=', 'shops.id')
+                ->where('orders.status', 'livrée')
+                ->whereMonth('orders.created_at', $month)
+                ->whereYear('orders.created_at', $year)
+                ->selectRaw('COALESCE(shops.currency,"GNF") as dev, SUM(orders.total) as t')
+                ->groupBy('dev')
+                ->get();
+            foreach ($rows as $r) {
+                $byDev[$r->dev] = ($byDev[$r->dev] ?? 0) + (float) $r->t;
+            }
+
+            // Frais livraison (delivery_fee des commandes livrées)
+            $rows2 = \DB::table('orders')
+                ->join('delivery_companies', 'orders.delivery_company_id', '=', 'delivery_companies.id')
+                ->where('orders.status', 'livrée')
+                ->whereNotNull('orders.delivery_company_id')
+                ->whereMonth('orders.created_at', $month)
+                ->whereYear('orders.created_at', $year)
+                ->selectRaw('COALESCE(delivery_companies.currency,"GNF") as dev, SUM(orders.delivery_fee) as t')
+                ->groupBy('dev')
+                ->get();
+            foreach ($rows2 as $r) {
+                $byDev[$r->dev] = ($byDev[$r->dev] ?? 0) + (float) $r->t;
+            }
+
+            arsort($byDev);
+            return $byDev;
+        };
+
+        $revByCurrency     = $mergeRev(now()->month, now()->year);
+        $revLastByCurrency = $mergeRev(now()->subMonth()->month, now()->subMonth()->year);
+        $revMonth          = array_sum($revByCurrency);    // total toutes devises (pour trend)
+        $revLastMonth      = array_sum($revLastByCurrency);
         $revTotal          = (float) Payment::where('status', 'payé')->sum('amount');
         $avgRating         = round((float)(Review::avg('rating') ?? 0), 1);
         $openTickets       = SupportTicket::where('status', 'open')->count();
+        $adminIds          = User::where('role', 'superadmin')->pluck('id');
+        $unreadMessages    = (int) \DB::table('support_messages')
+            ->join('support_tickets', 'support_tickets.id', '=', 'support_messages.ticket_id')
+            ->where('support_tickets.status', 'open')
+            ->whereNotIn('support_messages.user_id', $adminIds)
+            ->count();
         $clientsTotal      = User::where('role', 'client')->count();
+        $clientsToday      = User::where('role', 'client')->whereDate('created_at', today())->count();
         $paidToday         = Payment::where('status', 'payé')->whereDate('created_at', today())->count();
 
         return compact(
@@ -74,10 +116,10 @@ class DashboardController extends Controller
             'driversTotal',
             'ordersToday', 'ordersTotal', 'ordersDelivered',
             'pendingAppr',
-            'revMonth', 'revTotal',
+            'revMonth', 'revLastMonth', 'revByCurrency', 'revTotal',
             'avgRating',
-            'openTickets',
-            'clientsTotal',
+            'openTickets', 'unreadMessages',
+            'clientsTotal', 'clientsToday',
             'paidToday'
         );
     }

@@ -103,6 +103,9 @@ $countries = [
 
 <form method="POST" action="{{ route('register') }}" id="regForm" novalidate>
     @csrf
+    @if(request('redirect'))
+        <input type="hidden" name="redirect" value="{{ request('redirect') }}">
+    @endif
 
     {{-- ══════════════ ÉTAPE 1 ══════════════ --}}
     <div class="reg-step active" id="step1">

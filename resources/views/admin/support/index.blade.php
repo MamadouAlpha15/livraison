@@ -99,6 +99,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .ci-preview{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ci-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;animation:blink 2s ease-in-out infinite}
 .cl-empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:13px}
+.ci-unread{margin-left:auto;min-width:20px;height:20px;border-radius:10px;background:var(--brand);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 6px;flex-shrink:0}
+.conv-item.has-unread .ci-name{color:var(--brand);font-weight:800}
+.conv-item.has-unread .ci-preview{color:var(--text);font-weight:600}
+.conv-item.has-unread{background:rgba(124,58,237,.05)}
 
 /* RIGHT: chat */
 .conv-main{flex:1;display:flex;flex-direction:column;min-width:0}
@@ -296,7 +300,7 @@ $I = [
             <div class="conv-list" id="convList">
                 <div class="cl-hdr">
                     <span class="cl-hdr-t">Conversations</span>
-                    <span class="cl-hdr-c">{{ $tickets->count() }}</span>
+                    <span class="cl-hdr-c" id="clHdrCount">{{ $tickets->count() }}</span>
                 </div>
                 <div class="cl-search">
                     <input type="text" placeholder="Rechercher une boutique…" oninput="filterConvs(this.value)" autocomplete="off">
@@ -316,6 +320,7 @@ $I = [
                          data-color="{{ $color }}"
                          data-initial="{{ $initial }}"
                          data-search="{{ strtolower($shopName) }}"
+                         data-unread="{{ $ticket->unread_count ?? 0 }}"
                          >
                         <div class="ci-av" style="background:{{ $color }}">{{ $initial }}</div>
                         <div class="ci-body">
@@ -331,6 +336,7 @@ $I = [
                                 @endif
                             </div>
                         </div>
+                        <span class="ci-unread" id="ub-{{ $ticket->id }}" style="display:none"></span>
                     </div>
                     @empty
                     <div class="cl-empty">Aucune conversation pour le moment</div>
@@ -425,6 +431,14 @@ function filterConvs(q) {
 function openConv(ticketId, el) {
     document.querySelectorAll('.conv-item.active').forEach(x => x.classList.remove('active'));
     el.classList.add('active');
+
+    /* mark this ticket as seen → clear unread badge */
+    const unread = parseInt(el.dataset.unread || '0', 10);
+    _markTicketSeen(ticketId, unread);
+    const badge = document.getElementById('ub-' + ticketId);
+    if (badge) badge.style.display = 'none';
+    el.classList.remove('has-unread');
+    _refreshHeaderCount();
 
     _activeTicket = ticketId;
     _lastMsgId    = 0;
@@ -563,5 +577,57 @@ function backToList() {
     clearInterval(_pollTimer);
     _activeTicket = null;
 }
+
+/* ─── Unread badge tracking ─── */
+function _getSupportSeen() {
+    try { return JSON.parse(localStorage.getItem('sa_support_seen') || '{}'); } catch(e) { return {}; }
+}
+function _markTicketSeen(ticketId, unreadCount) {
+    const s = _getSupportSeen();
+    s[ticketId] = unreadCount;
+    try { localStorage.setItem('sa_support_seen', JSON.stringify(s)); } catch(e) {}
+}
+function _applyUnreadBadge(itemEl, ticketId, unreadCount) {
+    const seen = _getSupportSeen();
+    const seenCount = seen[ticketId] || 0;
+    const newCount  = Math.max(0, unreadCount - seenCount);
+    const badge     = document.getElementById('ub-' + ticketId);
+    if (badge) {
+        if (newCount > 0) {
+            badge.textContent    = newCount;
+            badge.style.display  = 'flex';
+            itemEl.classList.add('has-unread');
+        } else {
+            badge.style.display  = 'none';
+            itemEl.classList.remove('has-unread');
+        }
+    }
+    return newCount;
+}
+function _refreshHeaderCount() {
+    const total  = document.querySelectorAll('.conv-item').length;
+    const unread = document.querySelectorAll('.ci-unread[style*="flex"]').length;
+    const el = document.getElementById('clHdrCount');
+    if (!el) return;
+    if (unread > 0) {
+        el.textContent = unread + ' non lu' + (unread > 1 ? 's' : '');
+        el.style.background = 'rgba(124,58,237,.18)';
+        el.style.color       = 'var(--brand)';
+    } else {
+        el.textContent = total;
+        el.style.background = '';
+        el.style.color       = '';
+    }
+}
+
+/* Init badges on page load */
+(function initUnread() {
+    document.querySelectorAll('.conv-item').forEach(el => {
+        const id     = el.id.replace('ci-', '');
+        const unread = parseInt(el.dataset.unread || '0', 10);
+        _applyUnreadBadge(el, id, unread);
+    });
+    _refreshHeaderCount();
+})();
 </script>
 @endpush

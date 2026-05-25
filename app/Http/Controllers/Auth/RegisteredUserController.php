@@ -80,12 +80,21 @@ class RegisteredUserController extends Controller
             }
         }
 
+        // Si le client vient d'une page produit, le renvoyer directement dessus
+        if ($user->role === 'client' && $request->filled('redirect')) {
+            $target = $request->redirect;
+            // Sécurité : on n'accepte que les URLs du même domaine
+            if (str_starts_with($target, url('/'))) {
+                return redirect($target);
+            }
+        }
+
         // Redirections selon le rôle
         switch ($user->role) {
             case 'admin':
                 return redirect()->route('boutique.dashboard');
             case 'company':
-                return redirect()->route('company.dashboard'); // ✅ redirection spécifique entreprise
+                return redirect()->route('company.dashboard');
             case 'livreur':
                 return redirect()->route('livreur.dashboard');
             default:

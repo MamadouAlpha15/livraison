@@ -267,18 +267,157 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px}
 
 /* ─── RESPONSIVE ─── */
-@media(max-width:1200px){.g3{grid-template-columns:1fr 1fr}}
+@media(max-width:1200px){
+    .g3{grid-template-columns:1fr 1fr}
+    :root{--sb-w:240px}
+}
+@media(max-width:1024px){
+    :root{--sb-w:220px}
+    .kpi-g{grid-template-columns:repeat(auto-fill,minmax(162px,1fr))}
+}
 @media(max-width:900px){
     .sb{transform:translateX(-100%)}.sb.open{transform:translateX(0);box-shadow:4px 0 32px rgba(0,0,0,.32)}
     .sb-ov.open{display:block}.mn{margin-left:0}.ham{display:flex}
     .kpi-g{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}
     .saas-banner{grid-template-columns:1fr}.live-badge{display:none}
+    .tb-uname,.tb-urole{display:none}.tb-user{padding:4px 7px}
+    .saas-num{padding:9px 7px}.saas-num-v{font-size:19px}
+}
+@media(max-width:768px){
+    .ph h1{font-size:16px}.ph-sub{font-size:11px}
+    .ph-acts .btn-g span:last-child{display:none}
+    .saas-num-v{font-size:17px;letter-spacing:-.5px}.saas-num-l{font-size:8.5px}
+    .saas-num{padding:8px 5px}
+    .kpi-g{gap:9px}
 }
 @media(max-width:640px){
-    .con{padding:13px}.tb{padding:0 13px}.g3{grid-template-columns:1fr}
-    .ph{flex-direction:column}.qa-g{grid-template-columns:repeat(2,1fr)}
+    .con{padding:10px}.tb{padding:0 10px;gap:6px}
+    .g3{grid-template-columns:1fr}
+    .ph{flex-direction:column;gap:8px}
+    .qa-g{grid-template-columns:repeat(2,1fr)}
+    .kpi{padding:12px}.kpi-v{font-size:20px}.kpi-ic{width:32px;height:32px}
+    .kpi-l{font-size:11px}.kpi-s{font-size:9.5px}
+    .saas-card{padding:14px 15px}.saas-card-ico{width:38px;height:38px}
+    .saas-num-v{font-size:15px}.saas-num{padding:7px 4px}
+    .pc-row{flex-wrap:wrap}
+    .pc-right{flex:0 0 100%;display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+    .pc-date{margin-top:0}
+    .cw{height:110px}
+    .sc-h{padding:11px 14px 10px}.af-row{padding:9px 14px}
+    .bl{padding:10px 14px;gap:10px}
+    .tb-ttl{font-size:13px}
+    .drop{min-width:160px}
 }
-@media(max-width:400px){.kpi-g{grid-template-columns:1fr}}
+@media(max-width:480px){
+    .kpi-g{grid-template-columns:repeat(2,1fr);gap:8px}
+    .saas-nums{flex-wrap:wrap}
+    .saas-num{flex:0 0 calc(50% - 1px);box-sizing:border-box}
+    .saas-num:nth-child(3),.saas-num:nth-child(4){border-top:1px solid rgba(0,0,0,.06)}
+    .saas-num:nth-child(odd){border-left:none}
+    .saas-num+.saas-num:nth-child(even){border-left:1px solid rgba(0,0,0,.06)}
+    .qa-g{grid-template-columns:repeat(2,1fr);gap:7px}
+    .qa{padding:13px 7px}.qa-l{font-size:10px}
+    .pc-av{width:32px;height:32px;font-size:12px;border-radius:8px}
+    .ph-acts{gap:6px}.btn-g{font-size:11px;padding:7px 10px}
+    .sc-h{flex-wrap:wrap;gap:6px}
+}
+@media(max-width:360px){
+    .kpi-g{grid-template-columns:1fr}
+    .tb-acts{gap:3px}
+    .tb-btn{width:30px;height:30px}
+    .saas-num{flex:0 0 100%;border-left:none!important;border-top:1px solid rgba(0,0,0,.06)}
+    .saas-num:first-child{border-top:none}
+    .con{padding:8px}
+}
+
+/* ─── NOTIFICATION BELL ─── */
+@keyframes bellShake{
+    0%,100%{transform:rotate(0)}
+    10%{transform:rotate(16deg)}25%{transform:rotate(-14deg)}
+    40%{transform:rotate(11deg)}55%{transform:rotate(-8deg)}
+    70%{transform:rotate(5deg)}85%{transform:rotate(-3deg)}
+}
+.bell-shake{animation:bellShake .65s ease}
+.bell-badge{
+    position:absolute;top:3px;right:3px;
+    min-width:15px;height:15px;padding:0 3px;border-radius:8px;
+    background:var(--red);color:#fff;font-size:8px;font-weight:900;
+    display:flex;align-items:center;justify-content:center;
+    border:1.5px solid #fff;pointer-events:none;line-height:1;letter-spacing:0
+}
+.np{
+    position:absolute;top:calc(100% + 9px);right:-6px;width:340px;max-height:510px;
+    background:#fff;border:1px solid var(--bd);border-radius:15px;
+    box-shadow:0 20px 60px rgba(0,0,0,.18),0 4px 16px rgba(0,0,0,.07);
+    z-index:700;display:none;flex-direction:column;overflow:hidden
+}
+.np.open{display:flex}
+.np-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 16px 12px;border-bottom:1px solid var(--bd);flex-shrink:0
+}
+.np-title{font-size:13px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:7px}
+.np-clear{
+    font-size:10px;font-weight:700;color:var(--brand);background:none;border:none;
+    cursor:pointer;padding:4px 10px;border-radius:7px;
+    transition:background .13s;font-family:var(--font)
+}
+.np-clear:hover{background:rgba(124,58,237,.09)}
+.np-body{overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.1) transparent}
+.np-body::-webkit-scrollbar{width:3px}
+.np-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,.12);border-radius:2px}
+.np-sep{
+    font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.9px;
+    color:var(--muted);padding:9px 16px 5px;background:rgba(0,0,0,.022)
+}
+.np-item{
+    display:flex;align-items:center;gap:12px;padding:11px 16px;
+    border-bottom:1px solid rgba(0,0,0,.045);text-decoration:none;
+    transition:background .13s;position:relative;cursor:pointer
+}
+.np-item:last-child{border-bottom:none}
+.np-item:hover{background:rgba(124,58,237,.03)}
+.np-item.new{background:rgba(124,58,237,.05)}
+.np-item.new::before{
+    content:'';position:absolute;left:0;top:0;bottom:0;
+    width:3px;background:var(--brand);border-radius:0 2px 2px 0
+}
+.np-ico{
+    width:38px;height:38px;border-radius:11px;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0
+}
+.np-ico.r{background:var(--rbg);color:#dc2626}
+.np-ico.a{background:var(--abg);color:#d97706}
+.np-ico.p{background:rgba(139,92,246,.12);color:#7c3aed}
+.np-ico.g{background:var(--gbg);color:#059669}
+.np-ico.b{background:var(--bbg);color:#2563eb}
+.np-info{flex:1;min-width:0}
+.np-n{font-size:12px;font-weight:700;color:var(--text);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.np-d{font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.35}
+.np-cnt{
+    flex-shrink:0;min-width:22px;height:22px;padding:0 6px;border-radius:11px;
+    font-size:10px;font-weight:800;color:#fff;
+    display:flex;align-items:center;justify-content:center
+}
+.np-cnt.r{background:var(--red)}.np-cnt.a{background:var(--amber)}
+.np-cnt.p{background:var(--brand)}.np-cnt.g{background:var(--green)}.np-cnt.b{background:var(--blue)}
+.np-empty{padding:38px 20px;text-align:center}
+.np-empty-ico{
+    width:46px;height:46px;border-radius:50%;background:var(--gbg);color:var(--green);
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 12px;font-size:22px
+}
+.np-empty-t{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.np-empty-s{font-size:11px;color:var(--muted)}
+.np-foot{
+    border-top:1px solid var(--bd);padding:10px 16px;
+    text-align:center;flex-shrink:0
+}
+.np-foot a{font-size:11.5px;font-weight:600;color:var(--brand);text-decoration:none}
+.np-foot a:hover{text-decoration:underline}
+@media(max-width:500px){
+    .np{position:fixed;top:64px;left:8px;right:8px;width:auto;max-height:calc(100vh - 82px);border-radius:13px}
+}
 </style>
 @endpush
 
@@ -371,6 +510,7 @@ $I = [
         <div class="sb-sec shop">── SaaS Boutiques</div>
         <a href="{{ route('admin.shops.index') }}" class="sb-a">
             <span class="sb-i">{!! $I['store'] !!}</span><span>Boutiques</span>
+            <span class="sb-pill a" id="sbBadgeShops" style="{{ $kpis['shopsPending']>0?'':'display:none' }}">{{ $kpis['shopsPending'] }}</span>
         </a>
         <a href="{{ route('admin.products.index') }}" class="sb-a">
             <span class="sb-i">{!! $I['bag'] !!}</span><span>Produits</span>
@@ -387,7 +527,7 @@ $I = [
         <div class="sb-sec livr">── SaaS Livraison</div>
         <a href="{{ route('admin.entreprises.index') }}" class="sb-a">
             <span class="sb-i">{!! $I['truck'] !!}</span><span>Entreprises livraison</span>
-            @if($kpis['pendingAppr']>0)<span class="sb-pill r">{{ $kpis['pendingAppr'] }}</span>@endif
+            <span class="sb-pill r" id="sbBadgeComp" style="{{ $kpis['pendingAppr']>0?'':'display:none' }}">{{ $kpis['pendingAppr'] }}</span>
         </a>
         <a href="{{ route('admin.livreurs.index') }}" class="sb-a">
             <span class="sb-i">{!! $I['bike'] !!}</span><span>Livreurs</span>
@@ -425,8 +565,8 @@ $I = [
             <span class="sb-i">{!! $I['star'] !!}</span><span>Avis &amp; Notation</span>
         </a>
         <a href="{{ route('admin.support.index') }}" class="sb-a">
-            <span class="sb-i">{!! $I['ticket'] !!}</span><span>Tickets support</span>
-            @if($kpis['openTickets']>0)<span class="sb-pill a">{{ $kpis['openTickets'] }}</span>@endif
+            <span class="sb-i">{!! $I['ticket'] !!}</span><span>Support conversations</span>
+            <span class="sb-pill a" id="sbBadgeSupport" style="display:none"></span>
         </a>
         <a href="#" class="sb-a" onclick="nt();return false">
             <span class="sb-i">{!! $I['cog'] !!}</span><span>Paramètres système</span>
@@ -461,10 +601,26 @@ $I = [
         <span id="liveTs">{{ now()->format('H:i:s') }}</span>
     </div>
     <div class="tb-acts">
-        <button class="tb-btn" onclick="nt()" title="Notifications" style="position:relative">
-            {!! $I['bell'] !!}
-            @if($kpis['pendingAppr']>0)<span class="ndot"></span>@endif
-        </button>
+        {{-- ── CLOCHE DE NOTIFICATION ── --}}
+        <div style="position:relative">
+            <button class="tb-btn" id="bellBtn" onclick="toggleNotifPanel()" title="Notifications">
+                {!! $I['bell'] !!}
+                <span class="bell-badge" id="bellBadge" style="display:none"></span>
+            </button>
+            <div class="np" id="np">
+                <div class="np-head">
+                    <div class="np-title">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                        Notifications
+                    </div>
+                    <button class="np-clear" onclick="clearNotifs(event)">✓ Tout marquer lu</button>
+                </div>
+                <div class="np-body" id="npBody"></div>
+                <div class="np-foot">
+                    <a href="{{ route('admin.support.index') }}">Voir tous les tickets support →</a>
+                </div>
+            </div>
+        </div>
         <a href="{{ route('profile.edit') }}" class="tb-btn" title="Profil">{!! $I['user'] !!}</a>
     </div>
     <div style="position:relative">
@@ -626,22 +782,43 @@ $I = [
         <div class="kpi t">
             <div class="kpi-top">
                 <div class="kpi-ic t">{!! $I['dollar_lg'] !!}</div>
-                <div class="kpi-tr up">▲ ce mois</div>
+                @php
+                    $revLast = $kpis['revLastMonth'] ?? 0;
+                    $revNow  = $kpis['revMonth'] ?? 0;
+                    if ($revLast > 0) {
+                        $pct = round(($revNow - $revLast) / $revLast * 100);
+                        $trendTxt = ($pct >= 0 ? '▲ +' : '▼ ') . $pct . '% vs mois dernier';
+                        $trendCls = $pct >= 0 ? 'up' : 'dn';
+                    } else {
+                        $trendTxt = '▲ ce mois';
+                        $trendCls = 'up';
+                    }
+                @endphp
+                <div class="kpi-tr {{ $trendCls }}">{{ $trendTxt }}</div>
             </div>
-            <div class="kpi-v" id="kRevMonth" style="font-size:16px">{{ number_format($kpis['revMonth'],0,',',' ') }}</div>
+            <div id="kRevMonth" style="display:flex;flex-direction:column;gap:3px;margin:4px 0 2px">
+                @forelse($kpis['revByCurrency'] as $devise => $montant)
+                    <div style="font-size:15px;font-weight:800;line-height:1.2;color:inherit">
+                        {{ number_format($montant, 0, ',', ' ') }}
+                        <span style="font-size:10px;font-weight:600;opacity:.65;margin-left:2px">{{ $devise }}</span>
+                    </div>
+                @empty
+                    <div style="font-size:15px;font-weight:800">0</div>
+                @endforelse
+            </div>
             <div class="kpi-l">Revenus mois</div>
-            <div class="kpi-s">Paiements encaissés</div>
+            <div class="kpi-s">Boutiques + livraison · toute plateforme</div>
         </div>
-        <div class="kpi ro">
+        <div class="kpi b">
             <div class="kpi-top">
-                <div class="kpi-ic ro">{!! $I['ticket_lg'] !!}</div>
-                <div class="kpi-tr {{ $kpis['openTickets']>0?'dn':'g' }}">
-                    {{ $kpis['openTickets']>0?'▼ '.$kpis['openTickets'].' ouverts':'✓ 0 ouvert' }}
+                <div class="kpi-ic b">{!! $I['user'] !!}</div>
+                <div class="kpi-tr {{ $kpis['clientsToday']>0?'up':'fl' }}">
+                    {{ $kpis['clientsToday']>0?'▲ +'.$kpis['clientsToday'].' auj.':'→ 0 auj.' }}
                 </div>
             </div>
-            <div class="kpi-v" id="kTickets">{{ $kpis['openTickets'] }}</div>
-            <div class="kpi-l">Tickets support</div>
-            <div class="kpi-s">Ouverts</div>
+            <div class="kpi-v" id="kClientsTotal">{{ $kpis['clientsTotal'] }}</div>
+            <div class="kpi-l">Clients inscrits</div>
+            <div class="kpi-s" id="kClientsToday">{{ $kpis['clientsToday']>0?'+'.$kpis['clientsToday']." aujourd'hui"."":"Aucun aujourd'hui" }}</div>
         </div>
     </div>
 
@@ -925,6 +1102,184 @@ function nt(msg='Bientôt disponible'){
     clearTimeout(_t);_t=setTimeout(()=>{el.style.transform='translateY(80px)';el.style.opacity='0'},2800);
 }
 
+/* ═══════════════════════════════════════════════
+   NOTIFICATION BELL
+═══════════════════════════════════════════════ */
+const NP_URLS={
+    shops:  '{{ route("admin.shops.index") }}',
+    comp:   '{{ route("admin.entreprises.index") }}',
+    support:'{{ route("admin.support.index") }}',
+    orders: '{{ route("admin.orders.index") }}',
+    users:  '{{ route("admin.users.index") }}',
+};
+const NP_ICO={
+    store: `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`,
+    truck: `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v3"/><rect width="7" height="7" x="14" y="12" rx="1"/><path d="M5 17a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/><path d="M15 19a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/></svg>`,
+    ticket:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3Z"/></svg>`,
+    box:   `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>`,
+    users: `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+};
+
+let _latestKpis=@json($kpis);
+let _npOpen=false;
+let _prevBellBadge=null;
+
+function _getSeenState(){
+    try{
+        const s=JSON.parse(localStorage.getItem('sa_notif_seen')||'{}');
+        // Reset des compteurs journaliers si jour différent
+        const today=new Date().toISOString().slice(0,10);
+        if(s._date!==today){s.ordersToday=0;s.usersToday=0;}
+        return s;
+    }catch(e){return {};}
+}
+function _saveSeenState(k){
+    try{localStorage.setItem('sa_notif_seen',JSON.stringify({
+        shops:k.shopsPending,
+        comp:k.pendingAppr,
+        unreadMessages:k.unreadMessages||0,
+        ordersToday:k.ordersToday||0,
+        usersToday:k.usersToday||0,
+        _date:new Date().toISOString().slice(0,10)
+    }));}catch(e){}
+}
+function computeBadge(k){
+    const s=_getSeenState();
+    return Math.max(0,k.shopsPending-(s.shops||0))
+          +Math.max(0,k.pendingAppr-(s.comp||0))
+          +Math.max(0,(k.unreadMessages||0)-(s.unreadMessages||0));
+}
+function updateSupportSidebarBadge(k){
+    const s=_getSeenState();
+    const cnt=Math.max(0,(k.unreadMessages||0)-(s.unreadMessages||0));
+    const el=document.getElementById('sbBadgeSupport');
+    if(!el)return;
+    if(cnt>0){el.textContent=cnt;el.style.display='';}
+    else{el.style.display='none';}
+}
+function updateBellBadge(count){
+    const el=document.getElementById('bellBadge');
+    if(!el)return;
+    if(count>0){el.textContent=count>99?'99+':count;el.style.display='flex';}
+    else{el.style.display='none';}
+}
+function playBellSound(){
+    try{
+        const ac=new(window.AudioContext||window.webkitAudioContext)();
+        const t=ac.currentTime;
+        // Son de cloche : harmoniques + décroissance naturelle
+        [[523,.55,1.9],[1047,.28,1.5],[2093,.14,1.1],[4186,.06,.65]].forEach(([f,g,d])=>{
+            const o=ac.createOscillator(),gn=ac.createGain();
+            o.type='sine';o.frequency.value=f;
+            gn.gain.setValueAtTime(0,t);
+            gn.gain.linearRampToValueAtTime(g,t+.004);
+            gn.gain.exponentialRampToValueAtTime(.001,t+d);
+            o.connect(gn);gn.connect(ac.destination);
+            o.start(t);o.stop(t+d+.06);
+        });
+        // Animation cloche
+        const btn=document.getElementById('bellBtn');
+        if(btn){btn.classList.remove('bell-shake');void btn.offsetWidth;btn.classList.add('bell-shake');}
+    }catch(e){}
+}
+function renderNotifPanel(k){
+    const body=document.getElementById('npBody');if(!body)return;
+    const s=_getSeenState();
+    const pl=(n,word)=>n+' '+word+(n>1?'s':'');
+    const urgent=[];const info=[];
+    // Urgent : seulement si count DÉPASSE le niveau déjà vu → disparaît après "marquer lu"
+    if(k.shopsPending>(s.shops||0))urgent.push({
+        cls:'a',ico:NP_ICO.store,cnt:k.shopsPending,url:NP_URLS.shops,
+        n:'Boutiques en attente',
+        d:pl(k.shopsPending,'boutique')+' en attente d\'approbation',
+        type:'shops'
+    });
+    if(k.pendingAppr>(s.comp||0))urgent.push({
+        cls:'r',ico:NP_ICO.truck,cnt:k.pendingAppr,url:NP_URLS.comp,
+        n:'Entreprises en attente',
+        d:pl(k.pendingAppr,'entreprise')+' en attente d\'approbation',
+        type:'comp'
+    });
+    if((k.unreadMessages||0)>(s.unreadMessages||0))urgent.push({
+        cls:'p',ico:NP_ICO.ticket,cnt:k.unreadMessages,url:NP_URLS.support,
+        n:'Support — messages non lus',
+        d:(k.unreadMessages||0)+' message'+(k.unreadMessages>1?'s':'')+' en attente de votre réponse',
+        type:'support'
+    });
+    // Info : disparaît au clic, réapparaît si nouveaux événements (reset à minuit)
+    if((k.ordersToday||0)>(s.ordersToday||0))info.push({
+        cls:'g',ico:NP_ICO.box,cnt:k.ordersToday,url:NP_URLS.orders,
+        n:'Commandes aujourd\'hui',
+        d:pl(k.ordersToday,'commande')+' passée'+(k.ordersToday>1?'s':'')+' aujourd\'hui',
+        type:'orders'
+    });
+    if((k.usersToday||0)>(s.usersToday||0))info.push({
+        cls:'b',ico:NP_ICO.users,cnt:k.usersToday,url:NP_URLS.users,
+        n:'Nouveaux inscrits',
+        d:pl(k.usersToday,'utilisateur')+' inscrit'+(k.usersToday>1?'s':'')+' aujourd\'hui',
+        type:'users'
+    });
+    if(!urgent.length&&!info.length){
+        body.innerHTML=`<div class="np-empty"><div class="np-empty-ico">✓</div><div class="np-empty-t">Tout est à jour</div><div class="np-empty-s">Aucune action requise pour le moment.</div></div>`;
+        return;
+    }
+    // Urgent : toujours "new" (par définition : non encore vu), clic = marque comme lu
+    const urgRow=i=>`<a href="${i.url}" class="np-item new" onclick="markItemSeen('${i.type}')"><div class="np-ico ${i.cls}">${i.ico}</div><div class="np-info"><div class="np-n">${i.n}</div><div class="np-d">${i.d}</div></div><span class="np-cnt ${i.cls}">${i.cnt}</span></a>`;
+    const infRow=i=>`<a href="${i.url}" class="np-item" onclick="markItemSeen('${i.type}')"><div class="np-ico ${i.cls}">${i.ico}</div><div class="np-info"><div class="np-n">${i.n}</div><div class="np-d">${i.d}</div></div><span class="np-cnt ${i.cls}">${i.cnt}</span></a>`;
+    let html='';
+    if(urgent.length)html+=`<div class="np-sep">⚡ Actions requises</div>`+urgent.map(urgRow).join('');
+    if(info.length)html+=`<div class="np-sep">📊 Activité du jour</div>`+info.map(infRow).join('');
+    body.innerHTML=html;
+}
+function toggleNotifPanel(){
+    const np=document.getElementById('np');if(!np)return;
+    _npOpen=!_npOpen;
+    np.classList.toggle('open',_npOpen);
+    if(_npOpen)renderNotifPanel(_latestKpis);
+}
+function markItemSeen(type){
+    const s=_getSeenState();
+    if(type==='shops')         s.shops         = _latestKpis.shopsPending;
+    else if(type==='comp')    s.comp          = _latestKpis.pendingAppr;
+    else if(type==='support') s.unreadMessages = _latestKpis.unreadMessages||0;
+    else if(type==='orders')  { s.ordersToday = _latestKpis.ordersToday||0; s._date=new Date().toISOString().slice(0,10); }
+    else if(type==='users')   { s.usersToday  = _latestKpis.usersToday||0;  s._date=new Date().toISOString().slice(0,10); }
+    try{localStorage.setItem('sa_notif_seen',JSON.stringify(s));}catch(e){}
+    const badge=computeBadge(_latestKpis);
+    _prevBellBadge=badge;
+    updateBellBadge(badge);
+    updateSupportSidebarBadge(_latestKpis);
+    renderNotifPanel(_latestKpis); // ← re-render immédiat : l'item disparaît du panel
+}
+function clearNotifs(e){
+    if(e)e.stopPropagation();
+    _saveSeenState(_latestKpis);
+    const badge=computeBadge(_latestKpis); // = 0 après save
+    _prevBellBadge=badge;
+    updateBellBadge(badge);
+    updateSupportSidebarBadge(_latestKpis);
+    // Ferme le panel et le re-render (seuls les info restent)
+    renderNotifPanel(_latestKpis);
+    _npOpen=false;
+    const np=document.getElementById('np');
+    if(np)np.classList.remove('open');
+}
+document.addEventListener('click',e=>{
+    if(!_npOpen)return;
+    const btn=document.getElementById('bellBtn'),np=document.getElementById('np');
+    if(btn&&np&&!btn.contains(e.target)&&!np.contains(e.target)){
+        _npOpen=false;np.classList.remove('open');
+    }
+});
+// Initialisation
+(function initNotif(){
+    const badge=computeBadge(_latestKpis);
+    _prevBellBadge=badge;
+    updateBellBadge(badge);
+    updateSupportSidebarBadge(_latestKpis);
+    renderNotifPanel(_latestKpis);
+})();
+
 /* ── Progress bars ── */
 setTimeout(()=>{document.querySelectorAll('.bf').forEach(el=>{el.style.width=el.dataset.w+'%'})},350);
 
@@ -986,8 +1341,17 @@ function pollStats(){
             setVal('kDrivers',k.driversTotal);
             setVal('kOrdersTotal',k.ordersTotal);
             setVal('kPending',k.pendingAppr);
-            setVal('kRevMonth',k.revMonth.toLocaleString('fr-FR',{maximumFractionDigits:0}));
-            setVal('kTickets',k.openTickets);
+            setVal('kClientsTotal',k.clientsTotal);
+            const kct=document.getElementById('kClientsToday');
+            if(kct)kct.textContent=k.clientsToday>0?'+'+k.clientsToday+" aujourd'hui":"Aucun aujourd'hui";
+            // Revenue multi-devises
+            const revEl=document.getElementById('kRevMonth');
+            if(revEl&&k.revByCurrency){
+                const entries=Object.entries(k.revByCurrency);
+                revEl.innerHTML=entries.length===0
+                    ?'<div style="font-size:15px;font-weight:800">0</div>'
+                    :entries.map(([dev,amt])=>`<div style="font-size:15px;font-weight:800;line-height:1.2;color:inherit">${Number(amt).toLocaleString('fr-FR',{maximumFractionDigits:0})}<span style="font-size:10px;font-weight:600;opacity:.65;margin-left:2px">${dev}</span></div>`).join('');
+            }
             setVal('saasShopsTotal',k.shopsTotal);
             setVal('saasShopsActive',k.shopsActive);
             setVal('saasShopsPending',k.shopsPending);
@@ -1002,6 +1366,19 @@ function pollStats(){
             const brOV=document.getElementById('brOrdersV');if(brOV)brOV.textContent=k.ordersDelivered+'/'+k.ordersTotal;
             const brCV=document.getElementById('brCompV');if(brCV)brCV.textContent=k.compActive+'/'+k.compTotal;
             const brDV=document.getElementById('brDriversV');if(brDV)brDV.textContent=k.driversTotal;
+            // badges sidebar temps réel
+            const sbS=document.getElementById('sbBadgeShops');
+            if(sbS){sbS.style.display=k.shopsPending>0?'':'none';sbS.textContent=k.shopsPending;}
+            const sbC=document.getElementById('sbBadgeComp');
+            if(sbC){sbC.style.display=k.pendingAppr>0?'':'none';sbC.textContent=k.pendingAppr;}
+            updateSupportSidebarBadge(k);
+            // Notifications bell temps réel
+            _latestKpis=k;
+            const badge=computeBadge(k);
+            if(_prevBellBadge!==null&&badge>_prevBellBadge)playBellSound();
+            _prevBellBadge=badge;
+            updateBellBadge(badge);
+            if(_npOpen)renderNotifPanel(k);
             buildChart(d.chart);
             updateActivity(d.activity);
             const ts=document.getElementById('liveTs');if(ts)ts.textContent=d.ts;
