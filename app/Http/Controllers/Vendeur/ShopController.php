@@ -61,24 +61,26 @@ class ShopController extends Controller
             $validated['image'] = ImageOptimizer::store($request->file('image'), 'shops');
         }
 
-        // ✅ Création de la boutique et lien avec le vendeur
+        // ✅ Création de la boutique — auto-approuvée, plan gratuit par défaut
         $shop = new Shop($validated);
-        $shop->user_id  = Auth::id();
-        $shop->country  = Auth::user()->country;
-        $shop->currency = \App\Models\DeliveryCompany::currencyForCountry(Auth::user()->country ?? '');
+        $shop->user_id     = Auth::id();
+        $shop->country     = Auth::user()->country;
+        $shop->currency    = \App\Models\DeliveryCompany::currencyForCountry(Auth::user()->country ?? '');
+        $shop->is_approved = true;   // approbation automatique, les limites sont gérées par le plan
+        $shop->plan        = 'free'; // plan gratuit par défaut
         $shop->save();
 
         // ✅ Mise à jour du vendeur → il devient admin de sa boutique
         $user = Auth::user();
         $user->update([
-            'shop_id' => $shop->id,
+            'shop_id'      => $shop->id,
             'role_in_shop' => 'admin',
         ]);
 
         // ✅ Redirection vers le dashboard vendeur
         return redirect()
             ->route('boutique.dashboard')
-            ->with('success', 'Boutique créée avec succès, en attente de validation par l’admin.');
+            ->with('success', "Boutique créée avec succès ! Vous êtes sur le Plan Gratuit.");
     }
 
     /**

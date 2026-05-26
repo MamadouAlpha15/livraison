@@ -21,6 +21,7 @@ use App\Models\Product;      // Table "products" — les produits
 use App\Models\Payment;      // Table "payments" — les paiements liés aux commandes
 use App\Models\Shop;         // Table "shops" — les boutiques
 use App\Models\ShopMessage;  // Table "shop_messages" — les messages entre client et vendeur
+use App\Services\SubscriptionService; // Vérification des limites du plan
 
 // On importe Request : objet qui contient toutes les données envoyées par le formulaire (POST, GET...)
 use Illuminate\Http\Request;
@@ -243,7 +244,6 @@ class OrderController extends Controller
         $product = Product::with('shop')->findOrFail($request->product_id);
 
         // Vérification de sécurité : la boutique doit exister et être approuvée
-        // abort_unless avec 403 = erreur "Accès refusé"
         abort_unless($product->shop && $product->shop->is_approved, 403);
 
         // Vérification du stock (si le produit a un stock géré)

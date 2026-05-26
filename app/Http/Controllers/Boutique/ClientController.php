@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
+use App\Services\SubscriptionService;
 
 /**
  * ═══════════════════════════════════════════════════════════════
@@ -129,6 +130,9 @@ class ClientController extends Controller
             ->count('user_id');
         $caTotal          = (float) $shop->orders()->sum('total');
 
+        $isPro          = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
+        $processedCount = app(SubscriptionService::class)->processedOrdersThisMonth($shop);
+
         return view('boutique.clients.index', compact(
             'clients',
             'topClientIds',
@@ -137,7 +141,9 @@ class ClientController extends Controller
             'totalClients',
             'nouveauxCeMois',
             'caTotal',
-            'shop'
+            'shop',
+            'isPro',
+            'processedCount'
         ));
     }
 

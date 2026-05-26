@@ -588,7 +588,13 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
     $initials = strtoupper(substr($parts[0],0,1)) . strtoupper(substr($parts[1] ?? 'X',0,1));
     $init     = fn(string $n): string => strtoupper(substr(explode(' ',$n)[0],0,1))
                                        . strtoupper(substr(explode(' ',$n)[1] ?? substr($n,1,1),0,1));
-    $pendingCount = $shop->orders()->whereIn('status',['pending','en attente','en_attente','confirmée','processing'])->count();
+    $pendingCount   = $shop->orders()->whereIn('status',['pending','en attente','en_attente','confirmée','processing'])->count();
+    $isPro          = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
+    $processedCount = $shop->orders()->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->where(function($q){$q->whereNotNull('livreur_id')->orWhereNotNull('delivery_company_id');})->count();
+    $productCount   = $shop->products()->count();
+    $_sbCmdMax = 10; $_sbProdMax = 5;
+    if ($isPro)                            { $_sbCmdClr = '#10b981'; } elseif ($processedCount >= $_sbCmdMax) { $_sbCmdClr = '#ef4444'; } elseif ($processedCount >= 7) { $_sbCmdClr = '#f59e0b'; } else { $_sbCmdClr = '#8b5cf6'; }
+    if ($isPro)                           { $_sbProdClr = '#10b981'; } elseif ($productCount >= $_sbProdMax) { $_sbProdClr = '#ef4444'; } elseif ($productCount >= 4)  { $_sbProdClr = '#f59e0b'; } else { $_sbProdClr = '#8b5cf6'; }
 @endphp
 
 <div class="dash-wrap">
@@ -616,24 +622,47 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
         <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">{!! $I['msg_nav'] !!}</span> Messages</a>
         <a href="{{ route('boutique.orders.index') }}" class="sb-item">
             <span class="ico">{!! $I['box_nav'] !!}</span> Commandes
-            @if($pendingCount > 0)<span class="sb-badge">{{ $pendingCount }}</span>@endif
+            @if(!$isPro)
+                <span class="sb-badge" style="background:{{ $_sbCmdClr }};color:#fff;font-size:10px;padding:1px 5px;border-radius:8px;margin-left:auto">{{ $processedCount }}/{{ $_sbCmdMax }}</span>
+            @elseif($pendingCount > 0)
+                <span class="sb-badge">{{ $pendingCount }}</span>
+            @endif
         </a>
-        <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">{!! $I['tag_nav'] !!}</span> Produits</a>
+        <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">{!! $I['tag_nav'] !!}</span> Produits
+            @if(!$isPro)<span class="sb-badge" style="background:{{ $_sbProdClr }};color:#fff;font-size:10px;padding:1px 5px;border-radius:8px;margin-left:auto">{{ $productCount }}/{{ $_sbProdMax }}</span>@endif
+        </a>
         <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">{!! $I['users_nav'] !!}</span> Clients</a>
+        @if($isPro)
         <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">{!! $I['team_nav'] !!}</span> Équipe</a>
+        @else
+        <a href="{{ route('boutique.subscription.upgrade') }}" class="sb-item" style="opacity:.6;" title="Plan Pro requis"><span class="ico">{!! $I['team_nav'] !!}</span> Équipe <span class="sb-badge" style="background:#f59e0b;margin-left:auto;">🔒</span></a>
+        @endif
         <div class="sb-section">Livraison</div>
+        @if($isPro)
         <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">{!! $I['bike_nav'] !!}</span> Livreurs</a>
+        @else
+        <a href="{{ route('boutique.subscription.upgrade') }}" class="sb-item" style="opacity:.6;" title="Plan Pro requis"><span class="ico">{!! $I['bike_nav'] !!}</span> Livreurs <span class="sb-badge" style="background:#f59e0b;margin-left:auto;">🔒</span></a>
+        @endif
+        @if($isPro)
         <a href="{{ route('delivery.companies.index') }}" class="sb-item"><span class="ico">{!! $I['bldg_nav'] !!}</span> Partenaires</a>
+        @else
+        <a href="{{ route('boutique.subscription.upgrade') }}" class="sb-item" style="opacity:.6;" title="Plan Pro requis"><span class="ico">{!! $I['bldg_nav'] !!}</span> Partenaires <span class="sb-badge" style="background:#f59e0b;margin-left:auto;">🔒</span></a>
+        @endif
         <div class="sb-section">Finances</div>
         <div class="sb-group">
             <button class="sb-group-toggle open" onclick="toggleGroup(this)" type="button">
                 <span class="ico">{!! $I['wallet_nav'] !!}</span> Finances & Rapports
+                @if(!$isPro)<span style="font-size:11px;margin-left:4px;opacity:.7;">🔒</span>@endif
                 <span class="sb-arrow" style="transform:rotate(90deg);color:rgba(255,255,255,.5)">▶</span>
             </button>
             <div class="sb-sub open">
                 <a href="{{ route('boutique.payments.index') }}" class="sb-item"><span class="ico">{!! $I['card_nav'] !!}</span> Paiements</a>
                 <a href="{{ route('boutique.commissions.index') }}" class="sb-item active"><span class="ico">{!! $I['chart_nav'] !!}</span> Commissions</a>
+                @if($isPro)
                 <a href="{{ route('boutique.reports.index') }}" class="sb-item"><span class="ico">{!! $I['list_nav'] !!}</span> Rapports</a>
+                @else
+                <a href="{{ route('boutique.subscription.upgrade') }}" class="sb-item" style="opacity:.6;" title="Plan Pro requis"><span class="ico">{!! $I['list_nav'] !!}</span> Rapports <span class="sb-badge" style="background:#f59e0b;margin-left:auto;">🔒</span></a>
+                @endif
                 @if(auth()->user()->role === 'admin')
                 <a href="{{ route('shop.edit', $shop) }}" class="sb-item"><span class="ico">{!! $I['gear_nav'] !!}</span> Paramètres</a>
                 @endif

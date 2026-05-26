@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Vendeur;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -139,9 +140,13 @@ class ProductController extends Controller
         $activeProducts = $hasIsActive ? $shop->products()->where('is_active', true)->count() : $totalProducts;
         $outOfStock     = $hasStock    ? $shop->products()->where('stock', '<=', 0)->count()   : 0;
 
+        $isPro          = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
+        $processedCount = app(SubscriptionService::class)->processedOrdersThisMonth($shop);
+
         return view('vendeur.products.index', compact(
             'products', 'categories', 'customCats', 'devise',
-            'totalProducts', 'activeProducts', 'outOfStock'
+            'totalProducts', 'activeProducts', 'outOfStock',
+            'isPro', 'processedCount'
         ));
     }
 
@@ -167,6 +172,13 @@ class ProductController extends Controller
      ───────────────────────────────────────────── */
     public function store(Request $request)
     {
+        // Vérification limite plan gratuit : max 5 produits
+        $shop = Auth::user()->shop;
+        if ($shop && !app(SubscriptionService::class)->canCreateProduct($shop)) {
+            return redirect()->route('boutique.subscription.upgrade')
+                ->with('plan_error', 'Limite atteinte : le Plan Gratuit est limité à 5 produits. Passez au Plan Pro pour en créer davantage.');
+        }
+
         $request->validate([
             'name'             => 'required|string|max:255',
             'price'            => 'required|numeric|min:0',
@@ -332,6 +344,12 @@ class ProductController extends Controller
     {
         $shop = Auth::user()->shop;
         abort_if(!$shop || $product->shop_id !== $shop->id, 403);
+
+        // Vérification limite plan gratuit avant duplication
+        if (!app(SubscriptionService::class)->canCreateProduct($shop)) {
+            return redirect()->route('boutique.subscription.upgrade')
+                ->with('plan_error', 'Limite atteinte : impossible de dupliquer, vous avez déjà 5 produits. Passez au Plan Pro.');
+        }
 
         $new = $product->replicate();
         $new->name      = $product->name . ' (copie)';

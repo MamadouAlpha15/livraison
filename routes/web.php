@@ -28,6 +28,11 @@
 
 use Illuminate\Support\Facades\Route;
 
+/* ── Contrôleurs : Paiement & Abonnements ── */
+use App\Http\Controllers\Payment\GenuisPayController;
+use App\Http\Controllers\Boutique\SubscriptionController as BoutiqueSubscriptionController;
+use App\Http\Controllers\Company\SubscriptionController as CompanySubscriptionController;
+
 /* ── Contrôleurs : Auth & Profil ── */
 use App\Http\Controllers\ProfileController;
 
@@ -240,9 +245,11 @@ Route::middleware('auth')->group(function () {
     /* Espace company + admin boutique */
     Route::middleware('role:admin,company')->prefix('company')->group(function () {
 
-        /* Dashboard */
+        /* Dashboard — accessible en plan gratuit */
         Route::get('/', [DeliveryCompanyController::class, 'dashboard'])->name('company.dashboard');
-        Route::get('/live-stats', [DeliveryCompanyController::class, 'liveStats'])->name('company.live-stats');
+        /* Live stats dashboard — réservé Plan Business */
+        Route::get('/live-stats', [DeliveryCompanyController::class, 'liveStats'])
+            ->middleware('company.plan:business')->name('company.live-stats');
 
         /* Inbox company — toutes les conversations entrants (avant /{company} pour éviter conflit) */
         Route::get('/chat/inbox',         [DeliveryChatController::class, 'inbox'])        ->name('company.chat.inbox');
@@ -272,7 +279,9 @@ Route::middleware('auth')->group(function () {
 
         /* Livraisons en cours */
         Route::get('/livraisons',      [CompanyOrderController::class, 'inProgress'])    ->name('company.livraisons.index');
-        Route::get('/livraisons/data', [CompanyOrderController::class, 'inProgressData'])->name('company.livraisons.data');
+        /* données live des livraisons — réservé Plan Business */
+        Route::get('/livraisons/data', [CompanyOrderController::class, 'inProgressData'])
+            ->middleware('company.plan:business')->name('company.livraisons.data');
 
         /* Historique des livraisons */
         Route::get('/historique', [CompanyOrderController::class, 'historique'])->name('company.historique.index');
@@ -283,12 +292,15 @@ Route::middleware('auth')->group(function () {
         /* Clients livrés */
         Route::get('/clients', [CompanyOrderController::class, 'clients'])->name('company.clients.index');
 
-        /* Carte en direct */
-        Route::get('/carte',      [CompanyOrderController::class, 'mapView']) ->name('company.carte.index');
-        Route::get('/carte/data', [CompanyOrderController::class, 'mapData']) ->name('company.carte.data');
+        /* Carte en direct — réservé Plan Business */
+        Route::get('/carte',      [CompanyOrderController::class, 'mapView'])
+            ->middleware('company.plan:business')->name('company.carte.index');
+        Route::get('/carte/data', [CompanyOrderController::class, 'mapData'])
+            ->middleware('company.plan:business')->name('company.carte.data');
 
-        /* Rapport général */
-        Route::get('/rapport', [\App\Http\Controllers\Company\RapportController::class, 'index'])->name('company.rapport.index');
+        /* Rapport général — réservé Plan Business */
+        Route::get('/rapport', [\App\Http\Controllers\Company\RapportController::class, 'index'])
+            ->middleware('company.plan:business')->name('company.rapport.index');
 
         /* Paramètres */
         Route::get('/parametre',          [\App\Http\Controllers\Company\ParametreController::class, 'index'])          ->name('company.parametre.index');
@@ -296,10 +308,12 @@ Route::middleware('auth')->group(function () {
         Route::patch('/parametre/country',[\App\Http\Controllers\Company\ParametreController::class, 'updateCountry'])  ->name('company.parametre.updateCountry');
         Route::patch('/parametre/password',[\App\Http\Controllers\Company\ParametreController::class, 'updatePassword'])->name('company.parametre.updatePassword');
 
-        /* Utilisateurs (membres de l'entreprise) */
-        Route::get('/users',                [CompanyUserController::class, 'index'])  ->name('company.users.index');
-        Route::post('/users',               [CompanyUserController::class, 'store'])  ->name('company.users.store');
-        Route::delete('/users/{user}',      [CompanyUserController::class, 'destroy'])->name('company.users.destroy');
+        /* Utilisateurs (membres de l'entreprise) — réservé Plan Business */
+        Route::middleware('company.plan:business')->group(function () {
+            Route::get('/users',           [CompanyUserController::class, 'index'])  ->name('company.users.index');
+            Route::post('/users',          [CompanyUserController::class, 'store'])  ->name('company.users.store');
+            Route::delete('/users/{user}', [CompanyUserController::class, 'destroy'])->name('company.users.destroy');
+        });
 
         /* Zones de livraison */
         Route::get('/zones',                    [\App\Http\Controllers\Company\ZoneController::class, 'index'])  ->name('company.zones.index');
@@ -483,12 +497,7 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('shops/{shop}/edit',  [ShopController::class, 'edit'])  ->name('shops.edit');
         Route::put('shops/{shop}',       [ShopController::class, 'update'])->name('shops.update');
         
-        // voir touts les livreurs de la boutique
-        Route::get('livreurs', [\App\Http\Controllers\Boutique\LivreurController::class, 'index'])
-     ->name('livreurs.index');
-
-        /* Gestion des employés (vendeurs, livreurs) */
-        Route::resource('employees', \App\Http\Controllers\Vendeur\EmployeeController::class)->except(['show']);
+        /* ── Routes accessibles en Plan Gratuit ────────────────────────── */
 
         /* Commandes */
         Route::get('orders', [EmployeOrderController::class, 'index'])                 ->name('orders.index');
@@ -498,36 +507,47 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('payments', [VendeurPaymentController::class, 'index'])->name('payments.index');
 
         /* Commissions */
-        Route::get('commissions',            [VendeurCommissionController::class, 'index']) ->name('commissions.index');
-        Route::post('commissions/pay',       [VendeurCommissionController::class, 'pay'])   ->name('commissions.pay');
-        Route::get('commissions/export',     [VendeurCommissionController::class, 'export'])->name('commissions.export');
-
-        /* Rapports & Statistiques */
-        Route::get('reports',        [ReportController::class, 'index']) ->name('reports.index');
-        Route::get('reports/export', [ReportController::class, 'export'])->name('reports.export');
-        Route::get('stats',          [StatController::class, 'index'])   ->name('stats.index');
+        Route::get('commissions',        [VendeurCommissionController::class, 'index']) ->name('commissions.index');
+        Route::post('commissions/pay',   [VendeurCommissionController::class, 'pay'])   ->name('commissions.pay');
+        Route::get('commissions/export', [VendeurCommissionController::class, 'export'])->name('commissions.export');
 
         /* Clients de la boutique */
-        Route::get('clients',         [\App\Http\Controllers\Boutique\ClientController::class, 'index'])->name('clients.index');
-        Route::get('clients/{user}',  [\App\Http\Controllers\Boutique\ClientController::class, 'show']) ->name('clients.show');
+        Route::get('clients',        [\App\Http\Controllers\Boutique\ClientController::class, 'index'])->name('clients.index');
+        Route::get('clients/{user}', [\App\Http\Controllers\Boutique\ClientController::class, 'show']) ->name('clients.show');
 
-        /* Analyse par période (AJAX) */
-        Route::get('period-stats', \App\Http\Controllers\Boutique\PeriodStatsController::class)
-            ->name('period.stats');
+        /* KPI temps réel (AJAX polling 30s) — accessible en gratuit pour le dashboard */
+        Route::get('kpi-live', \App\Http\Controllers\Boutique\KpiLiveController::class)->name('kpi.live');
 
-        /* KPI temps réel (AJAX polling 30s) */
-        Route::get('kpi-live', \App\Http\Controllers\Boutique\KpiLiveController::class)
-            ->name('kpi.live');
+        /* ── Routes réservées au Plan Pro ───────────────────────────────── */
+        Route::middleware('shop.plan:pro')->group(function () {
 
-        /* Exports Excel */
-        Route::get('export/orders/excel',   [ExportController::class, 'exportOrdersExcel'])  ->name('export.orders.excel');
-        Route::get('export/payments/excel', [ExportController::class, 'exportPaymentsExcel'])->name('export.payments.excel');
-        Route::get('export/stats/excel',    [ExportController::class, 'exportStatsExcel'])   ->name('export.stats.excel');
+            /* Livreurs de la boutique */
+            Route::get('livreurs', [\App\Http\Controllers\Boutique\LivreurController::class, 'index'])
+                ->name('livreurs.index');
 
-        /* Exports PDF */
-        Route::get('export/orders/pdf',     [ExportController::class, 'exportOrdersPdf'])    ->name('export.orders.pdf');
-        Route::get('export/payments/pdf',   [ExportController::class, 'exportPaymentsPdf']) ->name('export.payments.pdf');
-        Route::get('export/stats/pdf',      [ExportController::class, 'exportStatsPdf'])    ->name('export.stats.pdf');
+            /* Gestion de l'équipe (employés/vendeurs) */
+            Route::resource('employees', \App\Http\Controllers\Vendeur\EmployeeController::class)->except(['show']);
+
+            /* Rapports & Statistiques */
+            Route::get('reports',        [ReportController::class, 'index']) ->name('reports.index');
+            Route::get('reports/export', [ReportController::class, 'export'])->name('reports.export');
+            Route::get('stats',          [StatController::class, 'index'])   ->name('stats.index');
+
+            /* Analyse par période (AJAX) */
+            Route::get('period-stats', \App\Http\Controllers\Boutique\PeriodStatsController::class)
+                ->name('period.stats');
+
+            /* Exports Excel */
+            Route::get('export/orders/excel',   [ExportController::class, 'exportOrdersExcel'])  ->name('export.orders.excel');
+            Route::get('export/payments/excel', [ExportController::class, 'exportPaymentsExcel'])->name('export.payments.excel');
+            Route::get('export/stats/excel',    [ExportController::class, 'exportStatsExcel'])   ->name('export.stats.excel');
+
+            /* Exports PDF */
+            Route::get('export/orders/pdf',   [ExportController::class, 'exportOrdersPdf'])  ->name('export.orders.pdf');
+            Route::get('export/payments/pdf', [ExportController::class, 'exportPaymentsPdf'])->name('export.payments.pdf');
+            Route::get('export/stats/pdf',    [ExportController::class, 'exportStatsPdf'])   ->name('export.stats.pdf');
+
+        }); // fin shop.plan:pro
 
         // === HUB MESSAGES (page dédiée vendeur) ===
 Route::get('messages',
@@ -759,5 +779,44 @@ Route::middleware(['auth', 'role:client'])
 /* ══════════════════════════════════════════════════════════════════════════
 |  14. AUTH (routes générées par Laravel Breeze / Fortify)
 ══════════════════════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════════════════════════
+|  PAIEMENT & ABONNEMENTS (GenuisPay)
+|  Routes publiques pour le webhook (pas de CSRF)
+|  Routes auth pour le checkout et les pages upgrade
+══════════════════════════════════════════════════════════════════════════ */
+
+/* Webhook GenuisPay : pas d'auth, pas de CSRF (vérifié par signature HMAC) */
+Route::post('/payment/callback', [GenuisPayController::class, 'callback'])
+    ->name('payment.callback')
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+
+/* Pages de retour après paiement (accessibles sans auth car GenuisPay redirige) */
+Route::get('/payment/success', [GenuisPayController::class, 'success'])->name('payment.success');
+Route::get('/payment/failed',  [GenuisPayController::class, 'failed']) ->name('payment.failed');
+
+/* Checkout et initiation de paiement → nécessite être connecté */
+Route::middleware('auth')->group(function () {
+    Route::get('/payment/checkout',  [GenuisPayController::class, 'checkout']) ->name('payment.checkout');
+    Route::post('/payment/initiate', [GenuisPayController::class, 'initiate']) ->name('payment.initiate');
+});
+
+/* Page upgrade boutique (plan Pro) */
+Route::middleware(['auth', 'role:admin'])
+    ->prefix('boutique')
+    ->name('boutique.')
+    ->group(function () {
+        Route::get('/subscription/upgrade', [BoutiqueSubscriptionController::class, 'upgrade'])
+            ->name('subscription.upgrade');
+    });
+
+/* Page upgrade entreprise (plan Business) */
+Route::middleware(['auth', 'role:company'])
+    ->prefix('company')
+    ->name('company.')
+    ->group(function () {
+        Route::get('/subscription/upgrade', [CompanySubscriptionController::class, 'upgrade'])
+            ->name('subscription.upgrade');
+    });
 
 require __DIR__.'/auth.php';

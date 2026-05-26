@@ -514,9 +514,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 
         {{-- Stats --}}
         @php
-            $allShops   = \App\Models\Shop::count();
-            $allApproved= \App\Models\Shop::where('is_approved',true)->count();
-            $allPending = \App\Models\Shop::where('is_approved',false)->count();
+            $allShops    = \App\Models\Shop::count();
+            $planFree    = \App\Models\Shop::where('plan','free')->orWhereNull('plan')->count();
+            $planPro     = \App\Models\Shop::where('plan','pro')
+                               ->where('plan_expires_at','>',now())->count();
+            $suspended   = \App\Models\Shop::where('is_approved',false)->count();
         @endphp
         <div class="stat-g">
             <div class="stat-c p">
@@ -530,42 +532,56 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
                 <div class="stat-top">
                     <div class="stat-ico g">{!! $I['check'] !!}</div>
                 </div>
-                <div class="stat-v">{{ $allApproved }}</div>
-                <div class="stat-l">Approuvées</div>
+                <div class="stat-v">{{ $planFree }}</div>
+                <div class="stat-l">Plan Gratuit</div>
             </div>
             <div class="stat-c a">
                 <div class="stat-top">
-                    <div class="stat-ico a">{!! $I['clock'] !!}</div>
+                    <div class="stat-ico a">{!! $I['trend'] !!}</div>
                 </div>
-                <div class="stat-v">{{ $allPending }}</div>
-                <div class="stat-l">En attente</div>
+                <div class="stat-v">{{ $planPro }}</div>
+                <div class="stat-l">Plan Pro actif</div>
             </div>
             <div class="stat-c r">
                 <div class="stat-top">
                     <div class="stat-ico r">{!! $I['x_sm'] !!}</div>
                 </div>
-                <div class="stat-v">0</div>
-                <div class="stat-l">Désactivées</div>
+                <div class="stat-v">{{ $suspended }}</div>
+                <div class="stat-l">Suspendues</div>
             </div>
         </div>
 
         {{-- Toolbar --}}
         <div class="toolbar">
             <div class="filter-g">
-                <button class="filter-btn active" onclick="filterStatus('all',this)">
-                    Toutes <span style="font-size:10px;opacity:.7">({{ $shops->total() }})</span>
-                </button>
-                <button class="filter-btn" onclick="filterStatus('approved',this)">
-                    <span class="filter-ico" style="color:#10b981">{!! $I['check'] !!}</span> Approuvées
-                </button>
-                <button class="filter-btn" onclick="filterStatus('pending',this)">
-                    <span class="filter-ico" style="color:#f59e0b">{!! $I['clock'] !!}</span> En attente
-                </button>
+                <a href="{{ route('admin.shops.index', ['filter'=>'all', 'search'=>$search]) }}"
+                   class="filter-btn {{ $filter==='all' ? 'active' : '' }}">
+                    Toutes <span style="font-size:10px;opacity:.7">({{ $allShops }})</span>
+                </a>
+                <a href="{{ route('admin.shops.index', ['filter'=>'free', 'search'=>$search]) }}"
+                   class="filter-btn {{ $filter==='free' ? 'active' : '' }}">
+                    <span class="filter-ico" style="color:#10b981">{!! $I['check'] !!}</span>
+                    Plan Gratuit <span style="font-size:10px;opacity:.7">({{ $planFree }})</span>
+                </a>
+                <a href="{{ route('admin.shops.index', ['filter'=>'pro', 'search'=>$search]) }}"
+                   class="filter-btn {{ $filter==='pro' ? 'active' : '' }}">
+                    <span class="filter-ico" style="color:#7c3aed">{!! $I['trend'] !!}</span>
+                    Plan Pro <span style="font-size:10px;opacity:.7">({{ $planPro }})</span>
+                </a>
+                <a href="{{ route('admin.shops.index', ['filter'=>'suspended', 'search'=>$search]) }}"
+                   class="filter-btn {{ $filter==='suspended' ? 'active' : '' }}">
+                    <span class="filter-ico" style="color:#ef4444">{!! $I['x_sm'] !!}</span>
+                    Suspendues <span style="font-size:10px;opacity:.7">({{ $suspended }})</span>
+                </a>
             </div>
-            <div class="srch-box">
-                <span class="srch-ico">{!! $I['search'] !!}</span>
-                <input type="text" id="tableSearch" placeholder="Filtrer par nom, propriétaire…">
-            </div>
+            <form method="GET" action="{{ route('admin.shops.index') }}" style="display:flex">
+                <input type="hidden" name="filter" value="{{ $filter }}">
+                <div class="srch-box">
+                    <span class="srch-ico">{!! $I['search'] !!}</span>
+                    <input type="text" name="search" value="{{ $search }}" placeholder="Rechercher nom, propriétaire…"
+                           onchange="this.form.submit()">
+                </div>
+            </form>
         </div>
 
         {{-- Table --}}
@@ -590,6 +606,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
                             <th>Propriétaire</th>
                             <th>Téléphone</th>
                             <th>Adresse</th>
+                            <th>Plan</th>
                             <th>Statut</th>
                             <th>Date</th>
                             <th>Action</th>
@@ -598,12 +615,16 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
                     <tbody>
                         @forelse($shops as $shop)
                         @php
-                            $words = explode(' ', $shop->name ?? 'S');
-                            $initials = strtoupper(substr($words[0],0,1)) . strtoupper(substr($words[1]??'',0,1));
+                            $words     = explode(' ', $shop->name ?? 'S');
+                            $initials  = strtoupper(substr($words[0],0,1)) . strtoupper(substr($words[1]??'',0,1));
                             $ownerName = $shop->owner->name ?? 'Utilisateur supprimé';
                             $ownerInit = strtoupper(substr($ownerName,0,1));
+                            // Plan Pro actif = plan=pro ET date non expirée
+                            $isPro     = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
+                            // data-status pour les filtres JS : suspended / pro / free
+                            $rowStatus = !$shop->is_approved ? 'suspended' : ($isPro ? 'pro' : 'free');
                         @endphp
-                        <tr data-status="{{ $shop->is_approved ? 'approved' : 'pending' }}"
+                        <tr data-status="{{ $rowStatus }}"
                             data-search="{{ strtolower($shop->name . ' ' . $ownerName . ' ' . ($shop->owner->email??'')) }}">
                             <td style="color:var(--muted);font-weight:600;font-size:12px">
                                 {{ ($shops->currentPage()-1)*$shops->perPage() + $loop->iteration }}
@@ -650,13 +671,32 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
                                     <span style="color:var(--muted)">—</span>
                                 @endif
                             </td>
+
+                            {{-- Colonne Plan --}}
                             <td>
-                                @if($shop->is_approved)
-                                    <span class="bdg g"><span class="bdg-dot"></span> Approuvée</span>
+                                @if($isPro)
+                                    <div>
+                                        <span class="bdg" style="color:#5b21b6;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.2)">
+                                            {!! $I['trend'] !!} Plan Pro
+                                        </span>
+                                        <div style="font-size:10.5px;color:var(--muted);margin-top:3px">
+                                            Expire {{ $shop->plan_expires_at->format('d/m/Y') }}
+                                        </div>
+                                    </div>
                                 @else
-                                    <span class="bdg a">{!! $I['clock'] !!} En attente</span>
+                                    <span class="bdg g"><span class="bdg-dot"></span> Plan Gratuit</span>
                                 @endif
                             </td>
+
+                            {{-- Colonne Statut (actif / suspendue) --}}
+                            <td>
+                                @if($shop->is_approved)
+                                    <span class="bdg g"><span class="bdg-dot"></span> Active</span>
+                                @else
+                                    <span class="bdg r">{!! $I['x_sm'] !!} Suspendue</span>
+                                @endif
+                            </td>
+
                             <td style="font-size:11.5px;color:var(--muted);white-space:nowrap">
                                 {{ optional($shop->created_at)->format('d/m/Y') }}
                             </td>
@@ -666,11 +706,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
                                     @method('PUT')
                                     @if($shop->is_approved)
                                         <button type="submit" class="btn-disable">
-                                            <span class="btn-ico">{!! $I['x_sm'] !!}</span> Désactiver
+                                            <span class="btn-ico">{!! $I['x_sm'] !!}</span> Suspendre
                                         </button>
                                     @else
                                         <button type="submit" class="btn-approve">
-                                            <span class="btn-ico">{!! $I['check_sm'] !!}</span> Approuver
+                                            <span class="btn-ico">{!! $I['check_sm'] !!}</span> Réactiver
                                         </button>
                                     @endif
                                 </form>
@@ -678,7 +718,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8">
+                            <td colspan="9">
                                 <div class="empty-state">
                                     <div class="empty-state-ico">{!! $I['store_lg'] !!}</div>
                                     <div class="empty-state-t">Aucune boutique trouvée</div>
@@ -730,23 +770,14 @@ function nt(msg='Bientôt disponible'){
     _t=setTimeout(()=>{el.style.transform='translateY(80px)';el.style.opacity='0';},2800);
 }
 
-/* filter by status */
-function filterStatus(status, btn){
-    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('#shopsTable tbody tr[data-status]').forEach(tr=>{
-        tr.style.display = (status==='all' || tr.dataset.status===status) ? '' : 'none';
-    });
-}
-
-/* live search */
-function liveSearch(val){
-    const q=val.toLowerCase().trim();
-    document.querySelectorAll('#shopsTable tbody tr[data-search]').forEach(tr=>{
-        tr.style.display = (!q || tr.dataset.search.includes(q)) ? '' : 'none';
-    });
-}
-document.getElementById('tableSearch').addEventListener('input',e=>liveSearch(e.target.value));
-document.getElementById('tbSearch').addEventListener('input',e=>liveSearch(e.target.value));
+/* topbar search → soumet le formulaire */
+document.getElementById('tbSearch').addEventListener('input', function() {
+    const form = document.querySelector('form[action="{{ route('admin.shops.index') }}"]');
+    if (form) {
+        form.querySelector('input[name=search]').value = this.value;
+        clearTimeout(this._t);
+        this._t = setTimeout(() => form.submit(), 400);
+    }
+});
 </script>
 @endpush

@@ -493,6 +493,22 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
     #autoRefreshBadge{display:none !important;}
 }
 *{scrollbar-width:thin;scrollbar-color:rgba(99,102,241,.2) transparent;}
+/* ── PLAN LIMIT MODAL ── */
+.plm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:3000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px);}
+.plm-overlay.open{display:flex;}
+.plm-box{background:#fff;border-radius:22px;padding:36px 30px 28px;max-width:400px;width:100%;box-shadow:0 32px 80px rgba(0,0,0,.28);animation:modalIn .25s ease;text-align:center;}
+.plm-icon-wrap{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#ef4444);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;box-shadow:0 10px 28px rgba(239,68,68,.35);}
+.plm-badge{display:inline-flex;align-items:center;gap:5px;background:#fef2f2;border:1.5px solid #fecaca;color:#dc2626;font-size:12px;font-weight:800;padding:5px 16px;border-radius:20px;margin-bottom:14px;font-family:var(--mono);}
+.plm-title{font-size:21px;font-weight:800;color:#0f172a;margin-bottom:8px;letter-spacing:-.4px;}
+.plm-sub{font-size:13.5px;color:#64748b;line-height:1.6;margin-bottom:20px;}
+.plm-features{background:#f8fafc;border:1px solid #e2e8f0;border-radius:13px;padding:14px 16px;text-align:left;margin-bottom:22px;}
+.plm-feat-title{font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.plm-feat-item{display:flex;align-items:center;gap:9px;font-size:13px;color:#1e293b;font-weight:600;padding:4px 0;}
+.plm-feat-ico{width:18px;height:18px;border-radius:50%;background:#d1fae5;color:#059669;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0;}
+.plm-btn-upgrade{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:12px;border:none;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:15px;font-weight:800;font-family:var(--font);cursor:pointer;transition:all .16s;box-shadow:0 6px 22px rgba(99,102,241,.42);text-decoration:none;margin-bottom:10px;}
+.plm-btn-upgrade:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(99,102,241,.55);color:#fff;}
+.plm-btn-close{width:100%;padding:10px;border-radius:10px;border:none;background:transparent;color:#94a3b8;font-size:13px;font-family:var(--font);cursor:pointer;transition:color .15s;}
+.plm-btn-close:hover{color:#475569;}
 /* ── Barre de filtres ── */
 .filter-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:14px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:10px;}
 .filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
@@ -633,6 +649,37 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
     </div>
 </div>
 @endif
+
+{{-- ══ MODAL LIMITE PLAN GRATUIT ══ --}}
+<div class="plm-overlay" id="planLimitModal">
+    <div class="plm-box">
+        <div class="plm-icon-wrap">
+            <svg width="36" height="36" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+        </div>
+        <div class="plm-badge">
+            <span>{{ $processedCount }}</span><span style="opacity:.5;">/</span><span>10</span>&nbsp;traitements ce mois
+        </div>
+        <div class="plm-title">Limite atteinte !</div>
+        <div class="plm-sub">
+            Vous avez traité les <strong>10 commandes</strong> incluses dans votre Plan Gratuit ce mois-ci.
+            Passez au <strong style="color:#6366f1;">Plan Pro</strong> pour continuer sans limite.
+        </div>
+        <div class="plm-features">
+            <div class="plm-feat-title">Ce que le Plan Pro débloque</div>
+            <div class="plm-feat-item"><div class="plm-feat-ico">✓</div> Commandes illimitées à traiter</div>
+            <div class="plm-feat-item"><div class="plm-feat-ico">✓</div> Produits illimités</div>
+            <div class="plm-feat-item"><div class="plm-feat-ico">✓</div> Statistiques & analyses complètes</div>
+            <div class="plm-feat-item"><div class="plm-feat-ico">✓</div> Livreurs & partenaires illimités</div>
+        </div>
+        <a href="{{ route('boutique.subscription.upgrade') }}" class="plm-btn-upgrade">
+            ⚡ Passer au Plan Pro
+        </a>
+        <button class="plm-btn-close" onclick="closePlanLimitModal()">Fermer</button>
+    </div>
+</div>
 
 {{-- ══ MODAL ENTREPRISE DE LIVRAISON ══ --}}
 <div class="modal-overlay" id="companyModal">
@@ -932,26 +979,59 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
         <nav class="sb-nav">
             <a href="{{ route('boutique.dashboard') }}" class="sb-item" style="margin-bottom:4px"><span class="ico">⊞</span> Tableau de bord</a>
             <div class="sb-section">Boutique</div>
+            @php
+                $_sbCmdMax  = 10; $_sbProdMax = 5;
+                $_sbCmdPct  = $isPro ? 0 : min(100, round(($processedCount / $_sbCmdMax) * 100));
+                $_sbCmdCls  = $isPro ? 'ok' : ($_sbCmdPct >= 100 ? 'danger' : ($_sbCmdPct >= 80 ? 'warn' : 'ok'));
+                $_sbCmdClr  = $_sbCmdCls === 'danger' ? '#dc2626' : ($_sbCmdCls === 'warn' ? '#d97706' : '#6366f1');
+                $_prodCount = $shop ? $shop->products()->count() : 0;
+                if ($isPro)                        { $_sbProdClr = '#10b981'; }
+                elseif ($_prodCount >= $_sbProdMax){ $_sbProdClr = '#ef4444'; }
+                elseif ($_prodCount >= 4)          { $_sbProdClr = '#f59e0b'; }
+                else                               { $_sbProdClr = '#8b5cf6'; }
+            @endphp
             <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">{!! $I['msg_nav'] !!}</span> Messages</a>
             <a href="{{ route('boutique.orders.index') }}" class="sb-item active">
                 <span class="ico">{!! $I['box_nav'] !!}</span> Commandes
-                @if($pendingCount > 0)<span class="sb-badge">{{ $pendingCount }}</span>@endif
+                @if(!$isPro)
+                    <span class="sb-badge" style="background:{{ $_sbCmdClr }};margin-left:auto;">{{ $processedCount }}/{{ $_sbCmdMax }}</span>
+                @elseif($pendingCount > 0)
+                    <span class="sb-badge">{{ $pendingCount }}</span>
+                @endif
             </a>
-            <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">{!! $I['tag_nav'] !!}</span> Produits</a>
+            <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">{!! $I['tag_nav'] !!}</span> Produits @if(!$isPro)<span class="sb-badge" style="background:{{ $_sbProdClr }};color:#fff;font-size:10px;padding:1px 5px;border-radius:8px;margin-left:auto">{{ $_prodCount }}/{{ $_sbProdMax }}</span>@endif</a>
             <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">{!! $I['users_nav'] !!}</span> Clients</a>
+            @if($isPro)
             <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">{!! $I['team_nav'] !!}</span> Équipe</a>
+            @else
+            <a href="{{ route('boutique.subscription.upgrade') }}" class="sb-item" style="opacity:.6;" title="Plan Pro requis"><span class="ico">{!! $I['team_nav'] !!}</span> Équipe <span class="sb-badge" style="background:#f59e0b;margin-left:auto;">🔒</span></a>
+            @endif
             <div class="sb-section">Livraison</div>
+            @if($isPro)
             <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">{!! $I['bike_nav'] !!}</span> Livreurs</a>
+            @else
+            <a href="{{ route('boutique.subscription.upgrade') }}" class="sb-item" style="opacity:.6;" title="Plan Pro requis"><span class="ico">{!! $I['bike_nav'] !!}</span> Livreurs <span class="sb-badge" style="background:#f59e0b;margin-left:auto;">🔒</span></a>
+            @endif
+            @if($isPro)
             <a href="{{ route('delivery.companies.index') }}" class="sb-item"><span class="ico">{!! $I['bldg_nav'] !!}</span> Partenaires</a>
+            @else
+            <a href="{{ route('boutique.subscription.upgrade') }}" class="sb-item" style="opacity:.6;" title="Plan Pro requis"><span class="ico">{!! $I['bldg_nav'] !!}</span> Partenaires <span class="sb-badge" style="background:#f59e0b;margin-left:auto;">🔒</span></a>
+            @endif
             <div class="sb-section">Finances</div>
             <div class="sb-group">
                 <button class="sb-group-toggle" onclick="toggleGroup(this)" type="button">
-                    <span class="ico">{!! $I['wallet_nav'] !!}</span> Finances & Rapports <span class="sb-arrow">▶</span>
+                    <span class="ico">{!! $I['wallet_nav'] !!}</span> Finances & Rapports
+                    @if(!$isPro)<span style="font-size:11px;margin-left:4px;opacity:.7;">🔒</span>@endif
+                    <span class="sb-arrow">▶</span>
                 </button>
                 <div class="sb-sub">
                     <a href="{{ route('boutique.payments.index') }}" class="sb-item"><span class="ico">{!! $I['card_nav'] !!}</span> Paiements</a>
                     <a href="{{ route('boutique.commissions.index') }}" class="sb-item"><span class="ico">{!! $I['chart_nav'] !!}</span> Commissions</a>
+                    @if($isPro)
                     <a href="{{ route('boutique.reports.index') }}" class="sb-item"><span class="ico">{!! $I['list_nav'] !!}</span> Rapports</a>
+                    @else
+                    <a href="{{ route('boutique.subscription.upgrade') }}" class="sb-item" style="opacity:.6;" title="Plan Pro requis"><span class="ico">{!! $I['list_nav'] !!}</span> Rapports <span class="sb-badge" style="background:#f59e0b;margin-left:auto;">🔒</span></a>
+                    @endif
                     @if(auth()->user()->role === 'admin')
                     <a href="{{ route('shop.edit', $shop) }}" class="sb-item"><span class="ico">{!! $I['gear_nav'] !!}</span> Paramètres</a>
                     @endif
@@ -2557,6 +2637,73 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('vposOverlay')) {
         setTimeout(openVposModal, 800);
     }
+});
+
+/* ══════════════════════════════════════════════════
+   PLAN LIMIT MODAL — intercepte toutes les tentatives
+   d'assignation quand la limite de 10/mois est atteinte
+══════════════════════════════════════════════════ */
+const PLAN_LIMIT_REACHED = {{ $planLimitReached ? 'true' : 'false' }};
+
+function openPlanLimitModal() {
+    document.getElementById('planLimitModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closePlanLimitModal() {
+    document.getElementById('planLimitModal').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+// 1) Formulaires d'assignation livreur (submit POST)
+document.querySelectorAll('form[action*="orders"][action*="assign"]').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+        if (PLAN_LIMIT_REACHED) { e.preventDefault(); openPlanLimitModal(); }
+    });
+});
+
+// 2) Bouton "Entreprise externe" sur chaque ligne (openCompanyModal)
+const _origOpenCompanyModal = window.openCompanyModal;
+if (typeof _origOpenCompanyModal === 'function') {
+    window.openCompanyModal = function(btn) {
+        if (PLAN_LIMIT_REACHED) { openPlanLimitModal(); return; }
+        _origOpenCompanyModal(btn);
+    };
+}
+
+// 3) Bulk assignation livreur
+const _origSubmitBulkDriver = window.submitBulkDriver;
+if (typeof _origSubmitBulkDriver === 'function') {
+    window.submitBulkDriver = async function() {
+        if (PLAN_LIMIT_REACHED) {
+            if (typeof closeBulkDriverModal === 'function') closeBulkDriverModal();
+            openPlanLimitModal();
+            return;
+        }
+        return _origSubmitBulkDriver();
+    };
+}
+
+// 4) Bulk assignation entreprise
+const _origSubmitBulkCompany = window.submitBulkCompany;
+if (typeof _origSubmitBulkCompany === 'function') {
+    window.submitBulkCompany = function(btn) {
+        if (PLAN_LIMIT_REACHED) { openPlanLimitModal(); return; }
+        _origSubmitBulkCompany(btn);
+    };
+}
+
+// 5) Confier via chat (confierLivraison)
+const _origConfierLivraison = window.confierLivraison;
+if (typeof _origConfierLivraison === 'function') {
+    window.confierLivraison = function() {
+        if (PLAN_LIMIT_REACHED) { openPlanLimitModal(); return; }
+        _origConfierLivraison();
+    };
+}
+
+// Fermer avec Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closePlanLimitModal();
 });
 </script>
 @endpush

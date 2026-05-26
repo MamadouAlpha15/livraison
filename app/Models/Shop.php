@@ -10,7 +10,8 @@ class Shop extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'name', 'type', 'description', 'address', 'phone', 'image', 'is_approved', 'email', 'status', 'commission_rate', 'currency', 'country'
+        'user_id', 'name', 'type', 'description', 'address', 'phone', 'image', 'is_approved', 'email', 'status', 'commission_rate', 'currency', 'country',
+        'plan', 'plan_expires_at',   // Plan d'abonnement (free/pro) + date d'expiration
     ];
 
     public function owner() {
@@ -31,8 +32,9 @@ public function clients()
     return $this->belongsToMany(\App\Models\User::class, 'shop_user')->withTimestamps();  // Une boutique (Shop) peut avoir plusieurs clients (User) abonnés via une table pivot shop_user.
 }
 protected $casts = [
-    'commission_rate' => 'float',
-    'is_approved'     => 'boolean',
+    'commission_rate'  => 'float',
+    'is_approved'      => 'boolean',
+    'plan_expires_at'  => 'datetime',  // Cast auto en Carbon pour isFuture() / isPast()
 ];
 
 // 🟢 0.15 → 15 (pour l'affichage)

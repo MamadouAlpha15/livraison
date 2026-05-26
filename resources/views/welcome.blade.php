@@ -1640,72 +1640,117 @@ footer.app-footer { display: none !important; }
         </div>
     </div>
 </section>
- <!-- 
+ 
  {{-- ══════════════════════════════════════════
    TARIFS
 ══════════════════════════════════════════ --}} 
  <section class="section pricing-section" id="pricing">
     <div class="section-inner">
         <div style="text-align:center;margin-bottom:48px">
+@php
+$proXof = number_format(config('genuispay.plans.pro', 7600), 0, ',', ' ');
+$proGnf = number_format(config('genuispay.plans_gnf.pro', 100000), 0, ',', ' ');
+$bizXof = number_format(config('genuispay.plans.business', 11400), 0, ',', ' ');
+$bizGnf = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', ' ');
+@endphp
             <div class="section-badge">Tarification</div>
             <h2 class="section-title">Des tarifs <span>transparents</span></h2>
-            <p class="section-sub" style="margin:0 auto">Commencez gratuitement, évoluez selon vos besoins.</p>
+            <p class="section-sub" style="margin:0 auto">Commencez gratuitement. Passez au Plan Pro pour les boutiques ou au Plan Business pour les entreprises de livraison.</p>
         </div>
         <div class="pricing-grid">
 
-            {{-- Gratuit --}}
+            {{-- Plan Gratuit (Boutiques & Entreprises) --}}
             <div class="pricing-card">
                 <div class="pricing-name">Gratuit</div>
-                <div class="pricing-price">0 <span>GNF/mois</span></div>
-                <div class="pricing-desc">Pour démarrer et tester la plateforme.</div>
+                <div class="pricing-price">0 <span>XOF/mois</span></div>
+                <div class="pricing-desc">Pour démarrer et découvrir la plateforme.</div>
                 <ul class="pricing-features">
-                    <li>1 boutique</li>
-                    <li>Jusqu'à 20 produits</li>
-                    <li>50 commandes/mois</li>
-                    <li>1 livreur</li>
-                    <li>Support communauté</li>
+
+                    {{-- Séparateur Boutiques --}}
+                    <li style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--green);padding-bottom:2px;border-bottom:1px solid #e2e8f0;list-style:none">
+                        🛍 Boutiques
+                    </li>
+                    <li>Jusqu'à 5 produits</li>
+                    <li>10 commandes / mois</li>
+                    <li style="opacity:.5;text-decoration:line-through">Livreurs & partenaires</li>
+                    <li style="opacity:.5;text-decoration:line-through">Rapports & exports</li>
+                    <li style="opacity:.5;text-decoration:line-through">Statistiques & graphiques</li>
+                    <li style="opacity:.5;text-decoration:line-through">Gestion d'équipe</li>
+
+                    {{-- Séparateur Entreprises --}}
+                    <li style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#7c3aed;padding-bottom:2px;border-bottom:1px solid #e2e8f0;list-style:none;margin-top:6px">
+                        🚚 Entreprises de livraison
+                    </li>
+                    <li>10 commandes / mois</li>
+                    <li>1 chauffeur maximum</li>
+                    <li>5 zones de livraison max</li>
+                    <li style="opacity:.5;text-decoration:line-through">Carte en direct (GPS)</li>
+                    <li style="opacity:.5;text-decoration:line-through">Rapports & exports</li>
+                    <li style="opacity:.5;text-decoration:line-through">Statistiques & graphiques</li>
+                    <li style="opacity:.5;text-decoration:line-through">Gestion utilisateurs</li>
+
                 </ul>
-                <a href="{{ route('register') }}" class="pricing-btn pricing-btn-outline">Commencer gratuitement</a>
+                @auth
+                    <a href="{{ route('register') }}" class="pricing-btn pricing-btn-outline">Votre plan actuel</a>
+                @else
+                    <a href="{{ route('register') }}" class="pricing-btn pricing-btn-outline">Commencer gratuitement</a>
+                @endauth
             </div>
 
-            {{-- Pro --}}
+            {{-- Plan Pro — Boutiques --}}
             <div class="pricing-card popular">
-                <div class="pricing-popular-badge">POPULAIRE</div>
-                <div class="pricing-name">Pro</div>
-                <div class="pricing-price">50k <span>GNF/mois</span></div>
-                <div class="pricing-desc">Pour les boutiques en pleine croissance.</div>
+                <div class="pricing-popular-badge">BOUTIQUES</div>
+                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--green);margin-bottom:4px">🛍 Pour les boutiques</div>
+                <div class="pricing-name">Plan Pro</div>
+                <div class="pricing-price">{{ $proXof }} <span>XOF/mois</span></div>
+                <div style="font-size:12px;font-weight:700;color:#d97706;margin-bottom:4px">≈ {{ $proGnf }} GNF 🇬🇳</div>
+                <div class="pricing-desc">Tout illimité pour votre boutique pendant 1 mois.</div>
                 <ul class="pricing-features">
-                    <li>1 boutique</li>
                     <li>Produits illimités</li>
                     <li>Commandes illimitées</li>
-                    <li>5 livreurs</li>
-                    <li>Analytics avancés</li>
-                    <li>Export Excel & PDF</li>
-                    <li>Support prioritaire</li>
+                    <li>Livreurs & partenaires débloqués</li>
+                    <li>Rapports & exports Excel/PDF</li>
+                    <li>Statistiques & graphiques</li>
+                    <li>Analyse par période</li>
+                    <li>Gestion d'équipe complète</li>
+                    <li>Durée : 1 mois renouvelable</li>
                 </ul>
-                <a href="{{ route('register') }}" class="pricing-btn pricing-btn-filled">Démarrer Pro</a>
+                @auth
+                    <a href="{{ route('boutique.subscription.upgrade') }}" class="pricing-btn pricing-btn-filled">Passer au Plan Pro</a>
+                @else
+                    <a href="{{ route('register') }}" class="pricing-btn pricing-btn-filled">Commencer → Plan Pro</a>
+                @endauth
             </div>
 
-            {{-- Entreprise --}}
+            {{-- Plan Business — Entreprises de Livraison --}}
             <div class="pricing-card">
-                <div class="pricing-name">Entreprise</div>
-                <div class="pricing-price">Sur <span>devis</span></div>
-                <div class="pricing-desc">Pour les grandes structures multi-boutiques.</div>
+                <div class="pricing-popular-badge" style="background:linear-gradient(135deg,#7c3aed,#4f46e5)">ENTREPRISES</div>
+                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#7c3aed;margin-bottom:4px">🚚 Pour les entreprises de livraison</div>
+                <div class="pricing-name">Plan Business</div>
+                <div class="pricing-price">{{ $bizXof }} <span>XOF/mois</span></div>
+                <div style="font-size:12px;font-weight:700;color:#d97706;margin-bottom:4px">≈ {{ $bizGnf }} GNF 🇬🇳</div>
+                <div class="pricing-desc">Tout illimité pour votre entreprise de livraison pendant 1 mois.</div>
                 <ul class="pricing-features">
-                    <li>Boutiques illimitées</li>
-                    <li>Équipe illimitée</li>
-                    <li>API dédiée</li>
-                    <li>Livreurs illimités</li>
-                    <li>Tableau de bord multi-boutiques</li>
-                    <li>Gestionnaire de compte dédié</li>
+                    <li>Chauffeurs illimités</li>
+                    <li>Commandes illimitées</li>
+                    <li>Zones de livraison illimitées</li>
+                    <li>Carte en direct (GPS)</li>
+                    <li>Rapports & exports</li>
+                    <li>Statistiques & graphiques</li>
+                    <li>Gestion utilisateurs & équipe</li>
+                    <li>Durée : 1 mois renouvelable</li>
                 </ul>
-                <a href="{{ route('support.index') }}" class="pricing-btn pricing-btn-outline">Nous contacter</a>
+                @auth
+                    <a href="{{ route('company.subscription.upgrade') }}" class="pricing-btn pricing-btn-outline">Passer au Plan Business</a>
+                @else
+                    <a href="{{ route('register', ['role'=>'company']) }}" class="pricing-btn pricing-btn-outline">Commencer → Plan Business</a>
+                @endauth
             </div>
 
         </div>
     </div>
 </section>
- !-->
+ 
 
 
 {{-- ══════════════════════════════════════════

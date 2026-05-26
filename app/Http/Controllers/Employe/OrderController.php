@@ -12,6 +12,7 @@ use App\Models\ShopMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\OrderStatusNotification;
+use App\Services\SubscriptionService;
 
 class OrderController extends Controller
 {
@@ -21,6 +22,19 @@ class OrderController extends Controller
         if (!$shopId) {
             return redirect()->route('employe.dashboard')
                 ->with('error', 'Aucune boutique rattachée à votre compte.');
+        }
+
+        // Vérification limite plan gratuit AVANT de charger quoi que ce soit
+        $shopEarly = Auth::user()->shop ?? Auth::user()->assignedShop;
+        if ($shopEarly) {
+            $isProEarly = $shopEarly->plan === 'pro' && $shopEarly->plan_expires_at?->isFuture();
+            if (!$isProEarly) {
+                $processedEarly = app(SubscriptionService::class)->processedOrdersThisMonth($shopEarly);
+                if ($processedEarly >= 10) {
+                    return redirect()->route('boutique.subscription.upgrade')
+                        ->with('error', '🔒 Limite atteinte — Vous avez traité '.$processedEarly.'/10 commandes ce mois. Passez au Plan Pro pour continuer à accéder aux commandes et en traiter sans limite.');
+                }
+            }
         }
 
         $q = Order::with(['client', 'shop', 'livreur', 'driver', 'deliveryCompany', 'items.product'])
@@ -75,9 +89,14 @@ class OrderController extends Controller
                 return $clientId . '-' . ($m->product_id ?? '0');
             });
 
+        $isPro            = $shop && $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
+        $processedCount   = $shop ? app(SubscriptionService::class)->processedOrdersThisMonth($shop) : 0;
+        $planLimitReached = $shop && !$isPro && $processedCount >= 10;
+
         return view('employe.orders.index', compact(
             'orders', 'livreurs', 'deliveryCompanies', 'devise', 'shop', 'clientMessages',
-            'search', 'status', 'dateFilter', 'dateFrom', 'dateTo'
+            'search', 'status', 'dateFilter', 'dateFrom', 'dateTo',
+            'isPro', 'planLimitReached', 'processedCount'
         ));
     }
 
@@ -219,6 +238,15 @@ class OrderController extends Controller
         $shopId = Auth::user()->currentShopId();
         if (! $shopId) return response()->json(['success' => false, 'message' => 'Boutique introuvable.'], 403);
 
+        $shop = Auth::user()->shop ?? Auth::user()->assignedShop;
+        if ($shop && !app(SubscriptionService::class)->canProcessOrder($shop)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Limite de 10 traitements/mois atteinte. Passez au Plan Pro pour continuer.',
+                'upgrade' => true,
+            ], 403);
+        }
+
         $data = $request->validate([
             'order_ids'           => 'required|array|min:1|max:50',
             'order_ids.*'         => 'integer',
@@ -311,6 +339,11 @@ class OrderController extends Controller
         $shopId = Auth::user()->currentShopId();
         abort_unless($shopId && $order->shop_id === $shopId, 403, 'Commande hors de votre boutique.');
 
+        $shop = Auth::user()->shop ?? Auth::user()->assignedShop;
+        if ($shop && !app(SubscriptionService::class)->canProcessOrder($shop)) {
+            return back()->with('error', 'Limite de 10 traitements/mois atteinte. Passez au Plan Pro pour continuer.');
+        }
+
         $data    = $request->validate(['livreur_id' => ['required', 'exists:users,id']]);
         $livreur = User::livreurs()->inShop($shopId)->findOrFail($data['livreur_id']);
 
@@ -331,6 +364,15 @@ class OrderController extends Controller
     {
         $shopId = Auth::user()->currentShopId();
         abort_unless($shopId && $order->shop_id === $shopId, 403, 'Commande hors de votre boutique.');
+
+        $shop = Auth::user()->shop ?? Auth::user()->assignedShop;
+        if ($shop && !app(SubscriptionService::class)->canProcessOrder($shop)) {
+            $msg = 'Limite de 10 traitements/mois atteinte. Passez au Plan Pro pour continuer.';
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $msg, 'upgrade' => true], 403);
+            }
+            return back()->with('error', $msg);
+        }
 
         $data = $request->validate([
             'delivery_company_id' => ['required', 'exists:delivery_companies,id'],

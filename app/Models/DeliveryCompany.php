@@ -8,7 +8,9 @@ use App\Models\Order;
 
 class DeliveryCompany extends Model
 {
-    protected $fillable = ['name','slug','description','logo','phone','email','active','user_id', 'approved', 'commission_percent', 'address', 'image', 'approved_at', 'country', 'currency'];
+    protected $fillable = ['name','slug','description','logo','phone','email','active','user_id', 'approved', 'commission_percent', 'address', 'image', 'approved_at', 'country', 'currency',
+        'plan', 'plan_expires_at',  // Plan d'abonnement (free/business) + date d'expiration
+    ];
 
     public static function currencyForCountry(string $country): string
     {
@@ -70,9 +72,10 @@ class DeliveryCompany extends Model
         return $this->hasMany(DeliveryMessage::class); // peut avoir plusieurs messages
     }
 
-     protected $casts = [
-        'approved' => 'boolean',
-        'active' => 'boolean',
+    protected $casts = [
+        'approved'        => 'boolean',
+        'active'          => 'boolean',
+        'plan_expires_at' => 'datetime',  // Cast auto en Carbon
     ];
 
     // Auto slug

@@ -449,9 +449,9 @@ html, body {
                 <h1 class="hero-name">{{ $shop->name }}</h1>
                 <div class="hero-badges">
                     @if($shop->is_approved)
-                        <span class="badge badge-approved">✅ Boutique approuvée</span>
+                        <span class="badge badge-approved">✅ Boutique active</span>
                     @else
-                        <span class="badge badge-pending">⏳ En attente de validation</span>
+                        <span class="badge badge-pending">⛔ Boutique suspendue</span>
                     @endif
                     @if($shop->type)
                         <span class="badge badge-type">🏷️ {{ $shop->type }}</span>

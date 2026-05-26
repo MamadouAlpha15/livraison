@@ -925,6 +925,95 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-thumb{background:rgba(99,102,241,.25);border-radius:5px;}
 ::-webkit-scrollbar-thumb:hover{background:rgba(99,102,241,.5);}
+
+/* ══════════════════════════════════════════
+   PLAN INDICATORS — usage bars & lock overlays
+══════════════════════════════════════════ */
+
+/* Bannière plan en haut du dashboard */
+.plan-banner{
+    background:linear-gradient(135deg,#fff7ed 0%,#fef3c7 100%);
+    border:1.5px solid #fcd34d;border-radius:var(--r);
+    padding:14px 18px;margin-bottom:20px;
+    display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.plan-banner.pro{
+    background:linear-gradient(135deg,#eef2ff 0%,#f5f3ff 100%);
+    border-color:rgba(99,102,241,.35);
+}
+.plan-banner-badge{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;
+    text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;flex-shrink:0;
+}
+.plan-banner-badge.free{background:#fef3c7;color:#92400e;border:1px solid #fcd34d;}
+.plan-banner-badge.pro{background:#eef2ff;color:#3730a3;border:1px solid #a5b4fc;}
+.plan-usages{display:flex;align-items:center;gap:20px;flex-wrap:wrap;flex:1;}
+.plan-usage-item{display:flex;flex-direction:column;gap:4px;min-width:140px;}
+.plan-usage-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.plan-usage-lbl{font-size:11px;font-weight:700;color:var(--text-2);}
+.plan-usage-count{font-size:12px;font-weight:800;font-family:var(--mono);color:var(--text);}
+.plan-usage-count.warn{color:#d97706;}
+.plan-usage-count.danger{color:#dc2626;}
+.plan-usage-track{height:6px;background:#e2e8f0;border-radius:4px;overflow:hidden;}
+.plan-usage-fill{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.23,1,.32,1);}
+.plan-usage-fill.ok{background:linear-gradient(90deg,#10b981,#34d399);}
+.plan-usage-fill.warn{background:linear-gradient(90deg,#f59e0b,#fbbf24);}
+.plan-usage-fill.danger{background:linear-gradient(90deg,#ef4444,#f87171);}
+.plan-banner-cta{
+    display:inline-flex;align-items:center;gap:6px;padding:8px 16px;
+    background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;
+    font-size:12px;font-weight:800;border-radius:9px;text-decoration:none;
+    white-space:nowrap;flex-shrink:0;transition:all .15s;
+    box-shadow:0 3px 12px rgba(245,158,11,.35);
+}
+.plan-banner-cta:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(245,158,11,.5);color:#fff;}
+.plan-banner-cta.pro-active{
+    background:linear-gradient(135deg,#6366f1,#4f46e5);
+    box-shadow:0 3px 12px rgba(99,102,241,.35);
+}
+
+/* Overlay de verrouillage sur les sections bloquées */
+.plan-locked-wrap{position:relative;}
+.plan-locked-wrap .plan-locked-overlay{
+    position:absolute;inset:0;z-index:10;
+    background:rgba(248,250,252,.88);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    border-radius:var(--r);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:12px;padding:24px;text-align:center;
+}
+.plan-locked-ico{
+    width:52px;height:52px;border-radius:50%;
+    background:linear-gradient(135deg,#fef3c7,#fde68a);
+    border:2px solid #fcd34d;
+    display:flex;align-items:center;justify-content:center;font-size:22px;
+    box-shadow:0 4px 16px rgba(245,158,11,.25);
+}
+.plan-locked-title{font-size:14px;font-weight:800;color:var(--text);}
+.plan-locked-sub{font-size:12px;color:var(--text-2);line-height:1.5;max-width:260px;}
+.plan-locked-btn{
+    display:inline-flex;align-items:center;gap:6px;padding:9px 20px;
+    background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;
+    font-size:12.5px;font-weight:800;border-radius:9px;text-decoration:none;
+    transition:all .15s;box-shadow:0 3px 12px rgba(245,158,11,.35);
+}
+.plan-locked-btn:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(245,158,11,.5);color:#fff;}
+
+/* Quick btn verrouillé */
+.quick-btn.locked{opacity:.7;cursor:default;position:relative;}
+.quick-btn.locked::after{
+    content:'🔒';position:absolute;top:8px;right:8px;
+    font-size:12px;line-height:1;
+}
+.quick-btn.locked:hover{background:transparent !important;}
+.quick-btn.locked:hover .quick-btn-ico{transform:none !important;}
+.quick-btn.locked:hover::before{opacity:0 !important;}
+.qb-locked-badge{
+    font-size:9.5px;font-weight:800;color:#d97706;
+    background:#fef3c7;border:1px solid #fcd34d;
+    padding:1px 6px;border-radius:8px;margin-top:2px;
+}
 </style>
 @endpush
 
@@ -1049,7 +1138,7 @@ $I = [
     $caGrossPrev  = (float) $shop->orders()->whereMonth('created_at',$now->copy()->subMonth()->month)->whereYear('created_at',$now->copy()->subMonth()->year)->where('status','livrée')->sum('total');
     $caNetPrev    = $caGrossPrev - $commissionsPaieesPrev;
     $caDelta      = $caNetPrev > 0 ? round((($caMonth - $caNetPrev) / $caNetPrev) * 100, 1) : ($caMonth > 0 ? 100 : 0);
-    $cmdMonth = $shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->whereNotIn('status',['annulée','cancelled'])->count();
+    $cmdMonth = $shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->where(function($q){$q->whereNotNull('livreur_id')->orWhereNotNull('delivery_company_id');})->count();
     $cmdToday = $shop->orders()->whereDate('created_at', today())->whereNotIn('status',['annulée','cancelled'])->count();
     $cmdYest  = $shop->orders()->whereDate('created_at', today()->subDay())->whereNotIn('status',['annulée','cancelled'])->count();
     $cmdLivreesMonth = $shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->where('status','livrée')->count();
@@ -1093,6 +1182,11 @@ $I = [
     $pendingCount = $shop->orders()->whereIn('status',['en attente','en_attente','pending','confirmée','processing'])->count();
     $avColors = ['#10b981','#6366f1','#f59e0b','#8b5cf6','#14b8a6','#f43f5e'];
     $devise = $shop->currency ?? 'GNF';
+    $proXof = number_format(config('genuispay.plans.pro', 7600), 0, ',', ' ');
+    $proGnf = number_format(config('genuispay.plans_gnf.pro', 100000), 0, ',', ' ');
+    $proPriceLabel = ($shop->country ?? '') === 'GN'
+        ? "{$proXof} XOF/mois (≈ {$proGnf} GNF 🇬🇳)"
+        : "{$proXof} XOF/mois";
     $caGrossToday    = (float) $shop->orders()->whereDate('created_at', today())->where('status','livrée')->sum('total');
     $commToday       = (float) \App\Models\CourierCommission::whereHas('order', function ($q) use ($shop) { $q->where('shop_id', $shop->id)->whereDate('created_at', today()); })->where('status', 'payée')->sum('amount');
     $caToday         = max(0, $caGrossToday - $commToday);
@@ -1134,6 +1228,15 @@ $I = [
         return ['label' => $_dayLabel($d), 'count' => $cnt, 'today' => $i === 0];
     })->values();
     $maxCmd7 = $cmdDays7->max('count') ?: 1;
+
+    // ── Plan & limites ──
+    $isPro           = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
+    $maxProduits     = 5;     // limite plan gratuit
+    $maxCmdMois      = 10;    // limite plan gratuit
+    $usageProdPct    = $isPro ? 100 : min(100, round(($totalProduits / $maxProduits) * 100));
+    $usageCmdPct     = $isPro ? 100 : min(100, round(($cmdMonth / $maxCmdMois) * 100));
+    $prodClass       = $isPro ? 'ok' : ($usageProdPct >= 100 ? 'danger' : ($usageProdPct >= 80 ? 'warn' : 'ok'));
+    $cmdClass        = $isPro ? 'ok' : ($usageCmdPct >= 100 ? 'danger' : ($usageCmdPct >= 80 ? 'warn' : 'ok'));
 @endphp
 
 {{-- ══ MODAL CHAT BOUTIQUE ↔ ENTREPRISE (depuis la cloche) ══ --}}
@@ -1232,22 +1335,48 @@ $I = [
             <a href="{{ route('boutique.dashboard') }}" class="sb-item active" style="margin-bottom:4px"><span class="ico">{!! $I['grid'] !!}</span> Tableau de bord</a>
             <div class="sb-section">Boutique</div>
             <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">{!! $I['msg'] !!}</span> Messages <span class="sb-badge" id="sbMsgBadge" style="display:none"></span></a>
-            <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">{!! $I['box'] !!}</span> Commandes <span class="sb-badge" id="sbOrdersBadge" style="{{ $pendingCount > 0 ? '' : 'display:none' }}">{{ $pendingCount }}</span></a>
-            <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">{!! $I['tag'] !!}</span> Produits</a>
+            <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">{!! $I['box'] !!}</span> Commandes
+                @if(!$isPro)
+                    <span class="sb-badge" style="background:{{ $cmdClass === 'danger' ? '#dc2626' : ($cmdClass === 'warn' ? '#d97706' : '#6366f1') }};margin-left:auto;">{{ $cmdMonth }}/{{ $maxCmdMois }}</span>
+                @else
+                    <span class="sb-badge" id="sbOrdersBadge" style="{{ $pendingCount > 0 ? '' : 'display:none' }}">{{ $pendingCount }}</span>
+                @endif
+            </a>
+            <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">{!! $I['tag'] !!}</span> Produits
+                @if(!$isPro)<span class="sb-badge" style="background:{{ $prodClass === 'danger' ? '#ef4444' : ($prodClass === 'warn' ? '#f59e0b' : '#8b5cf6') }};color:#fff;font-size:10px;padding:1px 5px;border-radius:8px;margin-left:auto">{{ $totalProduits }}/{{ $maxProduits }}</span>@endif
+            </a>
             <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">{!! $I['users'] !!}</span> Clients</a>
+            @if($isPro)
             <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">{!! $I['briefcase'] !!}</span> Équipe</a>
+            @else
+            <a href="{{ route('boutique.subscription.upgrade') }}" class="sb-item" style="opacity:.6;" title="Plan Pro requis"><span class="ico">{!! $I['briefcase'] !!}</span> Équipe <span class="sb-badge" style="background:#f59e0b;">🔒</span></a>
+            @endif
             <div class="sb-section">Livraison</div>
+            @if($isPro)
             <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">{!! $I['bike'] !!}</span> Livreurs <span class="sb-badge" id="sbLivreursBadge" style="{{ $livreursDisponibles->count() > 0 ? '' : 'display:none' }}">{{ $livreursDisponibles->count() }}</span></a>
+            @else
+            <a href="{{ route('boutique.subscription.upgrade') }}" class="sb-item" style="opacity:.6;" title="Plan Pro requis"><span class="ico">{!! $I['bike'] !!}</span> Livreurs <span class="sb-badge" style="background:#f59e0b;">🔒</span></a>
+            @endif
+            @if($isPro)
             <a href="{{ route('delivery.companies.index') }}" class="sb-item"><span class="ico">{!! $I['building'] !!}</span> Partenaires</a>
+            @else
+            <a href="{{ route('boutique.subscription.upgrade') }}" class="sb-item" style="opacity:.6;" title="Plan Pro requis"><span class="ico">{!! $I['building'] !!}</span> Partenaires <span class="sb-badge" style="background:#f59e0b;">🔒</span></a>
+            @endif
             <div class="sb-section">Finances</div>
             <div class="sb-group">
                 <button class="sb-group-toggle" onclick="toggleGroup(this)" type="button">
-                    <span class="ico">{!! $I['coin'] !!}</span> Finances & Rapports <span class="sb-arrow">▶</span>
+                    <span class="ico">{!! $I['coin'] !!}</span> Finances & Rapports
+                    @if(!$isPro)<span style="font-size:11px;margin-left:4px;opacity:.7;">🔒</span>@endif
+                    <span class="sb-arrow">▶</span>
                 </button>
                 <div class="sb-sub">
                     <a href="{{ route('boutique.payments.index') }}" class="sb-item"><span class="ico">{!! $I['card'] !!}</span> Paiements</a>
                     <a href="{{ route('boutique.commissions.index') }}" class="sb-item"><span class="ico">{!! $I['chart'] !!}</span> Commissions</a>
+                    @if($isPro)
                     <a href="{{ route('boutique.reports.index') }}" class="sb-item"><span class="ico">{!! $I['clip'] !!}</span> Rapports</a>
+                    @else
+                    <a href="{{ route('boutique.subscription.upgrade') }}" class="sb-item" style="opacity:.6;" title="Plan Pro requis"><span class="ico">{!! $I['clip'] !!}</span> Rapports <span class="sb-badge" style="background:#f59e0b;">🔒</span></a>
+                    @endif
                     @if(auth()->user()->role === 'admin')<a href="{{ route('shop.edit', $shop) }}" class="sb-item"><span class="ico">{!! $I['gear'] !!}</span> Paramètres</a>@endif
                 </div>
             </div>
@@ -1350,6 +1479,63 @@ $I = [
 
         <div class="content">
 
+            {{-- ── Bannière plan avec indicateurs d'usage ── --}}
+            <div class="plan-banner {{ $isPro ? 'pro' : '' }}">
+                {{-- Badge plan --}}
+                <div class="plan-banner-badge {{ $isPro ? 'pro' : 'free' }}">
+                    @if($isPro)
+                        ✦ Plan Pro actif — expire le {{ $shop->plan_expires_at->format('d/m/Y') }}
+                    @else
+                        🛍 Plan Gratuit
+                    @endif
+                </div>
+
+                {{-- Barres d'usage (seulement plan gratuit) --}}
+                @if(!$isPro)
+                <div class="plan-usages">
+                    {{-- Produits --}}
+                    <div class="plan-usage-item">
+                        <div class="plan-usage-top">
+                            <span class="plan-usage-lbl">Produits</span>
+                            <span class="plan-usage-count {{ $prodClass }}">{{ $totalProduits }}/{{ $maxProduits }}</span>
+                        </div>
+                        <div class="plan-usage-track">
+                            <div class="plan-usage-fill {{ $prodClass }}" style="width:{{ $usageProdPct }}%"></div>
+                        </div>
+                    </div>
+                    {{-- Commandes ce mois --}}
+                    <div class="plan-usage-item">
+                        <div class="plan-usage-top">
+                            <span class="plan-usage-lbl">Commandes (mois)</span>
+                            <span class="plan-usage-count {{ $cmdClass }}">{{ $cmdMonth }}/{{ $maxCmdMois }}</span>
+                        </div>
+                        <div class="plan-usage-track">
+                            <div class="plan-usage-fill {{ $cmdClass }}" style="width:{{ $usageCmdPct }}%"></div>
+                        </div>
+                    </div>
+                    {{-- Fonctionnalités bloquées --}}
+                    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center">
+                        <span style="font-size:10.5px;font-weight:700;color:var(--text-2);">Bloqués :</span>
+                        @foreach(['Livreurs','Partenaires','Rapports','Équipe','Graphiques','Analyse période'] as $feat)
+                            <span style="font-size:10px;font-weight:700;background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;padding:2px 8px;border-radius:20px;">🔒 {{ $feat }}</span>
+                        @endforeach
+                    </div>
+                </div>
+                {{-- CTA --}}
+                <a href="{{ route('boutique.subscription.upgrade') }}" class="plan-banner-cta">
+                    ✦ Passer au Plan Pro — {{ $proPriceLabel }}
+                </a>
+                @else
+                {{-- Pro : juste un lien vers l'upgrade au renouvellement --}}
+                <div style="font-size:12px;color:#4338ca;font-weight:600;flex:1">
+                    Toutes les fonctionnalités débloquées.
+                </div>
+                <a href="{{ route('boutique.subscription.upgrade') }}" class="plan-banner-cta pro-active" style="background:linear-gradient(135deg,#6366f1,#4f46e5);box-shadow:0 3px 12px rgba(99,102,241,.3)">
+                    Renouveler
+                </a>
+                @endif
+            </div>
+
             {{-- KPI Grid --}}
             <div class="kpi-grid" style="margin-bottom:22px">
                 <div class="kpi"  style="--kpi-color:#8b5cf6;--kpi-bg:#f5f3ff">
@@ -1366,12 +1552,48 @@ $I = [
                     </div>
                     @endif
                 </div>
-                <div class="kpi" style="--kpi-color:#8b5cf6;--kpi-bg:#f5f3ff">
-                    <div class="kpi-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);border-color:rgba(139,92,246,.3);box-shadow:0 0 0 3px rgba(139,92,246,.12),0 4px 14px rgba(139,92,246,.4)">{!! $I['box_kpi'] !!}</div>
+                @php
+                    $_cmdColor  = !$isPro && $cmdClass === 'danger' ? '#dc2626' : (!$isPro && $cmdClass === 'warn' ? '#d97706' : '#8b5cf6');
+                    $_cmdBg     = !$isPro && $cmdClass === 'danger' ? '#fef2f2' : (!$isPro && $cmdClass === 'warn' ? '#fffbeb' : '#f5f3ff');
+                    $_cmdGrad   = !$isPro && $cmdClass === 'danger' ? '#ef4444,#b91c1c' : (!$isPro && $cmdClass === 'warn' ? '#f59e0b,#b45309' : '#8b5cf6,#6d28d9');
+                    $_cmdShadow = !$isPro && $cmdClass === 'danger' ? '0 0 0 3px rgba(220,38,38,.12),0 4px 14px rgba(220,38,38,.35)' : (!$isPro && $cmdClass === 'warn' ? '0 0 0 3px rgba(217,119,6,.12),0 4px 14px rgba(217,119,6,.35)' : '0 0 0 3px rgba(139,92,246,.12),0 4px 14px rgba(139,92,246,.4)');
+                    $_cmdBorder = !$isPro && $cmdClass === 'danger' ? 'border:2px solid #fca5a5;' : (!$isPro && $cmdClass === 'warn' ? 'border:2px solid #fde68a;' : '');
+                @endphp
+                <div class="kpi" style="--kpi-color:{{ $_cmdColor }};--kpi-bg:{{ $_cmdBg }};{{ $_cmdBorder }}">
+                    <div class="kpi-icon" style="background:linear-gradient(135deg,{{ $_cmdGrad }});border-color:rgba(139,92,246,.3);box-shadow:{{ $_cmdShadow }}">{!! $I['box_kpi'] !!}</div>
                     <div class="kpi-lbl">{{ __('app.orders_this_month') }}</div>
-                    <div class="kpi-val" id="kpiCmdVal">{{ $cmdMonth }}</div>
-                    <div class="kpi-unit">commandes</div>
+                    <div class="kpi-val" id="kpiCmdVal">
+                        @if(!$isPro)
+                            {{ $cmdMonth }}<span style="font-size:16px;font-weight:600;color:var(--muted)">/{{ $maxCmdMois }}</span>
+                        @else
+                            {{ $cmdMonth }}
+                        @endif
+                    </div>
+                    <div class="kpi-unit">commandes traitées</div>
                     <div class="kpi-delta {{ $cmdToday >= $cmdYest ? 'up':'down' }}" id="kpiCmdDelta">{{ $cmdToday >= $cmdYest ? '↑':'↓' }} {{ $cmdToday }} aujourd'hui</div>
+
+                    @if(!$isPro)
+                    {{-- Barre de progression --}}
+                    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+                            <span style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Utilisation</span>
+                            <span style="font-size:10.5px;font-weight:800;font-family:var(--mono);color:{{ $_cmdColor }}">{{ $usageCmdPct }}%</span>
+                        </div>
+                        <div style="height:5px;border-radius:20px;background:{{ !$isPro && $cmdClass === 'danger' ? '#fee2e2' : (!$isPro && $cmdClass === 'warn' ? '#fef3c7' : '#ede9fe') }};overflow:hidden;">
+                            <div style="height:100%;border-radius:20px;width:{{ $usageCmdPct }}%;background:linear-gradient(90deg,{{ $_cmdGrad }});transition:width .4s ease;"></div>
+                        </div>
+                        @if($cmdClass === 'danger')
+                        <div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between;gap:6px;">
+                            <span style="font-size:10.5px;font-weight:800;color:#dc2626;">🔒 Limite atteinte</span>
+                            <a href="{{ route('boutique.subscription.upgrade') }}" style="font-size:10px;font-weight:800;color:#6366f1;background:#eef2ff;border:1px solid #c7d2fe;padding:2px 8px;border-radius:20px;text-decoration:none;white-space:nowrap;">⚡ Plan Pro</a>
+                        </div>
+                        @elseif($cmdClass === 'warn')
+                        <div style="margin-top:7px;font-size:10.5px;font-weight:700;color:#d97706;">⚠ Bientôt la limite — {{ $maxCmdMois - $cmdMonth }} restante{{ $maxCmdMois - $cmdMonth > 1 ? 's' : '' }}</div>
+                        @else
+                        <div style="margin-top:7px;font-size:10.5px;color:var(--muted);">{{ $maxCmdMois - $cmdMonth }} commande{{ $maxCmdMois - $cmdMonth > 1 ? 's' : '' }} restante{{ $maxCmdMois - $cmdMonth > 1 ? 's' : '' }} ce mois</div>
+                        @endif
+                    </div>
+                    @endif
                 </div>
                 <div class="kpi" style="--kpi-color:#d97706;--kpi-bg:#fffbeb">
                     <div class="kpi-icon" style="background:linear-gradient(135deg,#f59e0b,#b45309);border-color:rgba(169, 141, 110, 0.3);box-shadow:0 0 0 3px rgba(217,119,6,.12),0 4px 14px rgba(147, 94, 33, 0.4)">{!! $I['cart_kpi'] !!}</div>
@@ -1482,10 +1704,52 @@ $I = [
                         <span style="font-size:11px;color:var(--muted)">Accès direct aux tâches courantes</span>
                     </div>
                     <div class="quick-grid">
-                        <a href="{{ route('boutique.orders.index') }}" class="quick-btn" style="--q-bg:#fffbeb;--q-border:#fde68a;--q-color:#f59e0b"><div class="quick-btn-ico" style="color:#f59e0b">{!! $I['list_q'] !!}</div><div class="quick-btn-lbl">Commandes</div><div class="quick-btn-sub">Voir & gérer</div></a>
-                        <a href="{{ route('products.create') }}" class="quick-btn" style="--q-bg:#eef2ff;--q-border:#a5b4fc;--q-color:#6366f1"><div class="quick-btn-ico" style="color:#6366f1">{!! $I['plus_q'] !!}</div><div class="quick-btn-lbl">Nouveau produit</div><div class="quick-btn-sub">Ajouter au catalogue</div></a>
-                        <a href="{{ route('boutique.livreurs.index') }}" class="quick-btn" style="--q-bg:#f5f3ff;--q-border:#c4b5fd;--q-color:#8b5cf6"><div class="quick-btn-ico" style="color:#8b5cf6">{!! $I['bike_q'] !!}</div><div class="quick-btn-lbl">Livreurs</div><div class="quick-btn-sub">Voir en ligne</div></a>
-                        <a href="{{ route('boutique.payments.index') }}" class="quick-btn" style="--q-bg:#eff6ff;--q-border:#93c5fd;--q-color:#3b82f6"><div class="quick-btn-ico" style="color:#3b82f6">{!! $I['card_q'] !!}</div><div class="quick-btn-lbl">Paiements</div><div class="quick-btn-sub">Revenus reçus</div></a>
+                        {{-- Commandes — toujours accessible, mais avec usage pour plan gratuit --}}
+                        <a href="{{ route('boutique.orders.index') }}" class="quick-btn" style="--q-bg:#fffbeb;--q-border:#fde68a;--q-color:#f59e0b">
+                            <div class="quick-btn-ico" style="color:#f59e0b">{!! $I['list_q'] !!}</div>
+                            <div class="quick-btn-lbl">Commandes</div>
+                            @if(!$isPro)
+                                <div class="quick-btn-sub {{ $cmdClass === 'danger' ? '' : '' }}" style="color:{{ $cmdClass === 'danger' ? '#dc2626' : ($cmdClass === 'warn' ? '#d97706' : '') }}">{{ $cmdMonth }}/{{ $maxCmdMois }} ce mois</div>
+                            @else
+                                <div class="quick-btn-sub">Voir & gérer</div>
+                            @endif
+                        </a>
+
+                        {{-- Nouveau produit — accessible mais avec usage --}}
+                        <a href="{{ $isPro || $totalProduits < $maxProduits ? route('products.create') : route('boutique.subscription.upgrade') }}" class="quick-btn" style="--q-bg:#eef2ff;--q-border:#a5b4fc;--q-color:#6366f1">
+                            <div class="quick-btn-ico" style="color:#6366f1">{!! $I['plus_q'] !!}</div>
+                            <div class="quick-btn-lbl">Nouveau produit</div>
+                            @if(!$isPro)
+                                <div class="quick-btn-sub" style="color:{{ $prodClass === 'danger' ? '#dc2626' : ($prodClass === 'warn' ? '#d97706' : '') }}">{{ $totalProduits }}/{{ $maxProduits }} produits</div>
+                                @if($totalProduits >= $maxProduits)
+                                    <div class="qb-locked-badge">🔒 Limite atteinte</div>
+                                @endif
+                            @else
+                                <div class="quick-btn-sub">Ajouter au catalogue</div>
+                            @endif
+                        </a>
+
+                        {{-- Livreurs — bloqué plan gratuit --}}
+                        @if($isPro)
+                            <a href="{{ route('boutique.livreurs.index') }}" class="quick-btn" style="--q-bg:#f5f3ff;--q-border:#c4b5fd;--q-color:#8b5cf6">
+                                <div class="quick-btn-ico" style="color:#8b5cf6">{!! $I['bike_q'] !!}</div>
+                                <div class="quick-btn-lbl">Livreurs</div>
+                                <div class="quick-btn-sub">Voir en ligne</div>
+                            </a>
+                        @else
+                            <a href="{{ route('boutique.subscription.upgrade') }}" class="quick-btn locked" style="--q-bg:#fef2f2;--q-border:#fca5a5;--q-color:#ef4444">
+                                <div class="quick-btn-ico" style="color:#ef4444;filter:grayscale(.5)">{!! $I['bike_q'] !!}</div>
+                                <div class="quick-btn-lbl" style="color:var(--muted)">Livreurs</div>
+                                <div class="qb-locked-badge">🔒 Plan Pro</div>
+                            </a>
+                        @endif
+
+                        {{-- Paiements — toujours accessible --}}
+                        <a href="{{ route('boutique.payments.index') }}" class="quick-btn" style="--q-bg:#eff6ff;--q-border:#93c5fd;--q-color:#3b82f6">
+                            <div class="quick-btn-ico" style="color:#3b82f6">{!! $I['card_q'] !!}</div>
+                            <div class="quick-btn-lbl">Paiements</div>
+                            <div class="quick-btn-sub">Revenus reçus</div>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -1520,7 +1784,16 @@ $I = [
                     return round($n);
                 }
             @endphp
-            <div class="charts-duo">
+            <div class="plan-locked-wrap">
+            @if(!$isPro)
+            <div class="plan-locked-overlay">
+                <div class="plan-locked-ico">📊</div>
+                <div class="plan-locked-title">Graphiques — Plan Pro requis</div>
+                <div class="plan-locked-sub">Les graphiques de revenus et de commandes sont réservés au Plan Pro. Passez au Pro pour visualiser l'évolution de votre activité.</div>
+                <a href="{{ route('boutique.subscription.upgrade') }}" class="plan-locked-btn">✦ Débloquer les graphiques — {{ $proPriceLabel }}</a>
+            </div>
+            @endif
+            <div class="charts-duo" style="{{ !$isPro ? 'filter:blur(3px);pointer-events:none;user-select:none' : '' }}">
             <div class="card chart-wrap" style="margin-bottom:0">
                 {{-- Header --}}
                 <div class="rc-header">
@@ -1662,6 +1935,7 @@ $I = [
                 </div>
             </div>
             </div>{{-- /charts-duo --}}
+            </div>{{-- /plan-locked-wrap charts --}}
 
             {{-- CONTENT GRID --}}
             <div class="content-grid">
@@ -1729,7 +2003,13 @@ $I = [
                         {{-- Tabs --}}
                         <div class="tab-bar">
                             <button class="tab-btn active" data-tab="livreurs" style="gap:5px">{!! $I['bike_tab'] !!} Livreurs <span class="tab-count">{{ $livreursDisponibles->count() }}</span></button>
-                            @if($hasCompanies)<button class="tab-btn" data-tab="companies" style="gap:5px">{!! $I['bldg_tab'] !!} Entreprises <span class="tab-count {{ $deliveryCompanies->count() === 0 ? 'zero':'' }}">{{ $deliveryCompanies->count() }}</span></button>@endif
+                            @if($hasCompanies)
+                                @if($isPro)
+                                <button class="tab-btn" data-tab="companies" style="gap:5px">{!! $I['bldg_tab'] !!} Entreprises <span class="tab-count {{ $deliveryCompanies->count() === 0 ? 'zero':'' }}">{{ $deliveryCompanies->count() }}</span></button>
+                                @else
+                                <button class="tab-btn" style="gap:5px;opacity:.55;cursor:default;" type="button" onclick="document.getElementById('planLockPartenairesModal').style.display='flex'">{!! $I['bldg_tab'] !!} Entreprises 🔒</button>
+                                @endif
+                            @endif
                         </div>
                         {{-- Liste livreurs --}}
                         <div class="tab-panel active" id="tab-livreurs">
@@ -1771,7 +2051,7 @@ $I = [
                             @endif
                         </div>
                         @if($hasCompanies)
-                        <div class="tab-panel" id="tab-companies">
+                        <div class="tab-panel plan-locked-wrap" id="tab-companies">
                             <div class="co-list">
                                 @foreach($deliveryCompanies->take(4) as $company)
                                 <div class="co-row" onclick="window.location='{{ route('company.chat.show', $company) }}'" title="Ouvrir la discussion">
@@ -1783,6 +2063,14 @@ $I = [
                                 @endforeach
                             </div>
                             @if($deliveryCompanies->count() > 4)<div class="lv-footer"><a href="{{ route('delivery.companies.index') }}">Voir toutes →</a></div>@endif
+                            @if(!$isPro)
+                            <div class="plan-locked-overlay">
+                                <div class="plan-locked-ico">🚚</div>
+                                <div class="plan-locked-title">Partenaires — Plan Pro requis</div>
+                                <div class="plan-locked-sub">L'accès aux entreprises de livraison partenaires est réservé au Plan Pro. Passez au Pro pour contacter et collaborer avec les transporteurs.</div>
+                                <a href="{{ route('boutique.subscription.upgrade') }}" class="plan-locked-btn">✦ Débloquer les partenaires — {{ $proPriceLabel }}</a>
+                            </div>
+                            @endif
                         </div>
                         @endif
                     </div>
@@ -1810,21 +2098,29 @@ $I = [
                             </div>
                         </div>
                         @else
-                        <div style="padding:12px 18px;background:#fffbeb;border-bottom:1px solid #fde68a;display:flex;align-items:flex-start;gap:10px">
-                            <span style="flex-shrink:0;display:flex;margin-top:2px">{!! $I['warn_a'] !!}</span>
-                            <div><div style="font-size:12.5px;color:#92400e;font-weight:700;margin-bottom:3px">Vous n'avez pas de livreurs</div><div style="font-size:11.5px;color:#b45309;line-height:1.55">Contactez une entreprise partenaire ci-dessous. Cliquez sur <strong>Contacter</strong> pour ouvrir une discussion.</div></div>
-                        </div>
-                        <div class="co-list">
-                            @foreach($deliveryCompanies->take(4) as $company)
-                            <div class="co-row" onclick="window.location='{{ route('company.chat.show', $company) }}'" title="Ouvrir la discussion">
-                                <div class="co-logo">@if(!empty($company->logo))<img src="{{ asset('storage/'.$company->logo) }}" alt="{{ $company->name }}">@else {!! $I['truck_co'] !!} @endif</div>
-                                <div class="co-info"><div class="co-nm">{{ $company->name }}</div><div class="co-mt">{{ $company->phone ?? 'Contact non renseigné' }}</div></div>
-                                @if($company->commission_rate)<span class="co-commission">{{ number_format($company->commission_rate*100,1) }}%</span>@endif
-                                <a href="{{ route('company.chat.show', $company) }}" class="btn btn-sm btn-primary" onclick="event.stopPropagation()" style="gap:4px">{!! $I['msg_btn'] !!} Contacter</a>
+                        <div class="plan-locked-wrap">
+                            <div style="padding:12px 18px;background:#fffbeb;border-bottom:1px solid #fde68a;display:flex;align-items:flex-start;gap:10px">
+                                <span style="flex-shrink:0;display:flex;margin-top:2px">{!! $I['warn_a'] !!}</span>
+                                <div><div style="font-size:12.5px;color:#92400e;font-weight:700;margin-bottom:3px">Vous n'avez pas de livreurs</div><div style="font-size:11.5px;color:#b45309;line-height:1.55">Contactez une entreprise partenaire ci-dessous. Cliquez sur <strong>Contacter</strong> pour ouvrir une discussion.</div></div>
                             </div>
-                            @endforeach
+                            <div class="co-list">
+                                @foreach($deliveryCompanies->take(4) as $company)
+                                <div class="co-row">
+                                    <div class="co-logo">@if(!empty($company->logo))<img src="{{ asset('storage/'.$company->logo) }}" alt="{{ $company->name }}">@else {!! $I['truck_co'] !!} @endif</div>
+                                    <div class="co-info"><div class="co-nm">{{ $company->name }}</div><div class="co-mt">{{ $company->phone ?? 'Contact non renseigné' }}</div></div>
+                                    @if($company->commission_rate)<span class="co-commission">{{ number_format($company->commission_rate*100,1) }}%</span>@endif
+                                </div>
+                                @endforeach
+                            </div>
+                            @if(!$isPro)
+                            <div class="plan-locked-overlay">
+                                <div class="plan-locked-ico">🚚</div>
+                                <div class="plan-locked-title">Partenaires — Plan Pro requis</div>
+                                <div class="plan-locked-sub">L'accès aux entreprises de livraison partenaires est réservé au Plan Pro. Passez au Pro pour collaborer avec les transporteurs.</div>
+                                <a href="{{ route('boutique.subscription.upgrade') }}" class="plan-locked-btn">✦ Débloquer les partenaires — {{ $proPriceLabel }}</a>
+                            </div>
+                            @endif
                         </div>
-                        @if($deliveryCompanies->count() > 4)<div style="padding:10px 18px;text-align:center"><a href="{{ route('delivery.companies.index') }}" class="btn btn-ghost btn-sm">Voir toutes les entreprises →</a></div>@endif
                         @endif
                     </div>
                     @endif
@@ -1872,7 +2168,16 @@ $I = [
 
             {{-- SÉLECTEUR DE PÉRIODE + RÉSUMÉ RAPIDE --}}
             <div class="perf-grid">
-            <div class="card period-card" id="periodCard" style="margin-bottom:0">
+            <div class="plan-locked-wrap">
+            @if(!$isPro)
+            <div class="plan-locked-overlay">
+                <div class="plan-locked-ico">📅</div>
+                <div class="plan-locked-title">Analyse par période — Plan Pro requis</div>
+                <div class="plan-locked-sub">Analysez vos revenus semaine par semaine, mois par mois. Disponible avec le Plan Pro.</div>
+                <a href="{{ route('boutique.subscription.upgrade') }}" class="plan-locked-btn">✦ Débloquer l'analyse — {{ $proPriceLabel }}</a>
+            </div>
+            @endif
+            <div class="card period-card" id="periodCard" style="margin-bottom:0;{{ !$isPro ? 'filter:blur(3px);pointer-events:none;user-select:none' : '' }}">
                 <div class="card-hd">
                     <span class="card-title" style="display:inline-flex;align-items:center;gap:5px">{!! $I['cal_t'] !!} Analyse par période</span>
                     <span class="period-label" id="periodLabel">Période : <strong>Ce mois</strong></span>
@@ -1919,6 +2224,7 @@ $I = [
                     </div>
                 </div>
             </div>
+            </div>{{-- /plan-locked-wrap period --}}
 
             {{-- Résumé rapide --}}
             <div class="card" style="margin-bottom:0">

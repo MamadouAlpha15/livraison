@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'role'          => \App\Http\Middleware\RoleMiddleware::class,
             'scope.shop'    => \App\Http\Middleware\ScopeShop::class,
             'force.pwd'     => \App\Http\Middleware\ForcePasswordChange::class,
+            // Plan boutique : bloque les routes réservées au Plan Pro
+            'shop.plan'     => \App\Http\Middleware\CheckShopPlan::class,
+            // Plan entreprise : bloque les routes réservées au Plan Business
+            'company.plan'  => \App\Http\Middleware\CheckCompanyPlan::class,
         ]);
 
         $middleware->appendToGroup('web', \App\Http\Middleware\SetLocale::class);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Company;
 use App\Http\Controllers\Controller;
 use App\Models\DeliveryCompany;
 use App\Models\DeliveryZone;
+use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
 
 class ZoneController extends Controller
@@ -27,6 +28,15 @@ class ZoneController extends Controller
     public function store(Request $request)
     {
         $company = $this->getCompany();
+
+        // Vérification limite plan gratuit : max 5 zones de livraison
+        if (!app(SubscriptionService::class)->canCreateZone($company)) {
+            if ($request->expectsJson()) {
+                return response()->json(['error' => 'Limite atteinte : max 5 zones en Plan Gratuit.', 'upgrade' => route('company.subscription.upgrade')], 403);
+            }
+            return redirect()->route('company.subscription.upgrade')
+                ->with('plan_error', 'Limite atteinte : le Plan Gratuit est limité à 5 zones. Passez au Plan Business pour en créer davantage.');
+        }
 
         $data = $request->validate([
             'name'              => ['required', 'string', 'max:100'],

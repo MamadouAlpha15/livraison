@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Driver;
 use App\Models\DeliveryCompany;
+use App\Services\SubscriptionService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -145,6 +146,12 @@ class DriverController extends Controller
         if (! $company->approved) {
             return redirect()->route('company.drivers.index')
                 ->with('error', "Votre entreprise est en attente d'approbation.");
+        }
+
+        // Vérification limite plan gratuit : max 1 chauffeur
+        if (!app(SubscriptionService::class)->canCreateDriver($company)) {
+            return redirect()->route('company.subscription.upgrade')
+                ->with('plan_error', 'Limite atteinte : le Plan Gratuit est limité à 1 chauffeur. Passez au Plan Business pour en ajouter davantage.');
         }
 
         $data = $request->validate([
