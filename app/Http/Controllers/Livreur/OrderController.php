@@ -94,12 +94,19 @@ class OrderController extends Controller
         $result = [];
 
         foreach ($orders as $order) {
-            // Clé d'appartenance : batch_id si groupé intentionnellement, sinon solo par commande.
-            // Règle identique pour livreur boutique ET livreur entreprise :
-            //   delivery_batch_id présent → même lot = même trajet
-            //   absent → commande individuelle, jamais fusionnée avec d'autres
+            // Clé d'appartenance :
+            //   batch_id présent → même lot intentionnel
+            //   livreur entreprise (driver_id) sans batch → auto-grouper par client + boutique
+            //     même client + même boutique = même trajet = 1 seule carte
+            //   livreur boutique sans batch → solo par commande
             if ($order->delivery_batch_id) {
                 $key = 'batch_' . $order->delivery_batch_id;
+            } elseif ($order->driver_id) {
+                // Livreur entreprise : même client + même boutique = 1 trajet
+                $key = 'drv_u' . ($order->user_id ?? 'x') . '_s' . ($order->shop_id ?? '0');
+            } elseif ($order->livreur_id) {
+                // Livreur boutique : même client + même boutique = 1 trajet
+                $key = 'liv_u' . ($order->user_id ?? 'x') . '_s' . ($order->shop_id ?? '0');
             } else {
                 $key = '__solo__' . $order->id;
             }
@@ -223,6 +230,75 @@ class OrderController extends Controller
             DB::rollBack();
             return back()->with('error', 'Erreur : ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Regroupe plusieurs commandes solo dans un batch commun puis redirige vers la navigation.
+     * Utilisé quand plusieurs commandes d'un même client sont affichées en une seule carte.
+     */
+    public function autoBatchNav(Request $request)
+    {
+        $driver = $this->myDriver();
+        $user   = Auth::user();
+        $ids    = $request->validate(['order_ids' => 'required|array|min:1'])['order_ids'];
+
+        $orders = Order::whereIn('id', $ids)->get();
+
+        foreach ($orders as $order) {
+            if ($order->livreur_id !== $user->id && (!$driver || (int)$order->driver_id !== $driver->id)) {
+                abort(403);
+            }
+        }
+
+        // Créer un batch_id commun si les commandes n'en ont pas encore
+        $batchId = $orders->first()?->delivery_batch_id;
+        if (!$batchId) {
+            $batchId = (string)\Illuminate\Support\Str::uuid();
+            Order::whereIn('id', $ids)->whereNull('delivery_batch_id')->update(['delivery_batch_id' => $batchId]);
+        }
+
+        return redirect()->route('orders.nav', $orders->first());
+    }
+
+    /**
+     * Livreur boutique : démarre toutes les commandes du groupe (en_livraison) et redirige
+     * directement vers la Phase 2 (client) — pas de Phase 1, il est déjà à la boutique.
+     */
+    public function startBulkAndNav(Request $request)
+    {
+        $driver = $this->myDriver();
+        $user   = Auth::user();
+        $ids    = $request->validate(['order_ids' => 'required|array|min:1'])['order_ids'];
+
+        $orders = Order::whereIn('id', $ids)->get();
+
+        foreach ($orders as $order) {
+            if ($order->livreur_id !== $user->id && (!$driver || (int)$order->driver_id !== $driver->id)) {
+                abort(403);
+            }
+        }
+
+        // Créer un batch commun si plusieurs commandes sans batch
+        $batchId = $orders->first()?->delivery_batch_id;
+        if (!$batchId && $orders->count() > 1) {
+            $batchId = (string)\Illuminate\Support\Str::uuid();
+            Order::whereIn('id', $ids)->whereNull('delivery_batch_id')->update(['delivery_batch_id' => $batchId]);
+        }
+
+        // Passer toutes en en_livraison → Phase 2 s'affiche directement dans nav.blade.php
+        foreach ($orders as $order) {
+            if ($order->status === Order::STATUS_CONFIRMEE) {
+                $order->status = Order::STATUS_EN_LIVRAISON;
+                $order->save();
+                try {
+                    $order->client?->notify(new OrderStatusNotification($order, '🚚 Votre commande est en cours de livraison.'));
+                } catch (\Throwable $e) {}
+            }
+        }
+
+        if ($driver) $driver->update(['status' => 'busy']);
+
+        return redirect()->route('orders.nav', $orders->first());
     }
 
     /**

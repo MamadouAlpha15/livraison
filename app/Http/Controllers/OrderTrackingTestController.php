@@ -7,9 +7,8 @@ use App\Models\Order;
 
 class OrderTrackingTestController extends Controller
 {
-     public function simulate(Order $order)
+    public function simulate(Order $order)
     {
-        // sécurité basique : acteurs autorisés (admin/employés/vendeur de la boutique, client, livreur)
         $u = auth()->user();
         abort_unless($u, 401);
 
@@ -18,23 +17,34 @@ class OrderTrackingTestController extends Controller
         if ($u->shop_id && $u->shop_id === $order->shop_id) $ok = true;
         if ($order->user_id === $u->id) $ok = true;
         if ($order->livreur_id === $u->id) $ok = true;
+        if (! $ok) {
+            $driver = \App\Models\Driver::where('user_id', $u->id)->first();
+            if ($driver && (int) $order->driver_id === $driver->id) $ok = true;
+        }
         abort_unless($ok, 403);
 
-        // point de départ (fallback Conakry si vide)
-        $lat = $order->current_lat ?? 9.6412;
-        $lng = $order->current_lng ?? -13.5784;
+        // Point de base Conakry
+        $baseLat = 9.6412;
+        $baseLng = -13.5784;
 
-        // décalage aléatoire léger (~100 à 300 mètres)
-        $deltaLat = (rand(-3, 3)) / 1000.0;
-        $deltaLng = (rand(-3, 3)) / 1000.0;
+        $delta = fn() => rand(-5, 5) / 1000.0; // ~100–500 m
 
         $order->update([
-            'current_lat' => $lat + $deltaLat,
-            'current_lng' => $lng + $deltaLng,
-            'last_ping_at'=> now(),
+            // Position livreur
+            'current_lat'  => ($order->current_lat ?? $baseLat) + $delta(),
+            'current_lng'  => ($order->current_lng ?? $baseLng) + $delta(),
+            'last_ping_at' => now(),
+            // Position vendeur (boutique)
+            'vendor_lat'                => $baseLat + $delta(),
+            'vendor_lng'                => $baseLng + $delta(),
+            'vendor_location_shared_at' => now(),
+            // Position client
+            'client_lat'                => $baseLat + $delta(),
+            'client_lng'                => $baseLng + $delta(),
+            'client_location_shared_at' => now(),
         ]);
 
-        return back()->with('success', 'Position simulée ! Regarde la carte.');
+        return back()->with('success', '✅ Positions simulées (livreur + vendeur + client)');
     }
 }
 

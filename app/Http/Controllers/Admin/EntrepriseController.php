@@ -38,6 +38,18 @@ class EntrepriseController extends Controller
             });
         }
 
+        if ($request->filled('plan')) {
+            if ($request->plan === 'business') {
+                $query->where('plan', 'business')->where('plan_expires_at', '>', now());
+            } else {
+                $query->where(function ($q) {
+                    $q->whereNull('plan')
+                      ->orWhere('plan', 'free')
+                      ->orWhere('plan_expires_at', '<=', now());
+                });
+            }
+        }
+
         $entreprises = $query->paginate(20)->withQueryString();
 
         $base = DeliveryCompany::query();
@@ -49,6 +61,7 @@ class EntrepriseController extends Controller
             'active'     => (clone $base)->where('approved', true)->where('active', true)->count(),
             'inactive'   => (clone $base)->where('active', false)->count(),
             'drivers'    => \App\Models\Driver::count(),
+            'business'   => (clone $base)->where('plan', 'business')->where('plan_expires_at', '>', now())->count(),
         ];
 
         $countries = DeliveryCompany::whereNotNull('country')

@@ -231,6 +231,15 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:#0f
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4M8 12h8"/></svg>
         Ouvrir dans Google Maps
     </button>
+
+    @if(app()->isLocal())
+    <form method="POST" action="{{ route('orders.simulate.gps', $order) }}" style="margin-top:8px">
+        @csrf
+        <button type="submit" style="width:100%;padding:10px;border-radius:12px;border:1.5px dashed rgba(251,191,36,.5);background:rgba(251,191,36,.08);color:#fbbf24;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;">
+            🧪 [DEV] Simuler positions vendeur + client + livreur
+        </button>
+    </form>
+    @endif
 </div>
 
 {{-- MODAL CONFIRMATION COLIS RÉCUPÉRÉ --}}
@@ -572,6 +581,9 @@ function openGoogleMaps() {
         dest = `${destLat},${destLng}`;
     } else if (currentPhase === 1 && SHOP_ADDRESS) {
         dest = encodeURIComponent(SHOP_ADDRESS);
+    } else if (currentPhase === 2 && DESTINATION) {
+        // Client n'a pas partagé sa position GPS → utiliser l'adresse texte
+        dest = encodeURIComponent(DESTINATION);
     } else {
         alert('Destination non disponible.');
         return;

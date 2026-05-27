@@ -44,7 +44,11 @@ p{font-size:14px;color:#64748b;margin:0 0 24px;line-height:1.6}
         </div>
         <div class="info-row">
             <span class="info-lbl">Montant payé</span>
-            <span class="info-val">{{ number_format($subscription->amount, 0, ',', ' ') }} GNF</span>
+            @if($userCountry === 'GN')
+                <span class="info-val">{{ number_format($subscription->amount, 0, ',', ' ') }} GNF</span>
+            @else
+                <span class="info-val">{{ number_format($amountXof, 0, ',', ' ') }} XOF</span>
+            @endif
         </div>
         <div class="info-row">
             <span class="info-lbl">Expire le</span>

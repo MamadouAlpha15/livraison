@@ -404,22 +404,6 @@ class OrderController extends Controller
             'status'              => Order::STATUS_EN_ATTENTE,
         ]);
 
-        // Message automatique dans le chat pour notifier l'entreprise
-        \App\Models\DeliveryMessage::create([
-            'delivery_company_id' => $company->id,
-            'shop_id'             => $shopId,
-            'sender_id'           => Auth::id(),
-            'sender_role'         => 'shop',
-            'message'             => "📦 Nouvelle commande #" . str_pad($order->id, 5, '0', STR_PAD_LEFT)
-                . " confiée à votre entreprise.\n"
-                . "Client : " . ($order->client->name ?? '—')
-                . " · " . ($order->client->phone ?? '')
-                . "\nDestination : " . ($order->delivery_destination ?: ($order->client->address ?? 'Non renseignée'))
-                . (!empty($data['delivery_zone_id']) ? "\nZone : " . (DeliveryZone::find($data['delivery_zone_id'])?->name ?? '—') : '')
-                . ($fee ? "\nFrais de livraison : " . number_format($fee, 0, ',', ' ') . " {$shopCurrency}" : '')
-                . "\nMontant commande : " . number_format($order->total, 0, ',', ' ') . " {$shopCurrency}",
-        ]);
-
         if ($request->expectsJson()) {
             return response()->json(['success' => true, 'message' => "Commande #$order->id confiée à {$company->name}."]);
         }

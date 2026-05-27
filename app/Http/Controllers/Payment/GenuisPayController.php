@@ -222,8 +222,21 @@ class GenuisPayController extends Controller
             }
         }
 
-        $dashRoute = route('boutique.dashboard');
-        return view('payment.success', compact('subscription', 'dashRoute'));
+        // Redirige vers le bon dashboard selon le type d'abonné
+        $isCompany = $subscription && $subscription->subscriber_type === \App\Models\DeliveryCompany::class;
+        if (!$isCompany && $user) {
+            $companyId = $user->deliveryCompany?->id ?? $user->ownedCompany?->id;
+            $isCompany = (bool) $companyId;
+        }
+        $dashRoute = $isCompany ? route('company.dashboard') : route('boutique.dashboard');
+
+        // Pays de l'utilisateur pour l'affichage de la devise
+        $userCountry = $user?->country ?? '';
+        $amountXof   = $subscription
+            ? (int) ceil($subscription->amount / config('genuispay.gnf_to_xof_rate', 13.15))
+            : null;
+
+        return view('payment.success', compact('subscription', 'dashRoute', 'userCountry', 'amountXof'));
     }
 
     // ─── Page échec ──────────────────────────────────────────────────────────

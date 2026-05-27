@@ -475,7 +475,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
         $currentStatus  = request('status','');
         $currentCountry = request('country','');
         $currentSearch  = request('search','');
-        $baseParams     = array_filter(['status'=>$currentStatus,'country'=>$currentCountry,'search'=>$currentSearch]);
+        $currentPlan    = request('plan','');
+        $baseParams     = array_filter(['status'=>$currentStatus,'country'=>$currentCountry,'search'=>$currentSearch,'plan'=>$currentPlan]);
     @endphp
     <div class="chips">
         <a href="{{ route('admin.entreprises.index', array_merge($baseParams,['status'=>''])) }}"
@@ -501,11 +502,22 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
             <span style="display:inline-flex;color:var(--red)"><svg width="8" height="8" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="currentColor"/></svg></span>
             Inactives
         </a>
+        <a href="{{ route('admin.entreprises.index', array_merge($baseParams,['plan'=>'business'])) }}"
+           class="chip {{ $currentPlan==='business' ? 'on' : '' }}" style="{{ $currentPlan==='business' ? '' : 'border-color:rgba(124,58,237,.3)' }}">
+            💼 Plan Business
+            <span style="background:#7c3aed;color:#fff;padding:1px 6px;border-radius:10px;font-size:10px;margin-left:2px">{{ $stats['business'] }}</span>
+        </a>
+        <a href="{{ route('admin.entreprises.index', array_merge($baseParams,['plan'=>'gratuit'])) }}"
+           class="chip {{ $currentPlan==='gratuit' ? 'on' : '' }}">
+            🆓 Plan Gratuit
+            <span style="background:var(--muted);color:#fff;padding:1px 6px;border-radius:10px;font-size:10px;margin-left:2px">{{ $stats['total'] - $stats['business'] }}</span>
+        </a>
     </div>
 
     {{-- Filter bar --}}
     <form id="filterForm" method="GET" action="{{ route('admin.entreprises.index') }}">
         @if($currentStatus)<input type="hidden" name="status" value="{{ $currentStatus }}">@endif
+        @if($currentPlan)<input type="hidden" name="plan" value="{{ $currentPlan }}">@endif
         <div class="fb">
             @if($countries->count())
             <select name="country" class="fb-sel" onchange="document.getElementById('filterForm').submit()">
@@ -554,6 +566,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
                         <th>Commission</th>
                         <th>Livreurs</th>
                         <th>Zones</th>
+                        <th>Plan</th>
                         <th>Statut</th>
                         <th>Activation</th>
                         <th>Inscrit le</th>
@@ -620,6 +633,16 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
                             <span class="bdg {{ $zc>0 ? 'g' : 'm' }}">
                                 {!! $I['map_sm'] !!} {{ $zc }}
                             </span>
+                        </td>
+
+                        {{-- Plan --}}
+                        <td>
+                            @if($co->plan === 'business' && $co->plan_expires_at && $co->plan_expires_at->isFuture())
+                                <span class="bdg p">💼 Business</span>
+                                <div style="font-size:10px;color:var(--muted);margin-top:3px">exp. {{ $co->plan_expires_at->format('d/m/Y') }}</div>
+                            @else
+                                <span class="bdg m">🆓 Gratuit</span>
+                            @endif
                         </td>
 
                         {{-- Statut approbation --}}

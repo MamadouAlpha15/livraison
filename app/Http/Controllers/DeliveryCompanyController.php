@@ -59,9 +59,10 @@ class DeliveryCompanyController extends Controller
         $data['currency'] = $request->user()->country
             ? DeliveryCompany::currencyForCountry($request->user()->country)
             : 'GNF';
-        $data['approved'] = false; // en attente d'approbation
-        $data['active'] = true;
-        $data['slug'] = Str::slug($data['name']) . '-' . time();
+        $data['approved']    = true;
+        $data['approved_at'] = now();
+        $data['active']      = true;
+        $data['slug']        = Str::slug($data['name']) . '-' . time();
 
         $company = DeliveryCompany::create($data);
 

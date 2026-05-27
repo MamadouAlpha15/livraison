@@ -707,6 +707,8 @@ Route::middleware(['auth', 'role:livreur'])
         Route::put('orders/{order}/complete',       [LivreurOrderController::class, 'complete'])     ->name('orders.complete');
         Route::post('orders/start-bulk',            [LivreurOrderController::class, 'startBulk'])    ->name('orders.startBulk');
         Route::post('orders/complete-bulk',         [LivreurOrderController::class, 'completeBulk']) ->name('orders.completeBulk');
+        Route::post('orders/auto-batch-nav',        [LivreurOrderController::class, 'autoBatchNav'])    ->name('orders.autoBatchNav');
+        Route::post('orders/start-bulk-nav',        [LivreurOrderController::class, 'startBulkAndNav']) ->name('orders.startBulkNav');
         Route::get('orders/{order}/carte',          [LivreurOrderController::class, 'carte'])        ->name('orders.carte');
 
         /* Disponibilité */

@@ -240,7 +240,9 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
         $st        = $statusMap[$s] ?? ['label'=>ucfirst($group['status']),'cls'=>'other'];
         $waNum     = preg_replace('/\D/', '', $client?->phone ?? '');
         $shopWaNum = preg_replace('/\D/', '', $shop?->phone ?? '');
-        $isCompany = $isGroup || (bool)$order->driver_id;
+        $isCompanyDriver = (bool)$order->driver_id;              // vrai seulement si chauffeur entreprise (driver_id)
+        $showRoute       = $isCompanyDriver || $isGroup;          // afficher le bloc retrait→livraison
+        $isCompany       = $isCompanyDriver;                      // alias pour les boutons d'action
         // Collecter tous les items du groupe
         $allItems  = collect($grpOrders)->flatMap(fn($o) => $o->items)->values();
         $item      = $allItems->first();
@@ -265,8 +267,8 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
             <span class="ord-badge {{ $st['cls'] }}">{{ $st['label'] }}</span>
         </div>
 
-        @if($isCompany)
-        {{-- ══ BLOC RETRAIT → LIVRAISON (livreur entreprise) ══ --}}
+        @if($showRoute)
+        {{-- ══ BLOC RETRAIT → LIVRAISON (livreur entreprise et livreur boutique groupé) ══ --}}
         <div class="ord-route" style="margin:14px 18px;">
 
             {{-- ÉTAPE 1 : Retrait boutique --}}
@@ -431,57 +433,42 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
         <div class="ord-card-foot">
             @if($isCompany)
                 {{-- ── LIVREUR ENTREPRISE : tout se passe dans nav.blade.php ── --}}
-                <a href="{{ route('orders.nav', $order) }}"
-                   style="display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:1;padding:13px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-size:14px;font-weight:800;text-decoration:none;box-shadow:0 4px 14px rgba(99,102,241,.4)">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                    Commencer
-                </a>
+                @if($isBulk)
+                    {{-- Groupe multi-commandes : créer le batch puis aller en nav --}}
+                    <form action="{{ route('livreur.orders.autoBatchNav') }}" method="POST" style="flex:1">
+                        @csrf
+                        @foreach($orderIds as $oid)<input type="hidden" name="order_ids[]" value="{{ $oid }}">@endforeach
+                        <button type="submit" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-size:14px;font-weight:800;border:none;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(99,102,241,.4)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            Commencer ({{ count($grpOrders) }} colis)
+                        </button>
+                    </form>
+                @else
+                    <a href="{{ route('orders.nav', $order) }}"
+                       style="display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:1;padding:13px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-size:14px;font-weight:800;text-decoration:none;box-shadow:0 4px 14px rgba(99,102,241,.4)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        Commencer
+                    </a>
+                @endif
 
             @else
-                {{-- ── LIVREUR BOUTIQUE : comportement inchangé ── --}}
+                {{-- ── LIVREUR BOUTIQUE : déjà à la boutique → nav directement Phase 2 (chez le client) ── --}}
                 @if(in_array($s, $startStatuses))
-                    @if($isBulk)
-                    <form action="{{ route('livreur.orders.startBulk') }}" method="POST" style="flex:1">
+                    {{-- Commencer : marquer en_livraison + batch + aller en nav Phase 2 --}}
+                    <form action="{{ route('livreur.orders.startBulkNav') }}" method="POST" style="flex:1">
                         @csrf
                         @foreach($orderIds as $oid)<input type="hidden" name="order_ids[]" value="{{ $oid }}">@endforeach
                         <button type="submit" class="ord-action-btn start" style="width:100%">
-                            🚴 Commencer la livraison ({{ count($grpOrders) }})
+                            🚴 Commencer la livraison{{ $isBulk ? ' (' . count($grpOrders) . ' colis)' : '' }}
                         </button>
                     </form>
-                    @else
-                    <form action="{{ route('livreur.orders.start', $order) }}" method="POST" style="flex:1">
-                        @csrf @method('PUT')
-                        <button type="submit" class="ord-action-btn start" style="width:100%">
-                            🚴 Commencer la livraison
-                        </button>
-                    </form>
-                    @endif
                 @elseif(in_array($s, $deliverStatuses))
-                    <button type="button" class="ord-action-gps" id="gpsBtn_{{ $order->id }}"
-                            onclick="toggleGps({{ $order->id }}, this)" title="GPS tracking">📡</button>
-                    <a href="{{ route('livreur.orders.carte', $order) }}"
-                       style="display:inline-flex;align-items:center;gap:5px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--blue-lt);background:var(--blue-lt);color:var(--blue-dk);font-size:12.5px;font-weight:700;text-decoration:none;white-space:nowrap">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                        Carte GPS
+                    {{-- Déjà en cours : naviguer directement chez le client (Phase 2) --}}
+                    <a href="{{ route('orders.nav', $order) }}"
+                       style="display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:1;padding:13px;border-radius:10px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:14px;font-weight:800;text-decoration:none;box-shadow:0 4px 14px rgba(16,185,129,.4)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        Naviguer chez le client{{ $isBulk ? ' (' . count($grpOrders) . ')' : '' }}
                     </a>
-                    @if($isBulk)
-                    <form action="{{ route('livreur.orders.completeBulk') }}" method="POST" style="flex:1"
-                          onsubmit="return confirm('Confirmer la livraison des {{ count($grpOrders) }} commandes ?')">
-                        @csrf
-                        @foreach($orderIds as $oid)<input type="hidden" name="order_ids[]" value="{{ $oid }}">@endforeach
-                        <button type="submit" class="ord-action-btn complete" style="width:100%">
-                            ✅ Tout livré ({{ count($grpOrders) }})
-                        </button>
-                    </form>
-                    @else
-                    <form action="{{ route('livreur.orders.complete', $order) }}" method="POST" style="flex:1"
-                          onsubmit="return confirm('Confirmer la livraison de cette commande ?')">
-                        @csrf @method('PUT')
-                        <button type="submit" class="ord-action-btn complete" style="width:100%">
-                            ✅ Marquer comme livrée
-                        </button>
-                    </form>
-                    @endif
                 @endif
             @endif
         </div>
