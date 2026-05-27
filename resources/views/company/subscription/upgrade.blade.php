@@ -1,10 +1,12 @@
 @extends('layouts.app')
-
+@php $bodyClass = 'is-dashboard'; @endphp
 @section('content')
 @php
-$company    = Auth::user()->deliveryCompany ?? \App\Models\DeliveryCompany::find(Auth::user()->delivery_company_id);
-$isBusiness = ($company->plan ?? 'free') === 'business' && $company->plan_expires_at?->isFuture();
+$isBusiness = $currentPlan === 'business';
 $daysLeft   = $isBusiness ? (int) now()->diffInDays($company->plan_expires_at, false) : 0;
+$bizXof     = number_format(config('genuispay.plans.business', 11400), 0, ',', ' ');
+$bizGnf     = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', ' ');
+$isGuinea   = ($company->country ?? '') === 'GN';
 @endphp
 
 <style>
@@ -69,15 +71,6 @@ $daysLeft   = $isBusiness ? (int) now()->diffInDays($company->plan_expires_at, f
         <p>Débloquez tout le potentiel de votre entreprise de livraison avec le Plan Business</p>
     </div>
 
-    @if($isBusiness)
-    <div class="active-banner">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        <div>
-            <div class="active-banner-t">Plan Business actif — {{ $daysLeft }} jour{{ $daysLeft > 1 ? 's' : '' }} restant{{ $daysLeft > 1 ? 's' : '' }}</div>
-            <div class="active-banner-s">Expire le {{ $company->plan_expires_at->format('d/m/Y') }}</div>
-        </div>
-    </div>
-    @endif
 
     @if(session('plan_error'))
     <div class="plan-error">🔒 {{ session('plan_error') }}</div>
@@ -92,7 +85,7 @@ $daysLeft   = $isBusiness ? (int) now()->diffInDays($company->plan_expires_at, f
                 <div class="plan-name">Plan Gratuit</div>
                 <div class="plan-price">
                     <span class="plan-price-v">0</span>
-                    <span class="plan-price-c">GNF</span>
+                    <span class="plan-price-c">XOF</span>
                 </div>
                 <div class="plan-period">Pour toujours</div>
             </div>
@@ -138,9 +131,12 @@ $daysLeft   = $isBusiness ? (int) now()->diffInDays($company->plan_expires_at, f
                 <div class="plan-badge business">🚀 Business</div>
                 <div class="plan-name">Plan Business</div>
                 <div class="plan-price">
-                    <span class="plan-price-v">150 000</span>
-                    <span class="plan-price-c">GNF</span>
+                    <span class="plan-price-v">{{ $bizXof }}</span>
+                    <span class="plan-price-c">XOF</span>
                 </div>
+                @if($isGuinea)
+                <div class="plan-period" style="color:#d97706;font-weight:700;margin-bottom:2px">≈ {{ $bizGnf }} GNF 🇬🇳</div>
+                @endif
                 <div class="plan-period">par mois · renouvellement manuel</div>
             </div>
             <div class="plan-divider" style="margin:0 22px"></div>

@@ -9,6 +9,7 @@ use App\Models\SupportMessage;
 use App\Models\User;
 use App\Notifications\NewSupportTicket;
 use App\Notifications\NewSupportMessage;
+use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -42,7 +43,20 @@ class SupportController extends Controller
 
         $messages = $ticket->messages()->with('author:id,name,role')->oldest()->get();
 
-        return view('company.support.index', compact('ticket', 'company', 'messages'));
+        $svc          = app(SubscriptionService::class);
+        $isBusiness   = $svc->companyPlan($company) === 'business';
+        $maxDrivers   = SubscriptionService::COMP_FREE_MAX_DRIVERS;
+        $maxZones     = SubscriptionService::COMP_FREE_MAX_ZONES;
+        $maxOrders    = SubscriptionService::COMP_FREE_MAX_ORDERS;
+        $totalDrivers = $company->drivers()->count();
+        $totalZones   = $company->zones()->count();
+        $usedOrders   = $svc->monthlyCompanyOrderCount($company);
+
+        return view('company.support.index', compact(
+            'ticket', 'company', 'messages',
+            'isBusiness', 'maxDrivers', 'maxZones', 'maxOrders',
+            'totalDrivers', 'totalZones', 'usedOrders'
+        ));
     }
 
     public function send(Request $request, SupportTicket $ticket)

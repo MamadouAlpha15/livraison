@@ -98,6 +98,12 @@ class DriverController extends Controller
     public function index()
     {
         $company = $this->resolveCompany();
+        $svc     = app(SubscriptionService::class);
+
+        $isBusiness  = $svc->companyPlan($company) === 'business';
+        $maxDrivers  = SubscriptionService::COMP_FREE_MAX_DRIVERS;
+        $totalDrivers = $company->drivers()->count();
+        $canAdd      = $isBusiness || $totalDrivers < $maxDrivers;
 
         /* Stats sur tous les chauffeurs (avant pagination) */
         $allDrivers = $company->drivers()
@@ -124,7 +130,16 @@ class DriverController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
-        return view('company.drivers.index', compact('company', 'drivers', 'stats'));
+        $maxZones   = SubscriptionService::COMP_FREE_MAX_ZONES;
+        $maxOrders  = SubscriptionService::COMP_FREE_MAX_ORDERS;
+        $totalZones = $company->zones()->count();
+        $usedOrders = $svc->monthlyCompanyOrderCount($company);
+
+        return view('company.drivers.index', compact(
+            'company', 'drivers', 'stats',
+            'isBusiness', 'maxDrivers', 'totalDrivers', 'canAdd',
+            'maxZones', 'maxOrders', 'totalZones', 'usedOrders'
+        ));
     }
 
     /* ────────────────────────────────────────────
@@ -133,6 +148,13 @@ class DriverController extends Controller
     public function create()
     {
         $company = $this->resolveCompany();
+        $svc     = app(SubscriptionService::class);
+
+        if (! $svc->canCreateDriver($company)) {
+            return redirect()->route('company.subscription.upgrade')
+                ->with('plan_error', 'Limite atteinte : le Plan Gratuit est limité à 1 chauffeur. Passez au Plan Business pour en ajouter davantage.');
+        }
+
         return view('company.drivers.create', compact('company'));
     }
 

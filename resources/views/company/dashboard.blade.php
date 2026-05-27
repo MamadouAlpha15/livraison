@@ -13,7 +13,7 @@
 <style>
 html.cx-prelight body { background:#F5F7FA !important; }
 </style>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+@if($isBusiness)<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>@endif
 <style>
 /* ═══════════════════════════════════════════════════════════
    ShipXpress — Company Dashboard — Dark Theme
@@ -923,16 +923,26 @@ body.cx-light .cx-chart-big { color:#111827; }
         </a>
         <a href="{{ route('company.orders.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Commandes
-            <span class="cx-nav-badge" id="navOrderBadge" style="display:none"></span>
+            @if(!$isBusiness)
+                @php $oBg = $usedOrders >= $maxOrders ? '#ef4444' : ($usedOrders >= $maxOrders * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                <span class="cx-nav-badge" style="background:{{ $oBg }};margin-left:auto">{{ $usedOrders }}/{{ $maxOrders }}</span>
+            @else
+                <span class="cx-nav-badge" id="navOrderBadge" style="display:none"></span>
+            @endif
         </a>
         <a href="{{ route('company.livraisons.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span> Livraisons
         </a>
-        <a href="{{ route('company.carte.index') }}" class="cx-nav-item">
+        <a href="{{ $isBusiness ? route('company.carte.index') : route('company.subscription.upgrade') }}" class="cx-nav-item" @if(!$isBusiness) style="opacity:.6" title="Plan Business requis" @endif>
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span> Carte en direct
+            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917">🔒</span>@endif
         </a>
         <a href="{{ route('company.drivers.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></span> Chauffeurs
+            @if(!$isBusiness)
+                @php $dBg = $totalDrivers >= $maxDrivers ? '#ef4444' : ($totalDrivers >= $maxDrivers * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                <span class="cx-nav-badge" style="background:{{ $dBg }};margin-left:auto">{{ $totalDrivers }}/{{ $maxDrivers }}</span>
+            @endif
         </a>
         <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span> Boutiques
@@ -944,19 +954,27 @@ body.cx-light .cx-chart-big { color:#111827; }
         <div class="cx-nav-sec">Gestion</div>
         <a href="{{ route('company.zones.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span> Zone de livraison
+            @if(!$isBusiness)
+                @php $zNavBg = $totalZones >= $maxZones ? '#ef4444' : ($totalZones >= $maxZones * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                <span class="cx-nav-badge" style="background:{{ $zNavBg }};margin-left:auto">{{ $totalZones }}/{{ $maxZones }}</span>
+            @endif
         </a>
        
         <a href="{{ route('company.historique.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span> Historique
         </a>
-        <a href="{{ route('company.rapport.index') }}" class="cx-nav-item"><span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span> Rapport</a>
+        <a href="{{ $isBusiness ? route('company.rapport.index') : route('company.subscription.upgrade') }}" class="cx-nav-item" @if(!$isBusiness) style="opacity:.6" title="Plan Business requis" @endif>
+            <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span> Rapport
+            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917">🔒</span>@endif
+        </a>
 
         <div class="cx-nav-sec">Configuration</div>
         <a href="{{ route('company.parametre.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Paramètres
         </a>
-        <a href="{{ route('company.users.index') }}" class="cx-nav-item">
+        <a href="{{ $isBusiness ? route('company.users.index') : route('company.subscription.upgrade') }}" class="cx-nav-item" @if(!$isBusiness) style="opacity:.6" title="Plan Business requis" @endif>
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Utilisateurs
+            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917">🔒</span>@endif
         </a>
         <a href="{{ route('company.support.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span> Support
@@ -1048,6 +1066,70 @@ body.cx-light .cx-chart-big { color:#111827; }
     {{-- CONTENT --}}
     <div class="cx-content">
 
+        {{-- ══ BANNIÈRE PLAN ══ --}}
+        @if($isBusiness)
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:14px;padding:14px 20px;">
+            <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:18px">⚡</div>
+                <div>
+                    <div style="font-size:13px;font-weight:800;color:#fff">Plan Business actif</div>
+                    <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:1px">Expire le {{ $company->plan_expires_at->format('d/m/Y') }} — encore {{ $daysLeft }} jour{{ $daysLeft > 1 ? 's' : '' }}</div>
+                </div>
+            </div>
+            <a href="{{ route('company.subscription.upgrade') }}" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:11px;font-weight:700;padding:6px 14px;border-radius:20px;text-decoration:none;white-space:nowrap">Renouveler</a>
+        </div>
+        @else
+        <div style="background:linear-gradient(135deg,#2a1800 0%,#1e1000 60%,#241400 100%);border:1px solid rgba(245,158,11,.4);border-radius:14px;padding:16px 20px;box-shadow:0 4px 24px rgba(245,158,11,.12),inset 0 1px 0 rgba(255,255,255,.05);">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                <div>
+                    <div style="font-size:11px;font-weight:800;color:#fbbf24;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Plan Gratuit</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:14px;">
+                        {{-- Chauffeurs --}}
+                        @php $dPct = $maxDrivers > 0 ? min(100, round($totalDrivers / $maxDrivers * 100)) : 0; @endphp
+                        <div style="min-width:120px">
+                            <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.75);margin-bottom:5px">🚗 Chauffeurs</div>
+                            <div style="font-size:16px;font-weight:900;color:{{ $totalDrivers >= $maxDrivers ? '#fca5a5' : '#fff' }};letter-spacing:-.3px;line-height:1">{{ $totalDrivers }}<span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.5)">/{{ $maxDrivers }}</span></div>
+                            <div style="height:5px;background:rgba(255,255,255,.15);border-radius:99px;margin-top:6px;overflow:hidden">
+                                <div style="height:100%;width:{{ $dPct }}%;background:{{ $totalDrivers >= $maxDrivers ? '#ef4444' : '#f59e0b' }};border-radius:99px;transition:width .3s"></div>
+                            </div>
+                        </div>
+                        {{-- Zones --}}
+                        @php $zPct = $maxZones > 0 ? min(100, round($totalZones / $maxZones * 100)) : 0; @endphp
+                        <div style="min-width:120px">
+                            <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.75);margin-bottom:5px">🗺 Zones</div>
+                            <div style="font-size:16px;font-weight:900;color:{{ $totalZones >= $maxZones ? '#fca5a5' : '#fff' }};letter-spacing:-.3px;line-height:1">{{ $totalZones }}<span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.5)">/{{ $maxZones }}</span></div>
+                            <div style="height:5px;background:rgba(255,255,255,.15);border-radius:99px;margin-top:6px;overflow:hidden">
+                                <div style="height:100%;width:{{ $zPct }}%;background:{{ $totalZones >= $maxZones ? '#ef4444' : '#f59e0b' }};border-radius:99px;transition:width .3s"></div>
+                            </div>
+                        </div>
+                        {{-- Commandes --}}
+                        @php $oPct = $maxOrders > 0 ? min(100, round($usedOrders / $maxOrders * 100)) : 0; @endphp
+                        <div style="min-width:120px">
+                            <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.75);margin-bottom:5px">📦 Commandes/mois</div>
+                            <div style="font-size:16px;font-weight:900;color:{{ $usedOrders >= $maxOrders ? '#fca5a5' : '#fff' }};letter-spacing:-.3px;line-height:1">{{ $usedOrders }}<span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.5)">/{{ $maxOrders }}</span></div>
+                            <div style="height:5px;background:rgba(255,255,255,.15);border-radius:99px;margin-top:6px;overflow:hidden">
+                                <div style="height:100%;width:{{ $oPct }}%;background:{{ $usedOrders >= $maxOrders ? '#ef4444' : '#f59e0b' }};border-radius:99px;transition:width .3s"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ route('company.subscription.upgrade') }}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:12px;font-weight:800;border-radius:9px;text-decoration:none;white-space:nowrap;flex-shrink:0;box-shadow:0 3px 12px rgba(245,158,11,.35)">
+                    ✦ Passer au Plan Business — {{ $bizPriceLabel }}
+                </a>
+            </div>
+            <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);display:flex;flex-wrap:wrap;gap:8px;">
+                <span style="font-size:11px;color:#64748b">🔒 Fonctionnalités Business :</span>
+                <span style="font-size:11px;color:#475569">Carte en direct (GPS)</span>
+                <span style="color:#334155;font-size:10px">·</span>
+                <span style="font-size:11px;color:#475569">Rapports & exports</span>
+                <span style="color:#334155;font-size:10px">·</span>
+                <span style="font-size:11px;color:#475569">Statistiques avancées</span>
+                <span style="color:#334155;font-size:10px">·</span>
+                <span style="font-size:11px;color:#475569">Gestion utilisateurs</span>
+            </div>
+        </div>
+        @endif
+
         {{-- ══ STATS ══ --}}
         @php
             function cxTrend(int|float $today, int|float $yesterday): string {
@@ -1111,19 +1193,36 @@ body.cx-light .cx-chart-big { color:#111827; }
         <div class="cx-main-grid">
 
             {{-- ── GAUCHE : CARTE EN TEMPS RÉEL ── --}}
-            <div class="cx-panel cx-map-panel">
+            <div class="cx-panel cx-map-panel" style="position:relative;overflow:hidden">
                 <div class="cx-panel-hd">
                     <div class="cx-panel-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:6px"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>Carte en temps réel</div>
                     <div style="display:flex;align-items:center;gap:6px">
+                        @if($isBusiness)
                         <span class="cx-sys-dot"></span>
                         <span style="font-size:11px;color:var(--cx-green);font-weight:600">Live</span>
+                        @else
+                        <span style="font-size:11px;font-weight:700;background:rgba(245,158,11,.15);color:#f59e0b;padding:2px 8px;border-radius:20px;border:1px solid rgba(245,158,11,.3)">🔒 Plan Business</span>
+                        @endif
                     </div>
                 </div>
+                @if($isBusiness)
                 <div id="cxMap"></div>
                 <div class="cx-map-legend">
                     <span class="cx-legend-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:4px"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>Chaque marqueur = un chauffeur en mission</span>
                     <span class="cx-legend-item" style="margin-left:auto;color:var(--cx-muted)">Cliquer sur un marqueur pour les détails</span>
                 </div>
+                @else
+                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:420px;gap:16px;padding:32px;text-align:center">
+                    <div style="width:64px;height:64px;border-radius:16px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.2);display:flex;align-items:center;justify-content:center;font-size:28px">🗺</div>
+                    <div>
+                        <div style="font-size:16px;font-weight:800;color:#fff;margin-bottom:6px">Carte en direct — Plan Business</div>
+                        <div style="font-size:12.5px;color:var(--cx-text2);max-width:320px;line-height:1.6">Suivez vos chauffeurs en temps réel sur la carte GPS. Disponible uniquement avec le Plan Business.</div>
+                    </div>
+                    <a href="{{ route('company.subscription.upgrade') }}" style="display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:13px;font-weight:800;border-radius:10px;text-decoration:none;box-shadow:0 4px 14px rgba(245,158,11,.35)">
+                        ✦ Passer au Plan Business — {{ $bizPriceLabel }}
+                    </a>
+                </div>
+                @endif
             </div>
 
             {{-- ── DROITE : DEMANDES + PIPELINE + LIVREURS ── --}}
@@ -1230,7 +1329,8 @@ body.cx-light .cx-chart-big { color:#111827; }
         <div class="cx-bottom">
 
             {{-- Commandes par jour --}}
-            <div class="cx-panel">
+            <div class="cx-panel" style="position:relative;overflow:hidden">
+                <div style="{{ !$isBusiness ? 'filter:blur(5px);pointer-events:none;user-select:none' : '' }}">
                 <div class="cx-chart-body">
                     <div class="cx-chart-hd2">
                         <div>
@@ -1256,10 +1356,22 @@ body.cx-light .cx-chart-big { color:#111827; }
                         <canvas id="chartOrders"></canvas>
                     </div>
                 </div>
+                </div>
+                @if(!$isBusiness)
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center;background:rgba(11,13,34,.55);backdrop-filter:blur(2px)">
+                    <div style="font-size:22px">📈</div>
+                    <div style="font-size:13px;font-weight:800;color:#fff">Graphique Commandes</div>
+                    <div style="font-size:11.5px;color:var(--cx-text2);max-width:220px;line-height:1.5">Réservé au Plan Business</div>
+                    <a href="{{ route('company.subscription.upgrade') }}" style="display:inline-flex;align-items:center;gap:5px;padding:8px 14px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:11.5px;font-weight:800;border-radius:9px;text-decoration:none;box-shadow:0 3px 12px rgba(245,158,11,.35);white-space:nowrap">
+                        ✦ Plan Business — {{ $bizPriceLabel }}
+                    </a>
+                </div>
+                @endif
             </div>
 
             {{-- Revenus --}}
-            <div class="cx-panel">
+            <div class="cx-panel" style="position:relative;overflow:hidden">
+                <div style="{{ !$isBusiness ? 'filter:blur(5px);pointer-events:none;user-select:none' : '' }}">
                 <div class="cx-chart-body">
                     <div class="cx-chart-hd2">
                         <div>
@@ -1285,6 +1397,17 @@ body.cx-light .cx-chart-big { color:#111827; }
                         <canvas id="chartRevenue"></canvas>
                     </div>
                 </div>
+                </div>
+                @if(!$isBusiness)
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center;background:rgba(11,13,34,.55);backdrop-filter:blur(2px)">
+                    <div style="font-size:22px">💰</div>
+                    <div style="font-size:13px;font-weight:800;color:#fff">Graphique Revenus</div>
+                    <div style="font-size:11.5px;color:var(--cx-text2);max-width:220px;line-height:1.5">Réservé au Plan Business</div>
+                    <a href="{{ route('company.subscription.upgrade') }}" style="display:inline-flex;align-items:center;gap:5px;padding:8px 14px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:11.5px;font-weight:800;border-radius:9px;text-decoration:none;box-shadow:0 3px 12px rgba(245,158,11,.35);white-space:nowrap">
+                        ✦ Plan Business — {{ $bizPriceLabel }}
+                    </a>
+                </div>
+                @endif
             </div>
 
             {{-- Performance --}}
@@ -1446,7 +1569,7 @@ document.addEventListener('keydown', e => {
 @endsection
 
 @push('scripts')
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+@if($isBusiness)<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>@endif
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -1507,6 +1630,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /* ── Carte Leaflet temps réel ── */
+    @if($isBusiness)
     const map = L.map('cxMap', { zoomControl:false }).setView([9.537,-13.677], 13);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OpenStreetMap', maxZoom:19}).addTo(map);
@@ -1690,6 +1814,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     pollMap();
     setInterval(pollMap, 5000);
+    @endif
 
     /* ══ CHARTS PREMIUM ══ */
     (function() {

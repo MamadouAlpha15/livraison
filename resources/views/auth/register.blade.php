@@ -106,6 +106,9 @@ $countries = [
     @if(request('redirect'))
         <input type="hidden" name="redirect" value="{{ request('redirect') }}">
     @endif
+    @if(!empty($intent))
+        <input type="hidden" name="intent" value="{{ $intent }}">
+    @endif
 
     {{-- ══════════════ ÉTAPE 1 ══════════════ --}}
     <div class="reg-step active" id="step1">
@@ -113,15 +116,15 @@ $countries = [
         {{-- Rôle --}}
         <div class="f-group">
             <label class="f-label">Je m'inscris en tant que</label>
-            <input type="hidden" name="role" id="roleInput" value="{{ old('role','client') }}">
+            <input type="hidden" name="role" id="roleInput" value="{{ old('role', $defaultRole ?? 'client') }}">
             <div class="role-cards">
-                <div class="role-card {{ old('role','client') === 'client'  ? 'active':'' }}" onclick="setRole('client',this)">
+                <div class="role-card {{ old('role', $defaultRole ?? 'client') === 'client'  ? 'active':'' }}" onclick="setRole('client',this)">
                     <span class="rc-ico">🛒</span>Client
                 </div>
-                <div class="role-card {{ old('role') === 'admin'   ? 'active':'' }}" onclick="setRole('admin',this)">
+                <div class="role-card {{ old('role', $defaultRole ?? 'client') === 'admin'   ? 'active':'' }}" onclick="setRole('admin',this)">
                     <span class="rc-ico">🏪</span>Admin boutique
                 </div>
-                <div class="role-card {{ old('role') === 'company' ? 'active':'' }}" onclick="setRole('company',this)">
+                <div class="role-card {{ old('role', $defaultRole ?? 'client') === 'company' ? 'active':'' }}" onclick="setRole('company',this)">
                     <span class="rc-ico">🚚</span>Entreprise livraison
                 </div>
                

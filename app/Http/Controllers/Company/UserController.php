@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Company;
 use App\Http\Controllers\Controller;
 use App\Models\DeliveryCompany;
 use App\Models\User;
+use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -33,7 +34,20 @@ class UserController extends Controller
 
         $members = User::where('company_id', $company->id)->orderBy('name')->get();
 
-        return view('company.users.index', compact('company', 'members', 'isOwner'));
+        $svc          = app(SubscriptionService::class);
+        $isBusiness   = $svc->companyPlan($company) === 'business';
+        $maxDrivers   = SubscriptionService::COMP_FREE_MAX_DRIVERS;
+        $maxZones     = SubscriptionService::COMP_FREE_MAX_ZONES;
+        $maxOrders    = SubscriptionService::COMP_FREE_MAX_ORDERS;
+        $totalDrivers = $company->drivers()->count();
+        $totalZones   = $company->zones()->count();
+        $usedOrders   = $svc->monthlyCompanyOrderCount($company);
+
+        return view('company.users.index', compact(
+            'company', 'members', 'isOwner',
+            'isBusiness', 'maxDrivers', 'maxZones', 'maxOrders',
+            'totalDrivers', 'totalZones', 'usedOrders'
+        ));
     }
 
     public function store(Request $request)

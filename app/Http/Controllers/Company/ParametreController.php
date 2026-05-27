@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Company;
 use App\Http\Controllers\Controller;
 use App\Models\DeliveryCompany;
 use App\Services\ImageOptimizer;
+use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -21,7 +22,21 @@ class ParametreController extends Controller
     public function index()
     {
         $company = $this->getCompany();
-        return view('company.parametre.index', compact('company'));
+
+        $svc          = app(SubscriptionService::class);
+        $isBusiness   = $svc->companyPlan($company) === 'business';
+        $maxDrivers   = SubscriptionService::COMP_FREE_MAX_DRIVERS;
+        $maxZones     = SubscriptionService::COMP_FREE_MAX_ZONES;
+        $maxOrders    = SubscriptionService::COMP_FREE_MAX_ORDERS;
+        $totalDrivers = $company->drivers()->count();
+        $totalZones   = $company->zones()->count();
+        $usedOrders   = $svc->monthlyCompanyOrderCount($company);
+
+        return view('company.parametre.index', compact(
+            'company',
+            'isBusiness', 'maxDrivers', 'maxZones', 'maxOrders',
+            'totalDrivers', 'totalZones', 'usedOrders'
+        ));
     }
 
     public function updateInfo(Request $request)

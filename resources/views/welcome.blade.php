@@ -1718,7 +1718,7 @@ $bizGnf = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', 
                 @auth
                     <a href="{{ route('boutique.subscription.upgrade') }}" class="pricing-btn pricing-btn-filled">Passer au Plan Pro</a>
                 @else
-                    <a href="{{ route('register') }}" class="pricing-btn pricing-btn-filled">Commencer → Plan Pro</a>
+                    <a href="{{ route('register', ['intent' => 'pro']) }}" class="pricing-btn pricing-btn-filled">Commencer → Plan Pro</a>
                 @endauth
             </div>
 
@@ -1743,7 +1743,7 @@ $bizGnf = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', 
                 @auth
                     <a href="{{ route('company.subscription.upgrade') }}" class="pricing-btn pricing-btn-outline">Passer au Plan Business</a>
                 @else
-                    <a href="{{ route('register', ['role'=>'company']) }}" class="pricing-btn pricing-btn-outline">Commencer → Plan Business</a>
+                    <a href="{{ route('register', ['role' => 'company', 'intent' => 'business']) }}" class="pricing-btn pricing-btn-outline">Commencer → Plan Business</a>
                 @endauth
             </div>
 

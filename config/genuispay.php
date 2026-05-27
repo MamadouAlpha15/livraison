@@ -31,8 +31,9 @@ return [
     ],
 
     // Tarifs en XOF (envoyés à l'API GenuisPay)
+    // ceil(100000 / 13.15) = 7605, ceil(150000 / 13.15) = 11407
     'plans' => [
-        'pro'      => 7600,    // ≈ 100 000 GNF
-        'business' => 11400,   // ≈ 150 000 GNF
+        'pro'      => 7605,    // ≈ 100 000 GNF
+        'business' => 11407,   // ≈ 150 000 GNF
     ],
 ];

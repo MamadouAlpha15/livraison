@@ -7,6 +7,7 @@ use App\Models\DeliveryCompany;
 use App\Models\Driver;
 use App\Models\Order;
 use App\Models\Review;
+use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -130,13 +131,24 @@ class RapportController extends Controller
             ]);
         }
 
+        $svc          = app(SubscriptionService::class);
+        $isBusiness   = $svc->companyPlan($company) === 'business';
+        $maxDrivers   = SubscriptionService::COMP_FREE_MAX_DRIVERS;
+        $maxZones     = SubscriptionService::COMP_FREE_MAX_ZONES;
+        $maxOrders    = SubscriptionService::COMP_FREE_MAX_ORDERS;
+        $totalDrivers = $company->drivers()->count();
+        $totalZones   = $company->zones()->count();
+        $usedOrders   = $svc->monthlyCompanyOrderCount($company);
+
         return view('company.rapport.index', compact(
             'company', 'devise', 'days',
             'totalOrders', 'totalLivrees', 'totalAnnulees', 'totalEnCours', 'tauxReussite',
             'revenusTotal', 'revenusEncaiss', 'revenusAttente',
             'avgMins', 'avgRating', 'ratingCount',
             'topDrivers', 'zonePerf', 'topShops',
-            'ordersChart'
+            'ordersChart',
+            'isBusiness', 'maxDrivers', 'maxZones', 'maxOrders',
+            'totalDrivers', 'totalZones', 'usedOrders'
         ));
     }
 }

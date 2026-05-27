@@ -67,8 +67,13 @@ class DeliveryCompanyController extends Controller
 
         // redirection DIRECTE vers le tableau de bord de l'entreprise,
         // l'utilisateur pourra accéder au dashboard et voir la page "en attente" si non approuvée
+        if (session('payment_intent') === 'business') {
+            session()->forget('payment_intent');
+            return redirect()->route('payment.checkout', ['type' => 'company', 'id' => $company->id]);
+        }
+
         return redirect()->route('company.dashboard')
-                         ->with('success', 'Votre entreprise a été créée. Elle est en attente d’approbation par un administrateur. Vous pouvez accéder à votre tableau de bord en attendant.');
+                         ->with('success', "Votre entreprise a été créée. Elle est en attente d'approbation par un administrateur. Vous pouvez accéder à votre tableau de bord en attendant.");
     }
 
     // afficher les détails d'une entreprise de livraison
@@ -248,7 +253,20 @@ class DeliveryCompanyController extends Controller
         ->limit(50)
         ->get();
 
-    $devise = $company->currency ?? 'GNF';
+    $devise      = $company->currency ?? 'GNF';
+    $isBusiness  = $company->plan === 'business' && $company->plan_expires_at?->isFuture();
+    $daysLeft    = $isBusiness ? (int) now()->diffInDays($company->plan_expires_at, false) : 0;
+    $maxDrivers  = \App\Services\SubscriptionService::COMP_FREE_MAX_DRIVERS;
+    $maxZones    = \App\Services\SubscriptionService::COMP_FREE_MAX_ZONES;
+    $maxOrders   = \App\Services\SubscriptionService::COMP_FREE_MAX_ORDERS;
+    $usedOrders  = $baseOrders()->whereYear('created_at', now()->year)->whereMonth('created_at', now()->month)->count();
+    $totalZones  = $company->zones()->count();
+    $isGuinea       = ($company->country ?? '') === 'GN';
+    $bizXof         = number_format(config('genuispay.plans.business', 11400), 0, ',', ' ');
+    $bizGnf         = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', ' ');
+    $bizPriceLabel  = $isGuinea
+        ? "{$bizXof} XOF/mois (≈ {$bizGnf} GNF 🇬🇳)"
+        : "{$bizXof} XOF/mois";
 
     return view('company.dashboard', compact(
         'company', 'drivers',
@@ -265,7 +283,10 @@ class DeliveryCompanyController extends Controller
         'totalLivrees', 'totalAnnulees',
         'avgMins', 'avgMinsPrev',
         'avgRating', 'ratingCount', 'latestReviews',
-        'devise'
+        'devise',
+        'isBusiness', 'daysLeft',
+        'maxDrivers', 'maxZones', 'maxOrders', 'usedOrders', 'totalZones',
+        'isGuinea', 'bizXof', 'bizGnf', 'bizPriceLabel'
     ));
 }
 

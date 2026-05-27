@@ -240,8 +240,8 @@ class GenuisPayController extends Controller
         $rate = config('genuispay.gnf_to_xof_rate', 13.15);
         $gnfPro  = config('genuispay.plans_gnf.pro',      100000);
         $gnfBiz  = config('genuispay.plans_gnf.business', 150000);
-        $xofPro  = config('genuispay.plans.pro',  (int) round($gnfPro  / $rate));
-        $xofBiz  = config('genuispay.plans.business', (int) round($gnfBiz / $rate));
+        $xofPro  = config('genuispay.plans.pro',  (int) ceil($gnfPro  / $rate));
+        $xofBiz  = config('genuispay.plans.business', (int) ceil($gnfBiz / $rate));
 
         return match ($type) {
             'shop'    => [Shop::find($id),            'pro',      $gnfPro, $xofPro],

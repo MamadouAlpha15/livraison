@@ -77,7 +77,12 @@ class ShopController extends Controller
             'role_in_shop' => 'admin',
         ]);
 
-        // ✅ Redirection vers le dashboard vendeur
+        // ✅ Redirection : paiement direct si l'utilisateur venait du Plan Pro
+        if (session('payment_intent') === 'pro') {
+            session()->forget('payment_intent');
+            return redirect()->route('payment.checkout', ['type' => 'shop', 'id' => $shop->id]);
+        }
+
         return redirect()
             ->route('boutique.dashboard')
             ->with('success', "Boutique créée avec succès ! Vous êtes sur le Plan Gratuit.");

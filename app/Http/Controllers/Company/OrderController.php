@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\DeliveryCompany;
 use App\Models\Driver;
 use App\Models\Order;
+use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -24,6 +25,15 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $company = $this->company();
+
+        $svc = app(SubscriptionService::class);
+        if ($svc->companyPlan($company) === 'free') {
+            $usedThisMonth = $svc->monthlyCompanyOrderCount($company);
+            if ($usedThisMonth >= SubscriptionService::COMP_FREE_MAX_ORDERS) {
+                return redirect()->route('company.subscription.upgrade')
+                    ->with('plan_error', "Limite atteinte : {$usedThisMonth}/10 commandes ce mois. Passez au Plan Business pour continuer.");
+            }
+        }
 
         $query = Order::with(['client', 'shop', 'driver', 'items', 'deliveryZone'])
             ->where('delivery_company_id', $company->id)
@@ -93,8 +103,19 @@ class OrderController extends Controller
 
         $drivers = $company->drivers()->orderByRaw("FIELD(status,'available','busy','offline')")->orderBy('name')->get();
 
-        $devise = $company->currency ?? 'GNF';
-        return view('company.orders.index', compact('orders', 'stats', 'drivers', 'company', 'period', 'devise', 'shopFilter'));
+        $devise       = $company->currency ?? 'GNF';
+        $isBusiness   = $svc->companyPlan($company) === 'business';
+        $maxDrivers   = SubscriptionService::COMP_FREE_MAX_DRIVERS;
+        $maxZones     = SubscriptionService::COMP_FREE_MAX_ZONES;
+        $maxOrders    = SubscriptionService::COMP_FREE_MAX_ORDERS;
+        $totalDrivers = $company->drivers()->count();
+        $totalZones   = $company->zones()->count();
+        $usedOrders   = $svc->monthlyCompanyOrderCount($company);
+
+        return view('company.orders.index', compact(
+            'orders', 'stats', 'drivers', 'company', 'period', 'devise', 'shopFilter',
+            'isBusiness', 'maxDrivers', 'maxZones', 'maxOrders', 'totalDrivers', 'totalZones', 'usedOrders'
+        ));
     }
 
     public function assign(Request $request, Order $order)
@@ -136,7 +157,21 @@ class OrderController extends Controller
     public function mapView()
     {
         $company = $this->company();
-        return view('company.carte.index', compact('company'));
+
+        $svc          = app(SubscriptionService::class);
+        $isBusiness   = $svc->companyPlan($company) === 'business';
+        $maxDrivers   = SubscriptionService::COMP_FREE_MAX_DRIVERS;
+        $maxZones     = SubscriptionService::COMP_FREE_MAX_ZONES;
+        $maxOrders    = SubscriptionService::COMP_FREE_MAX_ORDERS;
+        $totalDrivers = $company->drivers()->count();
+        $totalZones   = $company->zones()->count();
+        $usedOrders   = $svc->monthlyCompanyOrderCount($company);
+
+        return view('company.carte.index', compact(
+            'company',
+            'isBusiness', 'maxDrivers', 'maxZones', 'maxOrders',
+            'totalDrivers', 'totalZones', 'usedOrders'
+        ));
     }
 
     public function mapData()
@@ -219,7 +254,20 @@ class OrderController extends Controller
             'en_livraison' => $orders->where('status', Order::STATUS_EN_LIVRAISON)->count(),
         ];
 
-        return view('company.livraisons.index', compact('orders', 'stats', 'company'));
+        $svc          = app(SubscriptionService::class);
+        $isBusiness   = $svc->companyPlan($company) === 'business';
+        $maxDrivers   = SubscriptionService::COMP_FREE_MAX_DRIVERS;
+        $maxZones     = SubscriptionService::COMP_FREE_MAX_ZONES;
+        $maxOrders    = SubscriptionService::COMP_FREE_MAX_ORDERS;
+        $totalDrivers = $company->drivers()->count();
+        $totalZones   = $company->zones()->count();
+        $usedOrders   = $svc->monthlyCompanyOrderCount($company);
+
+        return view('company.livraisons.index', compact(
+            'orders', 'stats', 'company',
+            'isBusiness', 'maxDrivers', 'maxZones', 'maxOrders',
+            'totalDrivers', 'totalZones', 'usedOrders'
+        ));
     }
 
     public function inProgressData()
@@ -337,7 +385,20 @@ class OrderController extends Controller
 
         $drivers = $company->drivers()->orderBy('name')->get();
 
-        return view('company.historique.index', compact('orders', 'stats', 'drivers', 'company', 'shopFilter', 'period'));
+        $svc          = app(SubscriptionService::class);
+        $isBusiness   = $svc->companyPlan($company) === 'business';
+        $maxDrivers   = SubscriptionService::COMP_FREE_MAX_DRIVERS;
+        $maxZones     = SubscriptionService::COMP_FREE_MAX_ZONES;
+        $maxOrders    = SubscriptionService::COMP_FREE_MAX_ORDERS;
+        $totalDrivers = $company->drivers()->count();
+        $totalZones   = $company->zones()->count();
+        $usedOrders   = $svc->monthlyCompanyOrderCount($company);
+
+        return view('company.historique.index', compact(
+            'orders', 'stats', 'drivers', 'company', 'shopFilter', 'period',
+            'isBusiness', 'maxDrivers', 'maxZones', 'maxOrders',
+            'totalDrivers', 'totalZones', 'usedOrders'
+        ));
     }
 
     public function clients(Request $request)
@@ -384,7 +445,20 @@ class OrderController extends Controller
                                 ->orderByDesc('total_orders')->first(),
         ];
 
-        return view('company.clients.index', compact('clients', 'stats', 'company', 'search'));
+        $svc          = app(SubscriptionService::class);
+        $isBusiness   = $svc->companyPlan($company) === 'business';
+        $maxDrivers   = SubscriptionService::COMP_FREE_MAX_DRIVERS;
+        $maxZones     = SubscriptionService::COMP_FREE_MAX_ZONES;
+        $maxOrders    = SubscriptionService::COMP_FREE_MAX_ORDERS;
+        $totalDrivers = $company->drivers()->count();
+        $totalZones   = $company->zones()->count();
+        $usedOrders   = $svc->monthlyCompanyOrderCount($company);
+
+        return view('company.clients.index', compact(
+            'clients', 'stats', 'company', 'search',
+            'isBusiness', 'maxDrivers', 'maxZones', 'maxOrders',
+            'totalDrivers', 'totalZones', 'usedOrders'
+        ));
     }
 
     public function boutiques(Request $request)
@@ -421,7 +495,20 @@ class OrderController extends Controller
             'total_revenus'   => Order::where('delivery_company_id', $company->id)->where('status', Order::STATUS_LIVREE)->sum('delivery_fee'),
         ];
 
-        return view('company.boutiques.index', compact('shops', 'stats', 'company', 'search'));
+        $svc          = app(SubscriptionService::class);
+        $isBusiness   = $svc->companyPlan($company) === 'business';
+        $maxDrivers   = SubscriptionService::COMP_FREE_MAX_DRIVERS;
+        $maxZones     = SubscriptionService::COMP_FREE_MAX_ZONES;
+        $maxOrders    = SubscriptionService::COMP_FREE_MAX_ORDERS;
+        $totalDrivers = $company->drivers()->count();
+        $totalZones   = $company->zones()->count();
+        $usedOrders   = $svc->monthlyCompanyOrderCount($company);
+
+        return view('company.boutiques.index', compact(
+            'shops', 'stats', 'company', 'search',
+            'isBusiness', 'maxDrivers', 'maxZones', 'maxOrders',
+            'totalDrivers', 'totalZones', 'usedOrders'
+        ));
     }
 
     public function notifications()

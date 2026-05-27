@@ -22,9 +22,14 @@ class RegisteredUserController extends Controller
      */
     public function create(Request $request): View
     {
-        // On garde l’ID de la boutique (si présent) pour un éventuel lien de suivi
-        $shopId = $request->get('shop_id');
-        return view('auth.register', compact('shopId'));
+        $shopId      = $request->get('shop_id');
+        $intent      = $request->get('intent', '');
+        $defaultRole = match($intent) {
+            'pro'      => 'admin',
+            'business' => 'company',
+            default    => $request->get('role', 'client'),
+        };
+        return view('auth.register', compact('shopId', 'intent', 'defaultRole'));
     }
 
     /**
@@ -71,6 +76,10 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
         Auth::login($user);
+
+        if ($request->filled('intent') && in_array($request->intent, ['pro', 'business'])) {
+            session(['payment_intent' => $request->intent]);
+        }
 
         // Si le client s'inscrit depuis une boutique à suivre
         if ($request->filled('shop_id') && $user->role === 'client') {

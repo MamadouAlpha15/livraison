@@ -210,11 +210,24 @@ class SubscriptionService
         return $company->zones()->count() < self::COMP_FREE_MAX_ZONES;
     }
 
-    // Vérifie si l'entreprise peut recevoir une commande (max 10 en free)
+    // Vérifie si l'entreprise peut recevoir une commande (max 10/mois en free)
     public function canReceiveCompanyOrder(DeliveryCompany $company): bool
     {
         if ($this->companyPlan($company) === 'business') return true;
-        return $company->orders()->count() < self::COMP_FREE_MAX_ORDERS;
+        $count = $company->orders()
+            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->count();
+        return $count < self::COMP_FREE_MAX_ORDERS;
+    }
+
+    // Retourne le nombre de commandes ce mois pour l'entreprise
+    public function monthlyCompanyOrderCount(DeliveryCompany $company): int
+    {
+        return (int) $company->orders()
+            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->count();
     }
 
     // ─────────────────────────────────────────────────────────────────────────
