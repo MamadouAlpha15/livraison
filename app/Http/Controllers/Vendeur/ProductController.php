@@ -146,7 +146,7 @@ class ProductController extends Controller
         return view('vendeur.products.index', compact(
             'products', 'categories', 'customCats', 'devise',
             'totalProducts', 'activeProducts', 'outOfStock',
-            'isPro', 'processedCount'
+            'isPro', 'processedCount', 'shop'
         ));
     }
 

@@ -799,10 +799,95 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <h1 class="page-title">{!! $I['tag_pg'] !!} Catalogue produits</h1>
             <p class="page-sub">Gérez vos produits — modification, activation et suivi du stock.</p>
         </div>
-        <a href="{{ route('products.create') }}" class="filter-btn filter-btn-primary" style="font-size:13px;padding:10px 20px">
-            {!! $I['plus_pg'] !!} Ajouter un produit
-        </a>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <button type="button" onclick="openSharePanel()" class="filter-btn" style="font-size:13px;padding:10px 18px;background:#f0fdf4;border-color:#86efac;color:#15803d;display:inline-flex;align-items:center;gap:7px">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                Partager ma boutique
+            </button>
+            <a href="{{ route('products.create') }}" class="filter-btn filter-btn-primary" style="font-size:13px;padding:10px 20px">
+                {!! $I['plus_pg'] !!} Ajouter un produit
+            </a>
+        </div>
     </div>
+
+    {{-- ══ PANNEAU PARTAGE ══ --}}
+    @if($shop)
+    @php $shareUrl = route('public.shops.products', $shop); @endphp
+    <div id="shareOverlay" onclick="closeSharePanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:900;backdrop-filter:blur(3px)"></div>
+    <div id="sharePanel" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:1000;background:#fff;border-radius:20px 20px 0 0;padding:0 0 32px;box-shadow:0 -8px 32px rgba(0,0,0,.18);max-height:90vh;overflow-y:auto">
+        <div style="width:40px;height:4px;border-radius:4px;background:#e5e7eb;margin:14px auto 0"></div>
+        <div style="padding:20px 24px 16px;border-bottom:1px solid #f3f4f6">
+            <div style="font-size:17px;font-weight:800;color:#111">Partager ma boutique</div>
+            <div style="font-size:13px;color:#9ca3af;margin-top:3px">Envoyez ce lien à vos clients — ils verront tous vos produits</div>
+        </div>
+        <div style="padding:20px 24px">
+
+            {{-- URL + copier --}}
+            <div style="background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:12px;padding:14px 16px;margin-bottom:20px">
+                <div style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Lien de votre boutique</div>
+                <div style="display:flex;align-items:center;gap:10px">
+                    <div style="flex:1;font-size:13px;color:#374151;word-break:break-all;font-family:monospace">{{ $shareUrl }}</div>
+                    <button onclick="copyShareUrl()" id="copyBtn" style="flex-shrink:0;background:#111;color:#fff;border:none;border-radius:9px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;transition:.15s;white-space:nowrap">
+                        Copier
+                    </button>
+                </div>
+            </div>
+
+            {{-- Réseaux sociaux --}}
+            <div style="font-size:12px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Partager directement sur</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+
+                <a href="https://wa.me/?text={{ urlencode('🛍 Découvrez ma boutique '.$shop->name.' sur Shopio : '.$shareUrl) }}"
+                   target="_blank" rel="noopener"
+                   style="display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:12px;background:#dcfce7;border:1.5px solid #86efac;text-decoration:none;transition:.15s">
+                    <span style="font-size:24px">📱</span>
+                    <div>
+                        <div style="font-size:13px;font-weight:700;color:#15803d">WhatsApp</div>
+                        <div style="font-size:11px;color:#16a34a">Envoyer le lien</div>
+                    </div>
+                </a>
+
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($shareUrl) }}"
+                   target="_blank" rel="noopener"
+                   style="display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:12px;background:#eff6ff;border:1.5px solid #93c5fd;text-decoration:none;transition:.15s">
+                    <span style="font-size:24px">👥</span>
+                    <div>
+                        <div style="font-size:13px;font-weight:700;color:#1d4ed8">Facebook</div>
+                        <div style="font-size:11px;color:#2563eb">Partager la page</div>
+                    </div>
+                </a>
+
+                <a href="https://telegram.me/share/url?url={{ urlencode($shareUrl) }}&text={{ urlencode('🛍 Découvrez '.$shop->name.' — tous mes produits disponibles !') }}"
+                   target="_blank" rel="noopener"
+                   style="display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:12px;background:#eff6ff;border:1.5px solid #7dd3fc;text-decoration:none;transition:.15s">
+                    <span style="font-size:24px">✈️</span>
+                    <div>
+                        <div style="font-size:13px;font-weight:700;color:#0369a1">Telegram</div>
+                        <div style="font-size:11px;color:#0284c7">Envoyer le lien</div>
+                    </div>
+                </a>
+
+                <a href="https://twitter.com/intent/tweet?url={{ urlencode($shareUrl) }}&text={{ urlencode('🛍 Découvrez tous les produits de '.$shop->name.' !') }}"
+                   target="_blank" rel="noopener"
+                   style="display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:12px;background:#f0f0f0;border:1.5px solid #d1d5db;text-decoration:none;transition:.15s">
+                    <span style="font-size:24px">🐦</span>
+                    <div>
+                        <div style="font-size:13px;font-weight:700;color:#111">X / Twitter</div>
+                        <div style="font-size:11px;color:#6b7280">Tweeter le lien</div>
+                    </div>
+                </a>
+            </div>
+
+            <button onclick="closeSharePanel()" style="width:100%;margin-top:20px;padding:13px;border-radius:12px;border:1.5px solid #e5e7eb;background:#fff;color:#374151;font-size:14px;font-weight:700;cursor:pointer">
+                Fermer
+            </button>
+        </div>
+    </div>
+
+    <div id="copyToast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111;color:#fff;font-size:13px;font-weight:700;padding:10px 22px;border-radius:30px;z-index:2000;box-shadow:0 4px 20px rgba(0,0,0,.25);white-space:nowrap">
+        ✓ Lien copié !
+    </div>
+    @endif
 
     {{-- Stats --}}
     <div class="stats-row">
@@ -1347,5 +1432,29 @@ document.querySelectorAll('.toggle-switch').forEach(btn => {
         }
     });
 });
+
+/* ══ PANNEAU PARTAGE ══ */
+function openSharePanel() {
+    document.getElementById('shareOverlay').style.display = 'block';
+    document.getElementById('sharePanel').style.display   = 'block';
+    document.body.style.overflow = 'hidden';
+}
+function closeSharePanel() {
+    document.getElementById('shareOverlay').style.display = 'none';
+    document.getElementById('sharePanel').style.display   = 'none';
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSharePanel(); });
+
+function copyShareUrl() {
+    var url = '{{ $shareUrl ?? "" }}';
+    if (!url) return;
+    navigator.clipboard.writeText(url).then(function() {
+        var btn   = document.getElementById('copyBtn');
+        var toast = document.getElementById('copyToast');
+        if (btn) { btn.textContent = '✓ Copié !'; btn.style.background = '#16a34a'; setTimeout(function(){ btn.textContent = 'Copier'; btn.style.background = '#111'; }, 2500); }
+        if (toast) { toast.style.display = 'block'; setTimeout(function(){ toast.style.display = 'none'; }, 2500); }
+    });
+}
 </script>
 @endpush

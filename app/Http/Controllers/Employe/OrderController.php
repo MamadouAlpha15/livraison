@@ -471,12 +471,16 @@ class OrderController extends Controller
             'lng' => ['required', 'numeric', 'between:-180,180'],
         ]);
 
-        $order->update([
-            'vendor_lat'                => $data['lat'],
-            'vendor_lng'                => $data['lng'],
-            'vendor_location_shared_at' => now(),
-        ]);
+        // Met à jour TOUTES les commandes actives de la boutique assignées à une entreprise
+        $updated = Order::where('shop_id', $shopId)
+            ->whereNotNull('delivery_company_id')
+            ->whereNotIn('status', [Order::STATUS_LIVREE, Order::STATUS_ANNULEE])
+            ->update([
+                'vendor_lat'                => $data['lat'],
+                'vendor_lng'                => $data['lng'],
+                'vendor_location_shared_at' => now(),
+            ]);
 
-        return response()->json(['ok' => true]);
+        return response()->json(['ok' => true, 'updated' => $updated]);
     }
 }

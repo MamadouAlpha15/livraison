@@ -1,322 +1,451 @@
 @extends('layouts.app')
-@php $bodyClass = 'is-dashboard'; @endphp
 
+@php $bodyClass = 'is-dashboard'; @endphp
 @section('title', $product->name)
 
-
 @php
-    $gallery = $product->gallery ? json_decode($product->gallery, true) : [];
+    $gallery      = $product->gallery ? json_decode($product->gallery, true) : [];
+    $hasPromo     = $product->original_price && $product->original_price > $product->price;
+    $savings      = $hasPromo ? $product->original_price - $product->price : 0;
+    $discountPct  = $hasPromo ? round(100 - ($product->price / $product->original_price * 100)) : 0;
+    $stockOk      = ($product->stock ?? 0) > 5;
+    $stockLow     = ($product->stock ?? 0) > 0 && ($product->stock ?? 0) <= 5;
+    $stockOut     = ($product->stock ?? 0) <= 0;
+    $unavailable  = $stockOut || $product->is_available === false;
+
+    $allPhotos = array_values(array_filter(array_merge(
+        [$product->image ? asset('storage/'.$product->image) : null],
+        array_map(fn($g) => asset('storage/'.$g), $gallery)
+    )));
+    $allThumbs = $allPhotos;
+
+    $tags      = $product->tags      ? array_filter(array_map('trim', explode(',', $product->tags)))      : [];
+    $allergens = $product->allergens ? array_filter(array_map('trim', explode(',', $product->allergens))) : [];
 @endphp
 
 <style>
-*, *::before, *::after { box-sizing: border-box; }
-body { background: #f6f7fb; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:#f0f2f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111}
 
-/* ── WRAPPER ── */
-.product-page {
-    max-width: 1100px;
-    margin: 25px auto;
-    background: #fff;
-    border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 20px 50px rgba(0,0,0,.08);
-    display: flex;
-    flex-wrap: wrap;
-    position: relative;
+/* ── BACK BAR ── */
+.back-bar{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,255,255,.92);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid #e5e7eb;
+    display:flex;align-items:center;gap:10px;
+    padding:0 16px;height:52px;
+}
+.back-btn{
+    display:inline-flex;align-items:center;gap:6px;
+    background:none;border:none;cursor:pointer;
+    font-size:14px;font-weight:600;color:#374151;
+    padding:6px 0;
+}
+.back-btn svg{flex-shrink:0}
+.back-btn:hover{color:#111}
+.bc{display:flex;align-items:center;gap:5px;font-size:12px;color:#9ca3af;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.bc a{color:#9ca3af;text-decoration:none}.bc a:hover{color:#374151}
+.bc-sep{flex-shrink:0}
+
+/* ── LAYOUT ── */
+.page{max-width:1080px;margin:0 auto;padding:24px 16px 80px}
+
+.card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.07),0 8px 24px rgba(0,0,0,.05)}
+
+/* ── GALLERY ── */
+.gallery-section{position:relative;background:#f9fafb}
+.main-img-wrap{position:relative;overflow:hidden;aspect-ratio:4/3;background:#f3f4f6;cursor:zoom-in}
+.main-image{width:100%;height:100%;object-fit:cover;transition:opacity .18s}
+.no-img{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:72px;color:#d1d5db}
+
+/* badges sur la photo */
+.img-badges{position:absolute;top:12px;left:12px;display:flex;flex-direction:column;gap:6px}
+.bdg{display:inline-block;padding:4px 10px;border-radius:30px;font-size:11px;font-weight:700;letter-spacing:.3px}
+.bdg-promo{background:#ef4444;color:#fff}
+.bdg-featured{background:#f59e0b;color:#fff}
+
+/* flèches */
+.arrow{
+    position:absolute;top:50%;transform:translateY(-50%);
+    width:36px;height:36px;border-radius:50%;border:none;
+    background:rgba(0,0,0,.45);color:#fff;font-size:20px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:.15s;opacity:0;z-index:2;
+}
+.main-img-wrap:hover .arrow{opacity:1}
+@media(hover:none){.arrow{opacity:1;width:32px;height:32px;font-size:18px}}
+.arrow:hover{background:rgba(0,0,0,.7)}
+.arrow-l{left:10px}.arrow-r{right:10px}
+.img-counter{
+    position:absolute;bottom:10px;right:12px;
+    background:rgba(0,0,0,.5);color:#fff;
+    font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;pointer-events:none
 }
 
-/* ── CLOSE ── */
-.close-btn {
-    position: absolute; top: 15px; right: 15px; z-index: 10;
-    width: 42px; height: 42px; border-radius: 50%;
-    border: none; background: #ff6a00; color: #fff; font-size: 20px;
-    cursor: pointer; transition: .2s;
-    display: flex; align-items: center; justify-content: center;
+/* miniatures */
+.thumbs{display:flex;gap:8px;padding:10px 12px;overflow-x:auto;background:#fff;border-top:1px solid #f3f4f6;scroll-snap-type:x mandatory}
+.thumbs::-webkit-scrollbar{height:3px}.thumbs::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:3px}
+.thumb{
+    width:60px;height:60px;border-radius:10px;object-fit:cover;
+    flex-shrink:0;scroll-snap-align:start;cursor:pointer;
+    border:2px solid transparent;transition:.15s;opacity:.65
 }
-.close-btn:hover { background: #e85f00; transform: scale(1.05); }
+.thumb:hover,.thumb.active{opacity:1;border-color:#111}
 
-/* ── LEFT — image ── */
-.left {
-    flex: 1; min-width: 320px;
-    background: #fafafa; padding: 15px;
-}
+/* ── INFO SECTION ── */
+.info-section{padding:22px 20px 28px}
 
-.main-img-wrap {
-    position: relative; display: flex; align-items: center; justify-content: center;
-    background: #fafafa; border-radius: 12px; overflow: hidden; margin-bottom: 10px;
+.cat-chip{
+    display:inline-block;font-size:11px;font-weight:700;
+    color:#6366f1;background:#eef2ff;padding:3px 10px;
+    border-radius:20px;margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px
 }
+.product-name{font-size:22px;font-weight:800;line-height:1.25;color:#111;margin-bottom:16px}
 
-.main-image {
-    width: 100%; height: 420px;
-    object-fit: cover; border-radius: 12px;
-    transition: opacity .18s ease;
-    display: block;
-}
-
-/* ── FLÈCHES ── */
-.gal-arrow {
-    position: absolute; top: 50%; transform: translateY(-50%);
-    background: rgba(0,0,0,.42); color: #fff; border: none; border-radius: 50%;
-    width: 38px; height: 38px; font-size: 22px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background .15s, opacity .2s; z-index: 2; line-height: 1;
-    opacity: 0;
-}
-.main-img-wrap:hover .gal-arrow { opacity: 1; }
-@media (hover: none) { .gal-arrow { opacity: 1; } }
-.gal-arrow:hover { background: rgba(0,0,0,.7); }
-.gal-arrow-l { left: 8px; }
-.gal-arrow-r { right: 8px; }
-.gal-counter {
-    position: absolute; bottom: 8px; right: 10px;
-    background: rgba(0,0,0,.5); color: #fff; font-size: 11px; font-weight: 700;
-    padding: 2px 8px; border-radius: 20px; pointer-events: none;
+/* PRIX */
+.price-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.price{font-size:28px;font-weight:900;color:#111}
+.currency{font-size:16px;font-weight:700;color:#6b7280}
+.old-price{font-size:14px;color:#9ca3af;text-decoration:line-through}
+.savings-pill{
+    display:inline-flex;align-items:center;gap:4px;
+    background:#dcfce7;color:#16a34a;
+    font-size:11.5px;font-weight:700;
+    padding:3px 10px;border-radius:20px;margin-bottom:16px
 }
 
-/* ── MINIATURES ── */
-.gallery {
-    display: flex; gap: 8px; margin-top: 10px;
-    overflow-x: auto; padding-bottom: 4px;
-    scroll-snap-type: x mandatory;
-}
-.gallery::-webkit-scrollbar { height: 4px; }
-.gallery::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
-.gal-thumb {
-    width: 70px; height: 70px; border-radius: 10px;
-    object-fit: cover; cursor: pointer; flex-shrink: 0;
-    border: 2px solid transparent; transition: .2s;
-    scroll-snap-align: start;
-}
-.gal-thumb:hover { border-color: #ff6a00; transform: scale(1.05); }
-.gal-thumb.active { border-color: #ff6a00; box-shadow: 0 0 0 2px #ffe0cc; }
+/* STOCK */
+.stock-line{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;margin-bottom:18px}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot-ok {background:#22c55e;box-shadow:0 0 0 3px #dcfce7}
+.dot-low{background:#f59e0b;box-shadow:0 0 0 3px #fef9c3}
+.dot-out{background:#ef4444;box-shadow:0 0 0 3px #fee2e2}
+.stock-ok-c {color:#15803d}.stock-low-c{color:#b45309}.stock-out-c{color:#dc2626}
+.stock-note{color:#9ca3af;font-weight:400}
 
-/* ── RIGHT — infos ── */
-.right { flex: 1; min-width: 320px; padding: 25px; }
-.title { font-size: 26px; font-weight: 700; color: #222; }
-.price-box { margin: 12px 0; }
-.price { font-size: 28px; font-weight: bold; color: #ff6a00; }
-.old-price { font-size: 16px; text-decoration: line-through; color: #aaa; margin-left: 8px; }
-.badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
-.badge { background: #fff3e6; color: #ff6a00; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
-.desc { margin-top: 18px; line-height: 1.7; color: #555; font-size: 14px; }
+/* SÉPARATEUR */
+.sep{height:1px;background:#f3f4f6;margin:18px 0}
 
-/* ── MOBILE ── */
-@media (max-width: 640px) {
-    .product-page {
-        flex-direction: column;
-        margin: 0;
-        border-radius: 0;
-        min-height: 100dvh;
-    }
-    .left, .right { min-width: 0; width: 100%; flex: none; }
-    .left { padding: 0; background: #fff; }
-    .main-img-wrap { border-radius: 0; margin-bottom: 0; }
-    .main-image { height: 280px; border-radius: 0; }
-    .gallery { padding: 10px 12px 6px; margin-top: 0; background: #fafafa; }
-    .gal-thumb { width: 60px; height: 60px; }
-    .gal-arrow { opacity: 1; width: 34px; height: 34px; font-size: 20px; }
-    .gal-arrow-l { left: 6px; }
-    .gal-arrow-r { right: 6px; }
-    .right { padding: 16px 14px 24px; }
-    .title { font-size: 20px; padding-right: 40px; }
-    .price { font-size: 24px; }
-    .old-price { font-size: 14px; }
-    .close-btn { width: 36px; height: 36px; font-size: 17px; top: 10px; right: 10px; }
+/* DESCRIPTION */
+.section-label{font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px}
+.desc{font-size:14px;line-height:1.75;color:#4b5563;white-space:pre-line}
+
+/* CHIPS (unité, prép) */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.chip{
+    display:inline-flex;align-items:center;gap:5px;
+    background:#f9fafb;border:1px solid #e5e7eb;
+    color:#374151;font-size:12.5px;font-weight:600;
+    padding:5px 12px;border-radius:20px
 }
 
-@media (max-width: 400px) {
-    .main-image { height: 240px; }
-    .title { font-size: 18px; }
-    .price { font-size: 21px; }
-    .gal-thumb { width: 54px; height: 54px; }
+/* TAGS */
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+.tag{font-size:12px;font-weight:600;color:#6366f1;background:#eef2ff;padding:4px 10px;border-radius:20px}
+
+/* ALLERGENS */
+.allergens{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+.allergen{font-size:12px;font-weight:600;color:#b45309;background:#fef9c3;border:1px solid #fde68a;padding:4px 10px;border-radius:20px}
+
+/* BOUTIQUE */
+.shop-row{
+    display:flex;align-items:center;gap:12px;
+    background:#f9fafb;border:1px solid #e5e7eb;
+    border-radius:14px;padding:13px 15px;margin-bottom:22px;
+    text-decoration:none;transition:.15s;
+}
+.shop-row:hover{background:#f3f4f6;border-color:#d1d5db}
+.shop-av{
+    width:42px;height:42px;border-radius:11px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:17px;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden
+}
+.shop-av img{width:100%;height:100%;object-fit:cover}
+.shop-name{font-size:14px;font-weight:700;color:#111}
+.shop-type{font-size:11.5px;color:#9ca3af;margin-top:1px}
+.shop-chevron{margin-left:auto;color:#9ca3af;font-size:18px;font-weight:300}
+
+/* CTA */
+.cta-stack{display:flex;flex-direction:column;gap:10px}
+.btn-order{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    background:#111;color:#fff;
+    font-size:15px;font-weight:800;letter-spacing:.2px;
+    padding:16px 24px;border-radius:14px;
+    text-decoration:none;transition:.18s;border:none;cursor:pointer
+}
+.btn-order:hover{background:#000;transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.btn-order.off{background:#e5e7eb;color:#9ca3af;pointer-events:none;cursor:default;transform:none;box-shadow:none}
+.btn-back{
+    display:flex;align-items:center;justify-content:center;gap:7px;
+    background:#fff;border:1.5px solid #e5e7eb;color:#374151;
+    font-size:14px;font-weight:700;padding:13px 24px;border-radius:14px;
+    text-decoration:none;transition:.15s
+}
+.btn-back:hover{border-color:#9ca3af;color:#111}
+
+/* ══ DESKTOP — côte à côte ══ */
+@media(min-width:780px){
+    .page{padding:32px 24px 80px}
+    .card{display:grid;grid-template-columns:1fr 1fr;align-items:start}
+    .gallery-section{border-right:1px solid #f3f4f6}
+    .main-img-wrap{aspect-ratio:1/1}
+    .info-section{padding:30px 28px 36px;overflow-y:auto;max-height:calc(100vh - 120px)}
+    .product-name{font-size:26px}
+    .price{font-size:32px}
+}
+@media(min-width:1024px){
+    .page{padding:40px 32px 80px}
+    .product-name{font-size:28px}
 }
 </style>
 
-<div class="product-page">
+{{-- BACK BAR --}}
+<div class="back-bar">
+    <button class="back-btn" onclick="goBack()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Retour
+    </button>
+    <div class="bc">
+        <a href="{{ route('client.dashboard') }}">Accueil</a>
+        <span class="bc-sep">›</span>
+        <a href="{{ route('client.products.index') }}">Produits</a>
+        <span class="bc-sep">›</span>
+        <span>{{ Str::limit($product->name, 28) }}</span>
+    </div>
+</div>
 
-    {{-- CLOSE --}}
-    <button class="close-btn" onclick="goBack()">×</button>
+<div class="page">
+<div class="card">
 
-    {{-- LEFT IMAGE --}}
-    <div class="left">
+    {{-- ════ GALERIE ════ --}}
+    <div class="gallery-section">
         <div class="main-img-wrap" id="mainImgWrap">
-            <img id="mainImage"
-                 src="{{ \App\Services\ImageOptimizer::url($product->image, 'medium') ?? asset('storage/'.$product->image) }}"
-                 class="main-image" style="cursor:zoom-in" onclick="openLightbox(_curIdx)">
-            @if(count($gallery) > 0)
-            <button class="gal-arrow gal-arrow-l" onclick="switchIdx(_curIdx - 1)">‹</button>
-            <button class="gal-arrow gal-arrow-r" onclick="switchIdx(_curIdx + 1)">›</button>
-            <div class="gal-counter" id="galCounter"></div>
+            @if(count($allPhotos))
+                <img id="mainImage" src="{{ $allPhotos[0] }}" class="main-image" alt="{{ $product->name }}" onclick="openLightbox(_curIdx)">
+            @else
+                <div class="no-img">🛍</div>
+            @endif
+
+            <div class="img-badges">
+                @if($hasPromo)<span class="bdg bdg-promo">-{{ $discountPct }}%</span>@endif
+                @if($product->is_featured)<span class="bdg bdg-featured">⭐ Vedette</span>@endif
+            </div>
+
+            @if(count($allPhotos) > 1)
+                <button class="arrow arrow-l" onclick="switchIdx(_curIdx-1)">‹</button>
+                <button class="arrow arrow-r" onclick="switchIdx(_curIdx+1)">›</button>
+                <div class="img-counter" id="galCtr">1 / {{ count($allPhotos) }}</div>
             @endif
         </div>
 
-        @php
-            $allPhotos = array_filter(array_merge(
-                [$product->image ? (\App\Services\ImageOptimizer::url($product->image, 'medium') ?? asset('storage/'.$product->image)) : null],
-                array_map(fn($g) => \App\Services\ImageOptimizer::url($g, 'medium') ?? asset('storage/'.$g), $gallery)
-            ));
-            $allThumbs = array_filter(array_merge(
-                [$product->image ? (\App\Services\ImageOptimizer::url($product->image, 'thumb') ?? asset('storage/'.$product->image)) : null],
-                array_map(fn($g) => \App\Services\ImageOptimizer::url($g, 'thumb') ?? asset('storage/'.$g), $gallery)
-            ));
-            $allPhotos = array_values($allPhotos);
-            $allThumbs = array_values($allThumbs);
-        @endphp
-
         @if(count($allThumbs) > 1)
-        <div class="gallery" id="galThumbRow">
-            @foreach($allThumbs as $i => $thumb)
-            <img src="{{ $thumb }}" class="gal-thumb {{ $i === 0 ? 'active' : '' }}"
-                 data-idx="{{ $i }}" onclick="switchIdx({{ $i }})" alt="Photo {{ $i+1 }}" loading="lazy">
+        <div class="thumbs" id="thumbRow">
+            @foreach($allThumbs as $i => $t)
+                <img src="{{ $t }}" class="thumb {{ $i===0?'active':'' }}" data-idx="{{ $i }}"
+                     onclick="switchIdx({{ $i }})" alt="Photo {{ $i+1 }}" loading="lazy">
             @endforeach
         </div>
         @endif
     </div>
 
-    {{-- RIGHT INFO --}}
-    <div class="right">
+    {{-- ════ INFOS ════ --}}
+    <div class="info-section">
 
-        <div class="title">{{ $product->name }}</div>
+        @if($product->category)
+            <div class="cat-chip">{{ $product->category }}</div>
+        @endif
 
-        <div class="price-box">
-            <span class="price">{{ $product->price }} GNF</span>
+        <div class="product-name">{{ $product->name }}</div>
 
-            @if($product->original_price)
-                <span class="old-price">{{ $product->original_price }} GNF</span>
+        {{-- PRIX --}}
+        <div class="price-row">
+            <span class="price">{{ number_format($product->price, 0, ',', ' ') }}</span>
+            <span class="currency">GNF</span>
+            @if($hasPromo)
+                <span class="old-price">{{ number_format($product->original_price, 0, ',', ' ') }} GNF</span>
+            @endif
+        </div>
+        @if($hasPromo)
+            <div class="savings-pill">✓ Économie de {{ number_format($savings, 0, ',', ' ') }} GNF</div>
+        @endif
+
+        {{-- STOCK --}}
+        <div class="stock-line">
+            @if($stockOk)
+                <span class="dot dot-ok"></span>
+                <span class="stock-ok-c">En stock</span>
+                <span class="stock-note">— {{ number_format($product->stock) }} {{ $product->unit ?: 'unités' }}</span>
+            @elseif($stockLow)
+                <span class="dot dot-low"></span>
+                <span class="stock-low-c">Stock limité</span>
+                <span class="stock-note">— plus que {{ $product->stock }}</span>
+            @else
+                <span class="dot dot-out"></span>
+                <span class="stock-out-c">Rupture de stock</span>
             @endif
         </div>
 
-        <div class="badges">
-            <div class="badge">📦 Stock: {{ $product->stock ?? 0 }}</div>
-            <div class="badge">📂 {{ $product->category }}</div>
-            @if($product->unit)
-                <div class="badge">⚖️ {{ $product->unit }}</div>
-            @endif
+        {{-- CHIPS --}}
+        @php $chips = [] @endphp
+        @if($product->unit) @php $chips[]=['⚖️',$product->unit] @endphp @endif
+        @if($product->preparation_time) @php $chips[]=['⏱',$product->preparation_time.' min'] @endphp @endif
+        @if(count($chips))
+        <div class="chips">
+            @foreach($chips as [$ico,$txt])
+                <span class="chip">{{ $ico }} {{ $txt }}</span>
+            @endforeach
         </div>
+        @endif
 
-        <div class="desc">
-            {{ $product->description }}
+        @if($product->description)
+        <div class="sep"></div>
+        <div class="section-label">Description</div>
+        <div class="desc">{{ $product->description }}</div>
+        @endif
+
+        @if(count($tags))
+        <div class="sep"></div>
+        <div class="tags">
+            @foreach($tags as $t)<span class="tag"># {{ $t }}</span>@endforeach
+        </div>
+        @endif
+
+        @if(count($allergens))
+        <div class="sep"></div>
+        <div class="section-label">⚠️ Allergènes</div>
+        <div class="allergens">
+            @foreach($allergens as $a)<span class="allergen">{{ $a }}</span>@endforeach
+        </div>
+        @endif
+
+        @if($shop)
+        <div class="sep"></div>
+        @php
+            $grads=['linear-gradient(135deg,#667eea,#764ba2)','linear-gradient(135deg,#f5576c,#f093fb)','linear-gradient(135deg,#4facfe,#00c6fb)','linear-gradient(135deg,#ee0979,#ff6a00)','linear-gradient(135deg,#11998e,#38ef7d)','linear-gradient(135deg,#fc4a1a,#f7b733)'];
+            $grad=$grads[abs(crc32($shop->name??''))%count($grads)];
+        @endphp
+        <a href="{{ route('client.shops.show', $shop) }}" class="shop-row">
+            <div class="shop-av" style="background:{{ $grad }}">
+                @if($shop->image)
+                    <img src="{{ asset('storage/'.$shop->image) }}" alt="{{ $shop->name }}">
+                @else
+                    {{ strtoupper(mb_substr($shop->name??'B',0,1)) }}
+                @endif
+            </div>
+            <div>
+                <div class="shop-name">{{ $shop->name }}</div>
+                @if($shop->type)<div class="shop-type">{{ $shop->type }}</div>@endif
+            </div>
+            <span class="shop-chevron">›</span>
+        </a>
+        @endif
+
+        <div class="sep"></div>
+
+        {{-- CTA --}}
+        <div class="cta-stack">
+            @if(!$unavailable)
+                <a href="{{ route('client.orders.createFromProduct', $product) }}" class="btn-order">
+                    🛒 Commander maintenant
+                </a>
+            @else
+                <span class="btn-order off">🚫 Indisponible actuellement</span>
+            @endif
+            <a href="{{ route('client.products.index') }}" class="btn-back">
+                ← Tous les produits
+            </a>
         </div>
 
     </div>
 </div>
+</div>
 
 <script>
-/* ── Photos ── */
-const _allPhotos = @json($allPhotos);
-let _curIdx = 0, _swipeActive = false;
+const _photos = @json($allPhotos);
+let _curIdx = 0;
 
-/* Met à jour miniatures + compteur sans toucher à l'image */
-function _syncMeta(idx) {
-    document.querySelectorAll('.gal-thumb').forEach((t, i) => {
-        t.classList.toggle('active', i === idx);
-        if (i === idx) t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+function _sync(idx){
+    document.querySelectorAll('.thumb').forEach((t,i)=>{
+        t.classList.toggle('active',i===idx);
+        if(i===idx) t.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
     });
-    const ctr = document.getElementById('galCounter');
-    if (ctr && _allPhotos.length > 1) ctr.textContent = `${idx + 1} / ${_allPhotos.length}`;
+    const c=document.getElementById('galCtr');
+    if(c) c.textContent=`${idx+1} / ${_photos.length}`;
 }
 
-/* Changement de photo via clic miniature ou flèches → fade simple */
-function switchIdx(idx) {
-    if (!_allPhotos.length) return;
-    _curIdx = ((idx % _allPhotos.length) + _allPhotos.length) % _allPhotos.length;
-    const img = document.getElementById('mainImage');
-    img.style.transition = 'opacity .18s ease';
-    img.style.opacity = '0';
-    setTimeout(() => { img.src = _allPhotos[_curIdx]; img.style.opacity = '1'; }, 170);
-    _syncMeta(_curIdx);
+function switchIdx(idx){
+    if(!_photos.length) return;
+    _curIdx=((idx%_photos.length)+_photos.length)%_photos.length;
+    const img=document.getElementById('mainImage');
+    if(!img) return;
+    img.style.opacity='0';
+    setTimeout(()=>{img.src=_photos[_curIdx];img.style.opacity='1';},150);
+    _sync(_curIdx);
 }
 
-/* ── Swipe sur l'image principale ── */
-document.addEventListener('DOMContentLoaded', () => {
-    if (_allPhotos.length > 1) {
-        const ctr = document.getElementById('galCounter');
-        if (ctr) ctr.textContent = `1 / ${_allPhotos.length}`;
-    }
-    if (_allPhotos.length <= 1) return;
-
-    const wrap = document.getElementById('mainImgWrap');
-    let startX = 0, startY = 0;
-
-    wrap.addEventListener('touchstart', e => {
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-    }, { passive: true });
-
-    wrap.addEventListener('touchend', e => {
-        const dx = e.changedTouches[0].clientX - startX;
-        const dy = e.changedTouches[0].clientY - startY;
-        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
-            switchIdx(_curIdx + (dx < 0 ? 1 : -1));
-        }
-    }, { passive: true });
+document.addEventListener('DOMContentLoaded',()=>{
+    if(_photos.length<=1) return;
+    const w=document.getElementById('mainImgWrap');
+    if(!w) return;
+    let sx=0,sy=0;
+    w.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
+    w.addEventListener('touchend',e=>{
+        const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
+        if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)) switchIdx(_curIdx+(dx<0?1:-1));
+    },{passive:true});
 });
 
-/* ── Lightbox plein écran ── */
-function openLightbox(startIdx) {
-    if (!_allPhotos.length) return;
-    let idx = (startIdx != null ? startIdx : _curIdx);
-
-    const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:9999;display:flex;align-items:center;justify-content:center;';
-
-    const img = document.createElement('img');
-    img.style.cssText = 'max-width:92%;max-height:82%;object-fit:contain;border-radius:8px;user-select:none;pointer-events:none;transition:opacity .17s;';
-
-    const setImg = (i) => {
-        idx = ((i % _allPhotos.length) + _allPhotos.length) % _allPhotos.length;
-        img.style.opacity = '0';
-        setTimeout(() => { img.src = _allPhotos[idx]; img.style.opacity = '1'; }, 170);
-        ctr.textContent = _allPhotos.length > 1 ? `${idx + 1} / ${_allPhotos.length}` : '';
+function openLightbox(si){
+    if(!_photos.length) return;
+    let idx=si??_curIdx;
+    const ov=document.createElement('div');
+    ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    const img=document.createElement('img');
+    img.style.cssText='max-width:94%;max-height:86dvh;object-fit:contain;border-radius:8px;user-select:none;pointer-events:none;transition:opacity .15s;';
+    const ctr=document.createElement('div');
+    ctr.style.cssText='position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:#fff;font-size:12px;font-weight:700;background:rgba(255,255,255,.15);padding:4px 14px;border-radius:20px;white-space:nowrap;';
+    const set=(i)=>{
+        idx=((i%_photos.length)+_photos.length)%_photos.length;
+        img.style.opacity='0';
+        setTimeout(()=>{img.src=_photos[idx];img.style.opacity='1';},140);
+        if(_photos.length>1) ctr.textContent=`${idx+1} / ${_photos.length}`;
     };
-
-    const ctr = document.createElement('div');
-    ctr.style.cssText = 'position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);left:50%;transform:translateX(-50%);color:#fff;font-size:13px;font-weight:700;background:rgba(0,0,0,.55);padding:4px 14px;border-radius:20px;white-space:nowrap;';
-
-    const close = document.createElement('button');
-    close.textContent = '✕';
-    close.style.cssText = 'position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:16px;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:20px;width:42px;height:42px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;';
-    close.onclick = () => { document.body.removeChild(overlay); document.removeEventListener('keydown', onKey); };
-
-    let _ltsx = 0, _ltsy = 0;
-    overlay.addEventListener('touchstart', e => {
-        _ltsx = e.touches[0].clientX; _ltsy = e.touches[0].clientY;
-    }, { passive: true });
-    overlay.addEventListener('touchend', e => {
-        const dx = e.changedTouches[0].clientX - _ltsx;
-        const dy = e.changedTouches[0].clientY - _ltsy;
-        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) setImg(idx + (dx < 0 ? 1 : -1));
-    }, { passive: true });
-    overlay.addEventListener('click', e => { if (e.target === overlay) close.onclick(); });
-
-    if (_allPhotos.length > 1) {
-        const mkArrow = (side, label) => {
-            const btn = document.createElement('button');
-            btn.textContent = label;
-            btn.style.cssText = `position:absolute;top:50%;transform:translateY(-50%);${side}:14px;background:rgba(255,255,255,.15);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:30px;width:46px;height:46px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;`;
-            btn.onclick = (e) => { e.stopPropagation(); setImg(idx + (side === 'left' ? -1 : 1)); };
-            return btn;
+    const close=document.createElement('button');
+    close.innerHTML='&times;';
+    close.style.cssText='position:absolute;top:14px;right:14px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:22px;width:44px;height:44px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;';
+    close.onclick=()=>{document.body.removeChild(ov);document.removeEventListener('keydown',onKey);};
+    ov.addEventListener('click',e=>{if(e.target===ov)close.onclick();});
+    let _sx=0,_sy=0;
+    ov.addEventListener('touchstart',e=>{_sx=e.touches[0].clientX;_sy=e.touches[0].clientY;},{passive:true});
+    ov.addEventListener('touchend',e=>{
+        const dx=e.changedTouches[0].clientX-_sx,dy=e.changedTouches[0].clientY-_sy;
+        if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)) set(idx+(dx<0?1:-1));
+    },{passive:true});
+    if(_photos.length>1){
+        const mk=(s,d)=>{
+            const b=document.createElement('button');
+            b.textContent=d<0?'‹':'›';
+            b.style.cssText=`position:absolute;top:50%;transform:translateY(-50%);${s}:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:28px;width:46px;height:46px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;`;
+            b.onclick=e=>{e.stopPropagation();set(idx+d);};
+            return b;
         };
-        overlay.appendChild(mkArrow('left', '‹'));
-        overlay.appendChild(mkArrow('right', '›'));
+        ov.appendChild(mk('left',-1));
+        ov.appendChild(mk('right',1));
     }
-
-    overlay.appendChild(img);
-    overlay.appendChild(ctr);
-    overlay.appendChild(close);
-    document.body.appendChild(overlay);
-    setImg(idx);
-
-    const onKey = (e) => {
-        if (e.key === 'Escape') close.onclick();
-        if (e.key === 'ArrowLeft')  setImg(idx - 1);
-        if (e.key === 'ArrowRight') setImg(idx + 1);
+    ov.appendChild(img);ov.appendChild(ctr);ov.appendChild(close);
+    document.body.appendChild(ov);set(idx);
+    const onKey=e=>{
+        if(e.key==='Escape')close.onclick();
+        if(e.key==='ArrowLeft')set(idx-1);
+        if(e.key==='ArrowRight')set(idx+1);
     };
-    document.addEventListener('keydown', onKey);
+    document.addEventListener('keydown',onKey);
 }
 
-function goBack() {
-    if (window.history.length > 1) window.history.back();
-    else window.location.href = '/client/dashboard';
+function goBack(){
+    if(window.history.length>1) window.history.back();
+    else window.location.href='{{ route("client.products.index") }}';
 }
 </script>

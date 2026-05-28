@@ -281,14 +281,11 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:#0f
 
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
 <script>
-// ──────────────────────────────────────────────────────────────────
-// Données initiales depuis Blade
-// ──────────────────────────────────────────────────────────────────
-const ORDER_ID     = {{ $order->id }};
-const DATA_URL     = '{{ route('suivi.data', $order) }}';
-const POS_URL      = '{{ route('orders.position.update', $order) }}';
-const STATUS_URL   = '{{ route('orders.driver.status', $order) }}';
-const CSRF         = '{{ csrf_token() }}';
+const ORDER_ID   = {{ $order->id }};
+const DATA_URL   = '{{ route('suivi.data', $order) }}';
+const POS_URL    = '{{ route('orders.position.update', $order) }}';
+const STATUS_URL = '{{ route('orders.driver.status', $order) }}';
+const CSRF       = '{{ csrf_token() }}';
 const SHOP_NAME    = @json($shopName);
 const SHOP_ADDRESS = @json($shopAddress);
 const DESTINATION  = @json($destination);
@@ -296,74 +293,160 @@ const DESTINATION  = @json($destination);
 let currentPhase = {{ $initialPhase }};
 let driverLat = null, driverLng = null;
 let destLat   = null, destLng   = null;
-let gpsWatcher = null;
+let gpsWatcher    = null;
+let mapInitialized = false;
 
-// Données initiales du vendeur / client
-const VENDOR = {
-    lat: @json($order->vendor_lat),
-    lng: @json($order->vendor_lng),
-};
-const CLIENT = {
-    lat: @json($order->client_lat),
-    lng: @json($order->client_lng),
-};
+const VENDOR = { lat: @json($order->vendor_lat), lng: @json($order->vendor_lng) };
+const CLIENT = { lat: @json($order->client_lat), lng: @json($order->client_lng) };
 
-// ──────────────────────────────────────────────────────────────────
-// Carte Leaflet
-// ──────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// CARTE
+// ─────────────────────────────────────────────
 const map = L.map('navMap', { zoomControl: true, attributionControl: false });
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19, subdomains: 'abc'
-}).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, subdomains: 'abc' }).addTo(map);
 
-// Icônes personnalisées
-function makeIcon(emoji, color) {
+function makeIcon(emoji, color, size = 42) {
     return L.divIcon({
         className: '',
-        html: `<div style="width:36px;height:36px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 3px 14px rgba(0,0,0,.5);border:2px solid rgba(255,255,255,.3)">${emoji}</div>`,
-        iconSize: [36, 36], iconAnchor: [18, 18],
+        html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*.46)}px;box-shadow:0 4px 18px rgba(0,0,0,.55);border:3px solid rgba(255,255,255,.95)">${emoji}</div>`,
+        iconSize: [size, size], iconAnchor: [size/2, size/2],
     });
 }
-const driverIcon = makeIcon('🛵', '#4f46e5');
-const vendorIcon = makeIcon('🏪', '#d97706');
-const clientIcon = makeIcon('📍', '#059669');
+const driverIcon = makeIcon('🛵', '#4f46e5', 46);
+const vendorIcon = makeIcon('🏪', '#d97706', 40);
+const clientIcon = makeIcon('📍', '#059669', 40);
 
-let driverMarker   = null;
-let destMarker     = null;
-let routeLine      = null;
-let routeShadow    = null;
-let mapInitialized = false; // true après le premier fitBounds
+let driverMarker = null, destMarker = null;
+let routeShadow  = null, routeLine  = null;
 
-// ──────────────────────────────────────────────────────────────────
-// Dessiner le trajet
-// ──────────────────────────────────────────────────────────────────
-function drawRoute(fromLat, fromLng, toLat, toLng) {
-    if (routeShadow) map.removeLayer(routeShadow);
-    if (routeLine)   map.removeLayer(routeLine);
-    if (!toLat || !toLng) return;
+// ─────────────────────────────────────────────
+// ANIMATION DOUCE DU MARQUEUR (effet Google Maps)
+// ─────────────────────────────────────────────
+let _aniFrom = null, _aniTo = null, _aniStart = null, _aniRAF = null;
 
-    const pts = [[fromLat, fromLng], [toLat, toLng]];
-    routeShadow = L.polyline(pts, { color: 'rgba(0,0,0,.25)', weight: 6 }).addTo(map);
-    routeLine   = L.polyline(pts, {
-        color: currentPhase === 1 ? '#f59e0b' : '#10b981',
-        weight: 4, dashArray: '10 6', lineCap: 'round'
-    }).addTo(map);
+function animateDriverTo(toLat, toLng) {
+    if (!driverMarker) return;
+    const cur = driverMarker.getLatLng();
+    // Si le livreur n'a pas bougé → pas d'animation
+    if (Math.abs(cur.lat - toLat) < 1e-7 && Math.abs(cur.lng - toLng) < 1e-7) return;
+    _aniFrom  = [cur.lat, cur.lng];
+    _aniTo    = [toLat, toLng];
+    _aniStart = null;
+    if (_aniRAF) cancelAnimationFrame(_aniRAF);
 
-    if (!mapInitialized) {
-        // Premier fix GPS : cadrer pour voir driver + destination
-        map.fitBounds(L.latLngBounds(pts), { padding: [60, 60], maxZoom: 16 });
-        mapInitialized = true;
-    } else {
-        // Ensuite : suivre le livreur en douceur sans changer le zoom
-        map.panTo([fromLat, fromLng], { animate: true, duration: 0.5 });
+    function step(ts) {
+        if (!_aniStart) _aniStart = ts;
+        const raw  = Math.min(1, (ts - _aniStart) / 700);       // 700 ms
+        const ease = raw < .5 ? 2*raw*raw : -1+(4-2*raw)*raw;   // easeInOut
+        driverMarker.setLatLng([
+            _aniFrom[0] + (_aniTo[0] - _aniFrom[0]) * ease,
+            _aniFrom[1] + (_aniTo[1] - _aniFrom[1]) * ease,
+        ]);
+        if (raw < 1) _aniRAF = requestAnimationFrame(step);
+        else _aniRAF = null;
     }
+    _aniRAF = requestAnimationFrame(step);
 }
 
-// ──────────────────────────────────────────────────────────────────
-// Mettre à jour la destination selon la phase
-// ──────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// ROUTAGE OSRM — vraies routes
+// ─────────────────────────────────────────────
+let routePoints    = [];   // Tous les waypoints calculés par OSRM
+let routeRemaining = [];   // Waypoints non encore dépassés (portion restante)
+let lastDestKey    = '';   // Clé "lat,lng" de la dernière destination → détecte un changement
+let isFetchingRoute = false;
+let offRouteStreak  = 0;   // Positions consécutives hors-route
+
+async function fetchOSRMRoute(fLat, fLng, tLat, tLng) {
+    try {
+        const url = `https://router.project-osrm.org/route/v1/driving/`
+                  + `${fLng},${fLat};${tLng},${tLat}`
+                  + `?overview=full&geometries=geojson`;
+        const r = await fetch(url);
+        const d = await r.json();
+        if (d.code === 'Ok' && d.routes?.[0]) {
+            // OSRM renvoie [lng, lat] → on inverse en [lat, lng] pour Leaflet
+            return d.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+        }
+    } catch(e) { /* réseau indisponible */ }
+    // Fallback ligne droite si OSRM échoue
+    return [[fLat, fLng], [tLat, tLng]];
+}
+
+function redrawRemaining() {
+    if (routeShadow) { map.removeLayer(routeShadow); routeShadow = null; }
+    if (routeLine)   { map.removeLayer(routeLine);   routeLine   = null; }
+    if (routeRemaining.length < 2) return;
+
+    routeShadow = L.polyline(routeRemaining, {
+        color: 'rgba(0,0,0,.28)', weight: 10, lineCap: 'round', lineJoin: 'round'
+    }).addTo(map);
+    routeLine = L.polyline(routeRemaining, {
+        color:     currentPhase === 1 ? '#f59e0b' : '#10b981',
+        weight:    6, lineCap: 'round', lineJoin: 'round', opacity: .97,
+    }).addTo(map);
+    // Remettre les marqueurs au dessus de la ligne
+    if (destMarker)   destMarker.bringToFront();
+    if (driverMarker) driverMarker.bringToFront();
+}
+
+// Trouver l'indice du waypoint le plus proche de la position actuelle
+function closestIdx(lat, lng, pts) {
+    let minD = Infinity, minI = 0;
+    for (let i = 0; i < pts.length; i++) {
+        const d = (pts[i][0]-lat)**2 + (pts[i][1]-lng)**2;
+        if (d < minD) { minD = d; minI = i; }
+    }
+    return minI;
+}
+
+// Distance minimale entre (lat,lng) et tous les points du trajet
+function distToRoute(lat, lng, pts) {
+    if (!pts.length) return Infinity;
+    let minD = Infinity;
+    for (const [pLat, pLng] of pts) {
+        const d = Math.sqrt((pLat-lat)**2 + (pLng-lng)**2);
+        if (d < minD) minD = d;
+    }
+    return minD;
+}
+
+// Consommer la portion déjà parcourue → effet GTA 5
+function consumeRoute(lat, lng) {
+    if (routeRemaining.length < 2) return;
+    const idx = closestIdx(lat, lng, routeRemaining);
+    if (idx > 0) routeRemaining = routeRemaining.slice(idx);
+    // Le premier point devient la position exacte du livreur
+    routeRemaining[0] = [lat, lng];
+    redrawRemaining();
+}
+
+// Calculer un nouveau trajet OSRM
+async function planRoute(fLat, fLng, tLat, tLng) {
+    if (isFetchingRoute) return;
+    isFetchingRoute = true;
+    const pts = await fetchOSRMRoute(fLat, fLng, tLat, tLng);
+    routePoints    = pts;
+    routeRemaining = [...pts];
+    lastDestKey    = `${tLat},${tLng}`;
+    offRouteStreak = 0;
+    redrawRemaining();
+
+    if (!mapInitialized && pts.length > 1) {
+        map.fitBounds(L.latLngBounds(pts), { padding: [70, 70], maxZoom: 16 });
+        mapInitialized = true;
+    }
+    isFetchingRoute = false;
+}
+
+// ─────────────────────────────────────────────
+// PHASE — mise à jour UI + destination
+// ─────────────────────────────────────────────
 function applyPhase(phase) {
-    if (phase !== currentPhase) mapInitialized = false; // recadrer sur la nouvelle destination
+    if (phase !== currentPhase) {
+        mapInitialized = false;
+        routePoints = []; routeRemaining = []; lastDestKey = '';
+    }
     currentPhase = phase;
 
     const badge = document.getElementById('phaseBadge');
@@ -373,93 +456,156 @@ function applyPhase(phase) {
     const val   = document.getElementById('destVal');
 
     if (phase === 1) {
-        badge.className = 'phase-badge phase-1';
+        badge.className  = 'phase-badge phase-1';
         label.textContent = 'Phase 1 · Ramassage';
-        ico.className = 'info-dest-ico ico-vendor';
-        ico.textContent = '🏪';
-        lbl.textContent = 'Destination · Ramassage';
-        val.textContent = SHOP_NAME;
+        ico.className    = 'info-dest-ico ico-vendor'; ico.textContent = '🏪';
+        lbl.textContent  = 'Destination · Ramassage';
+        val.textContent  = SHOP_NAME;
         destLat = VENDOR.lat; destLng = VENDOR.lng;
         if (destMarker) { map.removeLayer(destMarker); destMarker = null; }
         if (VENDOR.lat && VENDOR.lng) {
             destMarker = L.marker([VENDOR.lat, VENDOR.lng], { icon: vendorIcon })
-                .bindPopup(`<b>🏪 ${SHOP_NAME}</b><br>Point de ramassage`)
-                .addTo(map);
-            // Centrer la carte sur le vendeur en attendant le GPS du livreur
+                .bindPopup(`<b>🏪 ${SHOP_NAME}</b><br>Point de ramassage`).addTo(map);
             if (!driverLat) map.setView([VENDOR.lat, VENDOR.lng], 15);
         }
-        // Afficher/cacher le banner "vendeur n'a pas partagé"
         const banner = document.getElementById('noVendorBanner');
         if (banner) banner.style.display = (VENDOR.lat && VENDOR.lng) ? 'none' : 'flex';
     } else {
-        badge.className = 'phase-badge phase-2';
+        badge.className  = 'phase-badge phase-2';
         label.textContent = 'Phase 2 · Livraison';
-        ico.className = 'info-dest-ico ico-client';
-        ico.textContent = '📍';
-        lbl.textContent = 'Destination · Livraison';
-        val.textContent = DESTINATION;
+        ico.className    = 'info-dest-ico ico-client'; ico.textContent = '📍';
+        lbl.textContent  = 'Destination · Livraison';
+        val.textContent  = DESTINATION;
         destLat = CLIENT.lat; destLng = CLIENT.lng;
         if (destMarker) { map.removeLayer(destMarker); destMarker = null; }
         if (CLIENT.lat && CLIENT.lng) {
             destMarker = L.marker([CLIENT.lat, CLIENT.lng], { icon: clientIcon })
-                .bindPopup(`<b>📍 Client</b><br>${DESTINATION}`)
-                .addTo(map);
-            // Centrer sur le client en attendant le GPS du livreur
+                .bindPopup(`<b>📍 Client</b><br>${DESTINATION}`).addTo(map);
             if (!driverLat) map.setView([CLIENT.lat, CLIENT.lng], 15);
         }
     }
 
-    // Basculer boutons d'action
-    const btnStart = document.getElementById('btnStart');
-    const btnDone  = document.getElementById('btnDone');
-    if (btnStart) btnStart.style.display = phase === 1 ? '' : 'none';
-    if (btnDone)  btnDone.style.display  = phase === 2 ? '' : 'none';
+    document.getElementById('btnStart').style.display = phase === 1 ? '' : 'none';
+    document.getElementById('btnDone').style.display  = phase === 2 ? '' : 'none';
 
-    if (driverLat && destLat) drawRoute(driverLat, driverLng, destLat, destLng);
+    if (driverLat && destLat) planRoute(driverLat, driverLng, destLat, destLng);
 }
 
-// ──────────────────────────────────────────────────────────────────
-// Changement de statut
-// ──────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// GPS DU LIVREUR
+// ─────────────────────────────────────────────
+function startTracking() {
+    if (!navigator.geolocation) {
+        document.getElementById('gpsLoading').style.display = 'none';
+        map.setView([9.641, -13.578], 13);
+        applyPhase(currentPhase);
+        return;
+    }
+
+    gpsWatcher = navigator.geolocation.watchPosition(
+        async pos => {
+            document.getElementById('gpsLoading').style.display = 'none';
+            const newLat = pos.coords.latitude;
+            const newLng = pos.coords.longitude;
+
+            // ── Créer ou animer le marqueur ──
+            if (!driverMarker) {
+                driverMarker = L.marker([newLat, newLng], { icon: driverIcon })
+                    .bindPopup('🛵 Ma position').addTo(map);
+            } else {
+                animateDriverTo(newLat, newLng);
+            }
+            driverLat = newLat; driverLng = newLng;
+
+            // ── Carte suit IMMÉDIATEMENT le livreur (avant tout calcul OSRM) ──
+            map.panTo([newLat, newLng], { animate: true, duration: 0.4 });
+
+            // ── Envoyer position au serveur ──
+            fetch(POS_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
+                body: JSON.stringify({ lat: newLat, lng: newLng }),
+            }).catch(() => {});
+
+            if (!destLat) return;
+
+            const destKey = `${destLat},${destLng}`;
+
+            if (destKey !== lastDestKey || routePoints.length === 0) {
+                // Nouvelle destination → nouveau trajet OSRM
+                await planRoute(newLat, newLng, destLat, destLng);
+            } else {
+                const dist = distToRoute(newLat, newLng, routeRemaining);
+                if (dist > 0.004) {          // hors-route à ~400 m
+                    offRouteStreak++;
+                    if (offRouteStreak >= 2) planRoute(newLat, newLng, destLat, destLng);
+                } else {
+                    offRouteStreak = 0;
+                    consumeRoute(newLat, newLng);  // ← EFFET GTA 5 : mange la route
+                }
+            }
+        },
+        () => {
+            document.getElementById('gpsLoading').style.display = 'none';
+            map.setView([9.641, -13.578], 13);
+        },
+        { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 }
+    );
+}
+
+// ─────────────────────────────────────────────
+// POLLING (statut + positions)
+// ─────────────────────────────────────────────
+function pollOrderData() {
+    fetch(DATA_URL).then(r => r.json()).then(data => {
+        const prevVLat = VENDOR.lat, prevCLat = CLIENT.lat, prevCLng = CLIENT.lng;
+        if (data.vendor_lat && data.vendor_lng) { VENDOR.lat = data.vendor_lat; VENDOR.lng = data.vendor_lng; }
+        if (data.client_lat && data.client_lng) { CLIENT.lat = data.client_lat; CLIENT.lng = data.client_lng; }
+
+        const newPhase = data.status === 'en_livraison' ? 2 : 1;
+        if (newPhase !== currentPhase) {
+            applyPhase(newPhase);
+        } else if (currentPhase === 1 && VENDOR.lat && !prevVLat) {
+            mapInitialized = false; applyPhase(1);
+            const b = document.getElementById('vendorStatusBadge');
+            if (b) b.style.display = 'none';
+        } else if (currentPhase === 2 && CLIENT.lat) {
+            if (!prevCLat) {
+                applyPhase(2);
+            } else if (CLIENT.lat !== prevCLat || CLIENT.lng !== prevCLng) {
+                destLat = CLIENT.lat; destLng = CLIENT.lng;
+                if (destMarker) destMarker.setLatLng([CLIENT.lat, CLIENT.lng]);
+                if (driverLat)  planRoute(driverLat, driverLng, CLIENT.lat, CLIENT.lng);
+            }
+        }
+    }).catch(() => {});
+}
+
+// ─────────────────────────────────────────────
+// ACTIONS STATUT
+// ─────────────────────────────────────────────
 async function postStatus(status) {
     const r = await fetch(STATUS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
         body: JSON.stringify({ status }),
     });
-    if (!r.ok) {
-        const d = await r.json().catch(() => ({}));
-        throw new Error(d.message || 'Erreur serveur.');
-    }
+    if (!r.ok) { const d = await r.json().catch(()=>({})); throw new Error(d.message || 'Erreur serveur.'); }
     return true;
 }
 
-function startDelivery() {
-    document.getElementById('pickupOverlay').classList.add('open');
-}
-
-function closePickupModal() {
-    document.getElementById('pickupOverlay').classList.remove('open');
-}
+function startDelivery()  { document.getElementById('pickupOverlay').classList.add('open'); }
+function closePickupModal(){ document.getElementById('pickupOverlay').classList.remove('open'); }
 
 async function confirmPickup() {
     const btn = document.getElementById('btnPickupConfirm');
     btn.disabled = true; btn.textContent = 'En cours…';
-    try {
-        await postStatus('en_livraison');
-        closePickupModal();
-        applyPhase(2);
-    } catch(e) {
-        alert(e.message);
-        btn.disabled = false; btn.textContent = '✅ Oui, commencer la livraison';
-    }
+    try   { await postStatus('en_livraison'); closePickupModal(); applyPhase(2); }
+    catch(e) { alert(e.message); btn.disabled = false; btn.textContent = '✅ Oui, commencer la livraison'; }
 }
 
 const ORDERS_URL = '{{ route('livreur.orders.index') }}';
-
-function goToOrders() {
-    window.location.href = ORDERS_URL;
-}
+function goToOrders() { window.location.href = ORDERS_URL; }
 
 async function markDelivered() {
     if (!confirm('Confirmer la livraison de cette commande ?')) return;
@@ -468,135 +614,31 @@ async function markDelivered() {
     try {
         await postStatus('livrée');
         if (gpsWatcher) navigator.geolocation.clearWatch(gpsWatcher);
+        if (_aniRAF)    cancelAnimationFrame(_aniRAF);
         document.getElementById('navDoneScreen').style.display = 'flex';
-        // Compte à rebours auto-redirect 3s
         let t = 3;
         const cd = document.getElementById('navDoneCountdown');
         cd.textContent = `Redirection dans ${t}s…`;
-        const iv = setInterval(() => {
-            t--;
-            if (t <= 0) { clearInterval(iv); goToOrders(); return; }
-            cd.textContent = `Redirection dans ${t}s…`;
-        }, 1000);
-    } catch(e) {
-        alert(e.message);
-        btn.disabled = false; btn.style.opacity = '';
-    }
+        const iv = setInterval(() => { t--; if (t<=0){clearInterval(iv);goToOrders();return;} cd.textContent=`Redirection dans ${t}s…`; }, 1000);
+    } catch(e) { alert(e.message); btn.disabled=false; btn.style.opacity=''; }
 }
 
-// ──────────────────────────────────────────────────────────────────
-// GPS du livreur (navigateur)
-// ──────────────────────────────────────────────────────────────────
-function startTracking() {
-    if (!navigator.geolocation) {
-        document.getElementById('gpsLoading').style.display = 'none';
-        map.setView([9.641, -13.578], 13);
-        applyPhase(currentPhase);
-        return;
-    }
-    gpsWatcher = navigator.geolocation.watchPosition(
-        pos => {
-            document.getElementById('gpsLoading').style.display = 'none';
-            driverLat = pos.coords.latitude;
-            driverLng = pos.coords.longitude;
-
-            // Mise à jour marqueur driver
-            if (!driverMarker) {
-                driverMarker = L.marker([driverLat, driverLng], { icon: driverIcon })
-                    .bindPopup('📍 Ma position')
-                    .addTo(map);
-            } else {
-                driverMarker.setLatLng([driverLat, driverLng]);
-            }
-
-            // Envoyer position au serveur
-            fetch(POS_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
-                body: JSON.stringify({ lat: driverLat, lng: driverLng }),
-            }).catch(() => {});
-
-            if (destLat) drawRoute(driverLat, driverLng, destLat, destLng);
-            else map.setView([driverLat, driverLng], 15);
-        },
-        () => {
-            document.getElementById('gpsLoading').style.display = 'none';
-            map.setView([9.641, -13.578], 13);
-        },
-        { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
-    );
-}
-
-// ──────────────────────────────────────────────────────────────────
-// Polling : vérifier si le statut a changé (phase switch auto)
-// et récupérer les nouvelles positions vendeur/client
-// ──────────────────────────────────────────────────────────────────
-function pollOrderData() {
-    fetch(DATA_URL)
-        .then(r => r.json())
-        .then(data => {
-            const prevVendorLat = VENDOR.lat;
-            const prevClientLat = CLIENT.lat;
-            const prevClientLng = CLIENT.lng;
-
-            if (data.vendor_lat && data.vendor_lng) {
-                VENDOR.lat = data.vendor_lat;
-                VENDOR.lng = data.vendor_lng;
-            }
-            if (data.client_lat && data.client_lng) {
-                CLIENT.lat = data.client_lat;
-                CLIENT.lng = data.client_lng;
-            }
-
-            const newPhase = data.status === 'en_livraison' ? 2 : 1;
-            if (newPhase !== currentPhase) {
-                applyPhase(newPhase);
-            } else if (currentPhase === 1 && VENDOR.lat && !prevVendorLat) {
-                mapInitialized = false; // recadrer pour voir driver + boutique ensemble
-                applyPhase(1);
-                const badge = document.getElementById('vendorStatusBadge');
-                if (badge) badge.style.display = 'none';
-            } else if (currentPhase === 2 && CLIENT.lat) {
-                if (!prevClientLat) {
-                    // Client vient de partager pour la première fois → recréer marqueur + route
-                    applyPhase(2);
-                } else if (CLIENT.lat !== prevClientLat || CLIENT.lng !== prevClientLng) {
-                    // Client a bougé → déplacer le marqueur + mettre à jour destLat/destLng
-                    destLat = CLIENT.lat; destLng = CLIENT.lng;
-                    if (destMarker) destMarker.setLatLng([CLIENT.lat, CLIENT.lng]);
-                    if (driverLat) drawRoute(driverLat, driverLng, CLIENT.lat, CLIENT.lng);
-                }
-            }
-        })
-        .catch(() => {});
-}
-
-// ──────────────────────────────────────────────────────────────────
-// Google Maps fallback
-// ──────────────────────────────────────────────────────────────────
 function openGoogleMaps() {
     const origin = driverLat ? `${driverLat},${driverLng}` : '';
     let dest;
-    if (destLat && destLng) {
-        dest = `${destLat},${destLng}`;
-    } else if (currentPhase === 1 && SHOP_ADDRESS) {
-        dest = encodeURIComponent(SHOP_ADDRESS);
-    } else if (currentPhase === 2 && DESTINATION) {
-        // Client n'a pas partagé sa position GPS → utiliser l'adresse texte
-        dest = encodeURIComponent(DESTINATION);
-    } else {
-        alert('Destination non disponible.');
-        return;
-    }
+    if      (destLat && destLng)              dest = `${destLat},${destLng}`;
+    else if (currentPhase===1 && SHOP_ADDRESS) dest = encodeURIComponent(SHOP_ADDRESS);
+    else if (currentPhase===2 && DESTINATION)  dest = encodeURIComponent(DESTINATION);
+    else { alert('Destination non disponible.'); return; }
     window.open(`https://www.google.com/maps/dir/${origin}/${dest}`, '_blank');
 }
 
-// ──────────────────────────────────────────────────────────────────
-// Init
-// ──────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
 applyPhase(currentPhase);
 startTracking();
-setInterval(pollOrderData, 5000); // Vérifier toutes les 5s
+setInterval(pollOrderData, 5000);
 </script>
 </body>
 </html>

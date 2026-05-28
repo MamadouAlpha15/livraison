@@ -10,7 +10,6 @@
 @extends('layouts.app')
 @section('title', $shop->name . ' — Produits')
 @php $bodyClass = 'is-dashboard'; @endphp
-<p>sssd</p>
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -774,7 +773,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                  data-featured="{{ $product->is_featured ? '1' : '0' }}"
                  data-stock="{{ $stockOut ? 'out' : 'in' }}">
 
-                <div class="amz-card-img" onclick="goToProduct('{{ route('client.orders.createFromProduct', $product) }}')">
+                <div class="amz-card-img" onclick="goToProduct('{{ route('client.products.show', $product) }}')">
                     @if($product->image)
                         <img src="{{ \App\Services\ImageOptimizer::url($product->image, 'thumb') ?? asset('storage/'.$product->image) }}"
                              srcset="{{ \App\Services\ImageOptimizer::url($product->image, 'thumb') }} 300w,
@@ -795,7 +794,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     @if($product->category)
                     <div class="amz-card-cat">{{ $product->category }}</div>
                     @endif
-                    <div class="amz-card-name" onclick="goToProduct('{{ route('client.orders.createFromProduct', $product) }}')">
+                    <div class="amz-card-name" onclick="goToProduct('{{ route('client.products.show', $product) }}')">
                         {{ $product->name }}
                     </div>
                     <div class="amz-stars">
@@ -831,7 +830,13 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                             <a href="{{ route('client.messages.index', $product) }}" class="amz-btn-msg">💬 Poser une question</a>
                         @endif
                     @else
-                        <a href="{{ route('register', ['redirect' => route('client.orders.createFromProduct', $product)]) }}" class="amz-btn-order">S'inscrire pour commander</a>
+                        @php $orderUrl = route('client.orders.createFromProduct', $product); @endphp
+                        <a href="{{ route('register', ['redirect' => $orderUrl]) }}" class="amz-btn-order">
+                            🛒 Commander
+                        </a>
+                        <a href="{{ route('login', ['redirect' => $orderUrl]) }}" class="amz-btn-msg" style="margin-top:6px">
+                            Déjà inscrit ? Se connecter
+                        </a>
                     @endauth
                 </div>
             </div>

@@ -183,7 +183,11 @@ class OrderController extends Controller
                 if ($order->livreur_id !== $user->id && (!$driver || (int)$order->driver_id !== $driver->id)) continue;
                 $order->status = Order::STATUS_LIVREE;
                 $order->save();
-                if ($order->payment) { $order->payment->status = 'payé'; $order->payment->save(); }
+                if ($order->payment) {
+                    $order->payment->update(['status' => 'payé']);
+                } else {
+                    Payment::create(['order_id' => $order->id, 'method' => 'cash', 'amount' => $order->total, 'status' => 'payé']);
+                }
 
                 // Pour un batch : une seule commission pour tout le trajet groupé
                 $batchId = $order->delivery_batch_id;
@@ -346,8 +350,9 @@ class OrderController extends Controller
             $order->save();
 
             if ($order->payment) {
-                $order->payment->status = 'payé';
-                $order->payment->save();
+                $order->payment->update(['status' => 'payé']);
+            } else {
+                Payment::create(['order_id' => $order->id, 'method' => 'cash', 'amount' => $order->total, 'status' => 'payé']);
             }
 
             // Créer une commission si elle n'existe pas encore.

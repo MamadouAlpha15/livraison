@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\Payment;
 use App\Models\Shop;
 use Illuminate\Http\Request;
 
@@ -70,6 +71,15 @@ class OrderController extends Controller
         ]);
 
         $order->update(['status' => $request->status]);
+
+        if ($request->status === 'livrée') {
+            $order->load('payment');
+            if ($order->payment) {
+                $order->payment->update(['status' => 'payé']);
+            } else {
+                Payment::create(['order_id' => $order->id, 'method' => 'cash', 'amount' => $order->total, 'status' => 'payé']);
+            }
+        }
 
         return back()->with('success', "Statut de la commande #{$order->id} mis à jour.");
     }

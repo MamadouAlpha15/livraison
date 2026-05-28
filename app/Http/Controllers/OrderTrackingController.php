@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\CourierCommission;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 
 class OrderTrackingController extends Controller
@@ -195,6 +196,21 @@ class OrderTrackingController extends Controller
 
                 // Une seule commission pour tout le batch
                 if ($batchId) break;
+            }
+        }
+
+        // Mettre les paiements à "payé" pour toutes les commandes livrées du trajet
+        if ($data['status'] === Order::STATUS_LIVREE) {
+            $allOrders = $batchId
+                ? Order::where('delivery_batch_id', $batchId)->with('payment')->get()
+                : collect([$order->load('payment')]);
+
+            foreach ($allOrders as $o) {
+                if ($o->payment) {
+                    $o->payment->update(['status' => 'payé']);
+                } else {
+                    Payment::create(['order_id' => $o->id, 'method' => 'cash', 'amount' => $o->total, 'status' => 'payé']);
+                }
             }
         }
 

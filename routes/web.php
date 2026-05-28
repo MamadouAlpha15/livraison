@@ -769,8 +769,8 @@ Route::middleware(['auth', 'role:client'])
         /* Voir les produits d'une boutique */
         Route::get('shops/{shop}', [\App\Http\Controllers\Client\ShopController::class, 'show'])->name('shops.show');
 
-        Route::get('/produit/{product}', [ClientProductController::class, 'show'])
-    ->name('products.show');
+        Route::get('/produits',           [ClientProductController::class, 'index'])->name('products.index');
+        Route::get('/produit/{product}',  [ClientProductController::class, 'show']) ->name('products.show');
 
         /* Favoris */
         Route::post('/favorites/{shop}/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');

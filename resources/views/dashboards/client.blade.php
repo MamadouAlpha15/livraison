@@ -2365,6 +2365,16 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
                 </span>
             </span>
         </div>
+        <div class="hero-btns" style="display:flex;gap:12px;margin-top:22px;flex-wrap:wrap">
+            <a href="{{ route('client.products.index') }}"
+               style="display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:14px;background:linear-gradient(135deg,#ff6a00,#ee0979);color:#fff;font-size:14px;font-weight:700;text-decoration:none;box-shadow:0 4px 16px rgba(238,9,121,.35);transition:.2s">
+                {!! $si('tag',16) !!} Voir tous les produits
+            </a>
+            <a href="#boutiques"
+               style="display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:14px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);color:#fff;font-size:14px;font-weight:700;text-decoration:none;backdrop-filter:blur(8px);transition:.2s">
+                {!! $si('store',16) !!} Explorer les boutiques
+            </a>
+        </div>
     </div>
 </div>
 

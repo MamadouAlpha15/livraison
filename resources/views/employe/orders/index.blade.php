@@ -620,6 +620,10 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
         !in_array($o->status, ['livrée', 'annulée'])
     );
     $vposOrder = $ordersNeedingVendorPos->first();
+    $vposCount = $ordersNeedingVendorPos->count();
+    $vposIds   = $ordersNeedingVendorPos->pluck('id')->map(fn($id) => '#'.str_pad($id,5,'0',STR_PAD_LEFT))->implode(', ');
+    // Noms distincts des entreprises concernées
+    $vposCompanies = $ordersNeedingVendorPos->pluck('deliveryCompany.name')->filter()->unique()->implode(', ');
 @endphp
 
 {{-- ══ MODAL PARTAGE POSITION VENDEUR ══ --}}
@@ -629,14 +633,29 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
         <div class="vpos-icon-wrap vpos-pulse">
             <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
         </div>
-        <div class="vpos-order-badge">Commande #{{ $vposOrder->id }}</div>
+        @if($vposCount > 1)
+            <div class="vpos-order-badge">{{ $vposCount }} commandes · {{ $vposIds }}</div>
+        @else
+            <div class="vpos-order-badge">Commande {{ $vposIds }}</div>
+        @endif
         <div class="vpos-title">Guider le livreur jusqu'à vous</div>
-        <div class="vpos-desc">Un livreur de <strong>{{ $vposOrder->deliveryCompany->name ?? 'l\'entreprise' }}</strong> prend en charge cette commande. Partagez votre position pour qu'il trouve votre boutique facilement.</div>
+        <div class="vpos-desc">
+            @if($vposCount > 1)
+                <strong>{{ $vposCount }} commandes</strong> sont en attente de votre position.
+                Un seul partage couvre toutes les commandes en cours.
+            @else
+                Un livreur de <strong>{{ $vposCompanies ?: 'l\'entreprise' }}</strong> prend en charge cette commande.
+            @endif
+            Partagez votre position pour que le livreur trouve votre boutique facilement.
+        </div>
 
         <div id="vposMain">
             <button class="btn-vpos-share" id="btnVposShare" onclick="shareVendorPosition({{ $vposOrder->id }}, '{{ route('employe.orders.vendor-location', $vposOrder) }}')">
                 <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
                 Partager ma position
+                @if($vposCount > 1)
+                    <span style="font-size:11px;opacity:.8;font-weight:600;">({{ $vposCount }} commandes)</span>
+                @endif
             </button>
             <button class="btn-vpos-later" onclick="closeVposModal()">Plus tard</button>
             <div class="vpos-error" id="vposError"></div>
@@ -644,7 +663,14 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 
         <div class="vpos-success" id="vposSuccess">
             <div class="vpos-success-ico">📍</div>
-            <div class="vpos-success-msg">Position partagée ! Le livreur peut vous trouver.</div>
+            <div class="vpos-success-msg">
+                Position partagée !
+                @if($vposCount > 1)
+                    {{ $vposCount }} commandes couvertes.
+                @else
+                    Le livreur peut vous trouver.
+                @endif
+            </div>
         </div>
     </div>
 </div>

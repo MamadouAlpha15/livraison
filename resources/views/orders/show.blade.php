@@ -1031,9 +1031,21 @@ $init = fn(string $n): string =>
                     trailShadow.addLatLng([nLat, nLng]);
                     if (delta > 0.0004) map.panTo([nLat, nLng], { animate:true, duration:.9 });
                     lat = nLat; lng = nLng;
-                    /* Mettre à jour la route OSRM si le client partage sa position */
-                    if (typeof scheduleRouteUpdate === 'function' && clientLat !== null) {
-                        scheduleRouteUpdate();
+                    /* Route livreur → client : consommation GTA 5 ou recalcul si hors-route */
+                    if (clientLat !== null) {
+                        const destKey = `${clientLat},${clientLng}`;
+                        if (destKey !== routeDestKey || routeRemaining.length === 0) {
+                            scheduleRouteUpdate();
+                        } else {
+                            const rdist = distToRoutePoints(nLat, nLng, routeRemaining);
+                            if (rdist > 0.004) {
+                                routeOffStreak++;
+                                if (routeOffStreak >= 2) scheduleRouteUpdate();
+                            } else {
+                                routeOffStreak = 0;
+                                consumeOSRMRoute(nLat, nLng);
+                            }
+                        }
                     }
                 }
             }
@@ -1101,7 +1113,12 @@ $init = fn(string $n): string =>
     let watchId      = null;
     let lastSentTs   = 0;
     let shareActive  = false;
-    let routeTimer   = null;
+    let routeTimer    = null;
+    let routePoints   = [];
+    let routeRemaining= [];
+    let routeDestKey  = '';
+    let routeIsFetching = false;
+    let routeOffStreak  = 0;
 
     /* ── Icône position client (bleu) ── */
     function makeClientIcon() {
@@ -1142,24 +1159,68 @@ $init = fn(string $n): string =>
         } catch { return null; }
     }
 
-    async function updateRoute() {
-        if (!gpsFound || clientLat === null) {
+    /* ── Helpers consommation de route ── */
+    function closestRouteIdx(eLat, eLng, pts) {
+        let minD = Infinity, minI = 0;
+        for (let i = 0; i < pts.length; i++) {
+            const d = (pts[i][0]-eLat)**2 + (pts[i][1]-eLng)**2;
+            if (d < minD) { minD = d; minI = i; }
+        }
+        return minI;
+    }
+
+    function distToRoutePoints(eLat, eLng, pts) {
+        let minD = Infinity;
+        for (const [pLat, pLng] of pts) {
+            const d = Math.sqrt((pLat-eLat)**2 + (pLng-eLng)**2);
+            if (d < minD) minD = d;
+        }
+        return minD;
+    }
+
+    function redrawRoute() {
+        if (routeRemaining.length < 2) {
             if (routeLine)   { map.removeLayer(routeLine);   routeLine   = null; }
             if (routeShadow) { map.removeLayer(routeShadow); routeShadow = null; }
             return;
         }
-        const pts = await fetchRoute(lat, lng, clientLat, clientLng);
-        if (!pts) return;
-        if (routeShadow) routeShadow.setLatLngs(pts);
-        else routeShadow = L.polyline(pts, { color:'rgba(0,0,0,.12)', weight:7, lineCap:'round' }).addTo(map);
-        if (routeLine)  routeLine.setLatLngs(pts);
-        else routeLine  = L.polyline(pts, { color:'#3b82f6', weight:3.5, opacity:.82, lineCap:'round', dashArray:'8 5' }).addTo(map);
-        routeShadow.bringToBack();
-        routeLine.bringToBack();
-        /* Remettre le trail au-dessus */
-        trailShadow.bringToFront();
-        trail.bringToFront();
-        marker.bringToFront();
+        if (routeShadow) routeShadow.setLatLngs(routeRemaining);
+        else routeShadow = L.polyline(routeRemaining, { color:'rgba(0,0,0,.12)', weight:7, lineCap:'round', lineJoin:'round' }).addTo(map);
+        if (routeLine)  routeLine.setLatLngs(routeRemaining);
+        else routeLine  = L.polyline(routeRemaining, { color:'#3b82f6', weight:3.5, opacity:.82, lineCap:'round', lineJoin:'round' }).addTo(map);
+        routeShadow.bringToBack(); routeLine.bringToBack();
+        trailShadow.bringToFront(); trail.bringToFront(); marker.bringToFront();
+    }
+
+    /* GTA 5 : mange la route au fur et à mesure que le livreur avance */
+    function consumeOSRMRoute(dLat, dLng) {
+        if (routeRemaining.length < 2) return;
+        const idx = closestRouteIdx(dLat, dLng, routeRemaining);
+        if (idx > 0) routeRemaining = routeRemaining.slice(idx);
+        routeRemaining[0] = [dLat, dLng];
+        redrawRoute();
+    }
+
+    async function planOSRMRoute(dLat, dLng, cLat, cLng) {
+        if (routeIsFetching) return;
+        routeIsFetching = true;
+        const pts = await fetchRoute(dLat, dLng, cLat, cLng);
+        if (pts) {
+            routePoints = pts; routeRemaining = [...pts];
+            routeDestKey = `${cLat},${cLng}`; routeOffStreak = 0;
+            redrawRoute();
+        }
+        routeIsFetching = false;
+    }
+
+    async function updateRoute() {
+        if (!gpsFound || clientLat === null) {
+            if (routeLine)   { map.removeLayer(routeLine);   routeLine   = null; }
+            if (routeShadow) { map.removeLayer(routeShadow); routeShadow = null; }
+            routePoints = []; routeRemaining = []; routeDestKey = '';
+            return;
+        }
+        await planOSRMRoute(lat, lng, clientLat, clientLng);
     }
 
     function scheduleRouteUpdate() {
@@ -1268,10 +1329,13 @@ $init = fn(string $n): string =>
     /* ── Arrêt partage ── */
     function stopSharing(clearMarker = true) {
         if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+        clearTimeout(routeTimer); routeTimer = null;
         setShareUI(false);
         if (clearMarker && clientMarker) { map.removeLayer(clientMarker); clientMarker = null; }
+        if (clearMarker) { clientLat = null; clientLng = null; }
         if (routeLine)   { map.removeLayer(routeLine);   routeLine   = null; }
         if (routeShadow) { map.removeLayer(routeShadow); routeShadow = null; }
+        routePoints = []; routeRemaining = []; routeDestKey = '';
     }
 
     if (shareBtn && !IS_DELIVERED && !IS_CANCELLED) {

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\DeliveryCompany;
 use App\Models\Driver;
 use App\Models\Order;
+use App\Models\Payment;
 use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
 
@@ -589,6 +590,15 @@ class OrderController extends Controller
 
         $driverId = $order->driver_id;
         $order->update(['status' => $data['status']]);
+
+        if ($data['status'] === Order::STATUS_LIVREE) {
+            $order->load('payment');
+            if ($order->payment) {
+                $order->payment->update(['status' => 'payé']);
+            } else {
+                Payment::create(['order_id' => $order->id, 'method' => 'cash', 'amount' => $order->total, 'status' => 'payé']);
+            }
+        }
 
         if ($driverId) {
             $driver = Driver::find($driverId);

@@ -39,11 +39,23 @@ class PublicShopController extends Controller
         return view('shops.index', compact('shops', 'totalShops', 'types', 'type', 'q'));
     }
 
-    public function products(Shop $shop) // Route Model Binding
+    public function products(Shop $shop)
     {
-        abort_unless($shop->is_approved, 404); // Assure que la boutique est approuvée
+        abort_unless($shop->is_approved, 404);
 
-        $products = $shop->products()->latest()->paginate(12);  // Pagination
-        return view('public.shops.products', compact('shop','products'));
+        $products = $shop->products()
+            ->where('is_active', true)
+            ->latest()
+            ->paginate(20);
+
+        $categories = $shop->products()
+            ->where('is_active', true)
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->pluck('category')
+            ->toArray();
+
+        return view('public.shops.products', compact('shop', 'products', 'categories'));
     }
 }

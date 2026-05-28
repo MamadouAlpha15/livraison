@@ -280,9 +280,95 @@ const markers      = {};
 const traces       = {};
 const polylines    = {};
 const routeLines   = {};
+const routeShadows = {};
 const clientMarkers= {}; /* keyed by order id */
 const vendorMarkers= {}; /* keyed by order id */
+const driverRoutes = {}; /* OSRM route state par livreur */
+const driverAnims  = {}; /* animation state par livreur */
 let   selectedKey  = null;
+
+/* ── Animation douce — effet Google Maps ── */
+function animateMarkerTo(key, toLat, toLng) {
+    const m = markers[key];
+    if (!m) return;
+    const cur = m.getLatLng();
+    if (Math.abs(cur.lat - toLat) < 1e-7 && Math.abs(cur.lng - toLng) < 1e-7) return;
+    if (!driverAnims[key]) driverAnims[key] = {};
+    const a = driverAnims[key];
+    a.from = [cur.lat, cur.lng]; a.to = [toLat, toLng]; a.start = null;
+    if (a.raf) cancelAnimationFrame(a.raf);
+    function step(ts) {
+        if (!a.start) a.start = ts;
+        const raw  = Math.min(1, (ts - a.start) / 700);
+        const ease = raw < .5 ? 2*raw*raw : -1+(4-2*raw)*raw;
+        m.setLatLng([a.from[0] + (a.to[0]-a.from[0])*ease, a.from[1] + (a.to[1]-a.from[1])*ease]);
+        if (raw < 1) a.raf = requestAnimationFrame(step);
+        else a.raf = null;
+    }
+    a.raf = requestAnimationFrame(step);
+}
+
+/* ── OSRM — vraies routes ── */
+async function fetchOSRMRoute(fLat, fLng, tLat, tLng) {
+    try {
+        const url = `https://router.project-osrm.org/route/v1/driving/`
+                  + `${fLng},${fLat};${tLng},${tLat}?overview=full&geometries=geojson`;
+        const r = await fetch(url);
+        const d = await r.json();
+        if (d.code === 'Ok' && d.routes?.[0])
+            return d.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+    } catch(e) {}
+    return [[fLat, fLng], [tLat, tLng]];
+}
+
+function closestIdx(lat, lng, pts) {
+    let minD = Infinity, minI = 0;
+    for (let i = 0; i < pts.length; i++) {
+        const d = (pts[i][0]-lat)**2 + (pts[i][1]-lng)**2;
+        if (d < minD) { minD = d; minI = i; }
+    }
+    return minI;
+}
+
+function distToRoute(lat, lng, pts) {
+    let minD = Infinity;
+    for (const [pLat, pLng] of pts) {
+        const d = Math.sqrt((pLat-lat)**2 + (pLng-lng)**2);
+        if (d < minD) minD = d;
+    }
+    return minD;
+}
+
+function redrawDriverRoute(key, phase) {
+    if (routeShadows[key]) { map.removeLayer(routeShadows[key]); routeShadows[key] = null; }
+    if (routeLines[key])   { map.removeLayer(routeLines[key]);   routeLines[key]   = null; }
+    const pts = driverRoutes[key]?.remaining;
+    if (!pts || pts.length < 2) return;
+    const rColor = phase === 2 ? '#10b981' : '#f59e0b';
+    routeShadows[key] = L.polyline(pts, { color:'rgba(0,0,0,.22)', weight:9, lineCap:'round', lineJoin:'round' }).addTo(map);
+    routeLines[key]   = L.polyline(pts, { color:rColor, weight:5, lineCap:'round', lineJoin:'round', opacity:.95 }).addTo(map);
+    if (markers[key]) markers[key].bringToFront();
+}
+
+async function planDriverRoute(key, fLat, fLng, tLat, tLng, phase) {
+    if (!driverRoutes[key]) driverRoutes[key] = { points:[], remaining:[], destKey:'', isFetching:false, offStreak:0 };
+    const dr = driverRoutes[key];
+    if (dr.isFetching) return;
+    dr.isFetching = true;
+    const pts = await fetchOSRMRoute(fLat, fLng, tLat, tLng);
+    dr.points = pts; dr.remaining = [...pts];
+    dr.destKey = `${tLat},${tLng}`; dr.offStreak = 0; dr.isFetching = false;
+    redrawDriverRoute(key, phase);
+}
+
+function consumeDriverRoute(key, lat, lng, phase) {
+    const dr = driverRoutes[key];
+    if (!dr || dr.remaining.length < 2) return;
+    const idx = closestIdx(lat, lng, dr.remaining);
+    if (idx > 0) dr.remaining = dr.remaining.slice(idx);
+    dr.remaining[0] = [lat, lng];
+    redrawDriverRoute(key, phase);
+}
 
 /* ── Icône client (bleu) ── */
 function clientIcon() {
@@ -371,9 +457,11 @@ function updateMap(drivers) {
     Object.keys(markers).forEach(k => {
         if (!activeKeys.has(k)) {
             map.removeLayer(markers[k]); delete markers[k];
-            if (polylines[k])  { map.removeLayer(polylines[k]);  delete polylines[k];  }
-            if (routeLines[k]) { map.removeLayer(routeLines[k]); delete routeLines[k]; }
-            delete traces[k];
+            if (polylines[k])    { map.removeLayer(polylines[k]);    delete polylines[k];    }
+            if (routeShadows[k]) { map.removeLayer(routeShadows[k]); delete routeShadows[k]; }
+            if (routeLines[k])   { map.removeLayer(routeLines[k]);   delete routeLines[k];   }
+            if (driverAnims[k]?.raf) cancelAnimationFrame(driverAnims[k].raf);
+            delete driverAnims[k]; delete driverRoutes[k]; delete traces[k];
         }
     });
 
@@ -402,16 +490,16 @@ function updateMap(drivers) {
         }
 
         if (markers[k]) {
-            markers[k].setLatLng(pos);
+            animateMarkerTo(k, pos[0], pos[1]);
             markers[k].setIcon(driverIcon(color, isMoving));
-            markers[k].bindPopup(() => buildPopup(o)); // rebind à chaque poll
+            markers[k].bindPopup(() => buildPopup(o));
         } else {
             markers[k] = L.marker(pos, {icon: driverIcon(color, isMoving)}).addTo(map).bindPopup(() => buildPopup(o));
         }
         if (markers[k].isPopupOpen()) markers[k].setPopupContent(buildPopup(o));
         bounds.push(pos);
 
-        /* ── Ligne de route : Phase 1 → boutique (amber), Phase 2 → client (green) ── */
+        /* ── Route OSRM — vraies routes (Phase 1 → boutique amber, Phase 2 → client vert) ── */
         const allOrders = (o.trips || []).flatMap(t => t.orders || []).concat(o.orders || []);
         let routeDest = null;
         if (o.phase === 2) {
@@ -422,16 +510,24 @@ function updateMap(drivers) {
             if (ord) routeDest = [parseFloat(ord.vendor_lat), parseFloat(ord.vendor_lng)];
         }
         if (routeDest) {
-            const rPts   = [pos, routeDest];
-            const rColor = o.phase === 2 ? '#10b981' : '#f59e0b';
-            if (routeLines[k]) {
-                routeLines[k].setLatLngs(rPts);
-                routeLines[k].setStyle({color: rColor});
+            const dr = driverRoutes[k];
+            const newDestKey = `${routeDest[0]},${routeDest[1]}`;
+            if (!dr || dr.destKey !== newDestKey || dr.remaining.length === 0) {
+                planDriverRoute(k, pos[0], pos[1], routeDest[0], routeDest[1], o.phase);
             } else {
-                routeLines[k] = L.polyline(rPts, {color:rColor, weight:3, opacity:.85, dashArray:'10 6', lineCap:'round'}).addTo(map);
+                const dist = distToRoute(pos[0], pos[1], dr.remaining);
+                if (dist > 0.004) {
+                    dr.offStreak = (dr.offStreak || 0) + 1;
+                    if (dr.offStreak >= 2) planDriverRoute(k, pos[0], pos[1], routeDest[0], routeDest[1], o.phase);
+                } else {
+                    dr.offStreak = 0;
+                    consumeDriverRoute(k, pos[0], pos[1], o.phase);
+                }
             }
-        } else if (routeLines[k]) {
-            map.removeLayer(routeLines[k]); delete routeLines[k];
+        } else {
+            if (routeShadows[k]) { map.removeLayer(routeShadows[k]); delete routeShadows[k]; }
+            if (routeLines[k])   { map.removeLayer(routeLines[k]);   delete routeLines[k];   }
+            if (driverRoutes[k]) delete driverRoutes[k];
         }
     });
 

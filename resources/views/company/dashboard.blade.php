@@ -1684,7 +1684,93 @@ document.addEventListener('DOMContentLoaded', () => {
     const dashClientMarkers = {};
     const dashVendorMarkers = {};
     const dashRouteLines    = {};
+    const dashRouteShadows  = {};
+    const dashDriverRoutes  = {}; /* OSRM route state par chauffeur */
+    const dashDriverAnims   = {}; /* animation state par chauffeur */
     let mapInitialized = false;
+
+    /* ── Animation douce ── */
+    function animateDashMarkerTo(id, toLat, toLng) {
+        const m = dashMarkers[id];
+        if (!m) return;
+        const cur = m.getLatLng();
+        if (Math.abs(cur.lat - toLat) < 1e-7 && Math.abs(cur.lng - toLng) < 1e-7) return;
+        if (!dashDriverAnims[id]) dashDriverAnims[id] = {};
+        const a = dashDriverAnims[id];
+        a.from = [cur.lat, cur.lng]; a.to = [toLat, toLng]; a.start = null;
+        if (a.raf) cancelAnimationFrame(a.raf);
+        function step(ts) {
+            if (!a.start) a.start = ts;
+            const raw  = Math.min(1, (ts - a.start) / 700);
+            const ease = raw < .5 ? 2*raw*raw : -1+(4-2*raw)*raw;
+            m.setLatLng([a.from[0] + (a.to[0]-a.from[0])*ease, a.from[1] + (a.to[1]-a.from[1])*ease]);
+            if (raw < 1) a.raf = requestAnimationFrame(step);
+            else a.raf = null;
+        }
+        a.raf = requestAnimationFrame(step);
+    }
+
+    /* ── OSRM routing ── */
+    async function dashFetchOSRM(fLat, fLng, tLat, tLng) {
+        try {
+            const url = `https://router.project-osrm.org/route/v1/driving/`
+                      + `${fLng},${fLat};${tLng},${tLat}?overview=full&geometries=geojson`;
+            const r = await fetch(url);
+            const d = await r.json();
+            if (d.code === 'Ok' && d.routes?.[0])
+                return d.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+        } catch(e) {}
+        return [[fLat, fLng], [tLat, tLng]];
+    }
+
+    function dashClosestIdx(lat, lng, pts) {
+        let minD = Infinity, minI = 0;
+        for (let i = 0; i < pts.length; i++) {
+            const d = (pts[i][0]-lat)**2 + (pts[i][1]-lng)**2;
+            if (d < minD) { minD = d; minI = i; }
+        }
+        return minI;
+    }
+
+    function dashDistToRoute(lat, lng, pts) {
+        let minD = Infinity;
+        for (const [pLat, pLng] of pts) {
+            const d = Math.sqrt((pLat-lat)**2 + (pLng-lng)**2);
+            if (d < minD) minD = d;
+        }
+        return minD;
+    }
+
+    function dashRedrawRoute(id, phase) {
+        if (dashRouteShadows[id]) { map.removeLayer(dashRouteShadows[id]); dashRouteShadows[id] = null; }
+        if (dashRouteLines[id])   { map.removeLayer(dashRouteLines[id]);   dashRouteLines[id]   = null; }
+        const pts = dashDriverRoutes[id]?.remaining;
+        if (!pts || pts.length < 2) return;
+        const rColor = phase === 2 ? '#10b981' : '#f59e0b';
+        dashRouteShadows[id] = L.polyline(pts, { color:'rgba(0,0,0,.22)', weight:8, lineCap:'round', lineJoin:'round' }).addTo(map);
+        dashRouteLines[id]   = L.polyline(pts, { color:rColor, weight:4, lineCap:'round', lineJoin:'round', opacity:.95 }).addTo(map);
+        if (dashMarkers[id]) dashMarkers[id].bringToFront();
+    }
+
+    async function dashPlanRoute(id, fLat, fLng, tLat, tLng, phase) {
+        if (!dashDriverRoutes[id]) dashDriverRoutes[id] = { points:[], remaining:[], destKey:'', isFetching:false, offStreak:0 };
+        const dr = dashDriverRoutes[id];
+        if (dr.isFetching) return;
+        dr.isFetching = true;
+        const pts = await dashFetchOSRM(fLat, fLng, tLat, tLng);
+        dr.points = pts; dr.remaining = [...pts];
+        dr.destKey = `${tLat},${tLng}`; dr.offStreak = 0; dr.isFetching = false;
+        dashRedrawRoute(id, phase);
+    }
+
+    function dashConsumeRoute(id, lat, lng, phase) {
+        const dr = dashDriverRoutes[id];
+        if (!dr || dr.remaining.length < 2) return;
+        const idx = dashClosestIdx(lat, lng, dr.remaining);
+        if (idx > 0) dr.remaining = dr.remaining.slice(idx);
+        dr.remaining[0] = [lat, lng];
+        dashRedrawRoute(id, phase);
+    }
 
     function clientPinIcon() {
         return L.divIcon({
@@ -1705,7 +1791,10 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.keys(dashMarkers).forEach(id => {
             if (!activeIds.has(parseInt(id))) {
                 map.removeLayer(dashMarkers[id]); delete dashMarkers[id];
-                if (dashRouteLines[id]) { map.removeLayer(dashRouteLines[id]); delete dashRouteLines[id]; }
+                if (dashRouteShadows[id]) { map.removeLayer(dashRouteShadows[id]); delete dashRouteShadows[id]; }
+                if (dashRouteLines[id])   { map.removeLayer(dashRouteLines[id]);   delete dashRouteLines[id];   }
+                if (dashDriverAnims[id]?.raf) cancelAnimationFrame(dashDriverAnims[id].raf);
+                delete dashDriverAnims[id]; delete dashDriverRoutes[id];
             }
         });
 
@@ -1716,8 +1805,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const pos   = [parseFloat(o.lat), parseFloat(o.lng)];
             const did   = o.driver_id;
             if (dashMarkers[did]) {
-                dashMarkers[did].setLatLng(pos);
-                dashMarkers[did].bindPopup(() => buildMapPopup(o)); // rebind à chaque poll
+                animateDashMarkerTo(did, pos[0], pos[1]);
+                dashMarkers[did].bindPopup(() => buildMapPopup(o));
             } else {
                 dashMarkers[did] = L.marker(pos, {icon: makePin(color)})
                     .addTo(map)
@@ -1725,7 +1814,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             bounds.push(pos);
 
-            // Ligne de route : Phase 1 → boutique (amber), Phase 2 → client (green)
+            /* ── Route OSRM — vraies routes ── */
             let routeDest = null;
             if (o.phase === 2) {
                 const ord = (o.orders || []).find(ord => ord.client_lat && ord.client_lng);
@@ -1735,16 +1824,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (ord) routeDest = [parseFloat(ord.vendor_lat), parseFloat(ord.vendor_lng)];
             }
             if (routeDest) {
-                const rPts   = [pos, routeDest];
-                const rColor = o.phase === 2 ? '#10b981' : '#f59e0b';
-                if (dashRouteLines[did]) {
-                    dashRouteLines[did].setLatLngs(rPts);
-                    dashRouteLines[did].setStyle({color: rColor});
+                const dr = dashDriverRoutes[did];
+                const newDestKey = `${routeDest[0]},${routeDest[1]}`;
+                if (!dr || dr.destKey !== newDestKey || dr.remaining.length === 0) {
+                    dashPlanRoute(did, pos[0], pos[1], routeDest[0], routeDest[1], o.phase);
                 } else {
-                    dashRouteLines[did] = L.polyline(rPts, {color:rColor, weight:3, opacity:.8, dashArray:'10 6', lineCap:'round'}).addTo(map);
+                    const dist = dashDistToRoute(pos[0], pos[1], dr.remaining);
+                    if (dist > 0.004) {
+                        dr.offStreak = (dr.offStreak || 0) + 1;
+                        if (dr.offStreak >= 2) dashPlanRoute(did, pos[0], pos[1], routeDest[0], routeDest[1], o.phase);
+                    } else {
+                        dr.offStreak = 0;
+                        dashConsumeRoute(did, pos[0], pos[1], o.phase);
+                    }
                 }
-            } else if (dashRouteLines[did]) {
-                map.removeLayer(dashRouteLines[did]); delete dashRouteLines[did];
+            } else {
+                if (dashRouteShadows[did]) { map.removeLayer(dashRouteShadows[did]); delete dashRouteShadows[did]; }
+                if (dashRouteLines[did])   { map.removeLayer(dashRouteLines[did]);   delete dashRouteLines[did];   }
+                if (dashDriverRoutes[did]) delete dashDriverRoutes[did];
             }
         });
 

@@ -14,8 +14,14 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
+        if ($request->filled('redirect')) {
+            $target = $request->redirect;
+            if (str_starts_with($target, url('/'))) {
+                session(['product_redirect' => $target]);
+            }
+        }
         return view('auth.login');
     }
 
@@ -30,24 +36,16 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
-        if($user->role === 'superadmin'){
-            return redirect()->route('admin.dashboard');
-        }
+        if ($user->role === 'superadmin') return redirect()->route('admin.dashboard');
+        if ($user->role === 'admin')      return redirect()->route('boutique.dashboard');
+        if ($user->role === 'company')    return redirect()->route('company.dashboard');
+        if ($user->role === 'livreur')    return redirect()->route('livreur.dashboard');
+        if ($user->role === 'vendeur')    return redirect()->route('vendeur.dashboard');
 
-        if($user->role === 'admin'){
-           return redirect()->route('boutique.dashboard');
-        }
-
-      if($user->role === 'company'){
-           return redirect()->route('company.dashboard');
-        }
-
-        if($user->role === 'livreur'){
-           return redirect()->route('livreur.dashboard');
-        }
-
-        elseif ( $user->role === 'vendeur'){
-            return redirect()->route('vendeur.dashboard');
+        // Client : retourner sur la page produit s'il venait d'un lien partagé
+        if ($user->role === 'client' && session('product_redirect')) {
+            $target = session()->pull('product_redirect');
+            return redirect($target);
         }
 
         return redirect()->route('client.dashboard');

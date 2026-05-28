@@ -392,6 +392,16 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 @media (max-width: 380px) {
     .kpi-row { grid-template-columns: 1fr; }
 }
+
+/* ══ FILTRE PÉRIODE ══ */
+.period-filter { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
+.pf-btn {
+    padding: 7px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    font-family: var(--font); border: 1px solid var(--border-dk); background: var(--surface);
+    color: var(--text-2); cursor: pointer; text-decoration: none; transition: all .15s; white-space: nowrap;
+}
+.pf-btn:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-mlt); }
+.pf-btn.active { background: var(--brand); color: #fff; border-color: var(--brand-dk); box-shadow: 0 2px 8px rgba(99,102,241,.25); }
 </style>
 @endpush
 
@@ -569,14 +579,35 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         </div>
     </div>
 
+    {{-- ── Filtre période ── --}}
+    @php
+        $periodLabels = [
+            'month'      => 'Ce mois',
+            'last_month' => 'Mois dernier',
+            'all'        => 'Tout le temps',
+        ];
+        $heroUnit = match($period) {
+            'month'      => now()->locale('fr')->isoFormat('MMMM YYYY'),
+            'last_month' => now()->subMonthNoOverflow()->locale('fr')->isoFormat('MMMM YYYY'),
+            default      => 'toutes périodes',
+        };
+    @endphp
+    <div class="period-filter">
+        @foreach($periodLabels as $key => $label)
+        <a href="{{ request()->fullUrlWithQuery(['period' => $key, 'page' => 1]) }}"
+           class="pf-btn {{ $period === $key ? 'active' : '' }}">
+            {{ $label }}
+        </a>
+        @endforeach
+    </div>
+
     {{-- ── Hero total revenus ── --}}
     <div class="revenue-hero">
         <div class="hero-icon">{!! $I['hero_coin'] !!}</div>
         <div>
             <div class="hero-lbl">Total des revenus confirmés</div>
-            {{-- Devise dynamique de la boutique --}}
             <div class="hero-val">{{ number_format($totalRevenue, 0, ',', ' ') }}</div>
-            <div class="hero-unit">{{ $devise }} · paiements confirmés uniquement</div>
+            <div class="hero-unit">{{ $devise }} · {{ $heroUnit }}</div>
         </div>
         <div class="hero-right">
             <div class="hero-stat-lbl">Paiements</div>
@@ -589,14 +620,14 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     {{-- ── KPI row ── --}}
     <div class="kpi-row">
         <div class="kpi-chip" style="--kc:#6366f1">
-            <div class="kpi-chip-lbl">CA total confirmé</div>
+            <div class="kpi-chip-lbl">CA confirmé · {{ $periodLabels[$period] }}</div>
             <div class="kpi-chip-val">{{ number_format($totalRevenue/1000, 1) }}k</div>
             <div class="kpi-chip-sub">{{ $devise }}</div>
         </div>
         <div class="kpi-chip" style="--kc:#3b82f6">
             <div class="kpi-chip-lbl">Nb paiements</div>
             <div class="kpi-chip-val">{{ $nbPaiements }}</div>
-            <div class="kpi-chip-sub">paiements confirmés</div>
+            <div class="kpi-chip-sub">{{ $periodLabels[$period] }}</div>
         </div>
         <div class="kpi-chip" style="--kc:#f59e0b">
             <div class="kpi-chip-lbl">Panier moyen</div>
