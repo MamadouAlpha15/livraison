@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Review;
 use App\Models\Shop;
+use App\Models\Subscription;
 use App\Models\SupportTicket;
 use App\Models\User;
 
@@ -109,6 +110,14 @@ class DashboardController extends Controller
         $clientsToday      = User::where('role', 'client')->whereDate('created_at', today())->count();
         $paidToday         = Payment::where('status', 'payé')->whereDate('created_at', today())->count();
 
+        // ── Revenus abonnements (Boutiques Pro + Entreprises Business)
+        // CA = tous les paiements reçus (active + expired) → argent déjà encaissé
+        // Compteurs = uniquement actifs → nombre réel d'abonnés
+        $subCaTotal    = (int) Subscription::whereIn('status', ['active', 'expired'])->sum('amount');
+        $subCaToday    = (int) Subscription::whereIn('status', ['active', 'expired'])->whereDate('created_at', today())->sum('amount');
+        $subCountToday = (int) Subscription::where('status', 'active')->whereDate('created_at', today())->count();
+        $subCountMonth = (int) Subscription::where('status', 'active')->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count();
+
         return compact(
             'usersTotal', 'usersToday',
             'shopsTotal', 'shopsActive', 'shopsPending', 'shopsApprovedToday',
@@ -120,7 +129,8 @@ class DashboardController extends Controller
             'avgRating',
             'openTickets', 'unreadMessages',
             'clientsTotal', 'clientsToday',
-            'paidToday'
+            'paidToday',
+            'subCaTotal', 'subCaToday', 'subCountToday', 'subCountMonth'
         );
     }
 

@@ -26,7 +26,7 @@ body.cx-dashboard .app-flash{display:none!important}
 body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width:100%!important;width:100%!important}
 
 /* ── LAYOUT ── */
-.cx-wrap{display:flex;min-height:100vh;padding-left:var(--cx-sb-w)}
+.cx-wrap{display:flex;position:fixed;inset:0;padding-left:var(--cx-sb-w)}
 
 /* ── SIDEBAR ── */
 .cx-sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--cx-sb-w);background:linear-gradient(180deg,#0f0f59 0%,#0e0e16 40%,#10103a 100%);display:flex;flex-direction:column;border-right:1px solid rgba(99,102,241,.15);box-shadow:6px 0 30px rgba(0,0,0,.35);z-index:1200;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.3) transparent;transition:transform .25s cubic-bezier(.23,1,.32,1)}
@@ -66,7 +66,7 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .cx-toggle.on::after{left:19px}
 
 /* ── MAIN ── */
-.cx-main{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;background:var(--cx-bg)}
+.cx-main{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;background:var(--cx-bg)}
 .cx-topbar{height:60px;background:var(--cx-surface);border-bottom:1px solid var(--cx-border);display:flex;align-items:center;gap:12px;padding:0 20px;flex-shrink:0;position:sticky;top:0;z-index:100}
 .cx-hamburger{display:none;background:none;border:none;color:var(--cx-text2);font-size:18px;cursor:pointer;padding:4px 8px;border-radius:6px}
 .cx-topbar-title{font-size:15px;font-weight:800;color:var(--cx-text);display:flex;align-items:center;gap:8px}
@@ -82,7 +82,8 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 
 /* ── CHAT CONTAINER ── */
 .sp-chat{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
-.sp-messages{flex:1;overflow-y:auto;padding:24px 20px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
+.sp-messages{flex:1;min-height:0;overflow-y:auto;padding:24px 20px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
+.sp-messages::before{content:'';flex:1;min-height:0}
 .sp-messages::-webkit-scrollbar{width:5px}
 .sp-messages::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3);border-radius:4px}
 
@@ -133,14 +134,14 @@ body.cx-light .sp-info-bar{background:#f8fafc;border-color:rgba(0,0,0,.07)}
 @media(max-width:1024px){
     .cx-sidebar{transform:translateX(-100%)}
     .cx-sidebar.open{transform:translateX(0)}
-    .cx-wrap{padding-left:0}
+    .cx-wrap{padding-left:0;position:fixed;inset:0}
     .cx-hamburger{display:block}
     .cx-close-btn{display:flex}
 }
 @media(max-width:640px){
     .cx-topbar{padding:0 12px;gap:8px}
     .sp-messages{padding:16px 12px}
-    .sp-input-area{padding:12px}
+    .sp-input-area{padding:12px;position:sticky;bottom:0;z-index:10}
     .sp-info-bar{padding:8px 12px}
     .sp-row{max-width:92%}
     .sp-bubble{font-size:13px;padding:9px 12px}
@@ -419,10 +420,23 @@ inp?.addEventListener('input', () => {
 
 /* ── Scroll bas ── */
 function scrollBottom() {
-    const el = document.getElementById('spMessages');
-    if (el) el.scrollTop = el.scrollHeight;
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            const el = document.getElementById('spMessages');
+            if (el) el.scrollTop = el.scrollHeight;
+        });
+    });
 }
 scrollBottom();
+
+// Quand le clavier s'ouvre sur mobile, rescroller vers le bas
+const _inp = document.getElementById('spInput');
+if (_inp) {
+    _inp.addEventListener('focus', () => setTimeout(scrollBottom, 320));
+}
+if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => setTimeout(scrollBottom, 100));
+}
 
 /* ── Rendu message ── */
 function formatTime(iso) {

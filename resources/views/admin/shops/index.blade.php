@@ -193,8 +193,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .mc-ico{width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--brand)}
 
 /* ─── TABLE ─── */
-.tbl-wrap{overflow-x:auto}
-.tbl{width:100%;border-collapse:collapse;min-width:680px}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tbl-wrap::-webkit-scrollbar{height:4px}
+.tbl-wrap::-webkit-scrollbar-track{background:var(--bg)}
+.tbl-wrap::-webkit-scrollbar-thumb{background:rgba(124,58,237,.25);border-radius:2px}
+.tbl{width:100%;border-collapse:collapse;min-width:580px}
 .tbl th{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;
     letter-spacing:.5px;padding:10px 20px;background:#f8fafc;
     border-bottom:1px solid var(--bd);white-space:nowrap;text-align:left}
@@ -264,6 +267,36 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
     border:1px solid var(--bd);cursor:pointer;text-decoration:none;transition:all .15s;font-family:var(--font)}
 .btn-g:hover{background:#e2e8f0;color:var(--text)}
 
+/* ─── CARTES MOBILE ─── */
+.cards-mobile{display:none;flex-direction:column;gap:10px;padding:14px}
+.sm-card{background:var(--card);border-radius:13px;border:1px solid var(--bd);
+    overflow:hidden;transition:box-shadow .18s}
+.sm-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.sm-card-top{display:flex;align-items:center;gap:12px;padding:14px 14px 12px}
+.sm-card-av{width:44px;height:44px;border-radius:12px;flex-shrink:0;
+    background:linear-gradient(135deg,var(--brand),#4f46e5);
+    display:flex;align-items:center;justify-content:center;
+    font-size:16px;font-weight:800;color:#fff}
+.sm-card-img{width:44px;height:44px;border-radius:12px;object-fit:cover;flex-shrink:0}
+.sm-card-info{flex:1;min-width:0}
+.sm-card-name{font-size:14px;font-weight:800;color:var(--text);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sm-card-sub{font-size:11px;color:var(--muted);margin-top:2px;
+    display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.sm-card-badges{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.sm-card-body{display:grid;grid-template-columns:1fr 1fr;gap:0;
+    border-top:1px solid var(--bd)}
+.sm-card-field{padding:10px 14px;display:flex;flex-direction:column;gap:3px}
+.sm-card-field+.sm-card-field{border-left:1px solid var(--bd)}
+.sm-card-field:nth-child(3),.sm-card-field:nth-child(4){border-top:1px solid var(--bd)}
+.sm-card-field:nth-child(3){border-left:none}
+.sm-card-fl{font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.sm-card-fv{font-size:12px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:4px}
+.sm-card-foot{padding:11px 14px;border-top:1px solid var(--bd);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:rgba(0,0,0,.013)}
+.sm-card-date{font-size:11px;color:var(--muted)}
+
 /* ─── RESPONSIVE ─── */
 @media(max-width:900px){
     .sb{transform:translateX(-100%)}
@@ -272,17 +305,37 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
     .mn{margin-left:0}
     .ham{display:flex}
     .tb-srch{display:none}
+    .tb-uname,.tb-urole{display:none}
+    .tb-user{padding:4px 7px}
     .stat-g{grid-template-columns:repeat(2,1fr)}
 }
-@media(max-width:600px){
-    .con{padding:14px}
-    .tb{padding:0 14px}
-    .ph{flex-direction:column}
-    .toolbar{flex-direction:column;align-items:stretch}
-    .filter-g{justify-content:stretch}
-    .filter-btn{flex:1;justify-content:center}
+@media(max-width:768px){
+    .ph{flex-direction:column;gap:8px}.ph h1{font-size:17px}
 }
-@media(max-width:400px){.stat-g{grid-template-columns:1fr}}
+@media(max-width:640px){
+    .con{padding:12px}.tb{padding:0 12px;gap:8px}
+    .stat-g{grid-template-columns:repeat(2,1fr);gap:10px}
+    .stat-c{padding:14px}.stat-v{font-size:22px}
+    .toolbar{flex-direction:column;align-items:stretch;gap:10px}
+    .filter-g{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+    .filter-btn{justify-content:center;font-size:11.5px;padding:7px 10px}
+    .srch-box{min-width:0;width:100%}
+    /* Basculer table ↔ cartes */
+    .tbl-wrap{display:none}
+    .cards-mobile{display:flex}
+    .mc-h{padding:12px 14px}.mc-t{font-size:13px}
+    .bdg{font-size:10.5px;padding:3px 8px}
+}
+@media(max-width:480px){
+    .stat-g{gap:8px}.stat-c{padding:12px}.stat-v{font-size:20px}.stat-l{font-size:11px}
+    .filter-g{grid-template-columns:1fr 1fr}
+}
+@media(max-width:360px){
+    .con{padding:8px}
+    .filter-g{grid-template-columns:1fr}
+    .sm-card-body{grid-template-columns:1fr}
+    .sm-card-field+.sm-card-field{border-left:none;border-top:1px solid var(--bd)}
+}
 </style>
 @endpush
 
@@ -729,6 +782,93 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+
+            {{-- ── CARTES MOBILE (affichées à la place du tableau sur < 640px) ── --}}
+            <div class="cards-mobile">
+                @forelse($shops as $shop)
+                @php
+                    $words2    = explode(' ', $shop->name ?? 'S');
+                    $initials2 = strtoupper(substr($words2[0],0,1)).strtoupper(substr($words2[1]??'',0,1));
+                    $owner2    = $shop->owner->name ?? 'Utilisateur supprimé';
+                    $isPro2    = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
+                @endphp
+                <div class="sm-card">
+                    <div class="sm-card-top">
+                        <div class="sm-card-av">{{ $initials2 ?: 'S' }}</div>
+                        <div class="sm-card-info">
+                            <div class="sm-card-name">{{ $shop->name }}</div>
+                            <div class="sm-card-sub">
+                                @if($shop->country){!! $I['globe'] !!} {{ $shop->country }}@endif
+                                @if($shop->owner?->email)
+                                    <span>· {{ $shop->owner->email }}</span>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="sm-card-badges">
+                            @if($isPro2)
+                                <span class="bdg" style="color:#5b21b6;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.2)">✦ Pro</span>
+                            @else
+                                <span class="bdg g"><span class="bdg-dot"></span> Gratuit</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="sm-card-body">
+                        <div class="sm-card-field">
+                            <div class="sm-card-fl">Propriétaire</div>
+                            <div class="sm-card-fv">{{ $owner2 }}</div>
+                        </div>
+                        <div class="sm-card-field">
+                            <div class="sm-card-fl">Téléphone</div>
+                            <div class="sm-card-fv">
+                                @if($shop->phone){!! $I['phone'] !!} {{ $shop->phone }}@else —@endif
+                            </div>
+                        </div>
+                        <div class="sm-card-field">
+                            <div class="sm-card-fl">Statut</div>
+                            <div class="sm-card-fv">
+                                @if($shop->is_approved)
+                                    <span class="bdg g"><span class="bdg-dot"></span> Active</span>
+                                @else
+                                    <span class="bdg r">{!! $I['x_sm'] !!} Suspendue</span>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="sm-card-field">
+                            <div class="sm-card-fl">Adresse</div>
+                            <div class="sm-card-fv" style="font-size:11.5px">
+                                {{ $shop->address ? Str::limit($shop->address,22) : '—' }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sm-card-foot">
+                        <span class="sm-card-date">
+                            Inscrit {{ optional($shop->created_at)->format('d/m/Y') }}
+                            @if($isPro2)
+                                · Pro exp. {{ $shop->plan_expires_at->format('d/m/Y') }}
+                            @endif
+                        </span>
+                        <form action="{{ route('admin.shops.update', $shop) }}" method="POST" style="margin:0">
+                            @csrf @method('PUT')
+                            @if($shop->is_approved)
+                                <button type="submit" class="btn-disable" style="padding:6px 12px;font-size:11.5px">
+                                    <span class="btn-ico">{!! $I['x_sm'] !!}</span> Suspendre
+                                </button>
+                            @else
+                                <button type="submit" class="btn-approve" style="padding:6px 12px;font-size:11.5px">
+                                    <span class="btn-ico">{!! $I['check_sm'] !!}</span> Réactiver
+                                </button>
+                            @endif
+                        </form>
+                    </div>
+                </div>
+                @empty
+                    <div style="text-align:center;padding:40px 20px;color:var(--muted);font-size:13px">
+                        Aucune boutique trouvée.
+                    </div>
+                @endforelse
             </div>
 
             @if($shops->hasPages())

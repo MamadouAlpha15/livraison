@@ -32,6 +32,12 @@ class GenuisPayController extends Controller
         abort_unless($subscriber, 404);
         $this->authorizeSubscriber($subscriber);
 
+        // Bloque si abonnement déjà actif
+        if ($this->hasActiveSubscription($subscriber)) {
+            $dash = $type === 'company' ? route('company.dashboard') : route('boutique.dashboard');
+            return redirect($dash)->with('info', 'Vous avez déjà un abonnement actif.');
+        }
+
         $amount      = $amountGnf;
         $userCountry = Auth::user()->country ?? '';
         return view('payment.checkout', compact('subscriber', 'type', 'plan', 'amount', 'amountXof', 'userCountry'));
@@ -50,6 +56,18 @@ class GenuisPayController extends Controller
 
         abort_unless($subscriber, 404);
         $this->authorizeSubscriber($subscriber);
+
+        // Double vérification : bloque si déjà actif (protection contre multi-clic)
+        if ($this->hasActiveSubscription($subscriber)) {
+            $dash = $request->type === 'company' ? route('company.dashboard') : route('boutique.dashboard');
+            return redirect($dash)->with('info', 'Vous avez déjà un abonnement actif.');
+        }
+
+        // Annule les éventuels pending en cours pour éviter les fantômes
+        Subscription::where('subscriber_type', get_class($subscriber))
+            ->where('subscriber_id', $subscriber->id)
+            ->where('status', 'pending')
+            ->update(['status' => 'failed']);
 
         $internalRef = 'SUB-' . strtoupper(Str::random(8)) . '-' . now()->timestamp;
 
@@ -273,5 +291,13 @@ class GenuisPayController extends Controller
             $userCompanyId = $user->deliveryCompany?->id ?? $user->ownedCompany?->id;
             abort_unless($userCompanyId === $subscriber->id || $user->role === 'superadmin', 403);
         }
+    }
+
+    private function hasActiveSubscription($subscriber): bool
+    {
+        return Subscription::where('subscriber_type', get_class($subscriber))
+            ->where('subscriber_id', $subscriber->id)
+            ->where('status', 'active')
+            ->exists();
     }
 }

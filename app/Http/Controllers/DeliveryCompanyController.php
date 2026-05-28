@@ -74,7 +74,7 @@ class DeliveryCompanyController extends Controller
         }
 
         return redirect()->route('company.dashboard')
-                         ->with('success', "Votre entreprise a été créée. Elle est en attente d'approbation par un administrateur. Vous pouvez accéder à votre tableau de bord en attendant.");
+                         ->with('success', "Votre entreprise a été approuvée. Vous utilisez le plan gratuit.");
     }
 
     // afficher les détails d'une entreprise de livraison

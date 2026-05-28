@@ -147,8 +147,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .sc-h{padding:14px 20px 12px;border-bottom:1px solid var(--bd);
     display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .sc-t{font-size:13px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:7px}
-.tbl-wrap{overflow-x:auto}
-.tbl{width:100%;border-collapse:collapse}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tbl-wrap::-webkit-scrollbar{height:4px}
+.tbl-wrap::-webkit-scrollbar-track{background:var(--bg)}
+.tbl-wrap::-webkit-scrollbar-thumb{background:rgba(124,58,237,.25);border-radius:2px}
+.tbl{width:100%;border-collapse:collapse;min-width:520px}
 .tbl th{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;
     letter-spacing:.5px;padding:9px 16px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap;text-align:left}
 .tbl td{padding:11px 16px;font-size:12px;color:var(--text);border-bottom:1px solid var(--bd);vertical-align:middle}
@@ -187,8 +190,57 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .btn-p:hover{transform:translateY(-1px);box-shadow:0 4px 14px var(--glow)}
 .flag{font-size:16px;line-height:1}
 .globe-ico{display:inline-flex;align-items:center;color:var(--muted);opacity:.6}
-@media(max-width:900px){.sb{transform:translateX(-100%)}.sb.open{transform:translateX(0);box-shadow:4px 0 32px rgba(0,0,0,.32)}.sb-ov.open{display:block}.mn{margin-left:0}.kpi-g{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:640px){.con{padding:13px}.tb{padding:0 13px}}
+@media(max-width:900px){
+    .sb{transform:translateX(-100%)}.sb.open{transform:translateX(0);box-shadow:4px 0 32px rgba(0,0,0,.32)}
+    .sb-ov.open{display:block}.mn{margin-left:0}
+    .kpi-g{grid-template-columns:repeat(3,1fr)}
+    .tb-uname,.tb-urole{display:none}.tb-user{padding:4px 7px}
+}
+@media(max-width:768px){
+    .ph{flex-direction:column;gap:8px}.ph h1{font-size:16px}
+    .kpi-g{grid-template-columns:repeat(3,1fr)}
+    /* Cacher les colonnes moins importantes */
+    .tbl th:nth-child(3),.tbl td:nth-child(3), /* Commission */
+    .tbl th:nth-child(9),.tbl td:nth-child(9)  /* Inscrit le */
+    {display:none}
+    .tbl td,.tbl th{padding:9px 10px}
+}
+@media(max-width:640px){
+    .con{padding:12px}.tb{padding:0 12px;gap:8px}
+    .kpi-g{grid-template-columns:repeat(2,1fr);gap:9px}
+    .kpi{padding:12px}.kpi-v{font-size:20px}.kpi-ic{width:32px;height:32px}
+    /* Barre de filtre : colonne sur mobile */
+    .fb{flex-direction:column;align-items:stretch}
+    .fb-inp{width:100%!important;box-sizing:border-box}
+    .fb-sel{width:100%}
+    .fb-btn{justify-content:center}
+    /* Chips */
+    .chips{gap:5px}
+    .chip{font-size:11px;padding:4px 10px}
+    /* Cacher encore plus de colonnes */
+    .tbl th:nth-child(4),.tbl td:nth-child(4), /* Livreurs */
+    .tbl th:nth-child(5),.tbl td:nth-child(5), /* Zones */
+    .tbl th:nth-child(8),.tbl td:nth-child(8)  /* Activation */
+    {display:none}
+    .tbl td,.tbl th{padding:8px 8px;font-size:11px}
+    .t-name{font-size:11.5px}
+    .t-sub{display:none}
+    .t-av{width:28px;height:28px;border-radius:7px;font-size:10px}
+    .t-comp{gap:6px}
+    .act-btns{flex-direction:column;gap:3px}
+    .btn-sm{justify-content:center;font-size:10.5px;padding:5px 8px}
+    .bdg{font-size:9.5px;padding:2px 6px}
+}
+@media(max-width:480px){
+    .kpi-g{grid-template-columns:repeat(2,1fr);gap:7px}
+    /* Sur très petit écran : Pays aussi caché */
+    .tbl th:nth-child(2),.tbl td:nth-child(2){display:none}
+    .pag{flex-direction:column;gap:6px;align-items:flex-start}
+}
+@media(max-width:360px){
+    .kpi-g{grid-template-columns:1fr 1fr}
+    .con{padding:8px}
+}
 </style>
 @endpush
 
@@ -476,38 +528,48 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
         $currentCountry = request('country','');
         $currentSearch  = request('search','');
         $currentPlan    = request('plan','');
-        $baseParams     = array_filter(['status'=>$currentStatus,'country'=>$currentCountry,'search'=>$currentSearch,'plan'=>$currentPlan]);
+
+        // Params de base pour les chips status (garde country+search+plan, pas status)
+        $baseStatus = array_filter(['country'=>$currentCountry,'search'=>$currentSearch,'plan'=>$currentPlan]);
+        // Params de base pour les chips plan (garde country+search+status, pas plan)
+        $basePlan   = array_filter(['country'=>$currentCountry,'search'=>$currentSearch,'status'=>$currentStatus]);
+        // Params pour "Toutes" : efface status ET plan, garde seulement country+search
+        $baseAll    = array_filter(['country'=>$currentCountry,'search'=>$currentSearch]);
     @endphp
     <div class="chips">
-        <a href="{{ route('admin.entreprises.index', array_merge($baseParams,['status'=>''])) }}"
-           class="chip {{ $currentStatus==='' ? 'on' : '' }}">Toutes</a>
-        <a href="{{ route('admin.entreprises.index', array_merge($baseParams,['status'=>'approved'])) }}"
+        {{-- "Toutes" efface status + plan --}}
+        <a href="{{ route('admin.entreprises.index', $baseAll) }}"
+           class="chip {{ ($currentStatus===''&&$currentPlan==='') ? 'on' : '' }}">Toutes</a>
+
+        <a href="{{ route('admin.entreprises.index', array_merge($baseStatus,['status'=>'approved'])) }}"
            class="chip approved {{ $currentStatus==='approved' ? 'on' : '' }}">
             <span class="chip-ico">{!! $I['check_sm'] !!}</span> Approuvées
         </a>
-        <a href="{{ route('admin.entreprises.index', array_merge($baseParams,['status'=>'pending'])) }}"
+        <a href="{{ route('admin.entreprises.index', array_merge($baseStatus,['status'=>'pending'])) }}"
            class="chip pending {{ $currentStatus==='pending' ? 'on' : '' }}">
             <span class="chip-ico">{!! $I['clock_sm'] !!}</span> En attente
             @if($stats['pending']>0)
                 <span style="background:var(--amber);color:#fff;padding:1px 6px;border-radius:10px;font-size:10px;margin-left:2px">{{ $stats['pending'] }}</span>
             @endif
         </a>
-        <a href="{{ route('admin.entreprises.index', array_merge($baseParams,['status'=>'active'])) }}"
+        <a href="{{ route('admin.entreprises.index', array_merge($baseStatus,['status'=>'active'])) }}"
            class="chip {{ $currentStatus==='active' ? 'on' : '' }}">
             <span style="display:inline-flex;color:var(--green)"><svg width="8" height="8" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="currentColor"/></svg></span>
             Actives
         </a>
-        <a href="{{ route('admin.entreprises.index', array_merge($baseParams,['status'=>'inactive'])) }}"
+        <a href="{{ route('admin.entreprises.index', array_merge($baseStatus,['status'=>'inactive'])) }}"
            class="chip {{ $currentStatus==='inactive' ? 'on' : '' }}">
             <span style="display:inline-flex;color:var(--red)"><svg width="8" height="8" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="currentColor"/></svg></span>
             Inactives
         </a>
-        <a href="{{ route('admin.entreprises.index', array_merge($baseParams,['plan'=>'business'])) }}"
+
+        {{-- Chips plan : clic sur le plan actif = le désactive (toggle) --}}
+        <a href="{{ route('admin.entreprises.index', $currentPlan==='business' ? $basePlan : array_merge($basePlan,['plan'=>'business'])) }}"
            class="chip {{ $currentPlan==='business' ? 'on' : '' }}" style="{{ $currentPlan==='business' ? '' : 'border-color:rgba(124,58,237,.3)' }}">
             💼 Plan Business
             <span style="background:#7c3aed;color:#fff;padding:1px 6px;border-radius:10px;font-size:10px;margin-left:2px">{{ $stats['business'] }}</span>
         </a>
-        <a href="{{ route('admin.entreprises.index', array_merge($baseParams,['plan'=>'gratuit'])) }}"
+        <a href="{{ route('admin.entreprises.index', $currentPlan==='gratuit' ? $basePlan : array_merge($basePlan,['plan'=>'gratuit'])) }}"
            class="chip {{ $currentPlan==='gratuit' ? 'on' : '' }}">
             🆓 Plan Gratuit
             <span style="background:var(--muted);color:#fff;padding:1px 6px;border-radius:10px;font-size:10px;margin-left:2px">{{ $stats['total'] - $stats['business'] }}</span>
@@ -534,7 +596,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
                 {!! $I['search'] !!} Filtrer
             </button>
             @if($currentSearch || $currentCountry)
-                <a href="{{ route('admin.entreprises.index', $currentStatus ? ['status'=>$currentStatus] : []) }}" class="fb-btn">
+                @php $resetParams = array_filter(['status'=>$currentStatus,'plan'=>$currentPlan]); @endphp
+                <a href="{{ route('admin.entreprises.index', $resetParams) }}" class="fb-btn">
                     {!! $I['x_sm'] !!} Réinitialiser
                 </a>
             @endif

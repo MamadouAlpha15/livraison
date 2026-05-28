@@ -105,7 +105,7 @@ body.cx-light .ic-conv-time{color:var(--cx-muted)}
 body.cx-light .ic-empty-conv{color:var(--cx-text2)}
 
 /* ── Layout ── */
-.ic-wrap{display:flex;height:100vh;height:100dvh;overflow:hidden}
+.ic-wrap{display:flex;position:fixed;inset:0;overflow:hidden}
 
 /* ── Sidebar conversations ── */
 .ic-sidebar{
@@ -169,7 +169,7 @@ body.cx-light .ic-empty-conv{color:var(--cx-text2)}
 .ic-empty-conv p{font-size:12px;margin:0;line-height:1.6}
 
 /* ── Main area ── */
-.ic-main{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--cx-bg)}
+.ic-main{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--cx-bg)}
 
 .ic-main-hd{
     height:60px;background:var(--cx-surface);border-bottom:1px solid var(--cx-border);
@@ -202,10 +202,14 @@ body.cx-light .ic-empty-conv{color:var(--cx-text2)}
 
 /* Messages */
 .ic-messages{
-    flex:1;overflow-y:auto;padding:20px 24px;
+    flex:1;min-height:0;overflow-y:auto;padding:20px 24px;
     display:flex;flex-direction:column;gap:4px;
     scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.25) transparent;
 }
+/* Spacer qui pousse les messages vers le bas (comme WhatsApp) :
+   quand peu de messages → spacer prend la place vide → messages en bas
+   quand beaucoup → spacer = 0, scroll normal */
+.ic-messages::before{content:'';flex:1;min-height:0}
 .ic-messages::-webkit-scrollbar{width:4px}
 .ic-messages::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3);border-radius:4px}
 
@@ -296,7 +300,7 @@ button,input,textarea,select,
 /* Mobile (≤768px) : sidebar en overlay */
 @media(max-width:768px){
     .ic-sidebar{
-        width:min(320px,100%);position:fixed;top:0;left:0;bottom:0;z-index:40;
+        width:min(320px,100%);position:fixed;top:0;left:0;bottom:0;z-index:50;
         transform:translateX(-100%);transition:transform .28s cubic-bezier(.23,1,.32,1);
         box-shadow:4px 0 30px rgba(0,0,0,.4);
     }
@@ -310,7 +314,7 @@ button,input,textarea,select,
     .ic-wrap.no-conv .ic-overlay{display:none!important}
     .ic-overlay{
         display:none;position:fixed;inset:0;
-        background:rgba(0,0,0,.55);z-index:39;
+        background:rgba(0,0,0,.55);z-index:45;
         backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
     }
     .ic-overlay.open{display:block}
@@ -329,7 +333,7 @@ button,input,textarea,select,
     .ic-main-hd{padding:0 14px;gap:10px;height:56px}
     .ic-messages{padding:14px 12px;gap:3px}
     .msg-row{max-width:90%}
-    .ic-input-area{padding:10px 12px;padding-bottom:max(10px,env(safe-area-inset-bottom))}
+    .ic-input-area{padding:10px 12px;padding-bottom:max(10px,env(safe-area-inset-bottom));position:sticky;bottom:0;z-index:5}
     .ic-input-hint{display:none}
     .ic-welcome .wico{font-size:44px}
     .ic-welcome h3{font-size:17px}
@@ -410,8 +414,8 @@ body.cx-light .moc-val{color:#1e293b;}
     }
 @endphp
 
-<div class="ic-overlay" id="icOverlay"></div>
 <div class="ic-wrap {{ !$activeShopId ? 'no-conv' : '' }}" id="icWrap">
+<div class="ic-overlay" id="icOverlay"></div>
 
 {{-- ── SIDEBAR ── --}}
 <div class="ic-sidebar" id="icSidebar">
@@ -754,7 +758,7 @@ async function loadMessages(initial) {
         const data = await res.json();
         if (!data.ok || !data.messages.length) return;
         data.messages.forEach(m => { renderMsg(m); lastAt = m.created_at; });
-        messages.scrollTop = messages.scrollHeight;
+        scrollToBottom();
     } catch(e) { console.error(e); }
 }
 
@@ -774,7 +778,7 @@ async function sendMsg() {
         if (data.ok) {
             renderMsg({ from_type:'company', body:txt, created_at: data.last || new Date().toISOString() });
             icInput.value = ''; icInput.style.height = '';
-            messages.scrollTop = messages.scrollHeight;
+            scrollToBottom();
             lastAt = data.last;
             // Update sidebar preview
             const prev = document.querySelector(`.ic-conv[data-shop="${activeShopId}"] .ic-conv-preview`);
@@ -801,6 +805,16 @@ function showToast(msg, type) {
     setTimeout(() => t.remove(), 3500);
 }
 
+// Double RAF : 1er frame = layout calculé, 2ème = scrollHeight lisible
+function scrollToBottom() {
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            messages.scrollTop = messages.scrollHeight;
+        });
+    });
+}
+
+
 icSend.addEventListener('click', sendMsg);
 icInput.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
@@ -809,6 +823,14 @@ icInput.addEventListener('input', () => {
     icInput.style.height = 'auto';
     icInput.style.height = Math.min(icInput.scrollHeight, 130) + 'px';
 });
+
+// Quand le clavier s'ouvre, scroller vers le bas après l'animation (~300ms)
+icInput.addEventListener('focus', () => {
+    setTimeout(scrollToBottom, 320);
+});
+if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => setTimeout(scrollToBottom, 100));
+}
 
 // Search conversations
 document.getElementById('icSearch')?.addEventListener('input', function(){
@@ -895,8 +917,8 @@ if (activeShopId) {
     @if($messages->count())
     lastAt = '{{ $messages->last()->created_at->toDateTimeString() }}';
     @endif
-    messages.scrollTop = messages.scrollHeight;
-    // L'utilisateur a navigué vers cette conversation : marquer comme lus
+    // Petit délai pour laisser le DOM se stabiliser avant de scroller
+    setTimeout(scrollToBottom, 80);
     markRead(activeShopId);
     pollTimer = setInterval(() => loadMessages(false), 2000);
 }

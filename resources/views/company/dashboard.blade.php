@@ -884,6 +884,67 @@ body.cx-light .cx-chart-big { color:#111827; }
 .tb-greeting { font-size:14px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .tb-greeting-sub { font-size:11px; color:var(--muted); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
+
+/* ── Plan Gratuit banner – responsive mobile ── */
+.cx-free-banner {
+    background:linear-gradient(135deg,#2a1800 0%,#1e1000 60%,#241400 100%);
+    border:1px solid rgba(245,158,11,.4);border-radius:14px;
+    padding:16px 20px;
+    box-shadow:0 4px 24px rgba(245,158,11,.12),inset 0 1px 0 rgba(255,255,255,.05);
+}
+.cx-free-banner-label {
+    font-size:10px;font-weight:800;color:#fbbf24;text-transform:uppercase;
+    letter-spacing:.8px;margin-bottom:10px;display:flex;align-items:center;gap:6px;
+}
+.cx-free-banner-body {
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.cx-free-banner-stats {
+    display:flex;gap:16px;flex:1;
+}
+.cx-free-stat {
+    display:flex;flex-direction:column;gap:4px;flex:1;
+}
+.cx-free-stat-label { font-size:10px;font-weight:600;color:rgba(255,255,255,.55); }
+.cx-free-stat-val {
+    font-size:15px;font-weight:900;color:#fff;letter-spacing:-.3px;line-height:1;
+}
+.cx-free-stat-val span { font-size:11px;font-weight:600;color:rgba(255,255,255,.4); }
+.cx-free-stat-bar {
+    height:4px;background:rgba(255,255,255,.12);border-radius:99px;overflow:hidden;margin-top:3px;
+}
+.cx-free-stat-fill { height:100%;border-radius:99px;transition:width .3s; }
+.cx-free-banner-btn {
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    padding:9px 16px;
+    background:linear-gradient(135deg,#f59e0b,#d97706);
+    color:#fff;font-size:12px;font-weight:800;border-radius:9px;
+    text-decoration:none;white-space:nowrap;flex-shrink:0;
+    box-shadow:0 3px 12px rgba(245,158,11,.35);
+}
+.cx-free-banner-footer {
+    margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);
+    display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+}
+.cx-free-banner-footer span { font-size:10.5px;color:rgba(255,255,255,.35); }
+.cx-free-banner-footer span.ft-lbl { color:rgba(255,255,255,.45);font-weight:600; }
+/* Desktop : cacher le texte court */
+.cx-btn-mobile { display:none; }
+
+/* Mobile */
+@media(max-width:640px){
+    .cx-free-banner { padding:14px; }
+    .cx-free-banner-body { flex-direction:column;align-items:stretch;gap:12px; }
+    .cx-free-banner-stats { gap:0;border:1px solid rgba(245,158,11,.2);border-radius:10px;overflow:hidden; }
+    .cx-free-stat { flex:1;padding:10px 12px;gap:5px;border-right:1px solid rgba(245,158,11,.15); }
+    .cx-free-stat:last-child { border-right:none; }
+    .cx-free-stat-label { font-size:9px; }
+    .cx-free-stat-val { font-size:14px; }
+    .cx-free-banner-btn { width:100%;font-size:13px;padding:11px;white-space:normal; }
+    .cx-free-banner-footer { display:none; }
+    .cx-btn-desktop { display:none; }
+    .cx-btn-mobile { display:inline; }
+}
 </style>
 @endpush
 
@@ -1079,53 +1140,56 @@ body.cx-light .cx-chart-big { color:#111827; }
             <a href="{{ route('company.subscription.upgrade') }}" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:11px;font-weight:700;padding:6px 14px;border-radius:20px;text-decoration:none;white-space:nowrap">Renouveler</a>
         </div>
         @else
-        <div style="background:linear-gradient(135deg,#2a1800 0%,#1e1000 60%,#241400 100%);border:1px solid rgba(245,158,11,.4);border-radius:14px;padding:16px 20px;box-shadow:0 4px 24px rgba(245,158,11,.12),inset 0 1px 0 rgba(255,255,255,.05);">
-            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-                <div>
-                    <div style="font-size:11px;font-weight:800;color:#fbbf24;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Plan Gratuit</div>
-                    <div style="display:flex;flex-wrap:wrap;gap:14px;">
-                        {{-- Chauffeurs --}}
-                        @php $dPct = $maxDrivers > 0 ? min(100, round($totalDrivers / $maxDrivers * 100)) : 0; @endphp
-                        <div style="min-width:120px">
-                            <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.75);margin-bottom:5px">🚗 Chauffeurs</div>
-                            <div style="font-size:16px;font-weight:900;color:{{ $totalDrivers >= $maxDrivers ? '#fca5a5' : '#fff' }};letter-spacing:-.3px;line-height:1">{{ $totalDrivers }}<span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.5)">/{{ $maxDrivers }}</span></div>
-                            <div style="height:5px;background:rgba(255,255,255,.15);border-radius:99px;margin-top:6px;overflow:hidden">
-                                <div style="height:100%;width:{{ $dPct }}%;background:{{ $totalDrivers >= $maxDrivers ? '#ef4444' : '#f59e0b' }};border-radius:99px;transition:width .3s"></div>
-                            </div>
+        @php
+            $dPct = $maxDrivers > 0 ? min(100, round($totalDrivers / $maxDrivers * 100)) : 0;
+            $zPct = $maxZones   > 0 ? min(100, round($totalZones   / $maxZones   * 100)) : 0;
+            $oPct = $maxOrders  > 0 ? min(100, round($usedOrders   / $maxOrders  * 100)) : 0;
+        @endphp
+        <div class="cx-free-banner">
+            <div class="cx-free-banner-label">
+                <span>⚡</span> Plan Gratuit · Votre entreprise est active
+            </div>
+            <div class="cx-free-banner-body">
+                <div class="cx-free-banner-stats">
+                    <div class="cx-free-stat">
+                        <div class="cx-free-stat-label">🚗 Chauffeurs</div>
+                        <div class="cx-free-stat-val" style="color:{{ $totalDrivers >= $maxDrivers ? '#fca5a5' : '#fff' }}">
+                            {{ $totalDrivers }}<span>/{{ $maxDrivers }}</span>
                         </div>
-                        {{-- Zones --}}
-                        @php $zPct = $maxZones > 0 ? min(100, round($totalZones / $maxZones * 100)) : 0; @endphp
-                        <div style="min-width:120px">
-                            <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.75);margin-bottom:5px">🗺 Zones</div>
-                            <div style="font-size:16px;font-weight:900;color:{{ $totalZones >= $maxZones ? '#fca5a5' : '#fff' }};letter-spacing:-.3px;line-height:1">{{ $totalZones }}<span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.5)">/{{ $maxZones }}</span></div>
-                            <div style="height:5px;background:rgba(255,255,255,.15);border-radius:99px;margin-top:6px;overflow:hidden">
-                                <div style="height:100%;width:{{ $zPct }}%;background:{{ $totalZones >= $maxZones ? '#ef4444' : '#f59e0b' }};border-radius:99px;transition:width .3s"></div>
-                            </div>
+                        <div class="cx-free-stat-bar">
+                            <div class="cx-free-stat-fill" style="width:{{ $dPct }}%;background:{{ $totalDrivers >= $maxDrivers ? '#ef4444' : '#f59e0b' }}"></div>
                         </div>
-                        {{-- Commandes --}}
-                        @php $oPct = $maxOrders > 0 ? min(100, round($usedOrders / $maxOrders * 100)) : 0; @endphp
-                        <div style="min-width:120px">
-                            <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.75);margin-bottom:5px">📦 Commandes/mois</div>
-                            <div style="font-size:16px;font-weight:900;color:{{ $usedOrders >= $maxOrders ? '#fca5a5' : '#fff' }};letter-spacing:-.3px;line-height:1">{{ $usedOrders }}<span style="font-size:12px;font-weight:600;color:rgba(255,255,255,.5)">/{{ $maxOrders }}</span></div>
-                            <div style="height:5px;background:rgba(255,255,255,.15);border-radius:99px;margin-top:6px;overflow:hidden">
-                                <div style="height:100%;width:{{ $oPct }}%;background:{{ $usedOrders >= $maxOrders ? '#ef4444' : '#f59e0b' }};border-radius:99px;transition:width .3s"></div>
-                            </div>
+                    </div>
+                    <div class="cx-free-stat">
+                        <div class="cx-free-stat-label">🗺 Zones</div>
+                        <div class="cx-free-stat-val" style="color:{{ $totalZones >= $maxZones ? '#fca5a5' : '#fff' }}">
+                            {{ $totalZones }}<span>/{{ $maxZones }}</span>
+                        </div>
+                        <div class="cx-free-stat-bar">
+                            <div class="cx-free-stat-fill" style="width:{{ $zPct }}%;background:{{ $totalZones >= $maxZones ? '#ef4444' : '#f59e0b' }}"></div>
+                        </div>
+                    </div>
+                    <div class="cx-free-stat">
+                        <div class="cx-free-stat-label">📦 Cmd/mois</div>
+                        <div class="cx-free-stat-val" style="color:{{ $usedOrders >= $maxOrders ? '#fca5a5' : '#fff' }}">
+                            {{ $usedOrders }}<span>/{{ $maxOrders }}</span>
+                        </div>
+                        <div class="cx-free-stat-bar">
+                            <div class="cx-free-stat-fill" style="width:{{ $oPct }}%;background:{{ $usedOrders >= $maxOrders ? '#ef4444' : '#f59e0b' }}"></div>
                         </div>
                     </div>
                 </div>
-                <a href="{{ route('company.subscription.upgrade') }}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:12px;font-weight:800;border-radius:9px;text-decoration:none;white-space:nowrap;flex-shrink:0;box-shadow:0 3px 12px rgba(245,158,11,.35)">
-                    ✦ Passer au Plan Business — {{ $bizPriceLabel }}
+                <a href="{{ route('company.subscription.upgrade') }}" class="cx-free-banner-btn">
+                    <span class="cx-btn-desktop">✦ Passer au Plan Business — {{ $bizPriceLabel }}</span>
+                    <span class="cx-btn-mobile">✦ Passer au Plan Business</span>
                 </a>
             </div>
-            <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);display:flex;flex-wrap:wrap;gap:8px;">
-                <span style="font-size:11px;color:#64748b">🔒 Fonctionnalités Business :</span>
-                <span style="font-size:11px;color:#475569">Carte en direct (GPS)</span>
-                <span style="color:#334155;font-size:10px">·</span>
-                <span style="font-size:11px;color:#475569">Rapports & exports</span>
-                <span style="color:#334155;font-size:10px">·</span>
-                <span style="font-size:11px;color:#475569">Statistiques avancées</span>
-                <span style="color:#334155;font-size:10px">·</span>
-                <span style="font-size:11px;color:#475569">Gestion utilisateurs</span>
+            <div class="cx-free-banner-footer">
+                <span class="ft-lbl">🔒 Business :</span>
+                <span>Carte GPS</span><span>·</span>
+                <span>Rapports</span><span>·</span>
+                <span>Stats avancées</span><span>·</span>
+                <span>Multi-utilisateurs</span>
             </div>
         </div>
         @endif

@@ -330,6 +330,61 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
     .con{padding:8px}
 }
 
+/* ─── REVENUE BANNER ─── */
+.rev-banner{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.rev-card{border-radius:18px;padding:26px 28px;position:relative;overflow:hidden;cursor:default;
+    transition:transform .2s,box-shadow .2s}
+.rev-card:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.rev-card.ca{background:linear-gradient(135deg,#4c1d95 0%,#6d28d9 45%,#7c3aed 100%)}
+.rev-card.today{background:linear-gradient(135deg,#064e3b 0%,#065f46 45%,#059669 100%)}
+/* motif décoratif fond */
+.rev-card::before{
+    content:'';position:absolute;top:-40px;right:-40px;
+    width:180px;height:180px;border-radius:50%;
+    background:rgba(255,255,255,.06);pointer-events:none}
+.rev-card::after{
+    content:'';position:absolute;bottom:-60px;right:60px;
+    width:220px;height:220px;border-radius:50%;
+    background:rgba(255,255,255,.04);pointer-events:none}
+.rev-tag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;
+    text-transform:uppercase;letter-spacing:1px;
+    padding:4px 11px;border-radius:20px;margin-bottom:18px}
+.rev-card.ca .rev-tag{background:rgba(167,139,250,.25);color:#ddd6fe}
+.rev-card.today .rev-tag{background:rgba(52,211,153,.2);color:#a7f3d0}
+.rev-body{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.rev-left{flex:1;min-width:0}
+.rev-amount{font-size:34px;font-weight:900;color:#fff;letter-spacing:-1.5px;line-height:1;
+    transition:all .3s}
+.rev-currency{font-size:14px;font-weight:700;opacity:.65;margin-left:4px;letter-spacing:0}
+.rev-label{font-size:13px;font-weight:700;color:rgba(255,255,255,.75);margin-top:8px}
+.rev-sub{font-size:11px;color:rgba(255,255,255,.45);margin-top:3px}
+.rev-ico-wrap{width:58px;height:58px;border-radius:16px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center}
+.rev-card.ca .rev-ico-wrap{background:rgba(255,255,255,.12)}
+.rev-card.today .rev-ico-wrap{background:rgba(255,255,255,.12)}
+.rev-ico-wrap svg{width:26px;height:26px;color:#fff;opacity:.9}
+.rev-footer{display:flex;align-items:center;gap:8px;margin-top:18px;
+    padding-top:14px;border-top:1px solid rgba(255,255,255,.1)}
+.rev-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;
+    padding:3px 10px;border-radius:20px}
+.rev-card.ca .rev-badge{background:rgba(167,139,250,.2);color:#ddd6fe}
+.rev-card.today .rev-badge{background:rgba(52,211,153,.15);color:#a7f3d0}
+.rev-date{font-size:11px;color:rgba(255,255,255,.35);margin-left:auto}
+@media(max-width:900px){
+    .rev-card{padding:20px 22px}
+    .rev-amount{font-size:28px}
+}
+@media(max-width:640px){
+    .rev-banner{grid-template-columns:1fr;gap:12px}
+    .rev-card{padding:18px 20px}
+    .rev-amount{font-size:26px}
+    .rev-ico-wrap{width:48px;height:48px;border-radius:13px}
+}
+@media(max-width:480px){
+    .rev-amount{font-size:22px;letter-spacing:-1px}
+    .rev-currency{font-size:12px}
+}
+
 /* ─── NOTIFICATION BELL ─── */
 @keyframes bellShake{
     0%,100%{transform:rotate(0)}
@@ -677,6 +732,59 @@ $I = [
         </div>
     </div>
 
+    {{-- ── REVENUE ABONNEMENTS ── --}}
+    <div class="rev-banner">
+
+        {{-- Chiffre d'affaires total --}}
+        <div class="rev-card ca">
+            <div class="rev-tag">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h9l-1 8L21 10h-9l1-8z"/></svg>
+                Chiffre d'affaires
+            </div>
+            <div class="rev-body">
+                <div class="rev-left">
+                    <div class="rev-amount" id="kSubCaTotal">{{ number_format($kpis['subCaTotal'],0,',',' ') }}<span class="rev-currency">GNF</span></div>
+                    <div class="rev-label">Revenus abonnements</div>
+                    <div class="rev-sub">Boutiques Pro + Entreprises Business</div>
+                </div>
+                <div class="rev-ico-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M14 8H8m8 4H8m5 4H8"/></svg>
+                </div>
+            </div>
+            <div class="rev-footer">
+                <span class="rev-badge" id="kSubCountMonth">
+                    {{ $kpis['subCountMonth']>0?'▲ '.$kpis['subCountMonth'].' abonnement'.($kpis['subCountMonth']>1?'s':'').' ce mois':'→ Aucun ce mois' }}
+                </span>
+                <span class="rev-date">{{ now()->locale('fr')->isoFormat('MMMM YYYY') }}</span>
+            </div>
+        </div>
+
+        {{-- Revenue aujourd'hui --}}
+        <div class="rev-card today">
+            <div class="rev-tag">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                Revenue aujourd'hui
+            </div>
+            <div class="rev-body">
+                <div class="rev-left">
+                    <div class="rev-amount" id="kSubCaToday">{{ number_format($kpis['subCaToday'],0,',',' ') }}<span class="rev-currency">GNF</span></div>
+                    <div class="rev-label">Abonnements du jour</div>
+                    <div class="rev-sub" id="kSubCountToday">{{ $kpis['subCountToday']>0?$kpis['subCountToday'].' abonnement'.($kpis['subCountToday']>1?'s':'').' souscrit'.($kpis['subCountToday']>1?'s':'')." aujourd'hui":"Aucun abonnement aujourd'hui" }}</div>
+                </div>
+                <div class="rev-ico-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+            </div>
+            <div class="rev-footer">
+                <span class="rev-badge" id="kSubTodayFooter">
+                    {{ $kpis['subCaToday']>0?'✓ '.number_format($kpis['subCaToday'],0,',',' ').' GNF encaissé':'→ 0 GNF aujourd\'hui' }}
+                </span>
+                <span class="rev-date">{{ now()->locale('fr')->isoFormat('D MMMM') }}</span>
+            </div>
+        </div>
+
+    </div>
+
     {{-- ── DOUBLE SAAS BANNER ── --}}
     <div class="saas-banner">
         <div class="saas-card shop">
@@ -684,7 +792,7 @@ $I = [
                 <div class="saas-card-ico">{!! $I['store_lg'] !!}</div>
                 <div>
                     <div class="saas-card-title">SaaS Boutiques</div>
-                    <div class="saas-card-sub">{{ $kpis['clientsTotal'] }} clients · {{ $kpis['ordersTotal'] }} commandes</div>
+                    <div class="saas-card-sub" id="saasBannerShopSub">{{ $kpis['clientsTotal'] }} clients · {{ $kpis['ordersTotal'] }} commandes</div>
                 </div>
             </div>
             <div class="saas-nums">
@@ -713,7 +821,7 @@ $I = [
                 <div class="saas-card-ico">{!! $I['truck_lg'] !!}</div>
                 <div>
                     <div class="saas-card-title">SaaS Livraison</div>
-                    <div class="saas-card-sub">{{ $kpis['driversTotal'] }} livreurs · {{ $kpis['ordersDelivered'] }} livraisons</div>
+                    <div class="saas-card-sub" id="saasBannerLivrSub">{{ $kpis['driversTotal'] }} livreurs · {{ $kpis['ordersDelivered'] }} livraisons</div>
                 </div>
             </div>
             <div class="saas-nums">
@@ -744,7 +852,7 @@ $I = [
         <div class="kpi p">
             <div class="kpi-top">
                 <div class="kpi-ic p">{!! $I['users_lg'] !!}</div>
-                <div class="kpi-tr up">▲ +{{ $kpis['usersToday'] }} auj.</div>
+                <div class="kpi-tr up" id="kTrendUsers">▲ +{{ $kpis['usersToday'] }} auj.</div>
             </div>
             <div class="kpi-v" id="kUsersTotal">{{ $kpis['usersTotal'] }}</div>
             <div class="kpi-l">Utilisateurs</div>
@@ -762,16 +870,16 @@ $I = [
         <div class="kpi a">
             <div class="kpi-top">
                 <div class="kpi-ic a">{!! $I['box_lg'] !!}</div>
-                <div class="kpi-tr {{ $kpis['ordersToday']>0?'up':'fl' }}">▲ {{ $kpis['ordersToday'] }} auj.</div>
+                <div class="kpi-tr {{ $kpis['ordersToday']>0?'up':'fl' }}" id="kTrendOrders">▲ {{ $kpis['ordersToday'] }} auj.</div>
             </div>
             <div class="kpi-v" id="kOrdersTotal">{{ $kpis['ordersTotal'] }}</div>
             <div class="kpi-l">Commandes</div>
-            <div class="kpi-s">{{ $kpis['ordersDelivered'] }} livrées</div>
+            <div class="kpi-s" id="kOrdersDelivered">{{ $kpis['ordersDelivered'] }} livrées</div>
         </div>
         <div class="kpi r">
             <div class="kpi-top">
                 <div class="kpi-ic r">{!! $I['clock_lg'] !!}</div>
-                <div class="kpi-tr {{ $kpis['pendingAppr']>0?'dn':'fl' }}">
+                <div class="kpi-tr {{ $kpis['pendingAppr']>0?'dn':'fl' }}" id="kTrendPending">
                     {{ $kpis['pendingAppr']>0?'▼ '.$kpis['pendingAppr']:'→ 0' }}
                 </div>
             </div>
@@ -812,7 +920,7 @@ $I = [
         <div class="kpi b">
             <div class="kpi-top">
                 <div class="kpi-ic b">{!! $I['user'] !!}</div>
-                <div class="kpi-tr {{ $kpis['clientsToday']>0?'up':'fl' }}">
+                <div class="kpi-tr {{ $kpis['clientsToday']>0?'up':'fl' }}" id="kTrendClients">
                     {{ $kpis['clientsToday']>0?'▲ +'.$kpis['clientsToday'].' auj.':'→ 0 auj.' }}
                 </div>
             </div>
@@ -820,6 +928,7 @@ $I = [
             <div class="kpi-l">Clients inscrits</div>
             <div class="kpi-s" id="kClientsToday">{{ $kpis['clientsToday']>0?'+'.$kpis['clientsToday']." aujourd'hui"."":"Aucun aujourd'hui" }}</div>
         </div>
+
     </div>
 
     {{-- ── ACTIONS RAPIDES ── --}}
@@ -873,9 +982,7 @@ $I = [
                 <div class="sc-t">
                     <span class="sc-ico" style="color:var(--red)">{!! $I['clock'] !!}</span>
                     Entreprises en attente
-                    @if($kpis['pendingAppr']>0)
-                        <span class="bdg r">{{ $kpis['pendingAppr'] }}</span>
-                    @endif
+                    <span class="bdg r" id="kPendingBadge" style="{{ $kpis['pendingAppr']>0?'':'display:none' }}">{{ $kpis['pendingAppr'] }}</span>
                 </div>
                 <a href="{{ route('admin.entreprises.index', ['status'=>'pending']) }}" class="btn-sm-green">
                     {!! $I['truck'] !!} Tout voir
@@ -1036,7 +1143,7 @@ $I = [
             <div class="cw" id="chartWrap">
                 <div class="c-axis"></div>
             </div>
-            <div style="padding:0 18px 11px;font-size:10.5px;color:var(--muted);text-align:center">
+            <div style="padding:0 18px 11px;font-size:10.5px;color:var(--muted);text-align:center" id="kChartFooter">
                 {{ $kpis['ordersTotal'] }} commandes · {{ $kpis['ordersDelivered'] }} livrées
             </div>
         </div>
@@ -1362,10 +1469,49 @@ function pollStats(){
             setVal('saasCompPending',k.compPending);
             const sct=document.getElementById('saasCompToday');
             if(sct)sct.innerHTML='<span class="saas-arrow">▲</span>'+k.compApprovedToday;
+            // Progress bars — valeurs + largeur dynamique
             const brSV=document.getElementById('brShopsV');if(brSV)brSV.textContent=k.shopsActive+'/'+k.shopsTotal;
             const brOV=document.getElementById('brOrdersV');if(brOV)brOV.textContent=k.ordersDelivered+'/'+k.ordersTotal;
             const brCV=document.getElementById('brCompV');if(brCV)brCV.textContent=k.compActive+'/'+k.compTotal;
             const brDV=document.getElementById('brDriversV');if(brDV)brDV.textContent=k.driversTotal;
+            const brShops=document.getElementById('brShops');
+            if(brShops)brShops.style.width=(k.shopsTotal>0?Math.round(k.shopsActive/k.shopsTotal*100):0)+'%';
+            const brOrders=document.getElementById('brOrders');
+            if(brOrders)brOrders.style.width=(k.ordersTotal>0?Math.round(k.ordersDelivered/k.ordersTotal*100):0)+'%';
+            const brComp=document.getElementById('brComp');
+            if(brComp)brComp.style.width=(k.compTotal>0?Math.round(k.compActive/k.compTotal*100):0)+'%';
+            const brDrivers=document.getElementById('brDrivers');
+            if(brDrivers)brDrivers.style.width=Math.min(100,k.driversTotal*10)+'%';
+            // Trend badges KPI
+            const trU=document.getElementById('kTrendUsers');
+            if(trU)trU.textContent='▲ +'+(k.usersToday||0)+' auj.';
+            const trO=document.getElementById('kTrendOrders');
+            if(trO){trO.textContent='▲ '+(k.ordersToday||0)+' auj.';trO.className='kpi-tr '+(k.ordersToday>0?'up':'fl');}
+            const trP=document.getElementById('kTrendPending');
+            if(trP){trP.textContent=k.pendingAppr>0?'▼ '+k.pendingAppr:'→ 0';trP.className='kpi-tr '+(k.pendingAppr>0?'dn':'fl');}
+            const trC=document.getElementById('kTrendClients');
+            if(trC){trC.textContent=k.clientsToday>0?'▲ +'+(k.clientsToday)+' auj.':'→ 0 auj.';trC.className='kpi-tr '+(k.clientsToday>0?'up':'fl');}
+            // KPI secondary text
+            const kOD=document.getElementById('kOrdersDelivered');
+            if(kOD)kOD.textContent=(k.ordersDelivered||0)+' livrées';
+            // SaaS banner sub-text
+            const sbShopSub=document.getElementById('saasBannerShopSub');
+            if(sbShopSub)sbShopSub.textContent=(k.clientsTotal||0)+' clients · '+(k.ordersTotal||0)+' commandes';
+            const sbLivrSub=document.getElementById('saasBannerLivrSub');
+            if(sbLivrSub)sbLivrSub.textContent=(k.driversTotal||0)+' livreurs · '+(k.ordersDelivered||0)+' livraisons';
+            // Revenue banner badges
+            const subCM=document.getElementById('kSubCountMonth');
+            if(subCM&&k.subCountMonth!==undefined)
+                subCM.textContent=k.subCountMonth>0?'▲ '+k.subCountMonth+' abonnement'+(k.subCountMonth>1?'s':'')+' ce mois':'→ Aucun ce mois';
+            const subTF=document.getElementById('kSubTodayFooter');
+            if(subTF&&k.subCaToday!==undefined)
+                subTF.textContent=k.subCaToday>0?'✓ '+Number(k.subCaToday).toLocaleString('fr-FR',{maximumFractionDigits:0})+' GNF encaissé':'→ 0 GNF aujourd\'hui';
+            // Pending section badge
+            const kPB=document.getElementById('kPendingBadge');
+            if(kPB){kPB.textContent=k.pendingAppr;kPB.style.display=k.pendingAppr>0?'':'none';}
+            // Chart footer
+            const kCF=document.getElementById('kChartFooter');
+            if(kCF)kCF.textContent=(k.ordersTotal||0)+' commandes · '+(k.ordersDelivered||0)+' livrées';
             // badges sidebar temps réel
             const sbS=document.getElementById('sbBadgeShops');
             if(sbS){sbS.style.display=k.shopsPending>0?'':'none';sbS.textContent=k.shopsPending;}
@@ -1379,13 +1525,23 @@ function pollStats(){
             _prevBellBadge=badge;
             updateBellBadge(badge);
             if(_npOpen)renderNotifPanel(k);
+            // Abonnements CA
+            const subTotEl=document.getElementById('kSubCaTotal');
+            if(subTotEl&&k.subCaTotal!==undefined)
+                subTotEl.innerHTML=Number(k.subCaTotal).toLocaleString('fr-FR',{maximumFractionDigits:0})+'<span class="rev-currency">GNF</span>';
+            const subTodEl=document.getElementById('kSubCaToday');
+            if(subTodEl&&k.subCaToday!==undefined)
+                subTodEl.innerHTML=Number(k.subCaToday).toLocaleString('fr-FR',{maximumFractionDigits:0})+'<span class="rev-currency">GNF</span>';
+            const subCntEl=document.getElementById('kSubCountToday');
+            if(subCntEl&&k.subCountToday!==undefined)
+                subCntEl.textContent=k.subCountToday>0?k.subCountToday+' abonnement'+(k.subCountToday>1?'s':'')+(k.subCountToday>1?' souscrits':' souscrit')+" aujourd'hui":"Aucun abonnement aujourd'hui";
             buildChart(d.chart);
             updateActivity(d.activity);
             const ts=document.getElementById('liveTs');if(ts)ts.textContent=d.ts;
         })
         .catch(()=>{});
-    setTimeout(pollStats,30000);
+    setTimeout(pollStats,15000);
 }
-setTimeout(pollStats,30000);
+setTimeout(pollStats,15000);
 </script>
 @endpush

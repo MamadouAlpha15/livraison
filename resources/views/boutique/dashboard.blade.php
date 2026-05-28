@@ -1408,7 +1408,10 @@ $I = [
             <button class="btn-hamburger" id="btnMenu" aria-label="Menu">{!! $I['menu'] !!}</button>
             <div class="tb-info">
                 <div class="tb-greeting">Bonjour, {{ auth()->user()->name }} 👋</div>
-                <div class="tb-greeting-sub">Voici ce qui se passe avec votre boutique aujourd'hui.</div>
+                <div class="tb-greeting-sub">
+                    Voici ce qui se passe avec votre boutique aujourd'hui.
+                    <span id="dashLastUpdate" style="margin-left:6px;font-size:10px;color:var(--muted);font-weight:500"></span>
+                </div>
             </div>
 
             
@@ -2829,6 +2832,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const msgBtn = document.getElementById('msgTopbarBtn');
             if (msgBtn) msgBtn.classList.toggle('has-unread', d.messages_unread > 0);
 
+            /* Si plus aucun message non lu → purger les alertes msg de la cloche */
+            if (d.messages_unread === 0 && _alerts.some(a => a.type === 'msg')) {
+                _alerts = _alerts.filter(a => a.type !== 'msg');
+                _saveAlerts();
+                _pushNotifState();
+            }
+
             /* Nouveaux messages — même logique au 1er poll et aux suivants */
             if (Array.isArray(d.latest_messages) && d.latest_messages.length > 0) {
                 const newMsgs = d.latest_messages.filter(m => m.id > _lastSeenMsgId);
@@ -3658,6 +3668,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* Premier appel après 30s puis toutes les 30s */
     setInterval(pollKpi, 30000);
+})();
+
+/* ── Auto-refresh toutes les 90 secondes ── */
+(function () {
+    const INTERVAL = 90;
+    const el = document.getElementById('dashLastUpdate');
+
+    function fmt(d) {
+        return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+    }
+
+    let remaining = INTERVAL;
+    if (el) el.textContent = '· mis à jour à ' + fmt(new Date());
+
+    const tick = setInterval(function () {
+        remaining--;
+        if (remaining <= 0) {
+            clearInterval(tick);
+            location.reload();
+        }
+        if (el && remaining <= 10) {
+            el.textContent = '· actualisation dans ' + remaining + 's…';
+        }
+    }, 1000);
 })();
 </script>
 @endpush
