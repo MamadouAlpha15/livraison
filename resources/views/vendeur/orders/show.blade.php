@@ -1,4 +1,4 @@
-{{-- resources/views/vendeur/orders/show.blade.php --}}
+﻿{{-- resources/views/vendeur/orders/show.blade.php --}}
 @extends('layouts.app')
 @section('title', 'Commande #' . $order->id)
 @php $bodyClass = 'is-dashboard'; @endphp
@@ -817,13 +817,14 @@ function toggleGroup(btn) {
     let mapLat = {{ $lat0 ?? 9.6412 }};
     let mapLng = {{ $lng0 ?? -13.5784 }};
 
+    const MAPBOX_TOKEN = '{{ config('services.mapbox.token') }}';
     const TILE_PROVIDERS = [
+        { url:`https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=${MAPBOX_TOKEN}`,
+          opts:{ attribution:'© Mapbox', maxZoom:19, crossOrigin:'' } },
         { url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
           opts:{ attribution:'© OpenStreetMap', maxZoom:19, subdomains:'abc', crossOrigin:'' } },
         { url:'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
           opts:{ attribution:'© CartoDB', subdomains:'abcd', maxZoom:20, crossOrigin:'' } },
-        { url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
-          opts:{ attribution:'© Esri', maxZoom:19, crossOrigin:'' } },
     ];
 
     function makeMotoIcon() {

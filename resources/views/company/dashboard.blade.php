@@ -963,7 +963,7 @@ body.cx-light .cx-chart-big { color:#111827; }
     <div class="cx-brand-hd">
         <div class="cx-brand-top">
             <a href="{{ route('company.dashboard') }}" class="cx-logo">
-               <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
+               <div class="sb-logo-icon"><img src="/images/shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
                 <span class="sb-shop-name">{{ $company->name }}</span>
             </a>
             <button class="cx-close-btn" id="cxClose">✕</button>
@@ -1137,7 +1137,6 @@ body.cx-light .cx-chart-big { color:#111827; }
                     <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:1px">Expire le {{ $company->plan_expires_at->format('d/m/Y') }} — encore {{ $daysLeft }} jour{{ $daysLeft > 1 ? 's' : '' }}</div>
                 </div>
             </div>
-            <a href="{{ route('company.subscription.upgrade') }}" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:11px;font-weight:700;padding:6px 14px;border-radius:20px;text-decoration:none;white-space:nowrap">Renouveler</a>
         </div>
         @else
         @php
@@ -1695,9 +1694,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* ── Carte Leaflet temps réel ── */
     @if($isBusiness)
+    const MAPBOX_TOKEN = '{{ config('services.mapbox.token') }}';
     const map = L.map('cxMap', { zoomControl:false }).setView([9.537,-13.677], 13);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OpenStreetMap', maxZoom:19}).addTo(map);
+    L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=${MAPBOX_TOKEN}`, {attribution:'© Mapbox', maxZoom:19}).addTo(map);
     setTimeout(() => map.invalidateSize(), 60);
     window.addEventListener('resize', () => map.invalidateSize());
     screen.orientation?.addEventListener('change', () => { setTimeout(() => map.invalidateSize(), 150); });
@@ -1774,14 +1774,14 @@ document.addEventListener('DOMContentLoaded', () => {
         a.raf = requestAnimationFrame(step);
     }
 
-    /* ── OSRM routing ── */
+    /* ── Mapbox Directions routing ── */
     async function dashFetchOSRM(fLat, fLng, tLat, tLng) {
         try {
-            const url = `https://router.project-osrm.org/route/v1/driving/`
-                      + `${fLng},${fLat};${tLng},${tLat}?overview=full&geometries=geojson`;
+            const url = `https://api.mapbox.com/directions/v5/mapbox/driving/`
+                      + `${fLng},${fLat};${tLng},${tLat}?geometries=geojson&overview=full&access_token=${MAPBOX_TOKEN}`;
             const r = await fetch(url);
             const d = await r.json();
-            if (d.code === 'Ok' && d.routes?.[0])
+            if (d.routes?.[0])
                 return d.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
         } catch(e) {}
         return [[fLat, fLng], [tLat, tLng]];
@@ -1813,7 +1813,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const rColor = phase === 2 ? '#10b981' : '#f59e0b';
         dashRouteShadows[id] = L.polyline(pts, { color:'rgba(0,0,0,.22)', weight:8, lineCap:'round', lineJoin:'round' }).addTo(map);
         dashRouteLines[id]   = L.polyline(pts, { color:rColor, weight:4, lineCap:'round', lineJoin:'round', opacity:.95 }).addTo(map);
-        if (dashMarkers[id]) dashMarkers[id].bringToFront();
+        if (dashMarkers[id] && dashRouteLines[id]) dashRouteLines[id].bringToFront();
     }
 
     async function dashPlanRoute(id, fLat, fLng, tLat, tLng, phase) {

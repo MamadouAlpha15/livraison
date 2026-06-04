@@ -318,7 +318,7 @@ body.cx-light .mc-amount-total .mc-amount-val{color:#111827}
     <div class="cx-brand-hd">
         <div class="cx-brand-top">
             <a href="{{ route('company.dashboard') }}" class="cx-logo">
-                <div style="width:34px;height:34px;border-radius:9px;overflow:hidden;flex-shrink:0"><img src="/images/Shopio3.jpeg" alt="" style="width:100%;height:100%;object-fit:cover"></div>
+                <div style="width:34px;height:34px;border-radius:9px;overflow:hidden;flex-shrink:0"><img src="/images/shopio3.jpeg" alt="" style="width:100%;height:100%;object-fit:cover"></div>
                 <span>{{ $company->name }}</span>
             </a>
             <button class="cx-close-btn" id="cxCloseBtn">✕</button>

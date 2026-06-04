@@ -1375,9 +1375,10 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     body.is-dashboard .sidebar > .sb-card:not(.sb-card-topshops):not(.sb-card-explorer) { display: none !important; }
     body.is-dashboard .sb-card-topshops { display: block !important; border-radius: 10px !important; overflow: hidden !important; }
 
-    /* ── Hero — phone.png visible avec cover ── */
+    /* ── Hero mobile ── */
     body.is-dashboard .hero {
-        height: 200px !important;
+        height: auto !important;
+        min-height: 180px !important;
         background:
             linear-gradient(to right,
                 rgba(7,17,31,1)   0%,
@@ -1389,12 +1390,12 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
             url('/images/phone.png') center center / cover no-repeat,
             #07111f !important;
         flex-direction: row !important;
-        align-items: center !important;
+        align-items: flex-start !important;
         padding: 0 !important;
     }
     body.is-dashboard .hero-content { padding: 16px 14px !important; max-width: 62% !important; z-index: 2 !important; position: relative !important; }
     body.is-dashboard .hero-welcome { font-size: 9px !important; padding: 2px 7px !important; margin-bottom: 5px !important; }
-    body.is-dashboard .hero-title { font-size: 18px !important; letter-spacing: -.3px !important; margin-bottom: 5px !important; line-height: 1.2 !important; }
+    body.is-dashboard .hero-title { font-size: 16px !important; letter-spacing: -.3px !important; margin-bottom: 5px !important; line-height: 1.25 !important; }
     body.is-dashboard .hero-subtitle { font-size: 11px !important; line-height: 1.4 !important; margin-bottom: 6px !important; display: block !important; }
     body.is-dashboard .hero-badges { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 3px !important; }
     body.is-dashboard .hero-badge { padding: 3px 5px !important; gap: 2px !important; border-radius: 5px !important; }
@@ -1477,10 +1478,9 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 /* ── 390px ── */
 @media (max-width: 390px) {
     body.is-dashboard .nav-search { max-width: 90px !important; }
-    body.is-dashboard .hero { height: 185px !important; }
-    body.is-dashboard .hero-content { max-width: 58% !important; padding: 13px 12px !important; }
-    body.is-dashboard .hero-title { font-size: 16px !important; }
+    body.is-dashboard .hero-content { max-width: 60% !important; padding: 14px 12px !important; }
     body.is-dashboard .hero-subtitle { font-size: 10px !important; }
+    body.is-dashboard .hero-badges { display: none !important; }
     body.is-dashboard .stat-val { font-size: 15px !important; }
     body.is-dashboard .stat-sub { font-size: 8px !important; }
     body.is-dashboard .top-shop-card { width: 150px !important; min-width: 150px !important; max-width: 150px !important; }
@@ -1488,6 +1488,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     body.is-dashboard .shops-grid { gap: 6px !important; }
     body.is-dashboard .shop-card-img { height: 95px !important; }
     body.is-dashboard .page-wrap { padding-bottom: 70px !important; }
+    body.is-dashboard .order-amount { font-size: 11px !important; }
+    body.is-dashboard .order-pill { font-size: 8px !important; padding: 2px 5px !important; }
 }
 
 /* ── 360px ── */
@@ -1495,8 +1497,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     body.is-dashboard .nav { padding: 0 8px !important; }
     body.is-dashboard .nav-search { display: none !important; }
     body.is-dashboard .page-wrap { padding: 8px 8px 74px !important; }
-    body.is-dashboard .hero { height: 168px !important; }
-    body.is-dashboard .hero-content { max-width: 60% !important; padding: 11px 10px !important; }
+    body.is-dashboard .hero-content { max-width: 62% !important; padding: 12px 10px !important; }
     body.is-dashboard .hero-title { font-size: 15px !important; }
     body.is-dashboard .top-shop-card { width: 135px !important; min-width: 135px !important; max-width: 135px !important; }
     body.is-dashboard .top-shop-img { height: 80px !important; }
@@ -1507,6 +1508,37 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     body.is-dashboard .order-ico { width: 30px !important; height: 30px !important; font-size: 12px !important; }
     body.is-dashboard .order-pill { display: none !important; }
     body.is-dashboard .order-amount { font-size: 11px !important; }
+}
+
+/* ── 320px (iPhone SE ancien / Galaxy petit) ── */
+@media (max-width: 320px) {
+    body.is-dashboard .page-wrap { padding: 6px 6px 74px !important; }
+    body.is-dashboard .hero-content { max-width: 65% !important; padding: 10px 9px !important; }
+    body.is-dashboard .hero-title { font-size: 13px !important; }
+    body.is-dashboard .hero-subtitle { display: none !important; }
+    body.is-dashboard .hero-welcome { display: none !important; }
+    body.is-dashboard .stats-row { grid-template-columns: 1fr 1fr !important; gap: 5px !important; }
+    body.is-dashboard .stat-card { padding: 8px 7px !important; gap: 6px !important; }
+    body.is-dashboard .stat-ico { width: 28px !important; height: 28px !important; font-size: 13px !important; }
+    body.is-dashboard .stat-val { font-size: 13px !important; }
+    body.is-dashboard .stat-lbl { font-size: 9px !important; }
+    body.is-dashboard .stat-sub { display: none !important; }
+    body.is-dashboard .shops-grid { grid-template-columns: 1fr 1fr !important; gap: 4px !important; }
+    body.is-dashboard .shop-card-img { height: 80px !important; }
+    body.is-dashboard .shop-card-name { font-size: 10px !important; }
+    body.is-dashboard .shop-card-footer { flex-direction: column !important; gap: 3px !important; align-items: stretch !important; }
+    body.is-dashboard .shop-card-cta { text-align: center !important; justify-content: center !important; width: 100% !important; font-size: 9px !important; }
+    body.is-dashboard .top-shop-card { width: 120px !important; min-width: 120px !important; }
+    body.is-dashboard .order-row { gap: 6px !important; padding: 8px 8px !important; }
+    body.is-dashboard .order-ico { width: 28px !important; height: 28px !important; }
+    body.is-dashboard .order-ref { font-size: 11px !important; }
+    body.is-dashboard .order-shop { font-size: 10px !important; }
+    body.is-dashboard .order-amount { font-size: 10px !important; }
+    body.is-dashboard .order-pill { display: none !important; }
+    body.is-dashboard .nav-av { width: 28px !important; height: 28px !important; }
+    body.is-dashboard .nav-fav-btn,
+    body.is-dashboard .nav-msg-btn,
+    body.is-dashboard .cn-bell-btn { width: 28px !important; height: 28px !important; }
 }
 
 /* ══ BARRE NAVIGATION BAS — MOBILE ══ */
@@ -2328,8 +2360,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
     <div class="hero-content">
         <div class="hero-welcome">Bienvenue sur Shopio 👋</div>
         <h1 class="hero-title">
-            Le meilleur des boutiques de<br>
-            <span class="country">{{ $countryName ?: 'Guinée' }}</span>, au même endroit.
+            Le meilleur des boutiques de <span class="country">{{ $countryName ?: 'Guinée' }}</span>, au même endroit.
         </h1>
         <p class="hero-subtitle">
             Découvrez des boutiques vérifiées, des produits de qualité
@@ -4226,11 +4257,9 @@ function filterByCat(type) {
         } catch(e) {}
     }
 
-    /* ── Démarrage : attendre la sync serveur avant le 1er poll ── */
-    _serverSyncReady.then(() => {
-        pollClientNotifs();
-        setInterval(pollClientNotifs, 8000);
-    });
+    /* ── Démarrage ── */
+    pollClientNotifs();
+    setInterval(pollClientNotifs, 8000);
 
     /* ── CSS animations ── */
     const s = document.createElement('style');

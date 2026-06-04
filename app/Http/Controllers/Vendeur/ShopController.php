@@ -39,17 +39,29 @@ class ShopController extends Controller
      */
     public function store(Request $request){
         // ✅ Validation
+                $userEmail = Auth::user()->email;
+                $emailRules = ['nullable', 'email'];
+                // Unique uniquement si l'email n'est pas celui de l'utilisateur connecté
+                if ($request->filled('email') && $request->email !== $userEmail) {
+                    $emailRules[] = Rule::unique('shops', 'email');
+                }
+
                 $validated = $request->validate([
                     'name'        => 'required|string|max:255',
                     'type'        => 'nullable|string|max:100',
                     'address'     => 'nullable|string|max:255',
-                    'email'       => 'required|email|unique:shops,email',
+                    'email'       => $emailRules,
                     'phone'       => 'nullable|string|max:20',
                     'image'       => 'nullable|image',
                     'description' => 'nullable|string',
-                    'commission_rate' => ['nullable','numeric','between:0,100'], // ✅ taux de commission entre 0 et 100
-                    'currency' => ['nullable','string','max:10'], // ✅ code devise (ex: GNF, USD, etc.)
+                    'commission_rate' => ['nullable','numeric','between:0,100'],
+                    'currency' => ['nullable','string','max:10'],
                 ]);
+
+                // Si email vide → utilise l'email d'inscription automatiquement
+                if (empty($validated['email'])) {
+                    $validated['email'] = $userEmail;
+                }
                  // 🔁 Convertir 10 → 0.10, 15 → 0.15, etc.
     if (array_key_exists('commission_rate', $validated) && $validated['commission_rate'] !== null) {
         $validated['commission_rate'] = number_format(((float)$validated['commission_rate']) / 100, 4, '.', '');

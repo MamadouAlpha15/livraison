@@ -11,10 +11,12 @@ namespace App\Services;
 //   - Vérifier les limites du plan gratuit
 // ─────────────────────────────────────────────────────────────────────────────
 
+use App\Mail\SubscriptionConfirmedMail;
 use App\Models\DeliveryCompany;
 use App\Models\Shop;
 use App\Models\Subscription;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class SubscriptionService
 {
@@ -91,6 +93,7 @@ class SubscriptionService
                 'plan_expires_at' => $expiresAt,
             ]);
             Log::info("[Subscription] Boutique #{$subscriber->id} activée en Pro jusqu'au {$expiresAt->toDateString()}");
+            $this->sendConfirmationEmail($subscription, $subscriber->name, route('boutique.dashboard'));
         }
 
         if ($subscriber instanceof DeliveryCompany) {
@@ -99,6 +102,26 @@ class SubscriptionService
                 'plan_expires_at' => $expiresAt,
             ]);
             Log::info("[Subscription] Entreprise #{$subscriber->id} activée en Business jusqu'au {$expiresAt->toDateString()}");
+            $this->sendConfirmationEmail($subscription, $subscriber->name, route('company.dashboard'));
+        }
+    }
+
+    private function sendConfirmationEmail(Subscription $subscription, string $name, string $dashUrl): void
+    {
+        try {
+            $subscriber = $subscription->subscriber;
+            $user = $subscriber instanceof Shop
+                ? $subscriber->owner
+                : $subscriber->user;
+
+            if (!$user?->email) return;
+
+            Mail::to($user->email)->send(
+                new SubscriptionConfirmedMail($subscription, $name, $dashUrl, $user->country ?? '')
+            );
+            Log::info("[Subscription] Email confirmation envoyé à {$user->email}");
+        } catch (\Throwable $e) {
+            Log::error("[Subscription] Échec envoi email confirmation : " . $e->getMessage());
         }
     }
 

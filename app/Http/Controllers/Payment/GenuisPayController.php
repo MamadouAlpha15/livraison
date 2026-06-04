@@ -183,27 +183,31 @@ class GenuisPayController extends Controller
             'shop_id' => $user?->shop_id,
         ]);
 
-        // Cherche la dernière subscription pending de cet utilisateur (shop ou company)
+        // Cherche la subscription de cet utilisateur (pending OU déjà active via webhook)
         $subscription = null;
         if ($user) {
-            // Essaie d'abord via la ref GenuisPay dans les query params
             $gpRef = $request->query('reference') ?? $request->query('transaction_ref') ?? null;
+
+            // 1. Par référence GenuisPay — cherche pending ET active (webhook peut avoir déjà activé)
             if ($gpRef) {
                 $subscription = Subscription::where('payment_reference', $gpRef)
-                    ->where('status', 'pending')->first();
+                    ->whereIn('status', ['pending', 'active'])
+                    ->first();
             }
-            // Fallback : dernière subscription pending de la boutique
+
+            // 2. Fallback boutique — pending d'abord, puis active récente (webhook arrivé avant redirect)
             if (!$subscription && $user->shop_id) {
-                $subscription = Subscription::where('status', 'pending')
+                $subscription = Subscription::whereIn('status', ['pending', 'active'])
                     ->where('subscriber_type', Shop::class)
                     ->where('subscriber_id', $user->shop_id)
                     ->latest()->first();
             }
-            // Fallback : dernière subscription pending de la company
+
+            // 3. Fallback company
             if (!$subscription) {
                 $companyId = $user->deliveryCompany?->id ?? $user->ownedCompany?->id;
                 if ($companyId) {
-                    $subscription = Subscription::where('status', 'pending')
+                    $subscription = Subscription::whereIn('status', ['pending', 'active'])
                         ->where('subscriber_type', \App\Models\DeliveryCompany::class)
                         ->where('subscriber_id', $companyId)
                         ->latest()->first();
@@ -211,7 +215,7 @@ class GenuisPayController extends Controller
             }
         }
 
-        if ($subscription && !str_starts_with($subscription->payment_reference, 'SUB-')) {
+        if ($subscription && $subscription->status !== 'active' && !str_starts_with($subscription->payment_reference, 'SUB-')) {
             // GenuisPay envoie ?reference=...&status=completed dans l'URL de retour
             $gpStatus  = $request->query('status');
             $isSandbox = config('genuispay.sandbox', true);

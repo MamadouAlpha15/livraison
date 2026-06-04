@@ -369,14 +369,19 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     border-top: 1px solid #f3f6f4;
     display: flex; align-items: center; gap: 6px;
 }
+.product-footer form {
+    flex: 1;
+    display: flex;
+    margin: 0; padding: 0;
+}
 .action-btn {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 6px 10px; border-radius: var(--r-sm);
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    padding: 7px 10px; border-radius: var(--r-sm);
     font-size: 11.5px; font-weight: 600; font-family: var(--font);
     border: 1px solid var(--border-dk); background: var(--surface);
     color: var(--text-2); cursor: pointer; text-decoration: none;
     transition: all .15s; white-space: nowrap;
-    flex: 1; justify-content: center;
+    flex: 1; box-sizing: border-box;
 }
 .action-btn:hover { background: var(--bg); border-color: var(--brand); color: var(--brand); }
 .action-btn.edit  { border-color: #93c5fd; color: #1e40af; background: #eff6ff; }
@@ -459,15 +464,17 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     .product-desc { display: none; } /* caché sur mobile pour gagner de la place */
     .product-meta-row { gap: 4px; }
     .product-meta-chip { font-size: 9.5px; padding: 2px 6px; }
-    .product-footer { padding: 7px 9px; gap: 4px; }
-    .action-btn { padding: 5px 6px; font-size: 10.5px; gap: 2px; }
+    .product-footer { padding: 7px 9px; gap: 4px; flex-wrap: wrap; }
+    .product-footer form { flex: 1 1 calc(50% - 4px); }
+    .action-btn { padding: 7px 6px; font-size: 11px; gap: 3px; }
+    .btn-txt { display: inline; }
+    .action-btn.edit { flex: 1 1 calc(50% - 4px); }
+    .action-btn.dupe { flex: 1; }
+    .action-btn.del  { flex: 1 1 100%; }
     .stats-row { gap: 6px; }
     .stat-card { padding: 8px 10px; min-width: 0; }
     .stat-val { font-size: 18px; }
     .stat-lbl { font-size: 9px; }
-    .stat-ico { }
-    /* Masquer le bouton "Dupliquer" sur mobile — trop petit */
-    .action-btn.dupe { display: none; }
     /* Ajouter produit en pleine largeur */
     .page-hd { flex-direction: column; align-items: stretch; }
     .page-hd > a { text-align: center; justify-content: center; }
@@ -482,9 +489,12 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     .product-img-wrap { height: 110px; }
     .product-body { padding: 6px 7px; gap: 4px; }
     .product-name { font-size: 11.5px; }
-    .product-footer { flex-wrap: wrap; padding: 6px; }
-    .action-btn.edit { flex: 1; }
-    .action-btn.del  { flex: 0 0 auto; }
+    .product-footer { flex-wrap: wrap; padding: 6px; gap: 4px; }
+    .product-footer form { flex: 1 1 calc(50% - 4px); }
+    .action-btn { padding: 6px 5px; font-size: 10.5px; }
+    .action-btn.edit { flex: 1 1 calc(50% - 4px); }
+    .action-btn.dupe { flex: 1; }
+    .action-btn.del  { flex: 1 1 100%; }
     .badge { font-size: 9px; padding: 2px 6px; }
 }
 
@@ -647,7 +657,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 <aside class="sidebar" id="sidebar">
     <div class="sb-brand">
         <a href="{{ route('boutique.dashboard') }}" class="sb-logo">
-            <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width:100%;height:100%;object-fit:cover;border-radius:9px"></div>
+            <div class="sb-logo-icon"><img src="/images/shopio3.jpeg" alt="Shopio" style="width:100%;height:100%;object-fit:cover;border-radius:9px"></div>
             <span class="sb-shop-name">{{ $shop->name ?? 'Boutique' }}</span>
         </a>
         <button class="sb-close" id="btnCloseSidebar" aria-label="Fermer le menu">✕</button>
@@ -755,9 +765,15 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <div class="tb-title">{!! $I['tag_tb'] !!} Catalogue produits</div>
             <div class="tb-sub">{{ $shop->name ?? 'Boutique' }} · {{ $totalProducts }} produit(s)</div>
         </div>
-        <a href="{{ route('products.create') }}" style="padding:7px 14px;border-radius:var(--r-sm);font-size:12px;font-weight:700;background:var(--brand);color:#fff;border:1px solid var(--brand-dk);text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:background .15s">
-            {!! $I['plus_tb'] !!} Ajouter
-        </a>
+        @if(!$isPro && $totalProducts >= 5)
+            <span title="Limite du plan gratuit atteinte (5 produits)" style="padding:7px 14px;border-radius:var(--r-sm);font-size:12px;font-weight:700;background:#e2e8f0;color:#94a3b8;border:1px solid #cbd5e1;display:inline-flex;align-items:center;gap:5px;cursor:not-allowed;opacity:.7">
+                {!! $I['plus_tb'] !!} Ajouter
+            </span>
+        @else
+            <a href="{{ route('products.create') }}" style="padding:7px 14px;border-radius:var(--r-sm);font-size:12px;font-weight:700;background:var(--brand);color:#fff;border:1px solid var(--brand-dk);text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:background .15s">
+                {!! $I['plus_tb'] !!} Ajouter
+            </a>
+        @endif
     </div>
 
 {{-- ══════════════════════════════════════════════════════════════
@@ -804,9 +820,19 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                 Partager ma boutique
             </button>
-            <a href="{{ route('products.create') }}" class="filter-btn filter-btn-primary" style="font-size:13px;padding:10px 20px">
-                {!! $I['plus_pg'] !!} Ajouter un produit
-            </a>
+            @if(!$isPro && $totalProducts >= 5)
+                <span style="font-size:13px;padding:10px 20px;border-radius:var(--r-sm);background:#f1f5f9;color:#94a3b8;border:1px solid #cbd5e1;display:inline-flex;align-items:center;gap:7px;cursor:not-allowed;font-weight:700">
+                    {!! $I['plus_pg'] !!} Limite atteinte
+                </span>
+                <a href="{{ route('payment.checkout', ['type'=>'shop','id'=>$shop->id]) }}"
+                   style="font-size:12px;padding:10px 16px;border-radius:var(--r-sm);background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:6px;font-weight:700">
+                    ✦ Passer au Plan Pro
+                </a>
+            @else
+                <a href="{{ route('products.create') }}" class="filter-btn filter-btn-primary" style="font-size:13px;padding:10px 20px">
+                    {!! $I['plus_pg'] !!} Ajouter un produit
+                </a>
+            @endif
         </div>
     </div>
 
@@ -1129,11 +1155,11 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
             {{-- Footer actions --}}
             <div class="product-footer">
-                <a href="{{ route('products.edit', $product) }}" class="action-btn edit">{!! $I['edit_btn'] !!} Modifier</a>
+                <a href="{{ route('products.edit', $product) }}" class="action-btn edit">{!! $I['edit_btn'] !!} <span class="btn-txt">Modifier</span></a>
 
-                <form action="{{ route('products.duplicate', $product) }}" method="POST" style="flex:0.7">
+                <form action="{{ route('products.duplicate', $product) }}" method="POST">
                     @csrf
-                    <button type="submit" class="action-btn dupe" style="width:100%">⧉ Dupliquer</button>
+                    <button type="submit" class="action-btn dupe">⧉ <span class="btn-txt">Dupliquer</span></button>
                 </form>
 
                 <button type="button" class="action-btn del"

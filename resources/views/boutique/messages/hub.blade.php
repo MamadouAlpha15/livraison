@@ -1,4 +1,4 @@
-{{-- resources/views/boutique/messages/hub.blade.php --}}
+﻿{{-- resources/views/boutique/messages/hub.blade.php --}}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -630,7 +630,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 {{-- Topbar --}}
 <header class="topbar">
     <a href="{{ route('boutique.dashboard') }}" class="topbar-logo">
-        <img src="{{ asset('images/Shopio3.jpeg') }}" alt="Shopio">
+        <img src="{{ asset('images/shopio3.jpeg') }}" alt="Shopio">
         <span class="topbar-logo-name">Shopio</span>
     </a>
     <div class="topbar-sep"></div>

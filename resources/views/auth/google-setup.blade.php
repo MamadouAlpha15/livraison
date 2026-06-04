@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="utf-8">
@@ -57,7 +57,7 @@
 
 <div class="setup-card">
     <div class="setup-logo">
-        <img src="/images/Shopio3.jpeg" alt="Shopio">
+        <img src="/images/shopio3.jpeg" alt="Shopio">
         <span class="setup-logo-name">Shopio</span>
     </div>
 

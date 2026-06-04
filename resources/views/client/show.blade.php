@@ -25,7 +25,16 @@
 
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:#f0f2f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111}
+:root{ color-scheme: light only; }
+body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111 !important}
+@media (prefers-color-scheme: dark){
+    body,*{background-color:revert;color:revert}
+    body{background:#f0f2f5 !important;color:#111 !important}
+    .card{background:#fff !important}
+    .info-section,.product-name,.price,.desc,.section-label{color:inherit !important}
+    .price{color:#111 !important}
+    .desc{color:#4b5563 !important}
+}
 
 /* ── BACK BAR ── */
 .back-bar{

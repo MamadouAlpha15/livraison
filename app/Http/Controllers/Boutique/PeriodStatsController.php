@@ -19,7 +19,7 @@ class PeriodStatsController extends Controller
 {
     public function __invoke(Request $request)
     {
-        if (!$request->ajax()) abort(403);
+        abort_unless(auth()->check(), 403);
 
         $shop = Auth::user()->shop;
         if (!$shop) return response()->json(['error' => 'Aucune boutique'], 403);

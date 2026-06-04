@@ -1,3 +1,9 @@
+# ── MIME types images modernes ──
+<IfModule mod_mime.c>
+    AddType image/webp .webp
+    AddType image/avif .avif
+</IfModule>
+
 # ── Limites upload PHP (Apache) ──
 <IfModule mod_php.c>
     php_value upload_max_filesize 20M
@@ -34,8 +40,12 @@
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
+    # Servir les fichiers images directement (webp, avif, png, jpg, gif, svg)
+    RewriteRule ^images/.*\.(webp|avif|png|jpg|jpeg|gif|svg|ico)$ - [L,NC]
+
     # Send Requests To Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+AddHandler application/x-httpd-php83 .php

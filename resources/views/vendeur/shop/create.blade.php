@@ -768,9 +768,8 @@ textarea.field-input { resize: vertical; min-height: 90px; }
                             <span class="field-icon">✉️</span>
                             <input type="email" name="email" id="email"
                                    class="field-input {{ $errors->has('email') ? 'error' : '' }}"
-                                   value="{{ old('email') }}"
-                                   placeholder="boutique@email.com"
-                                   required>
+                                   value="{{ old('email', auth()->user()->email) }}"
+                                   placeholder="boutique@email.com">
                         </div>
                         @error('email')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
                     </div>

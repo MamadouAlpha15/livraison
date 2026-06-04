@@ -638,10 +638,11 @@ function nt(msg='Bientôt disponible'){const el=document.getElementById('toast')
 @endphp
 
 const mapPoints = @json($pts);
+const MAPBOX_TOKEN = '{{ config('services.mapbox.token') }}';
 
 const map = L.map('map');
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors',
+L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=${MAPBOX_TOKEN}`, {
+    attribution: '© Mapbox',
     maxZoom: 19
 }).addTo(map);
 

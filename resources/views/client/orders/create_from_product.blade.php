@@ -165,6 +165,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .submit-btn { width: 100%; padding: 13px; border-radius: 50px; border: none; font-size: 14px; font-weight: 800; font-family: var(--font); background: var(--orange); color: var(--navy); cursor: pointer; transition: all .15s; box-shadow: 0 4px 14px rgba(255,153,0,.4); display: flex; align-items: center; justify-content: center; gap: 7px; }
 .submit-btn:hover { background: var(--orange-dk); color: #fff; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,153,0,.5); }
 .submit-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.chat-btn { width: 100%; padding: 11px; border-radius: 50px; border: 1px solid rgba(255,255,255,.2); font-size: 13px; font-weight: 700; font-family: var(--font); background: transparent; color: rgba(255,255,255,.75); cursor: pointer; transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 7px; text-decoration: none; }
+.chat-btn:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.4); color: #fff; }
 
 /* ══ LIGHTBOX ══ */
 .lb-overlay { display: none; position: fixed; inset: 0; z-index: 9000; background: rgba(0,0,0,.96); align-items: center; justify-content: center; }
@@ -452,6 +454,10 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                         <button type="submit" class="submit-btn" id="submitBtn">
                             🛒 Valider ma commande
                         </button>
+
+                        <a href="{{ route('client.messages.index', $product) }}" class="chat-btn">
+                            💬 Poser une question au vendeur
+                        </a>
                     </div>
                 </div>
             </form>

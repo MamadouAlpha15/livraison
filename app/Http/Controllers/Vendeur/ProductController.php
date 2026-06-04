@@ -403,8 +403,8 @@ class ProductController extends Controller
         $rawPath  = "temp/{$filename}.{$ext}";
         Storage::disk('public')->put($rawPath, file_get_contents($file->getRealPath()));
 
-        // 2. Dispatcher le job (sync en dev → tourne immédiatement ; database en prod → tourne en fond)
-        ProcessProductImageJob::dispatch($rawPath, $folder, $filename);
+        // 2. Traitement immédiat (synchrone) pour affichage instantané après upload
+        ProcessProductImageJob::dispatchSync($rawPath, $folder, $filename);
 
         // 3. Chemin final WebP (créé par le job)
         $finalPath = "{$folder}/medium/{$filename}.webp";

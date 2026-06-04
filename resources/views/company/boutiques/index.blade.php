@@ -241,7 +241,7 @@ body.cx-light .shop-banner-name{text-shadow:0 1px 3px rgba(0,0,0,.5);}
     <div class="cx-brand-hd">
         <div class="cx-brand-top">
             <a href="{{ route('company.dashboard') }}" class="cx-logo">
-                <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
+                <div class="sb-logo-icon"><img src="/images/shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
                 <span>{{ Str::limit($company->name, 14) }}</span>
             </a>
             <button class="cx-close-btn" id="cxClose"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>

@@ -29,6 +29,15 @@ class RegisteredUserController extends Controller
             'business' => 'company',
             default    => $request->get('role', 'client'),
         };
+
+        // Sauvegarder en session pour que Google auth puisse aussi rediriger
+        if ($request->filled('redirect')) {
+            $target = $request->redirect;
+            if (str_starts_with($target, url('/'))) {
+                session(['product_redirect' => $target]);
+            }
+        }
+
         return view('auth.register', compact('shopId', 'intent', 'defaultRole'));
     }
 

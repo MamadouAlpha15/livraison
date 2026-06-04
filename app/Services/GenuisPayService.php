@@ -166,7 +166,8 @@ class GenuisPayService
             return false;
         }
 
-        $expected = hash_hmac('sha256', $timestamp . '.' . $rawBody, $this->webhookSecret);
+        $decoded  = json_decode($rawBody, true) ?? [];
+        $expected = hash_hmac('sha256', $timestamp . '.' . json_encode($decoded), $this->webhookSecret);
 
         return hash_equals($expected, $signature);
     }

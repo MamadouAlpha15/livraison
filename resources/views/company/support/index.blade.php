@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 @section('title', 'Support · ' . $company->name)
 @php
     $bodyClass = 'cx-dashboard';
@@ -159,7 +159,7 @@ body.cx-light .sp-info-bar{background:#f8fafc;border-color:rgba(0,0,0,.07)}
 <aside class="cx-sidebar" id="cxSidebar">
     <div class="cx-brand-hd">
         <div class="cx-brand-top">
-            <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width:40px;height:40px;object-fit:cover;border-radius:9px"></div>
+            <div class="sb-logo-icon"><img src="/images/shopio3.jpeg" alt="Shopio" style="width:40px;height:40px;object-fit:cover;border-radius:9px"></div>
             <button class="cx-close-btn" id="cxCloseBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
         <div class="cx-sys-badge"><span class="cx-sys-dot"></span> Système actif</div>

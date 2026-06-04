@@ -1,4 +1,4 @@
-{{--
+﻿{{--
     resources/views/public/shops/products.blade.php
     Route     : GET /shops/{shop}/products → Public\ShopController@products
     Variables :
@@ -8,6 +8,7 @@
       $devise     → string
 --}}
 @extends('layouts.app')
+
 @section('title', $shop->name . ' — Produits')
 @php $bodyClass = 'is-dashboard'; @endphp
 @push('styles')
@@ -523,7 +524,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 {{-- ══ NAVBAR ══ --}}
 <nav class="amz-nav">
     <a href="{{ url('/') }}" class="nav-logo-wrap">
-        <img src="/images/shopio3.jpeg" alt="Shopio" class="nav-logo-img">
+        <img src="/images/shopio3.jpeg" alt="Shopio" class="nav-logo-img" width="36" height="36">
         <span class="nav-brand-name">Shopio</span>
     </a>
     <a href="{{ url('/') }}" class="amz-back-home">🏠 <span class="txt">Accueil</span></a>
@@ -639,7 +640,10 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 <div class="shop-banner">
     <div class="shop-banner-logo">
         @if($shop->image)
-            <img src="{{ asset('storage/'.$shop->image) }}" alt="{{ $shop->name }}">
+            <img src="{{ \App\Services\ImageOptimizer::url($shop->image, 'thumb') ?? asset('storage/'.$shop->image) }}"
+                 alt="{{ $shop->name }}"
+                 width="72" height="72"
+                 fetchpriority="high">
         @else
             🛍️
         @endif
@@ -779,7 +783,10 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                              srcset="{{ \App\Services\ImageOptimizer::url($product->image, 'thumb') }} 300w,
                                      {{ \App\Services\ImageOptimizer::url($product->image, 'medium') }} 800w"
                              sizes="(max-width:640px) 150px, 300px"
-                             alt="{{ $product->name }}" loading="lazy">
+                             width="300" height="200"
+                             alt="{{ $product->name }}"
+                             loading="{{ $loop->index < 2 ? 'eager' : 'lazy' }}"
+                             {{ $loop->index < 2 ? 'fetchpriority=high' : '' }}>
                     @else
                         <div class="amz-card-img-ph">🏷️</div>
                     @endif
@@ -831,7 +838,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                         @endif
                     @else
                         @php $orderUrl = route('client.orders.createFromProduct', $product); @endphp
-                        <a href="{{ route('register', ['redirect' => $orderUrl]) }}" class="amz-btn-order">
+                        <a href="{{ route('register', ['redirect' => $orderUrl, 'role' => 'client']) }}" class="amz-btn-order">
                             🛒 Commander
                         </a>
                         <a href="{{ route('login', ['redirect' => $orderUrl]) }}" class="amz-btn-msg" style="margin-top:6px">

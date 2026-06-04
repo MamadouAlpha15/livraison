@@ -298,12 +298,16 @@ let mapInitialized = false;
 
 const VENDOR = { lat: @json($order->vendor_lat), lng: @json($order->vendor_lng) };
 const CLIENT = { lat: @json($order->client_lat), lng: @json($order->client_lng) };
+const MAPBOX_TOKEN = '{{ config('services.mapbox.token') }}';
 
 // ─────────────────────────────────────────────
 // CARTE
 // ─────────────────────────────────────────────
-const map = L.map('navMap', { zoomControl: true, attributionControl: false });
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, subdomains: 'abc' }).addTo(map);
+const _initLat = VENDOR.lat || CLIENT.lat || 9.641;
+const _initLng = VENDOR.lng || CLIENT.lng || -13.578;
+const map = L.map('navMap', { zoomControl: true, attributionControl: false })
+    .setView([_initLat, _initLng], 13);
+L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=${MAPBOX_TOKEN}`, { attribution:'© Mapbox', maxZoom:19 }).addTo(map);
 
 function makeIcon(emoji, color, size = 42) {
     return L.divIcon({
@@ -359,17 +363,15 @@ let offRouteStreak  = 0;   // Positions consécutives hors-route
 
 async function fetchOSRMRoute(fLat, fLng, tLat, tLng) {
     try {
-        const url = `https://router.project-osrm.org/route/v1/driving/`
+        const url = `https://api.mapbox.com/directions/v5/mapbox/driving/`
                   + `${fLng},${fLat};${tLng},${tLat}`
-                  + `?overview=full&geometries=geojson`;
+                  + `?geometries=geojson&overview=full&access_token=${MAPBOX_TOKEN}`;
         const r = await fetch(url);
         const d = await r.json();
-        if (d.code === 'Ok' && d.routes?.[0]) {
-            // OSRM renvoie [lng, lat] → on inverse en [lat, lng] pour Leaflet
+        if (d.routes?.[0]) {
             return d.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
         }
-    } catch(e) { /* réseau indisponible */ }
-    // Fallback ligne droite si OSRM échoue
+    } catch(e) {}
     return [[fLat, fLng], [tLat, tLng]];
 }
 
@@ -385,9 +387,8 @@ function redrawRemaining() {
         color:     currentPhase === 1 ? '#f59e0b' : '#10b981',
         weight:    6, lineCap: 'round', lineJoin: 'round', opacity: .97,
     }).addTo(map);
-    // Remettre les marqueurs au dessus de la ligne
-    if (destMarker)   destMarker.bringToFront();
-    if (driverMarker) driverMarker.bringToFront();
+    // Remettre la ligne au dessus
+    if (routeLine) routeLine.bringToFront();
 }
 
 // Trouver l'indice du waypoint le plus proche de la position actuelle
@@ -520,12 +521,16 @@ function startTracking() {
             // ── Carte suit IMMÉDIATEMENT le livreur (avant tout calcul OSRM) ──
             map.panTo([newLat, newLng], { animate: true, duration: 0.4 });
 
-            // ── Envoyer position au serveur ──
-            fetch(POS_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
-                body: JSON.stringify({ lat: newLat, lng: newLng }),
-            }).catch(() => {});
+            // ── Envoyer position au serveur (throttle 3s) ──
+            const _now = Date.now();
+            if (!window._lastPosSent || _now - window._lastPosSent > 3000) {
+                window._lastPosSent = _now;
+                fetch(POS_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
+                    body: JSON.stringify({ lat: newLat, lng: newLng }),
+                }).catch(() => {});
+            }
 
             if (!destLat) return;
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -190,7 +190,7 @@
         <img src="/images/shopio3.jpeg" alt="Shopio">
         <div>
             <div class="mobile-header-name">Shopio</div>
-            <div class="mobile-header-sub">La marketplace made in Guinée 🇬🇳</div>
+            <div class="mobile-header-sub">La marketplace pour tous</div>
         </div>
     </div>
 
@@ -200,12 +200,12 @@
             <span class="al-logo-name">Shopio</span>
         </div>
         <div class="al-body">
-            <div class="al-title">La marketplace<br>made in <span>Guinée</span> 🇬🇳</div>
+            <div class="al-title">La marketplace<br>pour <span>tous</span> 🌍</div>
             <p class="al-sub">Commandez, vendez et livrez en toute confiance.<br>Des milliers de boutiques à portée de main.</p>
             <div class="al-features">
                 <div class="al-feature"><div class="al-ico">🛒</div><div class="al-ftxt"><strong>Commandes faciles</strong><span>Parcourez et commandez en quelques clics</span></div></div>
                 <div class="al-feature"><div class="al-ico">🚚</div><div class="al-ftxt"><strong>Livraison rapide</strong><span>Suivi en temps réel de vos colis</span></div></div>
-                <div class="al-feature"><div class="al-ico">🏪</div><div class="al-ftxt"><strong>Ouvrez votre boutique</strong><span>Vendez vos produits partout en Guinée</span></div></div>
+                <div class="al-feature"><div class="al-ico">🏪</div><div class="al-ftxt"><strong>Ouvrez votre boutique</strong><span>Vendez vos produits partout dans le monde</span></div></div>
                 <div class="al-feature"><div class="al-ico">🔒</div><div class="al-ftxt"><strong>Transactions sécurisées</strong><span>Vos données et paiements sont protégés</span></div></div>
             </div>
         </div>

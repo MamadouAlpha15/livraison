@@ -417,7 +417,7 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
     <div class="cx-brand-hd">
         <div class="cx-brand-top">
            <a href="{{ route('company.dashboard') }}" class="cx-logo">
-                 <div class="cx-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
+                 <div class="cx-logo-icon"><img src="/images/shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
                 <span class="sb-shop-name">{{ $company->name }}</span>
             </a>
             <button class="cx-close-btn" id="cxCloseBtn">✕</button>

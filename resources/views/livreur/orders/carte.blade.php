@@ -147,12 +147,14 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',system-u
         $initLng = $order->client_lng ?? $order->current_lng ?? -13.5784;
     @endphp
 
+    const MAPBOX_TOKEN = '{{ config('services.mapbox.token') }}';
+
     /* ── Leaflet init ── */
     const map = L.map('map', { zoomControl: true, attributionControl: false })
         .setView([{{ $initLat }}, {{ $initLng }}], 15);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19, subdomains: 'abc', crossOrigin: ''
+    L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=${MAPBOX_TOKEN}`, {
+        attribution:'© Mapbox', maxZoom:19
     }).addTo(map);
     map.zoomControl.setPosition('topright');
     setTimeout(() => map.invalidateSize(), 200);
@@ -208,13 +210,13 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',system-u
         }
     }
 
-    /* ── OSRM route ── */
+    /* ── Mapbox Directions route ── */
     async function fetchRoute(dLat, dLng, cLat, cLng) {
         try {
-            const url = `https://router.project-osrm.org/route/v1/driving/${dLng},${dLat};${cLng},${cLat}?overview=full&geometries=geojson`;
+            const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${dLng},${dLat};${cLng},${cLat}?geometries=geojson&overview=full&access_token=${MAPBOX_TOKEN}`;
             const res = await fetch(url);
             const data = await res.json();
-            if (data.code !== 'Ok' || !data.routes?.length) return null;
+            if (!data.routes?.length) return null;
             return data.routes[0].geometry.coordinates.map(([lo, la]) => [la, lo]);
         } catch { return null; }
     }
@@ -227,9 +229,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',system-u
         else routeShadow = L.polyline(pts, { color: 'rgba(0,0,0,.15)', weight: 8, lineCap: 'round' }).addTo(map);
         if (routeLine)  routeLine.setLatLngs(pts);
         else routeLine  = L.polyline(pts, { color: '#3b82f6', weight: 4, opacity: .85, lineCap: 'round', dashArray: '10 6' }).addTo(map);
-        /* Keep driver + client markers on top */
-        if (driverMarker) driverMarker.bringToFront();
-        if (clientMarker) clientMarker.bringToFront();
+        /* Keep route lines on top */
+        if (routeLine) routeLine.bringToFront();
     }
 
     function scheduleRoute() {

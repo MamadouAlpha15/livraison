@@ -261,7 +261,7 @@ body.cx-light .lv-mc-btn-cancel{background:rgba(239,68,68,.06);color:#b91c1c}
 <aside class="cx-sidebar" id="cxSidebar">
     <div class="cx-brand-hd">
         <div class="cx-brand-top">
-            <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
+            <div class="sb-logo-icon"><img src="/images/shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
             <button class="cx-close-btn" id="cxCloseBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
         <div class="cx-sys-badge"><span class="cx-sys-dot"></span> Système actif</div>
@@ -542,21 +542,15 @@ body.cx-light .lv-mc-btn-cancel{background:rgba(239,68,68,.06);color:#b91c1c}
             </div>
 
             {{-- Boutons action --}}
+            @if($order->status === 'en_livraison')
             <div style="display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--cx-border);">
-                @if($order->status === 'confirmée')
-                <button onclick="lv_updateStatus({{ $order->id }}, 'en_livraison', this)"
-                        style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:10px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:#fbbf24;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>
-                    Commencer
-                </button>
-                @elseif($order->status === 'en_livraison')
                 <button onclick="lv_updateStatus({{ $order->id }}, 'livrée', this)"
                         style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:10px;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:#34d399;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                     Marquer livré
                 </button>
-                @endif
             </div>
+            @endif
 
         </div>
         @empty

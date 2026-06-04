@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -6,8 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#f06a0f">
     <title>{{ $title ?? config('app.name', 'Shopio') }}</title>
-    <link rel="icon" type="image/jpeg" href="{{ asset('images/Shopio3.jpeg') }}">
-    <link rel="shortcut icon" type="image/jpeg" href="{{ asset('images/Shopio3.jpeg') }}">
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/shopio3.jpeg') }}">
+    <link rel="shortcut icon" type="image/jpeg" href="{{ asset('images/shopio3.jpeg') }}">
 
 
     {{-- ══ Ressource hints (connexions anticipées) ══ --}}
@@ -228,12 +228,6 @@
         @yield('content')
     </main>
 
-    {{-- ═══ FOOTER (caché sur dashboard) ═══ --}}
-    <footer class="py-4 mt-5 app-footer">
-        <div class="container-xxl text-center small">
-            &copy; {{ date('Y') }} {{ config('app.name', 'Application') }} &middot; Laravel & Bootstrap
-        </div>
-    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
     @stack('scripts')

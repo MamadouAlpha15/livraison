@@ -1,4 +1,4 @@
-{{--
+﻿{{--
     resources/views/boutique/dashboard.blade.php
     Route : GET /boutique/dashboard  → ShopController@admin  → name('boutique.dashboard')
 --}}
@@ -532,7 +532,19 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 /* Topbar greeting */
 .tb-greeting { font-size:14px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.tb-greeting-sub { font-size:11px; color:var(--muted); margin-top:1px; }
+.tb-greeting-sub { font-size:11px; color:var(--muted); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+@media(max-width:640px){
+    .tb-greeting { font-size:13px; }
+    .tb-greeting-sub { font-size:10px; }
+}
+@media(max-width:480px){
+    .tb-greeting { font-size:12.5px; }
+    .tb-greeting-sub { display:none; }
+}
+@media(max-width:360px){
+    .tb-greeting { font-size:12px; }
+}
 
 /* Hero card wave decoration */
 .today-wave { position:absolute; right:0; top:0; bottom:0; width:55%; pointer-events:none; overflow:hidden; z-index:0; }
@@ -1313,7 +1325,7 @@ $I = [
     <aside class="sidebar" id="sidebar">
         <div class="sb-brand">
             <a href="{{ route('boutique.dashboard') }}" class="sb-logo">
-                <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width:100%;height:100%;object-fit:cover;border-radius:9px"></div>
+                <div class="sb-logo-icon"><img src="/images/shopio3.jpeg" alt="Shopio" style="width:100%;height:100%;object-fit:cover;border-radius:9px"></div>
                 <span class="sb-shop-name">{{ $shop->name }}</span>
             </a>
             <button class="sb-close" id="btnCloseSidebar" aria-label="Fermer le menu">{!! $I['close'] !!}</button>
@@ -1417,6 +1429,14 @@ $I = [
             
 
             <div class="tb-actions">
+
+                {{-- Activer sons (mobile) --}}
+                <button class="tb-icon-btn" id="btnEnableSound" title="Activer les sons de notification"
+                        onclick="enableSoundManual()"
+                        style="display:none;position:relative">
+                    🔔
+                    <span style="position:absolute;top:-3px;right:-3px;width:8px;height:8px;background:#ef4444;border-radius:50%;border:2px solid var(--surface)"></span>
+                </button>
 
                 {{-- Mode sombre --}}
                 <button class="tb-icon-btn" id="btnDarkMode" title="Mode sombre / clair">{!! $I['moon'] !!}</button>
@@ -1529,13 +1549,10 @@ $I = [
                     ✦ Passer au Plan Pro — {{ $proPriceLabel }}
                 </a>
                 @else
-                {{-- Pro : juste un lien vers l'upgrade au renouvellement --}}
+                {{-- Pro actif : pas de bouton renouveler --}}
                 <div style="font-size:12px;color:#4338ca;font-weight:600;flex:1">
                     Toutes les fonctionnalités débloquées.
                 </div>
-                <a href="{{ route('boutique.subscription.upgrade') }}" class="plan-banner-cta pro-active" style="background:linear-gradient(135deg,#6366f1,#4f46e5);box-shadow:0 3px 12px rgba(99,102,241,.3)">
-                    Renouveler
-                </a>
                 @endif
             </div>
 
@@ -2612,17 +2629,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     document.addEventListener('touchstart', _initAudio, { once: true, passive: true });
     document.addEventListener('click',      _initAudio, { once: true });
-    /* Relance l'audio quand la page revient en avant-plan (iOS interrupted state) */
-    document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible' && _audioCtx && _audioCtx.state !== 'running') {
-            _audioCtx.resume().catch(() => {});
+
+    /* Affiche le bouton son sur mobile si AudioContext bloqué */
+    function _checkShowSoundBtn() {
+        const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+        if (isMobile && (!_audioCtx || _audioCtx.state !== 'running')) {
+            const btn = document.getElementById('btnEnableSound');
+            if (btn) btn.style.display = 'inline-flex';
         }
+    }
+    setTimeout(_checkShowSoundBtn, 2000);
+
+    function enableSoundManual() {
+        _initAudio();
+        if (_audioCtx) _audioCtx.resume().then(() => {
+            playBeep();
+            const btn = document.getElementById('btnEnableSound');
+            if (btn) btn.style.display = 'none';
+        }).catch(() => {});
+    }
+    /* Relance l'audio quand la page revient en avant-plan (iOS/Android) */
+    async function _resumeAudio() {
+        if (!_audioCtx) return;
+        if (_audioCtx.state === 'suspended' || _audioCtx.state === 'interrupted') {
+            try { await _audioCtx.resume(); } catch(e) { _audioCtx = null; }
+        }
+        /* iOS invalide parfois le contexte — en créer un nouveau */
+        if (_audioCtx && _audioCtx.state === 'closed') { _audioCtx = null; }
+    }
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') _resumeAudio();
     });
+    window.addEventListener('focus',    _resumeAudio);
+    window.addEventListener('pageshow', _resumeAudio);
 
     async function playBeep() {
         try {
-            if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            /* Recrée le contexte si fermé/invalide (iOS background) */
+            if (!_audioCtx || _audioCtx.state === 'closed') {
+                _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
             if (_audioCtx.state !== 'running') await _audioCtx.resume();
+            if (_audioCtx.state !== 'running') return;
             const t = _audioCtx.currentTime;
             const o1 = _audioCtx.createOscillator(), g1 = _audioCtx.createGain();
             o1.connect(g1); g1.connect(_audioCtx.destination);

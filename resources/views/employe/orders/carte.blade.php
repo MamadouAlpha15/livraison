@@ -269,9 +269,11 @@ function driverIcon(color, isMoving) {
     return L.divIcon({html:svg, iconSize:[32,32], iconAnchor:[16,16], popupAnchor:[0,-18], className:''});
 }
 
+const MAPBOX_TOKEN = '{{ config('services.mapbox.token') }}';
+
 /* ── Leaflet ── */
 const map = L.map('map', {center:[9.537,-13.677], zoom:13, zoomControl:true});
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OpenStreetMap', maxZoom:19}).addTo(map);
+L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=${MAPBOX_TOKEN}`, {attribution:'© Mapbox', maxZoom:19}).addTo(map);
 map.zoomControl.setPosition('bottomright');
 window.addEventListener('resize', () => map.invalidateSize());
 
@@ -308,14 +310,14 @@ function animateMarkerTo(key, toLat, toLng) {
     a.raf = requestAnimationFrame(step);
 }
 
-/* ── OSRM — vraies routes ── */
+/* ── Mapbox Directions — vraies routes ── */
 async function fetchOSRMRoute(fLat, fLng, tLat, tLng) {
     try {
-        const url = `https://router.project-osrm.org/route/v1/driving/`
-                  + `${fLng},${fLat};${tLng},${tLat}?overview=full&geometries=geojson`;
+        const url = `https://api.mapbox.com/directions/v5/mapbox/driving/`
+                  + `${fLng},${fLat};${tLng},${tLat}?geometries=geojson&overview=full&access_token=${MAPBOX_TOKEN}`;
         const r = await fetch(url);
         const d = await r.json();
-        if (d.code === 'Ok' && d.routes?.[0])
+        if (d.routes?.[0])
             return d.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
     } catch(e) {}
     return [[fLat, fLng], [tLat, tLng]];
@@ -347,7 +349,7 @@ function redrawDriverRoute(key, phase) {
     const rColor = phase === 2 ? '#10b981' : '#f59e0b';
     routeShadows[key] = L.polyline(pts, { color:'rgba(0,0,0,.22)', weight:9, lineCap:'round', lineJoin:'round' }).addTo(map);
     routeLines[key]   = L.polyline(pts, { color:rColor, weight:5, lineCap:'round', lineJoin:'round', opacity:.95 }).addTo(map);
-    if (markers[key]) markers[key].bringToFront();
+    if (markers[key] && routeLines[key]) routeLines[key].bringToFront();
 }
 
 async function planDriverRoute(key, fLat, fLng, tLat, tLng, phase) {

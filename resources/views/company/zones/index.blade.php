@@ -248,7 +248,7 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
     <div class="cx-brand-hd">
         <div class="cx-brand-top">
             <a href="{{ route('company.dashboard') }}" class="cx-logo">
-                <div class="cx-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width:34px;height:34px;object-fit:cover;border-radius:9px"></div>
+                <div class="cx-logo-icon"><img src="/images/shopio3.jpeg" alt="Shopio" style="width:34px;height:34px;object-fit:cover;border-radius:9px"></div>
                 <span>{{ Str::limit($company->name, 14) }}</span>
             </a>
             <button class="cx-close-btn" id="cxCloseBtn">✕</button>
@@ -434,10 +434,19 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
                             <div class="banner-sub">{{ $company->name }} · Définissez vos zones et tarifs</div>
                         </div>
                     </div>
-                    <button class="btn-add" onclick="openModal('addModal')">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        Nouvelle zone
-                    </button>
+                    @if(!$isBusiness && $totalZones >= $maxZones)
+                        <a href="{{ route('company.subscription.upgrade') }}"
+                           title="Passer au Plan Business pour ajouter plus de zones"
+                           style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;border:none;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            Nouvelle zone
+                        </a>
+                    @else
+                        <button class="btn-add" onclick="openModal('addModal')">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Nouvelle zone
+                        </button>
+                    @endif
                 </div>
 
                 <div class="stats-bar">
@@ -528,7 +537,16 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
                     <div class="empty-ico-wrap"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
                     <div class="empty-title">Aucune zone configurée</div>
                     <div class="empty-sub">Créez vos zones de livraison pour indiquer aux boutiques où vous livrez et à quel tarif.</div>
-                    <button class="btn-add" onclick="openModal('addModal')" style="margin-top:4px;font-size:13px;padding:11px 20px;">+ Créer ma première zone</button>
+                    @if(!$isBusiness && $totalZones >= $maxZones)
+                        <a href="{{ route('company.subscription.upgrade') }}"
+                           title="Passer au Plan Business pour ajouter plus de zones"
+                           style="display:inline-flex;align-items:center;gap:7px;margin-top:4px;font-size:13px;padding:11px 20px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;font-weight:700;text-decoration:none;cursor:pointer;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            + Créer ma première zone
+                        </a>
+                    @else
+                        <button class="btn-add" onclick="openModal('addModal')" style="margin-top:4px;font-size:13px;padding:11px 20px;">+ Créer ma première zone</button>
+                    @endif
                 </div>
                 @endforelse
             </div>

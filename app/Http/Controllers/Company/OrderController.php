@@ -30,7 +30,7 @@ class OrderController extends Controller
         $svc = app(SubscriptionService::class);
         if ($svc->companyPlan($company) === 'free') {
             $usedThisMonth = $svc->monthlyCompanyOrderCount($company);
-            if ($usedThisMonth >= SubscriptionService::COMP_FREE_MAX_ORDERS) {
+            if ($usedThisMonth > SubscriptionService::COMP_FREE_MAX_ORDERS) {
                 return redirect()->route('company.subscription.upgrade')
                     ->with('plan_error', "Limite atteinte : {$usedThisMonth}/10 commandes ce mois. Passez au Plan Business pour continuer.");
             }

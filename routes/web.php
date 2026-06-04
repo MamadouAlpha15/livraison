@@ -611,9 +611,6 @@ Route::middleware(['auth', 'role:vendeur,admin'])->group(function () {
 
     /* ── Boutique / Shop ── */
     Route::resource('shop', ShopController::class);
-    /* Route nommée attendue par la vue edit → shop.update */
-    Route::get('shop/{shop}/edit',  [ShopController::class, 'edit'])  ->name('shop.edit');
-    Route::put('shop/{shop}',       [ShopController::class, 'update'])->name('shop.update');
 
     /* ── Produits ── */
     Route::get('products/top-ventes', [ProductController::class, 'topSales'])->name('products.top');
@@ -625,6 +622,9 @@ Route::middleware(['auth', 'role:vendeur,admin'])->group(function () {
 
     /* Upload AJAX image unique (galerie ou principale) — évite le POST trop grand */
     Route::post('products/upload-image', [ProductController::class, 'uploadImage'])->name('products.upload.image');
+
+    /* Shopio IA — génération de description produit */
+    Route::post('products/ai-description', [\App\Http\Controllers\Vendeur\AiDescriptionController::class, 'generate'])->name('products.ai.description');
 
     /* ── Commandes (vendeur) ── */
     Route::get('orders',                              [VendeurOrderController::class, 'index'])          ->name('orders.index');

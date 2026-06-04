@@ -267,7 +267,8 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 .flash ul li { margin-top: 3px; font-size: 12.5px; }
 
 /* ── Spinner upload ── */
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin   { to { transform: rotate(360deg); } }
+@keyframes iaSpin { to { transform: rotate(360deg); } }
 .upload-spin { display: inline-block; animation: spin .8s linear infinite; font-size: 28px; }
 .upload-uploading {
     position: absolute; inset: 0; display: flex; flex-direction: column;
@@ -328,7 +329,75 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
             @csrf
             @if($isEdit) @method('PUT') @endif
 
-            {{-- ── CARD 1 : Informations principales ── --}}
+            {{-- ── CARD 1 : Photos du produit ── --}}
+            <div class="form-card">
+                <div class="form-card-hd">
+                    <div class="form-card-hd-ico">🖼️</div>
+                    <span class="form-card-title">Photos du produit</span>
+                    <span class="form-card-sub">Max 20 Mo par image</span>
+                </div>
+                <div class="form-card-body">
+
+                    <div class="field-row" style="align-items:start">
+                        {{-- Image principale --}}
+                        <div class="field">
+                            <label class="field-lbl">Photo principale</label>
+                            <input type="file" id="mainImageInput"
+                                   class="upload-main-input" accept="image/*">
+                            <input type="hidden" id="mainImageUploaded" name="image_uploaded"
+                                   value="{{ $isEdit && $product->image ? $product->image : '' }}">
+                            <div class="upload-main" id="mainUploadZone"
+                                 onclick="document.getElementById('mainImageInput').click()">
+                                <img id="mainPreview"
+                                     class="upload-main-preview {{ ($isEdit && $product->image) ? 'visible' : '' }}"
+                                     src="{{ $isEdit && $product->image ? \App\Services\ImageOptimizer::url($product->image, 'medium') : '' }}"
+                                     alt="Aperçu">
+                                <div class="upload-main-overlay">📷 Changer l'image</div>
+                                <div class="upload-placeholder" id="mainPlaceholder"
+                                     style="{{ ($isEdit && $product->image) ? 'display:none' : '' }}">
+                                    <span class="upload-placeholder-ico">📷</span>
+                                    <div class="upload-placeholder-txt">Photo principale</div>
+                                    <div class="upload-placeholder-hint">JPG · PNG · WEBP — Max 20 Mo</div>
+                                </div>
+                                <button type="button" class="img-remove {{ ($isEdit && $product->image) ? 'visible' : '' }}"
+                                        id="mainRemoveBtn"
+                                        onclick="event.stopPropagation();removeMainImage()">✕</button>
+                            </div>
+                            @error('image_uploaded')<div class="field-error" style="margin-top:6px">{{ $message }}</div>@enderror
+                        </div>
+
+                        {{-- Galerie secondaire --}}
+                        <div class="field">
+                            <label class="field-lbl">Photos supplémentaires</label>
+                            @php $existingGallery = $isEdit && $product->gallery ? json_decode($product->gallery, true) : []; @endphp
+                            <div class="upload-gallery-grid" id="galleryGrid">
+                                @foreach($existingGallery as $galleryPath)
+                                <div class="gallery-slot has-image">
+                                    <img src="{{ asset('storage/'.$galleryPath) }}" alt="">
+                                    <input type="hidden" name="gallery_keep[]" value="{{ $galleryPath }}">
+                                    <button type="button" class="gallery-slot-remove"
+                                            onclick="removeExistingGallerySlot(this)"
+                                            title="Supprimer cette photo">✕</button>
+                                </div>
+                                @endforeach
+                                <div class="gallery-slot" id="galleryAddBtn"
+                                     onclick="document.getElementById('galleryInput').click()"
+                                     title="Ajouter une photo"
+                                     style="{{ count($existingGallery) >= 20 ? 'display:none' : '' }}">
+                                    ➕
+                                </div>
+                            </div>
+                            <input type="file" id="galleryInput" accept="image/*" multiple style="display:none">
+                            <div class="field-hint" style="margin-top:8px">
+                                Cliquez ✕ pour supprimer · ➕ pour ajouter · max 20 photos.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            {{-- ── CARD 2 : Informations principales ── --}}
             <div class="form-card">
                 <div class="form-card-hd">
                     <div class="form-card-hd-ico">🏷️</div>
@@ -347,12 +416,22 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                     </div>
 
                     <div class="field">
-                        <label class="field-lbl" for="description">Description</label>
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                            <label class="field-lbl" for="description" style="margin-bottom:0">Description</label>
+                            <button type="button" id="btnShopioIA" onclick="generateAiDescription()"
+                                style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;border:1.5px solid #6366f1;background:linear-gradient(135deg,#eef2ff,#e0e7ff);color:#4f46e5;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;font-family:var(--font);white-space:nowrap">
+                                ✨ Shopio IA
+                            </button>
+                        </div>
+                        <div id="shopioIaStatus" style="display:none;align-items:center;gap:8px;padding:10px 14px;background:#eef2ff;border:1px solid #c7d2fe;border-radius:9px;margin-bottom:8px;font-size:12.5px;color:#4f46e5;font-weight:600">
+                            <span style="display:inline-block;width:14px;height:14px;border:2px solid #c7d2fe;border-top-color:#6366f1;border-radius:50%;animation:iaSpin .7s linear infinite;flex-shrink:0"></span>
+                            Shopio IA génère la description…
+                        </div>
                         <textarea name="description" id="description"
                                   class="field-textarea"
                                   rows="3"
-                                  placeholder="Décrivez votre produit : ingrédients, matière, caractéristiques…">{{ old('description', $isEdit ? $product->description : '') }}</textarea>
-                        <div class="field-hint">Max 2000 caractères. Une bonne description augmente les ventes.</div>
+                                  placeholder="Décrivez votre produit ou cliquez ✨ Shopio IA pour générer automatiquement…">{{ old('description', $isEdit ? $product->description : '') }}</textarea>
+                        <div class="field-hint">Max 2000 caractères · <span style="color:#6366f1;font-weight:600">✨ Shopio IA</span> génère la description depuis la photo, le nom et le prix.</div>
                     </div>
 
                     <div class="field-row">
@@ -362,11 +441,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                                 $currentCat = old('category', $isEdit ? $product->category : '');
                                 $isCustomCat = $currentCat && !in_array($currentCat, $categories);
                             @endphp
-
-                            {{-- Champ réel envoyé au serveur --}}
                             <input type="hidden" name="category" id="categoryHidden" value="{{ $currentCat }}">
-
-                            {{-- Sélecteur liste --}}
                             <div style="display:flex;gap:8px;align-items:center" id="categorySelectWrap">
                                 <select id="categorySelect" class="field-select" style="flex:1"
                                         onchange="onCategorySelect(this.value)">
@@ -383,8 +458,6 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                                     <option value="__custom__">➕ Saisir une catégorie…</option>
                                 </select>
                             </div>
-
-                            {{-- Champ texte libre (masqué par défaut) --}}
                             <div id="categoryCustomWrap" style="display:{{ $isCustomCat ? 'flex' : 'none' }};gap:8px;align-items:center;margin-top:8px">
                                 <input type="text" id="categoryCustomInput"
                                        class="field-input" style="flex:1"
@@ -412,7 +485,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                 </div>
             </div>
 
-            {{-- ── CARD 2 : Prix & Stock ── --}}
+            {{-- ── CARD 3 : Prix & Stock ── --}}
             <div class="form-card">
                 <div class="form-card-hd">
                     <div class="form-card-hd-ico">💰</div>
@@ -474,86 +547,6 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                                    value="{{ old('preparation_time', $isEdit ? ($product->preparation_time ?? '') : '') }}"
                                    min="0" step="1" placeholder="—">
                             <div class="field-hint">Restaurant uniquement.</div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            {{-- ── CARD 3 : Images ── --}}
-            <div class="form-card">
-                <div class="form-card-hd">
-                    <div class="form-card-hd-ico">🖼️</div>
-                    <span class="form-card-title">Photos du produit</span>
-                    <span class="form-card-sub">Max 20 Mo par image</span>
-                </div>
-                <div class="form-card-body">
-
-                    <div class="field-row" style="align-items:start">
-                        {{-- Image principale --}}
-                        <div class="field">
-                            <label class="field-lbl">Photo principale</label>
-                            {{-- Picker caché — déclenché par clic, upload AJAX immédiat ── --}}
-                            <input type="file" id="mainImageInput"
-                                   class="upload-main-input" accept="image/*">
-                            {{-- Chemin stocké après upload AJAX (c'est ce qui est soumis avec le form) --}}
-                            <input type="hidden" id="mainImageUploaded" name="image_uploaded"
-                                   value="{{ $isEdit && $product->image ? $product->image : '' }}">
-
-                            {{-- Zone cliquable ── --}}
-                            <div class="upload-main" id="mainUploadZone"
-                                 onclick="document.getElementById('mainImageInput').click()">
-                                <img id="mainPreview"
-                                     class="upload-main-preview {{ ($isEdit && $product->image) ? 'visible' : '' }}"
-                                     src="{{ $isEdit && $product->image ? \App\Services\ImageOptimizer::url($product->image, 'medium') : '' }}"
-                                     alt="Aperçu">
-                                <div class="upload-main-overlay">📷 Changer l'image</div>
-                                <div class="upload-placeholder" id="mainPlaceholder"
-                                     style="{{ ($isEdit && $product->image) ? 'display:none' : '' }}">
-                                    <span class="upload-placeholder-ico">📷</span>
-                                    <div class="upload-placeholder-txt">Photo principale</div>
-                                    <div class="upload-placeholder-hint">JPG · PNG · WEBP — Max 20 Mo</div>
-                                </div>
-                                <button type="button" class="img-remove {{ ($isEdit && $product->image) ? 'visible' : '' }}"
-                                        id="mainRemoveBtn"
-                                        onclick="event.stopPropagation();removeMainImage()">✕</button>
-                            </div>
-                            @error('image_uploaded')<div class="field-error" style="margin-top:6px">{{ $message }}</div>@enderror
-                        </div>
-
-                        {{-- Galerie secondaire --}}
-                        <div class="field">
-                            <label class="field-lbl">Photos supplémentaires</label>
-                            @php $existingGallery = $isEdit && $product->gallery ? json_decode($product->gallery, true) : []; @endphp
-                            <div class="upload-gallery-grid" id="galleryGrid">
-
-                                {{-- ── Images existantes : affichées avec croix de suppression ── --}}
-                                @foreach($existingGallery as $galleryPath)
-                                <div class="gallery-slot has-image">
-                                    <img src="{{ asset('storage/'.$galleryPath) }}" alt="">
-                                    {{-- Input caché : les chemins listés ici seront CONSERVÉS --}}
-                                    <input type="hidden" name="gallery_keep[]" value="{{ $galleryPath }}">
-                                    <button type="button" class="gallery-slot-remove"
-                                            onclick="removeExistingGallerySlot(this)"
-                                            title="Supprimer cette photo">✕</button>
-                                </div>
-                                @endforeach
-
-                                {{-- ── Bouton ➕ pour ajouter de nouvelles photos ── --}}
-                                <div class="gallery-slot" id="galleryAddBtn"
-                                     onclick="document.getElementById('galleryInput').click()"
-                                     title="Ajouter une photo"
-                                     style="{{ count($existingGallery) >= 20 ? 'display:none' : '' }}">
-                                    ➕
-                                </div>
-
-                            </div>
-
-                            {{-- Input picker caché — NE porte PAS name (les fichiers vont dans des inputs dynamiques) --}}
-                            <input type="file" id="galleryInput" accept="image/*" multiple style="display:none">
-                            <div class="field-hint" style="margin-top:8px">
-                                Cliquez ✕ pour supprimer · ➕ pour ajouter · max 20 photos.
-                            </div>
                         </div>
                     </div>
 
@@ -824,8 +817,68 @@ zone.addEventListener('drop', e => {
    (évite "POST data is too large")
    ══════════════════════════════════════════════ */
 
-const CSRF       = document.querySelector('meta[name="csrf-token"]').content;
-const UPLOAD_URL = '{{ route("products.upload.image") }}';
+const CSRF        = document.querySelector('meta[name="csrf-token"]').content;
+const UPLOAD_URL  = '{{ route("products.upload.image") }}';
+const AI_DESC_URL = '{{ route("products.ai.description") }}';
+
+async function generateAiDescription() {
+    const name = document.getElementById('name').value.trim();
+    const price    = document.getElementById('price')?.value || '';
+    const btn      = document.getElementById('btnShopioIA');
+    const status   = document.getElementById('shopioIaStatus');
+    const textarea = document.getElementById('description');
+
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Génération…';
+    status.style.display = 'flex';
+
+    let imageBase64 = null;
+    const mainImg = document.getElementById('mainPreview');
+    if (mainImg && mainImg.classList.contains('visible') && mainImg.src) {
+        try {
+            const imgRes = await fetch(mainImg.src);
+            const blob   = await imgRes.blob();
+            imageBase64  = await new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.readAsDataURL(blob);
+            });
+        } catch(e) { imageBase64 = null; }
+    }
+
+    if (!name && !imageBase64) {
+        alert('Ajoutez au moins une photo ou un nom de produit.');
+        return;
+    }
+
+    try {
+        const res = await fetch(AI_DESC_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': CSRF,
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({ name, price: price || null, image: imageBase64 }),
+        });
+        const data = await res.json();
+        if (data.description) {
+            textarea.value = data.description;
+            textarea.dispatchEvent(new Event('input'));
+            textarea.style.borderColor = '#6366f1';
+            textarea.style.boxShadow = '0 0 0 3px rgba(99,102,241,.15)';
+            setTimeout(() => { textarea.style.borderColor = ''; textarea.style.boxShadow = ''; }, 2000);
+        } else {
+            alert(data.error || 'Erreur Shopio IA. Réessayez.');
+        }
+    } catch(e) {
+        alert('Erreur réseau. Vérifiez votre connexion.');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '✨ Shopio IA';
+        status.style.display = 'none';
+    }
+}
 
 function updateGalleryAddBtn() {
     const total  = document.querySelectorAll('#galleryGrid .gallery-slot.has-image').length;

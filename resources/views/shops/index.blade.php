@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 
 @push('styles')
@@ -527,7 +527,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 {{-- ══════════ NAVBAR ══════════ --}}
 <nav class="top-nav">
     <a href="{{ url('/') }}" class="nav-brand">
-        <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width:40px;height:40px;object-fit:cover;border-radius:9px"></div>
+        <div class="sb-logo-icon"><img src="/images/shopio3.jpeg" alt="Shopio" style="width:40px;height:40px;object-fit:cover;border-radius:9px"></div>
         {{ config('app.name', 'ShopManager') }}
     </a>
     <div class="nav-links">

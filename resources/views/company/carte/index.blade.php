@@ -302,7 +302,7 @@ body.cx-light .cx-panel-toggle{background:rgba(124,58,237,.08);border-color:rgba
 <aside class="cx-sidebar" id="cxSidebar">
     <div class="cx-brand-hd">
         <div class="cx-brand-top">
-            <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
+            <div class="sb-logo-icon"><img src="/images/shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
             <button class="cx-close-btn" id="cxCloseBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
         <div class="cx-sys-badge"><span class="cx-sys-dot"></span> Système actif</div>
@@ -545,10 +545,12 @@ function driverIcon(color, isMoving) {
     return L.divIcon({ html:svg, iconSize:[40,40], iconAnchor:[20,20], popupAnchor:[0,-20], className:'' });
 }
 
+const MAPBOX_TOKEN = '{{ config('services.mapbox.token') }}';
+
 /* ── Initialisation Leaflet ── */
 const map = L.map('map', { center:[9.537,-13.677], zoom:13, zoomControl:true });
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OpenStreetMap', maxZoom:19}).addTo(map);
+L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=${MAPBOX_TOKEN}`, {attribution:'© Mapbox', maxZoom:19}).addTo(map);
 setTimeout(() => map.invalidateSize(), 50);
 setTimeout(() => map.invalidateSize(), 400);
 
@@ -590,14 +592,14 @@ function animateMarkerTo(id, toLat, toLng) {
     a.raf = requestAnimationFrame(step);
 }
 
-/* ── OSRM — vraies routes ── */
+/* ── Mapbox Directions — vraies routes ── */
 async function fetchOSRMRoute(fLat, fLng, tLat, tLng) {
     try {
-        const url = `https://router.project-osrm.org/route/v1/driving/`
-                  + `${fLng},${fLat};${tLng},${tLat}?overview=full&geometries=geojson`;
+        const url = `https://api.mapbox.com/directions/v5/mapbox/driving/`
+                  + `${fLng},${fLat};${tLng},${tLat}?geometries=geojson&overview=full&access_token=${MAPBOX_TOKEN}`;
         const r = await fetch(url);
         const d = await r.json();
-        if (d.code === 'Ok' && d.routes?.[0])
+        if (d.routes?.[0])
             return d.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
     } catch(e) {}
     return [[fLat, fLng], [tLat, tLng]];
@@ -629,7 +631,7 @@ function redrawDriverRoute(id, phase) {
     const rColor = phase === 2 ? '#10b981' : '#f59e0b';
     routeShadows[id] = L.polyline(pts, { color:'rgba(0,0,0,.22)', weight:9, lineCap:'round', lineJoin:'round' }).addTo(map);
     routeLines[id]   = L.polyline(pts, { color:rColor, weight:5, lineCap:'round', lineJoin:'round', opacity:.95 }).addTo(map);
-    if (markers[id]) markers[id].bringToFront();
+    if (markers[id] && routeLines[id]) routeLines[id].bringToFront();
 }
 
 async function planDriverRoute(id, fLat, fLng, tLat, tLng, phase) {

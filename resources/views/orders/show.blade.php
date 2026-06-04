@@ -734,17 +734,19 @@ $init = fn(string $n): string =>
     let lname         = {!! json_encode($gpsDriverName ?? '') !!};
     let pollId        = null;
 
+    const MAPBOX_TOKEN    = '{{ config('services.mapbox.token') }}';
+
     /* ── Carte Leaflet ── */
     const map = L.map('gpsMap', { zoomControl: true, attributionControl: true })
         .setView([lat, lng], HAS_GPS ? 16 : 13);
 
     const TILE_PROVIDERS = [
+        { url:`https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=${MAPBOX_TOKEN}`,
+          opts:{ attribution:'© <a href="https://www.mapbox.com/">Mapbox</a>', maxZoom:19, crossOrigin:'' } },
         { url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
           opts:{ attribution:'© OpenStreetMap', maxZoom:19, subdomains:'abc', crossOrigin:'' } },
         { url:'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
           opts:{ attribution:'© CartoDB', subdomains:'abcd', maxZoom:20, crossOrigin:'' } },
-        { url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
-          opts:{ attribution:'© Esri', maxZoom:19, crossOrigin:'' } },
     ];
     let _pIdx = 0, _layer = null, _fails = 0;
     function _loadTiles(i) {
@@ -1009,43 +1011,38 @@ $init = fn(string $n): string =>
 
                 if (!gpsFound) {
                     gpsFound = true;
-                    // Premier GPS en Phase 2 : ajouter marker et halo à la carte
                     if (!map.hasLayer(marker)) marker.addTo(map);
                     if (!map.hasLayer(halo))   halo.addTo(map);
                     marker.setIcon(makeMotoIcon(false));
                     marker.setPopupContent(buildPopup());
                     halo.setStyle({ fillOpacity:.08, radius:65, dashArray:null });
-                    startDot = L.circleMarker([nLat,nLng], {
-                        radius:7, color:'#fff', weight:2.5, fillColor:'#f06a0f', fillOpacity:1
-                    }).addTo(map).bindTooltip('Départ', { permanent:false, direction:'top' });
-                    map.setView([nLat, nLng], 16, { animate:true });
+                    /* Centrer sur les 2 points si client a partagé, sinon sur le livreur */
+                    if (clientLat !== null) {
+                        map.fitBounds([[nLat, nLng], [clientLat, clientLng]], { padding:[60,60], maxZoom:16, animate:true });
+                        scheduleRouteUpdate();
+                    } else {
+                        map.setView([nLat, nLng], 16, { animate:true });
+                    }
                 }
 
                 if (delta > 0.00013) {
-                    const from = [lat, lng];
-                    animateTo(from, [nLat, nLng], pt => {
+                    animateTo([lat, lng], [nLat, nLng], pt => {
                         marker.setLatLng(pt);
                         halo.setLatLng(pt);
                     });
-                    trail.addLatLng([nLat, nLng]);
-                    trailShadow.addLatLng([nLat, nLng]);
-                    if (delta > 0.0004) map.panTo([nLat, nLng], { animate:true, duration:.9 });
                     lat = nLat; lng = nLng;
-                    /* Route livreur → client : consommation GTA 5 ou recalcul si hors-route */
+
+                    /* Ajuster la vue pour garder livreur + client visibles en même temps */
                     if (clientLat !== null) {
-                        const destKey = `${clientLat},${clientLng}`;
-                        if (destKey !== routeDestKey || routeRemaining.length === 0) {
-                            scheduleRouteUpdate();
-                        } else {
-                            const rdist = distToRoutePoints(nLat, nLng, routeRemaining);
-                            if (rdist > 0.004) {
-                                routeOffStreak++;
-                                if (routeOffStreak >= 2) scheduleRouteUpdate();
-                            } else {
-                                routeOffStreak = 0;
-                                consumeOSRMRoute(nLat, nLng);
-                            }
-                        }
+                        map.fitBounds(
+                            [[nLat, nLng], [clientLat, clientLng]],
+                            { padding: [60, 60], maxZoom: 16, animate: true, duration: 0.6 }
+                        );
+                        /* Route complète livreur → client (recalcul si changement de position) */
+                        scheduleRouteUpdate();
+                    } else {
+                        /* Pas de position client : on suit juste le livreur */
+                        if (delta > 0.0004) map.panTo([nLat, nLng], { animate:true, duration:.9 });
                     }
                 }
             }
@@ -1102,11 +1099,11 @@ $init = fn(string $n): string =>
     /* ══════════════════════════════════════════════════════════════════
      *  PARTAGE DE POSITION CLIENT
      * ══════════════════════════════════════════════════════════════════ */
-    const CLIENT_LOC_URL = '{{ route('suivi.client-location', $order) }}';
-    const CSRF_TOKEN     = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+    const CLIENT_LOC_URL  = '{{ route('suivi.client-location', $order) }}';
+    const CSRF_TOKEN      = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
-    let clientLat    = null;
-    let clientLng    = null;
+    let clientLat    = {{ $order->client_lat ?? 'null' }};
+    let clientLng    = {{ $order->client_lng ?? 'null' }};
     let clientMarker = null;
     let routeLine    = null;
     let routeShadow  = null;
@@ -1151,10 +1148,10 @@ $init = fn(string $n): string =>
     /* ── Trace OSRM du livreur vers le client ── */
     async function fetchRoute(dLat, dLng, cLat, cLng) {
         try {
-            const url = `https://router.project-osrm.org/route/v1/driving/${dLng},${dLat};${cLng},${cLat}?overview=full&geometries=geojson`;
+            const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${dLng},${dLat};${cLng},${cLat}?geometries=geojson&overview=full&access_token=${MAPBOX_TOKEN}`;
             const res = await fetch(url);
             const data = await res.json();
-            if (data.code !== 'Ok' || !data.routes?.length) return null;
+            if (!data.routes?.length) return null;
             return data.routes[0].geometry.coordinates.map(([lo, la]) => [la, lo]);
         } catch { return null; }
     }
@@ -1189,7 +1186,8 @@ $init = fn(string $n): string =>
         if (routeLine)  routeLine.setLatLngs(routeRemaining);
         else routeLine  = L.polyline(routeRemaining, { color:'#3b82f6', weight:3.5, opacity:.82, lineCap:'round', lineJoin:'round' }).addTo(map);
         routeShadow.bringToBack(); routeLine.bringToBack();
-        trailShadow.bringToFront(); trail.bringToFront(); marker.bringToFront();
+        if (trailShadow) trailShadow.bringToFront();
+        if (trail) trail.bringToFront();
     }
 
     /* GTA 5 : mange la route au fur et à mesure que le livreur avance */
@@ -1293,15 +1291,32 @@ $init = fn(string $n): string =>
         let _firstFix = true;
         watchId = navigator.geolocation.watchPosition(
             pos => {
-                const { latitude: clat, longitude: clng } = pos.coords;
+                const { latitude: clat, longitude: clng, accuracy } = pos.coords;
                 clientLat = clat; clientLng = clng;
                 if (_firstFix) {
                     _firstFix = false;
                     if (shareBtn) shareBtn.disabled = false;
                     setShareUI(true);
                 }
+                /* Avertir si précision mauvaise (PC sans GPS) */
+                if (shareSubEl) {
+                    if (accuracy > 500) {
+                        shareSubEl.style.color = '#f59e0b';
+                        shareSubEl.innerHTML = `<span style="width:6px;height:6px;border-radius:50%;background:#f59e0b;flex-shrink:0;display:inline-block"></span> Précision faible (${Math.round(accuracy)}m) — utilisez un téléphone pour un meilleur résultat`;
+                    } else {
+                        shareSubEl.style.color = '#10b981';
+                        shareSubEl.innerHTML = `<span style="width:6px;height:6px;border-radius:50%;background:#10b981;flex-shrink:0;display:inline-block;animation:gps-pulse 1.8s ease-in-out infinite"></span> Position partagée · précision ~${Math.round(accuracy)}m`;
+                    }
+                }
                 sendClientLocation(clat, clng);
                 updateClientMarker(clat, clng);
+                /* Si le livreur est déjà visible → ajuster la vue pour montrer les 2 */
+                if (gpsFound) {
+                    map.fitBounds(
+                        [[lat, lng], [clat, clng]],
+                        { padding:[60,60], maxZoom:16, animate:true, duration:0.6 }
+                    );
+                }
                 scheduleRouteUpdate();
             },
             err => {
@@ -1342,6 +1357,12 @@ $init = fn(string $n): string =>
         shareBtn.addEventListener('click', () => {
             if (shareActive) stopSharing(true); else startSharing();
         });
+    }
+
+    /* ── Restaurer le marqueur client si position déjà en base ── */
+    if (clientLat !== null && clientLng !== null && !IS_DELIVERED && !IS_CANCELLED) {
+        updateClientMarker(clientLat, clientLng);
+        if (gpsFound) scheduleRouteUpdate();
     }
 
 })();

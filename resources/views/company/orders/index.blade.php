@@ -680,7 +680,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
     <div class="cx-brand-hd">
         <div class="cx-brand-top">
             <a href="{{ route('company.dashboard') }}" class="cx-logo">
-                 <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
+                 <div class="sb-logo-icon"><img src="/images/shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
                 <span class="sb-shop-name">{{ $company->name }}</span>
             </a>
             <button class="cx-close-btn" id="cxClose"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
@@ -1033,7 +1033,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                     </td>
                     <td data-label="Actions">
                         <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                            @if(in_array($order->status, ['en_attente','confirmée']))
+                            @if(in_array($order->status, ['en_attente','confirmée']) && !$order->driver_id)
                             <button class="btn-action btn-assign"
                                     data-id="{{ $order->id }}"
                                     data-fee="{{ $order->delivery_fee ?? '' }}"
@@ -1163,7 +1163,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
 
         {{-- Actions --}}
         <div class="mc-actions">
-            @if(in_array($order->status, ['en_attente','confirmée']))
+            @if(in_array($order->status, ['en_attente','confirmée']) && !$order->driver_id)
             <button class="btn-action btn-assign"
                     data-id="{{ $order->id }}"
                     data-fee="{{ $order->delivery_fee ?? '' }}"

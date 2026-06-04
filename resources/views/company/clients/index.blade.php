@@ -271,7 +271,7 @@ body.cx-dark .toolbar .search-box input{color:#e2e8f0;}
     <div class="cx-brand-hd">
         <div class="cx-brand-top">
             <a href="{{ route('company.dashboard') }}" class="cx-logo">
-                <div class="sb-logo-icon"><img src="/images/Shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
+                <div class="sb-logo-icon"><img src="/images/shopio3.jpeg" alt="Shopio" style="width: 40px;;height: 40px;object-fit:cover;border-radius:9px"></div>
                 <span>{{ Str::limit($company->name, 14) }}</span>
             </a>
             <button class="cx-close-btn" id="cxClose">✕</button>

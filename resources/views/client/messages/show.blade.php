@@ -161,6 +161,18 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
 .price-card.proposal .price-card-header { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; }
 .price-card.offer    .price-card-header { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
 .price-card.order-ok .price-card-header { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1d4ed8; }
+.price-card.counter  .price-card-header { background: linear-gradient(135deg, #ede9fe, #ddd6fe); color: #5b21b6; }
+
+.btn-counter-offer {
+    display: inline-flex; align-items: center; gap: 7px;
+    width: 100%; padding: 10px 16px; margin-top: 8px;
+    background: transparent;
+    border: 1.5px solid #7c3aed; border-radius: 10px;
+    color: #7c3aed; font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all .2s; font-family: var(--font);
+    justify-content: center;
+}
+.btn-counter-offer:hover { background: #ede9fe; }
 .price-card-body { background: #fff; padding: 14px; border: 1px solid var(--border); border-top: none; border-radius: 0 0 14px 14px; }
 .price-card-amount { font-size: 22px; font-weight: 900; color: #0f1111; font-family: monospace; line-height: 1; margin-bottom: 4px; }
 .price-card-original { font-size: 11px; color: var(--muted); text-decoration: line-through; margin-bottom: 2px; }
@@ -423,6 +435,27 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
         </button>
     </div>
 
+    {{-- PANNEAU CONTRE-OFFRE CLIENT --}}
+    <div class="propose-panel" id="counterPanel">
+        <div class="propose-panel-title">🔄 Votre contre-offre</div>
+        <div class="propose-panel-sub">
+            Proposez un nouveau prix au vendeur.
+        </div>
+        <div class="propose-panel-row">
+            <input type="number"
+                   id="counterPriceInput"
+                   class="propose-input"
+                   placeholder="Votre prix…"
+                   min="1"
+                   step="500">
+            <span class="propose-devise">{{ $devise }}</span>
+            <button class="btn-send-propose" onclick="sendCounterOffer()" type="button">
+                Envoyer
+            </button>
+            <button class="btn-cancel-propose" onclick="closeCounterPanel()" type="button">Annuler</button>
+        </div>
+    </div>
+
     {{-- PANNEAU PROPOSITION DE PRIX --}}
     <div class="propose-panel" id="proposePanel">
         <div class="propose-panel-title">💰 Faire une proposition de prix</div>
@@ -491,7 +524,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
                 </div>
             </div>
 
-        @elseif(in_array($msgType, ['price_proposal', 'price_offer', 'order_created']))
+        @elseif(in_array($msgType, ['price_proposal', 'price_offer', 'price_counter', 'order_created']))
             {{-- ══ CARTE NÉGOCIATION ══ --}}
             <div class="msg-row {{ $isMine ? 'mine' : 'theirs' }}" data-msg-id="{{ $msg->id }}">
                 <div class="msg-av">{{ $isMine ? $initials : $sInit }}</div>
@@ -551,6 +584,38 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
                                 <div class="price-card-status status-refused">✕ Offre expirée</div>
                             @elseif($isMine)
                                 <div class="price-card-status status-pending">⏳ En attente de confirmation client…</div>
+                            @endif
+                        </div>
+                    </div>
+
+                    @elseif($msgType === 'price_counter')
+                    {{-- Contre-offre vendeur ou client --}}
+                    <div class="price-card counter">
+                        <div class="price-card-header">🔄 Contre-proposition {{ $isMine ? 'envoyée' : 'du vendeur' }}</div>
+                        <div class="price-card-body">
+                            <div class="price-card-amount">{{ number_format($msg->proposed_price, 0, ',', ' ') }} {{ $devise }}</div>
+                            <div class="price-card-original">Prix original : {{ number_format($product->price, 0, ',', ' ') }} {{ $devise }}</div>
+                            @php $discC = round((1 - $msg->proposed_price / $product->price) * 100); @endphp
+                            @if($discC > 0)
+                            <div class="price-card-discount">-{{ $discC }}%</div>
+                            @endif
+
+                            @if($msg->proposal_status === 'pending' && !$isMine)
+                                <button class="btn-confirm-offer"
+                                        id="confirmBtn_{{ $msg->id }}"
+                                        onclick="confirmOffer({{ $msg->id }}, this)">
+                                    ✓ Accepter cette contre-offre
+                                </button>
+                                <button class="btn-counter-offer"
+                                        onclick="openCounterPanel({{ $msg->id }}, {{ $msg->proposed_price }})">
+                                    🔄 Faire une contre-offre
+                                </button>
+                            @elseif($msg->proposal_status === 'pending' && $isMine)
+                                <div class="price-card-status status-pending">⏳ En attente de réponse…</div>
+                            @elseif($msg->proposal_status === 'accepted')
+                                <div class="price-card-status status-accepted">✓ Acceptée — commande créée</div>
+                            @elseif($msg->proposal_status === 'refused')
+                                <div class="price-card-status status-refused">✕ Remplacée par une nouvelle offre</div>
                             @endif
                         </div>
                     </div>
@@ -649,17 +714,51 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
 
 @push('scripts')
 <script>
-const CSRF             = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
-const DEVISE           = '{{ $devise }}';
-const INITIALS         = '{{ $initials }}';
-const STORE_URL        = '{{ route("client.messages.store", $product) }}';
-const POLL_URL         = '{{ route("client.messages.index", $product) }}';
-const CONFIRM_URL      = '{{ url("client/messages/confirm-offer") }}';
-const PROPOSE_URL      = '{{ route("client.messages.propose") }}';
-const SEND_IMAGES_URL  = '{{ route("client.messages.client.send-images", $product) }}';
-const IMAGE_STATUS_URL = '{{ url("client/messages/image-status") }}';
-const PRODUCT_ID       = {{ $product->id }};
-const PRODUCT_PRICE    = {{ $product->price }};
+const CSRF              = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+const DEVISE            = '{{ $devise }}';
+const INITIALS          = '{{ $initials }}';
+const STORE_URL         = '{{ route("client.messages.store", $product) }}';
+const POLL_URL          = '{{ route("client.messages.index", $product) }}';
+const CONFIRM_URL       = '{{ url("client/messages/confirm-offer") }}';
+const PROPOSE_URL       = '{{ route("client.messages.propose") }}';
+const COUNTER_OFFER_URL = '{{ route("client.messages.counter-offer") }}';
+const SEND_IMAGES_URL   = '{{ route("client.messages.client.send-images", $product) }}';
+const IMAGE_STATUS_URL  = '{{ url("client/messages/image-status") }}';
+const PRODUCT_ID        = {{ $product->id }};
+const PRODUCT_PRICE     = {{ $product->price }};
+
+let _counterMsgId = 0;
+
+function openCounterPanel(msgId, suggestedPrice) {
+    _counterMsgId = msgId;
+    const input = document.getElementById('counterPriceInput');
+    if (input) input.value = suggestedPrice;
+    document.getElementById('counterPanel').classList.add('open');
+    document.getElementById('proposePanel').classList.remove('open');
+    input?.focus();
+}
+
+function closeCounterPanel() {
+    document.getElementById('counterPanel').classList.remove('open');
+    _counterMsgId = 0;
+}
+
+async function sendCounterOffer() {
+    const input = document.getElementById('counterPriceInput');
+    const price = parseFloat(input.value);
+    if (!price || price < 1) { showToast('❌ Veuillez entrer un prix valide.', 'error'); return; }
+    try {
+        const res = await fetch(COUNTER_OFFER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
+            body: JSON.stringify({ message_id: _counterMsgId, counter_price: price }),
+        });
+        if (!res.ok) throw new Error();
+        showToast('🔄 Contre-offre envoyée au vendeur !', 'success');
+        closeCounterPanel();
+        setTimeout(() => location.reload(), 1200);
+    } catch(e) { showToast('❌ Erreur lors de l\'envoi. Réessayez.', 'error'); }
+}
 
 let _lastMsgId     = {{ $messages->isNotEmpty() ? $messages->last()->id : 0 }};
 let _selectedFiles = [];   // photos en attente d'envoi

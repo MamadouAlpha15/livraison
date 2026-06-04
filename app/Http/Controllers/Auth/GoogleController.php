@@ -15,7 +15,7 @@ class GoogleController extends Controller
     {
         return Socialite::driver('google')
             ->stateless()
-            ->setHttpClient(new \GuzzleHttp\Client(['verify' => false]));
+            ->setHttpClient(new \GuzzleHttp\Client(['verify' => true]));
     }
 
     public function redirect()
@@ -103,6 +103,10 @@ class GoogleController extends Controller
 
     private function redirectToDashboard(User $user)
     {
+        if ($user->role === 'client' && session('product_redirect')) {
+            return redirect(session()->pull('product_redirect'));
+        }
+
         return match($user->role) {
             'superadmin' => redirect()->route('admin.dashboard'),
             'admin'      => redirect()->route('boutique.dashboard'),
