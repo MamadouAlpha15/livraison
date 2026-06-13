@@ -124,6 +124,36 @@ Route::get('/language/{locale}', [\App\Http\Controllers\LanguageController::clas
 |  Accessibles sans authentification
 ══════════════════════════════════════════════════════════════════════════ */
 
+/* PWA — manifest servi via PHP pour contourner le WAF Tiger Protect */
+Route::get('/manifest.json', function () {
+    return response()->json([
+        'name'             => 'Shopio — Marketplace Africaine',
+        'short_name'       => 'Shopio',
+        'description'      => 'Commandez, vendez et gérez votre boutique avec Shopio.',
+        'start_url'        => '/dashboard',
+        'id'               => '/dashboard',
+        'display'          => 'standalone',
+        'background_color' => '#059669',
+        'theme_color'      => '#059669',
+        'orientation'      => 'portrait-primary',
+        'lang'             => 'fr',
+        'categories'       => ['shopping', 'business'],
+        'icons'            => [
+            [
+                'src'     => '/images/Shopio_logo.png',
+                'sizes'   => '1024x1024',
+                'type'    => 'image/png',
+                'purpose' => 'any maskable',
+            ],
+        ],
+        'screenshots' => [],
+        'shortcuts'   => [
+            ['name' => 'Mes commandes', 'url' => '/client/orders',  'description' => 'Voir mes commandes'],
+            ['name' => 'Boutiques',     'url' => '/shops',          'description' => 'Parcourir les boutiques'],
+        ],
+    ], 200, ['Content-Type' => 'application/manifest+json']);
+})->name('manifest');
+
 /* Page d'accueil */
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
@@ -820,5 +850,11 @@ Route::middleware(['auth', 'role:company'])
         Route::get('/subscription/upgrade', [CompanySubscriptionController::class, 'upgrade'])
             ->name('subscription.upgrade');
     });
+
+/* Push notifications — enregistrement/suppression d'abonnement */
+Route::middleware('auth')->group(function () {
+    Route::post('/push/subscribe',   [\App\Http\Controllers\PushSubscriptionController::class, 'store'])  ->name('push.subscribe');
+    Route::post('/push/unsubscribe', [\App\Http\Controllers\PushSubscriptionController::class, 'destroy'])->name('push.unsubscribe');
+});
 
 require __DIR__.'/auth.php';

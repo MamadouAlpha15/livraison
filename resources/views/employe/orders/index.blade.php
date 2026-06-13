@@ -73,7 +73,7 @@ $I = [
 
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=block" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 :root {
@@ -1958,14 +1958,22 @@ function setDate(val) {
         return ['INPUT','TEXTAREA','SELECT'].includes(active.tagName);
     }
 
+    function doReload() {
+        clearInterval(timer);
+        if (label) label.innerHTML = '⏳ Actualisation…';
+        if (dot)   dot.style.animation = 'none';
+        location.reload();
+    }
+
     function tick() {
         if (paused || isModalOpen() || isUserTyping()) return;
 
         seconds--;
-        count.textContent = seconds;
+        if (seconds < 0) seconds = 0;
+        if (count) count.textContent = seconds;
 
         if (seconds <= 0) {
-            location.reload();
+            doReload();
         }
     }
 
@@ -1988,6 +1996,17 @@ function setDate(val) {
             label.innerHTML = 'Actu dans <strong id="refreshCount">' + seconds + '</strong>s';
         }
     };
+
+    /* Pause auto quand l'onglet est en arrière-plan (mobile) */
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+            paused = true;
+        } else {
+            /* Retour sur l'onglet → actualiser immédiatement */
+            paused = false;
+            doReload();
+        }
+    });
 
     timer = setInterval(tick, 1000);
 })();

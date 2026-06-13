@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Services\ImageOptimizer;
 use App\Jobs\ProcessImageJob;
+use App\Services\PushService;
 
 // ============================================================
 // Classe ShopMessageController
@@ -171,6 +172,18 @@ class ShopMessageController extends Controller
             'body'        => $request->body,         // Le texte du message
             'type'        => ShopMessage::TYPE_TEXT, // Type = message texte simple
         ]);
+
+        // Notifier le vendeur par push
+        try {
+            $push = app(PushService::class);
+            $push->sendToUser(
+                $vendeur,
+                'Nouveau message de ' . $client->name,
+                $request->body,
+                $push->vendorBadgeCount($vendeur),
+                '/boutique/messages'
+            );
+        } catch (\Throwable $e) {}
 
         // Si c'est une requête AJAX (JavaScript), on retourne une confirmation JSON avec l'ID
         if (request()->ajax() || request()->wantsJson()) {

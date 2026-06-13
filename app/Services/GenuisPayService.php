@@ -17,7 +17,7 @@ class GenuisPayService
 
     public function __construct()
     {
-        $this->baseUrl       = config('genuispay.base_url', 'https://pay.genius.ci/api/v1/merchant');
+        $this->baseUrl       = config('genuispay.base_url', 'https://geniuspay.ci/api/v1/merchant');
         $this->apiKey        = config('genuispay.api_key', '');
         $this->apiSecret     = config('genuispay.api_secret', '');
         $this->webhookSecret = config('genuispay.webhook_secret', '');
@@ -90,6 +90,8 @@ class GenuisPayService
                 'internal_ref' => $internalRef,
                 'amount'       => $amount,
                 'method'       => $paymentMethod ?: 'checkout',
+                'success_url'  => $successUrl,
+                'error_url'    => $errorUrl,
                 'http_status'  => $response->status(),
                 'response'     => $data,
             ]);
@@ -166,8 +168,7 @@ class GenuisPayService
             return false;
         }
 
-        $decoded  = json_decode($rawBody, true) ?? [];
-        $expected = hash_hmac('sha256', $timestamp . '.' . json_encode($decoded), $this->webhookSecret);
+        $expected = hash_hmac('sha256', $timestamp . '.' . $rawBody, $this->webhookSecret);
 
         return hash_equals($expected, $signature);
     }

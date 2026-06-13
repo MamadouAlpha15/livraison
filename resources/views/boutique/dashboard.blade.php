@@ -11,7 +11,7 @@
 
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=block" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -1414,6 +1414,18 @@ $I = [
     <div class="sb-overlay" id="sbOverlay"></div>
 
     <main class="main">
+
+        {{-- ══ BANNIÈRE PAIEMENT RÉUSSI ══ --}}
+        @if($recentPayment)
+        <div id="paymentSuccessBanner" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:12px;border-radius:12px;margin:16px 16px 0;box-shadow:0 4px 20px rgba(16,185,129,.35);">
+            <span style="font-size:22px">🎉</span>
+            <div style="flex:1">
+                <strong style="font-size:15px">Paiement réussi ! Votre abonnement Pro est maintenant actif.</strong>
+                <div style="font-size:12px;opacity:.85;margin-top:2px">Vous avez accès à toutes les fonctionnalités premium.</div>
+            </div>
+            <button onclick="document.getElementById('paymentSuccessBanner').remove()" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px">✕</button>
+        </div>
+        @endif
 
         {{-- ══ TOPBAR RESPONSIVE ══ --}}
         <div class="topbar">

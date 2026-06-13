@@ -53,7 +53,7 @@ $I = [
 
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=block" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 :root {
@@ -643,7 +643,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         </div>
         <div class="modal-actions">
             <button type="button" class="action-btn" onclick="closeDeleteModal()" style="flex:1">← Retour</button>
-            <form id="deleteForm" method="POST" style="flex:1;display:contents">
+            <form id="deleteForm" method="POST" style="flex:1;display:flex">
                 @csrf @method('DELETE')
                 <button type="submit" class="action-btn btn-del-confirm" style="flex:1">{!! $I['trash_btn'] !!} Supprimer</button>
             </form>

@@ -269,8 +269,15 @@ class DeliveryCompanyController extends Controller
         ? "{$bizXof} XOF/mois (≈ {$bizGnf} GNF 🇬🇳)"
         : "{$bizXof} XOF/mois";
 
+    $recentPayment = \App\Models\Subscription::where('subscriber_type', \App\Models\DeliveryCompany::class)
+        ->where('subscriber_id', $company->id)
+        ->where('status', 'active')
+        ->where('updated_at', '>=', now()->subMinutes(10))
+        ->where('payment_method', 'genuispay')
+        ->exists();
+
     return view('company.dashboard', compact(
-        'company', 'drivers',
+        'company', 'drivers', 'recentPayment',
         'pendingOrders', 'pendingOrdersToday', 'pendingOrdersYday',
         'availableDrivers', 'totalDrivers',
         'inDelivery', 'inDeliveryYday',

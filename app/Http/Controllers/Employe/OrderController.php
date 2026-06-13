@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\OrderStatusNotification;
 use App\Services\SubscriptionService;
+use App\Services\PushService;
 
 class OrderController extends Controller
 {
@@ -288,6 +289,20 @@ class OrderController extends Controller
             }
             $order->save();
             $assigned++;
+
+            // Notifier le client
+            try {
+                $client = $order->user;
+                if ($client) {
+                    app(PushService::class)->sendToUser(
+                        $client,
+                        'Commande confirmée ✅',
+                        'Votre commande a été confirmée et un livreur a été assigné.',
+                        1,
+                        '/client/orders'
+                    );
+                }
+            } catch (\Throwable $e) {}
         }
 
         return response()->json(['success' => true, 'assigned' => $assigned]);
@@ -357,6 +372,20 @@ class OrderController extends Controller
             $livreur->notify(new OrderStatusNotification($order, 'Une nouvelle commande vous a été assignée.'));
         }
 
+        // Notifier le client
+        try {
+            $client = $order->user;
+            if ($client) {
+                app(PushService::class)->sendToUser(
+                    $client,
+                    'Commande confirmée ✅',
+                    'Votre commande a été confirmée et un livreur a été assigné.',
+                    1,
+                    '/client/orders'
+                );
+            }
+        } catch (\Throwable $e) {}
+
         return back()->with('success', 'Commande assignée au livreur.');
     }
 
@@ -403,6 +432,20 @@ class OrderController extends Controller
             'driver_id'           => null,
             'status'              => Order::STATUS_EN_ATTENTE,
         ]);
+
+        // Notifier l'entreprise de livraison
+        try {
+            $companyUser = $company->user;
+            if ($companyUser) {
+                app(PushService::class)->sendToUser(
+                    $companyUser,
+                    'Nouvelle commande à livrer 📦',
+                    'La boutique vous a confié une commande de ' . number_format($order->total, 0, ',', ' ') . ' GNF.',
+                    1,
+                    '/company/orders'
+                );
+            }
+        } catch (\Throwable $e) {}
 
         if ($request->expectsJson()) {
             return response()->json(['success' => true, 'message' => "Commande #$order->id confiée à {$company->name}."]);

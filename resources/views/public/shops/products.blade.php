@@ -485,6 +485,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     .amz-card-name { font-size: 12px; -webkit-line-clamp: 2; }
     .amz-price-main { font-size: 15px; }
     .amz-btn-msg { display: none; } /* trop encombrant sur mobile */
+    .amz-btn-login { display: flex; } /* toujours visible sur mobile */
     .shop-banner { padding: 16px 14px; gap: 12px; }
     .shop-banner-logo { width: 52px; height: 52px; font-size: 22px; }
     .shop-banner-name { font-size: 17px; margin-bottom: 6px; }
@@ -502,6 +503,33 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     .shop-banner-chip:first-of-type { display: inline-flex; }
     .amz-price-main { font-size: 14px; }
 }
+/* ══════════════════════════════
+   LIGHTBOX
+══════════════════════════════ */
+.lb-overlay {
+    display: none; position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,.88); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+    padding: 20px;
+}
+.lb-overlay.open { display: flex; }
+.lb-img {
+    max-width: 92vw; max-height: 88vh; border-radius: 12px;
+    object-fit: contain; box-shadow: 0 24px 80px rgba(0,0,0,.6);
+    animation: lbIn .22s ease;
+}
+@keyframes lbIn { from { opacity:0; transform:scale(.92); } to { opacity:1; transform:scale(1); } }
+.lb-close {
+    position: fixed; top: 16px; right: 16px;
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(255,255,255,.15); border: 1.5px solid rgba(255,255,255,.3);
+    color: #fff; font-size: 20px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+}
+.lb-close:hover { background: rgba(255,255,255,.3); }
+.amz-card-img { cursor: zoom-in; }
+
 @media (max-width: 360px) {
     /* 1 colonne sur très petit écran */
     .amz-grid { grid-template-columns: 1fr; gap: 12px; }
@@ -634,6 +662,12 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
         <button class="drawer-reset" onclick="resetFilters()">🔄 Réinitialiser les filtres</button>
         <button class="drawer-apply" onclick="applyAndClose()">✓ Appliquer</button>
     </div>
+</div>
+
+{{-- ══ LIGHTBOX ══ --}}
+<div class="lb-overlay" id="lbOverlay" onclick="closeLb(event)">
+    <button class="lb-close" onclick="closeLb()">✕</button>
+    <img class="lb-img" id="lbImg" src="" alt="">
 </div>
 
 {{-- ══ BANNIÈRE BOUTIQUE ══ --}}
@@ -777,7 +811,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                  data-featured="{{ $product->is_featured ? '1' : '0' }}"
                  data-stock="{{ $stockOut ? 'out' : 'in' }}">
 
-                <div class="amz-card-img" onclick="goToProduct('{{ route('client.products.show', $product) }}')">
+                <div class="amz-card-img" onclick="openLb('{{ \App\Services\ImageOptimizer::url($product->image, 'medium') ?? asset('storage/'.($product->image ?? '')) }}', '{{ addslashes($product->name) }}')">
                     @if($product->image)
                         <img src="{{ \App\Services\ImageOptimizer::url($product->image, 'thumb') ?? asset('storage/'.$product->image) }}"
                              srcset="{{ \App\Services\ImageOptimizer::url($product->image, 'thumb') }} 300w,
@@ -841,7 +875,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                         <a href="{{ route('register', ['redirect' => $orderUrl, 'role' => 'client']) }}" class="amz-btn-order">
                             🛒 Commander
                         </a>
-                        <a href="{{ route('login', ['redirect' => $orderUrl]) }}" class="amz-btn-msg" style="margin-top:6px">
+                        <a href="{{ route('login', ['redirect' => $orderUrl]) }}" class="amz-btn-login" style="margin-top:6px;display:flex;align-items:center;justify-content:center;gap:5px;width:100%;padding:8px 12px;border-radius:var(--r-sm);font-size:12px;font-weight:600;font-family:var(--font);background:var(--brand-mlt);color:var(--brand-dk);border:1.5px solid var(--brand-lt);text-decoration:none;transition:all .15s;">
                             Déjà inscrit ? Se connecter
                         </a>
                     @endauth
@@ -869,6 +903,24 @@ var state = { cat: '', sort: 'default', stockOnly: false, priceMin: 0, priceMax:
 
 /* ── Navigation produit ── */
 function goToProduct(url) { window.location.href = url; }
+
+/* ── Lightbox ── */
+function openLb(src, alt) {
+    if (!src) return;
+    var img = document.getElementById('lbImg');
+    img.src = src;
+    img.alt = alt || '';
+    document.getElementById('lbOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closeLb(e) {
+    if (e && e.target === document.getElementById('lbImg')) return;
+    document.getElementById('lbOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeLb();
+});
 
 /*
  * ── Sync visuelle GLOBALE (sidebar + drawer) ──

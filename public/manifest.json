@@ -1,0 +1,34 @@
+{
+    "name": "Shopio — Marketplace Africaine",
+    "short_name": "Shopio",
+    "description": "Commandez, vendez et gérez votre boutique avec Shopio.",
+    "start_url": "/dashboard",
+    "id": "/dashboard",
+    "display": "standalone",
+    "background_color": "#059669",
+    "theme_color": "#059669",
+    "orientation": "portrait-primary",
+    "lang": "fr",
+    "categories": ["shopping", "business"],
+    "icons": [
+        {
+            "src": "/images/Shopio_logo.png",
+            "sizes": "1024x1024",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "screenshots": [],
+    "shortcuts": [
+        {
+            "name": "Mes commandes",
+            "url": "/client/orders",
+            "description": "Voir mes commandes"
+        },
+        {
+            "name": "Boutiques",
+            "url": "/shops",
+            "description": "Parcourir les boutiques"
+        }
+    ]
+}

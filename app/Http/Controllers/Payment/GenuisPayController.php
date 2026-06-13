@@ -130,8 +130,14 @@ class GenuisPayController extends Controller
             return response()->json(['error' => 'Invalid signature'], 401);
         }
 
-        $payload  = json_decode($rawBody, true);
-        $data     = $payload['data'] ?? [];
+        // Événement de test GeniusPay (pas de référence de paiement)
+        if ($event === 'webhook.test') {
+            Log::info('[GenuisPay] Webhook test OK');
+            return response()->json(['ok' => true, 'note' => 'test_received']);
+        }
+
+        $payload   = json_decode($rawBody, true);
+        $data      = $payload['data'] ?? [];
         $genuisRef = $data['reference'] ?? null;
 
         if (!$genuisRef) {
@@ -252,8 +258,13 @@ class GenuisPayController extends Controller
         }
         $dashRoute = $isCompany ? route('company.dashboard') : route('boutique.dashboard');
 
-        // Pays de l'utilisateur pour l'affichage de la devise
-        $userCountry = $user?->country ?? '';
+        // Si l'utilisateur est connecté, rediriger directement vers son dashboard avec un message
+        if ($user) {
+            return redirect($dashRoute)->with('payment_success', true);
+        }
+
+        // Sinon afficher la page (cas rare : session expirée pendant le paiement)
+        $userCountry = '';
         $amountXof   = $subscription
             ? (int) ceil($subscription->amount / config('genuispay.gnf_to_xof_rate', 13.15))
             : null;

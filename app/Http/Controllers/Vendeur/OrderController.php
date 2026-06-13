@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\OrderStatusNotification;
+use App\Services\PushService;
 
 class OrderController extends Controller
 {
@@ -68,7 +69,20 @@ class OrderController extends Controller
 
         $order->update(['status' => Order::STATUS_CONFIRMEE]);
 
-        // Redirection vers la page d'assignation (où tu verras les livreurs)
+        // Notifier le client par push
+        try {
+            $client = $order->user;
+            if ($client) {
+                app(PushService::class)->sendToUser(
+                    $client,
+                    'Commande confirmée ✅',
+                    'Votre commande de ' . number_format($order->total, 0, ',', ' ') . ' GNF a été confirmée.',
+                    1,
+                    '/client/orders'
+                );
+            }
+        } catch (\Throwable $e) {}
+
         return redirect()->route('orders.assign.show', $order->id)
             ->with('success', 'Commande confirmée — assignez un livreur.');
     }
@@ -170,6 +184,20 @@ class OrderController extends Controller
             $livreur->notify(new OrderStatusNotification($order, 'Une commande vous a été assignée.'));
         } catch (\Throwable $e) {}
     }
+
+    // Notifier le client — commande en livraison
+    try {
+        $client = $order->user;
+        if ($client) {
+            app(PushService::class)->sendToUser(
+                $client,
+                'Commande en livraison 🚚',
+                'Votre commande est en route ! Un livreur a été assigné.',
+                1,
+                '/client/orders'
+            );
+        }
+    } catch (\Throwable $e) {}
 
     if ($request->ajax()) {
         return response()->json([

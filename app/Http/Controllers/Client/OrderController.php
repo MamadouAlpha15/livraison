@@ -22,6 +22,7 @@ use App\Models\Payment;      // Table "payments" — les paiements liés aux com
 use App\Models\Shop;         // Table "shops" — les boutiques
 use App\Models\ShopMessage;  // Table "shop_messages" — les messages entre client et vendeur
 use App\Services\SubscriptionService; // Vérification des limites du plan
+use App\Services\PushService;
 
 // On importe Request : objet qui contient toutes les données envoyées par le formulaire (POST, GET...)
 use Illuminate\Http\Request;
@@ -164,8 +165,21 @@ class OrderController extends Controller
             'status'   => 'en_attente',   // Le paiement n'a pas encore été effectué
         ]);
 
-        // On redirige le client vers la liste de ses commandes
-        // ->with('success', '...') = envoie un message flash (s'affiche une seule fois)
+        // Notifier le vendeur par push
+        try {
+            $shopOwner = $order->shop->user;
+            if ($shopOwner) {
+                $push  = app(PushService::class);
+                $push->sendToUser(
+                    $shopOwner,
+                    'Nouvelle commande !',
+                    'Vous avez reçu une nouvelle commande de ' . number_format($order->total, 0, ',', ' ') . ' GNF.',
+                    $push->vendorBadgeCount($shopOwner),
+                    '/vendeur/orders'
+                );
+            }
+        } catch (\Throwable $e) {}
+
         return redirect()->route('client.orders.index')
             ->with('success', 'Commande passée avec succès ! Paiement en cash à la livraison.');
     }
@@ -288,7 +302,21 @@ class OrderController extends Controller
             'status'   => 'en_attente',// Paiement pas encore effectué
         ]);
 
-        // On redirige vers la liste des commandes avec un message de succès
+        // Notifier le vendeur par push
+        try {
+            $shopOwner = $order->shop->user ?? $product->shop->user ?? null;
+            if ($shopOwner) {
+                $push = app(PushService::class);
+                $push->sendToUser(
+                    $shopOwner,
+                    'Nouvelle commande !',
+                    $product->name . ' × ' . $request->quantity . ' — ' . number_format($total, 0, ',', ' ') . ' GNF',
+                    $push->vendorBadgeCount($shopOwner),
+                    '/vendeur/orders'
+                );
+            }
+        } catch (\Throwable $e) {}
+
         return redirect()->route('client.orders.index')
             ->with('success', "Commande passée avec succès ! Vous recevrez une confirmation. 🎉");
     }

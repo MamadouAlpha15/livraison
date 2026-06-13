@@ -4,10 +4,55 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @auth<meta name="vapid-public-key" content="{{ config('app.vapid_public_key') }}">@endauth
     <meta name="theme-color" content="#f06a0f">
     <title>{{ $title ?? config('app.name', 'Shopio') }}</title>
-    <link rel="icon" type="image/jpeg" href="{{ asset('images/shopio3.jpeg') }}">
-    <link rel="shortcut icon" type="image/jpeg" href="{{ asset('images/shopio3.jpeg') }}">
+
+    {{-- ══ Loader plein écran — inline pour s'afficher avant tout CSS ══ --}}
+    <style>
+        #pg-loader {
+            position:fixed;inset:0;z-index:999999;
+            background:#fff;
+            display:flex;flex-direction:column;
+            align-items:center;justify-content:center;gap:20px;
+            transition:opacity .35s ease;
+        }
+        #pg-loader.done { opacity:0;pointer-events:none; }
+        #pg-loader-logo {
+            width:80px;height:80px;border-radius:20px;
+            object-fit:cover;
+            box-shadow:0 8px 28px rgba(5,150,105,.25);
+            animation:pgLogoPulse 1.5s ease-in-out infinite;
+        }
+        #pg-loader-spin {
+            width:40px;height:40px;
+            border:3.5px solid #e5e7eb;
+            border-top-color:#059669;
+            border-radius:50%;
+            animation:pgSpin .75s linear infinite;
+        }
+        #pg-loader-txt {
+            font-family:system-ui,sans-serif;
+            font-size:13px;font-weight:600;
+            color:#6b7280;letter-spacing:.3px;
+        }
+        @keyframes pgSpin     { to { transform:rotate(360deg); } }
+        @keyframes pgLogoPulse{
+            0%,100% { transform:scale(1);    box-shadow:0 8px 28px rgba(5,150,105,.25); }
+            50%      { transform:scale(1.06); box-shadow:0 12px 36px rgba(5,150,105,.4); }
+        }
+    </style>
+    <link rel="icon" type="image/png" href="{{ asset('images/Shopio_logo.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/Shopio_logo.png') }}">
+
+    {{-- ── PWA ── --}}
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Shopio">
+    <link rel="apple-touch-icon" href="{{ asset('images/Shopio_logo.png') }}">
+    <link rel="apple-touch-startup-image" href="{{ asset('images/Shopio_logo.png') }}">
 
 
     {{-- ══ Ressource hints (connexions anticipées) ══ --}}
@@ -17,6 +62,12 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    {{-- ══ NProgress — chargé après Bootstrap pour ne pas bloquer ══ --}}
+    <style>
+        #nprogress .bar { position:fixed;top:0;left:0;width:100%;height:3px;background:#059669;z-index:9999; }
+        #nprogress .peg { box-shadow:0 0 10px #059669,0 0 5px #059669;opacity:1;width:100px;height:100%;position:absolute;right:0; }
+    </style>
 
     {{-- ══ Bootstrap CSS — chargement normal (bloquant voulu : évite le flash de page non stylée) ══ --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -45,6 +96,11 @@
             background: var(--bg);
             color: var(--text);
             -webkit-font-smoothing: antialiased;
+            overscroll-behavior: contain;
+        }
+        /* Taps instantanés sur tous les éléments interactifs */
+        a, button, [role="button"], input, select, textarea, label {
+            touch-action: manipulation;
         }
 
         /* ── Navbar (masquée sur les pages avec sidebar) ── */
@@ -130,11 +186,85 @@
         @media (max-width: 768px) {
             input, select, textarea { font-size: 16px !important; }
         }
+
+        /* ══ Transition de page — fade-in doux (opacity only, pas de transform) ══ */
+        .app-main { animation: pgFadeIn .2s ease both; }
+        @keyframes pgFadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        /* ══ Bouton en cours de chargement ══ */
+        .btn-loading {
+            opacity: .7 !important;
+            pointer-events: none !important;
+            position: relative;
+        }
+        .btn-loading::after {
+            content: '';
+            display: inline-block;
+            width: 12px; height: 12px;
+            border: 2px solid currentColor;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: btnSpin .6s linear infinite;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        @keyframes btnSpin { to { transform: rotate(360deg); } }
+
+        /* ══ Ripple effect au tap ══ */
+        .ripple-host { position: relative; overflow: hidden; }
+        .ripple-wave {
+            position: absolute; border-radius: 50%;
+            background: rgba(255,255,255,.35);
+            transform: scale(0); animation: rippleAnim .5s linear;
+            pointer-events: none;
+        }
+        @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+
+        /* ══ Skeleton Shimmer — images en cours de chargement ══ */
+        .sk-active {
+            position: relative !important;
+            overflow: hidden;
+        }
+        .sk-active::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg,
+                #f0f0f0 0%,
+                #e0e0e0 40%,
+                #f0f0f0 80%
+            );
+            background-size: 200% 100%;
+            animation: sk-shimmer 1.4s ease-in-out infinite;
+            z-index: 5;
+            border-radius: inherit;
+            pointer-events: none;
+        }
+        @keyframes sk-shimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        @media (prefers-color-scheme: dark) {
+            .sk-active::after {
+                background: linear-gradient(90deg, #1e293b 0%, #334155 40%, #1e293b 80%);
+                background-size: 200% 100%;
+            }
+        }
     </style>
 
     @stack('styles')
 </head>
 <body class="{{ $bodyClass ?? '' }}">
+
+{{-- ══ Loader plein écran ══ --}}
+<div id="pg-loader">
+    <img id="pg-loader-logo" src="{{ asset('images/shopio3.jpeg') }}" alt="Shopio" data-no-skeleton>
+    <div id="pg-loader-spin"></div>
+    <span id="pg-loader-txt">Chargement…</span>
+</div>
 
     {{-- ═══ NAVBAR (cachée sur dashboard via body.is-dashboard) ═══ --}}
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top app-navbar">
@@ -230,7 +360,402 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" defer></script>
     @stack('scripts')
+
+{{-- ══ Bandeau activation notifications push ══ --}}
+@auth
+@if(in_array(auth()->user()->role ?? '', ['admin', 'company', 'client']))
+@if(!session('push_banner_dismissed'))
+<div id="pushNotifBanner" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:9999;width:calc(100% - 32px);max-width:420px;background:#1e293b;color:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,.35);align-items:center;gap:12px;">
+    <span style="font-size:22px">🔔</span>
+    <div style="flex:1;font-size:13px;line-height:1.4">
+        <strong>Activez les notifications</strong><br>
+        <span style="opacity:.8">Recevez vos commandes en temps réel</span>
+    </div>
+    <button onclick="localStorage.setItem('push_subscribed','1');document.getElementById('pushNotifBanner').remove();enablePushNotifications();" style="background:#059669;color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">Activer</button>
+    <button onclick="document.getElementById('pushNotifBanner').remove();localStorage.setItem('push_subscribed','1')" style="background:none;border:none;color:#94a3b8;font-size:18px;cursor:pointer;padding:0 4px;">✕</button>
+</div>
+<script>
+(function() {
+    if (localStorage.getItem('push_subscribed')) return;
+    if (!('PushManager' in window)) return;
+    if (Notification.permission === 'denied') return;
+    setTimeout(function() {
+        var b = document.getElementById('pushNotifBanner');
+        if (b) b.style.display = 'flex';
+    }, 2000);
+})();
+</script>
+@endif
+@endif
+@endauth
+
+{{-- ══ PWA : Modal d'installation ══ --}}
+<div id="pwaModal" style="
+    display:none;position:fixed;inset:0;z-index:99999;
+    background:rgba(0,0,0,.55);backdrop-filter:blur(4px);
+    align-items:flex-end;justify-content:center;padding:0 0 0 0;
+">
+    <div style="
+        background:#fff;border-radius:24px 24px 0 0;
+        padding:28px 24px 36px;width:100%;max-width:480px;
+        box-shadow:0 -8px 40px rgba(0,0,0,.18);
+        animation:pwaSlideUp .35s cubic-bezier(.23,1,.32,1);
+    ">
+        <div style="width:48px;height:5px;background:#e5e7eb;border-radius:99px;margin:0 auto 22px;"></div>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px">
+            <img src="{{ asset('images/shopio3.jpeg') }}"
+                 style="width:64px;height:64px;border-radius:16px;object-fit:cover;box-shadow:0 4px 14px rgba(5,150,105,.25)"
+                 alt="Shopio">
+            <div>
+                <div style="font-size:19px;font-weight:800;color:#0f172a">Shopio</div>
+                <div style="font-size:13px;color:#6b7280;margin-top:2px">Marketplace Africaine</div>
+            </div>
+        </div>
+        <p style="font-size:14px;color:#374151;line-height:1.6;margin-bottom:22px">
+            Installez <strong>Shopio</strong> sur votre téléphone pour un accès rapide, des notifications en temps réel et une expérience native.
+        </p>
+
+        {{-- Instructions iOS --}}
+        <div id="pwaIosHint" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px 14px;margin-bottom:18px;font-size:13px;color:#166534;line-height:1.6">
+            Sur iPhone : appuyez sur <strong>⬆ Partager</strong> puis <strong>"Sur l'écran d'accueil"</strong>
+        </div>
+
+        <button id="pwaInstallBtn" onclick="pwaInstall()" style="
+            width:100%;padding:14px;border:none;border-radius:14px;
+            background:linear-gradient(135deg,#059669,#16a34a);
+            color:#fff;font-size:16px;font-weight:700;cursor:pointer;
+            box-shadow:0 4px 16px rgba(5,150,105,.35);margin-bottom:12px;
+            display:flex;align-items:center;justify-content:center;gap:8px;
+        ">
+            📲 Installer l'application
+        </button>
+        <button onclick="pwaDismiss()" style="
+            width:100%;padding:12px;border:1.5px solid #e5e7eb;border-radius:14px;
+            background:#fff;color:#6b7280;font-size:14px;font-weight:600;cursor:pointer;
+        ">
+            Peut-être plus tard
+        </button>
+    </div>
+</div>
+
+<style>
+@keyframes pwaSlideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+</style>
+
+<script>
+/* ══ Page Loader — masquer après DOM + polices prêtes ══ */
+(function () {
+    var loader = document.getElementById('pg-loader');
+    if (!loader) return;
+    var done = false;
+
+    function hide() {
+        if (done) return;
+        done = true;
+        loader.classList.add('done');
+        setTimeout(function () { loader.remove(); }, 350);
+    }
+
+    /* Attendre DOM + polices pour éviter le flash de texte non stylé */
+    var domReady = document.readyState !== 'loading'
+        ? Promise.resolve()
+        : new Promise(function (r) { document.addEventListener('DOMContentLoaded', r); });
+
+    var fontsReady = (document.fonts && document.fonts.ready)
+        ? document.fonts.ready
+        : Promise.resolve();
+
+    Promise.all([domReady, fontsReady]).then(function () {
+        /* 2 frames pour laisser le navigateur finaliser le rendu des fonts */
+        requestAnimationFrame(function () {
+            requestAnimationFrame(hide);
+        });
+    });
+
+    /* Sécurité absolue : 4s max */
+    setTimeout(hide, 4000);
+})();
+
+/* ══ NProgress — barre de progression instantanée ══ */
+var _np = function(fn) { if (typeof NProgress !== 'undefined') fn(); };
+
+document.addEventListener('click', function (e) {
+    const link = e.target.closest('a[href]');
+    if (!link) return;
+    const href = link.getAttribute('href') || '';
+    if (!href || href.startsWith('#') || href.startsWith('javascript') ||
+        href.startsWith('mailto:') || href.startsWith('tel:') ||
+        link.target === '_blank' || link.dataset.noprogress !== undefined) return;
+    _np(() => NProgress.start());
+});
+
+document.addEventListener('submit', function (e) {
+    if (e.target.dataset.ajax !== undefined) return;
+    const btn = e.target.querySelector('[type="submit"]:not([data-no-loading])');
+    if (btn) btn.classList.add('btn-loading');
+    _np(() => NProgress.start());
+});
+
+window.addEventListener('pageshow', function () { _np(() => NProgress.done()); });
+window.addEventListener('load', function () {
+    if (typeof NProgress !== 'undefined') {
+        NProgress.configure({ showSpinner: false, trickleSpeed: 150, minimum: 0.08 });
+        NProgress.done();
+    }
+});
+
+/* ══ Ripple effect sur boutons et liens ══ */
+document.addEventListener('click', function (e) {
+    const el = e.target.closest('a, button, .btn, [role="button"]');
+    if (!el) return;
+
+    el.classList.add('ripple-host');
+    const r    = Math.max(el.offsetWidth, el.offsetHeight);
+    const rect = el.getBoundingClientRect();
+    const wave = document.createElement('span');
+    wave.className = 'ripple-wave';
+    wave.style.cssText = `
+        width:${r}px; height:${r}px;
+        left:${e.clientX - rect.left - r/2}px;
+        top:${e.clientY  - rect.top  - r/2}px;
+    `;
+    el.appendChild(wave);
+    setTimeout(() => wave.remove(), 550);
+});
+
+/* ══ Skeleton Shimmer — toutes les images du site ══ */
+(function () {
+    function applyToImg(img) {
+        if (!img.src || img.src.startsWith('data:')) return;
+        if (img.src.endsWith('.svg')) return;
+        if (img.complete && img.naturalHeight > 0) return; // déjà en cache
+        if (img.dataset.noSkeleton !== undefined) return;  // exclusion manuelle
+
+        const parent = img.parentElement;
+        if (!parent) return;
+
+        parent.classList.add('sk-active');
+        img.style.opacity  = '0';
+        img.style.transition = 'opacity 0.35s ease';
+
+        const done = () => {
+            parent.classList.remove('sk-active');
+            img.style.opacity = '1';
+        };
+
+        img.addEventListener('load',  done, { once: true });
+        img.addEventListener('error', done, { once: true });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('img').forEach(applyToImg);
+
+        /* Images ajoutées dynamiquement (polling, chat, etc.) */
+        new MutationObserver(function (muts) {
+            muts.forEach(function (m) {
+                m.addedNodes.forEach(function (n) {
+                    if (n.nodeName === 'IMG') applyToImg(n);
+                    else if (n.querySelectorAll) n.querySelectorAll('img').forEach(applyToImg);
+                });
+            });
+        }).observe(document.body, { childList: true, subtree: true });
+    });
+})();
+
+/* ══ PWA — Service Worker + Install Prompt + Badge ══ */
+let _pwaPrompt = null;
+
+/* ── Enregistrement du Service Worker ── */
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(reg => {
+                console.log('[SW] Enregistré');
+                /* Vérifier les mises à jour */
+                reg.addEventListener('updatefound', () => {
+                    const newSW = reg.installing;
+                    newSW?.addEventListener('statechange', () => {
+                        if (newSW.statechange === 'installed' && navigator.serviceWorker.controller) {
+                            newSW.postMessage({ type: 'SKIP_WAITING' });
+                        }
+                    });
+                });
+            })
+            .catch(e => console.warn('[SW] Erreur:', e));
+    });
+}
+
+/* ── Intercepter le prompt d'installation natif ── */
+window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    _pwaPrompt = e;
+
+    /* Afficher le modal après 3 secondes si pas encore installé ni refusé récemment */
+    const dismissed = localStorage.getItem('pwa_dismissed');
+    const tooSoon   = dismissed && (Date.now() - parseInt(dismissed)) < 3 * 24 * 60 * 60 * 1000; // 3 jours
+    if (!tooSoon) {
+        setTimeout(pwaShowModal, 3000);
+    }
+});
+
+/* ── iOS : détecter et afficher les instructions ── */
+const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isInStandaloneMode = window.navigator.standalone === true;
+
+if (isIos && !isInStandaloneMode) {
+    const dismissed = localStorage.getItem('pwa_dismissed');
+    const tooSoon   = dismissed && (Date.now() - parseInt(dismissed)) < 3 * 24 * 60 * 60 * 1000;
+    if (!tooSoon) {
+        setTimeout(() => {
+            document.getElementById('pwaIosHint').style.display = 'block';
+            document.getElementById('pwaInstallBtn').style.display = 'none';
+            pwaShowModal();
+        }, 3000);
+    }
+}
+
+function pwaShowModal() {
+    const modal = document.getElementById('pwaModal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function pwaInstall() {
+    if (!_pwaPrompt) return;
+    _pwaPrompt.prompt();
+    _pwaPrompt.userChoice.then(result => {
+        if (result.outcome === 'accepted') {
+            pwaDismiss();
+        }
+        _pwaPrompt = null;
+    });
+}
+
+function pwaDismiss() {
+    const modal = document.getElementById('pwaModal');
+    if (modal) modal.style.display = 'none';
+    localStorage.setItem('pwa_dismissed', Date.now());
+}
+
+/* Fermer en cliquant sur le fond */
+document.getElementById('pwaModal')?.addEventListener('click', function(e) {
+    if (e.target === this) pwaDismiss();
+});
+
+/* ── Push Notifications ── */
+@auth
+window._vapidKey = document.querySelector('meta[name="vapid-public-key"]')?.content;
+
+function _b64ToUint8(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = atob(base64);
+    return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+
+async function _savePushSub(sub) {
+    const key  = sub.getKey('p256dh');
+    const auth = sub.getKey('auth');
+    await fetch('/push/subscribe', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+        body: JSON.stringify({
+            endpoint:   sub.endpoint,
+            public_key: key  ? btoa(String.fromCharCode(...new Uint8Array(key)))  : null,
+            auth_token: auth ? btoa(String.fromCharCode(...new Uint8Array(auth))) : null,
+        }),
+    });
+    localStorage.setItem('push_subscribed', '1');
+    document.getElementById('pushNotifBanner')?.remove();
+}
+
+/* Appelé quand l'utilisateur clique sur "Activer" */
+window.enablePushNotifications = async function() {
+    if (!window._vapidKey || !('PushManager' in window) || !('serviceWorker' in navigator)) return;
+    try {
+        const perm = Notification.permission === 'granted'
+            ? 'granted'
+            : await Notification.requestPermission();
+        if (perm !== 'granted') return;
+        const reg = await navigator.serviceWorker.ready;
+        let sub = await reg.pushManager.getSubscription();
+        if (!sub) {
+            sub = await reg.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: _b64ToUint8(window._vapidKey),
+            });
+        }
+        await _savePushSub(sub);
+    } catch(e) {
+        console.warn('[Push] Échec:', e);
+    }
+};
+
+/* Si déjà accordé mais pas encore sauvegardé en base → s'abonner silencieusement */
+if ('PushManager' in window && 'serviceWorker' in navigator && !localStorage.getItem('push_subscribed')) {
+    navigator.serviceWorker.ready.then(async reg => {
+        if (Notification.permission === 'granted') {
+            try {
+                let sub = await reg.pushManager.getSubscription();
+                if (!sub) {
+                    sub = await reg.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: _b64ToUint8(window._vapidKey),
+                    });
+                }
+                await _savePushSub(sub);
+            } catch(e) {}
+        }
+    });
+}
+@endauth
+
+/* ── Badge API : met à jour le badge de l'icône ── */
+window.updatePwaBadge = function(count) {
+    count = parseInt(count) || 0;
+    /* Via Service Worker */
+    if (navigator.serviceWorker?.controller) {
+        navigator.serviceWorker.controller.postMessage({ type: 'SET_BADGE', count });
+    }
+    /* Direct (Chrome 81+) */
+    if ('setAppBadge' in navigator) {
+        count > 0
+            ? navigator.setAppBadge(count).catch(() => {})
+            : navigator.clearAppBadge().catch(() => {});
+    }
+};
+
+/* ── Badge : mis à jour depuis le polling existant ── */
+@auth
+@if(auth()->user()->role === 'client')
+async function pollGlobalBadge() {
+    try {
+        const res = await fetch('/client/notifications/poll?_t=' + Date.now(), {
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+        });
+        if (!res.ok) return;
+        const data  = await res.json();
+        const total = (data.messages_unread || 0) + (data.order_updates?.length || 0);
+        updatePwaBadge(total);
+    } catch(e) {}
+}
+setInterval(pollGlobalBadge, 30000);
+pollGlobalBadge();
+@endif
+
+@if(in_array(auth()->user()->role ?? '', ['admin', 'company', 'client']))
+/* Effacer le badge dès que l'utilisateur ouvre l'app */
+updatePwaBadge(0);
+@endif
+@endauth
+</script>
 
 </body>
 </html>

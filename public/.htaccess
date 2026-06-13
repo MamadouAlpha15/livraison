@@ -1,3 +1,30 @@
+# ── Compression Gzip ──
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript
+    AddOutputFilterByType DEFLATE application/javascript application/x-javascript
+    AddOutputFilterByType DEFLATE application/json application/xml
+    AddOutputFilterByType DEFLATE font/woff font/woff2 image/svg+xml
+</IfModule>
+
+# ── Cache navigateur ──
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg        "access plus 1 month"
+    ExpiresByType image/webp        "access plus 1 month"
+    ExpiresByType image/png         "access plus 1 month"
+    ExpiresByType image/gif         "access plus 1 month"
+    ExpiresByType image/svg+xml     "access plus 1 month"
+    ExpiresByType text/css          "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+    ExpiresByType font/woff2        "access plus 1 month"
+</IfModule>
+
+# ── Keep-Alive ──
+<IfModule mod_headers.c>
+    Header set Connection keep-alive
+    Header set X-Content-Type-Options nosniff
+</IfModule>
+
 # ── MIME types images modernes ──
 <IfModule mod_mime.c>
     AddType image/webp .webp
@@ -39,6 +66,10 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
+
+    # Servir les fichiers PWA directement
+    RewriteRule ^manifest\.json$ - [L]
+    RewriteRule ^sw\.js$ - [L]
 
     # Servir les fichiers images directement (webp, avif, png, jpg, gif, svg)
     RewriteRule ^images/.*\.(webp|avif|png|jpg|jpeg|gif|svg|ico)$ - [L,NC]

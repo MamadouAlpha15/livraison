@@ -6,6 +6,7 @@ use App\Models\DeliveryCompany;
 use App\Models\DeliveryMessage;
 use App\Models\Order;
 use App\Models\Shop;
+use App\Services\PushService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -205,6 +206,24 @@ class DeliveryChatController extends Controller
         $senderName = $isCompanyMember
             ? $company->name
             : ($msg->shop?->name ?? $user->name ?? 'Boutique');
+
+        // Push : si c'est le vendeur qui écrit → notifier l'entreprise
+        //        si c'est l'entreprise qui écrit → notifier le vendeur (propriétaire de la boutique)
+        try {
+            $push = app(PushService::class);
+            if ($isShopOwner || $isAdmin) {
+                $companyUser = $company->user;
+                if ($companyUser) {
+                    $push->sendToUser($companyUser, 'Message de ' . $senderName, $data['message'], 1, '/company/chat/inbox');
+                }
+            } elseif ($isCompanyMember && $shopId) {
+                $shop = Shop::find($shopId);
+                $shopOwner = $shop?->user;
+                if ($shopOwner) {
+                    $push->sendToUser($shopOwner, 'Message de ' . $senderName, $data['message'], 1, '/boutique/messages');
+                }
+            }
+        } catch (\Throwable $e) {}
 
         return response()->json([
             'ok'   => true,

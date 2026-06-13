@@ -219,11 +219,19 @@ $clientMessages = ShopMessage::where('shop_id', $shop->id)
     });
   
         // 3) On envoie TOUT ce que la Blade consomme
+        $recentPayment = \App\Models\Subscription::where('subscriber_type', \App\Models\Shop::class)
+            ->where('subscriber_id', $shop->id)
+            ->where('status', 'active')
+            ->where('updated_at', '>=', now()->subMinutes(10))
+            ->where('payment_method', 'genuispay')
+            ->exists();
+
         return view('boutique.dashboard', [
-            'shop' => $shop,
+            'shop'                => $shop,
             'livreursDisponibles' => $livreursDisponibles,
-            'deliveryCompanies' => $deliveryCompanies,
-            'clientMessages'      => $clientMessages,           
+            'deliveryCompanies'   => $deliveryCompanies,
+            'clientMessages'      => $clientMessages,
+            'recentPayment'       => $recentPayment || session('payment_success'),
         ]);
 
     }

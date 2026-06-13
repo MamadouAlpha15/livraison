@@ -1073,6 +1073,18 @@ body.cx-light .cx-chart-big { color:#111827; }
 {{-- ═══════════════════════ MAIN ═══════════════════════ --}}
 <main class="cx-main">
 
+    {{-- ══ BANNIÈRE PAIEMENT RÉUSSI ══ --}}
+    @if($recentPayment ?? false)
+    <div id="paymentSuccessBanner" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:12px;border-radius:12px;margin:16px 16px 0;box-shadow:0 4px 20px rgba(16,185,129,.35);">
+        <span style="font-size:22px">🎉</span>
+        <div style="flex:1">
+            <strong style="font-size:15px">Paiement réussi ! Votre abonnement Business est maintenant actif.</strong>
+            <div style="font-size:12px;opacity:.85;margin-top:2px">Vous avez accès à toutes les fonctionnalités premium.</div>
+        </div>
+        <button onclick="document.getElementById('paymentSuccessBanner').remove()" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px">✕</button>
+    </div>
+    @endif
+
     {{-- TOPBAR --}}
     <div class="cx-topbar">
         <button class="cx-hamburger" id="cxHamburger"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>

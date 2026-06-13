@@ -23,6 +23,7 @@ use App\Models\User;             // Utilisateurs (clients, vendeurs...)
 use App\Models\Product;          // Produits de la boutique
 use App\Services\ImageOptimizer;
 use App\Jobs\ProcessImageJob;
+use App\Services\PushService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -126,12 +127,25 @@ class BoutiqueMessageController extends Controller
         ]);
 
         // On marque les messages du CLIENT vers ce VENDEUR comme lus
-        // (puisque le vendeur répond, il a forcément lu les messages du client)
         ShopMessage::where('shop_id', $shop->id)
-            ->where('sender_id', $clientId)      // Messages envoyés par le client
-            ->where('receiver_id', $vendeur->id) // Destinés au vendeur
-            ->whereNull('read_at')               // Pas encore marqués comme lus
-            ->update(['read_at' => now()]);       // On les marque comme lus maintenant
+            ->where('sender_id', $clientId)
+            ->where('receiver_id', $vendeur->id)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        // Notifier le client par push
+        try {
+            $clientUser = User::find($clientId);
+            if ($clientUser) {
+                app(PushService::class)->sendToUser(
+                    $clientUser,
+                    'Nouveau message de ' . $shop->name,
+                    $request->body,
+                    1,
+                    '/client/messages'
+                );
+            }
+        } catch (\Throwable $e) {}
 
         // Si c'est une requête AJAX → retourner JSON avec l'ID du message créé
         if ($request->ajax() || $request->wantsJson()) {
