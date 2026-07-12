@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\Order;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,6 +23,12 @@ class AuthenticatedSessionController extends Controller
                 session(['product_redirect' => $target]);
             }
         }
+
+        // Commande passée sans compte : à rattacher au compte une fois connecté
+        if ($request->filled('order_id')) {
+            session(['link_order_id' => $request->order_id]);
+        }
+
         return view('auth.login');
     }
 
@@ -35,6 +42,8 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         $user = Auth::user();
+
+        Order::attachGuestOrderFromSession($user);
 
         if ($user->role === 'superadmin') return redirect()->route('admin.dashboard');
         if ($user->role === 'admin')      return redirect()->route('boutique.dashboard');

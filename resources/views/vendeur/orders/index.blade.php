@@ -272,8 +272,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); }
                     <tr>
                         <td style="font-family:var(--mono);font-size:11px;color:var(--muted);">#{{ $order->id }}</td>
                         <td>
-                            <div class="cli-name">{{ $order->client->name }}</div>
-                            <div class="cli-email">{{ $order->client->email }}</div>
+                            <div class="cli-name">{{ $order->display_name }}</div>
+                            <div class="cli-email">{{ $order->client->email ?? $order->display_phone ?? '—' }}</div>
                         </td>
                         <td>
                             <div class="prod-list">
@@ -360,7 +360,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); }
         <div class="mob-card">
             <div class="mob-card-hd">
                 <div>
-                    <div class="cli-name">{{ $order->client->name }}</div>
+                    <div class="cli-name">{{ $order->display_name }}</div>
                     <div class="cli-email">{{ $order->created_at->format('d/m/Y H:i') }}</div>
                 </div>
                 @switch($order->status)

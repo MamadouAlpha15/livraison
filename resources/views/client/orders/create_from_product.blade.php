@@ -241,8 +241,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 {{-- NAVBAR --}}
 <nav class="nav">
-    <a href="{{ route('client.dashboard') }}" class="nav-logo">Ma<span>Boutique</span></a>
-    <a href="{{ route('client.shops.show', $shop) }}" class="nav-back">← {{ Str::limit($shop->name, 18) }}</a>
+    <a href="{{ auth()->check() ? route('client.dashboard') : url('/') }}" class="nav-logo">Ma<span>Boutique</span></a>
+    <a href="{{ auth()->check() ? route('client.shops.show', $shop) : route('public.shops.products', $shop) }}" class="nav-back">← {{ Str::limit($shop->name, 18) }}</a>
     <div class="nav-title">{{ Str::limit($product->name, 40) }}</div>
 </nav>
 
@@ -376,16 +376,25 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                             @endif
                         </div>
 
+                        @guest
+                        <div class="field-group">
+                            <label class="field-label" for="client_name">🙍 Nom complet</label>
+                            <input type="text" name="client_name" id="client_name" required
+                                   class="field-input" placeholder="Ex : Mamadou Diallo"
+                                   value="{{ old('client_name') }}">
+                        </div>
+                        @endguest
+
                         <div class="field-group">
                             <label class="field-label" for="delivery_destination">📍 Adresse de livraison</label>
-                            <input type="text" name="delivery_destination" id="delivery_destination"
+                            <input type="text" name="delivery_destination" id="delivery_destination" @guest required @endguest
                                    class="field-input" placeholder="Ex : Quartier Almamya, en face du marché…"
                                    value="{{ old('delivery_destination', auth()->user()->address ?? '') }}">
                         </div>
 
                         <div class="field-group">
                             <label class="field-label" for="client_phone">📞 Téléphone</label>
-                            <input type="tel" name="client_phone" id="client_phone"
+                            <input type="tel" name="client_phone" id="client_phone" @guest required @endguest
                                    class="field-input" placeholder="Ex : 622 00 00 00"
                                    value="{{ old('client_phone', auth()->user()->phone ?? '') }}">
                         </div>
@@ -455,9 +464,16 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                             🛒 Valider ma commande
                         </button>
 
+                        @auth
                         <a href="{{ route('client.messages.index', $product) }}" class="chat-btn">
                             💬 Poser une question au vendeur
                         </a>
+                        @else
+                        @php $msgUrl = route('client.messages.index', $product); @endphp
+                        <a href="{{ route('register', ['redirect' => $msgUrl, 'role' => 'client']) }}" class="chat-btn">
+                            💬 Poser une question au vendeur
+                        </a>
+                        @endauth
                     </div>
                 </div>
             </form>
@@ -496,12 +512,22 @@ function updateTotal() {
 const PHOTOS = @json($allPhotos);
 let photoIdx = 0, lbIdx = 0;
 
+/* Précharge toutes les photos dès l'arrivée sur la page pour un défilement instantané */
+PHOTOS.forEach(src => { (new Image()).src = src; });
+
 function setPhoto(idx) {
     photoIdx = Math.max(0, Math.min(PHOTOS.length - 1, idx));
     const img = document.getElementById('mainImg');
     if (img) {
         img.style.opacity = '0';
-        setTimeout(() => { img.src = PHOTOS[photoIdx]; img.style.opacity = '1'; }, 170);
+        const preload = new Image();
+        preload.onload = () => {
+            img.removeAttribute('srcset');
+            img.removeAttribute('sizes');
+            img.src = PHOTOS[photoIdx];
+            img.style.opacity = '1';
+        };
+        preload.src = PHOTOS[photoIdx];
     }
     document.querySelectorAll('.prod-thumb').forEach((t, i) => {
         t.classList.toggle('active', i === photoIdx);
@@ -530,7 +556,9 @@ function lbNav(dir) {
 function _lbRender() {
     const img = document.getElementById('lbImg');
     img.style.opacity = '0';
-    setTimeout(() => { img.src = PHOTOS[lbIdx]; img.style.opacity = '1'; }, 170);
+    const preload = new Image();
+    preload.onload = () => { img.src = PHOTOS[lbIdx]; img.style.opacity = '1'; };
+    preload.src = PHOTOS[lbIdx];
     const prev = document.getElementById('lbPrev');
     const next = document.getElementById('lbNext');
     if (prev) prev.style.display = lbIdx === 0 ? 'none' : 'flex';

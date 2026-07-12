@@ -26,14 +26,14 @@ return [
 
     // Tarifs des abonnements en GNF (devise d'affichage pour les clients guinéens)
     'plans_gnf' => [
-        'pro'      => 5000,   // 100 000 GNF/mois  ≈ 7 600 XOF
-        'business' => 5000,   // 150 000 GNF/mois  ≈ 11 400 XOF
+        'pro'      => 100000,   // 100 000 GNF/mois  ≈ 7 600 XOF
+        'business' => 150000,   // 150 000 GNF/mois  ≈ 11 400 XOF
     ],
 
     // Tarifs en XOF (envoyés à l'API GenuisPay)
     // ceil(100000 / 13.15) = 7605, ceil(150000 / 13.15) = 11407
     'plans' => [
-        'pro'      => 380,    // ≈ 100 000 GNF
-        'business' => 380,   // ≈ 150 000 GNF
+        'pro'      => 7605,    // ≈ 100 000 GNF
+        'business' => 11407,   // ≈ 150 000 GNF
     ],
 ];

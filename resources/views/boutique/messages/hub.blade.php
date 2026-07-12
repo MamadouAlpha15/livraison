@@ -630,7 +630,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 {{-- Topbar --}}
 <header class="topbar">
     <a href="{{ route('boutique.dashboard') }}" class="topbar-logo">
-        <img src="{{ asset('images/shopio3.jpeg') }}" alt="Shopio">
+        <img src="{{ asset('images/shopio-logo-192.png') }}" alt="Shopio">
         <span class="topbar-logo-name">Shopio</span>
     </a>
     <div class="topbar-sep"></div>
@@ -1478,21 +1478,24 @@ function removeImgFile(i) {
 
 async function sendImagesMsg() {
     if (!_clientId || !_pendingFiles.length) return;
+
+    // Sauvegarder les blob URLs AVANT de vider la sélection → images visibles immédiatement
+    const blobUrls = _pendingFiles.map(f => URL.createObjectURL(f));
+    const fileCount = _pendingFiles.length;
+
     const btn = document.getElementById('hubSendBtn');
     btn.disabled = true;
     const origIcon = btn.innerHTML;
     btn.innerHTML = `<span class="spin">↻</span>`;
 
-    /* Bulle "envoi en cours" dans le thread */
     const thread = document.getElementById('hubThread');
-    const sendingRow = document.createElement('div');
-    sendingRow.className = 'hub-msg-row mine';
-    sendingRow.id = '__sendingBubble';
-    sendingRow.innerHTML = `<div class="img-sending-bubble">
-        <div class="img-sending-spinner"></div>
-        <span class="img-sending-text">Envoi de ${_pendingFiles.length} photo(s)…</span>
-    </div>`;
-    thread.appendChild(sendingRow);
+    thread.querySelector('.hub-thread-empty')?.remove();
+
+    // Afficher les images immédiatement (blob local, sans spinner)
+    const now  = new Date();
+    const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    const previewRow = buildImagesRow({ mine: true, images: blobUrls, time, read: false, type: 'images' });
+    thread.appendChild(previewRow);
     thread.scrollTop = thread.scrollHeight;
 
     const fd = new FormData();
@@ -1500,6 +1503,9 @@ async function sendImagesMsg() {
     if (_clientId)  fd.append('client_id',  _clientId);
     if (_productId) fd.append('product_id', _productId);
     fd.append('_token', CSRF);
+
+    _pendingFiles = [];
+    renderImgPreview();
 
     try {
         const pid = _productId ?? 0;
@@ -1509,41 +1515,36 @@ async function sendImagesMsg() {
             body: fd,
         });
         const data = await res.json();
-        document.getElementById('__sendingBubble')?.remove();
+
         if (data.sent || data.success) {
-            const empty = thread.querySelector('.hub-thread-empty');
-            if (empty) empty.remove();
-            const now  = new Date();
-            const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
-
-            if (data.message_id) { _lastMsgId = Math.max(_lastMsgId, data.message_id); _markMsgSeen(_lastMsgId); }
-
-            if (data.image_status === 'processing') {
-                // Afficher bulle "optimisation en cours" et poller jusqu'à ce que ce soit prêt
-                const row = buildProcessingRow(data.message_id, data.count, time);
-                thread.appendChild(row);
-                thread.scrollTop = thread.scrollHeight;
-                pollImageReady(data.message_id, row, data.count);
-            } else {
-                thread.appendChild(buildImagesRow({ id: data.message_id, mine: true, images: data.images, time, read: false, type: 'images' }));
-                thread.scrollTop = thread.scrollHeight;
+            if (data.message_id) {
+                previewRow.dataset.msgId = data.message_id;
+                _lastMsgId = Math.max(_lastMsgId, data.message_id);
+                _markMsgSeen(_lastMsgId);
+                if (data.image_status === 'ready' && data.images?.length > 0) {
+                    // Images déjà optimisées → remplacer les blobs immédiatement
+                    const now2  = new Date();
+                    const time2 = now2.getHours().toString().padStart(2,'0') + ':' + now2.getMinutes().toString().padStart(2,'0');
+                    const realRow = buildImagesRow({ id: data.message_id, mine: true, images: data.images, time: time2, read: false, type: 'images' });
+                    previewRow.replaceWith(realRow);
+                } else {
+                    // Fallback : polling si le traitement est encore en cours
+                    pollImageReady(data.message_id, previewRow, fileCount);
+                }
             }
-
-            _pendingFiles = [];
-            renderImgPreview();
             if (_convEl) {
                 const p = _convEl.querySelector('.hub-conv-preview');
-                if (p) p.textContent = `📷 ${data.count} photo(s)`;
+                if (p) p.textContent = `📷 ${fileCount} photo(s)`;
                 const t = _convEl.querySelector('.hub-conv-time');
                 if (t) t.textContent = 'À l\'instant';
                 document.getElementById('convList').prepend(_convEl);
             }
-            showToast(`✅ ${data.count} photo(s) en cours d'optimisation…`, 'ok');
         } else {
+            previewRow.remove();
             showToast('❌ Erreur lors de l\'envoi', 'err');
         }
     } catch(e) {
-        document.getElementById('__sendingBubble')?.remove();
+        previewRow.remove();
         showToast('❌ Erreur réseau', 'err');
     } finally {
         btn.disabled = false;

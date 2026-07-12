@@ -90,7 +90,7 @@ class ShopMessageController extends Controller
                     'proposal_status'     => $m->proposal_status,
                     'negotiated_order_id' => $m->negotiated_order_id,
                     'images'              => ($m->image_status === 'ready' && $m->images)
-                                                ? array_map(fn($p) => ImageOptimizer::url($p, 'large') ?? asset('storage/'.$p), $m->images)
+                                                ? array_map(fn($p) => ImageOptimizer::url($p, 'medium') ?? asset('storage/'.$p), $m->images)
                                                 : [],
                     'image_status'        => $m->image_status ?? 'ready',
                 ]);
@@ -246,6 +246,17 @@ class ShopMessageController extends Controller
             'proposed_price'  => $price,                           // Prix proposé stocké séparément
             'proposal_status' => ShopMessage::STATUS_PENDING,      // Statut : en attente de réponse
         ]);
+
+        // Push au vendeur
+        try {
+            app(PushService::class)->sendToUser(
+                $vendeur,
+                'Proposition de prix 💰',
+                $client->name . ' propose ' . number_format($price, 0, ',', ' ') . " {$devise} pour {$product->name}.",
+                1,
+                '/boutique/messages'
+            );
+        } catch (\Throwable $e) {}
 
         // On confirme à JavaScript que le message a été envoyé
         return response()->json(['sent' => true]);
@@ -486,10 +497,22 @@ class ShopMessageController extends Controller
                 'updated_at' => $o->updated_at->toIso8601String(),
             ]);
 
+        /* ── Compteur pour le badge PWA : uniquement les commandes pas encore vues
+           (le client n'a pas visité /client/orders depuis ce changement de statut) ── */
+        $orderUpdatesUnseen = \App\Models\Order::where('user_id', $client->id)
+            ->whereIn('status', [
+                \App\Models\Order::STATUS_CONFIRMEE,
+                \App\Models\Order::STATUS_EN_LIVRAISON,
+                \App\Models\Order::STATUS_LIVREE,
+            ])
+            ->where('updated_at', '>', $client->orders_badge_seen_at ?? now()->subHours(48))
+            ->count();
+
         return response()->json([
-            'messages_unread' => $messagesUnread,
-            'latest_messages' => $latestMessages,
-            'order_updates'   => $orderUpdates,
+            'messages_unread'      => $messagesUnread,
+            'latest_messages'      => $latestMessages,
+            'order_updates'        => $orderUpdates,
+            'order_updates_unseen' => $orderUpdatesUnseen,
         ]);
     }
 
@@ -565,6 +588,17 @@ class ShopMessageController extends Controller
             'proposal_status' => ShopMessage::STATUS_PENDING,
         ]);
 
+        // Push au vendeur
+        try {
+            app(PushService::class)->sendToUser(
+                $vendeur,
+                'Contre-offre reçue 🔄',
+                $client->name . ' contre-propose ' . number_format($counterPrice, 0, ',', ' ') . " {$devise} pour {$product->name}.",
+                1,
+                '/boutique/messages'
+            );
+        } catch (\Throwable $e) {}
+
         return response()->json(['success' => true]);
     }
 
@@ -591,14 +625,16 @@ class ShopMessageController extends Controller
         $vendeur = $shop->user;
         abort_unless($vendeur, 404);
 
-        $tempPaths = [];
+        $paths = [];
         foreach ($request->file('images') as $file) {
-            $tempName  = 'temp/' . Str::random(24) . '.' . $file->getClientOriginalExtension();
-            Storage::disk('local')->put($tempName, file_get_contents($file->getRealPath()));
-            $tempPaths[] = $tempName;
+            try {
+                $paths[] = ImageOptimizer::store($file, 'messages/' . $shop->id);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('sendImages optimize failed: ' . $e->getMessage());
+            }
         }
 
-        $count = count($tempPaths);
+        $count = count($request->file('images'));
 
         $msg = ShopMessage::create([
             'shop_id'      => $shop->id,
@@ -606,20 +642,34 @@ class ShopMessageController extends Controller
             'sender_id'    => $client->id,
             'receiver_id'  => $vendeur->id,
             'body'         => $count . ' photo(s)',
-            'images'       => [],
-            'image_status' => 'processing',
+            'images'       => $paths,
+            'image_status' => count($paths) > 0 ? 'ready' : 'failed',
             'type'         => ShopMessage::TYPE_IMAGES,
         ]);
 
-        ProcessImageJob::dispatch($msg->id, $tempPaths, 'messages/' . $shop->id);
+        // Push au vendeur
+        try {
+            app(PushService::class)->sendToUser(
+                $vendeur,
+                'Photo de ' . $client->name,
+                '📷 ' . $count . ' photo(s) reçue(s) — cliquez pour voir',
+                1,
+                '/boutique/messages'
+            );
+        } catch (\Throwable $e) {}
+
+        $urls = array_map(
+            fn($p) => ImageOptimizer::url($p, 'medium') ?? asset('storage/' . $p),
+            $paths
+        );
 
         return response()->json([
             'success'      => true,
             'sent'         => true,
             'message_id'   => $msg->id,
-            'images'       => [],
-            'image_status' => 'processing',
-            'count'        => $count,
+            'images'       => $urls,
+            'image_status' => $msg->image_status,
+            'count'        => count($paths),
         ]);
     }
 
@@ -637,7 +687,7 @@ class ShopMessageController extends Controller
         }
 
         $urls = array_map(
-            fn($p) => ImageOptimizer::url($p, 'large') ?? asset('storage/' . $p),
+            fn($p) => ImageOptimizer::url($p, 'medium') ?? asset('storage/' . $p),
             $message->images
         );
 

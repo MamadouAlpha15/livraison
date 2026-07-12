@@ -46,7 +46,7 @@ class OrderStatusNotification extends Notification implements ShouldQueue
         'url' => match($notifiable->role) {
             'client' => url('/client/orders'), // Tous les clients voient leurs commandes
             'livreur' => url('/livreur/orders'),
-            'vendeur' => url('/vendeur/orders'),
+            'vendeur' => url('/employe/orders'),
             default => url('/')
         }
         ];

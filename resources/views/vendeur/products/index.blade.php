@@ -617,7 +617,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     $initials = strtoupper(substr($parts[0],0,1)) . strtoupper(substr($parts[1] ?? 'X',0,1));
     $shop     = auth()->user()->shop ?? null;
     $pendingOrdersCount = $shop
-        ? $shop->orders()->whereIn('status',['pending','en attente','en_attente','confirmée','processing'])->count()
+        ? $shop->orders()->whereIn('status',['pending','en attente','en_attente'])->count()
         : 0;
     // Sidebar commandes usage indicator
     $_sbCmdMax = 10; $_sbProdMax = 5;

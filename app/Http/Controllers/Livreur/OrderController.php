@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Notifications\OrderStatusNotification;
+use App\Services\PushService;
 
 class OrderController extends Controller
 {
@@ -157,7 +157,17 @@ class OrderController extends Controller
             if ($order->livreur_id !== $user->id && (!$driver || (int)$order->driver_id !== $driver->id)) continue;
             $order->status = Order::STATUS_EN_LIVRAISON;
             $order->save();
-            try { $order->client?->notify(new OrderStatusNotification($order, '🚚 Votre commande est en cours de livraison.')); } catch (\Throwable $e) {}
+            if ($order->client) {
+                try {
+                    app(PushService::class)->sendToUser(
+                        $order->client,
+                        'Commande en route 🚚',
+                        'Votre commande #' . str_pad($order->id, 4, '0', STR_PAD_LEFT) . ' est en cours de livraison !',
+                        1,
+                        '/client/orders'
+                    );
+                } catch (\Throwable $e) {}
+            }
         }
 
         if ($driver) $driver->update(['status' => 'busy']);
@@ -224,11 +234,18 @@ class OrderController extends Controller
             }
             if ($driver) $driver->update(['status' => $user->is_available ? 'available' : 'offline']);
             DB::commit();
-            try {
-                foreach ($orders as $order) {
-                    $order->client?->notify(new OrderStatusNotification($order, '✅ Votre commande a été livrée avec succès.'));
-                }
-            } catch (\Throwable $e) {}
+            foreach ($orders as $order) {
+                if (!$order->client) continue;
+                try {
+                    app(PushService::class)->sendToUser(
+                        $order->client,
+                        'Commande livrée ✅',
+                        'Votre commande #' . str_pad($order->id, 4, '0', STR_PAD_LEFT) . ' a été livrée avec succès !',
+                        1,
+                        '/client/orders'
+                    );
+                } catch (\Throwable $e) {}
+            }
             return redirect()->route('livreur.orders.index')->with('success', 'Commandes livrées avec succès.');
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -294,9 +311,17 @@ class OrderController extends Controller
             if ($order->status === Order::STATUS_CONFIRMEE) {
                 $order->status = Order::STATUS_EN_LIVRAISON;
                 $order->save();
-                try {
-                    $order->client?->notify(new OrderStatusNotification($order, '🚚 Votre commande est en cours de livraison.'));
-                } catch (\Throwable $e) {}
+                if ($order->client) {
+                    try {
+                        app(PushService::class)->sendToUser(
+                            $order->client,
+                            'Commande en route 🚚',
+                            'Votre commande #' . str_pad($order->id, 4, '0', STR_PAD_LEFT) . ' est en cours de livraison !',
+                            1,
+                            '/client/orders'
+                        );
+                    } catch (\Throwable $e) {}
+                }
             }
         }
 
@@ -320,15 +345,18 @@ class OrderController extends Controller
             $driver->update(['status' => 'busy']);
         }
 
-        try {
-            if ($order->client) {
-                $order->client->notify(new OrderStatusNotification(
-                    $order,
-                    '🚚 Votre commande est en cours de livraison.'
-                ));
+        if ($order->client) {
+            try {
+                app(PushService::class)->sendToUser(
+                    $order->client,
+                    'Commande en route 🚚',
+                    'Votre commande #' . str_pad($order->id, 4, '0', STR_PAD_LEFT) . ' est en cours de livraison !',
+                    1,
+                    '/client/orders'
+                );
+            } catch (\Throwable $e) {
+                Log::warning('Push start order failed: ' . $e->getMessage());
             }
-        } catch (\Throwable $e) {
-            Log::warning('Notification start order failed: ' . $e->getMessage());
         }
 
         session()->flash('autostart_gps_order_id', $order->id);
@@ -394,15 +422,18 @@ class OrderController extends Controller
 
             DB::commit();
 
-            try {
-                if ($order->client) {
-                    $order->client->notify(new OrderStatusNotification(
-                        $order,
-                        '✅ Votre commande a été livrée avec succès.'
-                    ));
+            if ($order->client) {
+                try {
+                    app(PushService::class)->sendToUser(
+                        $order->client,
+                        'Commande livrée ✅',
+                        'Votre commande #' . str_pad($order->id, 4, '0', STR_PAD_LEFT) . ' a été livrée avec succès !',
+                        1,
+                        '/client/orders'
+                    );
+                } catch (\Throwable $e) {
+                    Log::warning('Push complete order failed: ' . $e->getMessage());
                 }
-            } catch (\Throwable $e) {
-                Log::warning('Notification complete order failed: ' . $e->getMessage());
             }
 
             return redirect()->route('livreur.orders.index')->with('success', 'Commande livrée avec succès.');

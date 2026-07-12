@@ -11,6 +11,13 @@ class AiDescriptionController extends Controller
 {
     public function generate(Request $request)
     {
+        $shop = auth()->user()?->shop;
+        $isPro = $shop && $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
+
+        if (!$isPro) {
+            return response()->json(['error' => '⭐ Shopio IA est réservé au plan Pro. Passez au plan Pro pour débloquer cette fonctionnalité.'], 403);
+        }
+
         $request->validate([
             'name'  => ['nullable', 'string', 'max:255'],
             'price' => ['nullable', 'numeric'],

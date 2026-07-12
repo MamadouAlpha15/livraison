@@ -106,6 +106,13 @@ class OrderController extends Controller
         $shopId = Auth::user()->currentShopId();
         if (!$shopId) return redirect()->route('employe.orders.index');
         $shop = Auth::user()->shop ?? Auth::user()->assignedShop;
+
+        $isPro = $shop && $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
+        if (!$isPro) {
+            return redirect()->route('boutique.subscription.upgrade')
+                ->with('info', 'La carte GPS est réservée au plan Pro.');
+        }
+
         return view('employe.orders.carte', compact('shop'));
     }
 
@@ -305,6 +312,39 @@ class OrderController extends Controller
             } catch (\Throwable $e) {}
         }
 
+        // Notifier le livreur par push PWA (une seule fois pour tout le lot)
+        if (!empty($data['livreur_id']) && $assigned > 0) {
+            try {
+                $livreurUser = User::find($data['livreur_id']);
+                if ($livreurUser) {
+                    app(PushService::class)->sendToUser(
+                        $livreurUser,
+                        'Nouvelle(s) commande(s) assignée(s) 📦',
+                        $assigned . ' commande(s) vous ont été assignées.',
+                        1,
+                        '/livreur/orders'
+                    );
+                }
+            } catch (\Throwable $e) {}
+        }
+
+        // Notifier l'entreprise de livraison (une seule fois pour tout le lot)
+        if (!empty($data['delivery_company_id']) && $assigned > 0) {
+            try {
+                $deliveryCompany = DeliveryCompany::find($data['delivery_company_id']);
+                $companyUser = $deliveryCompany?->user;
+                if ($companyUser) {
+                    app(PushService::class)->sendToUser(
+                        $companyUser,
+                        'Nouvelle(s) commande(s) à livrer 📦',
+                        $assigned . ' commande(s) vous ont été confiées.',
+                        1,
+                        '/company/orders'
+                    );
+                }
+            } catch (\Throwable $e) {}
+        }
+
         return response()->json(['success' => true, 'assigned' => $assigned]);
     }
 
@@ -371,6 +411,17 @@ class OrderController extends Controller
         if (method_exists($livreur, 'notify')) {
             $livreur->notify(new OrderStatusNotification($order, 'Une nouvelle commande vous a été assignée.'));
         }
+
+        // Notifier le livreur par push PWA
+        try {
+            app(PushService::class)->sendToUser(
+                $livreur,
+                'Nouvelle commande assignée 📦',
+                'Commande #' . str_pad($order->id, 4, '0', STR_PAD_LEFT) . ' · ' . number_format($order->total, 0, ',', ' ') . ' ' . ($shop?->currency ?? 'GNF'),
+                1,
+                '/livreur/orders'
+            );
+        } catch (\Throwable $e) {}
 
         // Notifier le client
         try {

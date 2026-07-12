@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Shop;
+use App\Models\ShopVisit;
 
 class PublicShopController extends Controller
 {
@@ -42,6 +43,8 @@ class PublicShopController extends Controller
     public function products(Shop $shop)
     {
         abort_unless($shop->is_approved, 404);
+
+        ShopVisit::record($shop->id);
 
         $products = $shop->products()
             ->where('is_active', true)

@@ -623,9 +623,7 @@ $I = [
             <span class="sb-i">{!! $I['ticket'] !!}</span><span>Support conversations</span>
             <span class="sb-pill a" id="sbBadgeSupport" style="display:none"></span>
         </a>
-        <a href="#" class="sb-a" onclick="nt();return false">
-            <span class="sb-i">{!! $I['cog'] !!}</span><span>Paramètres système</span>
-        </a>
+        <a href="{{ route('admin.plans.index') }}" class="sb-a"><span class="sb-i">{!! $I['cog'] !!}</span><span>Paramètres système</span></a>
     </nav>
     <div class="sb-ft">
         <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;font-size:11px;color:rgba(255,255,255,.5);font-weight:600">
@@ -1178,6 +1176,137 @@ $I = [
 
     </div>
 
+    {{-- ══ ZONE DANGER — SUPPRESSION DÉFINITIVE ══ --}}
+    <div style="margin-top:28px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(239,68,68,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+            </div>
+            <div>
+                <div style="font-size:14px;font-weight:900;color:#7f1d1d">Zone de suppression définitive</div>
+                <div style="font-size:11px;color:#b91c1c">Suppression irréversible — utilisateur + toutes ses données effacés de la base</div>
+            </div>
+        </div>
+
+        {{-- Tabs --}}
+        <div style="display:flex;gap:0;border-radius:10px 10px 0 0;overflow:hidden;border:1px solid rgba(239,68,68,.2);border-bottom:none">
+            <button onclick="dangerTab('shops')" id="dtab-shops" style="flex:1;padding:10px;font-size:12px;font-weight:700;background:#fef2f2;color:#dc2626;border:none;cursor:pointer;border-right:1px solid rgba(239,68,68,.2)">
+                Boutiques ({{ $allShops->count() }})
+            </button>
+            <button onclick="dangerTab('companies')" id="dtab-companies" style="flex:1;padding:10px;font-size:12px;font-weight:700;background:#fff;color:#6b7280;border:none;cursor:pointer">
+                Entreprises ({{ $allCompanies->count() }})
+            </button>
+        </div>
+
+        {{-- Panel Boutiques --}}
+        <div id="dpanel-shops" style="border:1px solid rgba(239,68,68,.2);border-radius:0 0 10px 10px;background:#fff;overflow:hidden">
+            <form method="POST" action="{{ route('admin.shops.purge') }}" id="form-purge-shops">
+                @csrf
+                <div style="padding:10px 14px;border-bottom:1px solid #fecaca;display:flex;align-items:center;gap:8px;background:#fef2f2">
+                    <input type="text" placeholder="Rechercher une boutique…" oninput="filterDanger('shops',this.value)"
+                        style="flex:1;border:1px solid #fecaca;border-radius:7px;padding:6px 10px;font-size:12px;color:#0f172a;outline:none">
+                    <label style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#7f1d1d;cursor:pointer">
+                        <input type="checkbox" onchange="selectAllDanger('shops',this.checked)"> Tout sélectionner
+                    </label>
+                </div>
+                <div id="list-shops" style="max-height:280px;overflow-y:auto">
+                    @forelse($allShops as $shop)
+                    <label class="drow drow-shop" data-name="{{ strtolower($shop->name) }}"
+                        style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid #fef2f2;cursor:pointer;transition:background .1s">
+                        <input type="checkbox" name="ids[]" value="{{ $shop->id }}" style="accent-color:#dc2626;width:15px;height:15px;flex-shrink:0">
+                        <div style="flex:1;min-width:0">
+                            <div style="font-size:12.5px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ $shop->name }}</div>
+                            <div style="font-size:10.5px;color:#6b7280;margin-top:1px">
+                                Propriétaire : {{ $shop->owner?->name ?? '—' }} ·
+                                {{ $shop->created_at?->format('d/m/Y') }}
+                            </div>
+                        </div>
+                        <span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:20px;{{ $shop->is_approved ? 'background:#dcfce7;color:#166534' : 'background:#fecaca;color:#7f1d1d' }}">
+                            {{ $shop->is_approved ? 'active' : 'suspendue' }}
+                        </span>
+                    </label>
+                    @empty
+                    <div style="padding:30px;text-align:center;font-size:12px;color:#6b7280">Aucune boutique</div>
+                    @endforelse
+                </div>
+                <div style="padding:10px 14px;background:#fef2f2;border-top:1px solid #fecaca;display:flex;justify-content:flex-end">
+                    <button type="button" onclick="confirmPurge('shops')"
+                        style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+                        Supprimer définitivement
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {{-- Panel Entreprises --}}
+        <div id="dpanel-companies" style="display:none;border:1px solid rgba(239,68,68,.2);border-radius:0 0 10px 10px;background:#fff;overflow:hidden">
+            <form method="POST" action="{{ route('admin.entreprises.purge') }}" id="form-purge-companies">
+                @csrf
+                <div style="padding:10px 14px;border-bottom:1px solid #fecaca;display:flex;align-items:center;gap:8px;background:#fef2f2">
+                    <input type="text" placeholder="Rechercher une entreprise…" oninput="filterDanger('companies',this.value)"
+                        style="flex:1;border:1px solid #fecaca;border-radius:7px;padding:6px 10px;font-size:12px;color:#0f172a;outline:none">
+                    <label style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#7f1d1d;cursor:pointer">
+                        <input type="checkbox" onchange="selectAllDanger('companies',this.checked)"> Tout sélectionner
+                    </label>
+                </div>
+                <div id="list-companies" style="max-height:280px;overflow-y:auto">
+                    @forelse($allCompanies as $co)
+                    <label class="drow drow-company" data-name="{{ strtolower($co->name) }}"
+                        style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid #fef2f2;cursor:pointer;transition:background .1s">
+                        <input type="checkbox" name="ids[]" value="{{ $co->id }}" style="accent-color:#dc2626;width:15px;height:15px;flex-shrink:0">
+                        <div style="flex:1;min-width:0">
+                            <div style="font-size:12.5px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ $co->name }}</div>
+                            <div style="font-size:10.5px;color:#6b7280;margin-top:1px">
+                                {{ $co->created_at?->format('d/m/Y') }}
+                            </div>
+                        </div>
+                        <span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:20px;{{ $co->approved ? 'background:#dcfce7;color:#166534' : 'background:#fef3c7;color:#92400e' }}">
+                            {{ $co->approved ? 'approuvée' : 'en attente' }}
+                        </span>
+                    </label>
+                    @empty
+                    <div style="padding:30px;text-align:center;font-size:12px;color:#6b7280">Aucune entreprise</div>
+                    @endforelse
+                </div>
+                <div style="padding:10px 14px;background:#fef2f2;border-top:1px solid #fecaca;display:flex;justify-content:flex-end">
+                    <button type="button" onclick="confirmPurge('companies')"
+                        style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+                        Supprimer définitivement
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- Modal de confirmation --}}
+    <div id="purgeModal" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,.6);align-items:center;justify-content:center">
+        <div style="background:#fff;border-radius:16px;padding:28px 28px 24px;width:90%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.25)">
+            <div style="width:48px;height:48px;border-radius:50%;background:#fef2f2;display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div style="text-align:center;margin-bottom:18px">
+                <div style="font-size:15px;font-weight:900;color:#0f172a;margin-bottom:6px">Suppression irréversible</div>
+                <div id="purgeModalDesc" style="font-size:12px;color:#64748b;line-height:1.6">Cette action supprimera définitivement les données sélectionnées.</div>
+            </div>
+            <div style="margin-bottom:16px">
+                <label style="font-size:11px;font-weight:700;color:#7f1d1d;display:block;margin-bottom:6px">Tapez <strong>SUPPRIMER</strong> pour confirmer :</label>
+                <input type="text" id="purgeConfirmInput" placeholder="SUPPRIMER"
+                    style="width:100%;border:1.5px solid #fecaca;border-radius:8px;padding:9px 12px;font-size:13px;font-weight:600;outline:none;box-sizing:border-box"
+                    oninput="document.getElementById('purgeConfirmBtn').disabled=this.value!=='SUPPRIMER'">
+            </div>
+            <div style="display:flex;gap:8px">
+                <button onclick="closePurgeModal()" style="flex:1;padding:10px;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:600;background:#f8fafc;cursor:pointer">Annuler</button>
+                <button id="purgeConfirmBtn" onclick="executePurge()" disabled
+                    style="flex:1;padding:10px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;opacity:.5;transition:opacity .15s"
+                    onfocus="this.style.opacity=this.disabled?'.5':'1'" onmouseover="this.style.opacity=this.disabled?'.5':'1'">
+                    Supprimer tout
+                </button>
+            </div>
+        </div>
+    </div>
+
 </div>{{-- /con --}}
 </div>{{-- /mn --}}
 </div>{{-- /sa --}}
@@ -1389,6 +1518,59 @@ document.addEventListener('click',e=>{
 
 /* ── Progress bars ── */
 setTimeout(()=>{document.querySelectorAll('.bf').forEach(el=>{el.style.width=el.dataset.w+'%'})},350);
+
+/* ── Zone Danger ── */
+var _purgeTarget=null;
+function dangerTab(t){
+    document.getElementById('dpanel-shops').style.display    = t==='shops'     ? '' : 'none';
+    document.getElementById('dpanel-companies').style.display= t==='companies' ? '' : 'none';
+    document.getElementById('dtab-shops').style.background    = t==='shops'     ? '#fef2f2' : '#fff';
+    document.getElementById('dtab-shops').style.color         = t==='shops'     ? '#dc2626' : '#6b7280';
+    document.getElementById('dtab-companies').style.background= t==='companies' ? '#fef2f2' : '#fff';
+    document.getElementById('dtab-companies').style.color     = t==='companies' ? '#dc2626' : '#6b7280';
+}
+function filterDanger(type,val){
+    var cls = type==='shops' ? '.drow-shop' : '.drow-company';
+    document.querySelectorAll(cls).forEach(function(el){
+        el.style.display = el.dataset.name.includes(val.toLowerCase()) ? '' : 'none';
+    });
+}
+function selectAllDanger(type,checked){
+    var cls = type==='shops' ? '.drow-shop input[type=checkbox]' : '.drow-company input[type=checkbox]';
+    document.querySelectorAll(cls).forEach(function(cb){ cb.checked = checked; });
+}
+function confirmPurge(type){
+    var cls = type==='shops' ? '.drow-shop input[type=checkbox]:checked' : '.drow-company input[type=checkbox]:checked';
+    var checked = document.querySelectorAll(cls);
+    if(!checked.length){ alert('Sélectionnez au moins un élément.'); return; }
+    _purgeTarget = type;
+    var label = type==='shops' ? 'boutique(s)' : 'entreprise(s)';
+    document.getElementById('purgeModalDesc').textContent = checked.length+' '+label+' et TOUTES leurs données (produits, commandes, paiements, utilisateurs) seront supprimées définitivement.';
+    document.getElementById('purgeConfirmInput').value = '';
+    document.getElementById('purgeConfirmBtn').disabled = true;
+    document.getElementById('purgeConfirmBtn').style.opacity = '.5';
+    document.getElementById('purgeModal').style.display = 'flex';
+}
+function closePurgeModal(){
+    document.getElementById('purgeModal').style.display='none';
+    _purgeTarget=null;
+}
+function executePurge(){
+    if(!_purgeTarget) return;
+    var formId = _purgeTarget==='shops' ? 'form-purge-shops' : 'form-purge-companies';
+    document.getElementById(formId).submit();
+    closePurgeModal();
+}
+document.getElementById('purgeConfirmBtn').addEventListener('click', function(){
+    this.style.opacity = this.disabled ? '.5' : '1';
+});
+document.querySelectorAll('.drow').forEach(function(el){
+    el.addEventListener('mouseover',function(){ this.style.background='#fef2f2'; });
+    el.addEventListener('mouseout', function(){ this.style.background=''; });
+});
+document.getElementById('purgeModal').addEventListener('click', function(e){
+    if(e.target===this) closePurgeModal();
+});
 
 /* ── Chart 7 jours ── */
 const _chartData=@json($chart);

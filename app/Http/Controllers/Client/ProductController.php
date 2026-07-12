@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\ShopVisit;
 
 class ProductController extends Controller
 {
     public function show(Product $product)
     {
+        ShopVisit::record($product->shop_id);
+
         $shop = $product->shop;
         return view('client.show', compact('product', 'shop'));
     }

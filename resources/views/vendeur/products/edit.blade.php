@@ -276,6 +276,13 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
     background: var(--brand-mlt); gap: 8px; z-index: 2;
 }
 .upload-uploading-txt { font-size: 12px; font-weight: 700; color: var(--brand-dk); }
+.upload-mini-spin {
+    position: absolute; bottom: 8px; right: 8px; z-index: 4;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(0,0,0,.55);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; pointer-events: none;
+}
 
 /* ── Responsive ── */
 @media (max-width: 900px) {
@@ -351,7 +358,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                                 <img id="mainPreview"
                                      class="upload-main-preview {{ ($isEdit && $product->image) ? 'visible' : '' }}"
                                      src="{{ $isEdit && $product->image ? \App\Services\ImageOptimizer::url($product->image, 'medium') : '' }}"
-                                     alt="Aperçu">
+                                     alt="Aperçu" data-no-skeleton>
                                 <div class="upload-main-overlay">📷 Changer l'image</div>
                                 <div class="upload-placeholder" id="mainPlaceholder"
                                      style="{{ ($isEdit && $product->image) ? 'display:none' : '' }}">
@@ -418,10 +425,18 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                     <div class="field">
                         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
                             <label class="field-lbl" for="description" style="margin-bottom:0">Description</label>
+                            @if($isPro)
                             <button type="button" id="btnShopioIA" onclick="generateAiDescription()"
                                 style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;border:1.5px solid #6366f1;background:linear-gradient(135deg,#eef2ff,#e0e7ff);color:#4f46e5;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;font-family:var(--font);white-space:nowrap">
                                 ✨ Shopio IA
                             </button>
+                            @else
+                            <a href="{{ route('boutique.subscription.upgrade') }}"
+                                style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;border:1.5px solid #d1d5db;background:#f9fafb;color:#9ca3af;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;cursor:pointer"
+                                title="Fonctionnalité réservée au plan Pro">
+                                🔒 Shopio IA <span style="font-size:10px;background:#f59e0b;color:#fff;padding:1px 6px;border-radius:10px;font-weight:800">PRO</span>
+                            </a>
+                            @endif
                         </div>
                         <div id="shopioIaStatus" style="display:none;align-items:center;gap:8px;padding:10px 14px;background:#eef2ff;border:1px solid #c7d2fe;border-radius:9px;margin-bottom:8px;font-size:12.5px;color:#4f46e5;font-weight:600">
                             <span style="display:inline-block;width:14px;height:14px;border:2px solid #c7d2fe;border-top-color:#6366f1;border-radius:50%;animation:iaSpin .7s linear infinite;flex-shrink:0"></span>
@@ -737,17 +752,17 @@ async function uploadMainImage(file) {
     if (mainUploading) return;
     mainUploading = true;
 
-    /* État : chargement */
-    mainPreview.classList.remove('visible');
-    mainRemoveBtn.classList.remove('visible');
-    mainPlaceholder.style.display = 'none';
+    /* Afficher la preview locale IMMÉDIATEMENT — sans attendre le serveur */
+    const localUrl = URL.createObjectURL(file);
+    showMainPreview(localUrl);
+    mainRemoveBtn.classList.remove('visible'); // pas de suppression pendant l'upload
     mainUploadZone.style.pointerEvents = 'none';
 
-    const spinner = document.createElement('div');
-    spinner.className = 'upload-uploading';
-    spinner.innerHTML = `<span class="upload-spin">⏳</span>
-                         <div class="upload-uploading-txt">Upload en cours…</div>`;
-    mainUploadZone.appendChild(spinner);
+    /* Petit spinner discret en bas à droite (image déjà visible) */
+    const miniSpin = document.createElement('div');
+    miniSpin.className = 'upload-mini-spin';
+    miniSpin.innerHTML = `<span class="upload-spin" style="font-size:14px">⏳</span>`;
+    mainUploadZone.appendChild(miniSpin);
 
     try {
         const fd = new FormData();
@@ -761,13 +776,20 @@ async function uploadMainImage(file) {
         if (!res.ok || !json.path) throw new Error(json.message || `Erreur ${res.status}`);
 
         mainImageUploaded.value = json.path;
-        showMainPreview(json.url);
+        /* Remplacer le blob local par l'URL serveur */
+        mainPreview.src = json.url;
+        if (previewImgEl) previewImgEl.src = json.url;
+        URL.revokeObjectURL(localUrl);
+        mainRemoveBtn.classList.add('visible');
 
     } catch (err) {
+        mainPreview.classList.remove('visible');
+        mainRemoveBtn.classList.remove('visible');
         mainPlaceholder.style.display = '';
+        URL.revokeObjectURL(localUrl);
         alert(`Erreur upload image : ${err.message}`);
     } finally {
-        spinner.remove();
+        miniSpin.remove();
         mainUploadZone.style.pointerEvents = '';
         mainUploading = false;
     }

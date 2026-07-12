@@ -538,7 +538,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         'linear-gradient(135deg,#ec4899,#be185d)',
         'linear-gradient(135deg,#84cc16,#4d7c0f)',
     ];
-    $pendingCount = $shop->orders()->whereIn('status',['pending','en attente','en_attente','confirmée','processing'])->count();
+    $pendingCount = $shop->orders()->whereIn('status',['pending','en attente','en_attente'])->count();
     // Sidebar commandes usage indicator
     $_sbCmdMax = 10; $_sbProdMax = 5;
     $_sbCmdPct = $isPro ? 0 : min(100, round(($processedCount / $_sbCmdMax) * 100));

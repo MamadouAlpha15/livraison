@@ -370,6 +370,46 @@ html, body {
     .share-loc-sub    { font-size: 10.5px; }
     .share-loc-btn    { padding: 7px 14px; font-size: 12px; }
 }
+
+/* ── MODAL INSCRIPTION (commande invité) ── */
+.signup-overlay {
+    display: none; position: fixed; inset: 0; z-index: 3000;
+    background: rgba(15,23,42,.55); backdrop-filter: blur(3px);
+    align-items: flex-end; justify-content: center;
+}
+.signup-overlay.open { display: flex; }
+@keyframes signup-slide-up { from { transform: translateY(24px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.signup-modal {
+    position: relative; width: 100%; max-width: 420px;
+    background: var(--surface); border-radius: 20px 20px 0 0;
+    padding: 28px 24px 30px; box-shadow: var(--shadow-lg);
+    animation: signup-slide-up .28s ease-out;
+    text-align: center;
+}
+@media (min-width: 640px) {
+    .signup-overlay { align-items: center; }
+    .signup-modal   { border-radius: var(--r); }
+}
+.signup-close {
+    position: absolute; top: 12px; right: 12px; width: 30px; height: 30px;
+    border-radius: 50%; border: none; background: var(--bg); color: var(--muted);
+    font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.signup-close:hover { background: var(--border); color: var(--text); }
+.signup-ico   { font-size: 40px; margin-bottom: 6px; }
+.signup-title { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+.signup-text  { font-size: 13.5px; color: var(--text-2); line-height: 1.55; margin-bottom: 20px; }
+.signup-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 13px; border-radius: 50px; font-size: 14px; font-weight: 700;
+    text-decoration: none; margin-bottom: 10px; transition: all .15s;
+}
+.signup-btn-google  { background: var(--surface); border: 1.5px solid var(--border); color: var(--text); }
+.signup-btn-google:hover { background: var(--bg); }
+.signup-btn-primary { background: var(--orange); color: #fff; box-shadow: 0 4px 14px rgba(240,106,15,.35); }
+.signup-btn-primary:hover { background: var(--orange-dk); transform: translateY(-1px); }
+.signup-link  { display: block; font-size: 13px; color: var(--text-2); font-weight: 600; text-decoration: underline; margin-bottom: 14px; }
+.signup-later { display: block; width: 100%; background: none; border: none; color: var(--muted); font-size: 12.5px; font-weight: 600; cursor: pointer; padding: 4px; }
 </style>
 @endpush
 
@@ -419,9 +459,9 @@ $init = fn(string $n): string =>
 
     {{-- ── Topbar ── --}}
     <div class="topbar">
-        <a href="{{ route('client.orders.index') }}" class="btn-back">
+        <a href="{{ auth()->check() ? route('client.orders.index') : url('/') }}" class="btn-back">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-            Mes commandes
+            {{ auth()->check() ? 'Mes commandes' : 'Accueil' }}
         </a>
         <div class="topbar-info">
             @if($isGroup)
@@ -682,6 +722,32 @@ $init = fn(string $n): string =>
     </div>
 
 </div>
+
+@if(!auth()->check() && is_null($order->user_id))
+{{-- ── Modal invitation à créer un compte (commande passée sans compte) ── --}}
+@php
+    $suiviUrl    = route('suivi.show', $order);
+    $registerUrl = route('register', ['redirect' => $suiviUrl, 'order_id' => $order->id, 'role' => 'client']);
+    $loginUrl    = route('login',    ['redirect' => $suiviUrl, 'order_id' => $order->id]);
+    $googleUrl   = route('google.redirect', ['redirect' => $suiviUrl, 'order_id' => $order->id]);
+@endphp
+<div class="signup-overlay" id="signupOverlay">
+    <div class="signup-modal">
+        <button class="signup-close" onclick="dismissSignupModal()">✕</button>
+        <div class="signup-ico">🎉</div>
+        <h2 class="signup-title">Suivez toutes vos commandes</h2>
+        <p class="signup-text">Créez votre compte pour retrouver cette commande, discuter avec le vendeur et commander plus vite la prochaine fois.</p>
+        <a href="{{ $googleUrl }}" class="signup-btn signup-btn-google">
+            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.4 29.3 35 24 35c-6.1 0-11-4.9-11-11s4.9-11 11-11c2.8 0 5.3 1 7.3 2.8l6-6C33.7 6.5 29.1 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5 43.5 34.8 43.5 24c0-1.2-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.6 15.9 18.9 13 24 13c2.8 0 5.3 1 7.3 2.8l6-6C33.7 6.5 29.1 4.5 24 4.5c-7.5 0-14 4.2-17.3 10.2z"/><path fill="#4CAF50" d="M24 43.5c5 0 9.6-1.9 13-5.1l-6-4.9C29.1 35.4 26.7 36.2 24 36.2c-5.3 0-9.7-3.4-11.3-8.1l-6.5 5C9.9 39.3 16.4 43.5 24 43.5z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.4l6 4.9c-.4.4 6.3-4.6 6.3-14.3 0-1.2-.1-2.4-.4-3.5z"/></svg>
+            Continuer avec Google
+        </a>
+        <a href="{{ $registerUrl }}" class="signup-btn signup-btn-primary">✨ Créer mon compte</a>
+        <a href="{{ $loginUrl }}" class="signup-link">J'ai déjà un compte</a>
+        <button class="signup-later" onclick="dismissSignupModal()">Plus tard</button>
+    </div>
+</div>
+@endif
+
 @endsection
 
 @push('scripts')
@@ -1365,6 +1431,26 @@ $init = fn(string $n): string =>
         if (gpsFound) scheduleRouteUpdate();
     }
 
+})();
+
+/* ── Modal invitation à créer un compte (commande invité) ── */
+(function () {
+    const overlay = document.getElementById('signupOverlay');
+    if (!overlay) return;
+
+    const key = 'shopio_hide_signup_modal_{{ $order->id }}';
+    if (localStorage.getItem(key)) return;
+
+    setTimeout(() => overlay.classList.add('open'), 1200);
+
+    window.dismissSignupModal = function () {
+        overlay.classList.remove('open');
+        localStorage.setItem(key, '1');
+    };
+
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) window.dismissSignupModal();
+    });
 })();
 </script>
 @endpush

@@ -2134,7 +2134,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 {{-- ══ NAVBAR ══ --}}
 <nav class="nav">
     <a href="{{ route('client.dashboard') }}" class="nav-logo">
-         <img src="{{ asset('images/Shopio2.jpeg') }}" alt="Shopio" style="height:60px;width:auto;object-fit:contain;border-radius:8px">
+         <img src="{{ asset('images/shopio-logo-192.png') }}" alt="Shopio" style="height:60px;width:auto;object-fit:contain;border-radius:8px">
        
     </a>
 
@@ -2344,6 +2344,58 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 
 {{-- ══ MAIN COLUMN ══ --}}
 <div class="main-col">
+
+{{-- Notifications push — activation manuelle si la bannière automatique n'est pas apparue --}}
+<div id="notifSettingsCard" style="display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:16px;">
+    <span style="font-size:26px">🔔</span>
+    <div style="flex:1;min-width:160px">
+        <div style="font-weight:700;font-size:14px;color:var(--text)">Notifications push</div>
+        <div id="notifSettingsSub" style="font-size:13px;color:var(--muted);margin-top:2px">Recevez vos commandes et messages en temps réel, même application fermée.</div>
+    </div>
+    <button type="button" id="notifSettingsBtn"
+            style="background:#059669;color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">
+        Activer les notifications
+    </button>
+</div>
+<script>
+(function() {
+    var card = document.getElementById('notifSettingsCard');
+    var btn  = document.getElementById('notifSettingsBtn');
+    var sub  = document.getElementById('notifSettingsSub');
+    if (!card) return;
+
+    if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+        card.style.display = 'none';
+        return;
+    }
+
+    function refresh() {
+        if (Notification.permission === 'granted' && localStorage.getItem('push_subscribed')) {
+            sub.textContent = 'Notifications activées ✓';
+            btn.textContent = 'Déjà activées';
+            btn.disabled = true;
+            btn.style.opacity = '.6';
+            btn.style.cursor = 'default';
+        } else if (Notification.permission === 'denied') {
+            sub.textContent = 'Bloquées dans les réglages de votre navigateur — autorisez les notifications pour ce site pour les activer.';
+            btn.style.display = 'none';
+        }
+    }
+
+    btn.addEventListener('click', function() {
+        btn.disabled = true;
+        btn.textContent = 'Activation…';
+        Promise.resolve(window.enablePushNotifications ? window.enablePushNotifications() : null)
+            .finally(function() {
+                btn.disabled = false;
+                btn.textContent = 'Activer les notifications';
+                refresh();
+            });
+    });
+
+    refresh();
+})();
+</script>
 
 {{-- Hero --}}
 <div class="hero">
@@ -4520,8 +4572,19 @@ function filterByCat(type) {
         if (url && url !== '#') window.location.href = url;
     };
     window.cnDismiss = function(id) {
+        const dismissed = _alerts.find(a => a.id === id);
         _alerts = _alerts.filter(a => a.id !== id);
         save(); updateBadge(); render();
+        if (typeof updatePwaBadge === 'function') updatePwaBadge(_alerts.length);
+
+        // Commande dismissée → acquitter côté serveur pour que le badge PWA
+        // ne revienne pas au prochain polling (30s)
+        if (dismissed && dismissed.type !== 'msg') {
+            fetch(@json(route('client.orders.badge-seen')), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
+            }).catch(() => {});
+        }
     };
 
     /* ── Ajouter une alerte (messages — groupé par sender) ── */

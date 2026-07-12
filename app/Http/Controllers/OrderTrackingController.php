@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\CourierCommission;
 use App\Models\Payment;
+use App\Services\PushService;
 use Illuminate\Http\Request;
 
 class OrderTrackingController extends Controller
@@ -159,6 +160,28 @@ class OrderTrackingController extends Controller
                     'delivered_at' => now(),
                 ]);
             }
+        }
+
+        // Notifier par push chaque client concerné (commande principale + siblings du même batch)
+        $ordersToNotify = $order->delivery_batch_id
+            ? Order::where('delivery_batch_id', $order->delivery_batch_id)->where('status', $data['status'])->with('client')->get()
+            : collect([$order->load('client')]);
+
+        $notifiedClientIds = [];
+        foreach ($ordersToNotify as $o) {
+            if (!$o->client || in_array($o->client->id, $notifiedClientIds)) continue;
+            $notifiedClientIds[] = $o->client->id;
+            try {
+                app(PushService::class)->sendToUser(
+                    $o->client,
+                    $data['status'] === Order::STATUS_LIVREE ? 'Commande livrée ✅' : 'Commande en route 🚚',
+                    $data['status'] === Order::STATUS_LIVREE
+                        ? 'Votre commande #' . str_pad($o->id, 4, '0', STR_PAD_LEFT) . ' a été livrée avec succès !'
+                        : 'Votre commande #' . str_pad($o->id, 4, '0', STR_PAD_LEFT) . ' est en cours de livraison !',
+                    1,
+                    '/client/orders'
+                );
+            } catch (\Throwable $e) {}
         }
 
         // Créer les commissions livreur quand statut → livrée

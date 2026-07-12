@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Shopio') }}</title>
-    <link rel="icon" type="image/jpeg" href="/images/Shopio2.jpeg">
-    <link rel="shortcut icon" type="image/jpeg" href="/images/Shopio.jpeg">
+    <link rel="icon" type="image/png" href="/images/shopio-logo-32.png?v=2">
+    <link rel="shortcut icon" type="image/png" href="/images/shopio-logo-32.png?v=2">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet"/>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -187,7 +187,7 @@
 <body>
     {{-- Header visible uniquement sur mobile (quand le panneau gauche est caché) --}}
     <div class="mobile-header">
-        <img src="/images/shopio3.jpeg" alt="Shopio">
+        <img src="/images/shopio-logo-192.png" alt="Shopio">
         <div>
             <div class="mobile-header-name">Shopio</div>
             <div class="mobile-header-sub">La marketplace pour tous</div>
@@ -196,7 +196,7 @@
 
     <div class="auth-left">
         <div class="al-logo">
-            <img src="/images/shopio3.jpeg" alt="Shopio">
+            <img src="/images/shopio-logo-192.png" alt="Shopio">
             <span class="al-logo-name">Shopio</span>
         </div>
         <div class="al-body">

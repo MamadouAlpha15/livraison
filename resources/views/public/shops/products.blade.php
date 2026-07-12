@@ -552,7 +552,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 {{-- ══ NAVBAR ══ --}}
 <nav class="amz-nav">
     <a href="{{ url('/') }}" class="nav-logo-wrap">
-        <img src="/images/shopio3.jpeg" alt="Shopio" class="nav-logo-img" width="36" height="36">
+        <img src="/images/shopio-logo-192.png" alt="Shopio" class="nav-logo-img" width="36" height="36">
         <span class="nav-brand-name">Shopio</span>
     </a>
     <a href="{{ url('/') }}" class="amz-back-home">🏠 <span class="txt">Accueil</span></a>
@@ -871,12 +871,14 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                             <a href="{{ route('client.messages.index', $product) }}" class="amz-btn-msg">💬 Poser une question</a>
                         @endif
                     @else
-                        @php $orderUrl = route('client.orders.createFromProduct', $product); @endphp
-                        <a href="{{ route('register', ['redirect' => $orderUrl, 'role' => 'client']) }}" class="amz-btn-order">
-                            🛒 Commander
-                        </a>
-                        <a href="{{ route('login', ['redirect' => $orderUrl]) }}" class="amz-btn-login" style="margin-top:6px;display:flex;align-items:center;justify-content:center;gap:5px;width:100%;padding:8px 12px;border-radius:var(--r-sm);font-size:12px;font-weight:600;font-family:var(--font);background:var(--brand-mlt);color:var(--brand-dk);border:1.5px solid var(--brand-lt);text-decoration:none;transition:all .15s;">
-                            Déjà inscrit ? Se connecter
+                        @if(!$stockOut)
+                        <a href="{{ route('client.orders.createFromProduct', $product) }}" class="amz-btn-order">🛒 Commander</a>
+                        @else
+                        <div class="amz-btn-order out">Indisponible</div>
+                        @endif
+                        @php $msgUrl = route('client.messages.index', $product); @endphp
+                        <a href="{{ route('register', ['redirect' => $msgUrl, 'role' => 'client']) }}" class="amz-btn-msg">
+                            💬 Poser une question
                         </a>
                     @endauth
                 </div>

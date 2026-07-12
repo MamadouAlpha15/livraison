@@ -184,7 +184,7 @@ a{text-decoration:none;color:inherit;}
 
 /* Image zone */
 .card-img{
-    position:relative;height:168px;
+    position:relative;height:220px;
     background:linear-gradient(135deg,#eef2ff,#e0e7ff);
     overflow:hidden;flex-shrink:0;
 }
@@ -361,6 +361,7 @@ a{text-decoration:none;color:inherit;}
     .card-actions{grid-template-columns:1fr;}
     .page-banner{padding:22px 0 20px;}
     .search-wrap input{font-size:16px !important;}
+    .card-img{height:260px;}
 }
 </style>
 @endpush

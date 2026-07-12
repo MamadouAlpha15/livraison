@@ -3,9 +3,21 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {{-- ── PWA — EN PREMIER pour que iOS le détecte avant tout autre contenu ── --}}
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Shopio">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="{{ asset('images/shopio-logo-192.png') }}?v=2">
+    <link rel="apple-touch-startup-image" href="{{ asset('images/shopio-logo-192.png') }}?v=2">
+    <link rel="icon" type="image/png" href="{{ asset('images/shopio-logo-32.png') }}?v=2">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/shopio-logo-32.png') }}?v=2">
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @auth<meta name="vapid-public-key" content="{{ config('app.vapid_public_key') }}">@endauth
-    <meta name="theme-color" content="#f06a0f">
+    <meta name="theme-color" content="#059669">
     <title>{{ $title ?? config('app.name', 'Shopio') }}</title>
 
     {{-- ══ Loader plein écran — inline pour s'afficher avant tout CSS ══ --}}
@@ -42,17 +54,6 @@
             50%      { transform:scale(1.06); box-shadow:0 12px 36px rgba(5,150,105,.4); }
         }
     </style>
-    <link rel="icon" type="image/png" href="{{ asset('images/Shopio_logo.png') }}">
-    <link rel="shortcut icon" type="image/png" href="{{ asset('images/Shopio_logo.png') }}">
-
-    {{-- ── PWA ── --}}
-    <link rel="manifest" href="/manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Shopio">
-    <link rel="apple-touch-icon" href="{{ asset('images/Shopio_logo.png') }}">
-    <link rel="apple-touch-startup-image" href="{{ asset('images/Shopio_logo.png') }}">
 
 
     {{-- ══ Ressource hints (connexions anticipées) ══ --}}
@@ -261,7 +262,7 @@
 
 {{-- ══ Loader plein écran ══ --}}
 <div id="pg-loader">
-    <img id="pg-loader-logo" src="{{ asset('images/shopio3.jpeg') }}" alt="Shopio" data-no-skeleton>
+    <img id="pg-loader-logo" src="{{ asset('images/shopio-logo-192.png') }}" alt="Shopio" data-no-skeleton>
     <div id="pg-loader-spin"></div>
     <span id="pg-loader-txt">Chargement…</span>
 </div>
@@ -270,7 +271,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top app-navbar">
         <div class="container-xxl">
              <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url('/') }}">
-                <img src="{{ asset('images/Shopio2.jpeg') }}" alt="Shopio" style="height:32px;width:auto;object-fit:contain">
+                <img src="{{ asset('images/shopio-logo-192.png') }}" alt="Shopio" style="height:32px;width:auto;object-fit:contain">
                 {{ config('app.name', 'Shopio') }}
             </a>
            
@@ -365,7 +366,7 @@
 
 {{-- ══ Bandeau activation notifications push ══ --}}
 @auth
-@if(in_array(auth()->user()->role ?? '', ['admin', 'company', 'client']))
+@if(in_array(auth()->user()->role ?? '', ['admin', 'company', 'client', 'vendeur', 'employe', 'livreur']))
 @if(!session('push_banner_dismissed'))
 <div id="pushNotifBanner" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:9999;width:calc(100% - 32px);max-width:420px;background:#1e293b;color:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,.35);align-items:center;gap:12px;">
     <span style="font-size:22px">🔔</span>
@@ -373,18 +374,73 @@
         <strong>Activez les notifications</strong><br>
         <span style="opacity:.8">Recevez vos commandes en temps réel</span>
     </div>
-    <button onclick="localStorage.setItem('push_subscribed','1');document.getElementById('pushNotifBanner').remove();enablePushNotifications();" style="background:#059669;color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">Activer</button>
-    <button onclick="document.getElementById('pushNotifBanner').remove();localStorage.setItem('push_subscribed','1')" style="background:none;border:none;color:#94a3b8;font-size:18px;cursor:pointer;padding:0 4px;">✕</button>
+    <button onclick="document.getElementById('pushNotifBanner').remove();enablePushNotifications();" style="background:#059669;color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">Activer</button>
+    @if(!in_array(auth()->user()->role ?? '', ['livreur', 'company']))
+    <button onclick="document.getElementById('pushNotifBanner').remove();sessionStorage.setItem('push_banner_hidden','1')" style="background:none;border:none;color:#94a3b8;font-size:18px;cursor:pointer;padding:0 4px;">✕</button>
+    @endif
 </div>
 <script>
 (function() {
     if (localStorage.getItem('push_subscribed')) return;
+
+    var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    var isStandalone = window.navigator.standalone === true
+                    || window.matchMedia('(display-mode: standalone)').matches;
+    var role = '{{ auth()->user()->role ?? "" }}';
+    var isDeliveryRole = (role === 'livreur' || role === 'company');
+
+    // Sur iOS navigateur : PushManager absent → guider vers l'installation de l'app
+    if (isIos && !isStandalone) {
+        var banner = document.getElementById('pushNotifBanner');
+        if (!banner) return;
+        var textEl = banner.querySelector('div[style*="flex:1"]');
+        var btnActiver = banner.querySelector('button:first-of-type');
+        if (textEl) {
+            textEl.innerHTML = '<strong>Installez l\'application</strong><br><span style="opacity:.8">Pour recevoir vos commandes en temps réel</span>';
+        }
+        if (btnActiver) {
+            btnActiver.textContent = 'Installer';
+            btnActiver.onclick = function() {
+                banner.remove();
+                localStorage.removeItem('pwa_dismissed');
+                // Afficher les instructions iOS dans le modal
+                var hint = document.getElementById('pwaIosHint');
+                var installBtn = document.getElementById('pwaInstallBtn');
+                if (hint) hint.style.display = 'block';
+                if (installBtn) installBtn.style.display = 'none';
+                if (typeof pwaShowModal === 'function') pwaShowModal();
+            };
+        }
+        setTimeout(function() { banner.style.display = 'flex'; }, 2000);
+        return;
+    }
+
     if (!('PushManager' in window)) return;
     if (Notification.permission === 'denied') return;
-    setTimeout(function() {
-        var b = document.getElementById('pushNotifBanner');
-        if (b) b.style.display = 'flex';
-    }, 2000);
+
+    // Livreur / entreprise : s'abonner automatiquement si permission déjà accordée
+    if (isDeliveryRole && Notification.permission === 'granted') {
+        navigator.serviceWorker.ready.then(function(reg) {
+            reg.pushManager.getSubscription().then(function(sub) {
+                if (!sub) {
+                    reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: _b64ToUint8(window._vapidKey) })
+                        .then(function(newSub) { _savePushSub(newSub); })
+                        .catch(function() {});
+                } else {
+                    _savePushSub(sub);
+                }
+            });
+        });
+        return;
+    }
+
+    // Pour livreur/company : banner non-fermable, re-affiché à chaque session
+    if (isDeliveryRole || !sessionStorage.getItem('push_banner_hidden')) {
+        setTimeout(function() {
+            var b = document.getElementById('pushNotifBanner');
+            if (b) b.style.display = 'flex';
+        }, 2000);
+    }
 })();
 </script>
 @endif
@@ -405,7 +461,7 @@
     ">
         <div style="width:48px;height:5px;background:#e5e7eb;border-radius:99px;margin:0 auto 22px;"></div>
         <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px">
-            <img src="{{ asset('images/shopio3.jpeg') }}"
+            <img src="{{ asset('images/shopio-logo-192.png') }}"
                  style="width:64px;height:64px;border-radius:16px;object-fit:cover;box-shadow:0 4px 14px rgba(5,150,105,.25)"
                  alt="Shopio">
             <div>
@@ -580,7 +636,7 @@ if ('serviceWorker' in navigator) {
                 reg.addEventListener('updatefound', () => {
                     const newSW = reg.installing;
                     newSW?.addEventListener('statechange', () => {
-                        if (newSW.statechange === 'installed' && navigator.serviceWorker.controller) {
+                        if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
                             newSW.postMessage({ type: 'SKIP_WAITING' });
                         }
                     });
@@ -590,14 +646,23 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-/* ── Intercepter le prompt d'installation natif ── */
+/* ── Détecter si déjà installée (standalone) ── */
+const isStandalone = window.navigator.standalone === true
+                  || window.matchMedia('(display-mode: standalone)').matches;
+
+@if(session('google_just_authed'))
+/* Vient de Google OAuth → reset le rejet PWA pour que le modal s'affiche */
+if (!isStandalone) { localStorage.removeItem('pwa_dismissed'); }
+@endif
+
+/* ── Intercepter le prompt d'installation natif (Android/Chrome) ── */
 window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
+    if (isStandalone) return; // déjà dans l'app installée
     _pwaPrompt = e;
 
-    /* Afficher le modal après 3 secondes si pas encore installé ni refusé récemment */
     const dismissed = localStorage.getItem('pwa_dismissed');
-    const tooSoon   = dismissed && (Date.now() - parseInt(dismissed)) < 3 * 24 * 60 * 60 * 1000; // 3 jours
+    const tooSoon   = dismissed && (Date.now() - parseInt(dismissed)) < 1 * 24 * 60 * 60 * 1000;
     if (!tooSoon) {
         setTimeout(pwaShowModal, 3000);
     }
@@ -605,11 +670,10 @@ window.addEventListener('beforeinstallprompt', e => {
 
 /* ── iOS : détecter et afficher les instructions ── */
 const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
-const isInStandaloneMode = window.navigator.standalone === true;
 
-if (isIos && !isInStandaloneMode) {
+if (isIos && !isStandalone) {
     const dismissed = localStorage.getItem('pwa_dismissed');
-    const tooSoon   = dismissed && (Date.now() - parseInt(dismissed)) < 3 * 24 * 60 * 60 * 1000;
+    const tooSoon   = dismissed && (Date.now() - parseInt(dismissed)) < 1 * 24 * 60 * 60 * 1000;
     if (!tooSoon) {
         setTimeout(() => {
             document.getElementById('pwaIosHint').style.display = 'block';
@@ -647,6 +711,15 @@ document.getElementById('pwaModal')?.addEventListener('click', function(e) {
 });
 
 /* ── Push Notifications ── */
+/* Vide le flag local d'abonnement à chaque déconnexion, pour que le prochain
+   utilisateur connecté sur ce même appareil resynchronise proprement son
+   propre abonnement push (sinon le flag reste "activé" pour l'ancien compte). */
+document.addEventListener('submit', function(e) {
+    if (e.target && e.target.action && e.target.action.indexOf('/logout') !== -1) {
+        localStorage.removeItem('push_subscribed');
+    }
+});
+
 @auth
 window._vapidKey = document.querySelector('meta[name="vapid-public-key"]')?.content;
 
@@ -715,6 +788,24 @@ if ('PushManager' in window && 'serviceWorker' in navigator && !localStorage.get
         }
     });
 }
+
+@if(in_array(auth()->user()->role ?? '', ['company', 'livreur']))
+/* Toujours rafraîchir la subscription en base à chaque page (anti-expiration) */
+if ('PushManager' in window && 'serviceWorker' in navigator && Notification.permission === 'granted') {
+    navigator.serviceWorker.ready.then(async function(reg) {
+        try {
+            let sub = await reg.pushManager.getSubscription();
+            if (!sub) {
+                sub = await reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: _b64ToUint8(window._vapidKey),
+                });
+            }
+            if (sub) await _savePushSub(sub);
+        } catch(e) {}
+    });
+}
+@endif
 @endauth
 
 /* ── Badge API : met à jour le badge de l'icône ── */
@@ -742,7 +833,7 @@ async function pollGlobalBadge() {
         });
         if (!res.ok) return;
         const data  = await res.json();
-        const total = (data.messages_unread || 0) + (data.order_updates?.length || 0);
+        const total = (data.messages_unread || 0) + (data.order_updates_unseen || 0);
         updatePwaBadge(total);
     } catch(e) {}
 }
@@ -750,7 +841,39 @@ setInterval(pollGlobalBadge, 30000);
 pollGlobalBadge();
 @endif
 
-@if(in_array(auth()->user()->role ?? '', ['admin', 'company', 'client']))
+@if(in_array(auth()->user()->role ?? '', ['vendeur', 'employe']))
+async function pollGlobalBadgeVendeur() {
+    try {
+        const res = await fetch('/boutique/notifications/poll', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json',
+                       'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+        });
+        if (!res.ok) return;
+        const d = await res.json();
+        updatePwaBadge((d.messages_unread || 0) + (d.orders_pending || 0));
+    } catch(e) {}
+}
+setInterval(pollGlobalBadgeVendeur, 30000);
+pollGlobalBadgeVendeur();
+@endif
+
+
+@if(auth()->user()->role === 'company')
+async function pollGlobalBadgeCompany() {
+    try {
+        const res = await fetch('/company/orders/notifications', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+        });
+        if (!res.ok) return;
+        const d = await res.json();
+        if (d.ok) updatePwaBadge(d.total_pending || 0);
+    } catch(e) {}
+}
+setInterval(pollGlobalBadgeCompany, 30000);
+pollGlobalBadgeCompany();
+@endif
+
+@if(in_array(auth()->user()->role ?? '', ['admin', 'client', 'vendeur', 'employe', 'livreur']))
 /* Effacer le badge dès que l'utilisateur ouvre l'app */
 updatePwaBadge(0);
 @endif

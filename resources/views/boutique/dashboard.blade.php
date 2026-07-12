@@ -184,7 +184,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .comm-banner { background: var(--brand-mlt); border: 1px solid var(--brand-lt); border-radius: var(--r-sm); padding: 10px 14px; display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: #3730a3; margin-bottom: 20px; font-weight: 500; }
 
 /* KPI GRID */
-.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 14px; }
 .kpi { background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--kpi-color, var(--brand)); border-radius: var(--r); padding: 18px 20px 16px; position: relative; overflow: hidden; box-shadow: var(--shadow-sm); transition: box-shadow .22s, transform .22s, border-color .15s; }
 .kpi:hover { box-shadow: 0 8px 28px rgba(0,0,0,.09), 0 2px 6px rgba(0,0,0,.04); transform: translateY(-2px); }
 .kpi-icon { width: 44px; height: 44px; background: var(--kpi-bg, var(--brand-mlt)); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; border: 1.5px solid var(--kpi-border, rgba(0,0,0,.08)); box-shadow: 0 0 0 3px var(--kpi-ring, transparent), 0 2px 10px var(--kpi-glow, rgba(0,0,0,.06)); }
@@ -1191,7 +1191,7 @@ $I = [
         'shipped'=>['label'=>'Expédié','cls'=>'p-info'],
         'annulée'=>['label'=>'Annulé','cls'=>'p-danger'],
     ];
-    $pendingCount = $shop->orders()->whereIn('status',['en attente','en_attente','pending','confirmée','processing'])->count();
+    $pendingCount = $shop->orders()->whereIn('status',['en attente','en_attente','pending'])->count();
     $avColors = ['#10b981','#6366f1','#f59e0b','#8b5cf6','#14b8a6','#f43f5e'];
     $devise = $shop->currency ?? 'GNF';
     $proXof = number_format(config('genuispay.plans.pro', 7600), 0, ',', ' ');
@@ -1641,6 +1641,20 @@ $I = [
                     <div class="kpi-unit" id="kpiTauxUnit">{{ $livres }} / {{ $totalCmdMonth }} livrées</div>
                     <div class="kpi-delta {{ $tauxLiv >= 90 ? 'up':'down' }}" id="kpiTauxDelta">{{ $tauxLiv >= 90 ? '✓ Excellent':'⚠ À améliorer' }}</div>
                 </div>
+
+            </div>
+
+            {{-- Barre visites --}}
+            <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:12px 18px;margin-bottom:22px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span style="font-size:12px;font-weight:700;color:#0284c7;text-transform:uppercase;letter-spacing:.4px;margin-right:6px">Visites boutique</span>
+                <span style="font-size:12px;color:#0369a1;background:#e0f2fe;padding:3px 10px;border-radius:20px;font-weight:700">{{ number_format($visitesToday,0,',',' ') }} aujourd'hui</span>
+                <span style="color:#bae6fd">·</span>
+                <span style="font-size:12px;color:#0369a1;background:#e0f2fe;padding:3px 10px;border-radius:20px;font-weight:700">{{ number_format($visitesWeek,0,',',' ') }} cette semaine</span>
+                <span style="color:#bae6fd">·</span>
+                <span style="font-size:12px;color:#0369a1;background:#e0f2fe;padding:3px 10px;border-radius:20px;font-weight:700">{{ number_format($visitesMonth,0,',',' ') }} ce mois</span>
+                <span style="color:#bae6fd">·</span>
+                <span style="font-size:12px;color:#64748b;margin-left:2px">{{ number_format($visitesTotal,0,',',' ') }} au total</span>
             </div>
 
 
@@ -3061,6 +3075,8 @@ document.addEventListener('DOMContentLoaded', () => {
             setBadge('sbSupportBadge', supportAlertCount);
             const total = d.messages_unread + d.orders_pending + companyAlertCount + supportAlertCount;
             setBadge('notifBellCount', total);
+            // Badge icône PWA (logo sur l'écran d'accueil)
+            if (typeof window.updatePwaBadge === 'function') window.updatePwaBadge(total);
             const totalEl = document.getElementById('notifDropdownTotal');
             if (totalEl) totalEl.textContent = _alerts.length;
 

@@ -663,12 +663,22 @@ body.cx-light .pw-strength { background: #e5e7eb; }
                     @csrf @method('PATCH')
 
                     <div class="pm-grid">
+                        @if(auth()->user()->google_id)
+                        <div class="pm-field col-full" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(34,197,94,.1);border:1.5px solid rgba(34,197,94,.35);border-radius:8px">
+                            <span style="font-size:20px">🔗</span>
+                            <div>
+                                <div style="font-size:13px;font-weight:700;color:#15803d">Compte connecté via Google</div>
+                                <div style="font-size:12px;color:#166534;margin-top:2px">Vous pouvez définir un mot de passe directement sans saisir l'ancien. Vous pourrez ensuite vous connecter avec ce mot de passe ou continuer avec Google.</div>
+                            </div>
+                        </div>
+                        @else
                         <div class="pm-field col-full">
                             <label>Mot de passe actuel</label>
                             <input type="password" name="current_password" autocomplete="current-password"
                                    class="{{ $errors->has('current_password') ? 'is-invalid' : '' }}"
                                    placeholder="••••••••">
                         </div>
+                        @endif
 
                         <div class="pm-field">
                             <label>Nouveau mot de passe</label>

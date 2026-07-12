@@ -13,9 +13,21 @@ class Order extends Model
 
     // Ajoute 'livreur_id' si tu fais des fill/update dessus
     protected $fillable = ['user_id','shop_id','total','status','ordonnance','livreur_id','current_lat','current_lng','last_ping_at',
-    'image','delivery_fee','delivery_destination','client_phone','delivery_company_id','driver_id','delivery_zone_id','delivery_batch_id',
+    'image','delivery_fee','delivery_destination','client_phone','client_name','delivery_company_id','driver_id','delivery_zone_id','delivery_batch_id',
     'client_lat','client_lng','client_location_shared_at',
     'vendor_lat','vendor_lng','vendor_location_shared_at','delivered_at'];
+
+    // Nom du client à afficher : compte connecté sinon nom saisi en tant qu'invité
+    public function getDisplayNameAttribute(): string
+    {
+        return $this->client->name ?? $this->client_name ?? 'Client invité';
+    }
+
+    // Téléphone à afficher : compte connecté sinon téléphone saisi en tant qu'invité
+    public function getDisplayPhoneAttribute(): ?string
+    {
+        return $this->client->phone ?? $this->client_phone;
+    }
 
     /* Relations */
 
@@ -108,6 +120,22 @@ protected $casts = [
         if ($normalized === self::STATUS_LIVREE && empty($this->attributes['delivered_at'])) {
             $this->attributes['delivered_at'] = now();
         }
+    }
+
+    // Rattache une commande passée sans compte au compte que le client vient de créer/connecter
+    // (appelé juste après l'inscription/connexion si l'utilisateur venait d'une page de suivi invité)
+    public static function attachGuestOrderFromSession(User $user): void
+    {
+        if ($user->role !== 'client') {
+            return;
+        }
+
+        $orderId = session()->pull('link_order_id');
+        if (!$orderId) {
+            return;
+        }
+
+        static::where('id', $orderId)->whereNull('user_id')->update(['user_id' => $user->id]);
     }
 
     public function user()

@@ -56,6 +56,9 @@ class OrderController extends Controller
 
         $orders = $query->paginate(15)->withQueryString();
 
+        // Le client vient de consulter ses commandes → efface le badge PWA
+        $user->update(['orders_badge_seen_at' => now()]);
+
         // Compteurs globaux (indépendants du filtre actif) pour les onglets et les stats
         $counts = [
             'all'          => $user->orders()->count(),
@@ -67,6 +70,18 @@ class OrderController extends Controller
         ];
 
         return view('client.orders.index', compact('orders', 'counts'));
+    }
+
+    // ============================================================
+    // MÉTHODE : markBadgeSeen()
+    // ROUTE   : POST /client/orders/badge-seen
+    // RÔLE    : Acquitte le badge PWA sans recharger la page (ex: dismiss
+    //           d'une notif de commande dans la cloche du dashboard)
+    // ============================================================
+    public function markBadgeSeen(Request $request)
+    {
+        $request->user()->update(['orders_badge_seen_at' => now()]);
+        return response()->json(['ok' => true]);
     }
 
     // ============================================================
@@ -175,7 +190,7 @@ class OrderController extends Controller
                     'Nouvelle commande !',
                     'Vous avez reçu une nouvelle commande de ' . number_format($order->total, 0, ',', ' ') . ' GNF.',
                     $push->vendorBadgeCount($shopOwner),
-                    '/vendeur/orders'
+                    '/employe/orders'
                 );
             }
         } catch (\Throwable $e) {}
@@ -200,35 +215,37 @@ class OrderController extends Controller
         // ->is_approved = la boutique doit être validée par l'admin, sinon erreur 404
         abort_unless(optional($product->shop)->is_approved, 404);
 
-        // On récupère le client connecté
+        // On récupère le client connecté (peut être null : commande possible sans compte)
         $client  = Auth::user();
 
         // On récupère la boutique qui vend ce produit (relation définie dans le modèle Product)
         $shop    = $product->shop;
 
-        // On récupère le vendeur (propriétaire de la boutique)
-        $vendeur = $shop->user;
+        // Un visiteur non connecté n'a pas d'historique de messages (il faut un compte pour discuter)
+        $messages = collect();
 
-        // On charge tous les messages échangés entre CE client et le vendeur SUR CE produit
-        $messages = ShopMessage::where('shop_id', $shop->id)          // Messages de cette boutique
-            ->where('product_id', $product->id)                       // Pour ce produit spécifique
-            ->where(function ($q) use ($client) {
-                // On veut les messages où le client est soit l'envoyeur soit le destinataire
-                // "use ($client)" = on passe la variable $client dans cette fonction anonyme
-                $q->where('sender_id', $client->id)    // Messages envoyés par le client
-                  ->orWhere('receiver_id', $client->id); // OU messages reçus par le client
-            })
-            ->with(['sender:id,name'])  // On charge aussi le nom de l'envoyeur (uniquement id et name)
-            ->orderBy('created_at')     // Trie par date d'envoi (du plus ancien au plus récent)
-            ->get();                    // Exécute la requête et retourne les résultats
+        if ($client) {
+            // On charge tous les messages échangés entre CE client et le vendeur SUR CE produit
+            $messages = ShopMessage::where('shop_id', $shop->id)          // Messages de cette boutique
+                ->where('product_id', $product->id)                       // Pour ce produit spécifique
+                ->where(function ($q) use ($client) {
+                    // On veut les messages où le client est soit l'envoyeur soit le destinataire
+                    // "use ($client)" = on passe la variable $client dans cette fonction anonyme
+                    $q->where('sender_id', $client->id)    // Messages envoyés par le client
+                      ->orWhere('receiver_id', $client->id); // OU messages reçus par le client
+                })
+                ->with(['sender:id,name'])  // On charge aussi le nom de l'envoyeur (uniquement id et name)
+                ->orderBy('created_at')     // Trie par date d'envoi (du plus ancien au plus récent)
+                ->get();                    // Exécute la requête et retourne les résultats
 
-        // On marque tous les messages reçus par le client comme "lus"
-        // (met à jour la colonne read_at avec la date et l'heure actuelle)
-        ShopMessage::where('shop_id', $shop->id)
-            ->where('product_id', $product->id)
-            ->where('receiver_id', $client->id)   // Messages destinés au client
-            ->whereNull('read_at')                // Seulement ceux pas encore lus
-            ->update(['read_at' => now()]);        // now() = date et heure actuelle
+            // On marque tous les messages reçus par le client comme "lus"
+            // (met à jour la colonne read_at avec la date et l'heure actuelle)
+            ShopMessage::where('shop_id', $shop->id)
+                ->where('product_id', $product->id)
+                ->where('receiver_id', $client->id)   // Messages destinés au client
+                ->whereNull('read_at')                // Seulement ceux pas encore lus
+                ->update(['read_at' => now()]);        // now() = date et heure actuelle
+        }
 
         // On retourne la vue avec le produit et les messages
         return view('client.orders.create_from_product', [
@@ -245,13 +262,24 @@ class OrderController extends Controller
     // ============================================================
     public function storeProduct(Request $request)
     {
-        // Validation des données du formulaire
-        $request->validate([
+        // Règles de base
+        $rules = [
             'product_id'           => 'required|exists:products,id',
             'quantity'             => 'required|integer|min:1',
             'delivery_destination' => 'nullable|string|max:255',
             'client_phone'         => 'nullable|string|max:30',
-        ]);
+        ];
+
+        // Un visiteur sans compte doit obligatoirement donner son nom, son téléphone et son adresse
+        // (on n'a pas de profil utilisateur pour récupérer ces infos)
+        if (!Auth::check()) {
+            $rules['client_name']         = 'required|string|max:255';
+            $rules['client_phone']        = 'required|string|max:30';
+            $rules['delivery_destination'] = 'required|string|max:255';
+        }
+
+        // Validation des données du formulaire
+        $request->validate($rules);
 
         // On charge le produit avec sa boutique en une seule requête (optimisation)
         // findOrFail() = cherche par ID, si non trouvé renvoie une erreur 404 automatiquement
@@ -272,7 +300,8 @@ class OrderController extends Controller
         $total = $product->price * $request->quantity;
 
         $order = Order::create([
-            'user_id'              => Auth::id(),
+            'user_id'              => Auth::id(),                                    // null si invité
+            'client_name'          => Auth::check() ? null : $request->client_name,  // nom de l'invité (sinon on utilise le compte)
             'shop_id'              => $product->shop->id,
             'total'                => $total,
             'status'               => Order::STATUS_EN_ATTENTE,
@@ -312,10 +341,16 @@ class OrderController extends Controller
                     'Nouvelle commande !',
                     $product->name . ' × ' . $request->quantity . ' — ' . number_format($total, 0, ',', ' ') . ' GNF',
                     $push->vendorBadgeCount($shopOwner),
-                    '/vendeur/orders'
+                    '/employe/orders'
                 );
             }
         } catch (\Throwable $e) {}
+
+        // Un invité n'a pas de compte pour voir "Mes commandes" → on l'envoie sur le suivi public de sa commande
+        if (!Auth::check()) {
+            return redirect()->route('suivi.show', $order)
+                ->with('success', "Commande passée avec succès ! Vous recevrez une confirmation. 🎉");
+        }
 
         return redirect()->route('client.orders.index')
             ->with('success', "Commande passée avec succès ! Vous recevrez une confirmation. 🎉");

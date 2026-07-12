@@ -1139,6 +1139,58 @@ body.cx-light .cx-chart-big { color:#111827; }
     {{-- CONTENT --}}
     <div class="cx-content">
 
+        {{-- Notifications push — activation manuelle si la bannière automatique n'est pas apparue --}}
+        <div id="notifSettingsCard" style="display:flex;align-items:center;gap:14px;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:16px 20px;">
+            <span style="font-size:26px">🔔</span>
+            <div style="flex:1;min-width:160px">
+                <div style="font-weight:700;font-size:14px;color:#111827">Notifications push</div>
+                <div id="notifSettingsSub" style="font-size:13px;color:#6b7280;margin-top:2px">Recevez vos commandes et messages en temps réel, même application fermée.</div>
+            </div>
+            <button type="button" id="notifSettingsBtn"
+                    style="background:#059669;color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">
+                Activer les notifications
+            </button>
+        </div>
+        <script>
+        (function() {
+            var card = document.getElementById('notifSettingsCard');
+            var btn  = document.getElementById('notifSettingsBtn');
+            var sub  = document.getElementById('notifSettingsSub');
+            if (!card) return;
+
+            if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+                card.style.display = 'none';
+                return;
+            }
+
+            function refresh() {
+                if (Notification.permission === 'granted' && localStorage.getItem('push_subscribed')) {
+                    sub.textContent = 'Notifications activées ✓';
+                    btn.textContent = 'Déjà activées';
+                    btn.disabled = true;
+                    btn.style.opacity = '.6';
+                    btn.style.cursor = 'default';
+                } else if (Notification.permission === 'denied') {
+                    sub.textContent = 'Bloquées dans les réglages de votre navigateur — autorisez les notifications pour ce site pour les activer.';
+                    btn.style.display = 'none';
+                }
+            }
+
+            btn.addEventListener('click', function() {
+                btn.disabled = true;
+                btn.textContent = 'Activation…';
+                Promise.resolve(window.enablePushNotifications ? window.enablePushNotifications() : null)
+                    .finally(function() {
+                        btn.disabled = false;
+                        btn.textContent = 'Activer les notifications';
+                        refresh();
+                    });
+            });
+
+            refresh();
+        })();
+        </script>
+
         {{-- ══ BANNIÈRE PLAN ══ --}}
         @if($isBusiness)
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:14px;padding:14px 20px;">
@@ -2619,6 +2671,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Support : 1 si message superadmin non vu
         const unseenSupport = (latestSupport?.has_unread && !isSupportDismissed(latestSupport.msg_id)) ? 1 : 0;
         setBadge('topbarNotifBadge', pendingOrders + unseenChat + unseenSupport);
+        // Badge icône PWA (logo sur l'écran d'accueil)
+        const totalBadge = _orderPendingCount + _chatUnreadCount;
+        if (typeof window.updatePwaBadge === 'function') window.updatePwaBadge(totalBadge);
     }
 
     /* ── Polling chat ── */

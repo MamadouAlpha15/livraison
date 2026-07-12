@@ -606,7 +606,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
     $nonAssignees = $col->filter(fn($o) => !$o->livreur && !$o->deliveryCompany)->count();
     $assignees    = $col->filter(fn($o) => $o->livreur || $o->deliveryCompany)->count();
     $caPage       = $col->where('status','livrée')->sum('total');
-    $pendingCount = $col->filter(fn($o) => in_array($o->status,['pending','en attente','en_attente','confirmée','processing']))->count();
+    $pendingCount = $col->filter(fn($o) => in_array($o->status,['pending','en attente','en_attente']))->count();
     $reviewsByOrderId = \App\Models\Review::whereIn('order_id', $orders->pluck('id'))
         ->where('user_id', auth()->id())
         ->get()->keyBy('order_id');
@@ -1090,9 +1090,15 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                 <div class="tb-title">{!! $I['box_tb'] !!} Commandes</div>
                 <div class="tb-sub">{{ $shop->name ?? 'Boutique' }} &nbsp;·&nbsp; <span class="devise-badge" style="font-size:10px;padding:2px 8px">{!! $I['currency_tb'] !!} {{ $devise }}</span></div>
             </div>
+            @if($isPro)
             <a href="{{ route('employe.orders.carte') }}" style="display:flex;align-items:center;gap:5px;height:30px;padding:0 12px;border-radius:8px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);color:#4f46e5;font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;text-decoration:none;transition:background .14s" onmouseover="this.style.background='rgba(99,102,241,.18)'" onmouseout="this.style.background='rgba(99,102,241,.1)'">
                 {!! $I['map_tb'] !!} <span class="desk-only">Carte GPS</span>
             </a>
+            @else
+            <a href="{{ route('boutique.subscription.upgrade') }}" style="display:flex;align-items:center;gap:5px;height:30px;padding:0 12px;border-radius:8px;background:#f9fafb;border:1px solid #d1d5db;color:#9ca3af;font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;text-decoration:none;" title="Fonctionnalité réservée au plan Pro">
+                {!! $I['map_tb'] !!} <span class="desk-only">Carte GPS</span> <span style="font-size:10px;background:#f59e0b;color:#fff;padding:1px 6px;border-radius:10px;font-weight:800">PRO</span>
+            </a>
+            @endif
             <div id="autoRefreshBadge" style="display:flex;align-items:center;gap:6px;background:#f0fdf4;border:1px solid #86efac;border-radius:20px;padding:4px 12px;font-size:11.5px;font-weight:600;color:#166534;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0" onclick="togglePause()" title="Cliquer pour mettre en pause">
                 <span id="refreshDot" style="width:7px;height:7px;border-radius:50%;background:#22c55e;animation:blink 2.2s ease-in-out infinite;flex-shrink:0"></span>
                 <span id="refreshLabel">Actu dans <strong id="refreshCount">30</strong>s</span>
@@ -1200,7 +1206,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         $st=$statusMap[$order->status]??['label'=>ucfirst($order->status),'cls'=>'p-muted'];
                         $product=$order->items->first()?->product;
                         $client=$order->client;
-                        $init=$client?initiales($client->name):'CL';
+                        $init=initiales($order->display_name);
                         $peutAnnuler=in_array($order->status,$annulables);
                         $dejaAnnulee=in_array($order->status,$restaurables);
                     @endphp
@@ -1217,7 +1223,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                              @php
                               $displayPhone = $order->client_phone ?: $client?->phone;
                             @endphp
-                        <td><div style="display:flex;align-items:center;gap:9px"><div class="c-av">{{ $init }}</div><div><div class="c-name">{{ $client->name ?? 'Inconnu' }}</div>  
+                        <td><div style="display:flex;align-items:center;gap:9px"><div class="c-av">{{ $init }}</div><div><div class="c-name">{{ $order->display_name }}</div>  
                          @if($displayPhone)
                          <div class="c-sub">📞 {{ $displayPhone }}</div>
                          @endif</div></div>
@@ -1265,7 +1271,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                                         style="background:#eef2ff;border-color:#c7d2fe;color:#4f46e5;white-space:nowrap;"
                                         data-order-id="{{ $order->id }}"
                                         data-order-num="#{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
-                                        data-client="{{ addslashes($client->name ?? 'Inconnu') }}"
+                                        data-client="{{ addslashes($order->display_name) }}"
                                         data-phone="{{ $client->phone ?? '' }}"
                                         data-dest="{{ addslashes($order->delivery_destination ?: ($client->address ?? '')) }}"
                                         data-shop-id="{{ $shop->id ?? '' }}"
@@ -1279,8 +1285,8 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         </td>
                         <td><div style="display:flex;align-items:center;gap:5px;flex-wrap:nowrap">
                             <!--<a href="{{ route('orders.show',$order) }}" class="btn btn-info btn-sm">🔍</a> !--->
-                            @if($peutAnnuler)<button type="button" class="btn-cancel" onclick="openCancelModal('{{ route('employe.orders.cancel',$order) }}','#{{ $order->id }}','{{ addslashes($client->name ?? 'Inconnu') }}')">✕ Annuler</button>
-                            @elseif($dejaAnnulee)<button type="button" class="btn-restore" onclick="openRestoreModal('{{ route('employe.orders.restore',$order) }}','#{{ $order->id }}','{{ addslashes($client->name ?? 'Inconnu') }}')">{!! $I['refresh_btn'] !!} Restaurer</button>
+                            @if($peutAnnuler)<button type="button" class="btn-cancel" onclick="openCancelModal('{{ route('employe.orders.cancel',$order) }}','#{{ $order->id }}','{{ addslashes($order->display_name) }}')">✕ Annuler</button>
+                            @elseif($dejaAnnulee)<button type="button" class="btn-restore" onclick="openRestoreModal('{{ route('employe.orders.restore',$order) }}','#{{ $order->id }}','{{ addslashes($order->display_name) }}')">{!! $I['refresh_btn'] !!} Restaurer</button>
                             @else<button type="button" class="btn-cancel disabled" disabled>✕</button>@endif
                             @if($order->status === 'livrée' && $order->deliveryCompany)
                                 @if(!isset($reviewsByOrderId[$order->id]))
@@ -1323,7 +1329,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                     $st=$statusMap[$order->status]??['label'=>ucfirst($order->status),'cls'=>'p-muted'];
                     $product=$order->items->first()?->product;
                     $client=$order->client;
-                    $init=$client?initiales($client->name):'CL';
+                    $init=initiales($order->display_name);
                     $peutAnnuler=in_array($order->status,$annulables);
                     $dejaAnnulee=in_array($order->status,$restaurables);
                 @endphp
@@ -1341,7 +1347,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                             $displayPhone = $order->client_phone ?: $client?->phone;
                             @endphp
                             <div>
-                                <div class="c-name">{{ $client->name ?? 'Inconnu' }}</div>
+                                <div class="c-name">{{ $order->display_name }}</div>
                             @if($displayPhone)<div class="c-sub">📞 {{ $displayPhone  }}</div>@endif</div></div>
                         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span><span style="font-family:var(--mono);font-size:10px;color:var(--muted)">#{{ $order->id }}</span></div>
                     </div>
@@ -1357,7 +1363,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                             <button type="button" class="btn btn-sm" style="background:#eef2ff;border-color:#c7d2fe;color:#4f46e5;width:100%;justify-content:center;"
                                     data-order-id="{{ $order->id }}"
                                     data-order-num="#{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
-                                    data-client="{{ addslashes($client->name ?? 'Inconnu') }}"
+                                    data-client="{{ addslashes($order->display_name) }}"
                                     data-phone="{{ $client->phone ?? '' }}"
                                     data-dest="{{ addslashes($order->delivery_destination ?: ($client->address ?? '')) }}"
                                     data-shop-id="{{ $shop->id ?? '' }}"
@@ -1368,8 +1374,8 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                     <div class="m-card-foot">
                         
                         @if($order->livreur || $order->deliveryCompany)<span class="btn btn-assigned btn-sm">✔ Assignée</span>@endif
-                        @if($peutAnnuler)<button type="button" class="btn-cancel" style="flex:1;justify-content:center" onclick="openCancelModal('{{ route('employe.orders.cancel',$order) }}','#{{ $order->id }}','{{ addslashes($client->name ?? 'Inconnu') }}')">✕ Annuler</button>
-                        @elseif($dejaAnnulee)<button type="button" class="btn-restore" style="flex:1;justify-content:center" onclick="openRestoreModal('{{ route('employe.orders.restore',$order) }}','#{{ $order->id }}','{{ addslashes($client->name ?? 'Inconnu') }}')">{!! $I['refresh_btn'] !!} Restaurer</button>@endif
+                        @if($peutAnnuler)<button type="button" class="btn-cancel" style="flex:1;justify-content:center" onclick="openCancelModal('{{ route('employe.orders.cancel',$order) }}','#{{ $order->id }}','{{ addslashes($order->display_name) }}')">✕ Annuler</button>
+                        @elseif($dejaAnnulee)<button type="button" class="btn-restore" style="flex:1;justify-content:center" onclick="openRestoreModal('{{ route('employe.orders.restore',$order) }}','#{{ $order->id }}','{{ addslashes($order->display_name) }}')">{!! $I['refresh_btn'] !!} Restaurer</button>@endif
                         @if($order->status === 'livrée' && $order->deliveryCompany)
                             @if(!isset($reviewsByOrderId[$order->id]))
                             <button type="button" class="btn-noter" style="flex:1;justify-content:center;"

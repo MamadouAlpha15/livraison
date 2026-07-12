@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Shop;
+use App\Models\ShopVisit;
 use Illuminate\Http\Request;
 
 class ShopController extends Controller
@@ -11,6 +12,8 @@ class ShopController extends Controller
     public function show(Shop $shop, Request $request)
     {
         abort_unless($shop->is_approved, 404);
+
+        ShopVisit::record($shop->id);
 
         /* Catégories distinctes des produits actifs de cette boutique */
         $categories = $shop->products()

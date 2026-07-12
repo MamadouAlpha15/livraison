@@ -574,7 +574,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 {{-- NAVBAR --}}
 <nav class="amz-nav">
-    <a href="{{ route('client.dashboard') }}" class="amz-nav-logo"> <img src="{{ asset('images/Shopio2.jpeg') }}" alt="Shopio" style="height:50px;width:auto;object-fit:contain;border-radius:8px">
+    <a href="{{ route('client.dashboard') }}" class="amz-nav-logo"> <img src="{{ asset('images/shopio-logo-192.png') }}" alt="Shopio" style="height:50px;width:auto;object-fit:contain;border-radius:8px">
         {{ config('app.name', 'Shopio') }}</a>
     <a href="{{ route('client.dashboard') }}" class="amz-back">← Retour</a>
     <div class="amz-nav-search">

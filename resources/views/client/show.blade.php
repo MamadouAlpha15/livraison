@@ -217,9 +217,9 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
         Retour
     </button>
     <div class="bc">
-        <a href="{{ route('client.dashboard') }}">Accueil</a>
+        <a href="{{ auth()->check() ? route('client.dashboard') : url('/') }}">Accueil</a>
         <span class="bc-sep">›</span>
-        <a href="{{ route('client.products.index') }}">Produits</a>
+        <a href="{{ auth()->check() ? route('client.products.index') : route('shops.index') }}">Produits</a>
         <span class="bc-sep">›</span>
         <span>{{ Str::limit($product->name, 28) }}</span>
     </div>
@@ -335,7 +335,7 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
             $grads=['linear-gradient(135deg,#667eea,#764ba2)','linear-gradient(135deg,#f5576c,#f093fb)','linear-gradient(135deg,#4facfe,#00c6fb)','linear-gradient(135deg,#ee0979,#ff6a00)','linear-gradient(135deg,#11998e,#38ef7d)','linear-gradient(135deg,#fc4a1a,#f7b733)'];
             $grad=$grads[abs(crc32($shop->name??''))%count($grads)];
         @endphp
-        <a href="{{ route('client.shops.show', $shop) }}" class="shop-row">
+        <a href="{{ auth()->check() ? route('client.shops.show', $shop) : route('public.shops.products', $shop) }}" class="shop-row">
             <div class="shop-av" style="background:{{ $grad }}">
                 @if($shop->image)
                     <img src="{{ asset('storage/'.$shop->image) }}" alt="{{ $shop->name }}">
@@ -362,7 +362,7 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
             @else
                 <span class="btn-order off">🚫 Indisponible actuellement</span>
             @endif
-            <a href="{{ route('client.products.index') }}" class="btn-back">
+            <a href="{{ auth()->check() ? route('client.products.index') : route('shops.index') }}" class="btn-back">
                 ← Tous les produits
             </a>
         </div>

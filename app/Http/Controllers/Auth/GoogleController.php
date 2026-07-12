@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,8 +19,21 @@ class GoogleController extends Controller
             ->setHttpClient(new \GuzzleHttp\Client(['verify' => true]));
     }
 
-    public function redirect()
+    public function redirect(Request $request)
     {
+        // Sauvegarder en session : le callback n'a pas accès aux query params d'origine
+        if ($request->filled('redirect')) {
+            $target = $request->redirect;
+            if (str_starts_with($target, url('/'))) {
+                session(['product_redirect' => $target]);
+            }
+        }
+
+        // Commande passée sans compte : à rattacher au compte une fois connecté
+        if ($request->filled('order_id')) {
+            session(['link_order_id' => $request->order_id]);
+        }
+
         return $this->driver()->redirect();
     }
 
@@ -103,6 +117,11 @@ class GoogleController extends Controller
 
     private function redirectToDashboard(User $user)
     {
+        // Signaler au layout qu'on vient de Google → reset PWA modal côté JS
+        session()->flash('google_just_authed', true);
+
+        Order::attachGuestOrderFromSession($user);
+
         if ($user->role === 'client' && session('product_redirect')) {
             return redirect(session()->pull('product_redirect'));
         }

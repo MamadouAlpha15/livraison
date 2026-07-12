@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Shop;
+use App\Models\Order;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -36,6 +37,11 @@ class RegisteredUserController extends Controller
             if (str_starts_with($target, url('/'))) {
                 session(['product_redirect' => $target]);
             }
+        }
+
+        // Commande passée sans compte : à rattacher au compte une fois créé
+        if ($request->filled('order_id')) {
+            session(['link_order_id' => $request->order_id]);
         }
 
         return view('auth.register', compact('shopId', 'intent', 'defaultRole'));
@@ -85,6 +91,8 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
         Auth::login($user);
+
+        Order::attachGuestOrderFromSession($user);
 
         if ($request->filled('intent') && in_array($request->intent, ['pro', 'business'])) {
             session(['payment_intent' => $request->intent]);

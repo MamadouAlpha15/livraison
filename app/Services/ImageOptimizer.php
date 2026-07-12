@@ -47,7 +47,6 @@ class ImageOptimizer
             $sizes = [
                 'thumb'  => 300,
                 'medium' => 800,
-                'large'  => 1600,
             ];
 
             $paths = [];
@@ -55,7 +54,7 @@ class ImageOptimizer
             foreach ($sizes as $key => $width) {
                 $img     = $manager->read($rawPath);
                 $img->scaleDown(width: $width);
-                $encoded = $img->encode(new WebpEncoder(quality: 82));
+                $encoded = $img->encode(new WebpEncoder(quality: 75));
 
                 $path = "{$folder}/{$key}/{$filename}.webp";
                 Storage::disk($disk)->put($path, (string) $encoded);

@@ -1222,7 +1222,7 @@ footer.app-footer { display: none !important; }
 ══════════════════════════════════════════ --}}
 <nav class="top-nav">
     <a href="{{ url('/') }}" class="nav-brand">
-        <img src="/images/shopio3.jpeg" alt="Shopio" class="nav-logo-img">
+        <img src="/images/shopio-logo-192.png" alt="Shopio" class="nav-logo-img">
         <span class="nav-brand-name">{{ config('app.name', 'Shopio') }}</span>
     </a>
     <div class="nav-links">
@@ -1676,6 +1676,8 @@ $bizGnf = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', 
                     <li style="opacity:.5;text-decoration:line-through">Rapports & exports</li>
                     <li style="opacity:.5;text-decoration:line-through">Statistiques & graphiques</li>
                     <li style="opacity:.5;text-decoration:line-through">Gestion d'équipe</li>
+                    <li style="opacity:.5;text-decoration:line-through">✨ Shopio IA — Plan Pro</li>
+                    <li style="opacity:.5;text-decoration:line-through">🗺️ Carte GPS — Plan Pro</li>
 
                     {{-- Séparateur Entreprises --}}
                     <li style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#7c3aed;padding-bottom:2px;border-bottom:1px solid #e2e8f0;list-style:none;margin-top:6px">
@@ -1713,6 +1715,8 @@ $bizGnf = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', 
                     <li>Statistiques & graphiques</li>
                     <li>Analyse par période</li>
                     <li>Gestion d'équipe complète</li>
+                    <li><strong>✨ Shopio IA</strong> — descriptions auto par IA</li>
+                    <li><strong>🗺️ Carte GPS</strong> — suivi livreurs en temps réel</li>
                     <li>Durée : 1 mois renouvelable</li>
                 </ul>
                 @auth
@@ -1840,7 +1844,7 @@ $bizGnf = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', 
     <div class="footer-inner">
         <div class="footer-brand">
             <a href="{{ url('/') }}" class="footer-logo">
-                <img src="/images/shopio3.jpeg" alt="Shopio" style="width:40px;height:40px;object-fit:cover;border-radius:10px;border:2px solid rgba(170,40,217,.4);box-shadow:0 0 0 3px rgba(41,29,149,.25)">
+                <img src="/images/shopio-logo-192.png" alt="Shopio" style="width:40px;height:40px;object-fit:cover;border-radius:10px;border:2px solid rgba(170,40,217,.4);box-shadow:0 0 0 3px rgba(41,29,149,.25)">
                 <span style="background:linear-gradient(90deg,#c4b5fd,#e879f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:800">{{ config('app.name', 'Shopio') }}</span>
             </a>
             <p class="footer-desc">La plateforme tout-en-un pour gérer votre boutique, vos livraisons et vos clients en Guinée.</p>

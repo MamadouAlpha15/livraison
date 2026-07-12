@@ -83,23 +83,34 @@ class ParametreController extends Controller
 
     public function updatePassword(Request $request)
     {
-        $request->validate([
-            'current_password' => ['required'],
-            'password'         => ['required', 'string', 'min:8', 'confirmed'],
-        ], [
+        $user     = auth()->user();
+        $isGoogle = !empty($user->google_id);
+
+        $rules = [
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ];
+
+        // Les comptes Google n'ont pas de mot de passe connu → pas de vérification requise
+        if (!$isGoogle) {
+            $rules['current_password'] = ['required'];
+        }
+
+        $request->validate($rules, [
             'current_password.required' => 'Veuillez entrer votre mot de passe actuel.',
             'password.min'              => 'Le nouveau mot de passe doit avoir au moins 8 caractères.',
             'password.confirmed'        => 'La confirmation ne correspond pas.',
         ]);
 
-        $user = auth()->user();
-
-        if (!Hash::check($request->input('current_password'), $user->password)) {
+        if (!$isGoogle && !Hash::check($request->input('current_password'), $user->password)) {
             return back()->withErrors(['current_password' => 'Mot de passe actuel incorrect.'])->withInput();
         }
 
         $user->update(['password' => Hash::make($request->input('password'))]);
 
-        return back()->with('success_password', 'Mot de passe modifié avec succès.');
+        $message = $isGoogle
+            ? 'Mot de passe défini avec succès. Vous pouvez désormais vous connecter avec ce mot de passe ou continuer avec Google.'
+            : 'Mot de passe modifié avec succès.';
+
+        return back()->with('success_password', $message);
     }
 }

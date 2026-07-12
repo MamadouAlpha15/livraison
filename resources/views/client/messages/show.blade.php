@@ -370,6 +370,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
 
 @media (max-width: 400px) {
     /* Entête produit : image plus petite, bouton pleine largeur */
+    .chat-prod-header { flex-wrap: wrap; }
     .chat-prod-img,
     .chat-prod-img-ph { width: 44px; height: 44px; font-size: 18px; }
     .chat-prod-name  { font-size: 13.5px; }
@@ -493,7 +494,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
             {{-- ══ PHOTOS ══ --}}
             @php
                 $imgUrls = collect($msg->images ?? [])->map(fn($p) =>
-                    \App\Services\ImageOptimizer::url($p, 'large') ?? asset('storage/'.$p)
+                    \App\Services\ImageOptimizer::url($p, 'medium') ?? asset('storage/'.$p)
                 )->toArray();
                 $imgCount = count($imgUrls);
             @endphp
@@ -999,6 +1000,10 @@ async function sendMessage() {
 
 async function sendPhotos() {
     if (!_selectedFiles.length) return;
+
+    // Créer les blob URLs AVANT de vider la sélection → images visibles immédiatement
+    const blobUrls = _selectedFiles.map(f => URL.createObjectURL(f));
+
     const formData = new FormData();
     _selectedFiles.forEach(f => formData.append('images[]', f));
     _selectedFiles = [];
@@ -1006,7 +1011,8 @@ async function sendPhotos() {
 
     const thread = document.getElementById('chatThread');
     thread.querySelector('.chat-empty')?.remove();
-    const row = buildImageRow({ mine: true, images: [], image_status: 'processing', time: nowTime() });
+    // Afficher les images tout de suite (blob local, pas de spinner)
+    const row = buildImageRow({ mine: true, images: blobUrls, image_status: 'ready', time: nowTime() });
     thread.appendChild(row);
     scrollBottom();
 
@@ -1020,7 +1026,24 @@ async function sendPhotos() {
         if (data.success && data.message_id) {
             row.dataset.msgId = data.message_id;
             _lastMsgId = Math.max(_lastMsgId, data.message_id);
-            pollImageStatus(data.message_id, row.querySelector('.msg-img-grid'));
+            if (data.image_status === 'ready' && data.images?.length > 0) {
+                // Images déjà optimisées → remplacer les blobs immédiatement
+                const gridEl = row.querySelector('.msg-img-grid');
+                if (gridEl) {
+                    gridEl.innerHTML = '';
+                    gridEl.className = 'msg-img-grid count-' + data.images.length;
+                    data.images.forEach((url, idx) => {
+                        const im = document.createElement('img');
+                        im.src = url; im.className = 'msg-img-thumb';
+                        im.onclick = () => openLightbox(data.images, idx);
+                        gridEl.appendChild(im);
+                    });
+                    gridEl.dataset.status = 'ready';
+                }
+            } else {
+                // Fallback : polling si le traitement est encore en cours
+                pollImageStatus(data.message_id, row.querySelector('.msg-img-grid'));
+            }
         }
     } catch(e) {
         row.remove();

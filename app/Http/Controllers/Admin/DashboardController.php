@@ -20,8 +20,10 @@ class DashboardController extends Controller
         $kpis     = $this->buildKpis();
         $chart    = $this->buildChart();
         $activity = $this->buildActivity();
+        $allShops     = Shop::with('owner')->latest()->get(['id','name','user_id','created_at','is_approved']);
+        $allCompanies = DeliveryCompany::latest()->get(['id','name','user_id','created_at','approved']);
 
-        return view('dashboards.SuperAdmin', compact('pendingCompanies', 'kpis', 'chart', 'activity'));
+        return view('dashboards.SuperAdmin', compact('pendingCompanies', 'kpis', 'chart', 'activity', 'allShops', 'allCompanies'));
     }
 
     public function stats()

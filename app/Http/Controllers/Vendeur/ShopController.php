@@ -10,6 +10,7 @@ use Illuminate\Validation\Rule;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use App\Models\ShopMessage;
+use App\Models\ShopVisit;
 use App\Services\ImageOptimizer;
 
 
@@ -226,12 +227,21 @@ $clientMessages = ShopMessage::where('shop_id', $shop->id)
             ->where('payment_method', 'genuispay')
             ->exists();
 
+        $visitesToday = ShopVisit::where('shop_id', $shop->id)->where('visited_on', today())->value('count') ?? 0;
+        $visitesWeek  = ShopVisit::where('shop_id', $shop->id)->where('visited_on', '>=', now()->startOfWeek())->sum('count');
+        $visitesMonth = ShopVisit::where('shop_id', $shop->id)->where('visited_on', '>=', now()->startOfMonth())->sum('count');
+        $visitesTotal = ShopVisit::where('shop_id', $shop->id)->sum('count');
+
         return view('boutique.dashboard', [
             'shop'                => $shop,
             'livreursDisponibles' => $livreursDisponibles,
             'deliveryCompanies'   => $deliveryCompanies,
             'clientMessages'      => $clientMessages,
             'recentPayment'       => $recentPayment || session('payment_success'),
+            'visitesToday'        => $visitesToday,
+            'visitesWeek'         => $visitesWeek,
+            'visitesMonth'        => $visitesMonth,
+            'visitesTotal'        => $visitesTotal,
         ]);
 
     }

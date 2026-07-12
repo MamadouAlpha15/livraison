@@ -406,9 +406,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
         <a href="{{ route('admin.support.index') }}" class="sb-a">
             <span class="sb-i">{!! $I['ticket'] !!}</span><span>Tickets support</span>
         </a>
-        <a href="#" class="sb-a" onclick="nt();return false">
-            <span class="sb-i">{!! $I['cog'] !!}</span><span>Paramètres système</span>
-        </a>
+        <a href="{{ route('admin.plans.index') }}" class="sb-a"><span class="sb-i">{!! $I['cog'] !!}</span><span>Paramètres système</span></a>
     </nav>
     <div class="sb-ft">
         <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;font-size:11.5px;color:rgba(255,255,255,.6);font-weight:600">

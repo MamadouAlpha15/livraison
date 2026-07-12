@@ -140,6 +140,14 @@ $isGuinea = ($shop->country ?? '') === 'GN';
                     <div class="feat-ico no"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
                     <div class="feat-txt dim">Statistiques &amp; Analyse — <em>Plan Pro</em></div>
                 </li>
+                <li class="feat-item">
+                    <div class="feat-ico lock">🔒</div>
+                    <div class="feat-txt dim">✨ Shopio IA — <em>Plan Pro</em></div>
+                </li>
+                <li class="feat-item">
+                    <div class="feat-ico lock">🔒</div>
+                    <div class="feat-txt dim">🗺️ Carte GPS — <em>Plan Pro</em></div>
+                </li>
             </ul>
             <div class="plan-btn-wrap">
                 <span class="plan-btn current">Plan actuel</span>
@@ -189,6 +197,14 @@ $isGuinea = ($shop->country ?? '') === 'GN';
                 <li class="feat-item">
                     <div class="feat-ico ok"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
                     <div class="feat-txt">Statistiques &amp; Analyse par période</div>
+                </li>
+                <li class="feat-item">
+                    <div class="feat-ico ok"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                    <div class="feat-txt"><strong>✨ Shopio IA</strong> — génération de descriptions par IA</div>
+                </li>
+                <li class="feat-item">
+                    <div class="feat-ico ok"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                    <div class="feat-txt"><strong>🗺️ Carte GPS</strong> — suivi des livreurs en temps réel</div>
                 </li>
             </ul>
             <div class="plan-btn-wrap">

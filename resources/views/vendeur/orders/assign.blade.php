@@ -157,13 +157,13 @@ body{font-family:var(--font);background:var(--bg);color:var(--text)}
             <div class="as-info-grid">
                 <div>
                     <div class="as-info-lbl">Nom</div>
-                    <div class="as-info-val">{{ $order->client->name ?? '—' }}</div>
+                    <div class="as-info-val">{{ $order->display_name }}</div>
                 </div>
                 <div>
                     <div class="as-info-lbl">Téléphone</div>
                     <div class="as-info-val">
-                        @if($order->client?->phone)
-                            <a href="tel:{{ $order->client->phone }}" style="color:var(--green-dk);text-decoration:none">📞 {{ $order->client->phone }}</a>
+                        @if($order->display_phone)
+                            <a href="tel:{{ $order->display_phone }}" style="color:var(--green-dk);text-decoration:none">📞 {{ $order->display_phone }}</a>
                         @else —
                         @endif
                     </div>
@@ -174,7 +174,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text)}
                 </div>
                 <div>
                     <div class="as-info-lbl">Adresse</div>
-                    <div class="as-info-val" style="font-size:12px;color:var(--muted)">📍 {{ $order->client?->address ?? 'Non renseignée' }}</div>
+                    <div class="as-info-val" style="font-size:12px;color:var(--muted)">📍 {{ $order->client?->address ?? $order->delivery_destination ?? 'Non renseignée' }}</div>
                 </div>
             </div>
         </div>

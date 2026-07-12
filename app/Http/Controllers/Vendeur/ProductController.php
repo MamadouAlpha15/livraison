@@ -163,8 +163,9 @@ class ProductController extends Controller
 
         $categories = self::CATEGORIES;
         $devise     = $shop->currency ?? 'GNF';
+        $isPro      = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
 
-        return view('vendeur.products.create', compact('categories', 'devise'));
+        return view('vendeur.products.create', compact('categories', 'devise', 'isPro'));
     }
 
     /* ─────────────────────────────────────────────
@@ -244,8 +245,9 @@ class ProductController extends Controller
 
         $categories = self::CATEGORIES;
         $devise     = $shop->currency ?? 'GNF';
+        $isPro      = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
 
-        return view('vendeur.products.edit', compact('product', 'categories', 'devise'));
+        return view('vendeur.products.edit', compact('product', 'categories', 'devise', 'isPro'));
     }
 
     /* ─────────────────────────────────────────────

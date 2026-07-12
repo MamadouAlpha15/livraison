@@ -1,13 +1,9 @@
-const CACHE = 'shopio-v3';
+const CACHE = 'shopio-v9';
 const OFFLINE_URL = '/';
 
 const PRECACHE = [
     '/',
-    '/images/shopio-192.png',
-    '/images/shopio-512.png',
-    'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css',
-    'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css',
-    'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=block',
+    '/images/shopio-logo-192.png',
 ];
 
 /* ── Installation ── */
@@ -52,8 +48,8 @@ self.addEventListener('push', e => {
 
     const options = {
         body:    data.body  || 'Vous avez une nouvelle notification.',
-        icon:    '/images/Shopio_logo.png',
-        badge:   '/images/Shopio_logo.png',
+        icon:    '/images/shopio-logo-192.png',
+        badge:   '/images/shopio-logo-96.png',
         vibrate: [200, 100, 200],
         data:    { url: data.url || '/' },
         actions: [
@@ -62,14 +58,16 @@ self.addEventListener('push', e => {
         ],
     };
 
-    e.waitUntil(
-        self.registration.showNotification(data.title || 'Shopio', options)
-    );
+    const badgeCount = parseInt(data.badge) || 0;
 
-    /* Badge sur l'icône de l'app */
-    if (data.badge && self.navigator?.setAppBadge) {
-        self.navigator.setAppBadge(data.badge).catch(() => {});
-    }
+    e.waitUntil(
+        Promise.all([
+            self.registration.showNotification(data.title || 'Shopio', options),
+            badgeCount > 0 && 'setAppBadge' in self.navigator
+                ? self.navigator.setAppBadge(badgeCount).catch(() => {})
+                : Promise.resolve(),
+        ])
+    );
 });
 
 /* ── Clic sur notification ── */

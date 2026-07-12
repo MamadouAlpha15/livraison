@@ -418,7 +418,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     };
     $parts    = explode(' ', auth()->user()->name);
     $initials = strtoupper(substr($parts[0],0,1)) . strtoupper(substr($parts[1] ?? 'X',0,1));
-    $pendingCount   = $shop->orders()->whereIn('status',['pending','en attente','en_attente','confirmée','processing'])->count();
+    $pendingCount   = $shop->orders()->whereIn('status',['pending','en attente','en_attente'])->count();
     $isPro          = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
     $processedCount = $shop->orders()->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->where(function($q){$q->whereNotNull('livreur_id')->orWhereNotNull('delivery_company_id');})->count();
     $productCount   = $shop->products()->count();

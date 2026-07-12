@@ -583,7 +583,30 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
                         </div>
                     </div>
                     @else
-                    <div class="card-body" style="text-align:center;color:var(--muted);padding:28px">Client introuvable.</div>
+                    {{-- Commande passée sans compte (invité) : on affiche les infos saisies au moment de la commande --}}
+                    <div class="client-card-top">
+                        <div class="c-avatar" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">{{ $init($order->display_name) }}</div>
+                        <div>
+                            <div class="c-name">{{ $order->display_name }}</div>
+                            <div class="c-email" style="font-size:11px;color:var(--muted)">Commande sans compte (invité)</div>
+                        </div>
+                    </div>
+                    <div class="card-body" style="padding-top:4px">
+                        <div class="info-list">
+                            @if($order->client_phone)
+                            <div class="info-row">
+                                <span class="lbl">Téléphone</span>
+                                <a href="tel:{{ $order->client_phone }}" class="val">📞 {{ $order->client_phone }}</a>
+                            </div>
+                            @endif
+                            @if($order->delivery_destination)
+                            <div class="info-row">
+                                <span class="lbl">Livraison</span>
+                                <span class="val">📍 {{ $order->delivery_destination }}</span>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
                     @endif
                 </div>
 

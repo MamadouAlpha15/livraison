@@ -178,12 +178,23 @@ class OrderController extends Controller
         ]
     );
 
-    // Notifier le livreur
+    // Notifier le livreur (email + DB)
     if (method_exists($livreur, 'notify')) {
         try {
             $livreur->notify(new OrderStatusNotification($order, 'Une commande vous a été assignée.'));
         } catch (\Throwable $e) {}
     }
+
+    // Notifier le livreur par push PWA
+    try {
+        app(PushService::class)->sendToUser(
+            $livreur,
+            'Nouvelle commande assignée 📦',
+            'Commande #' . str_pad($order->id, 4, '0', STR_PAD_LEFT) . ' · ' . number_format($order->total, 0, ',', ' ') . ' ' . ($shop?->currency ?? 'GNF'),
+            1,
+            '/livreur/orders'
+        );
+    } catch (\Throwable $e) {}
 
     // Notifier le client — commande en livraison
     try {
@@ -238,6 +249,20 @@ class OrderController extends Controller
             'driver_id'           => null,
             'status'              => Order::STATUS_CONFIRMEE,
         ]);
+
+        // Push à l'entreprise de livraison
+        try {
+            $companyUser = $company->user;
+            if ($companyUser) {
+                app(PushService::class)->sendToUser(
+                    $companyUser,
+                    'Nouvelle commande à livrer 📦',
+                    'La boutique vous a confié une commande de ' . number_format($order->total, 0, ',', ' ') . ' ' . ($shop?->currency ?? 'GNF') . '.',
+                    1,
+                    '/company/orders'
+                );
+            }
+        } catch (\Throwable $e) {}
 
         return redirect()->route('orders.assign.show', $order->id)
             ->with('success', "Commande confiée à {$company->name}. Leur équipe assignera un chauffeur.");

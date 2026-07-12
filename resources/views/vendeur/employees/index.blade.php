@@ -268,7 +268,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     $shop     = auth()->user()->shop ?? auth()->user()->assignedShop ?? null;
     $parts    = explode(' ', auth()->user()->name);
     $initials = strtoupper(substr($parts[0],0,1)) . strtoupper(substr($parts[1] ?? 'X',0,1));
-    $pendingCount   = $shop ? $shop->orders()->whereIn('status',['pending','en attente','en_attente','confirmée','processing'])->count() : 0;
+    $pendingCount   = $shop ? $shop->orders()->whereIn('status',['pending','en attente','en_attente'])->count() : 0;
     $isPro          = $shop && $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
     $processedCount = $shop ? $shop->orders()->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->where(function($q){$q->whereNotNull('livreur_id')->orWhereNotNull('delivery_company_id');})->count() : 0;
     $productCount   = $shop ? $shop->products()->count() : 0;

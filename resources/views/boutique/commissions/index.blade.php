@@ -588,7 +588,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
     $initials = strtoupper(substr($parts[0],0,1)) . strtoupper(substr($parts[1] ?? 'X',0,1));
     $init     = fn(string $n): string => strtoupper(substr(explode(' ',$n)[0],0,1))
                                        . strtoupper(substr(explode(' ',$n)[1] ?? substr($n,1,1),0,1));
-    $pendingCount   = $shop->orders()->whereIn('status',['pending','en attente','en_attente','confirmée','processing'])->count();
+    $pendingCount   = $shop->orders()->whereIn('status',['pending','en attente','en_attente'])->count();
     $isPro          = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
     $processedCount = $shop->orders()->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->where(function($q){$q->whereNotNull('livreur_id')->orWhereNotNull('delivery_company_id');})->count();
     $productCount   = $shop->products()->count();

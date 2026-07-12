@@ -130,8 +130,9 @@ Route::get('/manifest.json', function () {
         'name'             => 'Shopio — Marketplace Africaine',
         'short_name'       => 'Shopio',
         'description'      => 'Commandez, vendez et gérez votre boutique avec Shopio.',
-        'start_url'        => '/dashboard',
-        'id'               => '/dashboard',
+        'start_url'        => '/',
+        'id'               => '/',
+        'scope'            => '/',
         'display'          => 'standalone',
         'background_color' => '#059669',
         'theme_color'      => '#059669',
@@ -139,12 +140,9 @@ Route::get('/manifest.json', function () {
         'lang'             => 'fr',
         'categories'       => ['shopping', 'business'],
         'icons'            => [
-            [
-                'src'     => '/images/Shopio_logo.png',
-                'sizes'   => '1024x1024',
-                'type'    => 'image/png',
-                'purpose' => 'any maskable',
-            ],
+            ['src' => '/images/shopio-logo-192.png', 'sizes' => '192x192',   'type' => 'image/png', 'purpose' => 'any'],
+            ['src' => '/images/shopio-logo-512.png', 'sizes' => '512x512',   'type' => 'image/png', 'purpose' => 'any'],
+            ['src' => '/images/shopio-logo-1024.png', 'sizes' => '1024x1024', 'type' => 'image/png', 'purpose' => 'any maskable'],
         ],
         'screenshots' => [],
         'shortcuts'   => [
@@ -503,6 +501,15 @@ Route::middleware(['auth', 'role:superadmin'])
         /* Validation d'une entreprise de livraison (dashboard) */
         Route::post('/companies/{company}/approve', [DashboardController::class, 'approveCompany'])
             ->name('companies.approve');
+
+        /* Suppression définitive (purge totale) */
+        Route::post('/shops/purge',       [\App\Http\Controllers\Admin\ShopController::class,       'purgeBulk'])->name('shops.purge');
+        Route::post('/entreprises/purge', [\App\Http\Controllers\Admin\EntrepriseController::class,  'purgeBulk'])->name('entreprises.purge');
+
+        /* Paramètres système — gestion manuelle des plans (Pro boutique / Business entreprise) */
+        Route::get('/plans',                    [\App\Http\Controllers\Admin\PlanController::class, 'index'])->name('plans.index');
+        Route::put('/plans/shops/{shop}',       [\App\Http\Controllers\Admin\PlanController::class, 'updateShop'])->name('plans.shops.update');
+        Route::put('/plans/companies/{company}',[\App\Http\Controllers\Admin\PlanController::class, 'updateCompany'])->name('plans.companies.update');
     });
 
 
@@ -782,12 +789,9 @@ Route::middleware(['auth', 'role:client'])
 
         /* Commandes classiques */
         Route::resource('orders', OrderController::class)->only(['index', 'store', 'create']);
+        Route::post('/orders/badge-seen', [ClientOrderController::class, 'markBadgeSeen'])->name('orders.badge-seen');
        
         
-
-        /* Commander depuis un produit spécifique */
-        Route::get('/orders/create-from-product/{product}', [ClientOrderController::class, 'createFromProduct'])->name('orders.createFromProduct');
-        Route::post('/orders/store-product',                 [ClientOrderController::class, 'storeProduct'])     ->name('orders.storeProduct');
 
         /* Avis sur une commande */
         Route::get('orders/{order}/review',  [ReviewController::class, 'create'])->name('reviews.create');
@@ -800,12 +804,25 @@ Route::middleware(['auth', 'role:client'])
         Route::get('shops/{shop}', [\App\Http\Controllers\Client\ShopController::class, 'show'])->name('shops.show');
 
         Route::get('/produits',           [ClientProductController::class, 'index'])->name('products.index');
-        Route::get('/produit/{product}',  [ClientProductController::class, 'show']) ->name('products.show');
 
         /* Favoris */
         Route::post('/favorites/{shop}/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
         Route::get('/favorites',                [FavoriteController::class, 'index']) ->name('favorites.index');
     });
+
+/* ══════════════════════════════════════════════════════════════════════════
+|  COMMANDE SANS COMPTE (invité)
+|  Un client peut consulter un produit et commander sans se connecter.
+|  Seule la messagerie avec le vendeur nécessite une inscription.
+══════════════════════════════════════════════════════════════════════════ */
+Route::prefix('client')->name('client.')->group(function () {
+    /* Fiche produit (accessible sans compte — lien partagé par le vendeur) */
+    Route::get('/produit/{product}', [ClientProductController::class, 'show'])->name('products.show');
+
+    /* Commander depuis un produit spécifique — invité ou client connecté */
+    Route::get('/orders/create-from-product/{product}', [ClientOrderController::class, 'createFromProduct'])->name('orders.createFromProduct');
+    Route::post('/orders/store-product',                 [ClientOrderController::class, 'storeProduct'])     ->name('orders.storeProduct');
+});
 
 
 /* ══════════════════════════════════════════════════════════════════════════

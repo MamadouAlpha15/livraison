@@ -157,9 +157,10 @@ a{text-decoration:none;color:inherit;}
 .company-img-wrap{
     border-radius:var(--r);overflow:hidden;
     box-shadow:var(--sh-lg);position:relative;
+    background:linear-gradient(135deg,var(--brand-mlt),var(--brand-lt));
 }
 .company-img-wrap img{
-    width:100%;height:320px;object-fit:cover;display:block;
+    width:100%;height:auto;max-height:500px;object-fit:contain;display:block;margin:0 auto;
 }
 .company-img-overlay{
     position:absolute;inset:0;
@@ -200,6 +201,7 @@ a{text-decoration:none;color:inherit;}
 /* Description */
 .desc-text{
     font-size:14px;color:var(--text2);line-height:1.75;margin:0;
+    white-space:pre-line;word-break:break-word;
 }
 
 /* Stats grid */
@@ -387,7 +389,7 @@ a{text-decoration:none;color:inherit;}
     .banner-inner{padding:22px 16px 20px;}
     .banner-name{font-size:22px;}
     .banner-logo{width:54px;height:54px;font-size:24px;}
-    .company-img-wrap img{height:220px;}
+    .company-img-wrap img{max-height:280px;}
     .drivers-grid{grid-template-columns:1fr;}
     textarea[name="comment"]{font-size:16px !important;}
 }

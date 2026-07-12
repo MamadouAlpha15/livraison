@@ -7,6 +7,7 @@ use App\Models\DeliveryCompany;
 use App\Models\Driver;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Services\PushService;
 use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
 
@@ -145,6 +146,20 @@ class OrderController extends Controller
 
         // Le statut du chauffeur et son is_available ne changent PAS ici.
         // C'est le livreur qui passe "en_livraison" depuis son propre dashboard.
+
+        // Push au chauffeur s'il a un compte utilisateur lié
+        try {
+            $driverUser = $driver->user;
+            if ($driverUser) {
+                app(PushService::class)->sendToUser(
+                    $driverUser,
+                    'Nouvelle commande assignée 📦',
+                    'Commande #' . str_pad($order->id, 4, '0', STR_PAD_LEFT) . ' · ' . number_format($order->total, 0, ',', ' ') . ' ' . ($company->currency ?? 'GNF'),
+                    1,
+                    '/livreur/orders'
+                );
+            }
+        } catch (\Throwable $e) {}
 
         return response()->json([
             'success'      => true,

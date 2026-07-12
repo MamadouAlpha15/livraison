@@ -1,4 +1,5 @@
 ﻿@extends('layouts.app')
+
 @section('title', 'Support · ' . ($shop->name ?? 'Boutique'))
 @php $bodyClass = 'is-dashboard'; @endphp
 
@@ -202,10 +203,11 @@ body { background:var(--bg); margin:0; color:var(--text); -webkit-font-smoothing
 
 @section('content')
 @php
-    $u        = Auth::user();
-    $parts    = explode(' ', $u->name ?? 'U X');
-    $initials = strtoupper(substr($parts[0],0,1)).strtoupper(substr($parts[1] ?? 'X',0,1));
-    $myId     = $u->id;
+    $u            = Auth::user();
+    $parts        = explode(' ', $u->name ?? 'U X');
+    $initials     = strtoupper(substr($parts[0],0,1)).strtoupper(substr($parts[1] ?? 'X',0,1));
+    $myId         = $u->id;
+    $pendingCount = $shop ? $shop->orders()->whereIn('status',['pending','en attente','en_attente'])->count() : 0;
 @endphp
 
 <div class="dash-wrap">
@@ -228,7 +230,7 @@ body { background:var(--bg); margin:0; color:var(--text); -webkit-font-smoothing
         <a href="{{ route('boutique.dashboard') }}" class="sb-item"><span class="ico">{!! $I['dash_nav'] !!}</span> Tableau de bord</a>
         <div class="sb-section">Boutique</div>
         <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">{!! $I['msg_nav'] !!}</span> Messages</a>
-        <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">{!! $I['box_nav'] !!}</span> Commandes</a>
+        <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">{!! $I['box_nav'] !!}</span> Commandes @if($pendingCount > 0)<span class="sb-badge">{{ $pendingCount }}</span>@endif</a>
         <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">{!! $I['tag_nav'] !!}</span> Produits</a>
         <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">{!! $I['users_nav'] !!}</span> Clients</a>
         <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">{!! $I['team_nav'] !!}</span> Équipe</a>
