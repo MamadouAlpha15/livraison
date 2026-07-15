@@ -14,7 +14,14 @@ class ProductController extends Controller
         ShopVisit::record($product->shop_id);
 
         $shop = $product->shop;
-        return view('client.show', compact('product', 'shop'));
+
+        $isFavorited = auth()->check()
+            ? auth()->user()->favoriteProducts()->where('product_id', $product->id)->exists()
+            : false;
+
+        $variants = $product->activeVariants()->get();
+
+        return view('client.show', compact('product', 'shop', 'isFavorited', 'variants'));
     }
 
     public function index(Request $request)

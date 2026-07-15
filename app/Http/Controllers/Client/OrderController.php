@@ -23,6 +23,7 @@ use App\Models\Shop;         // Table "shops" — les boutiques
 use App\Models\ShopMessage;  // Table "shop_messages" — les messages entre client et vendeur
 use App\Services\SubscriptionService; // Vérification des limites du plan
 use App\Services\PushService;
+use App\Services\LoyaltyService;
 
 // On importe Request : objet qui contient toutes les données envoyées par le formulaire (POST, GET...)
 use Illuminate\Http\Request;
@@ -208,7 +209,7 @@ class OrderController extends Controller
     // PARAMÈTRE : $product = Laravel injecte automatiquement le produit
     //             dont l'ID est dans l'URL (route model binding)
     // ============================================================
-    public function createFromProduct(Product $product)
+    public function createFromProduct(Product $product, Request $request)
     {
         // abort_unless(condition, code_http) = si la condition est FAUSSE, on arrête avec une erreur
         // optional() = évite une erreur si $product->shop est null
@@ -247,10 +248,17 @@ class OrderController extends Controller
                 ->update(['read_at' => now()]);        // now() = date et heure actuelle
         }
 
+        // Variantes actives du produit (taille/couleur…), + variante présélectionnée via ?variant_id=
+        $variants = $product->activeVariants()->get();
+        $selectedVariantId = $request->integer('variant_id') ?: null;
+
         // On retourne la vue avec le produit et les messages
         return view('client.orders.create_from_product', [
             'product'  => $product,   // Les infos du produit
             'messages' => $messages,  // L'historique des messages
+            'loyaltyBalance' => $client->loyalty_points ?? 0, // Solde de points du client (0 si invité)
+            'variants' => $variants,
+            'selectedVariantId' => $selectedVariantId,
         ]);
     }
 
@@ -265,6 +273,7 @@ class OrderController extends Controller
         // Règles de base
         $rules = [
             'product_id'           => 'required|exists:products,id',
+            'variant_id'           => 'nullable|integer|exists:product_variants,id',
             'quantity'             => 'required|integer|min:1',
             'delivery_destination' => 'nullable|string|max:255',
             'client_phone'         => 'nullable|string|max:30',
@@ -288,38 +297,67 @@ class OrderController extends Controller
         // Vérification de sécurité : la boutique doit exister et être approuvée
         abort_unless($product->shop && $product->shop->is_approved, 403);
 
-        // Vérification du stock (si le produit a un stock géré)
-        // $product->stock !== null = le produit a un stock défini (pas illimité)
-        if ($product->stock !== null && $product->stock < $request->quantity) {
-            // Le stock est insuffisant : on redirige avec un message d'erreur
-            // withErrors() = passe les erreurs au formulaire (affichées en rouge)
+        // Variante (taille/couleur) : si le produit en gère, elle est obligatoire
+        $variant = null;
+        if ($product->has_variants) {
+            if (!$request->filled('variant_id')) {
+                return back()->withErrors(['variant_id' => 'Veuillez choisir une option (taille/couleur).']);
+            }
+            $variant = $product->variants()->findOrFail($request->variant_id);
+
+            if ($variant->stock < $request->quantity) {
+                return back()->withErrors(['quantity' => "Stock insuffisant pour \"{$variant->name}\". Seulement {$variant->stock} disponible(s)."]);
+            }
+        } elseif ($product->stock !== null && $product->stock < $request->quantity) {
+            // Produit sans variantes : on vérifie le stock global
             return back()->withErrors(['quantity' => "Stock insuffisant. Seulement {$product->stock} disponible(s)."]);
         }
 
+        // Prix unitaire : celui de la variante si sélectionnée, sinon celui du produit
+        $unitPrice = $variant ? $variant->effective_price : $product->price;
+
         // On calcule le total : prix unitaire × quantité
-        $total = $product->price * $request->quantity;
+        $total = $unitPrice * $request->quantity;
+
+        // Points fidélité : le client peut utiliser jusqu'à 50% du total en points (1 point = 1 GNF)
+        $pointsToUse = 0;
+        $user = Auth::user();
+        if ($user) {
+            $loyalty       = app(LoyaltyService::class);
+            $maxRedeemable = $loyalty->maxRedeemableFor($user, $total);
+            $pointsToUse   = max(0, min((int) $request->input('points_to_use', 0), $maxRedeemable));
+            $total         = $total - $pointsToUse;
+        }
 
         $order = Order::create([
             'user_id'              => Auth::id(),                                    // null si invité
             'client_name'          => Auth::check() ? null : $request->client_name,  // nom de l'invité (sinon on utilise le compte)
             'shop_id'              => $product->shop->id,
             'total'                => $total,
+            'loyalty_points_used'  => $pointsToUse,
             'status'               => Order::STATUS_EN_ATTENTE,
             'delivery_destination' => $request->delivery_destination,
             'client_phone'         => $request->client_phone,
         ]);
 
+        if ($pointsToUse > 0) {
+            app(LoyaltyService::class)->redeemPoints($user, $pointsToUse, $order->id);
+        }
+
         // On crée la ligne de commande (order item = détail du produit commandé)
         OrderItem::create([
-            'order_id'   => $order->id,        // Lien avec la commande
-            'product_id' => $product->id,      // Quel produit
-            'quantity'   => $request->quantity,// Combien d'exemplaires
-            'price'      => $product->price,   // Prix unitaire au moment de la commande
+            'order_id'           => $order->id,        // Lien avec la commande
+            'product_id'         => $product->id,      // Quel produit
+            'product_variant_id' => $variant?->id,
+            'variant_name'       => $variant?->name,
+            'quantity'           => $request->quantity,// Combien d'exemplaires
+            'price'              => $unitPrice,         // Prix unitaire au moment de la commande
         ]);
 
-        // Si le stock est géré, on le diminue du nombre commandé
-        // decrement('stock', N) = fait stock = stock - N dans la base de données
-        if ($product->stock !== null) {
+        // Diminue le stock du nombre commandé — au niveau variante si elle existe, sinon au niveau produit
+        if ($variant) {
+            $variant->decrement('stock', $request->quantity);
+        } elseif ($product->stock !== null) {
             $product->decrement('stock', $request->quantity);
         }
 
@@ -339,7 +377,7 @@ class OrderController extends Controller
                 $push->sendToUser(
                     $shopOwner,
                     'Nouvelle commande !',
-                    $product->name . ' × ' . $request->quantity . ' — ' . number_format($total, 0, ',', ' ') . ' GNF',
+                    $product->name . ($variant ? ' (' . $variant->name . ')' : '') . ' × ' . $request->quantity . ' — ' . number_format($total, 0, ',', ' ') . ' GNF',
                     $push->vendorBadgeCount($shopOwner),
                     '/employe/orders'
                 );

@@ -708,7 +708,7 @@ $init = fn(string $n): string =>
                     $remaining  = $allItems->count() - $shownItems->count();
                 @endphp
                 @foreach($shownItems as $item)
-                <div style="font-size:12.5px;margin-bottom:2px">· {{ $item->product?->name ?? 'Produit' }} <span style="color:var(--muted)">×{{ $item->quantity }}</span></div>
+                <div style="font-size:12.5px;margin-bottom:2px">· {{ $item->product?->name ?? 'Produit' }}{{ $item->variant_name ? ' ('.$item->variant_name.')' : '' }} <span style="color:var(--muted)">×{{ $item->quantity }}</span></div>
                 @endforeach
                 @if($remaining > 0)
                 <div style="font-size:12px;color:var(--muted)">+ {{ $remaining }} autre(s)</div>

@@ -805,6 +805,13 @@ Route::middleware(['auth', 'role:client'])
 
         Route::get('/produits',           [ClientProductController::class, 'index'])->name('products.index');
 
+        /* Points fidélité & parrainage */
+        Route::get('/fidelite', [\App\Http\Controllers\Client\LoyaltyController::class, 'index'])->name('loyalty.index');
+
+        /* Liste de souhaits produit */
+        Route::get('/wishlist', [\App\Http\Controllers\Client\ProductFavoriteController::class, 'index'])->name('wishlist.index');
+        Route::post('/products/{product}/favorite', [\App\Http\Controllers\Client\ProductFavoriteController::class, 'toggle'])->name('products.favorite.toggle');
+
         /* Favoris */
         Route::post('/favorites/{shop}/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
         Route::get('/favorites',                [FavoriteController::class, 'index']) ->name('favorites.index');

@@ -26,6 +26,10 @@ class User extends Authenticatable
         'company_id',            // FK vers delivery_companies (membres d'une entreprise)
         'notif_state',           // JSON — derniers IDs vus (sync cross-device)
         'orders_badge_seen_at',  // dernière visite de /client/orders (efface le badge PWA)
+        'loyalty_points',        // solde de points fidélité (1 point = 1 GNF)
+        'referral_code',         // code de parrainage unique de cet utilisateur
+        'referred_by',           // FK users.id — qui a parrainé cet utilisateur
+        'referral_rewarded_at',  // date à laquelle le parrain a été récompensé (1ère commande livrée)
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -38,7 +42,26 @@ class User extends Authenticatable
             'password'             => 'hashed',
             'must_change_password' => 'boolean',
             'notif_state'          => 'array',
+            'referral_rewarded_at' => 'datetime',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (User $user) {
+            if (empty($user->referral_code)) {
+                $user->referral_code = static::generateUniqueReferralCode();
+            }
+        });
+    }
+
+    public static function generateUniqueReferralCode(): string
+    {
+        do {
+            $code = strtoupper(substr(bin2hex(random_bytes(4)), 0, 6));
+        } while (static::where('referral_code', $code)->exists());
+
+        return $code;
     }
 
     /* =========================
@@ -99,6 +122,30 @@ class User extends Authenticatable
     public function favorites()
     {
         return $this->belongsToMany(Shop::class, 'shop_favorites');
+    }
+
+    // Liste de souhaits — produits favoris du client
+    public function favoriteProducts()
+    {
+        return $this->belongsToMany(Product::class, 'product_favorites')->withTimestamps();
+    }
+
+    // Historique des mouvements de points fidélité
+    public function loyaltyTransactions()
+    {
+        return $this->hasMany(LoyaltyTransaction::class)->latest();
+    }
+
+    // Le parrain de cet utilisateur (celui dont le code a été utilisé à l'inscription)
+    public function referrer()
+    {
+        return $this->belongsTo(User::class, 'referred_by');
+    }
+
+    // Les filleuls parrainés par cet utilisateur
+    public function referrals()
+    {
+        return $this->hasMany(User::class, 'referred_by');
     }
 
     /* =========================

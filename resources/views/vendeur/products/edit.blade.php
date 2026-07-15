@@ -203,6 +203,19 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 }
 .toggle-ctrl input:checked + .toggle-ctrl-track::after { transform: translateX(20px); }
 
+/* ── Variantes (taille/couleur/quantité) ── */
+.variant-hd-row, .variant-row { display: grid; grid-template-columns: 44px 1.3fr .8fr .6fr .8fr 34px; gap: 8px; align-items: center; }
+.variant-hd-row { font-size: 10.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 6px; }
+.variant-row { margin-bottom: 8px; }
+.variant-row .field-input { padding: 9px 10px; font-size: 13px; }
+.variant-thumb { width: 44px; height: 44px; border-radius: 8px; border: 1.5px dashed var(--border); background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; overflow: hidden; flex-shrink: 0; transition: border-color .15s; }
+.variant-thumb:hover { border-color: var(--brand); }
+.variant-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.variant-rm { width: 34px; height: 34px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--surface); color: var(--danger); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: all .15s; flex-shrink: 0; }
+.variant-rm:hover { background: var(--danger-lt); border-color: var(--danger); }
+.variant-add-btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 9px; border: 1.5px dashed var(--brand); background: var(--brand-lt); color: var(--brand-dk); font-size: 12.5px; font-weight: 700; cursor: pointer; transition: all .15s; font-family: var(--font); }
+.variant-add-btn:hover { background: var(--brand); color: #fff; }
+
 /* ── Allergens & tags ── */
 .tag-input-wrap { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: var(--r-sm); min-height: 42px; cursor: text; transition: border-color .15s; }
 .tag-input-wrap:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(99,102,241,.12); }
@@ -565,6 +578,29 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                         </div>
                     </div>
 
+                </div>
+            </div>
+
+            {{-- ── CARD : Variantes (taille/couleur/quantité) ── --}}
+            <div class="form-card">
+                <div class="form-card-hd">
+                    <div class="form-card-hd-ico">🎨</div>
+                    <span class="form-card-title">Variantes</span>
+                    <span class="form-card-sub">Optionnel</span>
+                </div>
+                <div class="form-card-body">
+                    <div class="field-hint" style="margin-bottom:12px">
+                        Si ce produit existe en plusieurs couleurs/tailles, ajoutez-les ici avec leur propre stock (et prix si différent). Sinon, le stock global ci-dessus suffit.
+                    </div>
+                    <div style="overflow-x:auto">
+                        <div style="min-width:560px">
+                            <div class="variant-hd-row">
+                                <span>Photo</span><span>Nom (ex : Rouge - M)</span><span>Prix ({{ $devise }})</span><span>Stock</span><span>SKU</span><span></span>
+                            </div>
+                            <div id="variantsList"></div>
+                        </div>
+                    </div>
+                    <button type="button" class="variant-add-btn" onclick="addVariantRow()">+ Ajouter une variante</button>
                 </div>
             </div>
 
@@ -1080,5 +1116,125 @@ document.getElementById('productForm').addEventListener('submit', function (e) {
     btn.disabled = true;
     btn.innerHTML = '⏳ Enregistrement…';
 });
+
+/* ══════════════════════════════════════════════
+   VARIANTES (taille/couleur/quantité)
+   ══════════════════════════════════════════════ */
+let variantIdx = 0;
+
+function addVariantRow(data = {}) {
+    const list = document.getElementById('variantsList');
+    const idx  = variantIdx++;
+    const row  = document.createElement('div');
+    row.className = 'variant-row';
+
+    if (data.id) {
+        const hid = document.createElement('input');
+        hid.type = 'hidden';
+        hid.name = `variants[${idx}][id]`;
+        hid.value = data.id;
+        row.appendChild(hid);
+    }
+
+    // Vignette photo (optionnelle) — clic pour uploader
+    const thumb = document.createElement('div');
+    thumb.className = 'variant-thumb';
+    thumb.title = 'Photo de cette variante (optionnel)';
+    if (data.image_url) {
+        const img = document.createElement('img');
+        img.src = data.image_url;
+        thumb.appendChild(img);
+    } else {
+        thumb.textContent = '📷';
+    }
+
+    const imageInput = document.createElement('input');
+    imageInput.type = 'hidden';
+    imageInput.name = `variants[${idx}][image]`;
+    imageInput.value = data.image ?? '';
+
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/jpeg,image/png,image/webp,image/gif';
+    fileInput.style.display = 'none';
+    fileInput.addEventListener('change', () => uploadVariantImage(fileInput, thumb, imageInput));
+
+    thumb.addEventListener('click', () => fileInput.click());
+
+    row.appendChild(thumb);
+    row.appendChild(imageInput);
+    row.appendChild(fileInput);
+
+    const mk = (name, type, placeholder, value) => {
+        const inp = document.createElement('input');
+        inp.type = type;
+        inp.className = 'field-input';
+        inp.name = `variants[${idx}][${name}]`;
+        inp.placeholder = placeholder;
+        inp.value = value ?? '';
+        if (type === 'number') { inp.min = '0'; inp.step = '1'; }
+        return inp;
+    };
+
+    row.appendChild(mk('name', 'text', 'Rouge - M', data.name));
+    row.appendChild(mk('price', 'number', '= prix produit', data.price));
+    row.appendChild(mk('stock', 'number', '0', data.stock ?? 0));
+    row.appendChild(mk('sku', 'text', '—', data.sku));
+
+    const rm = document.createElement('button');
+    rm.type = 'button';
+    rm.className = 'variant-rm';
+    rm.textContent = '✕';
+    rm.onclick = () => row.remove();
+    row.appendChild(rm);
+
+    list.appendChild(row);
+}
+
+async function uploadVariantImage(fileInput, thumb, imageInput) {
+    const file = fileInput.files[0];
+    if (!file) return;
+    if (file.size > 20 * 1024 * 1024) { alert('Image trop lourde — maximum 20 Mo.'); return; }
+
+    thumb.innerHTML = '';
+    thumb.textContent = '⏳';
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('folder', 'products/gallery');
+
+    try {
+        const res = await fetch('{{ route('products.upload.image') }}', {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+            body: formData,
+        });
+        const data = await res.json();
+        imageInput.value = data.path;
+        thumb.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = data.url;
+        thumb.appendChild(img);
+    } catch (e) {
+        thumb.innerHTML = '';
+        thumb.textContent = '📷';
+        alert("Erreur lors de l'upload de la photo. Réessayez.");
+    }
+}
+
+@if($isEdit)
+@php
+    $existingVariantsForJs = $product->variants->map(function ($v) {
+        return [
+            'id' => $v->id, 'name' => $v->name, 'price' => $v->price, 'stock' => $v->stock, 'sku' => $v->sku,
+            'image' => $v->image, 'image_url' => $v->image_url,
+        ];
+    })->values();
+@endphp
+document.addEventListener('DOMContentLoaded', function () {
+    const existingVariants = @json($existingVariantsForJs);
+    existingVariants.forEach(v => addVariantRow(v));
+});
+@endif
 </script>
 @endpush

@@ -498,6 +498,7 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
                                         @endif
                                         <div>
                                             <div class="prod-name">{{ $prod?->name ?? 'Produit supprimé' }}</div>
+                                            @if($item->variant_name)<div class="prod-ref" style="color:#6366f1;font-weight:700">🎨 {{ $item->variant_name }}</div>@endif
                                             @if($prod?->sku)<div class="prod-ref">REF: {{ $prod->sku }}</div>@endif
                                         </div>
                                     </div>

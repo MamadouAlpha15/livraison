@@ -44,6 +44,11 @@ class RegisteredUserController extends Controller
             session(['link_order_id' => $request->order_id]);
         }
 
+        // Lien de parrainage : mémorise le code tant que l'inscription n'est pas finalisée
+        if ($request->filled('ref')) {
+            session(['referral_code' => strtoupper($request->get('ref'))]);
+        }
+
         return view('auth.register', compact('shopId', 'intent', 'defaultRole'));
     }
 
@@ -78,16 +83,28 @@ class RegisteredUserController extends Controller
             'country.size'       => 'Le pays sélectionné est invalide.',
         ]);
 
+        // Code de parrainage : champ du formulaire en priorité, sinon celui mémorisé en session
+        $referredBy = null;
+        if ($request->role === 'client') {
+            $refCode = strtoupper($request->get('ref', session('referral_code', '')));
+            if ($refCode) {
+                $referredBy = User::where('referral_code', $refCode)->value('id');
+            }
+        }
+
         // Création du compte utilisateur
         $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
-            'phone'    => in_array($request->role, ['client', 'livreur']) ? $request->phone : null,
-            'address'  => $request->role === 'client' ? $request->address : null,
-            'country'  => strtoupper($request->country),
-            'role'     => $request->role,
+            'name'        => $request->name,
+            'email'       => $request->email,
+            'password'    => Hash::make($request->password),
+            'phone'       => in_array($request->role, ['client', 'livreur']) ? $request->phone : null,
+            'address'     => $request->role === 'client' ? $request->address : null,
+            'country'     => strtoupper($request->country),
+            'role'        => $request->role,
+            'referred_by' => $referredBy,
         ]);
+
+        session()->forget('referral_code');
 
         event(new Registered($user));
         Auth::login($user);

@@ -4,10 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Services\StockAlertService;
 
 class Product extends Model
 {
     use HasFactory;
+
+    protected static function booted(): void
+    {
+        static::updated(function (Product $product) {
+            if ($product->wasChanged('stock')) {
+                app(StockAlertService::class)->checkProduct($product);
+            }
+        });
+    }
 
     /*
     |------------------------------------------------------------------
@@ -32,6 +42,7 @@ class Product extends Model
         'tags',              // mots-clés
         'image',             // photo principale
         'gallery',           // JSON : photos supplémentaires
+        'low_stock_threshold', // seuil d'alerte stock faible
     ];
 
     /*
@@ -67,6 +78,30 @@ class Product extends Model
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /** Variantes du produit (taille/couleur/etc.), triées par ordre défini par le vendeur */
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class)->orderBy('sort_order');
+    }
+
+    /** Variantes actives uniquement, pour l'affichage côté client */
+    public function activeVariants()
+    {
+        return $this->variants()->where('is_active', true);
+    }
+
+    /** Vrai si ce produit gère des variantes (sinon on utilise le stock global) */
+    public function getHasVariantsAttribute(): bool
+    {
+        return $this->variants()->exists();
+    }
+
+    /** Clients ayant mis ce produit dans leur liste de souhaits */
+    public function favoritedBy()
+    {
+        return $this->belongsToMany(User::class, 'product_favorites')->withTimestamps();
     }
 
     /*

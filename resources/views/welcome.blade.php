@@ -1659,7 +1659,7 @@ $bizGnf = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', 
         </div>
         <div class="pricing-grid">
 
-            {{-- Plan Gratuit (Boutiques & Entreprises) --}}
+         <!--    {{-- Plan Gratuit (Boutiques & Entreprises) --}}
             <div class="pricing-card">
                 <div class="pricing-name">Gratuit</div>
                 <div class="pricing-price">0 <span>XOF/mois</span></div>
@@ -1699,7 +1699,7 @@ $bizGnf = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', 
                 @endauth
             </div>
 
-            {{-- Plan Pro — Boutiques --}}
+           {{-- Plan Pro — Boutiques --}}
             <div class="pricing-card popular">
                 <div class="pricing-popular-badge">BOUTIQUES</div>
                 <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--green);margin-bottom:4px">🛍 Pour les boutiques</div>
@@ -1750,7 +1750,7 @@ $bizGnf = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', 
                     <a href="{{ route('register', ['role' => 'company', 'intent' => 'business']) }}" class="pricing-btn pricing-btn-outline">Commencer → Plan Business</a>
                 @endauth
             </div>
-
+                  !--->
         </div>
     </div>
 </section>

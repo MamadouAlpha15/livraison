@@ -119,6 +119,11 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .prod-chip.amber  { color: #92400e; background: var(--amber-lt); border-color: #fde68a; }
 .prod-chip.danger { color: var(--red); background: var(--rose-lt); border-color: #fca5a5; }
 
+.variant-pill-order { padding: 8px 15px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--surface); font-size: 12.5px; font-weight: 600; color: var(--text-2); cursor: pointer; transition: all .15s; font-family: var(--font); }
+.variant-pill-order:hover:not(.disabled) { border-color: var(--orange); }
+.variant-pill-order.selected { background: var(--orange); color: var(--navy); border-color: var(--orange); }
+.variant-pill-order.disabled { opacity: .45; text-decoration: line-through; cursor: not-allowed; }
+
 /* Boutique mini */
 .shop-mini { display: flex; align-items: center; gap: 10px; background: var(--grey); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 10px 12px; }
 .shop-mini-logo { width: 38px; height: 38px; border-radius: 9px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 18px; overflow: hidden; flex-shrink: 0; }
@@ -226,8 +231,9 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
         array_map(fn($g) => asset('storage/'.$g), $gallery)
     )));
     $stockVal  = $product->stock ?? null;
-    $stockOut  = $stockVal !== null && $stockVal <= 0;
-    $stockLow  = $stockVal !== null && $stockVal > 0 && $stockVal <= 5;
+    // Si le produit gère des variantes, c'est leur stock qui fait foi, pas le stock global du produit
+    $stockOut  = $variants->isEmpty() && $stockVal !== null && $stockVal <= 0;
+    $stockLow  = $variants->isEmpty() && $stockVal !== null && $stockVal > 0 && $stockVal <= 5;
 @endphp
 
 {{-- LIGHTBOX --}}
@@ -309,12 +315,28 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                         @endif
                     </div>
 
+                    @if($variants->isNotEmpty())
+                    <div id="variantPickerOrder" style="margin-bottom:14px">
+                        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Choisissez une option</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:8px">
+                            @foreach($variants as $v)
+                            <button type="button" class="variant-pill-order {{ (($selectedVariantId ?? null) == $v->id) ? 'selected' : '' }} {{ $v->out_of_stock ? 'disabled' : '' }}"
+                                    data-id="{{ $v->id }}" data-name="{{ $v->name }}" data-price="{{ $v->effective_price }}" data-stock="{{ $v->stock }}" data-image="{{ $v->image_url }}"
+                                    onclick="selectOrderVariant(this)" {{ $v->out_of_stock ? 'disabled' : '' }}>
+                                {{ $v->name }}{{ $v->out_of_stock ? ' (épuisé)' : '' }}
+                            </button>
+                            @endforeach
+                        </div>
+                        <div id="variantOrderError" style="display:none;margin-top:8px;color:#b12704;font-size:12.5px;font-weight:600">Veuillez choisir une option ci-dessus.</div>
+                    </div>
+                    @endif
+
                     @if($product->description)
                     <p class="prod-desc">{{ $product->description }}</p>
                     @endif
 
-                    <div class="prod-chips">
-                        @if($stockVal !== null)
+                    <div class="prod-chips" id="stockChipsWrap">
+                        @if($variants->isEmpty() && $stockVal !== null)
                             @if($stockOut)<span class="prod-chip danger">❌ Rupture de stock</span>
                             @elseif($stockLow)<span class="prod-chip amber">⚠ {{ $stockVal }} restants</span>
                             @else<span class="prod-chip ok">✓ En stock</span>@endif
@@ -358,6 +380,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
             <form method="POST" action="{{ route('client.orders.storeProduct') }}" id="orderForm">
                 @csrf
                 <input type="hidden" name="product_id" value="{{ $product->id }}">
+                <input type="hidden" name="variant_id" id="variantIdInput" value="{{ $selectedVariantId ?? '' }}">
 
                
 
@@ -368,7 +391,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                             <span class="qty-label">Quantité</span>
                             <div class="qty-ctrl">
                                 <button type="button" class="qty-btn" onclick="changeQty(-1)">−</button>
-                                <input type="number" name="quantity" id="qty" class="qty-input" value="1" min="1" max="{{ $stockVal ?? 999 }}" oninput="updateTotal()">
+                                <input type="number" name="quantity" id="qty" class="qty-input" value="1" min="1" max="{{ $variants->isNotEmpty() ? 999 : ($stockVal ?? 999) }}" oninput="updateTotal()">
                                 <button type="button" class="qty-btn" onclick="changeQty(1)">+</button>
                             </div>
                             @if($product->unit)
@@ -422,6 +445,15 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                             @endif
                             <div style="min-width:0;overflow:hidden">
                                 <div class="order-summary-prod-name">{{ Str::limit($product->name, 28) }}</div>
+                                @if($variants->isNotEmpty())
+                                <div id="summaryVariant" style="font-size:11px;font-weight:700;color:var(--orange);margin-top:3px">
+                                    @if($selectedVariantId ?? null)
+                                        {{ $variants->firstWhere('id', $selectedVariantId)?->name }}
+                                    @else
+                                        Choisissez une option ↑
+                                    @endif
+                                </div>
+                                @endif
                                 <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:2px">{{ $shop->name }}</div>
                             </div>
                         </div>
@@ -443,6 +475,26 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                             <span class="order-summary-row-val" style="color:#fca5a5">-{{ $remise }}%</span>
                         </div>
                         @endif
+
+                        @auth
+                        @if(($loyaltyBalance ?? 0) > 0)
+                        <div class="order-summary-sep"></div>
+                        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12.5px;color:rgba(255,255,255,.85);font-weight:600">
+                            <input type="checkbox" id="usePointsChk" onchange="togglePoints()" style="width:15px;height:15px;accent-color:var(--orange)">
+                            🎁 Utiliser mes points (solde : {{ number_format($loyaltyBalance, 0, ',', ' ') }})
+                        </label>
+                        <div id="pointsRow" style="display:none;align-items:center;gap:8px;margin-top:8px">
+                            <input type="number" id="pointsInput" name="points_to_use" value="0" min="0"
+                                   style="width:90px;padding:7px 9px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font-family:monospace;font-size:13px"
+                                   oninput="onPointsInput()">
+                            <button type="button" onclick="usePointsMax()" style="padding:7px 12px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:transparent;color:var(--orange);font-size:11.5px;font-weight:700;cursor:pointer">MAX</button>
+                        </div>
+                        <div class="order-summary-row" id="pointsDiscountRow" style="display:none">
+                            <span class="order-summary-row-lbl" style="color:#6ee7b7">Réduction points</span>
+                            <span class="order-summary-row-val" id="pointsDiscountVal" style="color:#6ee7b7">-0</span>
+                        </div>
+                        @endif
+                        @endauth
 
                         <div class="order-summary-sep"></div>
 
@@ -487,8 +539,60 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 @push('scripts')
 <script>
-const PRICE = {{ (float) $product->price }};
-const STOCK = {{ $stockVal ?? 9999 }};
+const HAS_VARIANTS = {{ $variants->isNotEmpty() ? 'true' : 'false' }};
+let PRICE = {{ (float) $product->price }};
+let STOCK = {{ $stockVal ?? 9999 }};
+const LOYALTY_BALANCE = {{ (int) ($loyaltyBalance ?? 0) }};
+const MAX_REDEEM_RATIO = 0.5;
+
+/* ══ VARIANTES ══ */
+function selectOrderVariant(btn) {
+    if (btn.disabled) return;
+    document.querySelectorAll('.variant-pill-order').forEach(p => p.classList.remove('selected'));
+    btn.classList.add('selected');
+
+    document.getElementById('variantIdInput').value = btn.dataset.id;
+    PRICE = parseFloat(btn.dataset.price);
+    STOCK = parseInt(btn.dataset.stock);
+
+    const qtyInput = document.getElementById('qty');
+    if (qtyInput) {
+        qtyInput.max = STOCK;
+        if (parseInt(qtyInput.value || 1) > STOCK) qtyInput.value = Math.max(1, STOCK);
+    }
+
+    const priceEl = document.querySelector('.prod-price');
+    if (priceEl) priceEl.textContent = Math.round(PRICE).toLocaleString('fr-FR');
+
+    // Met à jour l'option affichée dans le résumé "Votre commande"
+    const summaryVariant = document.getElementById('summaryVariant');
+    if (summaryVariant) summaryVariant.textContent = btn.dataset.name;
+
+    // Si la variante a sa propre photo, on l'affiche ; sinon on revient à la photo par défaut du produit
+    const mainImg = document.getElementById('mainImg');
+    if (mainImg) {
+        const nextSrc = btn.dataset.image || (typeof PHOTOS !== 'undefined' && PHOTOS[0]) || mainImg.src;
+        mainImg.style.opacity = '0';
+        setTimeout(() => {
+            mainImg.removeAttribute('srcset');
+            mainImg.removeAttribute('sizes');
+            mainImg.src = nextSrc;
+            mainImg.style.opacity = '1';
+        }, 150);
+    }
+
+    const err = document.getElementById('variantOrderError');
+    if (err) err.style.display = 'none';
+
+    updateTotal();
+}
+
+@if($variants->isNotEmpty() && ($selectedVariantId ?? null))
+document.addEventListener('DOMContentLoaded', function () {
+    const preselected = document.querySelector('.variant-pill-order.selected');
+    if (preselected) selectOrderVariant(preselected);
+});
+@endif
 
 function changeQty(d) {
     const inp = document.getElementById('qty');
@@ -499,9 +603,46 @@ function changeQty(d) {
     updateTotal();
 }
 
+function currentMaxPoints(subtotal) {
+    return Math.max(0, Math.min(LOYALTY_BALANCE, Math.floor(subtotal * MAX_REDEEM_RATIO)));
+}
+
+function togglePoints() {
+    const chk = document.getElementById('usePointsChk');
+    const row = document.getElementById('pointsRow');
+    if (!chk || !row) return;
+    row.style.display = chk.checked ? 'flex' : 'none';
+    if (!chk.checked) document.getElementById('pointsInput').value = 0;
+    updateTotal();
+}
+
+function onPointsInput() {
+    updateTotal();
+}
+
+function usePointsMax() {
+    const qty = parseInt(document.getElementById('qty')?.value || 1);
+    const subtotal = Math.round(PRICE * qty);
+    document.getElementById('pointsInput').value = currentMaxPoints(subtotal);
+    updateTotal();
+}
+
 function updateTotal() {
     const qty = parseInt(document.getElementById('qty')?.value || 1);
-    const total = Math.round(PRICE * qty);
+    const subtotal = Math.round(PRICE * qty);
+
+    let pointsUsed = 0;
+    const chk = document.getElementById('usePointsChk');
+    if (chk && chk.checked) {
+        const input = document.getElementById('pointsInput');
+        const max = currentMaxPoints(subtotal);
+        pointsUsed = Math.max(0, Math.min(parseInt(input.value || 0), max));
+        input.value = pointsUsed;
+        document.getElementById('pointsDiscountRow').style.display = 'flex';
+        document.getElementById('pointsDiscountVal').textContent = '-' + pointsUsed.toLocaleString('fr-FR');
+    }
+
+    const total = Math.max(0, subtotal - pointsUsed);
     const el = document.getElementById('totalDisplay');
     if (el) el.textContent = total.toLocaleString('fr-FR');
     const sq = document.getElementById('summaryQty');
@@ -597,7 +738,14 @@ if (PHOTOS.length > 1) {
 }
 
 /* Submit */
-document.getElementById('orderForm')?.addEventListener('submit', () => {
+document.getElementById('orderForm')?.addEventListener('submit', (e) => {
+    if (HAS_VARIANTS && !document.getElementById('variantIdInput').value) {
+        e.preventDefault();
+        const err = document.getElementById('variantOrderError');
+        if (err) err.style.display = 'block';
+        document.getElementById('variantPickerOrder')?.scrollIntoView({behavior:'smooth', block:'center'});
+        return;
+    }
     const btn = document.getElementById('submitBtn');
     if (btn) { btn.disabled = true; btn.textContent = '⏳ Envoi en cours…'; }
 });

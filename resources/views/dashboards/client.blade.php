@@ -2223,6 +2223,11 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
                 </div>
                 <a href="#" onclick="openProfileModal();return false;">{!! $si('user',15) !!} Modifier mon profil</a>
                 <a href="{{ route('client.orders.index') }}">{!! $si('package',15) !!} Mes commandes</a>
+                <a href="{{ route('client.loyalty.index') }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                    <span style="display:flex;align-items:center;gap:8px">🎁 Mes points &amp; Parrainage</span>
+                    <span style="background:var(--orange,#f90);color:#111;font-size:10.5px;font-weight:800;padding:1px 7px;border-radius:20px">{{ number_format(auth()->user()->loyalty_points ?? 0, 0, ',', ' ') }}</span>
+                </a>
+                <a href="{{ route('client.wishlist.index') }}">❤️ Ma liste de souhaits</a>
                 <div class="sep"></div>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

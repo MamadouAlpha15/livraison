@@ -212,7 +212,7 @@ class ProductController extends Controller
             }
         }
 
-        Product::create([
+        $product = Product::create([
             'shop_id'          => $shop->id,
             'name'             => $request->name,
             'description'      => $request->description,
@@ -230,6 +230,8 @@ class ProductController extends Controller
             'image'            => $imagePath,
             'gallery'          => !empty($gallery) ? json_encode($gallery) : null,
         ]);
+
+        $this->syncVariants($product, $request->input('variants', []));
 
         return redirect()->route('products.index')
             ->with('success', 'Produit "' . $request->name . '" ajouté avec succès !');
@@ -319,8 +321,56 @@ class ProductController extends Controller
 
         $product->update($data);
 
+        $this->syncVariants($product, $request->input('variants', []));
+
         return redirect()->route('products.index')
             ->with('success', 'Produit "' . $product->name . '" mis à jour avec succès !');
+    }
+
+    /* ─────────────────────────────────────────────
+     | SYNC VARIANTES (taille/couleur/quantité)
+     | - Met à jour les variantes existantes (par id)
+     | - Crée les nouvelles (sans id)
+     | - Désactive (si déjà commandées) ou supprime celles retirées
+     ───────────────────────────────────────────── */
+    private function syncVariants(Product $product, array $variants): void
+    {
+        $submitted   = collect($variants)->filter(fn($v) => !empty($v['name']));
+        $submittedIds = $submitted->pluck('id')->filter()->map(fn($id) => (int) $id)->all();
+
+        // Retire les variantes qui ne sont plus soumises
+        $product->variants()->whereNotIn('id', $submittedIds ?: [0])->get()->each(function ($variant) {
+            if ($variant->orderItems()->exists()) {
+                $variant->update(['is_active' => false]);
+            } else {
+                if ($variant->image) ImageOptimizer::delete($variant->image);
+                $variant->delete();
+            }
+        });
+
+        foreach ($submitted->values() as $i => $v) {
+            $image = ($v['image'] ?? '') !== '' ? $v['image'] : null;
+
+            $data = [
+                'name'       => $v['name'],
+                'image'      => $image,
+                'price'      => ($v['price'] ?? '') !== '' ? $v['price'] : null,
+                'stock'      => (int) ($v['stock'] ?? 0),
+                'sku'        => $v['sku'] ?? null,
+                'sort_order' => $i,
+                'is_active'  => true,
+            ];
+
+            if (!empty($v['id'])) {
+                $existing = $product->variants()->find($v['id']);
+                if ($existing && $existing->image && $existing->image !== $image) {
+                    ImageOptimizer::delete($existing->image);
+                }
+                $product->variants()->where('id', $v['id'])->update($data);
+            } else {
+                $product->variants()->create($data);
+            }
+        }
     }
 
     /* ─────────────────────────────────────────────

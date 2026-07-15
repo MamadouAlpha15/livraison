@@ -110,6 +110,14 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
     color:#6366f1;background:#eef2ff;padding:3px 10px;
     border-radius:20px;margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px
 }
+.wish-btn{
+    width:38px;height:38px;border-radius:50%;flex-shrink:0;
+    background:#f9fafb;border:1px solid #e5e7eb;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;font-size:17px;
+    transition:transform .15s,background .15s;
+}
+.wish-btn:hover{transform:scale(1.08);background:#fef2f2}
+.wish-btn.active{background:#fef2f2;border-color:#fecaca}
 .product-name{font-size:22px;font-weight:800;line-height:1.25;color:#111;margin-bottom:16px}
 
 /* PRIX */
@@ -123,6 +131,14 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
     font-size:11.5px;font-weight:700;
     padding:3px 10px;border-radius:20px;margin-bottom:16px
 }
+
+/* VARIANTES */
+.variant-picker{margin-bottom:18px}
+.variant-pills{display:flex;flex-wrap:wrap;gap:8px}
+.variant-pill{padding:9px 16px;border-radius:20px;border:1.5px solid #e5e7eb;background:#f9fafb;font-size:13px;font-weight:600;color:#374151;cursor:pointer;transition:all .15s;font-family:inherit}
+.variant-pill:hover:not(.disabled){border-color:#111}
+.variant-pill.selected{background:#111;color:#fff;border-color:#111}
+.variant-pill.disabled{opacity:.45;text-decoration:line-through;cursor:not-allowed}
 
 /* STOCK */
 .stock-line{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;margin-bottom:18px}
@@ -262,9 +278,19 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
     {{-- ════ INFOS ════ --}}
     <div class="info-section">
 
-        @if($product->category)
-            <div class="cat-chip">{{ $product->category }}</div>
-        @endif
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+            @if($product->category)
+                <div class="cat-chip">{{ $product->category }}</div>
+            @else
+                <div></div>
+            @endif
+            @auth
+            <button type="button" class="wish-btn {{ ($isFavorited ?? false) ? 'active' : '' }}"
+                    id="wishBtn" onclick="toggleWish({{ $product->id }})" title="Ajouter à ma liste de souhaits">
+                <span id="wishIcon">{{ ($isFavorited ?? false) ? '❤️' : '🤍' }}</span>
+            </button>
+            @endauth
+        </div>
 
         <div class="product-name">{{ $product->name }}</div>
 
@@ -280,6 +306,24 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
             <div class="savings-pill">✓ Économie de {{ number_format($savings, 0, ',', ' ') }} GNF</div>
         @endif
 
+        {{-- VARIANTES --}}
+        @if($variants->isNotEmpty())
+        <div class="variant-picker" id="variantPicker">
+            <div class="section-label" style="margin-bottom:8px">Choisissez une option</div>
+            <div class="variant-pills">
+                @foreach($variants as $v)
+                <button type="button" class="variant-pill {{ $v->out_of_stock ? 'disabled' : '' }}"
+                        data-id="{{ $v->id }}" data-price="{{ $v->effective_price }}" data-image="{{ $v->image_url }}"
+                        onclick="selectVariant(this)" {{ $v->out_of_stock ? 'disabled' : '' }}>
+                    {{ $v->name }}{{ $v->out_of_stock ? ' (épuisé)' : '' }}
+                </button>
+                @endforeach
+            </div>
+            <div class="field-error" id="variantError" style="display:none;margin-top:8px;color:#dc2626;font-size:12.5px">
+                Veuillez choisir une option avant de commander.
+            </div>
+        </div>
+        @else
         {{-- STOCK --}}
         <div class="stock-line">
             @if($stockOk)
@@ -295,6 +339,7 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
                 <span class="stock-out-c">Rupture de stock</span>
             @endif
         </div>
+        @endif
 
         {{-- CHIPS --}}
         @php $chips = [] @endphp
@@ -356,7 +401,10 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
         {{-- CTA --}}
         <div class="cta-stack">
             @if(!$unavailable)
-                <a href="{{ route('client.orders.createFromProduct', $product) }}" class="btn-order">
+                <a href="{{ route('client.orders.createFromProduct', $product) }}"
+                   data-base-href="{{ route('client.orders.createFromProduct', $product) }}"
+                   id="orderCta" class="btn-order"
+                   @if($variants->isNotEmpty()) onclick="return checkVariantSelected(event)" @endif>
                     🛒 Commander maintenant
                 </a>
             @else
@@ -456,5 +504,67 @@ function openLightbox(si){
 function goBack(){
     if(window.history.length>1) window.history.back();
     else window.location.href='{{ route("client.products.index") }}';
+}
+
+/* ══ VARIANTES ══ */
+let selectedVariantId = null;
+
+function selectVariant(btn){
+    if(btn.disabled) return;
+    document.querySelectorAll('.variant-pill').forEach(p=>p.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedVariantId = btn.dataset.id;
+
+    const price = parseFloat(btn.dataset.price);
+    const priceEl = document.querySelector('.price');
+    if(priceEl && !isNaN(price)) priceEl.textContent = Math.round(price).toLocaleString('fr-FR');
+
+    // Si la variante a sa propre photo, on l'affiche ; sinon on revient à la photo par défaut du produit
+    const mainImg = document.getElementById('mainImage');
+    if(mainImg){
+        mainImg.style.opacity = '0';
+        const nextSrc = btn.dataset.image || (_photos[0] ?? mainImg.src);
+        setTimeout(() => { mainImg.src = nextSrc; mainImg.style.opacity = '1'; }, 150);
+    }
+
+    const orderBtn = document.getElementById('orderCta');
+    if(orderBtn){
+        const base = orderBtn.dataset.baseHref;
+        orderBtn.href = base + (base.includes('?') ? '&' : '?') + 'variant_id=' + selectedVariantId;
+    }
+    const err = document.getElementById('variantError');
+    if(err) err.style.display = 'none';
+}
+
+function checkVariantSelected(e){
+    if(!selectedVariantId){
+        e.preventDefault();
+        const err = document.getElementById('variantError');
+        if(err) err.style.display = 'block';
+        document.getElementById('variantPicker')?.scrollIntoView({behavior:'smooth', block:'center'});
+        return false;
+    }
+    return true;
+}
+
+async function toggleWish(productId){
+    const btn = document.getElementById('wishBtn');
+    const icon = document.getElementById('wishIcon');
+    if(!btn) return;
+    btn.disabled = true;
+    try{
+        const res = await fetch('/client/products/' + productId + '/favorite', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+            },
+        });
+        const data = await res.json();
+        btn.classList.toggle('active', data.favorited);
+        icon.textContent = data.favorited ? '❤️' : '🤍';
+    } catch(e) {}
+    btn.disabled = false;
 }
 </script>

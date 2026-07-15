@@ -109,6 +109,9 @@ $countries = [
     @if(!empty($intent))
         <input type="hidden" name="intent" value="{{ $intent }}">
     @endif
+    @if(session('referral_code'))
+        <input type="hidden" name="ref" value="{{ session('referral_code') }}">
+    @endif
 
     {{-- ══════════════ ÉTAPE 1 ══════════════ --}}
     <div class="reg-step active" id="step1">

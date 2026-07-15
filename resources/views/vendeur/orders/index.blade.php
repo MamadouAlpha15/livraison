@@ -286,6 +286,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); }
                                     @endif
                                     <div>
                                         <div class="prod-name">{{ Str::limit($item->product->name ?? '—', 45) }}</div>
+                                        @if($item->variant_name)<div class="prod-meta" style="color:#6366f1;font-weight:700">🎨 {{ $item->variant_name }}</div>@endif
                                         <div class="prod-meta">Qté: {{ $item->quantity }} · {{ number_format($item->price,0,',',' ') }} {{ $devise }}</div>
                                     </div>
                                 </div>
@@ -383,6 +384,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); }
                         @endif
                         <div>
                             <div class="prod-name">{{ Str::limit($item->product->name ?? '—', 38) }}</div>
+                            @if($item->variant_name)<div class="prod-meta" style="color:#6366f1;font-weight:700">🎨 {{ $item->variant_name }}</div>@endif
                             <div class="prod-meta">Qté: {{ $item->quantity }} · {{ number_format($item->price,0,',',' ') }} GNF</div>
                         </div>
                     </div>
