@@ -43,6 +43,9 @@ class Product extends Model
         'image',             // photo principale
         'gallery',           // JSON : photos supplémentaires
         'low_stock_threshold', // seuil d'alerte stock faible
+        'flash_price',         // prix pendant une vente flash
+        'flash_starts_at',     // début de la vente flash
+        'flash_ends_at',       // fin de la vente flash (compte à rebours)
     ];
 
     /*
@@ -53,6 +56,9 @@ class Product extends Model
     protected $casts = [
         'price'            => 'decimal:2',
         'original_price'   => 'decimal:2',
+        'flash_price'      => 'decimal:2',
+        'flash_starts_at'  => 'datetime',
+        'flash_ends_at'    => 'datetime',
         'stock'            => 'integer',
         'preparation_time' => 'integer',
         'is_active'        => 'boolean',
@@ -129,6 +135,38 @@ class Product extends Model
     {
         if (!$this->has_promo) return 0;
         return (int) round((1 - $this->price / $this->original_price) * 100);
+    }
+
+    /** Vrai si une vente flash est active en ce moment (prix + fenêtre de temps valides) */
+    public function getIsFlashActiveAttribute(): bool
+    {
+        if ($this->flash_price === null || $this->flash_ends_at === null) {
+            return false;
+        }
+        if ($this->flash_starts_at && $this->flash_starts_at->isFuture()) {
+            return false;
+        }
+        return $this->flash_ends_at->isFuture();
+    }
+
+    /** Prix réellement appliqué en ce moment : prix flash si actif, sinon prix normal */
+    public function getCurrentPriceAttribute(): float
+    {
+        return $this->is_flash_active ? (float) $this->flash_price : (float) $this->price;
+    }
+
+    /** Secondes restantes avant la fin de la vente flash (0 si inactive) */
+    public function getFlashSecondsRemainingAttribute(): int
+    {
+        if (!$this->is_flash_active) return 0;
+        return max(0, (int) round(now()->diffInSeconds($this->flash_ends_at, false)));
+    }
+
+    /** Pourcentage de remise de la vente flash (par rapport au prix normal) */
+    public function getFlashDiscountPercentAttribute(): int
+    {
+        if (!$this->is_flash_active || (float) $this->price <= 0) return 0;
+        return (int) round((1 - $this->flash_price / $this->price) * 100);
     }
 
     /** Stock faible (entre 1 et 5) */

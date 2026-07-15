@@ -719,10 +719,11 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     'id'       => $product->id,
                     'name'     => $product->name,
                     'cat'      => $product->category ?? '',
-                    'price'    => $product->price,
-                    'orig'     => $product->original_price,
-                    'remise'   => $remise,
-                    'hasPromo' => $hasPromo,
+                    'price'    => $product->current_price,
+                    'orig'     => $product->is_flash_active ? $product->price : $product->original_price,
+                    'remise'   => $product->is_flash_active ? $product->flash_discount_percent : $remise,
+                    'hasPromo' => $product->is_flash_active || $hasPromo,
+                    'isFlash'  => $product->is_flash_active,
                     'desc'     => $product->description ?? '',
                     'unit'     => $product->unit ?? '',
                     'prep'     => $product->preparation_time ?? '',
@@ -754,7 +755,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     @else
                         <div class="amz-card-img-ph">🏷️</div>
                     @endif
-                    @if($hasPromo)<span class="amz-card-badge badge-promo">🔥 -{{ $remise }}%</span>
+                    @if($product->is_flash_active)<span class="amz-card-badge" style="background:linear-gradient(135deg,#dc2626,#f97316)">⚡ Flash −{{ $product->flash_discount_percent }}%</span>
+                    @elseif($hasPromo)<span class="amz-card-badge badge-promo">🔥 -{{ $remise }}%</span>
                     @elseif($isNew)<span class="amz-card-badge badge-nouveau">✨ Nouveau</span>
                     @elseif($product->is_featured)<span class="amz-card-badge badge-vedette">⭐ Vedette</span>
                     @elseif($stockOut)<span class="amz-card-badge badge-rupture">Rupture</span>@endif
@@ -770,8 +772,9 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     </div>
                     <div class="amz-price-wrap">
                         <div style="display:flex;align-items:baseline;gap:5px;flex-wrap:wrap">
-                            <span class="amz-price-main">{{ number_format($product->price,0,',',' ') }} <span class="amz-price-devise">{{ $devise }}</span></span>
-                            @if($hasPromo)<span class="amz-price-orig">{{ number_format($product->original_price,0,',',' ') }}</span><span class="amz-price-remise">-{{ $remise }}%</span>@endif
+                            <span class="amz-price-main">{{ number_format($product->current_price,0,',',' ') }} <span class="amz-price-devise">{{ $devise }}</span></span>
+                            @if($product->is_flash_active)<span class="amz-price-orig">{{ number_format($product->price,0,',',' ') }}</span><span class="amz-price-remise">-{{ $product->flash_discount_percent }}%</span>
+                            @elseif($hasPromo)<span class="amz-price-orig">{{ number_format($product->original_price,0,',',' ') }}</span><span class="amz-price-remise">-{{ $remise }}%</span>@endif
                         </div>
                         <div class="amz-delivery">✓ Livraison dispo</div>
                     </div>

@@ -194,9 +194,11 @@ class ProductController extends Controller
             'is_available'     => 'nullable|boolean',
             'allergens'        => 'nullable|string|max:500',
             'tags'             => 'nullable|string|max:500',
-            'image_uploaded'   => 'nullable|string|max:500', // 
+            'image_uploaded'   => 'nullable|string|max:500', //
             'gallery_uploaded' => 'nullable|array|max:20',
             'gallery_uploaded.*' => 'nullable|string|max:500',
+            'flash_price'      => 'nullable|numeric|min:0|lt:price',
+            'flash_ends_at'    => 'nullable|date|after:now|required_with:flash_price',
         ]);
 
         $shop = Auth::user()->shop;
@@ -229,6 +231,9 @@ class ProductController extends Controller
             'tags'             => $request->tags,
             'image'            => $imagePath,
             'gallery'          => !empty($gallery) ? json_encode($gallery) : null,
+            'flash_price'      => $request->filled('flash_price') ? $request->flash_price : null,
+            'flash_starts_at'  => $request->filled('flash_price') ? now() : null,
+            'flash_ends_at'    => $request->filled('flash_price') ? $request->flash_ends_at : null,
         ]);
 
         $this->syncVariants($product, $request->input('variants', []));
@@ -279,6 +284,8 @@ class ProductController extends Controller
             'gallery_keep.*'   => 'nullable|string|max:500',
             'gallery_uploaded' => 'nullable|array|max:20',
             'gallery_uploaded.*' => 'nullable|string|max:500',
+            'flash_price'      => 'nullable|numeric|min:0|lt:price',
+            'flash_ends_at'    => 'nullable|date|required_with:flash_price',
         ]);
 
         $data = $request->only([
@@ -290,6 +297,20 @@ class ProductController extends Controller
         $data['is_active']    = $request->boolean('is_active', $product->is_active);
         $data['is_featured']  = $request->boolean('is_featured', false);
         $data['is_available'] = $request->boolean('is_available', true);
+
+        // Vente flash : si un prix flash est fourni, on (re)garde/pose la fenêtre de temps ;
+        // on ne réinitialise le départ du compte à rebours que si le prix flash a changé.
+        if ($request->filled('flash_price')) {
+            $data['flash_price']     = $request->flash_price;
+            $data['flash_ends_at']   = $request->flash_ends_at;
+            $data['flash_starts_at'] = ((float) $product->flash_price !== (float) $request->flash_price || !$product->flash_starts_at)
+                ? now()
+                : $product->flash_starts_at;
+        } else {
+            $data['flash_price']     = null;
+            $data['flash_starts_at'] = null;
+            $data['flash_ends_at']   = null;
+        }
 
         // Image principale : chemin uploadé via AJAX
         $newImagePath = $request->input('image_uploaded') ?: null;

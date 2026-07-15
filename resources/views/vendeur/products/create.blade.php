@@ -26,7 +26,7 @@
     --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
     --shadow:    0 8px 32px rgba(0,0,0,.08);
 }
-html, body { font-family: var(--font); background: var(--bg); color: var(--text); margin: 0; -webkit-font-smoothing: antialiased; }
+html, body { font-family: var(--font); background: var(--bg); color: var(--text); margin: 0; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 
 /* ── Layout 2 colonnes ── */
 .product-form-wrap {
@@ -36,7 +36,9 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
     grid-template-columns: 1fr 320px;
     gap: 20px;
     align-items: start;
+    overflow-x: hidden;
 }
+.main-col { min-width: 0; }
 
 /* ── Cards ── */
 .form-card {
@@ -652,6 +654,56 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                 </div>
             </div>
 
+            {{-- ── CARD : Vente flash ── --}}
+            <div class="form-card">
+                <div class="form-card-hd">
+                    <div class="form-card-hd-ico">⚡</div>
+                    <span class="form-card-title">Vente flash</span>
+                    <span class="form-card-sub">Optionnel</span>
+                </div>
+                <div class="form-card-body">
+                    <div class="toggle-field">
+                        <div class="toggle-field-info">
+                            <div class="toggle-field-lbl">Activer une vente flash</div>
+                            <div class="toggle-field-hint">Prix réduit pendant une durée limitée, avec compte à rebours visible par le client</div>
+                        </div>
+                        <label class="toggle-ctrl">
+                            <input type="checkbox" id="flashToggle" onchange="toggleFlashFields()"
+                                   {{ old('flash_price', $isEdit ? $product->flash_price : null) ? 'checked' : '' }}>
+                            <div class="toggle-ctrl-track"></div>
+                        </label>
+                    </div>
+
+                    <div id="flashFields" style="display:none;margin-top:14px">
+                        <div class="field-row-3">
+                            <div class="field">
+                                <label class="field-lbl" for="flash_price">Prix flash <span>*</span></label>
+                                <div class="price-wrap">
+                                    <input type="number" name="flash_price" id="flash_price"
+                                           class="field-input {{ $errors->has('flash_price') ? 'error' : '' }}"
+                                           value="{{ old('flash_price', $isEdit ? ($product->flash_price ?? '') : '') }}"
+                                           step="1" min="0" placeholder="0">
+                                    <span class="price-suffix">{{ $devise }}</span>
+                                </div>
+                                @error('flash_price')<div class="field-error">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="field" style="grid-column: span 2">
+                                <label class="field-lbl" for="flash_ends_at">Fin de la vente flash <span>*</span></label>
+                                <input type="datetime-local" name="flash_ends_at" id="flash_ends_at"
+                                       class="field-input {{ $errors->has('flash_ends_at') ? 'error' : '' }}"
+                                       value="{{ old('flash_ends_at', $isEdit && $product->flash_ends_at ? $product->flash_ends_at->format('Y-m-d\TH:i') : '') }}">
+                                @error('flash_ends_at')<div class="field-error">{{ $message }}</div>@enderror
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+                            <button type="button" class="variant-add-btn" onclick="setFlashDuration(24)">+24h (FLASH24H)</button>
+                            <button type="button" class="variant-add-btn" onclick="setFlashDuration(48)">+48h</button>
+                            <button type="button" class="variant-add-btn" onclick="setFlashDuration(72)">+72h</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {{-- ── CARD : Variantes (taille/couleur/quantité) ── --}}
             <div class="form-card">
                 <div class="form-card-hd">
@@ -1193,6 +1245,32 @@ document.getElementById('productForm').addEventListener('submit', function (e) {
 /* ══════════════════════════════════════════════
    VARIANTES (taille/couleur/quantité)
    ══════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════
+   VENTE FLASH
+   ══════════════════════════════════════════════ */
+function toggleFlashFields() {
+    const on = document.getElementById('flashToggle').checked;
+    document.getElementById('flashFields').style.display = on ? 'block' : 'none';
+    if (!on) {
+        document.getElementById('flash_price').value = '';
+        document.getElementById('flash_ends_at').value = '';
+    }
+}
+
+function setFlashDuration(hours) {
+    const d = new Date(Date.now() + hours * 3600 * 1000);
+    d.setSeconds(0, 0);
+    const pad = (n) => String(n).padStart(2, '0');
+    const local = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    document.getElementById('flash_ends_at').value = local;
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    if (document.getElementById('flashToggle')?.checked) {
+        document.getElementById('flashFields').style.display = 'block';
+    }
+});
+
 let variantIdx = 0;
 
 function addVariantRow(data = {}) {

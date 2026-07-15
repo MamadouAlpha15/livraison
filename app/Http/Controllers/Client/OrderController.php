@@ -30,6 +30,7 @@ use Illuminate\Http\Request;
 
 // On importe Auth : façade pour récupérer l'utilisateur connecté facilement
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 // ============================================================
 // Déclaration de la classe
@@ -297,24 +298,21 @@ class OrderController extends Controller
         // Vérification de sécurité : la boutique doit exister et être approuvée
         abort_unless($product->shop && $product->shop->is_approved, 403);
 
-        // Variante (taille/couleur) : si le produit en gère, elle est obligatoire
+        // Variante (taille/couleur) : optionnelle — le client peut commander "sans préférence"
         $variant = null;
-        if ($product->has_variants) {
-            if (!$request->filled('variant_id')) {
-                return back()->withErrors(['variant_id' => 'Veuillez choisir une option (taille/couleur).']);
-            }
+        if ($product->has_variants && $request->filled('variant_id')) {
             $variant = $product->variants()->findOrFail($request->variant_id);
 
             if ($variant->stock < $request->quantity) {
                 return back()->withErrors(['quantity' => "Stock insuffisant pour \"{$variant->name}\". Seulement {$variant->stock} disponible(s)."]);
             }
-        } elseif ($product->stock !== null && $product->stock < $request->quantity) {
+        } elseif (!$product->has_variants && $product->stock !== null && $product->stock < $request->quantity) {
             // Produit sans variantes : on vérifie le stock global
             return back()->withErrors(['quantity' => "Stock insuffisant. Seulement {$product->stock} disponible(s)."]);
         }
 
         // Prix unitaire : celui de la variante si sélectionnée, sinon celui du produit
-        $unitPrice = $variant ? $variant->effective_price : $product->price;
+        $unitPrice = $variant ? $variant->effective_price : $product->current_price;
 
         // On calcule le total : prix unitaire × quantité
         $total = $unitPrice * $request->quantity;
@@ -355,9 +353,11 @@ class OrderController extends Controller
         ]);
 
         // Diminue le stock du nombre commandé — au niveau variante si elle existe, sinon au niveau produit
+        // (si le produit gère des variantes mais qu'aucune n'a été choisie, on ne touche à aucun stock :
+        // le champ stock du produit n'est pas pertinent dans ce cas)
         if ($variant) {
             $variant->decrement('stock', $request->quantity);
-        } elseif ($product->stock !== null) {
+        } elseif (!$product->has_variants && $product->stock !== null) {
             $product->decrement('stock', $request->quantity);
         }
 
@@ -392,5 +392,23 @@ class OrderController extends Controller
 
         return redirect()->route('client.orders.index')
             ->with('success', "Commande passée avec succès ! Vous recevrez une confirmation. 🎉");
+    }
+
+    // ============================================================
+    // MÉTHODE : downloadInvoice()
+    // ROUTE   : GET /client/orders/{order}/invoice
+    // RÔLE    : Génère et télécharge le reçu/facture PDF d'une commande
+    // ============================================================
+    public function downloadInvoice(Order $order)
+    {
+        // Seul le client propriétaire de la commande peut télécharger son reçu
+        abort_unless($order->user_id === Auth::id(), 403);
+
+        $order->load(['items.product', 'items.variant', 'shop', 'payment', 'client']);
+
+        $pdf = Pdf::loadView('client.orders.invoice', ['order' => $order])
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download('Recu-Shopio-Commande-' . $order->id . '.pdf');
     }
 }

@@ -278,9 +278,10 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); }
                         <td>
                             <div class="prod-list">
                                 @foreach($order->items as $item)
+                                @php $itemPhoto = $item->variant?->image_url ?: ($item->product?->image ? asset('storage/'.$item->product->image) : null); @endphp
                                 <div class="prod-item">
-                                    @if($item->product && $item->product->image)
-                                        <img class="prod-img" src="{{ asset('storage/'.$item->product->image) }}" alt="">
+                                    @if($itemPhoto)
+                                        <img class="prod-img" src="{{ $itemPhoto }}" alt="">
                                     @else
                                         <div class="prod-ph">📦</div>
                                     @endif
@@ -376,9 +377,10 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); }
             <div class="mob-card-body">
                 <div class="prod-list" style="max-width:none">
                     @foreach($order->items as $item)
+                    @php $itemPhoto = $item->variant?->image_url ?: ($item->product?->image ? asset('storage/'.$item->product->image) : null); @endphp
                     <div class="prod-item">
-                        @if($item->product && $item->product->image)
-                            <img class="prod-img" src="{{ asset('storage/'.$item->product->image) }}" alt="">
+                        @if($itemPhoto)
+                            <img class="prod-img" src="{{ $itemPhoto }}" alt="">
                         @else
                             <div class="prod-ph">📦</div>
                         @endif

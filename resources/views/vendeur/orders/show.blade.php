@@ -487,12 +487,15 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
                             </thead>
                             <tbody>
                             @forelse($order->items as $item)
-                            @php $prod = $item->product; @endphp
+                            @php
+                                $prod = $item->product;
+                                $itemPhoto = $item->variant?->image_url ?: ($prod?->image ? asset('storage/'.$prod->image) : null);
+                            @endphp
                             <tr>
                                 <td>
                                     <div class="prod-cell">
-                                        @if($prod?->image)
-                                            <img src="{{ asset('storage/'.$prod->image) }}" class="prod-img" alt="">
+                                        @if($itemPhoto)
+                                            <img src="{{ $itemPhoto }}" class="prod-img" alt="">
                                         @else
                                             <div class="prod-img-placeholder">📦</div>
                                         @endif

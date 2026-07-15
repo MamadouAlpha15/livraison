@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Notifications\OrderStatusNotification;
 use App\Services\SubscriptionService;
 use App\Services\PushService;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
@@ -576,5 +577,21 @@ class OrderController extends Controller
             ]);
 
         return response()->json(['ok' => true, 'updated' => $updated]);
+    }
+
+    /**
+     * Télécharge le reçu PDF d'une commande de MA boutique (vendeur/employé)
+     */
+    public function downloadInvoice(Order $order)
+    {
+        $shopId = Auth::user()->currentShopId();
+        abort_unless($shopId && $order->shop_id === $shopId, 403, 'Commande hors de votre boutique.');
+
+        $order->load(['items.product', 'items.variant', 'shop', 'payment', 'client']);
+
+        $pdf = Pdf::loadView('client.orders.invoice', ['order' => $order])
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download('Recu-Shopio-Commande-' . $order->id . '.pdf');
     }
 }

@@ -132,6 +132,23 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
     padding:3px 10px;border-radius:20px;margin-bottom:16px
 }
 
+/* VENTE FLASH */
+.flash-badge{
+    display:inline-flex;align-items:center;gap:5px;
+    background:linear-gradient(135deg,#dc2626,#f97316);color:#fff;
+    font-size:11.5px;font-weight:800;letter-spacing:.3px;
+    padding:4px 12px;border-radius:20px;margin-bottom:10px;
+    animation:flashPulse 1.6s ease-in-out infinite;
+}
+@keyframes flashPulse{0%,100%{opacity:1}50%{opacity:.75}}
+.flash-countdown{
+    display:inline-flex;align-items:center;gap:6px;
+    background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;
+    font-size:12.5px;font-weight:700;
+    padding:6px 12px;border-radius:10px;margin-bottom:16px;
+    font-family:ui-monospace,monospace;
+}
+
 /* VARIANTES */
 .variant-picker{margin-bottom:18px}
 .variant-pills{display:flex;flex-wrap:wrap;gap:8px}
@@ -295,15 +312,27 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
         <div class="product-name">{{ $product->name }}</div>
 
         {{-- PRIX --}}
-        <div class="price-row">
-            <span class="price">{{ number_format($product->price, 0, ',', ' ') }}</span>
-            <span class="currency">GNF</span>
+        @if($product->is_flash_active)
+            <div class="flash-badge">⚡ VENTE FLASH −{{ $product->flash_discount_percent }}%</div>
+            <div class="price-row">
+                <span class="price" style="color:#dc2626">{{ number_format($product->flash_price, 0, ',', ' ') }}</span>
+                <span class="currency">GNF</span>
+                <span class="old-price">{{ number_format($product->price, 0, ',', ' ') }} GNF</span>
+            </div>
+            <div class="flash-countdown" id="flashCountdown" data-ends="{{ $product->flash_ends_at->timestamp }}">
+                ⏳ Se termine dans <span id="flashTimer">--:--:--</span>
+            </div>
+        @else
+            <div class="price-row">
+                <span class="price">{{ number_format($product->price, 0, ',', ' ') }}</span>
+                <span class="currency">GNF</span>
+                @if($hasPromo)
+                    <span class="old-price">{{ number_format($product->original_price, 0, ',', ' ') }} GNF</span>
+                @endif
+            </div>
             @if($hasPromo)
-                <span class="old-price">{{ number_format($product->original_price, 0, ',', ' ') }} GNF</span>
+                <div class="savings-pill">✓ Économie de {{ number_format($savings, 0, ',', ' ') }} GNF</div>
             @endif
-        </div>
-        @if($hasPromo)
-            <div class="savings-pill">✓ Économie de {{ number_format($savings, 0, ',', ' ') }} GNF</div>
         @endif
 
         {{-- VARIANTES --}}
@@ -422,6 +451,31 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
 <script>
 const _photos = @json($allPhotos);
 let _curIdx = 0;
+
+/* ══ COMPTE À REBOURS VENTE FLASH ══ */
+(function(){
+    const el = document.getElementById('flashCountdown');
+    if(!el) return;
+    const endsAt = parseInt(el.dataset.ends, 10) * 1000;
+    const timerEl = document.getElementById('flashTimer');
+
+    function tick(){
+        const diff = endsAt - Date.now();
+        if(diff <= 0){
+            timerEl.textContent = 'Terminée';
+            clearInterval(_flashInterval);
+            return;
+        }
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        const pad = n => String(n).padStart(2,'0');
+        timerEl.textContent = (d > 0 ? d+'j ' : '') + pad(h)+':'+pad(m)+':'+pad(s);
+    }
+    tick();
+    var _flashInterval = setInterval(tick, 1000);
+})();
 
 function _sync(idx){
     document.querySelectorAll('.thumb').forEach((t,i)=>{

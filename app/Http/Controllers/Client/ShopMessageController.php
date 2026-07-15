@@ -80,6 +80,7 @@ class ShopMessageController extends Controller
                 ->map(fn($m) => [
                     'id'                  => $m->id,
                     'body'                => $m->body,                        // Texte du message
+                    'note'                => $m->note,                        // Message libre (proposition/contre-offre), affiché à part
                     'mine'                => $m->sender_id === $client->id,   // true si c'est le client qui a envoyé
                     'sender'              => $m->sender->name,                // Nom de l'expéditeur
                     'time'                => $m->created_at->format('H:i'),   // Heure (ex: "14:30")
@@ -210,6 +211,7 @@ class ShopMessageController extends Controller
         $request->validate([
             'product_id'     => ['required', 'exists:products,id'], // L'ID du produit doit exister
             'proposed_price' => ['required', 'numeric', 'min:1'],   // Prix : nombre positif obligatoire
+            'message'        => ['nullable', 'string', 'max:500'],  // Message libre du client (optionnel)
         ]);
 
         // On charge le produit avec sa boutique (en une seule requête)
@@ -230,29 +232,39 @@ class ShopMessageController extends Controller
         // On convertit le prix en nombre décimal (float)
         $price  = (float) $request->proposed_price;
 
+        // Message libre optionnel du client (ex: "Est-ce que je peux avoir ça à ce prix ?")
+        $customMessage = trim((string) $request->input('message', ''));
+
+        $autoText = "💰 Je propose d'acheter **{$product->name}** à "
+                  . number_format($price, 0, ',', ' ')         // Ex: "80 000"
+                  . " {$devise} au lieu de "
+                  . number_format($product->price, 0, ',', ' ')// Ex: "100 000"
+                  . " {$devise}.";
+
         // On crée le message de proposition de prix
         ShopMessage::create([
             'shop_id'         => $shop->id,
             'product_id'      => $product->id,
             'sender_id'       => $client->id,             // Le client envoie
             'receiver_id'     => $vendeur->id,            // Le vendeur reçoit
-            // Texte du message affiché dans la conversation :
-            'body'            => "💰 Je propose d'acheter **{$product->name}** à "
-                                . number_format($price, 0, ',', ' ')         // Ex: "80 000"
-                                . " {$devise} au lieu de "
-                                . number_format($product->price, 0, ',', ' ')// Ex: "100 000"
-                                . " {$devise}.",
+            // Texte du message affiché dans la conversation : message du client (s'il y en a un) + le prix proposé
+            'body'            => $customMessage !== '' ? ($customMessage . "\n\n" . $autoText) : $autoText,
+            'note'            => $customMessage !== '' ? $customMessage : null, // Message libre du client, affiché à part dans la carte
             'type'            => ShopMessage::TYPE_PRICE_PROPOSAL, // Type spécial "proposition de prix"
             'proposed_price'  => $price,                           // Prix proposé stocké séparément
             'proposal_status' => ShopMessage::STATUS_PENDING,      // Statut : en attente de réponse
         ]);
 
-        // Push au vendeur
+        // Push au vendeur (avec un aperçu du message libre du client, s'il y en a un)
         try {
+            $pushBody = $client->name . ' propose ' . number_format($price, 0, ',', ' ') . " {$devise} pour {$product->name}.";
+            if ($customMessage !== '') {
+                $pushBody .= ' « ' . Str::limit($customMessage, 60) . ' »';
+            }
             app(PushService::class)->sendToUser(
                 $vendeur,
                 'Proposition de prix 💰',
-                $client->name . ' propose ' . number_format($price, 0, ',', ' ') . " {$devise} pour {$product->name}.",
+                $pushBody,
                 1,
                 '/boutique/messages'
             );
@@ -552,6 +564,7 @@ class ShopMessageController extends Controller
         $request->validate([
             'message_id'    => ['required', 'exists:shop_messages,id'],
             'counter_price' => ['required', 'numeric', 'min:1'],
+            'message'       => ['nullable', 'string', 'max:500'], // Message libre du client (optionnel)
         ]);
 
         $client   = Auth::user();
@@ -570,10 +583,14 @@ class ShopMessageController extends Controller
         $vendeur = $shop?->user;
         abort_unless($vendeur, 403);
 
-        $counterPrice = (float) $request->counter_price;
+        $counterPrice  = (float) $request->counter_price;
+        $customMessage = trim((string) $request->input('message', ''));
 
         // Marquer l'offre originale comme refusée (remplacée)
         $original->update(['proposal_status' => ShopMessage::STATUS_REFUSED]);
+
+        $autoText = "🔄 Contre-proposition du client : "
+                  . number_format($counterPrice, 0, ',', ' ') . " {$devise}.";
 
         // Créer la contre-offre du client
         ShopMessage::create([
@@ -581,19 +598,23 @@ class ShopMessageController extends Controller
             'product_id'      => $original->product_id,
             'sender_id'       => $client->id,
             'receiver_id'     => $vendeur->id,
-            'body'            => "🔄 Contre-proposition du client : "
-                                . number_format($counterPrice, 0, ',', ' ') . " {$devise}.",
+            'body'            => $customMessage !== '' ? ($customMessage . "\n\n" . $autoText) : $autoText,
+            'note'            => $customMessage !== '' ? $customMessage : null,
             'type'            => ShopMessage::TYPE_COUNTER_OFFER,
             'proposed_price'  => $counterPrice,
             'proposal_status' => ShopMessage::STATUS_PENDING,
         ]);
 
-        // Push au vendeur
+        // Push au vendeur (avec un aperçu du message libre du client, s'il y en a un)
         try {
+            $pushBody = $client->name . ' contre-propose ' . number_format($counterPrice, 0, ',', ' ') . " {$devise} pour {$product->name}.";
+            if ($customMessage !== '') {
+                $pushBody .= ' « ' . Str::limit($customMessage, 60) . ' »';
+            }
             app(PushService::class)->sendToUser(
                 $vendeur,
                 'Contre-offre reçue 🔄',
-                $client->name . ' contre-propose ' . number_format($counterPrice, 0, ',', ' ') . " {$devise} pour {$product->name}.",
+                $pushBody,
                 1,
                 '/boutique/messages'
             );

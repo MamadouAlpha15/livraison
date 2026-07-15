@@ -30,6 +30,8 @@ use Illuminate\Support\Str;
 // Outils Laravel
 use Illuminate\Http\Request;           // Données envoyées par le formulaire/AJAX
 use Illuminate\Support\Facades\Auth;  // Utilisateur connecté
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\RateLimiter;
 
 // ============================================================
 // Classe BoutiqueMessageController
@@ -92,7 +94,7 @@ class BoutiqueMessageController extends Controller
         $request->validate([
             'body'       => ['required', 'string', 'max:1000'], // Le message est obligatoire, max 1000 caractères
             'client_id'  => ['required', 'exists:users,id'],    // L'ID du client doit exister dans la table users
-            'product_id' => ['nullable', 'exists:products,id'], // L'ID du produit est optionnel
+            'product_id' => ['nullable', 'integer'], // Simple référence historique : le produit a pu être supprimé depuis
         ]);
 
         // On récupère le vendeur connecté
@@ -315,6 +317,7 @@ class BoutiqueMessageController extends Controller
         $request->validate([
             'message_id'     => ['required', 'exists:shop_messages,id'],
             'counter_price'  => ['required', 'numeric', 'min:1'],
+            'message'        => ['nullable', 'string', 'max:500'], // Message libre du vendeur (optionnel)
         ]);
 
         $vendeur = Auth::user();
@@ -331,9 +334,13 @@ class BoutiqueMessageController extends Controller
 
         $devise       = $shop->currency ?? 'GNF';
         $counterPrice = (float) $request->counter_price;
+        $customMessage = trim((string) $request->input('message', ''));
 
         // Marquer la proposition originale comme "refusée" (remplacée par la contre-offre)
         $original->update(['proposal_status' => ShopMessage::STATUS_REFUSED]);
+
+        $autoText = "🔄 Contre-proposition du vendeur : "
+                  . number_format($counterPrice, 0, ',', ' ') . " {$devise}.";
 
         // Créer la contre-offre du vendeur
         ShopMessage::create([
@@ -341,12 +348,32 @@ class BoutiqueMessageController extends Controller
             'product_id'      => $original->product_id,
             'sender_id'       => $vendeur->id,
             'receiver_id'     => $original->sender_id,
-            'body'            => "🔄 Contre-proposition du vendeur : "
-                                . number_format($counterPrice, 0, ',', ' ') . " {$devise}.",
+            'body'            => $customMessage !== '' ? ($customMessage . "\n\n" . $autoText) : $autoText,
+            'note'            => $customMessage !== '' ? $customMessage : null, // Message libre du vendeur, affiché à part dans la carte
             'type'            => ShopMessage::TYPE_COUNTER_OFFER,
             'proposed_price'  => $counterPrice,
             'proposal_status' => ShopMessage::STATUS_PENDING,
         ]);
+
+        // Notifier le client par push (avec un aperçu du message libre du vendeur, s'il y en a un)
+        try {
+            $clientUser = User::find($original->sender_id);
+            if ($clientUser) {
+                $product  = $original->product_id ? Product::find($original->product_id) : null;
+                $pushBody = $shop->name . ' vous propose ' . number_format($counterPrice, 0, ',', ' ') . " {$devise}"
+                          . ($product ? " pour {$product->name}." : '.');
+                if ($customMessage !== '') {
+                    $pushBody .= ' « ' . Str::limit($customMessage, 60) . ' »';
+                }
+                app(PushService::class)->sendToUser(
+                    $clientUser,
+                    'Contre-offre de ' . $shop->name . ' 🔄',
+                    $pushBody,
+                    1,
+                    '/client/messages'
+                );
+            }
+        } catch (\Throwable $e) {}
 
         return response()->json(['success' => true]);
     }
@@ -409,7 +436,7 @@ class BoutiqueMessageController extends Controller
         // Validation : l'ID du client est obligatoire, le produit est optionnel
         $request->validate([
             'client_id'  => ['required', 'exists:users,id'],
-            'product_id' => ['nullable', 'exists:products,id'],
+            'product_id' => ['nullable', 'integer'],
         ]);
 
         // On récupère le vendeur connecté et sa boutique
@@ -452,7 +479,7 @@ class BoutiqueMessageController extends Controller
     {
         $request->validate([
             'client_id'  => ['required', 'exists:users,id'],
-            'product_id' => ['nullable', 'exists:products,id'],
+            'product_id' => ['nullable', 'integer'],
         ]);
 
         $vendeur = Auth::user();
@@ -474,6 +501,7 @@ class BoutiqueMessageController extends Controller
         $messages = $query->get()->map(fn($m) => [
             'id'                  => $m->id,
             'body'                => $m->body,
+            'note'                => $m->note,
             'mine'                => $m->sender_id === $vendeur->id,
             'sender'              => $m->sender->name ?? 'Inconnu',
             'time'                => $m->created_at->format('H:i'),
@@ -587,6 +615,226 @@ class BoutiqueMessageController extends Controller
             'status' => 'ready',
             'images' => $urls,
         ]);
+    }
+
+    // ============================================================
+    // MÉTHODE : suggestReply()
+    // ROUTE   : POST /boutique/messages/ai-suggest-reply
+    // RÔLE    : Shopio IA lit les derniers messages de la conversation
+    //           et suggère une réponse au vendeur (éditable avant envoi).
+    //           Réservé au plan Pro, comme le reste de Shopio IA.
+    // ============================================================
+    public function suggestReply(Request $request)
+    {
+        $request->validate([
+            'client_id'  => ['required', 'exists:users,id'],
+            'product_id' => ['nullable', 'integer'],
+        ]);
+
+        $vendeur = Auth::user();
+        $shop    = $vendeur->shop ?? $vendeur->assignedShop;
+        abort_unless($shop, 403);
+
+        $isPro = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
+        if (!$isPro) {
+            return response()->json(['error' => '⭐ Shopio IA est réservé au plan Pro. Passez au plan Pro pour débloquer cette fonctionnalité.'], 403);
+        }
+
+        // Max 20 suggestions par vendeur par heure (même quota que la génération de description)
+        $key = 'ai-reply:' . $vendeur->id;
+        if (RateLimiter::tooManyAttempts($key, 20)) {
+            return response()->json(['error' => 'Limite atteinte. Réessayez dans une heure.'], 429);
+        }
+        RateLimiter::hit($key, 3600);
+
+        // On récupère les derniers messages de la conversation pour donner le contexte à l'IA
+        $query = ShopMessage::where('shop_id', $shop->id)
+            ->where(function ($q) use ($request) {
+                $q->where('sender_id', $request->client_id)
+                  ->orWhere('receiver_id', $request->client_id);
+            })
+            ->orderByDesc('created_at');
+
+        if ($request->filled('product_id')) {
+            $query->where('product_id', $request->product_id);
+        }
+
+        $recentMessages = $query->limit(8)->get()->reverse()->values();
+
+        if ($recentMessages->isEmpty()) {
+            return response()->json(['error' => 'Aucun message dans cette conversation pour le moment.'], 422);
+        }
+
+        $product = $request->filled('product_id') ? Product::find($request->product_id) : null;
+        $devise  = $shop->currency ?? 'GNF';
+
+        // On construit une transcription lisible de la conversation pour l'IA
+        $transcript = $recentMessages->map(function ($m) use ($vendeur, $devise) {
+            $who  = $m->sender_id === $vendeur->id ? 'Vendeur' : 'Client';
+            $text = $m->body;
+            if (in_array($m->type, [ShopMessage::TYPE_PRICE_PROPOSAL, ShopMessage::TYPE_COUNTER_OFFER, ShopMessage::TYPE_PRICE_OFFER]) && $m->proposed_price) {
+                $text .= ' [Prix proposé : ' . number_format($m->proposed_price, 0, ',', ' ') . " {$devise}]";
+            }
+            return "{$who} : {$text}";
+        })->implode("\n");
+
+        $prompt = "Tu es Shopio IA, un assistant qui aide un vendeur d'une marketplace africaine à répondre à ses clients par chat. "
+            . "Voici la conversation récente entre le vendeur et un client"
+            . ($product ? " au sujet du produit \"{$product->name}\"" : '') . " :\n\n"
+            . $transcript . "\n\n"
+            . "Rédige UNE réponse courte (1 à 3 phrases), polie, commerciale et chaleureuse que le VENDEUR peut envoyer maintenant "
+            . "pour répondre au dernier message du client. Adapte le ton au contexte (négociation de prix, question, réclamation…). "
+            . "Ne mets pas de guillemets ni de préfixe comme « Réponse : ». Réponds UNIQUEMENT avec le texte du message à envoyer.";
+
+        try {
+            $response = Http::withOptions(['verify' => app()->isProduction()])
+                ->timeout(30)
+                ->withHeaders([
+                    'x-api-key'         => config('services.anthropic.key'),
+                    'anthropic-version' => '2023-06-01',
+                    'content-type'      => 'application/json',
+                ])
+                ->post('https://api.anthropic.com/v1/messages', [
+                    'model'       => 'claude-haiku-4-5-20251001',
+                    'max_tokens'  => 200,
+                    'temperature' => 0.8,
+                    'messages'    => [
+                        ['role' => 'user', 'content' => $prompt],
+                    ],
+                ]);
+
+            if (!$response->successful()) {
+                \Log::error('Anthropic API error (suggestReply): ' . $response->body());
+                $errMsg = $response->json('error.message') ?? 'Erreur API Claude.';
+                return response()->json(['error' => app()->isLocal() ? $errMsg : 'Erreur Shopio IA. Réessayez.'], 500);
+            }
+
+            $suggestion = trim($response->json('content.0.text') ?? '');
+
+            if (!$suggestion) {
+                return response()->json(['error' => 'Réponse vide. Réessayez.'], 500);
+            }
+
+            return response()->json(['suggestion' => $suggestion]);
+
+        } catch (\Exception $e) {
+            \Log::error('Shopio IA suggestReply error: ' . $e->getMessage());
+            $msg = app()->isLocal() ? $e->getMessage() : 'Erreur Shopio IA. Réessayez.';
+            return response()->json(['error' => $msg], 500);
+        }
+    }
+
+    // ============================================================
+    // MÉTHODE : suggestCounterOffer()
+    // ROUTE   : POST /boutique/messages/ai-suggest-counter
+    // RÔLE    : Shopio IA lit la proposition/contre-offre du client et
+    //           suggère au vendeur À LA FOIS un prix de contre-offre ET
+    //           un message à envoyer avec, en un seul clic.
+    //           Réservé au plan Pro, comme le reste de Shopio IA.
+    // ============================================================
+    public function suggestCounterOffer(Request $request)
+    {
+        $request->validate([
+            'message_id' => ['required', 'integer', 'exists:shop_messages,id'],
+        ]);
+
+        $vendeur = Auth::user();
+        $shop    = $vendeur->shop ?? $vendeur->assignedShop;
+        abort_unless($shop, 403);
+
+        $isPro = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
+        if (!$isPro) {
+            return response()->json(['error' => '⭐ Shopio IA est réservé au plan Pro. Passez au plan Pro pour débloquer cette fonctionnalité.'], 403);
+        }
+
+        // Même quota que les autres suggestions Shopio IA (20 par vendeur par heure)
+        $key = 'ai-reply:' . $vendeur->id;
+        if (RateLimiter::tooManyAttempts($key, 20)) {
+            return response()->json(['error' => 'Limite atteinte. Réessayez dans une heure.'], 429);
+        }
+        RateLimiter::hit($key, 3600);
+
+        $original = ShopMessage::where('shop_id', $shop->id)->findOrFail($request->message_id);
+
+        if (!in_array($original->type, [ShopMessage::TYPE_PRICE_PROPOSAL, ShopMessage::TYPE_COUNTER_OFFER]) || !$original->proposed_price) {
+            return response()->json(['error' => "Ce message n'est pas une proposition de prix."], 422);
+        }
+
+        $product = $original->product_id ? Product::find($original->product_id) : null;
+        $devise  = $shop->currency ?? 'GNF';
+        $clientPrice = (float) $original->proposed_price;
+
+        if ($product) {
+            $contexte = "Produit : \"{$product->name}\", prix normal affiché : " . number_format((float) $product->current_price, 0, ',', ' ') . " {$devise}.\n"
+                . "Le client vient de proposer : " . number_format($clientPrice, 0, ',', ' ') . " {$devise}.\n\n"
+                . "Propose une contre-offre raisonnable pour le vendeur (un prix entre la proposition du client et le prix normal, "
+                . "en général plus proche du prix normal pour rester rentable).";
+        } else {
+            // Pas de produit rattaché (ex : produit supprimé depuis) — l'IA doit quand même répondre,
+            // sans le prix normal on se base uniquement sur une majoration raisonnable de l'offre du client.
+            $contexte = "Le client vient de proposer : " . number_format($clientPrice, 0, ',', ' ') . " {$devise} pour un produit de la boutique.\n\n"
+                . "Tu ne connais pas le prix normal du produit. Propose quand même une contre-offre raisonnable, "
+                . "un peu au-dessus de la proposition du client (par exemple +10 à +20%).";
+        }
+
+        $prompt = "Tu es Shopio IA, un assistant qui aide un vendeur d'une marketplace africaine à négocier un prix avec un client par chat.\n\n"
+            . $contexte . "\n\n"
+            . "Rédige aussi un court message poli et commercial (1 à 2 phrases) à envoyer avec cette contre-offre.\n\n"
+            . "Tu dois TOUJOURS répondre avec une contre-offre concrète, même si des informations manquent — ne pose jamais de question, "
+            . "ne demande jamais de précisions, fais une hypothèse raisonnable et propose un chiffre.\n\n"
+            . "Réponds STRICTEMENT dans ce format, sur deux lignes, sans rien ajouter d'autre :\n"
+            . "PRIX: [uniquement un nombre entier, sans espace ni devise ni texte]\n"
+            . "MESSAGE: [le message à envoyer au client]";
+
+        try {
+            $response = Http::withOptions(['verify' => app()->isProduction()])
+                ->timeout(30)
+                ->withHeaders([
+                    'x-api-key'         => config('services.anthropic.key'),
+                    'anthropic-version' => '2023-06-01',
+                    'content-type'      => 'application/json',
+                ])
+                ->post('https://api.anthropic.com/v1/messages', [
+                    'model'       => 'claude-haiku-4-5-20251001',
+                    'max_tokens'  => 200,
+                    'temperature' => 0.7,
+                    'messages'    => [
+                        ['role' => 'user', 'content' => $prompt],
+                    ],
+                ]);
+
+            if (!$response->successful()) {
+                \Log::error('Anthropic API error (suggestCounterOffer): ' . $response->body());
+                $errMsg = $response->json('error.message') ?? 'Erreur API Claude.';
+                return response()->json(['error' => app()->isLocal() ? $errMsg : 'Erreur Shopio IA. Réessayez.'], 500);
+            }
+
+            $text = trim($response->json('content.0.text') ?? '');
+
+            $price   = null;
+            $message = null;
+
+            if (preg_match('/PRIX\s*:\s*([\d\s]+)/iu', $text, $m)) {
+                $digits = preg_replace('/\D/', '', $m[1]);
+                if ($digits !== '') {
+                    $price = (float) $digits;
+                }
+            }
+            if (preg_match('/MESSAGE\s*:\s*(.+)/isu', $text, $m)) {
+                $message = trim($m[1]);
+            }
+
+            if (!$price && !$message) {
+                return response()->json(['error' => 'Réponse IA invalide. Réessayez.'], 500);
+            }
+
+            return response()->json(['price' => $price, 'message' => $message]);
+
+        } catch (\Exception $e) {
+            \Log::error('Shopio IA suggestCounterOffer error: ' . $e->getMessage());
+            $msg = app()->isLocal() ? $e->getMessage() : 'Erreur Shopio IA. Réessayez.';
+            return response()->json(['error' => $msg], 500);
+        }
     }
 
     // GET /boutique/notifications/poll — toutes les compteurs en temps réel

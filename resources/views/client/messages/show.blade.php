@@ -99,6 +99,13 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
     font-family: monospace; color: var(--text); outline: none;
     background: #fff; transition: border-color .15s, box-shadow .15s;
 }
+.propose-message-input {
+    width: 100%; padding: 9px 14px; border: 1.5px solid var(--yellow);
+    border-radius: 12px; font-size: 13.5px; font-weight: 500;
+    font-family: var(--font); color: var(--text); outline: none;
+    background: #fff; resize: vertical; min-height: 40px; margin-bottom: 8px;
+    transition: border-color .15s, box-shadow .15s;
+}
 .propose-input:focus { border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(245,158,11,.15); }
 .propose-devise { font-size: 12px; font-weight: 700; color: #92400e; }
 .btn-send-propose {
@@ -177,6 +184,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
 .price-card-amount { font-size: 22px; font-weight: 900; color: #0f1111; font-family: monospace; line-height: 1; margin-bottom: 4px; }
 .price-card-original { font-size: 11px; color: var(--muted); text-decoration: line-through; margin-bottom: 2px; }
 .price-card-discount { font-size: 11px; font-weight: 700; color: var(--green); background: var(--green-lt); display: inline-flex; padding: 2px 8px; border-radius: 20px; margin-bottom: 10px; }
+.price-card-note { font-size: 12.5px; color: #374151; background: #f9fafb; border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; margin-bottom: 10px; white-space: pre-wrap; }
 .price-card-status { font-size: 11.5px; font-weight: 700; padding: 5px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; margin-top: 4px; }
 .status-pending  { background: var(--yellow-lt); color: #92400e; }
 .status-accepted { background: var(--green-lt);  color: #065f46; }
@@ -442,6 +450,8 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
         <div class="propose-panel-sub">
             Proposez un nouveau prix au vendeur.
         </div>
+        <textarea id="counterMessageInput" class="propose-message-input" rows="2" maxlength="500"
+                  placeholder="Votre message (optionnel)…"></textarea>
         <div class="propose-panel-row">
             <input type="number"
                    id="counterPriceInput"
@@ -463,6 +473,8 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
         <div class="propose-panel-sub">
             Prix actuel : <strong>{{ number_format($product->price, 0, ',', ' ') }} {{ $devise }}</strong> · Proposez votre prix, le vendeur pourra accepter ou refuser.
         </div>
+        <textarea id="proposeMessageInput" class="propose-message-input" rows="2" maxlength="500"
+                  placeholder="Votre message (optionnel) — ex: Est-ce que je peux avoir ça à ce prix ?"></textarea>
         <div class="propose-panel-row">
             <input type="number"
                    id="proposePriceInput"
@@ -543,6 +555,9 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
                             @if($disc > 0)
                             <div class="price-card-discount">-{{ $disc }}%</div>
                             @endif
+                            @if($msg->note)
+                            <div class="price-card-note">{{ $msg->note }}</div>
+                            @endif
                             @if($msg->proposal_status === 'pending')
                                 <div class="price-card-status status-pending">⏳ En attente de réponse…</div>
                             @elseif($msg->proposal_status === 'accepted')
@@ -599,6 +614,9 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
                             @php $discC = round((1 - $msg->proposed_price / $product->price) * 100); @endphp
                             @if($discC > 0)
                             <div class="price-card-discount">-{{ $discC }}%</div>
+                            @endif
+                            @if($msg->note)
+                            <div class="price-card-note">{{ $msg->note }}</div>
                             @endif
 
                             @if($msg->proposal_status === 'pending' && !$isMine)
@@ -748,14 +766,16 @@ async function sendCounterOffer() {
     const input = document.getElementById('counterPriceInput');
     const price = parseFloat(input.value);
     if (!price || price < 1) { showToast('❌ Veuillez entrer un prix valide.', 'error'); return; }
+    const message = document.getElementById('counterMessageInput')?.value.trim() || '';
     try {
         const res = await fetch(COUNTER_OFFER_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
-            body: JSON.stringify({ message_id: _counterMsgId, counter_price: price }),
+            body: JSON.stringify({ message_id: _counterMsgId, counter_price: price, message }),
         });
         if (!res.ok) throw new Error();
         showToast('🔄 Contre-offre envoyée au vendeur !', 'success');
+        document.getElementById('counterMessageInput').value = '';
         closeCounterPanel();
         setTimeout(() => location.reload(), 1200);
     } catch(e) { showToast('❌ Erreur lors de l\'envoi. Réessayez.', 'error'); }
@@ -1093,15 +1113,17 @@ async function sendPriceProposal() {
     const input = document.getElementById('proposePriceInput');
     const price = parseFloat(input.value);
     if (!price || price < 1) { showToast('❌ Veuillez entrer un prix valide.', 'error'); return; }
+    const message = document.getElementById('proposeMessageInput')?.value.trim() || '';
     try {
         const res = await fetch(PROPOSE_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
-            body: JSON.stringify({ product_id: PRODUCT_ID, proposed_price: price }),
+            body: JSON.stringify({ product_id: PRODUCT_ID, proposed_price: price, message }),
         });
         if (!res.ok) throw new Error();
         showToast('💰 Proposition envoyée au vendeur !', 'success');
         document.getElementById('proposePanel').classList.remove('open');
+        document.getElementById('proposeMessageInput').value = '';
         input.value = '';
         setTimeout(() => location.reload(), 1200);
     } catch(e) { showToast('❌ Erreur lors de l\'envoi. Réessayez.', 'error'); }

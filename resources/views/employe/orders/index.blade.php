@@ -1205,6 +1205,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                     @php
                         $st=$statusMap[$order->status]??['label'=>ucfirst($order->status),'cls'=>'p-muted'];
                         $product=$order->items->first()?->product;
+                        $variantPhoto=$order->items->first()?->variant?->image_url;
                         $client=$order->client;
                         $init=initiales($order->display_name);
                         $peutAnnuler=in_array($order->status,$annulables);
@@ -1230,7 +1231,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                     </td>
 
                         <td>
-                            @if($product)<div style="display:flex;align-items:center;gap:8px">@if($product->image)<img src="{{ asset('storage/'.$product->image) }}" class="prod-img" alt="{{ $product->name }}" onclick="openLightbox('{{ asset('storage/'.$product->image) }}','{{ addslashes($product->name) }}')">@else<div class="prod-ph">{!! $I['tag_product'] !!}</div>@endif<div><div style="font-size:12.5px;font-weight:600;color:var(--text)">{{ Str::limit($product->name,22) }}</div>@if($order->items->first()?->variant_name)<div style="font-size:11px;font-weight:700;color:var(--brand,#6366f1)">🎨 {{ $order->items->first()->variant_name }}</div>@endif<div style="font-size:11px;color:var(--muted)">Qté : {{ $order->items->first()->quantity ?? 1 }}</div></div></div>
+                            @if($product)@php $photoUrl = $variantPhoto ?: ($product->image ? asset('storage/'.$product->image) : null); @endphp<div style="display:flex;align-items:center;gap:8px">@if($photoUrl)<img src="{{ $photoUrl }}" class="prod-img" alt="{{ $product->name }}" onclick="openLightbox('{{ $photoUrl }}','{{ addslashes($product->name) }}')">@else<div class="prod-ph">{!! $I['tag_product'] !!}</div>@endif<div><div style="font-size:12.5px;font-weight:600;color:var(--text)">{{ Str::limit($product->name,22) }}</div>@if($order->items->first()?->variant_name)<div style="font-size:11px;font-weight:700;color:var(--brand,#6366f1)">🎨 {{ $order->items->first()->variant_name }}</div>@endif<div style="font-size:11px;color:var(--muted)">Qté : {{ $order->items->first()->quantity ?? 1 }}</div></div></div>
                             @else<span style="color:var(--muted);font-size:12px">—</span>@endif
                         </td>
                         <td>
@@ -1288,6 +1289,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                             @if($peutAnnuler)<button type="button" class="btn-cancel" onclick="openCancelModal('{{ route('employe.orders.cancel',$order) }}','#{{ $order->id }}','{{ addslashes($order->display_name) }}')">✕ Annuler</button>
                             @elseif($dejaAnnulee)<button type="button" class="btn-restore" onclick="openRestoreModal('{{ route('employe.orders.restore',$order) }}','#{{ $order->id }}','{{ addslashes($order->display_name) }}')">{!! $I['refresh_btn'] !!} Restaurer</button>
                             @else<button type="button" class="btn-cancel disabled" disabled>✕</button>@endif
+                            <a href="{{ route('employe.orders.invoice',$order) }}" title="Télécharger le reçu PDF" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:7px;border:1px solid var(--border);color:var(--muted);text-decoration:none;font-size:14px;flex-shrink:0">📄</a>
                             @if($order->status === 'livrée' && $order->deliveryCompany)
                                 @if(!isset($reviewsByOrderId[$order->id]))
                                 <button type="button" class="btn-noter"
@@ -1328,6 +1330,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                 @php
                     $st=$statusMap[$order->status]??['label'=>ucfirst($order->status),'cls'=>'p-muted'];
                     $product=$order->items->first()?->product;
+                    $variantPhoto=$order->items->first()?->variant?->image_url;
                     $client=$order->client;
                     $init=initiales($order->display_name);
                     $peutAnnuler=in_array($order->status,$annulables);
@@ -1352,7 +1355,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span><span style="font-family:var(--mono);font-size:10px;color:var(--muted)">#{{ $order->id }}</span></div>
                     </div>
                     <div class="m-card-body">
-                        @if($product)<div style="display:flex;align-items:center;gap:9px">@if($product->image)<img src="{{ asset('storage/'.$product->image) }}" class="prod-img" alt="{{ $product->name }}" onclick="openLightbox('{{ asset('storage/'.$product->image) }}','{{ addslashes($product->name) }}')">@else<div class="prod-ph">{!! $I['tag_product'] !!}</div>@endif<div><div style="font-size:13px;font-weight:600">{{ $product->name }}</div>@if($order->items->first()?->variant_name)<div style="font-size:11px;font-weight:700;color:var(--brand,#6366f1)">🎨 {{ $order->items->first()->variant_name }}</div>@endif<div style="font-size:11px;color:var(--muted)">Qté : {{ $order->items->first()->quantity ?? 1 }}</div></div></div>@endif
+                        @if($product)@php $photoUrl = $variantPhoto ?: ($product->image ? asset('storage/'.$product->image) : null); @endphp<div style="display:flex;align-items:center;gap:9px">@if($photoUrl)<img src="{{ $photoUrl }}" class="prod-img" alt="{{ $product->name }}" onclick="openLightbox('{{ $photoUrl }}','{{ addslashes($product->name) }}')">@else<div class="prod-ph">{!! $I['tag_product'] !!}</div>@endif<div><div style="font-size:13px;font-weight:600">{{ $product->name }}</div>@if($order->items->first()?->variant_name)<div style="font-size:11px;font-weight:700;color:var(--brand,#6366f1)">🎨 {{ $order->items->first()->variant_name }}</div>@endif<div style="font-size:11px;color:var(--muted)">Qté : {{ $order->items->first()->quantity ?? 1 }}</div></div></div>@endif
                         @php $mAddr = $order->delivery_destination ?: ($client?->address ?? ''); @endphp
                         @if($mAddr)<div class="m-row"><span class="m-lbl">Adresse</span><span style="font-size:12px;color:var(--text-2);text-align:right;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{{ $mAddr }}">{!! $I['pin_addr'] !!} {{ $mAddr }}</span></div>@endif
                         <div class="m-row"><span class="m-lbl">Montant</span><span class="amount">{{ number_format($order->total,0,',',' ') }} <small>{{ $devise }}</small></span></div>
@@ -1376,6 +1379,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         @if($order->livreur || $order->deliveryCompany)<span class="btn btn-assigned btn-sm">✔ Assignée</span>@endif
                         @if($peutAnnuler)<button type="button" class="btn-cancel" style="flex:1;justify-content:center" onclick="openCancelModal('{{ route('employe.orders.cancel',$order) }}','#{{ $order->id }}','{{ addslashes($order->display_name) }}')">✕ Annuler</button>
                         @elseif($dejaAnnulee)<button type="button" class="btn-restore" style="flex:1;justify-content:center" onclick="openRestoreModal('{{ route('employe.orders.restore',$order) }}','#{{ $order->id }}','{{ addslashes($order->display_name) }}')">{!! $I['refresh_btn'] !!} Restaurer</button>@endif
+                        <a href="{{ route('employe.orders.invoice',$order) }}" style="display:inline-flex;align-items:center;justify-content:center;gap:5px;flex:1;padding:7px 10px;border-radius:8px;border:1px solid var(--border);color:var(--muted);text-decoration:none;font-size:12.5px;font-weight:600">📄 Reçu PDF</a>
                         @if($order->status === 'livrée' && $order->deliveryCompany)
                             @if(!isset($reviewsByOrderId[$order->id]))
                             <button type="button" class="btn-noter" style="flex:1;justify-content:center;"

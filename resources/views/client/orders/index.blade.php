@@ -1,4 +1,5 @@
 @extends('layouts.app')
+
 @php $bodyClass = 'is-dashboard'; @endphp
 
 
@@ -694,6 +695,9 @@ $groups = $orders->getCollection()
             $allItems     = $group['all_items'];
             $firstItem    = $allItems->first();
             $firstProduct = $firstItem?->product;
+            // Photo affichée : celle de la variante choisie (ex: couleur Jaune) si elle en a une, sinon la photo du produit
+            $firstImageUrl = $firstItem?->variant?->image_url
+                ?: ($firstProduct?->image ? (\App\Services\ImageOptimizer::url($firstProduct->image, 'thumb') ?? asset('storage/'.$firstProduct->image)) : null);
             $extraItems   = $allItems->count() - 1;
             $devise       = $order->shop?->currency ?? 'GNF';
             $totalQty     = $allItems->sum('quantity');
@@ -715,9 +719,9 @@ $groups = $orders->getCollection()
             {{-- Corps principal --}}
             <div class="order-card-body">
 
-                {{-- Image produit --}}
-                @if($firstProduct?->image)
-                    <img src="{{ \App\Services\ImageOptimizer::url($firstProduct->image, 'thumb') ?? asset('storage/'.$firstProduct->image) }}"
+                {{-- Image produit (photo de la variante choisie si applicable) --}}
+                @if($firstImageUrl)
+                    <img src="{{ $firstImageUrl }}"
                          alt="{{ $firstProduct->name }}"
                          class="order-thumb"
                          loading="lazy"
@@ -798,6 +802,9 @@ $groups = $orders->getCollection()
                     {{-- Suivre : lien vers la 1ère commande du groupe --}}
                     <a href="{{ route('suivi.show', $order) }}" class="btn-action btn-track">
                         🔍 Suivre
+                    </a>
+                    <a href="{{ route('client.orders.invoice', $order) }}" class="btn-action btn-track" style="background:#f8fafc;border-color:#e2e8f0;color:#475569">
+                        📄 Reçu PDF
                     </a>
                     {{-- Avis : seulement si toutes les commandes du groupe sont livrées et sans avis --}}
                     @if($group['all_delivered'] && !$group['has_review'])

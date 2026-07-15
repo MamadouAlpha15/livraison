@@ -111,6 +111,9 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .prod-devise { font-size: 12px; color: var(--muted); font-weight: 600; }
 .prod-orig { font-size: 13px; color: var(--muted); text-decoration: line-through; font-family: monospace; }
 .prod-remise { font-size: 11px; font-weight: 800; background: #fce4e4; color: var(--red); padding: 2px 8px; border-radius: 20px; }
+.flash-badge-order { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg,#dc2626,#f97316); color: #fff; font-size: 11px; font-weight: 800; letter-spacing: .3px; padding: 4px 12px; border-radius: 20px; margin-bottom: 8px; animation: flashPulseOrder 1.6s ease-in-out infinite; }
+@keyframes flashPulseOrder { 0%,100% { opacity: 1; } 50% { opacity: .75; } }
+.flash-countdown-order { display: inline-flex; align-items: center; gap: 6px; background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; font-size: 12px; font-weight: 700; padding: 5px 11px; border-radius: 9px; margin-bottom: 12px; font-family: ui-monospace, monospace; }
 .prod-desc { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 12px; }
 
 .prod-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
@@ -306,19 +309,32 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     @if($product->category)<div class="prod-cat">{{ $product->category }}</div>@endif
                     <h1 class="prod-name">{{ $product->name }}</h1>
 
+                    @if($product->is_flash_active)
+                    <div class="flash-badge-order">⚡ VENTE FLASH −{{ $product->flash_discount_percent }}%</div>
+                    @endif
                     <div class="prod-price-row">
-                        <span class="prod-price">{{ number_format($product->price, 0, ',', ' ') }}</span>
+                        <span class="prod-price">{{ number_format($product->current_price, 0, ',', ' ') }}</span>
                         <span class="prod-devise">{{ $devise }}</span>
-                        @if($hasPromo)
+                        @if($product->is_flash_active)
+                        <span class="prod-orig">{{ number_format($product->price, 0, ',', ' ') }}</span>
+                        @elseif($hasPromo)
                         <span class="prod-orig">{{ number_format($product->original_price, 0, ',', ' ') }}</span>
                         <span class="prod-remise">-{{ $remise }}%</span>
                         @endif
                     </div>
+                    @if($product->is_flash_active)
+                    <div class="flash-countdown-order" id="flashCountdownOrder" data-ends="{{ $product->flash_ends_at->timestamp }}">
+                        ⏳ Se termine dans <span id="flashTimerOrder">--:--:--</span>
+                    </div>
+                    @endif
 
                     @if($variants->isNotEmpty())
                     <div id="variantPickerOrder" style="margin-bottom:14px">
                         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Choisissez une option</div>
                         <div style="display:flex;flex-wrap:wrap;gap:8px">
+                            <button type="button" class="variant-pill-order" id="defaultPhotoPill" onclick="showDefaultPhoto(this)">
+                                {{ $product->name }}
+                            </button>
                             @foreach($variants as $v)
                             <button type="button" class="variant-pill-order {{ (($selectedVariantId ?? null) == $v->id) ? 'selected' : '' }} {{ $v->out_of_stock ? 'disabled' : '' }}"
                                     data-id="{{ $v->id }}" data-name="{{ $v->name }}" data-price="{{ $v->effective_price }}" data-stock="{{ $v->stock }}" data-image="{{ $v->image_url }}"
@@ -540,12 +556,71 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 @push('scripts')
 <script>
 const HAS_VARIANTS = {{ $variants->isNotEmpty() ? 'true' : 'false' }};
-let PRICE = {{ (float) $product->price }};
-let STOCK = {{ $stockVal ?? 9999 }};
+const BASE_PRICE = {{ (float) $product->current_price }};
+const BASE_STOCK = {{ $variants->isNotEmpty() ? 999 : ($stockVal ?? 999) }};
+let PRICE = BASE_PRICE;
+let STOCK = BASE_STOCK;
 const LOYALTY_BALANCE = {{ (int) ($loyaltyBalance ?? 0) }};
 const MAX_REDEEM_RATIO = 0.5;
 
+/* ══ COMPTE À REBOURS VENTE FLASH ══ */
+(function(){
+    const el = document.getElementById('flashCountdownOrder');
+    if(!el) return;
+    const endsAt = parseInt(el.dataset.ends, 10) * 1000;
+    const timerEl = document.getElementById('flashTimerOrder');
+
+    function tick(){
+        const diff = endsAt - Date.now();
+        if(diff <= 0){
+            timerEl.textContent = 'Terminée';
+            clearInterval(_flashOrderInterval);
+            return;
+        }
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        const pad = n => String(n).padStart(2,'0');
+        timerEl.textContent = (d > 0 ? d+'j ' : '') + pad(h)+':'+pad(m)+':'+pad(s);
+    }
+    tick();
+    var _flashOrderInterval = setInterval(tick, 1000);
+})();
+
 /* ══ VARIANTES ══ */
+function showDefaultPhoto(btn) {
+    document.querySelectorAll('.variant-pill-order').forEach(p => p.classList.remove('selected'));
+    btn.classList.add('selected');
+
+    // Ce n'est pas une vraie option : on vide la sélection (le client devra choisir une couleur/taille pour commander)
+    document.getElementById('variantIdInput').value = '';
+    PRICE = BASE_PRICE;
+    STOCK = BASE_STOCK;
+
+    const qtyInput = document.getElementById('qty');
+    if (qtyInput) qtyInput.max = STOCK;
+
+    const mainImg = document.getElementById('mainImg');
+    if (mainImg && typeof PHOTOS !== 'undefined' && PHOTOS[0]) {
+        mainImg.style.opacity = '0';
+        setTimeout(() => {
+            mainImg.removeAttribute('srcset');
+            mainImg.removeAttribute('sizes');
+            mainImg.src = PHOTOS[0];
+            mainImg.style.opacity = '1';
+        }, 150);
+    }
+
+    const priceEl = document.querySelector('.prod-price');
+    if (priceEl) priceEl.textContent = Math.round(PRICE).toLocaleString('fr-FR');
+
+    const summaryVariant = document.getElementById('summaryVariant');
+    if (summaryVariant) summaryVariant.textContent = 'Choisissez une option ↑';
+
+    updateTotal();
+}
+
 function selectOrderVariant(btn) {
     if (btn.disabled) return;
     document.querySelectorAll('.variant-pill-order').forEach(p => p.classList.remove('selected'));
@@ -579,6 +654,10 @@ function selectOrderVariant(btn) {
             mainImg.src = nextSrc;
             mainImg.style.opacity = '1';
         }, 150);
+
+        // Affiche le bouton "Revoir la photo du produit" seulement si la variante a sa propre photo
+        const resetBtn = document.getElementById('resetPhotoBtn');
+        if (resetBtn) resetBtn.style.display = btn.dataset.image ? 'block' : 'none';
     }
 
     const err = document.getElementById('variantOrderError');
@@ -739,7 +818,10 @@ if (PHOTOS.length > 1) {
 
 /* Submit */
 document.getElementById('orderForm')?.addEventListener('submit', (e) => {
-    if (HAS_VARIANTS && !document.getElementById('variantIdInput').value) {
+    // Il faut avoir fait un choix : soit une vraie option (couleur/taille), soit "aucune préférence" (pastille nom du produit)
+    const hasVariant  = !!document.getElementById('variantIdInput').value;
+    const noPreference = document.getElementById('defaultPhotoPill')?.classList.contains('selected');
+    if (HAS_VARIANTS && !hasVariant && !noPreference) {
         e.preventDefault();
         const err = document.getElementById('variantOrderError');
         if (err) err.style.display = 'block';

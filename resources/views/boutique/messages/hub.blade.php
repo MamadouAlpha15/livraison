@@ -534,6 +534,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     .hub-textarea { font-size: 16px !important; padding: 8px 13px; }
     .hub-send-btn { width: 40px; height: 40px; font-size: 16px; }
     .hub-offer-input { font-size: 16px !important; }
+    .nego-counter-input, .nego-counter-message { font-size: 16px !important; }
 
     /* dvh = exclut le clavier iOS (fallback 100vh déjà défini globalement) */
     .hub { height: calc(100dvh - var(--nav-h)); }
@@ -788,10 +789,17 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
                 {{-- Preview images sélectionnées --}}
                 <div class="hub-img-preview" id="hubImgPreview"></div>
 
+                @php $isPro = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture(); @endphp
                 <div class="hub-input-row">
                     {{-- Bouton + photo (vendeur seulement) --}}
                     <input type="file" id="hubImgInput" accept="image/*" multiple style="display:none" onchange="onImgSelected(this)">
                     <button class="hub-attach-btn" title="Envoyer des photos (max 20)" onclick="document.getElementById('hubImgInput').click()">📷</button>
+
+                    @if($isPro)
+                    <button class="hub-attach-btn" id="hubAiBtn" title="Shopio IA — suggérer une réponse" onclick="suggestAiReply()" style="color:#6366f1;border-color:#c7d2fe;background:#eef2ff">✨</button>
+                    @else
+                    <a class="hub-attach-btn" href="{{ route('boutique.subscription.upgrade') }}" title="Shopio IA — réservé au plan Pro" style="color:#9ca3af;text-decoration:none;font-size:16px">🔒</a>
+                    @endif
 
                     <textarea id="hubInput" class="hub-textarea" placeholder="Écrire un message au client…" rows="1"
                         onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendHubMsg()}"
@@ -848,6 +856,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 
 <script>
 const CSRF = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+const IS_PRO = {{ ($shop->plan === 'pro' && $shop->plan_expires_at?->isFuture()) ? 'true' : 'false' }};
 
 /* Signale au dashboard que ces messages ont été lus (sync cross-device) */
 let _syncMsgTimer = null;
@@ -1154,6 +1163,41 @@ async function pollConv() {
 }
 
 /* ── Envoyer un message ── */
+async function suggestAiReply() {
+    if (!_clientId) return;
+
+    const btn = document.getElementById('hubAiBtn');
+    const input = document.getElementById('hubInput');
+    if (!btn) return;
+
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '⏳';
+
+    try {
+        const res = await fetch('/boutique/messages/ai-suggest-reply', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify({ client_id: _clientId, product_id: _productId }),
+        });
+        const data = await res.json();
+
+        if (data.suggestion) {
+            input.value = data.suggestion;
+            input.style.height = 'auto';
+            input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+            input.focus();
+        } else {
+            alert(data.error || 'Erreur Shopio IA. Réessayez.');
+        }
+    } catch (e) {
+        alert('Erreur réseau. Réessayez.');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = original;
+    }
+}
+
 async function sendHubMsg() {
     if (!_clientId) return;
 
@@ -1642,7 +1686,11 @@ function buildProposalCard(msg) {
                 ✕ Refuser
             </button>
         </div>
-        <div class="nego-counter-form" id="counterForm_${msg.id}" style="display:none">
+        <div class="nego-counter-form" id="counterForm_${msg.id}" style="display:none;flex-direction:column;gap:6px">
+            <textarea id="counterMessage_${msg.id}" class="nego-counter-message" placeholder="Votre message (optionnel)…" rows="2" maxlength="500"
+                      style="width:100%;padding:8px 12px;border:1.5px solid #d1d5db;border-radius:10px;font-size:12.5px;font-family:inherit;resize:vertical;min-height:36px"></textarea>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            ${IS_PRO ? `<button type="button" class="nego-card-btn" onclick="suggestCounterAi(${msg.id}, this)" id="counterAiBtn_${msg.id}" style="background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe" title="Shopio IA — suggérer prix + message">✨ IA</button>` : ''}
             <input type="number" class="nego-counter-input" id="counterInput_${msg.id}"
                    placeholder="Votre prix…" min="1" step="500"
                    value="${Math.round((msg.proposed_price || 0) * 1.1)}">
@@ -1650,6 +1698,7 @@ function buildProposalCard(msg) {
             <button class="nego-card-btn nego-btn-accept" onclick="sendCounterProposal(${msg.id}, this)">
                 Envoyer ✓
             </button>
+            </div>
         </div>` : '';
 
     const wrap = document.createElement('div');
@@ -1661,6 +1710,7 @@ function buildProposalCard(msg) {
             <div class="nego-card-body">
                 <span class="nego-status ${statusClass[status] || 'pending'}">${statusLabels[status] || status}</span>
                 <div class="nego-card-price">${escHtml(price)}</div>
+                ${msg.note ? `<div class="nego-card-note">${escHtml(msg.note)}</div>` : ''}
             </div>
             ${actionsHtml}
             <div style="padding:0 14px 8px;font-size:10.5px;color:#9ca3af">${escHtml(msg.time || '')}</div>
@@ -1693,7 +1743,11 @@ function buildCounterCard(msg) {
                 ✕ Refuser
             </button>
         </div>
-        <div class="nego-counter-form" id="counterForm_${msg.id}" style="display:none">
+        <div class="nego-counter-form" id="counterForm_${msg.id}" style="display:none;flex-direction:column;gap:6px">
+            <textarea id="counterMessage_${msg.id}" class="nego-counter-message" placeholder="Votre message (optionnel)…" rows="2" maxlength="500"
+                      style="width:100%;padding:8px 12px;border:1.5px solid #d1d5db;border-radius:10px;font-size:12.5px;font-family:inherit;resize:vertical;min-height:36px"></textarea>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            ${IS_PRO ? `<button type="button" class="nego-card-btn" onclick="suggestCounterAi(${msg.id}, this)" id="counterAiBtn_${msg.id}" style="background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe" title="Shopio IA — suggérer prix + message">✨ IA</button>` : ''}
             <input type="number" class="nego-counter-input" id="counterInput_${msg.id}"
                    placeholder="Votre prix…" min="1" step="500"
                    value="${Math.round((msg.proposed_price || 0) * 1.05)}">
@@ -1701,6 +1755,7 @@ function buildCounterCard(msg) {
             <button class="nego-card-btn nego-btn-accept" onclick="sendCounterProposal(${msg.id}, this)">
                 Envoyer ✓
             </button>
+            </div>
         </div>` : '';
 
     const wrap = document.createElement('div');
@@ -1712,6 +1767,7 @@ function buildCounterCard(msg) {
             <div class="nego-card-body">
                 <span class="nego-status ${statusClass[status] || 'pending'}">${statusLabels[status] || status}</span>
                 <div class="nego-card-price">${escHtml(price)}</div>
+                ${msg.note ? `<div class="nego-card-note">${escHtml(msg.note)}</div>` : ''}
             </div>
             ${actionsHtml}
             <div style="padding:0 14px 8px;font-size:10.5px;color:#9ca3af;text-align:${isMine?'right':'left'}">${escHtml(msg.time || '')}</div>
@@ -1732,12 +1788,13 @@ async function sendCounterProposal(msgId, btn) {
     const input = document.getElementById('counterInput_' + msgId);
     const price = parseFloat(input?.value);
     if (!price || price < 1) { showToast('❌ Entrez un prix valide', 'err'); return; }
+    const message = document.getElementById('counterMessage_' + msgId)?.value.trim() || '';
     btn.disabled = true; btn.textContent = '⏳…';
     try {
         const res = await fetch('/boutique/messages/counter-proposal', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-            body: JSON.stringify({ message_id: msgId, counter_price: price }),
+            body: JSON.stringify({ message_id: msgId, counter_price: price, message }),
         });
         const data = await res.json();
         if (data.success) {
@@ -1750,6 +1807,32 @@ async function sendCounterProposal(msgId, btn) {
     } catch(e) {
         showToast('❌ Erreur réseau', 'err');
         btn.disabled = false; btn.textContent = 'Envoyer ✓';
+    }
+}
+
+/* Shopio IA — suggère un prix ET un message pour la contre-offre, en un clic */
+async function suggestCounterAi(msgId, btn) {
+    const original = btn.textContent;
+    btn.disabled = true; btn.textContent = '⏳';
+    try {
+        const res = await fetch('/boutique/messages/ai-suggest-counter', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify({ message_id: msgId }),
+        });
+        const data = await res.json();
+        if (data.price || data.message) {
+            const priceInput = document.getElementById('counterInput_' + msgId);
+            const msgInput   = document.getElementById('counterMessage_' + msgId);
+            if (data.price && priceInput) priceInput.value = Math.round(data.price);
+            if (data.message && msgInput) msgInput.value = data.message;
+        } else {
+            showToast('❌ ' + (data.error || 'Erreur Shopio IA'), 'err');
+        }
+    } catch (e) {
+        showToast('❌ Erreur réseau', 'err');
+    } finally {
+        btn.disabled = false; btn.textContent = original;
     }
 }
 

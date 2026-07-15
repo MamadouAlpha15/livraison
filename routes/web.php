@@ -629,6 +629,16 @@ Route::post('messages/images/{client}/{product?}',
     [BoutiqueMessageController::class, 'sendImages'])
     ->name('messages.send-images');
 
+// === SHOPIO IA — suggestion de réponse dans le chat ===
+Route::post('messages/ai-suggest-reply',
+    [BoutiqueMessageController::class, 'suggestReply'])
+    ->name('messages.ai-suggest-reply');
+
+// === SHOPIO IA — suggestion de contre-offre (prix + message) ===
+Route::post('messages/ai-suggest-counter',
+    [BoutiqueMessageController::class, 'suggestCounterOffer'])
+    ->name('messages.ai-suggest-counter');
+
 Route::get('messages/image-status/{message}',
     [BoutiqueMessageController::class, 'imageStatus'])
     ->name('messages.image-status');
@@ -709,6 +719,7 @@ Route::middleware(['auth', 'role:employe,superadmin,admin,vendeur'])
         Route::put('orders/{order}/restore',              [EmployeOrderController::class, 'restore'])       ->name('orders.restore');
         Route::post('orders/{order}/rate-company',        [EmployeOrderController::class, 'rateCompany'])   ->name('orders.rate-company');
         Route::post('orders/{order}/vendor-location',     [EmployeOrderController::class, 'shareVendorLocation'])->name('orders.vendor-location');
+        Route::get('orders/{order}/invoice',              [EmployeOrderController::class, 'downloadInvoice'])->name('orders.invoice');
 
         /* Chat boutique ↔ entreprise de livraison */
         Route::post('companies/{company}/chat/send',     [\App\Http\Controllers\DeliveryChatController::class, 'send'])    ->name('delivery.chat.send');
@@ -790,6 +801,7 @@ Route::middleware(['auth', 'role:client'])
         /* Commandes classiques */
         Route::resource('orders', OrderController::class)->only(['index', 'store', 'create']);
         Route::post('/orders/badge-seen', [ClientOrderController::class, 'markBadgeSeen'])->name('orders.badge-seen');
+        Route::get('/orders/{order}/invoice', [ClientOrderController::class, 'downloadInvoice'])->name('orders.invoice');
        
         
 

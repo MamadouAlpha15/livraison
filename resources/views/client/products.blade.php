@@ -428,7 +428,9 @@ body { background: #0f0f1a; color: #e2e8f0; }
                 @else
                     <div class="p-card-ph">🛍</div>
                 @endif
-                @if($hasPromo)
+                @if($product->is_flash_active)
+                    <span class="p-card-badge" style="background:linear-gradient(135deg,#dc2626,#f97316)">⚡ Flash −{{ $product->flash_discount_percent }}%</span>
+                @elseif($hasPromo)
                     <span class="p-card-badge">Promo</span>
                 @endif
             </div>
@@ -447,8 +449,10 @@ body { background: #0f0f1a; color: #e2e8f0; }
         </a>
         <div class="p-card-footer">
             <div>
-                <span class="p-card-price">{{ number_format($product->price, 0, ',', ' ') }} GNF</span>
-                @if($hasPromo)
+                <span class="p-card-price">{{ number_format($product->current_price, 0, ',', ' ') }} GNF</span>
+                @if($product->is_flash_active)
+                    <span class="p-card-orig">{{ number_format($product->price, 0, ',', ' ') }}</span>
+                @elseif($hasPromo)
                     <span class="p-card-orig">{{ number_format($product->original_price, 0, ',', ' ') }}</span>
                 @endif
             </div>

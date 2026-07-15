@@ -34,10 +34,22 @@ class ProductVariant extends Model
         return $this->hasMany(OrderItem::class, 'product_variant_id');
     }
 
-    /** Prix effectif : celui de la variante, sinon celui du produit parent */
+    /**
+     * Prix effectif : celui de la variante si défini, sinon celui du produit.
+     * Si une vente flash est active sur le produit, la même remise (en %) s'applique
+     * à TOUTES les variantes — y compris celles avec un prix personnalisé — puisque
+     * c'est le même produit, juste une couleur/taille différente.
+     */
     public function getEffectivePriceAttribute(): float
     {
-        return $this->price !== null ? (float) $this->price : (float) $this->product->price;
+        $base = $this->price !== null ? (float) $this->price : (float) $this->product->price;
+
+        if ($this->product->is_flash_active && (float) $this->product->price > 0) {
+            $ratio = (float) $this->product->flash_price / (float) $this->product->price;
+            return round($base * $ratio);
+        }
+
+        return $base;
     }
 
     /** URL de la photo de la variante (null si elle n'en a pas — on retombe alors sur la photo du produit) */

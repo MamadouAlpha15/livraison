@@ -121,6 +121,7 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 .nego-amount { font-size:24px; font-weight:900; font-family:monospace; color:#111; line-height:1; margin-bottom:4px; }
 .nego-original { font-size:11px; color:var(--muted); text-decoration:line-through; margin-bottom:3px; }
 .nego-discount { font-size:11px; font-weight:700; color:var(--green); background:var(--green-lt); padding:2px 8px; border-radius:20px; display:inline-flex; margin-bottom:10px; }
+.nego-note { font-size:12.5px; color:#374151; background:#f9fafb; border:1px solid var(--border); border-radius:10px; padding:8px 10px; margin-bottom:10px; white-space:pre-wrap; }
 .nego-status { font-size:11.5px; font-weight:700; padding:5px 10px; border-radius:20px; display:inline-flex; align-items:center; gap:5px; }
 .s-pending  { background:#fef3c7; color:#92400e; }
 .s-accepted { background:#d1fae5; color:#065f46; }
@@ -139,7 +140,9 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 .nego-btn-counter:hover { background:#fde68a; }
 .nego-btn-refuse  { background:#fee2e2; color:#991b1b; border:1.5px solid #fecaca; }
 .nego-btn-refuse:hover { background:#fecaca; }
-.nego-counter-form { display:none; margin-top:8px; }
+.nego-counter-form { display:none; margin-top:8px; flex-direction:column; gap:6px; }
+.nego-counter-message { width:100%; padding:8px 12px; border:1.5px solid #fde68a; border-radius:10px; font-size:12.5px; font-family:inherit; resize:vertical; min-height:36px; outline:none; }
+.nego-counter-message:focus { box-shadow:0 0 0 3px rgba(245,158,11,.2); }
 .nego-counter-row  { display:flex; gap:6px; align-items:center; margin-top:6px; flex-wrap:wrap; }
 .nego-counter-input { flex:1; min-width:80px; padding:8px 12px; border-radius:20px; border:1.5px solid #fde68a; font-size:13px; font-weight:600; font-family:monospace; outline:none; background:#fff; }
 .nego-counter-input:focus { box-shadow:0 0 0 3px rgba(245,158,11,.2); }
@@ -613,10 +616,13 @@ a, button, [onclick], .hub-conv-item {
         {{-- Panneau proposition prix --}}
         <div class="hub-propose-panel" id="hubProposePanel">
             <div class="hub-propose-label">💰 Faire une proposition de prix au vendeur</div>
-            <input type="number" id="hubProposeInput" class="hub-propose-input" placeholder="Votre prix…" min="1" step="500">
-            <span class="hub-propose-devise" id="hubProposeDevise">GNF</span>
-            <button class="hub-propose-send" onclick="sendPriceProposal()">Envoyer la proposition</button>
-            <button class="hub-propose-cancel" onclick="toggleProposePanel()">Annuler</button>
+            <textarea id="hubProposeMessage" class="hub-propose-input" style="width:100%;resize:vertical;min-height:38px;margin-bottom:8px" placeholder="Votre message (optionnel) — ex: Est-ce que je peux avoir ça à ce prix ?" rows="2" maxlength="500"></textarea>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <input type="number" id="hubProposeInput" class="hub-propose-input" placeholder="Votre prix…" min="1" step="500">
+                <span class="hub-propose-devise" id="hubProposeDevise">GNF</span>
+                <button class="hub-propose-send" onclick="sendPriceProposal()">Envoyer la proposition</button>
+                <button class="hub-propose-cancel" onclick="toggleProposePanel()">Annuler</button>
+            </div>
         </div>
 
         {{-- Thread --}}
@@ -787,6 +793,7 @@ function toggleProposePanel() {
 async function sendPriceProposal() {
     const price = parseFloat(document.getElementById('hubProposeInput').value);
     if (!price || price < 1) { alert('Entrez un prix valide.'); return; }
+    const message = document.getElementById('hubProposeMessage')?.value.trim() || '';
 
     const btn = document.querySelector('.hub-propose-send');
     btn.disabled = true; btn.textContent = '⏳ Envoi…';
@@ -795,11 +802,12 @@ async function sendPriceProposal() {
         const res = await fetch('/client/messages/propose-price', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
-            body: JSON.stringify({ product_id: _productId, proposed_price: price }),
+            body: JSON.stringify({ product_id: _productId, proposed_price: price, message }),
         });
         const data = await res.json();
         if (data.sent || data.success) {
             document.getElementById('hubProposePanel').classList.remove('open');
+            document.getElementById('hubProposeMessage').value = '';
             /* Recharger le thread pour afficher la carte */
             _lastMsgId = 0;
             await loadConv();
@@ -1251,6 +1259,7 @@ function buildProposalCard(msg) {
           <div class="nego-amount">${fmtPrice(msg.proposed_price, devise)}</div>
           ${raw>0 ? `<div class="nego-original">Prix catalogue : ${fmtPrice(raw, devise)}</div>` : ''}
           ${disc>0 ? `<div class="nego-discount">-${disc}% de réduction</div>` : ''}
+          ${msg.note ? `<div class="nego-note">${escHtml(msg.note)}</div>` : ''}
           <div class="nego-status ${statusClass[msg.proposal_status]||'s-pending'}">${statusMap[msg.proposal_status]||'⏳ En attente…'}</div>
           <div class="nego-meta">${escHtml(msg.time||'')}</div>
         </div>
@@ -1275,6 +1284,7 @@ function buildOfferCard(msg) {
             <button class="nego-card-btn nego-btn-refuse" onclick="refuseClientOffer(${msg.id},this)">✕ Refuser</button>
           </div>
           <div class="nego-counter-form" id="cliCounterForm_${msg.id}">
+            <textarea class="nego-counter-message" id="cliCounterMessage_${msg.id}" placeholder="Votre message (optionnel)…" rows="2" maxlength="500"></textarea>
             <div class="nego-counter-row">
               <input type="number" class="nego-counter-input" id="cliCounterInput_${msg.id}" placeholder="Votre contre-offre…" min="1" step="500">
               <span class="nego-counter-devise">${escHtml(devise)}</span>
@@ -1337,6 +1347,7 @@ function buildCounterCard(msg) {
             <button class="nego-card-btn nego-btn-refuse" onclick="refuseClientOffer(${msg.id},this)">✕ Refuser</button>
           </div>
           <div class="nego-counter-form" id="cliCounterForm_${msg.id}">
+            <textarea class="nego-counter-message" id="cliCounterMessage_${msg.id}" placeholder="Votre message (optionnel)…" rows="2" maxlength="500"></textarea>
             <div class="nego-counter-row">
               <input type="number" class="nego-counter-input" id="cliCounterInput_${msg.id}" placeholder="Votre contre-offre…" min="1" step="500">
               <span class="nego-counter-devise">${escHtml(devise)}</span>
@@ -1360,6 +1371,7 @@ function buildCounterCard(msg) {
           <div class="nego-amount">${fmtPrice(msg.proposed_price, devise)}</div>
           ${raw>0 ? `<div class="nego-original">Prix catalogue : ${fmtPrice(raw, devise)}</div>` : ''}
           ${disc>0 ? `<div class="nego-discount">${msg.mine?'-':'Vous économisez '}${disc}%</div>` : ''}
+          ${msg.note ? `<div class="nego-note">${escHtml(msg.note)}</div>` : ''}
           ${actionsHtml}
           <div class="nego-meta">${escHtml(msg.time||'')}</div>
         </div>
@@ -1370,8 +1382,8 @@ function buildCounterCard(msg) {
 function toggleClientCounterInput(btn, msgId, currentPrice) {
     const form = document.getElementById('cliCounterForm_' + msgId);
     if (!form) return;
-    const isOpen = form.style.display === 'block';
-    form.style.display = isOpen ? 'none' : 'block';
+    const isOpen = form.style.display === 'flex';
+    form.style.display = isOpen ? 'none' : 'flex';
     if (!isOpen) {
         const inp = document.getElementById('cliCounterInput_' + msgId);
         if (inp) { inp.value = Math.floor(currentPrice * 1.05); inp.focus(); }
@@ -1382,13 +1394,14 @@ async function sendClientCounter(msgId, btn) {
     const inp = document.getElementById('cliCounterInput_' + msgId);
     const price = parseFloat(inp?.value);
     if (!price || price < 1) { alert('Entrez un prix valide.'); return; }
+    const message = document.getElementById('cliCounterMessage_' + msgId)?.value.trim() || '';
 
     btn.disabled = true; btn.textContent = '⏳…';
     try {
         const res = await fetch('/client/messages/counter-offer', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
-            body: JSON.stringify({ message_id: msgId, counter_price: price }),
+            body: JSON.stringify({ message_id: msgId, counter_price: price, message }),
         });
         const data = await res.json();
         if (data.success) {
