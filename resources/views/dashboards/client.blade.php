@@ -623,6 +623,153 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     margin-bottom: 28px;
 }
 
+/* ══ RECOMMANDÉ POUR VOUS (carrousel produits — défilement automatique) ══ */
+.reco-row-outer {
+    position: relative;
+    padding: 2px 0 16px;
+    /* Par défaut (pas assez d'articles pour boucler) : défilement manuel au doigt/souris */
+    overflow-x: auto; overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+.reco-row-outer::-webkit-scrollbar { height: 6px; }
+.reco-row-outer::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+/* Défilement automatique = scroll natif incrémenté en JS (voir script) → pas de snap, sinon ça saccade */
+.reco-row-outer.reco-loop { scroll-snap-type: none; }
+
+.reco-row-outer::before, .reco-row-outer::after {
+    content: ''; position: absolute; top: 0; bottom: 16px; width: 40px; z-index: 2; pointer-events: none;
+}
+.reco-row-outer::before { left: 0;  background: linear-gradient(to right, var(--grey), transparent); }
+.reco-row-outer::after  { right: 0; background: linear-gradient(to left,  var(--grey), transparent); }
+
+.reco-row {
+    display: flex; gap: 16px; width: max-content;
+}
+.reco-card { scroll-snap-align: start; }
+
+.reco-card {
+    flex: 0 0 190px; width: 190px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r); overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow .2s, transform .2s, border-color .2s;
+    text-decoration: none; color: inherit;
+    display: flex; flex-direction: column;
+}
+.reco-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); border-color: var(--orange); }
+.reco-card-img { height: 130px; position: relative; overflow: hidden; flex-shrink: 0; background: var(--grey); }
+.reco-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+.reco-card:hover .reco-card-img img { transform: scale(1.07); }
+.reco-card-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.reco-card-badge {
+    position: absolute; top: 8px; left: 8px;
+    background: var(--orange); color: #fff; font-size: 10px; font-weight: 800;
+    padding: 3px 8px; border-radius: 20px;
+}
+.reco-card-fav {
+    position: absolute; top: 8px; right: 8px;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(255,255,255,.92); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-2); transition: all .15s;
+}
+.reco-card-fav:hover { transform: scale(1.08); }
+.reco-card-fav.favorited { background: #fff0f0; color: #e53e3e; }
+.reco-card-fav.favorited svg { stroke: #e53e3e; fill: #e53e3e; }
+.reco-card-body { padding: 11px 13px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.reco-card-shop { font-size: 10.5px; color: var(--muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.reco-card-name {
+    font-size: 12.5px; font-weight: 700; color: var(--text); line-height: 1.3;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    min-height: 2.6em;
+}
+.reco-card-price-row { display: flex; align-items: baseline; gap: 6px; margin-top: auto; flex-wrap: wrap; }
+.reco-card-price { font-size: 14px; font-weight: 800; color: var(--orange); font-family: monospace; }
+.reco-card-orig { font-size: 10.5px; color: var(--muted); text-decoration: line-through; font-family: monospace; }
+
+@media (max-width: 480px) {
+    .reco-card { flex-basis: 152px; width: 152px; }
+    .reco-card-img { height: 105px; }
+}
+
+/* ══ VENTES FLASH (défilement automatique, urgence) ══ */
+.flash-section {
+    background: linear-gradient(135deg, #7c2d12 0%, #dc2626 55%, #f97316 100%);
+    border-radius: var(--r); padding: 20px 20px 22px;
+    position: relative; overflow: hidden; margin-bottom: 28px;
+    box-shadow: 0 8px 28px rgba(220,38,38,.25);
+}
+.flash-section::before {
+    content: ''; position: absolute; right: -40px; top: -40px; width: 180px; height: 180px;
+    border-radius: 50%; background: rgba(255,255,255,.08); pointer-events: none;
+}
+.flash-section-hd { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; position: relative; z-index: 1; flex-wrap: wrap; }
+.flash-section-title { font-family: var(--display); font-size: 18px; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 8px; }
+.flash-section-title .bolt { display: inline-block; animation: boltPulse 1.4s ease-in-out infinite; }
+@keyframes boltPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.25); } }
+.flash-section-sub { font-size: 12px; color: rgba(255,255,255,.85); font-weight: 600; }
+
+.flash-row-outer {
+    position: relative;
+    /* Par défaut (pas assez d'articles pour boucler) : défilement manuel au doigt/souris */
+    overflow-x: auto; overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.4) transparent;
+}
+.flash-row-outer::-webkit-scrollbar { height: 6px; }
+.flash-row-outer::-webkit-scrollbar-thumb { background: rgba(255,255,255,.4); border-radius: 4px; }
+/* Défilement automatique = scroll natif incrémenté en JS (voir script) → pas de snap, sinon ça saccade */
+.flash-row-outer.flash-loop { scroll-snap-type: none; }
+
+.flash-row-outer::before, .flash-row-outer::after {
+    content: ''; position: absolute; top: 0; bottom: 0; width: 32px; z-index: 2; pointer-events: none;
+}
+.flash-row-outer::before { left: 0;  background: linear-gradient(to right, #ad1f0f, transparent); }
+.flash-row-outer::after  { right: 0; background: linear-gradient(to left,  #f97316, transparent); }
+
+.flash-row { display: flex; gap: 14px; width: max-content; }
+.flash-card { scroll-snap-align: start; }
+
+.flash-card {
+    flex: 0 0 168px; width: 168px;
+    background: var(--surface); border-radius: 14px; overflow: hidden;
+    text-decoration: none; color: inherit; display: flex; flex-direction: column;
+    box-shadow: 0 4px 14px rgba(0,0,0,.18);
+    transition: transform .2s;
+}
+.flash-card:hover { transform: translateY(-4px); }
+.flash-card-img { height: 112px; position: relative; background: var(--grey); overflow: hidden; }
+.flash-card-img img { width: 100%; height: 100%; object-fit: cover; }
+.flash-card-badge {
+    position: absolute; top: 7px; left: 7px;
+    background: #111; color: #fde047; font-size: 10.5px; font-weight: 900;
+    padding: 3px 8px; border-radius: 20px;
+}
+.flash-card-body { padding: 9px 11px 11px; display: flex; flex-direction: column; gap: 3px; }
+.flash-card-shop { font-size: 10px; color: var(--muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.flash-card-name {
+    font-size: 12px; font-weight: 700; color: var(--text); line-height: 1.25;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    min-height: 2.4em;
+}
+.flash-card-price-row { display: flex; align-items: baseline; gap: 5px; flex-wrap: wrap; }
+.flash-card-price { font-size: 14px; font-weight: 900; color: #dc2626; font-family: monospace; }
+.flash-card-orig { font-size: 10px; color: var(--muted); text-decoration: line-through; font-family: monospace; }
+.flash-card-countdown {
+    margin-top: 4px; display: inline-flex; align-items: center; gap: 4px;
+    background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c;
+    font-size: 10.5px; font-weight: 800; padding: 3px 8px; border-radius: 8px;
+    font-family: ui-monospace, monospace; width: fit-content;
+}
+
+@media (max-width: 480px) {
+    .flash-card { flex-basis: 138px; width: 138px; }
+    .flash-card-img { height: 92px; }
+}
+
 /* ══ AVATAR BOUTIQUE (cercle initiales) ══ */
 .shop-av {
     width: 46px; height: 46px; border-radius: 50%;
@@ -803,6 +950,30 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     font-size: 12.5px; font-weight: 600; color: var(--text);
     box-shadow: var(--shadow-sm);
 }
+
+/* ══ FIDÉLITÉ (sidebar) ══ */
+.sb-loyalty-card {
+    background: linear-gradient(135deg, #fff7ed, #ffedd5);
+    border: 1px solid #fed7aa;
+    border-radius: var(--r); padding: 14px 16px;
+    box-shadow: var(--shadow-sm);
+}
+.sb-loyalty-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; text-decoration: none; color: inherit; }
+.sb-loyalty-ico { font-size: 26px; flex-shrink: 0; }
+.sb-loyalty-pts { font-family: var(--display); font-size: 16px; font-weight: 900; color: var(--orange-dk); line-height: 1.1; }
+.sb-loyalty-pts span { font-size: 11px; font-weight: 600; color: var(--text-2); }
+.sb-loyalty-value { font-size: 11px; color: var(--text-2); margin-top: 2px; }
+.sb-loyalty-bar-wrap { height: 7px; background: rgba(240,106,15,.15); border-radius: 20px; overflow: hidden; margin-bottom: 6px; }
+.sb-loyalty-bar { height: 100%; background: linear-gradient(90deg, var(--orange), var(--orange-dk)); border-radius: 20px; transition: width .4s ease; }
+.sb-loyalty-next { font-size: 10.5px; color: var(--text-2); line-height: 1.4; margin-bottom: 10px; text-decoration: none; display: block; }
+.sb-loyalty-refer {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 8px 10px; border-radius: 20px;
+    background: var(--surface); border: 1.5px solid var(--orange);
+    color: var(--orange-dk); font-size: 11.5px; font-weight: 700;
+    text-decoration: none; transition: all .15s;
+}
+.sb-loyalty-refer:hover { background: var(--orange); color: #fff; }
 
 .sb-cta {
     background: linear-gradient(135deg, var(--navy) 0%, #3d5a73 100%);
@@ -2244,6 +2415,24 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 {{-- ══ SIDEBAR ══ --}}
 <aside class="sidebar">
 
+    {{-- Fidélité --}}
+    <div class="sb-loyalty-card">
+        <a href="{{ route('client.loyalty.index') }}" class="sb-loyalty-top">
+            <span class="sb-loyalty-ico">🎁</span>
+            <div style="flex:1;min-width:0">
+                <div class="sb-loyalty-pts">{{ number_format($loyaltyPoints, 0, ',', ' ') }} <span>points</span></div>
+                <div class="sb-loyalty-value">= {{ number_format($loyaltyPoints, 0, ',', ' ') }} GNF de réduction</div>
+            </div>
+        </a>
+        <div class="sb-loyalty-bar-wrap">
+            <div class="sb-loyalty-bar" style="width:{{ $loyaltyProgressPercent }}%"></div>
+        </div>
+        <a href="{{ route('client.loyalty.index') }}" class="sb-loyalty-next">
+            Encore {{ number_format($loyaltyNextMilestone - $loyaltyPoints, 0, ',', ' ') }} points pour {{ number_format($loyaltyNextMilestone, 0, ',', ' ') }} GNF de réduction
+        </a>
+        <a href="{{ route('client.loyalty.index') }}" class="sb-loyalty-refer">👥 Parrainez un ami → +{{ number_format($loyaltyReferralBonus, 0, ',', ' ') }} GNF</a>
+    </div>
+
     {{-- Explorer catégories --}}
     @if(isset($categories) && $categories->isNotEmpty())
     <div class="sb-card sb-card-explorer">
@@ -2502,6 +2691,52 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
     </div>
 </div>
 
+{{-- Ventes Flash — défilement automatique, urgence --}}
+@if(isset($flashProducts) && $flashProducts->isNotEmpty())
+@php
+    $flashLoop = $flashProducts->count() >= 4;
+    $flashPasses = $flashLoop ? 2 : 1;
+@endphp
+<div class="flash-section">
+    <div class="flash-section-hd">
+        <div>
+            <div class="flash-section-title"><span class="bolt">⚡</span> Ventes Flash</div>
+            <div class="flash-section-sub">Offres à durée limitée — dépêchez-vous !</div>
+        </div>
+    </div>
+    <div class="flash-row-outer {{ $flashLoop ? 'flash-loop' : '' }}" id="flashRowOuter">
+        <div class="flash-row {{ $flashLoop ? 'flash-auto' : '' }}" id="flashRow">
+            @for ($fpass = 0; $fpass < $flashPasses; $fpass++)
+                @foreach($flashProducts as $fp)
+                <a href="{{ route('client.products.show', $fp) }}" class="flash-card" @if($fpass > 0) aria-hidden="true" tabindex="-1" @endif>
+                    <div class="flash-card-img">
+                        @if($fp->image)
+                            <img src="{{ \App\Services\ImageOptimizer::url($fp->image, 'medium') }}" alt="{{ $fp->name }}" loading="lazy">
+                        @else
+                            <div class="reco-card-ph">{!! $si('bag', 26) !!}</div>
+                        @endif
+                        <span class="flash-card-badge">-{{ $fp->flash_discount_percent }}%</span>
+                    </div>
+                    <div class="flash-card-body">
+                        <div class="flash-card-shop">{{ $fp->shop->name ?? '' }}</div>
+                        <div class="flash-card-name">{{ $fp->name }}</div>
+                        <div class="flash-card-price-row">
+                            <span class="flash-card-price">{{ number_format($fp->flash_price, 0, ',', ' ') }}</span>
+                            <span class="flash-card-orig">{{ number_format($fp->price, 0, ',', ' ') }}</span>
+                            <span style="font-size:10px;color:var(--muted)">{{ $fp->shop->currency ?? 'GNF' }}</span>
+                        </div>
+                        <div class="flash-card-countdown" data-ends="{{ $fp->flash_ends_at->timestamp }}">
+                            ⏳ <span class="flash-cd-val">--:--:--</span>
+                        </div>
+                    </div>
+                </a>
+                @endforeach
+            @endfor
+        </div>
+    </div>
+</div>
+@endif
+
 {{-- Flash --}}
 @foreach(['success','danger'] as $t)
     @if(session($t))<div class="c-flash c-flash-{{ $t }}"><span>{{ $t === 'success' ? '✓' : '✕' }}</span>{{ session($t) }}</div>@endif
@@ -2540,6 +2775,62 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
             <div class="order-amount">{{ number_format($order->total, 0, ',', ' ') }} <span style="font-size:10px;font-weight:400;color:var(--muted)">{{ $order->shop?->currency ?? 'GNF' }}</span></div>
         </a>
         @endforeach
+        </div>
+    </div>
+</div>
+@endif
+
+{{-- Recommandé pour vous — défilement automatique en boucle infinie --}}
+@if(isset($recommendedProducts) && $recommendedProducts->isNotEmpty())
+@php
+    // Boucle infinie fluide : on duplique une fois la liste (assez d'articles pour que ce soit joli),
+    // l'animation CSS glisse de 0 à -50% donc revient pile sur la copie identique = pas de saut visible.
+    $recoLoop = $recommendedProducts->count() >= 4;
+    $recoPasses = $recoLoop ? 2 : 1;
+@endphp
+<div>
+    <div class="sec-hd">
+        <div class="sec-title"><strong>Recommandé</strong> pour vous</div>
+    </div>
+    <div class="reco-row-outer {{ $recoLoop ? 'reco-loop' : '' }}" id="recoRowOuter">
+        <div class="reco-row {{ $recoLoop ? 'reco-auto' : '' }}" id="recoRow">
+            @for ($pass = 0; $pass < $recoPasses; $pass++)
+                @foreach($recommendedProducts as $rp)
+                <a href="{{ route('client.products.show', $rp) }}" class="reco-card" @if($pass > 0) aria-hidden="true" tabindex="-1" @endif>
+                    <div class="reco-card-img">
+                        @if($rp->image)
+                            <img src="{{ \App\Services\ImageOptimizer::url($rp->image, 'medium') }}" alt="{{ $rp->name }}" loading="lazy">
+                        @else
+                            <div class="reco-card-ph">{!! $si('bag', 30) !!}</div>
+                        @endif
+                        @if($rp->is_flash_active)
+                            <span class="reco-card-badge">⚡ -{{ $rp->flash_discount_percent }}%</span>
+                        @elseif($rp->has_promo)
+                            <span class="reco-card-badge">-{{ $rp->discount_percent }}%</span>
+                        @endif
+                        <button class="reco-card-fav {{ in_array($rp->id, $favoriteProductIds ?? []) ? 'favorited' : '' }}"
+                                data-product-id="{{ $rp->id }}"
+                                onclick="event.preventDefault();toggleProductFavorite({{ $rp->id }}, this)"
+                                title="{{ in_array($rp->id, $favoriteProductIds ?? []) ? 'Retirer des favoris' : 'Ajouter aux favoris' }}">
+                            {!! $si('heart', 13) !!}
+                        </button>
+                    </div>
+                    <div class="reco-card-body">
+                        <div class="reco-card-shop">{{ $rp->shop->name ?? '' }}</div>
+                        <div class="reco-card-name">{{ $rp->name }}</div>
+                        <div class="reco-card-price-row">
+                            <span class="reco-card-price">{{ number_format($rp->current_price, 0, ',', ' ') }}</span>
+                            @if($rp->is_flash_active)
+                                <span class="reco-card-orig">{{ number_format($rp->price, 0, ',', ' ') }}</span>
+                            @elseif($rp->has_promo)
+                                <span class="reco-card-orig">{{ number_format($rp->original_price, 0, ',', ' ') }}</span>
+                            @endif
+                            <span style="font-size:10px;color:var(--muted)">{{ $rp->shop->currency ?? 'GNF' }}</span>
+                        </div>
+                    </div>
+                </a>
+                @endforeach
+            @endfor
         </div>
     </div>
 </div>
@@ -3624,6 +3915,153 @@ function toggleFavorite(shopId, btn) {
         btn.disabled = false;
     });
 }
+
+/* Favoris PRODUITS (carrousel "Recommandé pour vous") — même logique que toggleFavorite() mais pour un produit */
+function toggleProductFavorite(productId, btn) {
+    btn.style.opacity = '0.5';
+    btn.disabled = true;
+
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+    fetch(`/client/products/${productId}/favorite`, {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json', 'Content-Type': 'application/json' }
+    })
+    .then(r => {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+    })
+    .then(data => {
+        // Met à jour TOUS les cœurs de ce produit (la boucle infinie affiche chaque carte 2 fois)
+        document.querySelectorAll(`.reco-card-fav[data-product-id="${productId}"]`).forEach(b => {
+            b.disabled = false;
+            b.style.opacity = '';
+            if (data.favorited) {
+                b.classList.add('favorited');
+                b.title = 'Retirer des favoris';
+            } else {
+                b.classList.remove('favorited');
+                b.title = 'Ajouter aux favoris';
+            }
+        });
+    })
+    .catch(err => {
+        console.error('Erreur favoris produit:', err);
+        btn.style.opacity = '';
+        btn.disabled = false;
+    });
+}
+
+/* ══════════════════════════════════════════════════════════
+   Carrousels auto-défilants (Recommandé / Ventes Flash)
+   — Le défilement automatique avance via scrollLeft (scroll natif),
+     donc l'utilisateur peut glisser librement au doigt/à la souris
+     À TOUT MOMENT, y compris pendant le défilement automatique.
+   — Dès qu'on relâche, l'auto-défilement reprend là où on l'a laissé
+     (aucun saut, aucune réinitialisation de position).
+   — Boucle infinie : le contenu est dupliqué x2, on revient au début
+     dès qu'on atteint la moitié de la largeur totale.
+   ══════════════════════════════════════════════════════════ */
+function initAutoScrollCarousel(outer, row, autoClass, pxPerSecond) {
+    if (!outer || !row || !row.classList.contains(autoClass)) return;
+
+    let paused = false;
+    let resumeTimeout = null;
+    let lastTs = null;
+    // scrollWidth est calculé UNE SEULE FOIS (pas à chaque frame) : lire cette propriété force
+    // le navigateur à recalculer la mise en page, ce qui serait coûteux répété 60 fois/seconde.
+    // Les cartes ont une largeur fixe en CSS, donc cette valeur ne bouge pas toute seule.
+    let half = outer.scrollWidth / 2;
+    window.addEventListener('resize', () => { half = outer.scrollWidth / 2; });
+
+    function wrap() {
+        if (half <= 0) return;
+        if (outer.scrollLeft >= half) outer.scrollLeft -= half;
+        else if (outer.scrollLeft < 0) outer.scrollLeft += half;
+    }
+
+    function frame(ts) {
+        if (!paused) {
+            const dt = lastTs ? (ts - lastTs) / 1000 : 0;
+            outer.scrollLeft += pxPerSecond * dt;
+            wrap();
+        }
+        lastTs = ts;
+        requestAnimationFrame(frame);
+    }
+
+    function pause() {
+        paused = true;
+        if (resumeTimeout) clearTimeout(resumeTimeout);
+    }
+    function resumeLater(delay) {
+        if (resumeTimeout) clearTimeout(resumeTimeout);
+        resumeTimeout = setTimeout(() => { paused = false; lastTs = null; }, delay);
+    }
+
+    // Glissement manuel (souris/doigt) : on met en pause, puis on reprend après le relâchement
+    outer.addEventListener('pointerdown', pause);
+    outer.addEventListener('pointerup', () => resumeLater(1800));
+    outer.addEventListener('pointercancel', () => resumeLater(1800));
+    outer.addEventListener('touchstart', pause, { passive: true });
+    outer.addEventListener('touchend', () => resumeLater(1800), { passive: true });
+    // mouseenter/mouseleave = uniquement pour un vrai curseur de souris (desktop).
+    // Sur iOS Safari, un simple effleurement peut déclencher un mouseenter "fantôme"
+    // sans jamais déclencher le mouseleave correspondant (pas de curseur qui "part" sur
+    // écran tactile) → le carrousel restait en pause pour toujours après le premier contact.
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        outer.addEventListener('mouseenter', pause);
+        outer.addEventListener('mouseleave', () => resumeLater(400));
+    }
+    // Si l'utilisateur scrolle manuellement sans passer par pointerdown (molette, trackpad…)
+    outer.addEventListener('wheel', () => { pause(); resumeLater(1800); }, { passive: true });
+    // Sécurité : si le scroll manuel dépasse la boucle, on la reboucle aussi
+    outer.addEventListener('scroll', wrap);
+
+    requestAnimationFrame(frame);
+}
+
+(function () {
+    const recoOuter = document.getElementById('recoRowOuter');
+    const recoRow   = document.getElementById('recoRow');
+    if (recoRow && recoRow.classList.contains('reco-auto')) {
+        const count = recoRow.querySelectorAll('.reco-card').length / 2;
+        const duration = Math.max(18, Math.round(count * 4)); // secondes pour un tour complet
+        const speed = (recoOuter.scrollWidth / 2) / duration;
+        initAutoScrollCarousel(recoOuter, recoRow, 'reco-auto', speed);
+    }
+
+    const flashOuter = document.getElementById('flashRowOuter');
+    const flashRow   = document.getElementById('flashRow');
+    if (flashRow && flashRow.classList.contains('flash-auto')) {
+        const count = flashRow.querySelectorAll('.flash-card').length / 2;
+        const duration = Math.max(16, Math.round(count * 3.5));
+        const speed = (flashOuter.scrollWidth / 2) / duration;
+        initAutoScrollCarousel(flashOuter, flashRow, 'flash-auto', speed);
+    }
+})();
+
+/* Comptes à rebours des ventes flash (mis à jour chaque seconde) */
+(function () {
+    const cards = document.querySelectorAll('.flash-card-countdown[data-ends]');
+    if (!cards.length) return;
+    function tick() {
+        cards.forEach(card => {
+            const endsAt = parseInt(card.dataset.ends, 10) * 1000;
+            const el = card.querySelector('.flash-cd-val');
+            if (!el) return;
+            const diff = endsAt - Date.now();
+            if (diff <= 0) { el.textContent = 'Terminée'; return; }
+            const d = Math.floor(diff / 86400000);
+            const h = Math.floor((diff % 86400000) / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            const pad = n => String(n).padStart(2, '0');
+            el.textContent = (d > 0 ? d + 'j ' : '') + pad(h) + ':' + pad(m) + ':' + pad(s);
+        });
+    }
+    tick();
+    setInterval(tick, 1000);
+})();
 
 function loadFavList() {
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content ?? '';

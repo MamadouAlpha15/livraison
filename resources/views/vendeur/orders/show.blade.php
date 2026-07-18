@@ -414,6 +414,9 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
                 <div class="oh-total-wrap">
                     <div class="oh-total-lbl">Total commande</div>
                     <div class="oh-total">{{ number_format($order->total,0,',',' ') }} <span>{{ $devise }}</span></div>
+                    @if($order->loyalty_points_used > 0)
+                    <div style="font-size:11px;font-weight:700;color:#b45309;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;padding:3px 9px;margin-top:5px;display:inline-block">🎁 Dont -{{ number_format($order->loyalty_points_used,0,',',' ') }} {{ $devise }} via points fidélité du client</div>
+                    @endif
                 </div>
             </div>
 
@@ -529,6 +532,12 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
                                 Frais de livraison
                             </span>
                             <span class="val">{{ number_format($order->delivery_fee,0,',',' ') }} {{ $devise }}</span>
+                        </div>
+                        @endif
+                        @if($order->loyalty_points_used > 0)
+                        <div class="tot-row">
+                            <span class="lbl" style="color:#b45309">🎁 Réduction points fidélité du client</span>
+                            <span class="val" style="color:#b45309">-{{ number_format($order->loyalty_points_used,0,',',' ') }} {{ $devise }}</span>
                         </div>
                         @endif
                         <div class="tot-row tot-grand">

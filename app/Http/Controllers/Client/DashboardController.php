@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\Shop;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\ShopMessage;
 use App\Models\Product;
 use App\Models\User;
+use App\Services\LoyaltyService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -83,6 +85,96 @@ class DashboardController extends Controller
         /* ── Favoris ── */
         $favoriteIds = $user->favorites()->pluck('shops.id')->toArray();
 
+        /* ── Recommandé pour vous ──
+           Basé sur les catégories déjà achetées + les produits favoris.
+           Si le client est nouveau (aucun historique), on retombe sur les
+           produits vedettes / en vente flash pour ne jamais afficher un bloc vide. */
+        $purchasedCategories = OrderItem::whereHas('order', fn($q) => $q->where('user_id', $user->id))
+            ->join('products', 'products.id', '=', 'order_items.product_id')
+            ->whereNotNull('products.category')
+            ->select('products.category', DB::raw('COUNT(*) as cnt'))
+            ->groupBy('products.category')
+            ->orderByDesc('cnt')
+            ->limit(5)
+            ->pluck('products.category')
+            ->toArray();
+
+        $favoriteProductIds = $user->favoriteProducts()->pluck('products.id')->toArray();
+
+        $recoQuery = Product::where('is_active', true)
+            ->whereHas('shop', function ($q) use ($user) {
+                $q->where('is_approved', true);
+                if ($user->country) $q->where('country', $user->country);
+            })
+            ->with(['shop:id,name,currency,country', 'activeVariants:id,product_id,stock']);
+
+        if (!empty($purchasedCategories) || !empty($favoriteProductIds)) {
+            $recoQuery->where(function ($q) use ($purchasedCategories, $favoriteProductIds) {
+                if (!empty($purchasedCategories)) $q->orWhereIn('category', $purchasedCategories);
+                if (!empty($favoriteProductIds))  $q->orWhereIn('id', $favoriteProductIds);
+            });
+        } else {
+            $recoQuery->where(function ($q) {
+                $q->where('is_featured', true)
+                  ->orWhere(function ($q2) {
+                      $q2->whereNotNull('flash_price')->where('flash_ends_at', '>', now());
+                  });
+            });
+        }
+
+        $recommendedProducts = $recoQuery
+            ->inRandomOrder()
+            ->limit(30)
+            ->get()
+            ->reject(function ($p) {
+                return $p->has_variants
+                    ? $p->activeVariants->every(fn ($v) => $v->stock <= 0)
+                    : $p->out_of_stock;
+            })
+            ->take(10)
+            ->values();
+
+        /* ── Ventes Flash actives (toutes boutiques confondues) ──
+           Triées par urgence (celles qui se terminent le plus tôt en premier). */
+        $flashProducts = Product::where('is_active', true)
+            ->whereNotNull('flash_price')
+            ->whereNotNull('flash_ends_at')
+            ->where('flash_ends_at', '>', now())
+            ->where(function ($q) {
+                $q->whereNull('flash_starts_at')->orWhere('flash_starts_at', '<=', now());
+            })
+            ->whereHas('shop', function ($q) use ($user) {
+                $q->where('is_approved', true);
+                if ($user->country) $q->where('country', $user->country);
+            })
+            ->with(['shop:id,name,currency,country', 'activeVariants:id,product_id,stock'])
+            ->orderBy('flash_ends_at')
+            ->limit(20)
+            ->get()
+            ->reject(function ($p) {
+                return $p->has_variants
+                    ? $p->activeVariants->every(fn ($v) => $v->stock <= 0)
+                    : $p->out_of_stock;
+            })
+            ->take(10)
+            ->values();
+
+        /* ── Fidélité : progression vers le prochain palier (widget sidebar) ──
+           Les points valent 1:1 en GNF de réduction (LoyaltyService::redeemPoints).
+           On affiche une barre de progression vers un palier "rond" suivant,
+           purement motivationnel (n'importe quel solde est déjà utilisable). */
+        $loyaltyPoints = $user->loyalty_points ?? 0;
+        $loyaltyLadder = [500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000];
+        $loyaltyNextMilestone = collect($loyaltyLadder)->first(fn ($m) => $m > $loyaltyPoints);
+        if (!$loyaltyNextMilestone) {
+            $loyaltyNextMilestone = (intdiv($loyaltyPoints, 500000) + 1) * 500000;
+        }
+        $loyaltyPrevMilestone = collect($loyaltyLadder)->filter(fn ($m) => $m <= $loyaltyPoints)->last() ?? 0;
+        $loyaltyProgressPercent = $loyaltyNextMilestone > $loyaltyPrevMilestone
+            ? (int) round((($loyaltyPoints - $loyaltyPrevMilestone) / ($loyaltyNextMilestone - $loyaltyPrevMilestone)) * 100)
+            : 100;
+        $loyaltyReferralBonus = LoyaltyService::REFERRAL_REFERRER_BONUS;
+
         /* ── Messages client ── */
         $clientId   = $user->id;
         $myMessages = ShopMessage::where(function($q) use ($clientId) {
@@ -100,7 +192,9 @@ class DashboardController extends Controller
         return view('dashboards.client', compact(
             'shops', 'recentOrders', 'myMessages', 'myUnread',
             'shopCount', 'productCount', 'deliveredCount', 'clientCount',
-            'categories', 'topShops', 'allTopShops', 'favoriteIds'
+            'categories', 'topShops', 'allTopShops', 'favoriteIds',
+            'recommendedProducts', 'favoriteProductIds', 'flashProducts',
+            'loyaltyPoints', 'loyaltyNextMilestone', 'loyaltyProgressPercent', 'loyaltyReferralBonus'
         ));
     }
 }

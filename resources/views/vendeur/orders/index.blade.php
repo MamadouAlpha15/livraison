@@ -294,7 +294,12 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); }
                                 @endforeach
                             </div>
                         </td>
-                        <td><span class="amount">{{ number_format($order->total,0,',',' ') }} <small style="font-size:10px;color:var(--muted);font-weight:500;">{{ $devise }}</small></span></td>
+                        <td>
+                            <span class="amount">{{ number_format($order->total,0,',',' ') }} <small style="font-size:10px;color:var(--muted);font-weight:500;">{{ $devise }}</small></span>
+                            @if($order->loyalty_points_used > 0)
+                            <div style="font-size:10px;color:#b45309;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;padding:2px 6px;margin-top:3px;display:inline-block;white-space:nowrap">🎁 -{{ number_format($order->loyalty_points_used,0,',',' ') }} {{ $devise }} (points fidélité)</div>
+                            @endif
+                        </td>
                         <td>
                             @switch($order->status)
                                 @case(\App\Models\Order::STATUS_EN_ATTENTE)
@@ -392,8 +397,13 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); }
                     </div>
                     @endforeach
                 </div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
-                    <span class="amount">{{ number_format($order->total,0,',',' ') }} {{ $devise }}</span>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap;gap:6px">
+                    <div>
+                        <span class="amount">{{ number_format($order->total,0,',',' ') }} {{ $devise }}</span>
+                        @if($order->loyalty_points_used > 0)
+                        <div style="font-size:11px;font-weight:700;color:#b45309;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;padding:2px 8px;margin-top:3px;display:inline-block">🎁 -{{ number_format($order->loyalty_points_used,0,',',' ') }} {{ $devise }} (points fidélité)</div>
+                        @endif
+                    </div>
                     @if($order->shop && strtolower($order->shop->type) === 'pharmacie' && $order->ordonnance)
                         <button class="act-btn act-btn-ordonnance" data-bs-toggle="modal" data-bs-target="#ordonnanceModal" data-url="{{ asset('storage/'.$order->ordonnance) }}">📎 Ordonnance</button>
                     @endif

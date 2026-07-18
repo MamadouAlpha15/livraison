@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @php $bodyClass = 'is-dashboard'; @endphp
 @section('title', $product->name)
 
@@ -60,7 +59,8 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
 /* ── LAYOUT ── */
 .page{max-width:1080px;margin:0 auto;padding:24px 16px 80px}
 
-.card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.07),0 8px 24px rgba(0,0,0,.05)}
+.card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.07),0 8px 24px rgba(0,0,0,.05);animation:cardIn .28s ease both}
+@keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── GALLERY ── */
 .gallery-section{position:relative;background:#f9fafb}
@@ -117,6 +117,7 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
     transition:transform .15s,background .15s;
 }
 .wish-btn:hover{transform:scale(1.08);background:#fef2f2}
+.wish-btn:active{transform:scale(.92)}
 .wish-btn.active{background:#fef2f2;border-color:#fecaca}
 .product-name{font-size:22px;font-weight:800;line-height:1.25;color:#111;margin-bottom:16px}
 
@@ -156,6 +157,7 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
 .variant-pill:hover:not(.disabled){border-color:#111}
 .variant-pill.selected{background:#111;color:#fff;border-color:#111}
 .variant-pill.disabled{opacity:.45;text-decoration:line-through;cursor:not-allowed}
+.variant-hint{margin-top:8px;font-size:12px;color:#9ca3af}
 
 /* STOCK */
 .stock-line{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;margin-bottom:18px}
@@ -218,6 +220,7 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
     text-decoration:none;transition:.18s;border:none;cursor:pointer
 }
 .btn-order:hover{background:#000;transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.btn-order:active{transform:scale(.97)}
 .btn-order.off{background:#e5e7eb;color:#9ca3af;pointer-events:none;cursor:default;transform:none;box-shadow:none}
 .btn-back{
     display:flex;align-items:center;justify-content:center;gap:7px;
@@ -226,20 +229,34 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
     text-decoration:none;transition:.15s
 }
 .btn-back:hover{border-color:#9ca3af;color:#111}
+.btn-back:active{transform:scale(.97)}
+.variant-pill:active:not(.disabled){transform:scale(.96)}
+.shop-row:active{transform:scale(.99)}
+
+/* ══ TRÈS PETIT MOBILE ══ */
+@media(max-width:380px){
+    .page{padding:16px 10px 70px}
+    .info-section{padding:18px 16px 24px}
+    .product-name{font-size:19px;margin-bottom:12px}
+    .price{font-size:24px}
+    .btn-order,.btn-back{padding:14px 18px;font-size:14px}
+}
 
 /* ══ DESKTOP — côte à côte ══ */
 @media(min-width:780px){
     .page{padding:32px 24px 80px}
-    .card{display:grid;grid-template-columns:1fr 1fr;align-items:start}
-    .gallery-section{border-right:1px solid #f3f4f6}
-    .main-img-wrap{aspect-ratio:1/1}
-    .info-section{padding:30px 28px 36px;overflow-y:auto;max-height:calc(100vh - 120px)}
-    .product-name{font-size:26px}
-    .price{font-size:32px}
+    .card{display:grid;grid-template-columns:420px 1fr;align-items:stretch}
+    .gallery-section{border-right:1px solid #f3f4f6;display:flex;flex-direction:column}
+    .main-img-wrap{aspect-ratio:4/3}
+    .info-section{padding:30px 28px 36px;overflow-y:auto;max-height:calc(100vh - 120px);display:flex;flex-direction:column}
+    .cta-stack{margin-top:auto;padding-top:18px}
+    .product-name{font-size:24px}
+    .price{font-size:30px}
 }
 @media(min-width:1024px){
     .page{padding:40px 32px 80px}
-    .product-name{font-size:28px}
+    .card{grid-template-columns:460px 1fr}
+    .product-name{font-size:26px}
 }
 </style>
 
@@ -348,9 +365,7 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
                 </button>
                 @endforeach
             </div>
-            <div class="field-error" id="variantError" style="display:none;margin-top:8px;color:#dc2626;font-size:12.5px">
-                Veuillez choisir une option avant de commander.
-            </div>
+            <div class="variant-hint">Optionnel — vous pouvez commander sans choisir d'option précise.</div>
         </div>
         @else
         {{-- STOCK --}}
@@ -432,8 +447,7 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
             @if(!$unavailable)
                 <a href="{{ route('client.orders.createFromProduct', $product) }}"
                    data-base-href="{{ route('client.orders.createFromProduct', $product) }}"
-                   id="orderCta" class="btn-order"
-                   @if($variants->isNotEmpty()) onclick="return checkVariantSelected(event)" @endif>
+                   id="orderCta" class="btn-order">
                     🛒 Commander maintenant
                 </a>
             @else
@@ -586,19 +600,6 @@ function selectVariant(btn){
         const base = orderBtn.dataset.baseHref;
         orderBtn.href = base + (base.includes('?') ? '&' : '?') + 'variant_id=' + selectedVariantId;
     }
-    const err = document.getElementById('variantError');
-    if(err) err.style.display = 'none';
-}
-
-function checkVariantSelected(e){
-    if(!selectedVariantId){
-        e.preventDefault();
-        const err = document.getElementById('variantError');
-        if(err) err.style.display = 'block';
-        document.getElementById('variantPicker')?.scrollIntoView({behavior:'smooth', block:'center'});
-        return false;
-    }
-    return true;
 }
 
 async function toggleWish(productId){

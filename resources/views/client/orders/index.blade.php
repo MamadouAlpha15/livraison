@@ -806,6 +806,11 @@ $groups = $orders->getCollection()
                     <a href="{{ route('client.orders.invoice', $order) }}" class="btn-action btn-track" style="background:#f8fafc;border-color:#e2e8f0;color:#475569">
                         📄 Reçu PDF
                     </a>
+                    @if($order->delivery_proof_photo)
+                    <a href="{{ $order->delivery_proof_photo_url }}" target="_blank" rel="noopener" class="btn-action btn-track" style="background:#f0fdf4;border-color:#bbf7d0;color:#15803d">
+                        📸 Preuve de livraison
+                    </a>
+                    @endif
                     {{-- Avis : seulement si toutes les commandes du groupe sont livrées et sans avis --}}
                     @if($group['all_delivered'] && !$group['has_review'])
                     <a href="{{ route('client.reviews.create', $order) }}" class="btn-action btn-review">

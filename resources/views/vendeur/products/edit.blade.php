@@ -285,6 +285,12 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 @keyframes spin   { to { transform: rotate(360deg); } }
 @keyframes iaSpin { to { transform: rotate(360deg); } }
 .upload-spin { display: inline-block; animation: spin .8s linear infinite; font-size: 28px; }
+.btn-spinner {
+    display: inline-block; width: 15px; height: 15px;
+    border: 2px solid rgba(255,255,255,.4); border-top-color: #fff;
+    border-radius: 50%; animation: spin .7s linear infinite;
+    flex-shrink: 0;
+}
 .upload-uploading {
     position: absolute; inset: 0; display: flex; flex-direction: column;
     align-items: center; justify-content: center;
@@ -1166,7 +1172,7 @@ document.getElementById('productForm').addEventListener('submit', function (e) {
 
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
-    btn.innerHTML = '⏳ Enregistrement…';
+    btn.innerHTML = '<span class="btn-spinner"></span> Enregistrement…';
 });
 
 /* ══════════════════════════════════════════════

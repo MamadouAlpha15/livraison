@@ -133,7 +133,13 @@ class OrderTrackingController extends Controller
         abort_unless($authorized, 403, 'Réservé au chauffeur assigné.');
 
         $data = $request->validate([
-            'status' => ['required', 'in:en_livraison,livrée'],
+            'status'      => ['required', 'in:en_livraison,livrée'],
+            'proof_photo' => ['nullable', 'image', 'mimes:jpeg,png,webp,gif', 'max:8192'],
+        ], [
+            'proof_photo.image'    => "Le fichier envoyé n'est pas une image valide.",
+            'proof_photo.mimes'    => 'Format de photo non supporté (JPEG, PNG, WEBP ou GIF uniquement).',
+            'proof_photo.max'      => 'La photo est trop volumineuse (max 8 Mo).',
+            'proof_photo.uploaded' => "L'envoi de la photo a échoué (connexion instable ?). Réessayez, ou continuez sans photo.",
         ]);
 
         abort_unless(
@@ -142,7 +148,15 @@ class OrderTrackingController extends Controller
             'Commande déjà terminée.'
         );
 
-        $order->update(['status' => $data['status']]);
+        // Preuve de livraison : photo prise par le livreur au moment de la remise (optionnelle)
+        $proofPhotoPath = $request->hasFile('proof_photo')
+            ? \App\Services\ImageOptimizer::store($request->file('proof_photo'), 'delivery_proofs')
+            : null;
+
+        $order->update(array_filter([
+            'status'                => $data['status'],
+            'delivery_proof_photo'  => $proofPhotoPath,
+        ], fn ($v) => $v !== null));
 
         // Propager le changement de statut aux commandes du même batch (même trajet)
         if ($order->delivery_batch_id) {
@@ -155,10 +169,11 @@ class OrderTrackingController extends Controller
                     ->update(['status' => Order::STATUS_EN_LIVRAISON]);
             } elseif ($data['status'] === Order::STATUS_LIVREE) {
                 // Mass-update bypass le mutateur setStatusAttribute → delivered_at doit être explicite
-                $siblings->update([
-                    'status'       => Order::STATUS_LIVREE,
-                    'delivered_at' => now(),
-                ]);
+                $siblings->update(array_filter([
+                    'status'               => Order::STATUS_LIVREE,
+                    'delivered_at'         => now(),
+                    'delivery_proof_photo' => $proofPhotoPath,
+                ], fn ($v) => $v !== null));
             }
         }
 

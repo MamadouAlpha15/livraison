@@ -299,6 +299,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/orders/live-stats',               [CompanyOrderController::class, 'liveStats'])        ->name('company.orders.live-stats');
         Route::get('/orders/notifications',             [CompanyOrderController::class, 'notifications'])    ->name('company.orders.notifications');
         Route::post('/orders/{order}/assign',           [CompanyOrderController::class, 'assign'])           ->name('company.orders.assign');
+        Route::post('/orders/{order}/auto-assign',      [CompanyOrderController::class, 'autoAssign'])       ->name('company.orders.auto-assign');
+        Route::post('/orders/bulk-auto-assign',         [CompanyOrderController::class, 'bulkAutoAssign'])   ->name('company.orders.bulk-auto-assign');
         Route::post('/orders/{order}/status',           [CompanyOrderController::class, 'updateStatus'])     ->name('company.orders.status');
         Route::post('/orders/{order}/cancel',           [CompanyOrderController::class, 'cancel'])           ->name('company.orders.cancel');
         Route::post('/orders/{order}/restore',          [CompanyOrderController::class, 'restore'])          ->name('company.orders.restore');

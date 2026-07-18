@@ -142,6 +142,33 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
 .ab-purple .action-sub { color:#8b5cf6; }
 .ab-purple:hover { background:#ede9fe; border-color:var(--purple); }
 
+/* ─── NOTIFICATIONS PUSH ─── */
+.lv-notif-card {
+    display:flex; align-items:center; gap:14px;
+    background:#fff; border-radius:16px;
+    padding:16px 20px; margin:16px 24px;
+    box-shadow:0 2px 12px rgba(0,0,0,.06);
+    border-left:4px solid var(--blue);
+}
+.lv-notif-ico {
+    width:44px; height:44px; border-radius:12px; flex-shrink:0;
+    background:var(--blue-lt); display:flex; align-items:center; justify-content:center;
+    font-size:21px;
+}
+.lv-notif-title { font-weight:800; font-size:14px; color:var(--text); }
+.lv-notif-sub { font-size:12.5px; color:var(--muted); margin-top:2px; line-height:1.4; }
+.lv-notif-btn {
+    background:linear-gradient(135deg,var(--green),#059669); color:#fff; border:none;
+    border-radius:10px; padding:10px 18px; font-size:13px; font-weight:700; font-family:var(--font);
+    cursor:pointer; white-space:nowrap; box-shadow:0 3px 10px rgba(16,185,129,.3);
+    transition:transform .15s, opacity .15s;
+}
+.lv-notif-btn:hover { transform:scale(1.03); }
+@media(max-width:640px) {
+    .lv-notif-card { margin:14px 16px; padding:14px 16px; flex-wrap:wrap; }
+    .lv-notif-btn { width:100%; }
+}
+
 /* ─── STAT COMMISSION ─── */
 .lv-commission-hero {
     background:linear-gradient(135deg,#1e1b4b,#3730a3);
@@ -149,6 +176,35 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
 }
 .lv-commission-hero .amount { font-size:28px; font-weight:900; color:#fff; font-family:monospace; }
 .lv-commission-hero .label  { font-size:12px; color:rgba(255,255,255,.7); margin-top:4px; }
+
+/* ─── OBJECTIF DU JOUR (gamification) ─── */
+.lv-goal-card {
+    background:linear-gradient(135deg,#f59e0b,#fbbf24);
+    border-radius:16px; padding:18px 20px; margin:0 24px 20px;
+    box-shadow:0 4px 20px rgba(245,158,11,.25);
+}
+.lv-goal-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.lv-goal-title { font-size:14px; font-weight:800; color:#78350f; display:flex; align-items:center; gap:6px; }
+.lv-goal-count { font-size:13px; font-weight:700; color:#78350f; font-family:monospace; }
+.lv-goal-bar-wrap { height:10px; background:rgba(120,53,15,.15); border-radius:20px; overflow:hidden; margin-bottom:8px; }
+.lv-goal-bar { height:100%; background:#78350f; border-radius:20px; transition:width .5s ease; }
+.lv-goal-sub { font-size:12px; color:#92400e; font-weight:600; }
+.lv-goal-sub.reached { color:#065f46; }
+
+/* ─── CLASSEMENT (gamification) ─── */
+.lv-rank-row {
+    display:flex; align-items:center; gap:10px;
+    padding:10px 16px; border-bottom:1px solid #f8fafc;
+}
+.lv-rank-row:last-child { border-bottom:none; }
+.lv-rank-row.me { background:#eef2ff; }
+.lv-rank-pos { width:22px; text-align:center; font-weight:900; font-size:13px; color:var(--muted); flex-shrink:0; }
+.lv-rank-pos.gold   { color:#f59e0b; }
+.lv-rank-pos.silver { color:#94a3b8; }
+.lv-rank-pos.bronze { color:#cd7c3c; }
+.lv-rank-name { flex:1; min-width:0; font-size:12.5px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lv-rank-row.me .lv-rank-name { color:var(--brand); }
+.lv-rank-count { font-size:12px; font-weight:800; color:var(--muted); font-family:monospace; flex-shrink:0; }
 
 /* ─── EMPTY ─── */
 .lv-empty { padding:32px; text-align:center; color:var(--muted); font-size:13px; }
@@ -237,14 +293,13 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
 </div>
 
 {{-- Notifications push — activation manuelle si la bannière automatique n'est pas apparue --}}
-<div id="notifSettingsCard" style="display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin:14px 0;">
-    <span style="font-size:26px">🔔</span>
+<div id="notifSettingsCard" class="lv-notif-card">
+    <div class="lv-notif-ico">🔔</div>
     <div style="flex:1;min-width:160px">
-        <div style="font-weight:700;font-size:14px;color:var(--text)">Notifications push</div>
-        <div id="notifSettingsSub" style="font-size:13px;color:var(--muted);margin-top:2px">Recevez vos commandes en temps réel, même application fermée.</div>
+        <div class="lv-notif-title">Notifications push</div>
+        <div id="notifSettingsSub" class="lv-notif-sub">Recevez vos commandes en temps réel, même application fermée.</div>
     </div>
-    <button type="button" id="notifSettingsBtn"
-            style="background:#059669;color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">
+    <button type="button" id="notifSettingsBtn" class="lv-notif-btn">
         Activer les notifications
     </button>
 </div>
@@ -312,6 +367,24 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
     </div>
 </div>
 
+{{-- ═══ OBJECTIF DU JOUR (gamification) ═══ --}}
+<div class="lv-goal-card">
+    <div class="lv-goal-top">
+        <div class="lv-goal-title">🎯 Objectif du jour</div>
+        <div class="lv-goal-count" id="goal-count">{{ $dailyProgress['count'] }}/{{ $dailyProgress['goal'] }}</div>
+    </div>
+    <div class="lv-goal-bar-wrap">
+        <div class="lv-goal-bar" id="goal-bar" style="width:{{ $dailyProgress['percent'] }}%"></div>
+    </div>
+    <div class="lv-goal-sub {{ $dailyProgress['rewarded'] ? 'reached' : '' }}" id="goal-sub">
+        @if($dailyProgress['rewarded'])
+            ✅ Prime de {{ number_format($dailyProgress['bonus'], 0, ',', ' ') }} débloquée aujourd'hui !
+        @else
+            Livrez {{ $dailyProgress['goal'] }} commandes aujourd'hui pour débloquer une prime de {{ number_format($dailyProgress['bonus'], 0, ',', ' ') }}
+        @endif
+    </div>
+</div>
+
 {{-- ═══ BODY ═══ --}}
 <div class="lv-body">
 
@@ -362,22 +435,54 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
     {{-- Colonne droite --}}
     <div style="display:flex;flex-direction:column;gap:20px;">
 
-        {{-- Commission --}}
+        {{-- Commission / Frais de livraison --}}
         <div class="lv-card">
             <div class="lv-commission-hero">
                 <div class="amount">{{ $fmt($totalCommission) }}</div>
-                <div class="label">💸 Total commissions gagnées</div>
+                @if($isCompanyDriver)
+                    <div class="label">🚚 Frais de livraison collectés pour l'entreprise</div>
+                @else
+                    <div class="label">💸 Total commissions gagnées</div>
+                @endif
             </div>
             <div style="padding:14px 16px">
                 <a href="{{ route('livreur.commissions.index') }}" class="lv-action-btn ab-green" style="border-radius:10px;">
                     <div class="action-ico">💰</div>
                     <div>
-                        <div class="action-lbl">Voir mes commissions</div>
+                        <div class="action-lbl">{{ $isCompanyDriver ? 'Voir les frais de livraison' : 'Voir mes commissions' }}</div>
                         <div class="action-sub">Historique détaillé</div>
                     </div>
                 </a>
             </div>
         </div>
+
+        {{-- Classement (gamification) --}}
+        @if(count($leaderboard))
+        <div class="lv-card">
+            <div class="lv-card-hd">
+                <span class="lv-card-title">🏆 Classement de la semaine</span>
+            </div>
+            <div>
+                @foreach(array_slice($leaderboard, 0, 5) as $row)
+                <div class="lv-rank-row {{ $row['is_me'] ? 'me' : '' }}">
+                    <div class="lv-rank-pos {{ $row['rank']===1?'gold':($row['rank']===2?'silver':($row['rank']===3?'bronze':'')) }}">
+                        {{ $row['rank']===1?'🥇':($row['rank']===2?'🥈':($row['rank']===3?'🥉':$row['rank'])) }}
+                    </div>
+                    <div class="lv-rank-name">{{ $row['is_me'] ? 'Vous' : $row['name'] }}</div>
+                    <div class="lv-rank-count">{{ $row['count'] }} 📦</div>
+                </div>
+                @endforeach
+                @php $myRow = collect($leaderboard)->firstWhere('is_me', true); @endphp
+                @if($myRow && $myRow['rank'] > 5)
+                <div class="lv-rank-row me" style="border-top:2px solid var(--border)">
+                    <div class="lv-rank-pos">{{ $myRow['rank'] }}</div>
+                    <div class="lv-rank-name">Vous</div>
+                    <div class="lv-rank-count">{{ $myRow['count'] }} 📦</div>
+                </div>
+                @endif
+            </div>
+        </div>
+        @endif
 
         {{-- Actions rapides --}}
         <div class="lv-card">
@@ -483,6 +588,20 @@ async function pollDashboard() {
         document.getElementById('kpi-attente').textContent  = d.enAttente;
 
         document.getElementById('recent-orders-list').innerHTML = renderOrders(d.recentOrders);
+
+        if (d.dailyProgress) {
+            const gp = d.dailyProgress;
+            document.getElementById('goal-count').textContent = gp.count + '/' + gp.goal;
+            document.getElementById('goal-bar').style.width = gp.percent + '%';
+            const sub = document.getElementById('goal-sub');
+            if (gp.rewarded) {
+                sub.textContent = '✅ Prime de ' + new Intl.NumberFormat('fr').format(gp.bonus) + ' débloquée aujourd\'hui !';
+                sub.classList.add('reached');
+            } else {
+                sub.textContent = 'Livrez ' + gp.goal + ' commandes aujourd\'hui pour débloquer une prime de ' + new Intl.NumberFormat('fr').format(gp.bonus);
+                sub.classList.remove('reached');
+            }
+        }
     } catch (_) {}
 }
 

@@ -30,12 +30,20 @@ class Order extends Model
     protected $fillable = ['user_id','shop_id','total','loyalty_points_used','status','ordonnance','livreur_id','current_lat','current_lng','last_ping_at',
     'image','delivery_fee','delivery_destination','client_phone','client_name','delivery_company_id','driver_id','delivery_zone_id','delivery_batch_id',
     'client_lat','client_lng','client_location_shared_at',
-    'vendor_lat','vendor_lng','vendor_location_shared_at','delivered_at'];
+    'vendor_lat','vendor_lng','vendor_location_shared_at','delivered_at','delivery_proof_photo'];
 
     // Nom du client à afficher : compte connecté sinon nom saisi en tant qu'invité
     public function getDisplayNameAttribute(): string
     {
         return $this->client->name ?? $this->client_name ?? 'Client invité';
+    }
+
+    /** URL de la photo de preuve de livraison, si le livreur en a pris une. */
+    public function getDeliveryProofPhotoUrlAttribute(): ?string
+    {
+        return $this->delivery_proof_photo
+            ? \App\Services\ImageOptimizer::url($this->delivery_proof_photo, 'medium')
+            : null;
     }
 
     // Téléphone à afficher : compte connecté sinon téléphone saisi en tant qu'invité

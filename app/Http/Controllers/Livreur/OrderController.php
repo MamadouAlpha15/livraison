@@ -142,7 +142,64 @@ class OrderController extends Controller
             }
         }
 
+        // Optimisation de tournée : pour les trajets à plusieurs arrêts, on réordonne
+        // les commandes du plus proche au plus loin (au lieu de l'ordre d'arrivée des commandes),
+        // pour minimiser la distance totale parcourue par le livreur.
+        foreach ($result as &$group) {
+            if (count($group['orders']) > 1) {
+                $group['orders'] = $this->optimizeRouteOrder($group['orders']);
+            }
+        }
+        unset($group);
+
         return $result;
+    }
+
+    /**
+     * Réordonne une liste de commandes d'un même trajet groupé selon l'algorithme
+     * du "plus proche voisin" : depuis le point de départ (la boutique), on va toujours
+     * à l'arrêt le plus proche restant, puis au suivant le plus proche de là, etc.
+     * Ne fait rien si une commande du groupe n'a pas de coordonnées GPS client
+     * (on ne touche pas à l'ordre si on n'est pas sûr de la distance réelle).
+     */
+    private function optimizeRouteOrder(array $orders): array
+    {
+        foreach ($orders as $o) {
+            if (is_null($o->client_lat) || is_null($o->client_lng)) {
+                return $orders;
+            }
+        }
+
+        $first  = $orders[0];
+        $curLat = $first->vendor_lat ?? $first->client_lat;
+        $curLng = $first->vendor_lng ?? $first->client_lng;
+
+        $remaining = $orders;
+        $sequenced = [];
+
+        while (count($remaining) > 0) {
+            usort($remaining, function ($a, $b) use ($curLat, $curLng) {
+                return $this->haversineKm($curLat, $curLng, $a->client_lat, $a->client_lng)
+                     <=> $this->haversineKm($curLat, $curLng, $b->client_lat, $b->client_lng);
+            });
+            $next = array_shift($remaining);
+            $sequenced[] = $next;
+            $curLat = $next->client_lat;
+            $curLng = $next->client_lng;
+        }
+
+        return $sequenced;
+    }
+
+    /** Distance à vol d'oiseau entre deux points GPS, en kilomètres (formule de Haversine). */
+    private function haversineKm(float $lat1, float $lon1, float $lat2, float $lon2): float
+    {
+        $earthRadiusKm = 6371;
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+        $a = sin($dLat / 2) ** 2 + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon / 2) ** 2;
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        return $earthRadiusKm * $c;
     }
 
     /** Démarrer plusieurs commandes d'un même groupe d'un coup. */
@@ -180,7 +237,16 @@ class OrderController extends Controller
     {
         $driver = $this->myDriver();
         $user   = Auth::user();
-        $ids    = $request->validate(['order_ids' => 'required|array|min:1'])['order_ids'];
+        $data   = $request->validate([
+            'order_ids'   => 'required|array|min:1',
+            'proof_photo' => ['nullable', 'image', 'mimes:jpeg,png,webp,gif', 'max:8192'],
+        ]);
+        $ids = $data['order_ids'];
+
+        // Une seule photo prise pour tout le trajet groupé (même client) → appliquée à chaque commande du lot
+        $proofPhotoPath = $request->hasFile('proof_photo')
+            ? \App\Services\ImageOptimizer::store($request->file('proof_photo'), 'delivery_proofs')
+            : null;
 
         $orders = Order::with(['payment'])->whereIn('id', $ids)->get();
 
@@ -192,6 +258,9 @@ class OrderController extends Controller
             foreach ($orders as $order) {
                 if ($order->livreur_id !== $user->id && (!$driver || (int)$order->driver_id !== $driver->id)) continue;
                 $order->status = Order::STATUS_LIVREE;
+                if ($proofPhotoPath) {
+                    $order->delivery_proof_photo = $proofPhotoPath;
+                }
                 $order->save();
                 if ($order->payment) {
                     $order->payment->update(['status' => 'payé']);
@@ -246,6 +315,14 @@ class OrderController extends Controller
                     );
                 } catch (\Throwable $e) {}
             }
+
+            // Objectif journalier (gamification) : vérifie si le livreur vient de débloquer sa prime du jour
+            try {
+                if (app(\App\Services\GamificationService::class)->checkAndAwardDailyBonus($user, $driver)) {
+                    session()->flash('daily_bonus_unlocked', true);
+                }
+            } catch (\Throwable $e) {}
+
             return redirect()->route('livreur.orders.index')->with('success', 'Commandes livrées avec succès.');
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -367,14 +444,21 @@ class OrderController extends Controller
     /**
      * Livreur termine la livraison → statut "livrée", chauffeur → available.
      */
-    public function complete(Order $order)
+    public function complete(Request $request, Order $order)
     {
         $driver = $this->authorizeOrder($order);
+
+        $request->validate([
+            'proof_photo' => ['nullable', 'image', 'mimes:jpeg,png,webp,gif', 'max:8192'],
+        ]);
 
         DB::beginTransaction();
 
         try {
             $order->status = Order::STATUS_LIVREE;
+            if ($request->hasFile('proof_photo')) {
+                $order->delivery_proof_photo = \App\Services\ImageOptimizer::store($request->file('proof_photo'), 'delivery_proofs');
+            }
             $order->save();
 
             if ($order->payment) {
@@ -435,6 +519,13 @@ class OrderController extends Controller
                     Log::warning('Push complete order failed: ' . $e->getMessage());
                 }
             }
+
+            // Objectif journalier (gamification) : vérifie si le livreur vient de débloquer sa prime du jour
+            try {
+                if (app(\App\Services\GamificationService::class)->checkAndAwardDailyBonus(Auth::user(), $driver)) {
+                    session()->flash('daily_bonus_unlocked', true);
+                }
+            } catch (\Throwable $e) {}
 
             return redirect()->route('livreur.orders.index')->with('success', 'Commande livrée avec succès.');
 

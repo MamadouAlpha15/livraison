@@ -817,6 +817,10 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                     @endif
                 </div>
             </div>
+            <button type="button" class="btn-sel-assign" id="bulkAutoAssignBtn" onclick="bulkAutoAssignAll()"
+                    title="Assigne automatiquement toutes les commandes en attente au meilleur chauffeur disponible (zone + charge de travail)">
+                🤖 Assigner tout automatiquement
+            </button>
         </div>
         @php
             [$livreesLbl, $revenusLbl] = match($period) {
@@ -1027,7 +1031,12 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                         @endif
                     </td>
                     <td data-label="Montant"><div class="amount-val">{{ $fmt($order->total) }}</div></td>
-                    <td data-label="Statut"><span class="badge {{ $st['cls'] }}">{{ $st['lbl'] }}</span></td>
+                    <td data-label="Statut">
+                        <span class="badge {{ $st['cls'] }}">{{ $st['lbl'] }}</span>
+                        @if($order->delivery_proof_photo)
+                        <a href="{{ $order->delivery_proof_photo_url }}" target="_blank" rel="noopener" title="Voir la preuve de livraison" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;text-decoration:none;font-size:11px;margin-left:4px;vertical-align:middle">📸</a>
+                        @endif
+                    </td>
                     <td data-label="Date" style="color:var(--cx-muted);font-size:12px;" class="td-date">
                         {{ \Carbon\Carbon::parse($order->created_at)->format('d/m/y H:i') }}
                     </td>
@@ -1045,6 +1054,10 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                                     data-client-addr="{{ $order->client->address ?? '' }}"
                                     onclick="openAssign(this)">
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>Assigner
+                            </button>
+                            <button class="btn-action btn-assign" title="Assigner automatiquement au meilleur chauffeur disponible"
+                                    onclick="autoAssignOrder({{ $order->id }}, this)">
+                                🤖 Auto
                             </button>
                             @endif
                             @if(!in_array($order->status, ['livrée','annulée']))
@@ -1155,6 +1168,16 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                     @endif
                 </span>
             </div>
+            @if($order->delivery_proof_photo)
+            <div class="mc-row">
+                <span class="mc-lbl" style="display:inline-flex;align-items:center;gap:4px">📸 Preuve</span>
+                <span class="mc-val">
+                    <a href="{{ $order->delivery_proof_photo_url }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;text-decoration:none;font-size:11.5px;font-weight:700">
+                        📸 Voir la photo
+                    </a>
+                </span>
+            </div>
+            @endif
             <div class="mc-row" style="border-bottom:none">
                 <span class="mc-lbl" style="display:inline-flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Date</span>
                 <span class="mc-val" style="color:var(--cx-muted)">{{ \Carbon\Carbon::parse($order->created_at)->format('d/m/y H:i') }}</span>
@@ -1175,6 +1198,10 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                     data-client-addr="{{ $order->client->address ?? '' }}"
                     onclick="openAssign(this)">
                 🚴 Assigner
+            </button>
+            <button class="btn-action btn-assign" title="Assigner automatiquement au meilleur chauffeur disponible"
+                    onclick="autoAssignOrder({{ $order->id }}, this)">
+                🤖 Auto
             </button>
             @endif
             @if(!in_array($order->status, ['livrée','annulée']))
@@ -1820,6 +1847,61 @@ async function submitAssign(){
     }catch(err){
         toast('Erreur réseau : '+err.message,'error');
         btn.disabled=false; btn.textContent='🚴 Confirmer l\'assignation';
+    }
+}
+
+/* ── Assignation automatique (une commande) ── */
+async function autoAssignOrder(orderId, btn){
+    var original = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '⏳…';
+    var fd = new FormData();
+    fd.append('_token', CSRF);
+    try{
+        var r = await fetch('/company/orders/'+orderId+'/auto-assign', {method:'POST', body:fd});
+        var data = await r.json();
+        if(data.success){
+            var grpMsg = data.grouped_count > 1 ? ' ('+data.grouped_count+' commandes du même client regroupées, frais appliqués 1 seule fois)' : '';
+            toast('🤖 '+data.driver_name+' assigné automatiquement · '+data.delivery_fee+' '+DEVISE+grpMsg, 'success');
+            setTimeout(function(){ location.reload(); }, 1200);
+        } else {
+            toast('❌ '+(data.message||'Aucun chauffeur disponible.'), 'error');
+            btn.disabled = false; btn.innerHTML = original;
+        }
+    }catch(err){
+        toast('Erreur réseau : '+err.message, 'error');
+        btn.disabled = false; btn.innerHTML = original;
+    }
+}
+
+/* ── Assignation automatique en masse (toutes les commandes en attente non assignées) ── */
+async function bulkAutoAssignAll(){
+    var btn = document.getElementById('bulkAutoAssignBtn');
+    var original = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Assignation en cours…';
+    var fd = new FormData();
+    fd.append('_token', CSRF);
+    try{
+        var r = await fetch('/company/orders/bulk-auto-assign', {method:'POST', body:fd});
+        var data = await r.json();
+        if(data.success){
+            if(data.assigned > 0){
+                var msg = data.assigned+' commande'+(data.assigned>1?'s':'')+' assignée'+(data.assigned>1?'s':'')+' automatiquement sur '+data.trips+' trajet'+(data.trips>1?'s':'')+' (frais appliqués 1 seule fois par client).';
+                if(data.skipped > 0) msg += ' ('+data.skipped+' laissée'+(data.skipped>1?'s':'')+' en attente, aucun chauffeur disponible.)';
+                toast('🤖 '+msg, 'success');
+                setTimeout(function(){ location.reload(); }, 1500);
+            } else {
+                toast('Aucune commande en attente à assigner, ou aucun chauffeur disponible.', 'error');
+                btn.disabled = false; btn.innerHTML = original;
+            }
+        } else {
+            toast('❌ Erreur lors de l\'assignation automatique.', 'error');
+            btn.disabled = false; btn.innerHTML = original;
+        }
+    }catch(err){
+        toast('Erreur réseau : '+err.message, 'error');
+        btn.disabled = false; btn.innerHTML = original;
     }
 }
 

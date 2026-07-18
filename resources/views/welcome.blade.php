@@ -407,6 +407,25 @@ body {
     to   { opacity: 1; }
 }
 
+/* Reveal au scroll */
+.reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .7s cubic-bezier(.2,.7,.3,1), transform .7s cubic-bezier(.2,.7,.3,1);
+    transition-delay: var(--reveal-delay, 0ms);
+}
+.reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+    .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
+
 /* ════════════════════════════════════════════════════════════════
    SECTION COMMUNE
 ════════════════════════════════════════════════════════════════ */
@@ -1406,7 +1425,7 @@ footer.app-footer { display: none !important; }
      CTA CLIENT
 ══════════════════════════════════════════ --}}
 <div style="padding:72px 0 0;background:linear-gradient(180deg,#0a0a1e 0%,#f8fafc 50%)">
-    <div class="client-cta">
+    <div class="client-cta reveal">
 
         {{-- Texte + boutons --}}
         <div class="client-cta-top">
@@ -1455,27 +1474,27 @@ footer.app-footer { display: none !important; }
 ══════════════════════════════════════════ --}}
 <section class="section how-section" id="how">
     <div class="section-inner">
-        <div class="section-badge">Simple & rapide</div>
-        <h2 class="section-title">Lancez-vous en <span>4 étapes</span></h2>
-        <p class="section-sub">De l'inscription à votre première vente livrée, le processus est simple et guidé.</p>
+        <div class="section-badge reveal">Simple & rapide</div>
+        <h2 class="section-title reveal" style="--reveal-delay:80ms">Lancez-vous en <span>4 étapes</span></h2>
+        <p class="section-sub reveal" style="--reveal-delay:160ms">De l'inscription à votre première vente livrée, le processus est simple et guidé.</p>
 
         <div class="steps-grid">
-            <div class="step-item">
+            <div class="step-item reveal">
                 <div class="step-num">1</div>
                 <h4 class="step-title">Créez votre compte</h4>
                 <p class="step-desc">Inscrivez-vous en moins de 2 minutes. Choisissez votre rôle : boutique, livreur ou client.</p>
             </div>
-            <div class="step-item">
+            <div class="step-item reveal">
                 <div class="step-num">2</div>
                 <h4 class="step-title">Configurez votre boutique</h4>
                 <p class="step-desc">Ajoutez vos produits, définissez vos prix et personnalisez votre espace en quelques clics.</p>
             </div>
-            <div class="step-item">
+            <div class="step-item reveal">
                 <div class="step-num">3</div>
                 <h4 class="step-title">Recevez des commandes</h4>
                 <p class="step-desc">Les clients commandent directement sur votre boutique. Vous êtes notifié en temps réel.</p>
             </div>
-            <div class="step-item">
+            <div class="step-item reveal">
                 <div class="step-num">4</div>
                 <h4 class="step-title">Livrez & encaissez</h4>
                 <p class="step-desc">Assignez un livreur, suivez la livraison GPS et recevez votre paiement automatiquement.</p>
@@ -1490,13 +1509,13 @@ footer.app-footer { display: none !important; }
 @if(isset($shops) && $shops->count() > 0)
 <section class="section shops-section" id="shops">
     <div class="section-inner">
-        <div class="section-badge">Marketplace</div>
-        <h2 class="section-title">Boutiques <span>disponibles</span></h2>
-        <p class="section-sub">Découvrez les boutiques déjà présentes sur la plateforme et commandez dès maintenant.</p>
+        <div class="section-badge reveal">Marketplace</div>
+        <h2 class="section-title reveal" style="--reveal-delay:80ms">Boutiques <span>disponibles</span></h2>
+        <p class="section-sub reveal" style="--reveal-delay:160ms">Découvrez les boutiques déjà présentes sur la plateforme et commandez dès maintenant.</p>
 
         <div class="shops-grid">
             @foreach($shops->take(3) as $shop)
-            <a href="{{ route('public.shops.products', $shop) }}" class="shop-card">
+            <a href="{{ route('public.shops.products', $shop) }}" class="shop-card reveal" style="--reveal-delay:{{ $loop->index * 90 }}ms">
                 <div class="shop-img-wrap">
                     @if(!empty($shop->image))
                         <img src="{{ asset('storage/'.$shop->image) }}" alt="{{ $shop->name }}" loading="lazy">
@@ -1534,13 +1553,13 @@ footer.app-footer { display: none !important; }
 @if(isset($companies) && $companies->count() > 0)
 <section class="section companies-section">
     <div class="section-inner">
-        <div class="section-badge" style="background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.22);color:#6366f1">Nos partenaires</div>
-        <h2 class="section-title">Entreprises de livraison <span style="color:#6366f1">partenaires</span></h2>
-        <p class="section-sub">Des entreprises vérifiées, prêtes à livrer vos commandes partout dans la ville.</p>
+        <div class="section-badge reveal" style="background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.22);color:#6366f1">Nos partenaires</div>
+        <h2 class="section-title reveal" style="--reveal-delay:80ms">Entreprises de livraison <span style="color:#6366f1">partenaires</span></h2>
+        <p class="section-sub reveal" style="--reveal-delay:160ms">Des entreprises vérifiées, prêtes à livrer vos commandes partout dans la ville.</p>
 
         <div class="companies-grid">
             @foreach($companies->take(3) as $company)
-            <a href="{{ route('delivery.companies.show', $company) }}" class="company-card">
+            <a href="{{ route('delivery.companies.show', $company) }}" class="company-card reveal" style="--reveal-delay:{{ $loop->index * 90 }}ms">
 
                 {{-- Logo ou avatar initiales --}}
                 <div class="company-card-head">
@@ -1599,12 +1618,12 @@ footer.app-footer { display: none !important; }
 <section class="proof-section">
     <div style="max-width:1100px;margin:0 auto">
         <div style="text-align:center;margin-bottom:60px">
-            <div class="section-badge" style="background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.22);color:#6366f1">Ils nous font confiance</div>
-            <h2 class="section-title" style="margin-bottom:12px">Ce que disent<br><span style="color:#6366f1">nos utilisateurs</span></h2>
-            <p style="font-size:15px;color:#6b7280;margin:0 auto;max-width:480px;line-height:1.6">Des boutiques et entreprises qui font confiance à Shopio chaque jour.</p>
+            <div class="section-badge reveal" style="background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.22);color:#6366f1">Ils nous font confiance</div>
+            <h2 class="section-title reveal" style="margin-bottom:12px;--reveal-delay:80ms">Ce que disent<br><span style="color:#6366f1">nos utilisateurs</span></h2>
+            <p class="reveal" style="font-size:15px;color:#6b7280;margin:0 auto;max-width:480px;line-height:1.6;--reveal-delay:160ms">Des boutiques et entreprises qui font confiance à Shopio chaque jour.</p>
         </div>
         <div class="proof-grid">
-            <div class="proof-card">
+            <div class="proof-card reveal">
                 <div class="proof-stars">★★★★★</div>
                 <p class="proof-text">"Depuis que j'utilise cette plateforme, mes ventes ont augmenté de 40%. Le suivi des livraisons en temps réel a vraiment changé la donne avec mes clients."</p>
                 <div class="proof-author">
@@ -1615,7 +1634,7 @@ footer.app-footer { display: none !important; }
                     </div>
                 </div>
             </div>
-            <div class="proof-card">
+            <div class="proof-card reveal">
                 <div class="proof-stars">★★★★★</div>
                 <p class="proof-text">"Le dashboard est incroyablement clair. En quelques secondes je vois mon CA du jour, mes commandes en attente et mes livreurs disponibles."</p>
                 <div class="proof-author">
@@ -1626,7 +1645,7 @@ footer.app-footer { display: none !important; }
                     </div>
                 </div>
             </div>
-            <div class="proof-card">
+            <div class="proof-card reveal">
                 <div class="proof-stars">★★★★★</div>
                 <p class="proof-text">"Notre entreprise de livraison a rejoint la plateforme il y a 3 mois. Nous avons maintenant des contrats réguliers avec 12 boutiques différentes."</p>
                 <div class="proof-author">
@@ -1653,13 +1672,13 @@ $proGnf = number_format(config('genuispay.plans_gnf.pro', 100000), 0, ',', ' ');
 $bizXof = number_format(config('genuispay.plans.business', 11400), 0, ',', ' ');
 $bizGnf = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', ' ');
 @endphp
-            <div class="section-badge">Tarification</div>
-            <h2 class="section-title">Des tarifs <span>transparents</span></h2>
-            <p class="section-sub" style="margin:0 auto">Commencez gratuitement. Passez au Plan Pro pour les boutiques ou au Plan Business pour les entreprises de livraison.</p>
+            <div class="section-badge reveal">Tarification</div>
+               <h2 class="section-title reveal" style="--reveal-delay:80ms">Des tarifs <span>transparents</span></h2>
+            <p class="section-sub reveal" style="margin:0 auto;--reveal-delay:160ms">Commencez gratuitement. Passez au Plan Pro pour les boutiques ou au Plan Business pour les entreprises de livraison.</p>
         </div>
         <div class="pricing-grid">
 
-         <!--    {{-- Plan Gratuit (Boutiques & Entreprises) --}}
+          {{-- Plan Gratuit (Boutiques & Entreprises) --}}
             <div class="pricing-card">
                 <div class="pricing-name">Gratuit</div>
                 <div class="pricing-price">0 <span>XOF/mois</span></div>
@@ -1750,7 +1769,7 @@ $bizGnf = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', 
                     <a href="{{ route('register', ['role' => 'company', 'intent' => 'business']) }}" class="pricing-btn pricing-btn-outline">Commencer → Plan Business</a>
                 @endauth
             </div>
-                  !--->
+                  
         </div>
     </div>
 </section>
@@ -1761,7 +1780,7 @@ $bizGnf = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', 
      CTA ENTREPRISE LIVRAISON
 ══════════════════════════════════════════ --}}
 <div style="padding:72px 0 80px;background:linear-gradient(180deg,#f8fafc 0%,#fff 50%)">
-    <div class="company-cta">
+    <div class="company-cta reveal">
 
         {{-- Texte + boutons --}}
         <div class="company-cta-top">
@@ -1805,31 +1824,31 @@ $bizGnf = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', 
 <section class="section faq-section" id="faq">
     <div class="section-inner">
         <div style="text-align:center;margin-bottom:40px">
-            <div class="section-badge">FAQ</div>
-            <h2 class="section-title">Questions <span>fréquentes</span></h2>
+            <div class="section-badge reveal">FAQ</div>
+            <h2 class="section-title reveal" style="--reveal-delay:80ms">Questions <span>fréquentes</span></h2>
         </div>
         <div class="faq-grid">
-            <div class="faq-item">
+            <div class="faq-item reveal">
                 <div class="faq-q">Comment créer ma boutique ? <span class="arrow">+</span></div>
                 <div class="faq-a">Inscrivez-vous, choisissez le rôle "Admin Boutique", puis cliquez sur "Créer une boutique". Remplissez les informations de base et vous êtes prêt en moins de 5 minutes.</div>
             </div>
-            <div class="faq-item">
+            <div class="faq-item reveal">
                 <div class="faq-q">Comment fonctionne la livraison ? <span class="arrow">+</span></div>
                 <div class="faq-a">Vous pouvez créer vos propres livreurs ou contacter une entreprise partenaire via le chat intégré. Le suivi GPS est automatique dès que le livreur démarre sa course.</div>
             </div>
-            <div class="faq-item">
+            <div class="faq-item reveal">
                 <div class="faq-q">Puis-je avoir plusieurs boutiques ? <span class="arrow">+</span></div>
                 <div class="faq-a">Oui, vous pouvez creé plusieurs boutiques.</div>
             </div>
-            <div class="faq-item">
+            <div class="faq-item reveal">
                 <div class="faq-q">Comment les paiements sont-ils gérés ? <span class="arrow">+</span></div>
                 <div class="faq-a">Le système de paiement est cash à la livraison. Chaque commande livrée génère un enregistrement de paiement automatique avec calcul des commissions livreurs.</div>
             </div>
-            <div class="faq-item">
+            <div class="faq-item reveal">
                 <div class="faq-q">Est-ce que je peux exporter mes données ? <span class="arrow">+</span></div>
                 <div class="faq-a">Oui, vous pouvez exporter vos commandes, paiements et statistiques en Excel ou PDF directement depuis votre dashboard,.</div>
             </div>
-            <div class="faq-item">
+            <div class="faq-item reveal">
                 <div class="faq-q">Comment contacter le support ? <span class="arrow">+</span></div>
                 <div class="faq-a">Un système de tickets est intégré directement dans la plateforme. Créez un ticket et notre équipe vous répond dans les 24h ouvrées.</div>
             </div>
@@ -1951,27 +1970,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* ── Reveal au scroll ─────────────────────────────────────────
-     * Les cartes de features et étapes apparaissent en fondu
-     * au fur et à mesure du scroll.
+     * Chaque section (titres, cartes, CTA) apparaît en fondu/glissement
+     * doux au moment où elle entre dans le viewport, via la classe
+     * .reveal + .is-visible (voir CSS). Le délai en cascade est géré
+     * par --reveal-delay (inline) ou par l'ordre d'apparition dans
+     * le viewport pour les éléments sans délai explicite.
      * ──────────────────────────────────────────────────────────── */
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach((entry, i) => {
-            if (entry.isIntersecting) {
-                setTimeout(() => {
-                    entry.target.style.opacity  = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }, i * 80);
-                observer.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.1 });
+    if ('IntersectionObserver' in window) {
+        const revealObserver = new IntersectionObserver(entries => {
+            entries.forEach((entry, i) => {
+                if (entry.isIntersecting) {
+                    if (!entry.target.style.getPropertyValue('--reveal-delay')) {
+                        entry.target.style.setProperty('--reveal-delay', (i * 70) + 'ms');
+                    }
+                    entry.target.classList.add('is-visible');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 
-    document.querySelectorAll('.step-item, .shop-card, .proof-card, .company-card, .faq-item').forEach(el => {
-        el.style.opacity   = '0';
-        el.style.transform = 'translateY(20px)';
-        el.style.transition = 'opacity .5s ease, transform .5s ease';
-        observer.observe(el);
-    });
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+    } else {
+        // Pas de support IntersectionObserver : on affiche tout directement
+        document.querySelectorAll('.reveal').forEach(el => el.classList.add('is-visible'));
+    }
 
 });
 </script>

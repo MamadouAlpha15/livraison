@@ -89,6 +89,22 @@
         }
         .btn-auth:hover { opacity:.92; transform:translateY(-1px); }
         .btn-auth:active { transform:translateY(0); }
+        .btn-auth:disabled { opacity:.7; cursor:not-allowed; transform:none; }
+        .btn-auth { display:inline-flex; align-items:center; justify-content:center; gap:8px; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .btn-spinner {
+            display:inline-block; width:15px; height:15px;
+            border:2px solid rgba(255,255,255,.4); border-top-color:#fff;
+            border-radius:50%; animation:spin .7s linear infinite;
+            flex-shrink:0;
+        }
+        /* Variante sombre : pour les boutons à fond clair (ex: "Continuer avec Google") */
+        .btn-spinner-dark {
+            display:inline-block; width:15px; height:15px;
+            border:2px solid #e5e7eb; border-top-color:#4285F4;
+            border-radius:50%; animation:spin .7s linear infinite;
+            flex-shrink:0;
+        }
         .role-cards { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:2px; }
         .role-card {
             display:flex; flex-direction:column; align-items:center; gap:5px;

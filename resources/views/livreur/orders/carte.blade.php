@@ -134,6 +134,33 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',system-u
     </div>
 </div>
 
+{{-- ══ Modal : preuve de livraison (photo à la remise) ══ --}}
+<div id="proofModal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.75);align-items:flex-end;justify-content:center;">
+    <div style="background:#1e293b;border-radius:20px 20px 0 0;padding:24px 20px calc(20px + env(safe-area-inset-bottom));width:100%;max-width:480px;">
+        <div style="text-align:center;margin-bottom:16px;">
+            <div style="font-size:32px;">📸</div>
+            <div style="font-size:16px;font-weight:800;color:#fff;margin-top:6px;">Preuve de livraison</div>
+            <div style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:4px;">Prenez une photo du colis remis — ça évite les litiges</div>
+        </div>
+
+        <div id="proofPreviewWrap" style="display:none;margin-bottom:14px;">
+            <img id="proofPreviewImg" style="width:100%;max-height:240px;object-fit:cover;border-radius:12px;display:block;" alt="Aperçu de la photo">
+        </div>
+
+        <label for="proofPhotoInput" id="proofPickBtn" style="display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,.08);border:1.5px dashed rgba(255,255,255,.3);border-radius:12px;padding:16px;color:#fff;font-size:13.5px;font-weight:700;cursor:pointer;margin-bottom:14px;">
+            📷 Prendre une photo
+        </label>
+        <input type="file" id="proofPhotoInput" accept="image/*" capture="environment" style="display:none">
+
+        <button type="button" id="proofConfirmBtn" style="width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;font-family:inherit;">
+            ✅ Confirmer la livraison
+        </button>
+        <button type="button" id="proofCancelBtn" style="width:100%;padding:12px;border:1.5px solid rgba(255,255,255,.2);border-radius:12px;background:transparent;color:rgba(255,255,255,.7);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">
+            Annuler
+        </button>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
 <script>
 (function () {
@@ -315,16 +342,53 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',system-u
     pollData();
     setInterval(pollData, 5000);
 
-    /* ── "Livré" button → POST complete form ── */
+    /* ── "Livré" button → ouvre la modale de preuve de livraison (photo optionnelle) ── */
+    const proofModal       = document.getElementById('proofModal');
+    const proofInput       = document.getElementById('proofPhotoInput');
+    const proofPreviewWrap = document.getElementById('proofPreviewWrap');
+    const proofPreviewImg  = document.getElementById('proofPreviewImg');
+    const proofPickBtn     = document.getElementById('proofPickBtn');
+    const proofConfirmBtn  = document.getElementById('proofConfirmBtn');
+
     document.getElementById('completeBtn')?.addEventListener('click', () => {
-        if (!confirm('Confirmer la livraison de cette commande ?')) return;
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = COMPLETE_URL;
-        form.innerHTML = `<input type="hidden" name="_token" value="${CSRF}">
-                          <input type="hidden" name="_method" value="PUT">`;
-        document.body.appendChild(form);
-        form.submit();
+        proofModal.style.display = 'flex';
+    });
+
+    document.getElementById('proofCancelBtn')?.addEventListener('click', () => {
+        proofModal.style.display = 'none';
+    });
+
+    proofInput?.addEventListener('change', () => {
+        const file = proofInput.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            proofPreviewImg.src = e.target.result;
+            proofPreviewWrap.style.display = 'block';
+            proofPickBtn.textContent = '📷 Reprendre la photo';
+        };
+        reader.readAsDataURL(file);
+    });
+
+    proofConfirmBtn?.addEventListener('click', () => {
+        proofConfirmBtn.disabled = true;
+        proofConfirmBtn.textContent = '⏳ Envoi en cours…';
+
+        const fd = new FormData();
+        fd.append('_token', CSRF);
+        fd.append('_method', 'PUT');
+        if (proofInput.files[0]) fd.append('proof_photo', proofInput.files[0]);
+
+        fetch(COMPLETE_URL, { method: 'POST', body: fd })
+            .then((res) => {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                window.location.href = '{{ route('livreur.orders.index') }}';
+            })
+            .catch(() => {
+                proofConfirmBtn.disabled = false;
+                proofConfirmBtn.textContent = '✅ Confirmer la livraison';
+                alert('Erreur réseau, réessayez.');
+            });
     });
 
 })();

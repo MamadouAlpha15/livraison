@@ -367,6 +367,19 @@ html.cx-predark body{background:#0b0d22!important;color:#e2e8f0!important}</styl
                         @error('phone')<p class="err-msg">{{ $message }}</p>@enderror
                     </div>
 
+                    {{-- Zone couverte --}}
+                    <div class="form-group">
+                        <label class="form-label" for="zone_id">Zone couverte</label>
+                        <select id="zone_id" name="zone_id" class="form-control">
+                            <option value="">— Aucune zone précise —</option>
+                            @foreach($zones as $z)
+                            <option value="{{ $z->id }}" {{ old('zone_id') == $z->id ? 'selected' : '' }}>{{ $z->name }}</option>
+                            @endforeach
+                        </select>
+                        <p style="font-size:.75rem;color:var(--cx-muted);margin:.3rem 0 0;">Utilisée pour l'assignation automatique des commandes de cette zone à ce chauffeur.</p>
+                        @error('zone_id')<p class="err-msg">{{ $message }}</p>@enderror
+                    </div>
+
                     <div class="section-divider"><span>Connexion & accès</span></div>
 
                     {{-- Rôle (fixé à livreur) --}}

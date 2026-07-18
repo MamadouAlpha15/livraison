@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Livreur;
 use App\Http\Controllers\Controller;
 use App\Models\Driver;
 use App\Models\Order;
+use App\Services\GamificationService;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -19,9 +20,14 @@ class DashboardController extends Controller
         $data = $this->buildData($livreur, $driver);
 
         $totalCommission = $livreur->courierCommissions()->sum('amount');
+        $isCompanyDriver = (bool) ($driver && $driver->delivery_company_id);
+
+        $gamification   = app(GamificationService::class);
+        $dailyProgress  = $gamification->dailyProgress($livreur, $driver);
+        $leaderboard    = $gamification->weeklyLeaderboard($livreur, $driver, $shop);
 
         return view('dashboards.livreur', array_merge($data, compact(
-            'livreur', 'devise', 'shop', 'totalCommission'
+            'livreur', 'devise', 'shop', 'totalCommission', 'dailyProgress', 'leaderboard', 'isCompanyDriver'
         )));
     }
 
@@ -33,7 +39,8 @@ class DashboardController extends Controller
                    ?? $driver?->company?->currency
                    ?? 'GNF';
 
-        $data = $this->buildData($livreur, $driver);
+        $data          = $this->buildData($livreur, $driver);
+        $dailyProgress = app(GamificationService::class)->dailyProgress($livreur, $driver);
 
         $fmt = fn($n) => number_format($n ?? 0, 0, ',', ' ') . ' ' . $devise;
 
@@ -42,6 +49,7 @@ class DashboardController extends Controller
             'enCours'       => $data['enCours'],
             'terminees'     => $data['terminees'],
             'enAttente'     => $data['enAttente'],
+            'dailyProgress' => $dailyProgress,
             'recentOrders'  => $data['recentOrders']->map(fn($g) => [
                 'order_id' => $g['order']->id,
                 'count'    => $g['count'],

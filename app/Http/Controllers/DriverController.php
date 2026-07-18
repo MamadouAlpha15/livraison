@@ -155,7 +155,9 @@ class DriverController extends Controller
                 ->with('plan_error', 'Limite atteinte : le Plan Gratuit est limité à 1 chauffeur. Passez au Plan Business pour en ajouter davantage.');
         }
 
-        return view('company.drivers.create', compact('company'));
+        $zones = $company->zones()->where('active', true)->orderBy('name')->get();
+
+        return view('company.drivers.create', compact('company', 'zones'));
     }
 
     /* ────────────────────────────────────────────
@@ -183,7 +185,13 @@ class DriverController extends Controller
             'password'   => 'nullable|string|min:6|max:100',
             'photo'      => 'nullable|image|mimes:jpeg,png,webp,gif|max:5120',
             'photo_data' => 'nullable|string',
+            'zone_id'    => 'nullable|exists:delivery_zones,id',
         ]);
+
+        // Vérifie que la zone appartient bien à cette entreprise (pas celle d'une autre)
+        if (! empty($data['zone_id']) && ! $company->zones()->where('id', $data['zone_id'])->exists()) {
+            $data['zone_id'] = null;
+        }
 
         $path = null;
         if (! empty($data['photo_data'])) {
@@ -212,6 +220,7 @@ class DriverController extends Controller
             'name'                 => $data['name'],
             'phone'                => $data['phone'] ?? null,
             'email'                => $data['email'] ?? null,
+            'zone_id'              => $data['zone_id'] ?? null,
             'password'             => Hash::make($rawPassword),
             'must_change_password' => true,
             'photo'                => $path,
@@ -237,7 +246,9 @@ class DriverController extends Controller
             'orders as en_cours_count' => fn($q) => $q->where('status', 'en_livraison'),
         ]);
 
-        return view('company.drivers.edit', compact('company', 'driver'));
+        $zones = $company->zones()->where('active', true)->orderBy('name')->get();
+
+        return view('company.drivers.edit', compact('company', 'driver', 'zones'));
     }
 
     /* ────────────────────────────────────────────
@@ -266,7 +277,13 @@ class DriverController extends Controller
             'photo'        => 'nullable|image|mimes:jpeg,png,webp,gif|max:5120',
             'photo_data'   => 'nullable|string',
             'remove_photo' => 'nullable|boolean',
+            'zone_id'      => 'nullable|exists:delivery_zones,id',
         ]);
+
+        // Vérifie que la zone appartient bien à cette entreprise (pas celle d'une autre)
+        if (! empty($data['zone_id']) && ! $company->zones()->where('id', $data['zone_id'])->exists()) {
+            $data['zone_id'] = null;
+        }
 
         // Suppression manuelle de la photo
         if ($request->boolean('remove_photo') && $driver->photo) {
@@ -281,9 +298,10 @@ class DriverController extends Controller
             $driver->photo = $this->saveOptimizedPhoto($request->file('photo'), $driver->photo);
         }
 
-        $driver->name  = $data['name'];
-        $driver->phone = $data['phone'] ?? null;
-        $driver->email = $data['email'] ?? $driver->email;
+        $driver->name    = $data['name'];
+        $driver->phone   = $data['phone'] ?? null;
+        $driver->email   = $data['email'] ?? $driver->email;
+        $driver->zone_id = $data['zone_id'] ?? null;
         // status non modifiable ici — géré par le livreur depuis son dashboard
 
         if (! empty($data['password'])) {

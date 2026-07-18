@@ -170,6 +170,205 @@ class OrderController extends Controller
         ]);
     }
 
+    /**
+     * Choisit le meilleur chauffeur disponible pour une commande :
+     * 1. Priorité aux chauffeurs disponibles couvrant la même zone que la commande.
+     * 2. À défaut (aucun chauffeur dans cette zone), n'importe quel chauffeur disponible de l'entreprise.
+     * 3. Parmi les candidats, celui qui a le moins de commandes actives en ce moment (équilibrage de charge).
+     */
+    private function pickBestDriver(DeliveryCompany $company, Order $order): ?Driver
+    {
+        $candidates = collect();
+
+        if ($order->delivery_zone_id) {
+            $candidates = Driver::where('delivery_company_id', $company->id)
+                ->where('status', 'available')
+                ->where('zone_id', $order->delivery_zone_id)
+                ->get();
+        }
+
+        if ($candidates->isEmpty()) {
+            $candidates = Driver::where('delivery_company_id', $company->id)
+                ->where('status', 'available')
+                ->get();
+        }
+
+        if ($candidates->isEmpty()) {
+            return null;
+        }
+
+        return $candidates
+            ->map(function ($driver) {
+                $driver->active_orders_count = Order::where('driver_id', $driver->id)
+                    ->whereIn('status', [Order::STATUS_CONFIRMEE, Order::STATUS_EN_LIVRAISON])
+                    ->count();
+                return $driver;
+            })
+            ->sortBy('active_orders_count')
+            ->first();
+    }
+
+    /**
+     * Trouve les commandes "sœurs" d'une commande : même trajet (même delivery_batch_id),
+     * ou à défaut même client + même boutique — encore en attente, sans chauffeur.
+     * Sert à ne facturer les frais de livraison qu'une seule fois pour un même client
+     * qui a commandé plusieurs produits (donc plusieurs commandes) en une fois.
+     */
+    private function findGroupSiblings(DeliveryCompany $company, Order $order): \Illuminate\Support\Collection
+    {
+        $query = Order::where('delivery_company_id', $company->id)
+            ->where('id', '!=', $order->id)
+            ->whereNull('driver_id')
+            ->where('status', Order::STATUS_EN_ATTENTE);
+
+        if ($order->delivery_batch_id) {
+            $query->where('delivery_batch_id', $order->delivery_batch_id);
+        } else {
+            $query->where('user_id', $order->user_id)->where('shop_id', $order->shop_id);
+        }
+
+        return $query->get();
+    }
+
+    /**
+     * Assigne UN chauffeur à un groupe de commandes formant un même trajet
+     * (même client + même boutique, ou déjà un même delivery_batch_id) :
+     * - un seul chauffeur pour tout le groupe (choisi sur la 1ère commande du groupe)
+     * - les frais de livraison ne sont appliqués qu'une seule fois (1ère commande, les autres à 0)
+     * - un delivery_batch_id commun est créé si le groupe a plusieurs commandes et n'en avait pas encore
+     * - une seule notification push envoyée pour tout le groupe (pas une par commande)
+     * Retourne null si aucun chauffeur disponible.
+     */
+    private function assignGroupToDriver(DeliveryCompany $company, \Illuminate\Support\Collection $groupOrders): ?array
+    {
+        $representative = $groupOrders->first();
+        $driver = $this->pickBestDriver($company, $representative);
+
+        if (! $driver) {
+            return null;
+        }
+
+        $batchId = $representative->delivery_batch_id;
+        if (! $batchId && $groupOrders->count() > 1) {
+            $batchId = (string) \Illuminate\Support\Str::uuid();
+        }
+
+        $appliedFee = 0;
+        foreach ($groupOrders->values() as $i => $order) {
+            // Même client/trajet : les frais de livraison ne comptent qu'une fois, sur la 1ère commande
+            $fee = $i === 0
+                ? ($order->delivery_fee ?? optional(\App\Models\DeliveryZone::find($order->delivery_zone_id))->price ?? 0)
+                : 0;
+            if ($i === 0) $appliedFee = $fee;
+
+            $order->update([
+                'driver_id'         => $driver->id,
+                'delivery_fee'      => $fee,
+                'delivery_batch_id' => $batchId ?? $order->delivery_batch_id,
+                'status'            => Order::STATUS_CONFIRMEE,
+            ]);
+        }
+
+        try {
+            $driverUser = $driver->user;
+            if ($driverUser) {
+                $total = $groupOrders->sum('total');
+                app(PushService::class)->sendToUser(
+                    $driverUser,
+                    'Nouvelle commande assignée 📦',
+                    $groupOrders->count() > 1
+                        ? $groupOrders->count() . ' commandes (même client) · ' . number_format($total, 0, ',', ' ') . ' ' . ($company->currency ?? 'GNF')
+                        : 'Commande #' . str_pad($representative->id, 4, '0', STR_PAD_LEFT) . ' · ' . number_format($representative->total, 0, ',', ' ') . ' ' . ($company->currency ?? 'GNF'),
+                    1,
+                    '/livreur/orders'
+                );
+            }
+        } catch (\Throwable $e) {}
+
+        return ['driver' => $driver, 'fee' => $appliedFee];
+    }
+
+    /**
+     * Assigne automatiquement le meilleur chauffeur disponible à une commande.
+     * Si d'autres commandes en attente du même client (même boutique, ou même batch)
+     * sont aussi non assignées, elles sont assignées en même temps au même chauffeur,
+     * avec les frais de livraison appliqués une seule fois pour tout le groupe.
+     */
+    public function autoAssign(Order $order)
+    {
+        $company = $this->company();
+
+        abort_unless((int) $order->delivery_company_id === $company->id, 403, 'Cette commande ne vous appartient pas.');
+
+        if ($order->driver_id) {
+            return response()->json(['success' => false, 'message' => 'Cette commande a déjà un chauffeur assigné.'], 422);
+        }
+
+        $siblings    = $this->findGroupSiblings($company, $order);
+        $groupOrders = collect([$order])->merge($siblings)->values();
+
+        $result = $this->assignGroupToDriver($company, $groupOrders);
+
+        if (! $result) {
+            return response()->json(['success' => false, 'message' => 'Aucun chauffeur disponible actuellement.'], 422);
+        }
+
+        return response()->json([
+            'success'       => true,
+            'driver_id'     => $result['driver']->id,
+            'driver_name'   => $result['driver']->name,
+            'driver_phone'  => $result['driver']->phone,
+            'delivery_fee'  => number_format($result['fee'], 0, ',', ' '),
+            'grouped_count' => $groupOrders->count(),
+            'status'        => Order::STATUS_CONFIRMEE,
+        ]);
+    }
+
+    /**
+     * Assigne automatiquement TOUTES les commandes en attente non assignées de l'entreprise.
+     * Regroupe d'abord par trajet (même batch, sinon même client + même boutique) pour que
+     * chaque groupe n'ait qu'un seul chauffeur et une seule facturation de frais de livraison.
+     */
+    public function bulkAutoAssign(Request $request)
+    {
+        $company = $this->company();
+
+        $orders = Order::where('delivery_company_id', $company->id)
+            ->where('status', Order::STATUS_EN_ATTENTE)
+            ->whereNull('driver_id')
+            ->orderBy('created_at') // les plus anciennes en attente en premier
+            ->get();
+
+        $groups = $orders->groupBy(function ($o) {
+            return $o->delivery_batch_id
+                ? 'batch_' . $o->delivery_batch_id
+                : 'client_' . $o->user_id . '_shop_' . $o->shop_id;
+        });
+
+        $assigned = 0;
+        $skipped  = 0;
+        $trips    = 0;
+
+        foreach ($groups as $groupOrders) {
+            $result = $this->assignGroupToDriver($company, $groupOrders->values());
+
+            if (! $result) {
+                $skipped += $groupOrders->count();
+                continue;
+            }
+
+            $assigned += $groupOrders->count();
+            $trips++;
+        }
+
+        return response()->json([
+            'success'  => true,
+            'assigned' => $assigned,
+            'skipped'  => $skipped,
+            'trips'    => $trips,
+        ]);
+    }
+
     public function mapView()
     {
         $company = $this->company();

@@ -6,6 +6,7 @@
 --}}
 
 @extends('layouts.app')
+
 @section('title', 'Équipe · ' . (auth()->user()->shop?->name ?? 'Boutique'))
 @php $bodyClass = 'is-dashboard'; @endphp
 

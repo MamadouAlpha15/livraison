@@ -364,6 +364,29 @@
     <script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" defer></script>
     @stack('scripts')
 
+{{-- ══ Célébration : objectif journalier du livreur atteint (gamification) ══ --}}
+@auth
+@if(session('daily_bonus_unlocked'))
+<div id="bonusCelebration" style="position:fixed;inset:0;z-index:100000;background:rgba(15,23,42,.75);display:flex;align-items:center;justify-content:center;padding:20px;animation:bonusFadeIn .25s ease;">
+    <div style="background:linear-gradient(135deg,#f59e0b,#fbbf24);border-radius:24px;padding:36px 28px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:bonusPop .4s cubic-bezier(.23,1,.32,1);">
+        <div style="font-size:56px;line-height:1;margin-bottom:10px;">🎉</div>
+        <div style="font-size:20px;font-weight:900;color:#78350f;margin-bottom:6px;">Objectif du jour atteint !</div>
+        <div style="font-size:14px;color:#92400e;line-height:1.5;margin-bottom:20px;">
+            Vous avez livré {{ \App\Services\GamificationService::DAILY_GOAL }} commandes aujourd'hui.<br>
+            Prime débloquée : <strong>{{ number_format(\App\Services\GamificationService::DAILY_BONUS, 0, ',', ' ') }}</strong> !
+        </div>
+        <button onclick="document.getElementById('bonusCelebration').remove()" style="background:#78350f;color:#fff;border:none;border-radius:12px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;">
+            Continuer 🚀
+        </button>
+    </div>
+</div>
+<style>
+@keyframes bonusFadeIn { from{opacity:0} to{opacity:1} }
+@keyframes bonusPop { from{opacity:0;transform:scale(.85)} to{opacity:1;transform:scale(1)} }
+</style>
+@endif
+@endauth
+
 {{-- ══ Bandeau activation notifications push ══ --}}
 @auth
 @if(in_array(auth()->user()->role ?? '', ['admin', 'company', 'client', 'vendeur', 'employe', 'livreur']))
@@ -383,7 +406,10 @@
 (function() {
     if (localStorage.getItem('push_subscribed')) return;
 
-    var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    // Depuis iPadOS 13, Safari sur iPad se présente comme un Mac de bureau dans le user-agent
+    // (pas de "iPad" dedans) — on le détecte via le support tactile multi-points, propre aux iPad.
+    var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent)
+             || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     var isStandalone = window.navigator.standalone === true
                     || window.matchMedia('(display-mode: standalone)').matches;
     var role = '{{ auth()->user()->role ?? "" }}';
@@ -668,8 +694,11 @@ window.addEventListener('beforeinstallprompt', e => {
     }
 });
 
-/* ── iOS : détecter et afficher les instructions ── */
-const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+/* ── iOS : détecter et afficher les instructions ──
+   Depuis iPadOS 13, Safari sur iPad se présente comme un Mac de bureau dans le user-agent
+   (pas de "iPad" dedans) — on le détecte via le support tactile multi-points, propre aux iPad. */
+const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent)
+           || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
 if (isIos && !isStandalone) {
     const dismissed = localStorage.getItem('pwa_dismissed');

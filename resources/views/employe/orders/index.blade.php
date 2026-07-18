@@ -1238,7 +1238,12 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                             @php $addr = $order->delivery_destination ?: ($client?->address ?? ''); @endphp
                             @if($addr)<div class="addr-cell" title="{{ $addr }}">{!! $I['pin_addr'] !!} {{ $addr }}</div>@else<span class="addr-empty">—</span>@endif
                         </td>
-                        <td><div class="amount">{{ number_format($order->total,0,',',' ') }} <small>{{ $devise }}</small></div></td>
+                        <td>
+                            <div class="amount">{{ number_format($order->total,0,',',' ') }} <small>{{ $devise }}</small></div>
+                            @if($order->loyalty_points_used > 0)
+                            <div style="font-size:10px;color:#b45309;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;padding:2px 6px;margin-top:3px;display:inline-block;white-space:nowrap">🎁 -{{ number_format($order->loyalty_points_used,0,',',' ') }} {{ $devise }} (points fidélité)</div>
+                            @endif
+                        </td>
                         <td><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span></td>
                         <td>
                             @if($order->livreur)
@@ -1290,6 +1295,9 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                             @elseif($dejaAnnulee)<button type="button" class="btn-restore" onclick="openRestoreModal('{{ route('employe.orders.restore',$order) }}','#{{ $order->id }}','{{ addslashes($order->display_name) }}')">{!! $I['refresh_btn'] !!} Restaurer</button>
                             @else<button type="button" class="btn-cancel disabled" disabled>✕</button>@endif
                             <a href="{{ route('employe.orders.invoice',$order) }}" title="Télécharger le reçu PDF" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:7px;border:1px solid var(--border);color:var(--muted);text-decoration:none;font-size:14px;flex-shrink:0">📄</a>
+                            @if($order->delivery_proof_photo)
+                            <a href="{{ $order->delivery_proof_photo_url }}" target="_blank" rel="noopener" title="Voir la preuve de livraison" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:7px;border:1px solid #bbf7d0;background:#f0fdf4;color:#15803d;text-decoration:none;font-size:14px;flex-shrink:0">📸</a>
+                            @endif
                             @if($order->status === 'livrée' && $order->deliveryCompany)
                                 @if(!isset($reviewsByOrderId[$order->id]))
                                 <button type="button" class="btn-noter"
@@ -1359,6 +1367,9 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         @php $mAddr = $order->delivery_destination ?: ($client?->address ?? ''); @endphp
                         @if($mAddr)<div class="m-row"><span class="m-lbl">Adresse</span><span style="font-size:12px;color:var(--text-2);text-align:right;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{{ $mAddr }}">{!! $I['pin_addr'] !!} {{ $mAddr }}</span></div>@endif
                         <div class="m-row"><span class="m-lbl">Montant</span><span class="amount">{{ number_format($order->total,0,',',' ') }} <small>{{ $devise }}</small></span></div>
+                        @if($order->loyalty_points_used > 0)
+                        <div class="m-row"><span class="m-lbl">🎁 Points fidélité</span><span style="font-size:11.5px;font-weight:700;color:#b45309;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;padding:2px 8px">-{{ number_format($order->loyalty_points_used,0,',',' ') }} {{ $devise }}</span></div>
+                        @endif
                         <div class="m-row"><span class="m-lbl">Assignation</span>@if($order->livreur)<div class="lv-chip"><div class="lv-chip-av">{{ initiales($order->livreur->name) }}</div>{{ $order->livreur->name }}</div>@elseif($order->deliveryCompany)<div class="lv-chip" style="background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8;"><div class="lv-chip-av" style="background:#3b82f6;">{!! $I['bldg_chip'] !!}</div>{{ $order->deliveryCompany->name }}</div>@else<span class="pill p-warning">Non assigné</span>@endif</div>
                         @if(!$order->livreur && !$order->deliveryCompany)
                         <div style="display:flex;flex-direction:column;gap:6px;">
@@ -1380,6 +1391,9 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         @if($peutAnnuler)<button type="button" class="btn-cancel" style="flex:1;justify-content:center" onclick="openCancelModal('{{ route('employe.orders.cancel',$order) }}','#{{ $order->id }}','{{ addslashes($order->display_name) }}')">✕ Annuler</button>
                         @elseif($dejaAnnulee)<button type="button" class="btn-restore" style="flex:1;justify-content:center" onclick="openRestoreModal('{{ route('employe.orders.restore',$order) }}','#{{ $order->id }}','{{ addslashes($order->display_name) }}')">{!! $I['refresh_btn'] !!} Restaurer</button>@endif
                         <a href="{{ route('employe.orders.invoice',$order) }}" style="display:inline-flex;align-items:center;justify-content:center;gap:5px;flex:1;padding:7px 10px;border-radius:8px;border:1px solid var(--border);color:var(--muted);text-decoration:none;font-size:12.5px;font-weight:600">📄 Reçu PDF</a>
+                        @if($order->delivery_proof_photo)
+                        <a href="{{ $order->delivery_proof_photo_url }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;justify-content:center;gap:5px;flex:1;padding:7px 10px;border-radius:8px;border:1px solid #bbf7d0;background:#f0fdf4;color:#15803d;text-decoration:none;font-size:12.5px;font-weight:600">📸 Preuve</a>
+                        @endif
                         @if($order->status === 'livrée' && $order->deliveryCompany)
                             @if(!isset($reviewsByOrderId[$order->id]))
                             <button type="button" class="btn-noter" style="flex:1;justify-content:center;"

@@ -264,6 +264,30 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:#0f
     </div>
 </div>
 
+{{-- MODAL PREUVE DE LIVRAISON --}}
+<div class="pickup-overlay" id="proofOverlay">
+    <div class="pickup-modal">
+        <div class="pickup-modal-ico">📸</div>
+        <div class="pickup-modal-title">Preuve de livraison</div>
+        <div class="pickup-modal-desc">Prenez une photo du colis remis — ça évite les litiges. (optionnel)</div>
+
+        <div id="proofPreviewWrap" style="display:none;margin:12px 0">
+            <img id="proofPreviewImg" style="width:100%;max-height:220px;object-fit:cover;border-radius:12px;display:block" alt="Aperçu de la photo">
+        </div>
+        <label for="proofPhotoInput" id="proofPickBtn" style="display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,.08);border:1.5px dashed rgba(255,255,255,.3);border-radius:12px;padding:14px;color:#fff;font-size:13.5px;font-weight:700;cursor:pointer;margin:12px 0">
+            📷 Prendre une photo
+        </label>
+        <input type="file" id="proofPhotoInput" accept="image/*" capture="environment" style="display:none">
+
+        <div class="pickup-modal-btns">
+            <button class="btn-pickup-cancel" onclick="closeProofModal()">Annuler</button>
+            <button class="btn-pickup-confirm" id="btnProofConfirm" onclick="confirmDelivered()">
+                ✅ Confirmer la livraison
+            </button>
+        </div>
+    </div>
+</div>
+
 {{-- Écran de fin --}}
 <div class="nav-done-screen" id="navDoneScreen">
     <div class="nav-done-ico">✅</div>
@@ -587,14 +611,56 @@ function pollOrderData() {
 }
 
 // ─────────────────────────────────────────────
+// Compresse une photo côté navigateur avant envoi — une photo prise directement
+// avec l'appareil d'un téléphone peut peser 8-15 Mo, ce qui échoue souvent sur
+// une connexion mobile instable. On la redimensionne et compresse en JPEG léger.
+// ─────────────────────────────────────────────
+function compressImage(file, maxDim = 1600, quality = 0.75) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            let { width, height } = img;
+            if (width > height && width > maxDim) {
+                height = Math.round(height * (maxDim / width));
+                width = maxDim;
+            } else if (height >= width && height > maxDim) {
+                width = Math.round(width * (maxDim / height));
+                height = maxDim;
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+            canvas.toBlob((blob) => {
+                if (!blob) { reject(new Error('Échec de la compression de la photo.')); return; }
+                resolve(new File([blob], 'proof.jpg', { type: 'image/jpeg' }));
+            }, 'image/jpeg', quality);
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Photo invalide.')); };
+        img.src = url;
+    });
+}
+
+// ─────────────────────────────────────────────
 // ACTIONS STATUT
 // ─────────────────────────────────────────────
-async function postStatus(status) {
-    const r = await fetch(STATUS_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
-        body: JSON.stringify({ status }),
-    });
+async function postStatus(status, photoFile) {
+    let opts;
+    if (photoFile) {
+        const fd = new FormData();
+        fd.append('status', status);
+        fd.append('proof_photo', photoFile);
+        opts = { method: 'POST', headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' }, body: fd };
+    } else {
+        opts = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
+            body: JSON.stringify({ status }),
+        };
+    }
+    const r = await fetch(STATUS_URL, opts);
     if (!r.ok) { const d = await r.json().catch(()=>({})); throw new Error(d.message || 'Erreur serveur.'); }
     return true;
 }
@@ -612,12 +678,43 @@ async function confirmPickup() {
 const ORDERS_URL = '{{ route('livreur.orders.index') }}';
 function goToOrders() { window.location.href = ORDERS_URL; }
 
-async function markDelivered() {
-    if (!confirm('Confirmer la livraison de cette commande ?')) return;
-    const btn = document.getElementById('btnDone');
-    btn.disabled = true; btn.style.opacity = '.6';
+/* "Marquer comme livrée" → ouvre la modale de preuve de livraison (photo optionnelle) */
+function markDelivered() {
+    document.getElementById('proofOverlay').classList.add('open');
+}
+function closeProofModal() {
+    document.getElementById('proofOverlay').classList.remove('open');
+}
+
+document.getElementById('proofPhotoInput')?.addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        document.getElementById('proofPreviewImg').src = e.target.result;
+        document.getElementById('proofPreviewWrap').style.display = 'block';
+        document.getElementById('proofPickBtn').textContent = '📷 Reprendre la photo';
+    };
+    reader.readAsDataURL(file);
+});
+
+async function confirmDelivered() {
+    const btn = document.getElementById('btnProofConfirm');
+    btn.disabled = true; btn.textContent = '⏳ Envoi en cours…';
+    let photoFile = document.getElementById('proofPhotoInput').files[0] || null;
     try {
-        await postStatus('livrée');
+        if (photoFile) {
+            btn.textContent = '⏳ Compression de la photo…';
+            try {
+                photoFile = await compressImage(photoFile);
+            } catch (e) {
+                // Si la compression échoue pour une raison quelconque, on tente quand même
+                // l'envoi avec le fichier d'origine plutôt que de bloquer la livraison.
+            }
+            btn.textContent = '⏳ Envoi en cours…';
+        }
+        await postStatus('livrée', photoFile);
+        closeProofModal();
         if (gpsWatcher) navigator.geolocation.clearWatch(gpsWatcher);
         if (_aniRAF)    cancelAnimationFrame(_aniRAF);
         document.getElementById('navDoneScreen').style.display = 'flex';
@@ -625,7 +722,10 @@ async function markDelivered() {
         const cd = document.getElementById('navDoneCountdown');
         cd.textContent = `Redirection dans ${t}s…`;
         const iv = setInterval(() => { t--; if (t<=0){clearInterval(iv);goToOrders();return;} cd.textContent=`Redirection dans ${t}s…`; }, 1000);
-    } catch(e) { alert(e.message); btn.disabled=false; btn.style.opacity=''; }
+    } catch(e) {
+        alert(e.message);
+        btn.disabled = false; btn.textContent = '✅ Confirmer la livraison';
+    }
 }
 
 function openGoogleMaps() {

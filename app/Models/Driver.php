@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Driver extends Model
 {
-    protected $fillable = ['user_id','delivery_company_id','name','phone','email','password','must_change_password','photo','status'];
+    protected $fillable = ['user_id','delivery_company_id','zone_id','name','phone','email','password','must_change_password','photo','status'];
 
     protected $hidden = ['password'];
 
@@ -21,6 +21,12 @@ class Driver extends Model
     public function company()
     {
         return $this->belongsTo(DeliveryCompany::class, 'delivery_company_id');
+    }
+
+    /** Zone couverte par ce chauffeur (utilisée pour l'assignation automatique) */
+    public function zone()
+    {
+        return $this->belongsTo(DeliveryZone::class, 'zone_id');
     }
 
     public function orders()
