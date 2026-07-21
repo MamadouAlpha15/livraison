@@ -50,6 +50,7 @@ class AuthenticatedSessionController extends Controller
         if ($user->role === 'company')    return redirect()->route('company.dashboard');
         if ($user->role === 'livreur')    return redirect()->route('livreur.dashboard');
         if ($user->role === 'vendeur')    return redirect()->route('vendeur.dashboard');
+        if ($user->role === 'employe')    return redirect()->route('employe.dashboard');
 
         // Client : retourner sur la page produit s'il venait d'un lien partagé
         if ($user->role === 'client' && session('product_redirect')) {

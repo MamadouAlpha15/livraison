@@ -22,8 +22,12 @@
 .emp-pwd-wrap { position:relative; }
 .emp-pwd-wrap input { padding-right:44px; }
 .emp-eye { position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:18px; color:#9ca3af; }
-.emp-submit { width:100%; padding:13px; background:linear-gradient(135deg,#f90,#e47911); color:#fff; border:none; border-radius:12px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; transition:opacity .15s; }
+.emp-submit { width:100%; padding:13px; background:linear-gradient(135deg,#f90,#e47911); color:#fff; border:none; border-radius:12px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; transition:opacity .15s; display:flex; align-items:center; justify-content:center; gap:8px; }
 .emp-submit:hover { opacity:.9; }
+.emp-submit:disabled { opacity:.7; cursor:not-allowed; }
+.emp-submit-spinner { width:16px; height:16px; border:2.5px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:emp-spin .7s linear infinite; flex-shrink:0; display:none; }
+.emp-submit.is-loading .emp-submit-spinner { display:inline-block; }
+@keyframes emp-spin { to { transform:rotate(360deg); } }
 .emp-info-box { background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:14px 16px; margin-bottom:20px; font-size:13px; color:#1e40af; line-height:1.6; }
 .emp-copy-box { display:none; background:#eef2ff; border:1px solid #c7d2fe; border-radius:10px; padding:14px 16px; margin-top:16px; }
 .emp-copy-box p { margin:0 0 10px; font-size:13px; font-weight:700; color:#3730a3; }
@@ -94,13 +98,24 @@
 
             <div class="emp-field">
                 <label>Rôle <span style="color:#ef4444">*</span></label>
-                <select name="role_in_shop" required>
+                <select name="role_in_shop" id="empRoleSelect" required onchange="toggleOrdersOnly()">
                     <option value="livreur"  {{ old('role_in_shop')==='livreur'  ?'selected':'' }}>🚚 Livreur</option>
-                    
+                    <option value="employe"  {{ old('role_in_shop')==='employe'  ?'selected':'' }}>👤 Employé</option>
                 </select>
             </div>
 
-            <button type="submit" class="emp-submit">➕ Créer le compte</button>
+            <div class="emp-field" id="ordersOnlyField" style="display:none;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:12px 14px;">
+                <label style="display:flex;align-items:center;gap:8px;margin:0;cursor:pointer">
+                    <input type="checkbox" name="orders_only" value="1" style="width:auto" {{ old('orders_only') ? 'checked' : '' }}>
+                    🔒 Accès limité à la page Commandes uniquement
+                </label>
+                <div style="font-size:11.5px;color:#6b7280;margin-top:6px;">L'employé ne pourra qu'assigner et traiter les commandes — pas d'accès aux paiements, rapports ou statistiques.</div>
+            </div>
+
+            <button type="submit" class="emp-submit" id="empSubmitBtn">
+                <span class="emp-submit-spinner"></span>
+                <span id="empSubmitLabel">➕ Créer le compte</span>
+            </button>
         </form>
 
         {{-- Zone affichée après soumission réussie --}}
@@ -128,6 +143,13 @@
 </div>
 
 <script>
+function toggleOrdersOnly() {
+    const role  = document.getElementById('empRoleSelect').value;
+    const field = document.getElementById('ordersOnlyField');
+    field.style.display = role === 'employe' ? 'block' : 'none';
+}
+document.addEventListener('DOMContentLoaded', toggleOrdersOnly);
+
 function genPwd() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#';
     let pwd = '';
@@ -142,6 +164,11 @@ function onFormSubmit() {
     document.getElementById('empPwdConf').value = pwd;
     document.getElementById('copyEmail').textContent = email;
     document.getElementById('copyPwd').textContent   = pwd;
+
+    const btn = document.getElementById('empSubmitBtn');
+    btn.disabled = true;
+    btn.classList.add('is-loading');
+    document.getElementById('empSubmitLabel').textContent = 'Création en cours…';
 }
 
 function copyText(id) {

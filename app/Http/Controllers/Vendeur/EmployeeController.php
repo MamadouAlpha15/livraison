@@ -45,6 +45,7 @@ class EmployeeController extends Controller
             'phone'         => 'required|string|max:255',
             'password'     => 'required|min:6|confirmed',
             'role_in_shop' => 'required|in:vendeur,livreur,employe',
+            'orders_only'  => 'nullable|boolean',
         ]);
 
         $globalRole = match ($request->role_in_shop) {
@@ -61,6 +62,7 @@ class EmployeeController extends Controller
             'role'                 => $globalRole,
             'shop_id'              => $shopId,
             'role_in_shop'         => $request->role_in_shop,
+            'orders_only'          => $request->role_in_shop === 'employe' && $request->boolean('orders_only'),
             'must_change_password' => true,
         ]);
 
@@ -90,6 +92,7 @@ class EmployeeController extends Controller
             'name'         => 'required|string|max:255',
             'phone'        => 'nullable|string|max:255',
             'role_in_shop' => 'required|in:vendeur,livreur,employe',
+            'orders_only'  => 'nullable|boolean',
         ]);
 
         $employee->update([
@@ -101,6 +104,7 @@ class EmployeeController extends Controller
                 'livreur' => 'livreur',
                 default   => 'employe',
             },
+            'orders_only'  => $request->role_in_shop === 'employe' && $request->boolean('orders_only'),
         ]);
 
         return redirect()->route('boutique.employees.index')

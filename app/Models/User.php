@@ -21,6 +21,7 @@ class User extends Authenticatable
         'country',       // code ISO 2 lettres ex: SN, CI, ML
         'shop_id',       // FK vers la boutique principale de l'utilisateur
         'role_in_shop',  // ex: admin|vendeur|livreur (rôle dans la boutique)
+        'orders_only',   // employé restreint à la page commandes uniquement (choix du propriétaire)
         'is_available',          // pour les livreurs
         'must_change_password',  // forcé à changer son mot de passe à la 1ère connexion
         'company_id',            // FK vers delivery_companies (membres d'une entreprise)
@@ -41,6 +42,7 @@ class User extends Authenticatable
             'orders_badge_seen_at' => 'datetime',
             'password'             => 'hashed',
             'must_change_password' => 'boolean',
+            'orders_only'          => 'boolean',
             'notif_state'          => 'array',
             'referral_rewarded_at' => 'datetime',
         ];

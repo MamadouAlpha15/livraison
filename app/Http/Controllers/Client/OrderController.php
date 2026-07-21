@@ -197,6 +197,17 @@ class OrderController extends Controller
             }
         } catch (\Throwable $e) {}
 
+        // Notifier aussi les employés/vendeurs de la boutique (pas seulement le propriétaire)
+        try {
+            app(PushService::class)->notifyShopStaff(
+                $order->shop,
+                'Nouvelle commande !',
+                'Vous avez reçu une nouvelle commande de ' . number_format($order->total, 0, ',', ' ') . ' GNF.',
+                '/employe/orders',
+                $order->shop->user_id
+            );
+        } catch (\Throwable $e) {}
+
         return redirect()->route('client.orders.index')
             ->with('success', 'Commande passée avec succès ! Paiement en cash à la livraison.');
     }
@@ -380,6 +391,20 @@ class OrderController extends Controller
                     $product->name . ($variant ? ' (' . $variant->name . ')' : '') . ' × ' . $request->quantity . ' — ' . number_format($total, 0, ',', ' ') . ' GNF',
                     $push->vendorBadgeCount($shopOwner),
                     '/employe/orders'
+                );
+            }
+        } catch (\Throwable $e) {}
+
+        // Notifier aussi les employés/vendeurs de la boutique (pas seulement le propriétaire)
+        try {
+            $notifShop = $order->shop ?? $product->shop ?? null;
+            if ($notifShop) {
+                app(PushService::class)->notifyShopStaff(
+                    $notifShop,
+                    'Nouvelle commande !',
+                    $product->name . ($variant ? ' (' . $variant->name . ')' : '') . ' × ' . $request->quantity . ' — ' . number_format($total, 0, ',', ' ') . ' GNF',
+                    '/employe/orders',
+                    $notifShop->user_id
                 );
             }
         } catch (\Throwable $e) {}

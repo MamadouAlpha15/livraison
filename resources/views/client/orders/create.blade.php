@@ -206,6 +206,13 @@ document.addEventListener('DOMContentLoaded', function () {
         totalInput.value = Math.round(price * qty);
     }
 
+    form.addEventListener('submit', function (e) {
+        const btn = form.querySelector('button[type="submit"]');
+        if (btn.disabled) { e.preventDefault(); return; }
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Validation en cours…';
+    });
+
     shopSelect.addEventListener('change', onShopChange);
     productSelect.addEventListener('change', function () {
         const opt = productSelect.options[productSelect.selectedIndex];

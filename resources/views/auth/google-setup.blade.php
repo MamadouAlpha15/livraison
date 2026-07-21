@@ -46,8 +46,12 @@
         .f-select:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.10);}
 
         /* Submit */
-        .btn-submit{width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,#291d95,#aa28d9);color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.2px;margin-top:6px;font-family:inherit;}
+        .btn-submit{width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,#291d95,#aa28d9);color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.2px;margin-top:6px;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:9px;}
         .btn-submit:hover{opacity:.92;transform:translateY(-1px);}
+        .btn-submit:disabled{opacity:.75;cursor:not-allowed;transform:none;}
+        .btn-spinner{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:btn-spin .7s linear infinite;display:none;flex-shrink:0;}
+        .btn-submit.is-loading .btn-spinner{display:inline-block;}
+        @keyframes btn-spin{to{transform:rotate(360deg);}}
 
         .f-error{font-size:11.5px;color:#ef4444;margin-top:4px;}
         .alert-err{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;}
@@ -82,7 +86,7 @@
     <div class="alert-err">{{ $errors->first() }}</div>
     @endif
 
-    <form method="POST" action="{{ route('google.setup.store') }}">
+    <form method="POST" action="{{ route('google.setup.store') }}" id="setupForm">
         @csrf
 
         {{-- Rôle --}}
@@ -118,7 +122,10 @@
             @error('country')<p class="f-error">{{ $message }}</p>@enderror
         </div>
 
-        <button type="submit" class="btn-submit">Accéder à mon espace →</button>
+        <button type="submit" class="btn-submit" id="btnSubmit">
+            <span class="btn-spinner"></span>
+            <span class="btn-label">Accéder à mon espace →</span>
+        </button>
     </form>
 </div>
 
@@ -128,6 +135,17 @@ function setRole(role, el) {
     document.querySelectorAll('.role-card').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
 }
+
+document.getElementById('setupForm').addEventListener('submit', function(e) {
+    const btn = document.getElementById('btnSubmit');
+    if (btn.classList.contains('is-loading')) {
+        e.preventDefault();
+        return;
+    }
+    btn.classList.add('is-loading');
+    btn.disabled = true;
+    btn.querySelector('.btn-label').textContent = 'Chargement…';
+});
 </script>
 
 </body>

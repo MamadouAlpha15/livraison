@@ -1,0 +1,9 @@
+{
+  "appId": "com.shopio.app",
+  "appName": "Shopio",
+  "webDir": "capacitor-www",
+  "server": {
+    "url": "https://shopio-app.com",
+    "androidScheme": "https"
+  }
+}

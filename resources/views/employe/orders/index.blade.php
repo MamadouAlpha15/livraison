@@ -700,9 +700,13 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
             <div class="plm-feat-item"><div class="plm-feat-ico">✓</div> Statistiques & analyses complètes</div>
             <div class="plm-feat-item"><div class="plm-feat-ico">✓</div> Livreurs & partenaires illimités</div>
         </div>
+        @if(auth()->user()->role === 'admin')
         <a href="{{ route('boutique.subscription.upgrade') }}" class="plm-btn-upgrade">
             ⚡ Passer au Plan Pro
         </a>
+        @else
+        <div style="font-size:12.5px;color:#6b7280;margin:6px 0 4px">Demandez au propriétaire de la boutique de passer au Plan Pro.</div>
+        @endif
         <button class="plm-btn-close" onclick="closePlanLimitModal()">Fermer</button>
     </div>
 </div>
@@ -983,7 +987,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 <div class="dash-wrap">
     <aside class="sidebar" id="sidebar">
         <div class="sb-brand">
-            <a href="{{ route('boutique.dashboard') }}" class="sb-logo">
+            <a href="{{ auth()->user()->role === 'admin' ? route('boutique.dashboard') : route('employe.dashboard') }}" class="sb-logo">
                 <div class="sb-logo-icon"><img src="/images/shopio3.jpeg" alt="Shopio" style="width:100%;height:100%;object-fit:cover;border-radius:9px"></div>
                 <span class="sb-shop-name">{{ $shop->name ?? 'Boutique' }}</span>
             </a>
@@ -1003,6 +1007,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
             </div>
         </div>
         <nav class="sb-nav">
+        @if(auth()->user()->role === 'admin')
             <a href="{{ route('boutique.dashboard') }}" class="sb-item" style="margin-bottom:4px"><span class="ico">⊞</span> Tableau de bord</a>
             <div class="sb-section">Boutique</div>
             @php
@@ -1065,6 +1070,31 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
             </div>
             <div class="sb-section">Aide</div>
             <a href="{{ route('support.index') }}" class="sb-item"><span class="ico">{!! $I['hdp_nav'] !!}</span> Support</a>
+        @elseif(auth()->user()->orders_only)
+            {{-- Employé restreint : uniquement Commandes, rien d'autre --}}
+            <a href="{{ route('employe.orders.index') }}" class="sb-item active" style="margin-bottom:4px">
+                <span class="ico">{!! $I['box_nav'] !!}</span> Commandes
+                @if($pendingCount > 0)
+                    <span class="sb-badge">{{ $pendingCount }}</span>
+                @endif
+            </a>
+        @else
+            {{-- Compte employé (accès complet) : seuls les boutons auxquels il a réellement accès --}}
+            <a href="{{ route('employe.dashboard') }}" class="sb-item" style="margin-bottom:4px"><span class="ico">⊞</span> Tableau de bord</a>
+            <div class="sb-section">Commandes</div>
+            <a href="{{ route('employe.orders.index') }}" class="sb-item active">
+                <span class="ico">{!! $I['box_nav'] !!}</span> Commandes
+                @if($pendingCount > 0)
+                    <span class="sb-badge">{{ $pendingCount }}</span>
+                @endif
+            </a>
+            <div class="sb-section">Finances & Rapports</div>
+            <a href="{{ route('employe.payments.index') }}" class="sb-item"><span class="ico">{!! $I['card_nav'] !!}</span> Paiements</a>
+            <a href="{{ route('employe.reports.index') }}" class="sb-item"><span class="ico">{!! $I['list_nav'] !!}</span> Rapports</a>
+            <a href="{{ route('employe.stats.index') }}" class="sb-item"><span class="ico">{!! $I['chart_nav'] !!}</span> Statistiques</a>
+            <div class="sb-section">Aide</div>
+            <a href="{{ route('support.index') }}" class="sb-item"><span class="ico">{!! $I['hdp_nav'] !!}</span> Support</a>
+        @endif
         </nav>
         <div class="sb-footer">
             <a href="{{ route('profile.edit') }}" class="sb-user">
@@ -1094,7 +1124,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
             <a href="{{ route('employe.orders.carte') }}" style="display:flex;align-items:center;gap:5px;height:30px;padding:0 12px;border-radius:8px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);color:#4f46e5;font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;text-decoration:none;transition:background .14s" onmouseover="this.style.background='rgba(99,102,241,.18)'" onmouseout="this.style.background='rgba(99,102,241,.1)'">
                 {!! $I['map_tb'] !!} <span class="desk-only">Carte GPS</span>
             </a>
-            @else
+            @elseif(auth()->user()->role === 'admin')
             <a href="{{ route('boutique.subscription.upgrade') }}" style="display:flex;align-items:center;gap:5px;height:30px;padding:0 12px;border-radius:8px;background:#f9fafb;border:1px solid #d1d5db;color:#9ca3af;font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;text-decoration:none;" title="Fonctionnalité réservée au plan Pro">
                 {!! $I['map_tb'] !!} <span class="desk-only">Carte GPS</span> <span style="font-size:10px;background:#f59e0b;color:#fff;padding:1px 6px;border-radius:10px;font-weight:800">PRO</span>
             </a>

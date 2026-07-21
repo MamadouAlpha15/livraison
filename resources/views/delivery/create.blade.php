@@ -263,8 +263,13 @@ body.cx-dashboard .dc-form-footer { border-top-color: rgba(255,255,255,.07); }
     transition: transform .15s, box-shadow .15s, opacity .15s;
     box-shadow: 0 4px 14px rgba(37,99,235,.35);
     letter-spacing: .01em;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
 }
 .btn-create:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,99,235,.45); }
+.btn-create:disabled { opacity: .75; cursor: not-allowed; transform: none; }
+.btn-create-spinner { width: 15px; height: 15px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: btn-create-spin .7s linear infinite; flex-shrink: 0; display: none; }
+.btn-create.is-loading .btn-create-spinner { display: inline-block; }
+@keyframes btn-create-spin { to { transform: rotate(360deg); } }
 .btn-create:active { transform: translateY(0); }
 .btn-create:disabled { opacity: .6; cursor: not-allowed; transform: none; }
 
@@ -424,7 +429,8 @@ body.cx-dashboard .dc-feature-card h4 { color: var(--cx-text); }
             {{-- Footer --}}
             <div class="dc-form-footer">
                 <button type="submit" class="btn-create" id="submitBtn">
-                    Créer mon entreprise et soumettre pour approbation
+                    <span class="btn-create-spinner"></span>
+                    <span id="submitBtnLabel">Créer mon entreprise et soumettre pour approbation</span>
                 </button>
             </div>
 
@@ -485,9 +491,11 @@ removeBtn.addEventListener('click', function (e) {
     placeholder.style.display = '';
 });
 
-document.getElementById('createForm').addEventListener('submit', function () {
+document.getElementById('createForm').addEventListener('submit', function (e) {
+    if (submitBtn.disabled) { e.preventDefault(); return; }
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Création en cours…';
+    submitBtn.classList.add('is-loading');
+    document.getElementById('submitBtnLabel').textContent = 'Création en cours…';
 });
 </script>
 @endpush

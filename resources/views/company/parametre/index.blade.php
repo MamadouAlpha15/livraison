@@ -292,8 +292,13 @@ body.cx-light .pm-img-zone:hover { border-color: #7c3aed; background: #f5f0ff; }
     cursor: pointer;
     transition: opacity .2s, transform .15s;
     font-family: inherit;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
 }
 .pm-btn:hover { opacity: .88; transform: translateY(-1px); }
+.pm-btn:disabled { opacity: .7; cursor: not-allowed; transform: none; }
+.pm-btn-spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: pm-btn-spin .7s linear infinite; flex-shrink: 0; display: none; }
+.pm-btn.is-loading .pm-btn-spinner { display: inline-block; }
+@keyframes pm-btn-spin { to { transform: rotate(360deg); } }
 .pm-btn-primary { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; box-shadow: 0 3px 12px rgba(124,58,237,.35); }
 .pm-btn-green   { background: linear-gradient(135deg, #10b981, #059669); color: #fff; box-shadow: 0 3px 12px rgba(16,185,129,.3); }
 .pm-btn-red     { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; box-shadow: 0 3px 12px rgba(239,68,68,.3); }
@@ -508,7 +513,7 @@ body.cx-light .pw-strength { background: #e5e7eb; }
                     <div class="pm-alert success"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> {{ session('success_info') }}</div>
                 @endif
 
-                <form action="{{ route('company.parametre.updateInfo') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('company.parametre.updateInfo') }}" method="POST" enctype="multipart/form-data" id="pmInfoForm">
                     @csrf @method('PATCH')
 
                     <div class="pm-grid">
@@ -569,7 +574,10 @@ body.cx-light .pw-strength { background: #e5e7eb; }
                     </div>
 
                     <div class="pm-btn-actions">
-                        <button type="submit" class="pm-btn pm-btn-primary">Enregistrer les informations</button>
+                        <button type="submit" class="pm-btn pm-btn-primary" id="pmInfoBtn">
+                            <span class="pm-btn-spinner"></span>
+                            <span class="pm-btn-label">Enregistrer les informations</span>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -589,7 +597,7 @@ body.cx-light .pw-strength { background: #e5e7eb; }
                     <div class="pm-alert success"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> {{ session('success_country') }}</div>
                 @endif
 
-                <form action="{{ route('company.parametre.updateCountry') }}" method="POST">
+                <form action="{{ route('company.parametre.updateCountry') }}" method="POST" id="pmCountryForm">
                     @csrf @method('PATCH')
 
                     <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:1.25rem;">
@@ -636,7 +644,10 @@ body.cx-light .pw-strength { background: #e5e7eb; }
                     </div>
 
                     <div class="pm-btn-actions" style="margin-top:1rem">
-                        <button type="submit" class="pm-btn pm-btn-green">Mettre à jour le pays</button>
+                        <button type="submit" class="pm-btn pm-btn-green" id="pmCountryBtn">
+                            <span class="pm-btn-spinner"></span>
+                            <span class="pm-btn-label">Mettre à jour le pays</span>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -659,7 +670,7 @@ body.cx-light .pw-strength { background: #e5e7eb; }
                     <div class="pm-alert error"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> {{ $errors->first('current_password') }}</div>
                 @endif
 
-                <form action="{{ route('company.parametre.updatePassword') }}" method="POST">
+                <form action="{{ route('company.parametre.updatePassword') }}" method="POST" id="pmPasswordForm">
                     @csrf @method('PATCH')
 
                     <div class="pm-grid">
@@ -698,7 +709,10 @@ body.cx-light .pw-strength { background: #e5e7eb; }
                     </div>
 
                     <div class="pm-btn-actions">
-                        <button type="submit" class="pm-btn pm-btn-red">Changer le mot de passe</button>
+                        <button type="submit" class="pm-btn pm-btn-red" id="pmPasswordBtn">
+                            <span class="pm-btn-spinner"></span>
+                            <span class="pm-btn-label">Changer le mot de passe</span>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -765,6 +779,22 @@ body.cx-light .pw-strength { background: #e5e7eb; }
         bar.style.background = colors[score - 1] || '#ef4444';
         hnt.textContent   = v.length ? labels[score - 1] || 'Trop court' : '8 caractères minimum';
     });
+
+    /* ── Anti double-clic sur les formulaires (évite "Page Expired") ── */
+    function guardSubmit(formId, btnId, loadingText) {
+        const form = document.getElementById(formId);
+        const btn  = document.getElementById(btnId);
+        if (!form || !btn) return;
+        form.addEventListener('submit', function (e) {
+            if (btn.disabled) { e.preventDefault(); return; }
+            btn.disabled = true;
+            btn.classList.add('is-loading');
+            btn.querySelector('.pm-btn-label').textContent = loadingText;
+        });
+    }
+    guardSubmit('pmInfoForm',     'pmInfoBtn',     'Enregistrement…');
+    guardSubmit('pmCountryForm',  'pmCountryBtn',  'Mise à jour…');
+    guardSubmit('pmPasswordForm', 'pmPasswordBtn', 'Changement en cours…');
 })();
 </script>
 @endpush

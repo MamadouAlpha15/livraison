@@ -513,6 +513,9 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                             <span class="role-badge {{ $role['class'] }}">
                                 {!! $role['ico'] !!} {{ $role['label'] }}
                             </span>
+                            @if($emp->role_in_shop === 'employe' && $emp->orders_only)
+                            <span class="role-badge" style="background:#f5f3ff;color:#5b21b6;border:1px solid #ddd6fe;margin-left:4px" title="Accès limité à la page Commandes uniquement">🔒 Commandes seulement</span>
+                            @endif
                         </td>
                         <td style="font-size:12px;color:var(--text-2)">
                             {{ $emp->created_at->diffForHumans() }}
@@ -558,12 +561,19 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     </span>
                 </div>
                 <div class="m-emp-body">
+                    @if($emp->role_in_shop === 'employe' && $emp->orders_only)
+                    <div class="m-row">
+                        <span class="m-lbl">Accès</span>
+                        <span class="role-badge" style="background:#f5f3ff;color:#5b21b6;border:1px solid #ddd6fe">🔒 Commandes seulement</span>
+                    </div>
+                    @endif
                     <div class="m-row">
                         <span class="m-lbl">Membre depuis</span>
                         <span style="font-size:12px;color:var(--text-2);font-weight:500">{{ $emp->created_at->diffForHumans() }}</span>
                     </div>
                 </div>
-                <div class="m-emp-foot">
+                <div class="m-emp-foot" style="justify-content:space-between;gap:8px">
+                    <a href="{{ route('boutique.employees.edit', $emp) }}" class="btn btn-sm" style="background:#f0f2f5;color:#374151;border:1px solid #d1d5db">{!! $I['edit_btn'] !!} Modifier</a>
                     <form method="POST"
                           action="{{ route('boutique.employees.destroy', $emp) }}"
                           onsubmit="return confirm('Supprimer {{ addslashes($emp->name) }} ?')">

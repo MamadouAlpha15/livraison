@@ -57,8 +57,9 @@ $countries = [
 .step-nav{display:flex;gap:10px;margin-top:6px}
 .btn-back{flex:0 0 auto;padding:0 20px;height:46px;border-radius:10px;border:1.5px solid #e5e7eb;background:#fff;color:#374151;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
 .btn-back:hover{border-color:#6366f1;color:#6366f1}
-.btn-next{flex:1;height:46px;border-radius:10px;border:none;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.2px}
+.btn-next{flex:1;height:46px;border-radius:10px;border:none;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.2px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 .btn-next:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(99,102,241,.35)}
+.btn-next:disabled{opacity:.75;cursor:not-allowed;transform:none}
 .btn-submit{width:100%;height:46px;border-radius:10px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.2px;margin-top:6px}
 .btn-submit:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(16,185,129,.35)}
 
@@ -269,7 +270,7 @@ $countries = [
 
         <div class="step-nav">
             <button type="button" class="btn-back" onclick="goStep1()">← Retour</button>
-            <button type="submit" class="btn-next">Créer mon compte ✓</button>
+            <button type="submit" class="btn-next" id="regSubmitBtn">Créer mon compte ✓</button>
         </div>
 
         <p style="text-align:center;margin-top:16px;font-size:13px;color:#6b7280">
@@ -421,6 +422,12 @@ document.addEventListener('DOMContentLoaded', function () {
         if (conf && conf.value) pcs.value = conf.value;
         // Si les champs visibles sont vides (Chrome les a effacés) mais les cachés ont déjà
         // une valeur copiée par goStep2(), on garde la valeur déjà là
+
+        // Empêcher le double-clic pendant la création du compte
+        var submitBtn = document.getElementById('regSubmitBtn');
+        if (submitBtn.disabled) { e.preventDefault(); return; }
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="btn-spinner"></span> Création du compte…';
     });
 });
 </script>

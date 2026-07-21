@@ -551,16 +551,16 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
         {{-- Export grand écran --}}
         <div class="topbar-export-group">
-            <a href="{{ route('boutique.export.payments.excel', ['shop_id' => $shop->id]) }}" class="btn-export-tb excel">{!! $I['table_sm'] !!} Excel</a>
-            <a href="{{ route('boutique.export.payments.pdf',   ['shop_id' => $shop->id]) }}" class="btn-export-tb pdf">{!! $I['file_sm'] !!} PDF</a>
+            <a href="{{ route('boutique.export.payments.excel', ['shop_id' => $shop->id]) }}" class="btn-export-tb excel" data-noprogress>{!! $I['table_sm'] !!} Excel</a>
+            <a href="{{ route('boutique.export.payments.pdf',   ['shop_id' => $shop->id]) }}" class="btn-export-tb pdf" data-noprogress>{!! $I['file_sm'] !!} PDF</a>
         </div>
 
         {{-- Export petit écran : dropdown --}}
         <div class="topbar-export-dropdown">
             <button class="export-dd-btn" onclick="toggleExportDd(this)" type="button">{!! $I['download'] !!} &#9662;</button>
             <div class="export-dd-menu" id="payExportMenu">
-                <a href="{{ route('boutique.export.payments.excel', ['shop_id' => $shop->id]) }}">{!! $I['table_sm'] !!} &nbsp;Excel</a>
-                <a href="{{ route('boutique.export.payments.pdf',   ['shop_id' => $shop->id]) }}">{!! $I['file_sm'] !!} &nbsp;PDF</a>
+                <a href="{{ route('boutique.export.payments.excel', ['shop_id' => $shop->id]) }}" data-noprogress>{!! $I['table_sm'] !!} &nbsp;Excel</a>
+                <a href="{{ route('boutique.export.payments.pdf',   ['shop_id' => $shop->id]) }}" data-noprogress>{!! $I['file_sm'] !!} &nbsp;PDF</a>
             </div>
         </div>
     </div>
@@ -656,11 +656,13 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     &nbsp;&bull;&nbsp; {{ $payments->total() }} paiement(s)
                 </span>
                 <a href="{{ route('boutique.export.payments.excel', ['shop_id' => $shop->id]) }}"
-                   style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;padding:3px 9px;border-radius:6px;text-decoration:none">
+                   style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;padding:3px 9px;border-radius:6px;text-decoration:none"
+                   data-noprogress>
                    {!! $I['table_sm'] !!} Excel
                 </a>
                 <a href="{{ route('boutique.export.payments.pdf', ['shop_id' => $shop->id]) }}"
-                   style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;padding:3px 9px;border-radius:6px;text-decoration:none">
+                   style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;padding:3px 9px;border-radius:6px;text-decoration:none"
+                   data-noprogress>
                    {!! $I['file_sm'] !!} PDF
                 </a>
             </div>

@@ -1,10 +1,20 @@
-const CACHE = 'shopio-v9';
-const OFFLINE_URL = '/';
+const CACHE = 'shopio-v10';
 
 const PRECACHE = [
     '/',
     '/images/shopio-logo-192.png',
 ];
+
+const OFFLINE_HTML = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+    '<title>Connexion perdue</title><style>body{font-family:system-ui,sans-serif;' +
+    'display:flex;align-items:center;justify-content:center;height:100vh;margin:0;' +
+    'background:#f8fafc;color:#334155;text-align:center;padding:24px}' +
+    'button{margin-top:16px;background:#059669;color:#fff;border:none;' +
+    'border-radius:10px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer}' +
+    '</style></head><body><div><div style="font-size:40px">📶</div>' +
+    '<h2>Connexion perdue</h2><p>Vérifiez votre connexion internet et réessayez.</p>' +
+    '<button onclick="location.reload()">Réessayer</button></div></body></html>';
 
 /* ── Installation ── */
 self.addEventListener('install', e => {
@@ -38,7 +48,13 @@ self.addEventListener('fetch', e => {
                 }
                 return res;
             })
-            .catch(() => caches.match(e.request).then(r => r || caches.match(OFFLINE_URL)))
+            .catch(() => caches.match(e.request).then(r => {
+                if (r) return r;
+                if (e.request.mode === 'navigate') {
+                    return new Response(OFFLINE_HTML, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+                }
+                return new Response('', { status: 504 });
+            }))
     );
 });
 

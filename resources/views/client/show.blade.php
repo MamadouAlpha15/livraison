@@ -243,7 +243,7 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
 }
 
 /* ══ DESKTOP — côte à côte ══ */
-@media(min-width:780px){
+@media(min-width:768px){
     .page{padding:32px 24px 80px}
     .card{display:grid;grid-template-columns:420px 1fr;align-items:stretch}
     .gallery-section{border-right:1px solid #f3f4f6;display:flex;flex-direction:column}

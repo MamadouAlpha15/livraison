@@ -9,12 +9,17 @@ use App\Models\User;
 use Minishlink\WebPush\WebPush;
 use Minishlink\WebPush\Subscription;
 use Illuminate\Support\Facades\Log;
+use Kreait\Firebase\Contract\Messaging;
+use Kreait\Firebase\Exception\Messaging\NotFound;
+use Kreait\Firebase\Exception\Messaging\InvalidArgument;
+use Kreait\Firebase\Messaging\CloudMessage;
 
 class PushService
 {
     private WebPush $webPush;
+    private Messaging $messaging;
 
-    public function __construct()
+    public function __construct(Messaging $messaging)
     {
         $this->webPush = new WebPush([
             'VAPID' => [
@@ -23,6 +28,8 @@ class PushService
                 'privateKey' => config('app.vapid_private_key'),
             ],
         ]);
+
+        $this->messaging = $messaging;
     }
 
     public function vendorBadgeCount(User $user): int
@@ -41,6 +48,20 @@ class PushService
         return max(1, $pendingOrders + $unreadMessages);
     }
 
+    // Notifie le personnel de la boutique (propriétaire + employés/vendeurs), hors livreurs.
+    // Utilisé pour "nouvelle commande" afin que les employés voient aussi l'alerte, pas seulement le propriétaire.
+    public function notifyShopStaff(\App\Models\Shop $shop, string $title, string $body, string $url = '/', ?int $excludeUserId = null): void
+    {
+        $staff = User::where('shop_id', $shop->id)
+            ->whereIn('role_in_shop', ['employe', 'vendeur'])
+            ->when($excludeUserId, fn ($q) => $q->where('id', '!=', $excludeUserId))
+            ->get();
+
+        foreach ($staff as $user) {
+            $this->sendToUser($user, $title, $body, $this->vendorBadgeCount($user), $url);
+        }
+    }
+
     public function sendToUser(User $user, string $title, string $body, int $badge = 0, string $url = '/'): void
     {
         $subscriptions = PushSubscription::where('user_id', $user->id)->get();
@@ -49,6 +70,20 @@ class PushService
             return;
         }
 
+        $webSubs = $subscriptions->where('type', 'webpush');
+        $fcmSubs = $subscriptions->where('type', 'fcm');
+
+        if ($webSubs->isNotEmpty()) {
+            $this->sendWebPush($webSubs, $title, $body, $badge, $url);
+        }
+
+        foreach ($fcmSubs as $sub) {
+            $this->sendFcm($sub, $title, $body, $badge, $url);
+        }
+    }
+
+    private function sendWebPush($subscriptions, string $title, string $body, int $badge, string $url): void
+    {
         $payload = json_encode([
             'title' => $title,
             'body'  => $body,
@@ -78,6 +113,39 @@ class PushService
                     PushSubscription::where('endpoint_hash', hash('sha256', $expiredEndpoint))->delete();
                 }
             }
+        }
+    }
+
+    private function sendFcm(PushSubscription $sub, string $title, string $body, int $badge, string $url): void
+    {
+        $message = CloudMessage::fromArray([
+            'token' => $sub->endpoint,
+            'notification' => [
+                'title' => $title,
+                'body'  => $body,
+            ],
+            'android' => [
+                'priority' => 'high',
+                'notification' => [
+                    'sound'                  => 'default',
+                    'default_sound'          => true,
+                    'notification_priority'  => 'PRIORITY_MAX',
+                    'visibility'             => 'PUBLIC',
+                ],
+            ],
+            'data' => [
+                'url'   => $url,
+                'badge' => (string) $badge,
+            ],
+        ]);
+
+        try {
+            $this->messaging->send($message);
+        } catch (NotFound|InvalidArgument $e) {
+            // Jeton FCM invalide/expiré : on retire l'abonnement
+            $sub->delete();
+        } catch (\Throwable $e) {
+            Log::warning('[Push][FCM] Échec envoi: ' . $e->getMessage(), ['user_id' => $sub->user_id]);
         }
     }
 }

@@ -360,7 +360,6 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     .tb-sub   { display: none; }
 }
 @media (max-width: 380px) {
-    .kpi-grid { grid-template-columns: 1fr; }
     .today-grid { grid-template-columns: 1fr; }
     .kanban-grid { grid-template-columns: repeat(2,1fr); }
 }
@@ -799,11 +798,11 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     .co-row .btn{width:100%;justify-content:center;font-size:11px;}
 }
 
-/* Period stats : 1 colonne sous 400px */
+/* Period stats : reste en 2 colonnes sous 400px */
 @media(max-width:400px){
-    .period-stats{grid-template-columns:1fr !important;}
-    .period-stat{border-right:none !important;border-top:1px solid var(--border);}
-    .period-stat:first-child{border-top:none;}
+    .period-stats{grid-template-columns:repeat(2,1fr) !important;}
+    .period-stat:nth-child(2){border-right:none !important;}
+    .period-stat:nth-child(3){border-top:1px solid var(--border);}
 }
 
 /* risk-row : 1 par ligne sur très petit écran */
@@ -1482,16 +1481,16 @@ $I = [
 
                 {{-- Export grand écran --}}
                 <div class="topbar-export-group">
-                    <a href="{{ route('boutique.export.orders.excel', ['shop_id' => $shop->id]) }}" class="btn btn-sm" style="gap:4px">{!! $I['download'] !!} Excel</a>
-                    <a href="{{ route('boutique.export.orders.pdf',   ['shop_id' => $shop->id]) }}" class="btn btn-sm" style="gap:4px">{!! $I['download'] !!} PDF</a>
+                    <a href="{{ route('boutique.export.orders.excel', ['shop_id' => $shop->id]) }}" class="btn btn-sm" style="gap:4px" data-noprogress>{!! $I['download'] !!} Excel</a>
+                    <a href="{{ route('boutique.export.orders.pdf',   ['shop_id' => $shop->id]) }}" class="btn btn-sm" style="gap:4px" data-noprogress>{!! $I['download'] !!} PDF</a>
                 </div>
 
                 {{-- Export petit écran : dropdown --}}
                 <div class="topbar-export-dropdown">
                     <button class="export-dropdown-btn" onclick="toggleExportMenu(this)" type="button" style="gap:4px">{!! $I['download'] !!} ▾</button>
                     <div class="export-menu" id="exportMenu">
-                        <a href="{{ route('boutique.export.orders.excel', ['shop_id' => $shop->id]) }}" style="gap:8px">{!! $I['table_sm'] !!} Excel</a>
-                        <a href="{{ route('boutique.export.orders.pdf',   ['shop_id' => $shop->id]) }}" style="gap:8px">{!! $I['file_sm'] !!} PDF</a>
+                        <a href="{{ route('boutique.export.orders.excel', ['shop_id' => $shop->id]) }}" style="gap:8px" data-noprogress>{!! $I['table_sm'] !!} Excel</a>
+                        <a href="{{ route('boutique.export.orders.pdf',   ['shop_id' => $shop->id]) }}" style="gap:8px" data-noprogress>{!! $I['file_sm'] !!} PDF</a>
                     </div>
                 </div>
 

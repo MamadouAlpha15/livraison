@@ -531,8 +531,6 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .amz-card-img { cursor: zoom-in; }
 
 @media (max-width: 360px) {
-    /* 1 colonne sur très petit écran */
-    .amz-grid { grid-template-columns: 1fr; gap: 12px; }
     .amz-card-img { height: 200px; }
     .amz-card-name { font-size: 13px; -webkit-line-clamp: 3; }
     .amz-price-main { font-size: 17px; }

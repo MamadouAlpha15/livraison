@@ -13,7 +13,7 @@
 </div>
 @endif
 
-<form method="POST" action="{{ route('password.change.update') }}">
+<form method="POST" action="{{ route('password.change.update') }}" id="pwdChangeForm">
     @csrf
 
     <div style="margin-bottom:16px;">
@@ -46,9 +46,10 @@
         💡 Ce mot de passe est personnel. Ne le partagez avec personne, même pas votre employeur.
     </div>
 
-    <button type="submit"
-            style="width:100%;padding:13px;background:linear-gradient(135deg,#f90,#e47911);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;">
-        ✅ Enregistrer mon mot de passe
+    <button type="submit" id="pwdChangeBtn"
+            style="width:100%;padding:13px;background:linear-gradient(135deg,#f90,#e47911);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:9px;">
+        <span class="btn-spinner" id="pwdChangeSpinner" style="display:none;"></span>
+        <span id="pwdChangeLabel">✅ Enregistrer mon mot de passe</span>
     </button>
 </form>
 
@@ -59,6 +60,16 @@ function togglePwd(id, btn) {
     inp.type = show ? 'text' : 'password';
     btn.textContent = show ? '🙈' : '👁';
 }
+
+document.getElementById('pwdChangeForm').addEventListener('submit', function (e) {
+    const btn = document.getElementById('pwdChangeBtn');
+    if (btn.disabled) { e.preventDefault(); return; }
+    btn.disabled = true;
+    btn.style.opacity = '.75';
+    btn.style.cursor = 'not-allowed';
+    document.getElementById('pwdChangeSpinner').style.display = 'inline-block';
+    document.getElementById('pwdChangeLabel').textContent = 'Enregistrement…';
+});
 </script>
 
 </x-guest-layout>

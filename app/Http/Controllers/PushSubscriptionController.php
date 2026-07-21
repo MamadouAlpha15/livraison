@@ -12,6 +12,7 @@ class PushSubscriptionController extends Controller
     {
         $request->validate([
             'endpoint'   => 'required|string',
+            'type'       => 'nullable|string|in:webpush,fcm',
             'public_key' => 'nullable|string',
             'auth_token' => 'nullable|string',
         ]);
@@ -20,6 +21,7 @@ class PushSubscriptionController extends Controller
             ['endpoint_hash' => hash('sha256', $request->endpoint)],
             [
                 'user_id'       => Auth::id(),
+                'type'          => $request->type ?? 'webpush',
                 'endpoint'      => $request->endpoint,
                 'endpoint_hash' => hash('sha256', $request->endpoint),
                 'public_key'    => $request->public_key,

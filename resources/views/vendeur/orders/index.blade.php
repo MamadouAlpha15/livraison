@@ -190,11 +190,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); }
             <span style="color:rgba(255,255,255,.8);font-size:13px;font-weight:600;">Boutique</span>
         </div>
         <div class="export-group">
-            <a href="{{ route('boutique.export.orders.excel') }}" class="btn-export">⬇ Cmd Excel</a>
-            <a href="{{ route('boutique.export.orders.pdf') }}" class="btn-export" target="_blank">⬇ Cmd PDF</a>
-            <a href="{{ route('boutique.export.payments.excel') }}" class="btn-export">⬇ Paiem Excel</a>
-            <a href="{{ route('boutique.export.payments.pdf') }}" class="btn-export">⬇ Paiem PDF</a>
-            <a href="{{ route('boutique.export.stats.pdf') }}" class="btn-export">⬇ Stats PDF</a>
+            <a href="{{ route('boutique.export.orders.excel') }}" class="btn-export" data-noprogress>⬇ Cmd Excel</a>
+            <a href="{{ route('boutique.export.orders.pdf') }}" class="btn-export" target="_blank" data-noprogress>⬇ Cmd PDF</a>
+            <a href="{{ route('boutique.export.payments.excel') }}" class="btn-export" data-noprogress>⬇ Paiem Excel</a>
+            <a href="{{ route('boutique.export.payments.pdf') }}" class="btn-export" data-noprogress>⬇ Paiem PDF</a>
+            <a href="{{ route('boutique.export.stats.pdf') }}" class="btn-export" data-noprogress>⬇ Stats PDF</a>
         </div>
     </div>
     <div class="ord-hero-title">📦 Commandes reçues</div>
@@ -242,9 +242,9 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); }
 
     {{-- Exports mobile --}}
     <div class="mob-only" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">
-        <a href="{{ route('boutique.export.orders.excel') }}" class="act-btn act-btn-detail" style="font-size:11px;">⬇ Cmd Excel</a>
-        <a href="{{ route('boutique.export.orders.pdf') }}" class="act-btn act-btn-detail" target="_blank" style="font-size:11px;">⬇ Cmd PDF</a>
-        <a href="{{ route('boutique.export.stats.pdf') }}" class="act-btn act-btn-detail" style="font-size:11px;">⬇ Stats PDF</a>
+        <a href="{{ route('boutique.export.orders.excel') }}" class="act-btn act-btn-detail" style="font-size:11px;" data-noprogress>⬇ Cmd Excel</a>
+        <a href="{{ route('boutique.export.orders.pdf') }}" class="act-btn act-btn-detail" target="_blank" style="font-size:11px;" data-noprogress>⬇ Cmd PDF</a>
+        <a href="{{ route('boutique.export.stats.pdf') }}" class="act-btn act-btn-detail" style="font-size:11px;" data-noprogress>⬇ Stats PDF</a>
     </div>
 
     {{-- ══ DESKTOP TABLE ══ --}}

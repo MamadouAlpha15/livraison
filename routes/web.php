@@ -155,6 +155,9 @@ Route::get('/manifest.json', function () {
 /* Page d'accueil */
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
+/* Page d'accueil alternative — affiche directement produits, flash, boutiques (style Alibaba) */
+Route::get('/accueil-produits', [WelcomeController::class, 'catalogue'])->name('welcome.produits');
+
 /* Liste publique de toutes les boutiques */
 Route::get('/shops', [PublicShopController::class, 'index'])
     ->name('shops.index');
@@ -699,7 +702,7 @@ Route::middleware(['auth', 'role:vendeur,admin'])->group(function () {
 |  Préfixe : /employe  |  Nom : employe.*
 ══════════════════════════════════════════════════════════════════════════ */
 
-Route::middleware(['auth', 'role:employe,superadmin,admin,vendeur'])
+Route::middleware(['auth', 'role:employe,superadmin,admin,vendeur', 'orders.only'])
     ->prefix('employe')
     ->name('employe.')
     ->group(function () {

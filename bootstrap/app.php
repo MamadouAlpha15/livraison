@@ -20,6 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'shop.plan'     => \App\Http\Middleware\CheckShopPlan::class,
             // Plan entreprise : bloque les routes réservées au Plan Business
             'company.plan'  => \App\Http\Middleware\CheckCompanyPlan::class,
+            // Employé limité aux commandes uniquement (défini par le propriétaire de la boutique)
+            'orders.only'   => \App\Http\Middleware\RestrictEmployeeToOrders::class,
         ]);
 
         $middleware->appendToGroup('web', \App\Http\Middleware\SetLocale::class);

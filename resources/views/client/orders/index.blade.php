@@ -516,6 +516,9 @@ html, body {
 }
 
 /* ── Responsive ── */
+@media (max-width: 1024px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+}
 @media (max-width: 700px) {
     .stats-grid { grid-template-columns: 1fr 1fr; }
     .order-card-body { grid-template-columns: 56px 1fr; }

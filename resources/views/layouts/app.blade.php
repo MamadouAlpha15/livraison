@@ -406,6 +406,10 @@
 (function() {
     if (localStorage.getItem('push_subscribed')) return;
 
+    // Dans l'appli native (Capacitor), l'enregistrement se fait via _registerNativePush()
+    // plus bas — on n'affiche pas ce bandeau web dedans.
+    if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) return;
+
     // Depuis iPadOS 13, Safari sur iPad se présente comme un Mac de bureau dans le user-agent
     // (pas de "iPad" dedans) — on le détecte via le support tactile multi-points, propre aux iPad.
     var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent)
@@ -694,9 +698,12 @@ window.addEventListener('beforeinstallprompt', e => {
     }
 });
 
+@unless(request()->routeIs('welcome'))
 /* ── iOS : détecter et afficher les instructions ──
    Depuis iPadOS 13, Safari sur iPad se présente comme un Mac de bureau dans le user-agent
-   (pas de "iPad" dedans) — on le détecte via le support tactile multi-points, propre aux iPad. */
+   (pas de "iPad" dedans) — on le détecte via le support tactile multi-points, propre aux iPad.
+   Volontairement absent sur la page d'accueil publique : le modal s'affiche déjà
+   une fois l'utilisateur inscrit/connecté (bandeau notifications push). */
 const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent)
            || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
@@ -711,6 +718,7 @@ if (isIos && !isStandalone) {
         }, 3000);
     }
 }
+@endunless
 
 function pwaShowModal() {
     const modal = document.getElementById('pwaModal');
@@ -751,6 +759,48 @@ document.addEventListener('submit', function(e) {
 
 @auth
 window._vapidKey = document.querySelector('meta[name="vapid-public-key"]')?.content;
+window._isNativeApp = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+
+/* ── Notifications natives (appli Android/iOS via Capacitor + Firebase) ── */
+async function _registerNativePush() {
+    try {
+        const { PushNotifications } = window.Capacitor.Plugins;
+        let perm = await PushNotifications.checkPermissions();
+        if (perm.receive !== 'granted') {
+            perm = await PushNotifications.requestPermissions();
+        }
+        if (perm.receive !== 'granted') return;
+
+        PushNotifications.addListener('registration', async (token) => {
+            await fetch('/push/subscribe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify({ type: 'fcm', endpoint: token.value }),
+            });
+            localStorage.setItem('push_subscribed', '1');
+        });
+        PushNotifications.addListener('registrationError', (err) => {
+            console.warn('[Push][Natif] Échec enregistrement:', err);
+        });
+
+        /* Clic sur une notification (appli en arrière-plan) → ouvrir la bonne page */
+        PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
+            const url = action.notification?.data?.url;
+            if (url) window.location.href = url;
+        });
+
+        await PushNotifications.register();
+    } catch (e) {
+        console.warn('[Push][Natif] Échec:', e);
+    }
+}
+
+if (window._isNativeApp) {
+    _registerNativePush();
+}
 
 function _b64ToUint8(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -780,6 +830,7 @@ async function _savePushSub(sub) {
 
 /* Appelé quand l'utilisateur clique sur "Activer" */
 window.enablePushNotifications = async function() {
+    if (window._isNativeApp) return;
     if (!window._vapidKey || !('PushManager' in window) || !('serviceWorker' in navigator)) return;
     try {
         const perm = Notification.permission === 'granted'
@@ -801,7 +852,7 @@ window.enablePushNotifications = async function() {
 };
 
 /* Si déjà accordé mais pas encore sauvegardé en base → s'abonner silencieusement */
-if ('PushManager' in window && 'serviceWorker' in navigator && !localStorage.getItem('push_subscribed')) {
+if (!window._isNativeApp && 'PushManager' in window && 'serviceWorker' in navigator && !localStorage.getItem('push_subscribed')) {
     navigator.serviceWorker.ready.then(async reg => {
         if (Notification.permission === 'granted') {
             try {
@@ -820,7 +871,7 @@ if ('PushManager' in window && 'serviceWorker' in navigator && !localStorage.get
 
 @if(in_array(auth()->user()->role ?? '', ['company', 'livreur']))
 /* Toujours rafraîchir la subscription en base à chaque page (anti-expiration) */
-if ('PushManager' in window && 'serviceWorker' in navigator && Notification.permission === 'granted') {
+if (!window._isNativeApp && 'PushManager' in window && 'serviceWorker' in navigator && Notification.permission === 'granted') {
     navigator.serviceWorker.ready.then(async function(reg) {
         try {
             let sub = await reg.pushManager.getSubscription();

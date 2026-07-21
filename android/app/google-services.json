@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "241110276473",
+    "project_id": "shopio-a358d",
+    "storage_bucket": "shopio-a358d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:241110276473:android:b7aea8f97e059a11e237a8",
+        "android_client_info": {
+          "package_name": "com.shopio.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDn330EnG9uaitK85OznTnwOcCMZqrlNxI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

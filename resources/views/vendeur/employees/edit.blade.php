@@ -58,15 +58,31 @@
 
             <div class="emp-field">
                 <label>Rôle</label>
-                <select name="role_in_shop" required>
-                    <option value="livreur" {{ $employee->role_in_shop === 'livreur' ? 'selected' : '' }}>🚚 Livreur</option>
-                    <option value="vendeur" {{ $employee->role_in_shop === 'vendeur' ? 'selected' : '' }}>🛒 Vendeur</option>
-                    <option value="employe" {{ $employee->role_in_shop === 'employe' ? 'selected' : '' }}>👤 Employé</option>
+                <select name="role_in_shop" id="empRoleSelect" required onchange="toggleOrdersOnly()">
+                    <option value="livreur" {{ old('role_in_shop', $employee->role_in_shop) === 'livreur' ? 'selected' : '' }}>🚚 Livreur</option>
+                    <option value="employe" {{ old('role_in_shop', $employee->role_in_shop) === 'employe' ? 'selected' : '' }}>👤 Employé</option>
                 </select>
+            </div>
+
+            <div class="emp-field" id="ordersOnlyField" style="display:none;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:12px 14px;">
+                <label style="display:flex;align-items:center;gap:8px;margin:0;cursor:pointer">
+                    <input type="checkbox" name="orders_only" value="1" style="width:auto" {{ old('orders_only', $employee->orders_only) ? 'checked' : '' }}>
+                    🔒 Accès limité à la page Commandes uniquement
+                </label>
+                <div style="font-size:11.5px;color:#6b7280;margin-top:6px;">L'employé ne pourra qu'assigner et traiter les commandes — pas d'accès aux paiements, rapports ou statistiques.</div>
             </div>
 
             <button type="submit" class="emp-submit">💾 Enregistrer les modifications</button>
         </form>
     </div>
 </div>
+
+<script>
+function toggleOrdersOnly() {
+    const role  = document.getElementById('empRoleSelect').value;
+    const field = document.getElementById('ordersOnlyField');
+    field.style.display = role === 'employe' ? 'block' : 'none';
+}
+document.addEventListener('DOMContentLoaded', toggleOrdersOnly);
+</script>
 @endsection
