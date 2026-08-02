@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Mail\OtpVerificationMail;
 use App\Models\Order;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -42,6 +44,24 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         $user = Auth::user();
+
+        // Compte créé manuellement mais jamais vérifié : on renvoie vers la saisie du code OTP
+        if (!$user->email_verified_at) {
+            Auth::logout();
+
+            $code = (string) random_int(100000, 999999);
+            $user->forceFill([
+                'otp_code'       => $code,
+                'otp_expires_at' => now()->addMinutes(10),
+            ])->save();
+
+            Mail::to($user->email)->send(new OtpVerificationMail($user->name, $code));
+
+            session(['otp_user_id' => $user->id]);
+
+            return redirect()->route('verification.otp.show')
+                ->with('status', 'Confirmez votre adresse email pour continuer : un code vient de vous être envoyé.');
+        }
 
         Order::attachGuestOrderFromSession($user);
 

@@ -122,6 +122,15 @@
             @error('country')<p class="f-error">{{ $message }}</p>@enderror
         </div>
 
+        {{-- Conditions d'utilisation --}}
+        <div class="f-group">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" name="terms" value="1" {{ old('terms') ? 'checked' : '' }} required style="width:16px;height:16px;accent-color:#6366f1;cursor:pointer;flex-shrink:0;">
+                <span style="font-size:12.5px;color:#6b7280;">J'accepte les <a href="{{ route('legal.terms') }}" target="_blank" style="color:#6366f1;font-weight:600;text-decoration:none;">conditions d'utilisation et la politique de confidentialité</a> de Shopio</span>
+            </label>
+            @error('terms')<p class="f-error">{{ $message }}</p>@enderror
+        </div>
+
         <button type="submit" class="btn-submit" id="btnSubmit">
             <span class="btn-spinner"></span>
             <span class="btn-label">Accéder à mon espace →</span>

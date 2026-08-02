@@ -51,8 +51,16 @@ class GoogleController extends Controller
                     ->first();
 
         if ($user) {
+            $updates = [];
             if (!$user->google_id) {
-                $user->update(['google_id' => $googleUser->getId()]);
+                $updates['google_id'] = $googleUser->getId();
+            }
+            // Google confirme la propriété de l'email → on considère l'email vérifié
+            if (!$user->email_verified_at) {
+                $updates['email_verified_at'] = now();
+            }
+            if ($updates) {
+                $user->update($updates);
             }
             Auth::login($user, true);
             return $this->redirectToDashboard($user);
@@ -92,10 +100,13 @@ class GoogleController extends Controller
         $request->validate([
             'role'    => ['required', 'in:client,admin,company,livreur'],
             'country' => ['required', 'string', 'size:2'],
+            'terms'   => ['required', 'accepted'],
         ], [
             'role.required'    => 'Veuillez choisir votre type de compte.',
             'role.in'          => 'Type de compte invalide.',
             'country.required' => 'Veuillez sélectionner votre pays.',
+            'terms.required'   => 'Vous devez accepter les conditions d\'utilisation pour créer un compte.',
+            'terms.accepted'   => 'Vous devez accepter les conditions d\'utilisation pour créer un compte.',
         ]);
 
         $user = User::create([

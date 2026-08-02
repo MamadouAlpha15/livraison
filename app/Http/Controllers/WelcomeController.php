@@ -122,8 +122,15 @@ class WelcomeController extends Controller
             ->filter()
             ->values();
 
+        /* ── Chiffres clés pour le hero (compteurs animés) ── */
+        $stats = [
+            'total_shops'    => Shop::where('is_approved', true)->count(),
+            'total_products' => Product::where('is_active', true)->whereHas('shop', $approvedShopFilter)->count(),
+            'total_orders'   => Order::count(),
+        ];
+
         return view('welcome2', compact(
-            'flashProducts', 'recommendedProducts', 'shops', 'products', 'categories'
+            'flashProducts', 'recommendedProducts', 'shops', 'products', 'categories', 'stats'
         ));
     }
 }

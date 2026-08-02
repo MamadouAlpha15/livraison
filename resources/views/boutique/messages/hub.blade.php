@@ -542,7 +542,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 
 /* ── Très petit mobile (≤400px) ── */
 @media (max-width: 400px) {
-    .topbar-back { display: none; }
+    .topbar-back { font-size: 10px; padding: 4px 8px; }
     .hub-chat-head { padding: 7px 8px; }
     .hub-prod-strip { padding: 6px 8px; gap: 6px; }
     .hub-prod-img, .hub-prod-img-ph { width: 38px; height: 38px; }

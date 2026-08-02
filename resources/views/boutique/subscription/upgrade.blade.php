@@ -5,9 +5,7 @@
 $shop     = Auth::user()->shop;
 $isPro    = ($shop->plan ?? 'free') === 'pro' && $shop->plan_expires_at?->isFuture();
 $daysLeft = $isPro ? (int) now()->diffInDays($shop->plan_expires_at, false) : 0;
-$proXof   = number_format(config('genuispay.plans.pro', 7600), 0, ',', ' ');
-$proGnf   = number_format(config('genuispay.plans_gnf.pro', 100000), 0, ',', ' ');
-$isGuinea = ($shop->country ?? '') === 'GN';
+$proGnf   = number_format(150000, 0, ',', ' ');
 @endphp
 
 <style>
@@ -106,7 +104,7 @@ $isGuinea = ($shop->country ?? '') === 'GN';
                 <div class="plan-name">Plan Gratuit</div>
                 <div class="plan-price">
                     <span class="plan-price-v">0</span>
-                    <span class="plan-price-c">XOF</span>
+                    <span class="plan-price-c">GNF</span>
                 </div>
                 <div class="plan-period">Pour toujours</div>
             </div>
@@ -160,12 +158,9 @@ $isGuinea = ($shop->country ?? '') === 'GN';
                 <div class="plan-badge pro">⚡ Pro</div>
                 <div class="plan-name">Plan Pro</div>
                 <div class="plan-price">
-                    <span class="plan-price-v">{{ $proXof }}</span>
-                    <span class="plan-price-c">XOF</span>
+                    <span class="plan-price-v">{{ $proGnf }}</span>
+                    <span class="plan-price-c">GNF</span>
                 </div>
-                @if($isGuinea)
-                <div class="plan-period" style="color:#d97706;font-weight:700;margin-bottom:2px">≈ {{ $proGnf }} GNF 🇬🇳</div>
-                @endif
                 <div class="plan-period">par mois · renouvellement manuel</div>
             </div>
             <div class="plan-divider" style="margin:0 22px"></div>
@@ -234,7 +229,7 @@ $isGuinea = ($shop->country ?? '') === 'GN';
         </div>
         <div class="faq-item" onclick="this.classList.toggle('open')">
             <div class="faq-q">Quels modes de paiement sont acceptés ? <span class="faq-arr">▾</span></div>
-            <div class="faq-a">Orange Money, Waves, Mobile Money et Carte Visa — tous via GenuisPay, la passerelle de paiement sécurisée locale.</div>
+            <div class="faq-a">Orange Money, MTN MoMo et Carte Visa / MasterCard — paiement sécurisé et instantané.</div>
         </div>
     </div>
 </div>

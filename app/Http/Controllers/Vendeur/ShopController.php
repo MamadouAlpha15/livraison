@@ -224,7 +224,6 @@ $clientMessages = ShopMessage::where('shop_id', $shop->id)
             ->where('subscriber_id', $shop->id)
             ->where('status', 'active')
             ->where('updated_at', '>=', now()->subMinutes(10))
-            ->where('payment_method', 'genuispay')
             ->exists();
 
         $visitesToday = ShopVisit::where('shop_id', $shop->id)->where('visited_on', today())->value('count') ?? 0;

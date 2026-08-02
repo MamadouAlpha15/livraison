@@ -64,21 +64,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f1f5f9;color:#0f172a}
                 </span>
             </div>
             <div class="plan-details">
-                @php
-                    $guineaCountries = ['Guinea','Guinée','GN','guinea','guinée','GUINEA','GUINÉE'];
-                    $isGuinea = in_array(trim($userCountry), $guineaCountries);
-                    $rate = config('genuispay.gnf_to_xof_rate', 13.15);
-                    if ($isGuinea || empty($userCountry)) {
-                        $displayAmount   = number_format($subscription->amount, 0, ',', ' ');
-                        $displayCurrency = 'GNF';
-                    } else {
-                        $displayAmount   = number_format((int) ceil($subscription->amount / $rate), 0, ',', ' ');
-                        $displayCurrency = 'XOF';
-                    }
-                @endphp
                 <div class="plan-detail">
                     <div class="plan-detail-label">Montant payé</div>
-                    <div class="plan-detail-value">{{ $displayAmount }} {{ $displayCurrency }}</div>
+                    <div class="plan-detail-value">{{ number_format($subscription->amount, 0, ',', ' ') }} GNF</div>
                 </div>
                 <div class="plan-detail">
                     <div class="plan-detail-label">Référence</div>

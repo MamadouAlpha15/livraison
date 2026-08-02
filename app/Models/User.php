@@ -31,6 +31,8 @@ class User extends Authenticatable
         'referral_code',         // code de parrainage unique de cet utilisateur
         'referred_by',           // FK users.id — qui a parrainé cet utilisateur
         'referral_rewarded_at',  // date à laquelle le parrain a été récompensé (1ère commande livrée)
+        'otp_code',              // code à 6 chiffres envoyé par email pour vérifier l'adresse
+        'otp_expires_at',        // expiration du code OTP
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -45,6 +47,7 @@ class User extends Authenticatable
             'orders_only'          => 'boolean',
             'notif_state'          => 'array',
             'referral_rewarded_at' => 'datetime',
+            'otp_expires_at'       => 'datetime',
         ];
     }
 

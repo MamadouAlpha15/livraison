@@ -183,13 +183,28 @@ body {
     letter-spacing: -2px;
     max-width: 820px;
     margin: 0 auto 20px;
-    animation: fadeDown .7s .1s ease both;
 }
-.hero-title span {
+.hero-title .hw {
+    display: inline-block;
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(30px) scale(.95);
+    animation: heroWordIn .8s cubic-bezier(.16,1,.3,1) both;
+    animation-delay: calc(var(--i) * 100ms + 150ms);
+}
+.hero-title .hw-grad {
     background: linear-gradient(135deg, #a5b4fc, #6366f1, #8b5cf6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+}
+@keyframes heroWordIn {
+    0%   { opacity: 0; filter: blur(6px); transform: translateY(30px) scale(.95); }
+    60%  { filter: blur(0); }
+    100% { opacity: 1; filter: blur(0); transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .hero-title .hw { animation: none; opacity: 1; filter: none; transform: none; }
 }
 
 .hero-sub {
@@ -213,13 +228,32 @@ body {
     border: none; cursor: pointer;
 }
 .cta-primary {
-    background: linear-gradient(135deg,#6366f1,#4f46e5); color: #fff;
+    position: relative; color: #fff; background-repeat: no-repeat;
+    background-image:
+        linear-gradient(135deg,#6366f1,#4f46e5),
+        linear-gradient(120deg, transparent 35%, rgba(255,255,255,.6) 50%, transparent 65%);
+    background-size: 100% 100%, 220% 100%;
+    background-position: 0 0, 200% 0;
     box-shadow: 0 4px 20px rgba(99,102,241,.45);
+    animation: ctaGlow 2.6s ease-in-out infinite, ctaShine 3.4s ease-in-out infinite;
 }
 .cta-primary:hover {
-    background: linear-gradient(135deg,#4f46e5,#3730a3); color: #fff;
-    box-shadow: 0 6px 28px rgba(99,102,241,.55);
+    color: #fff;
+    filter: brightness(1.08);
+    box-shadow: 0 6px 30px rgba(99,102,241,.65);
     transform: translateY(-1px);
+}
+@keyframes ctaGlow {
+    0%, 100% { box-shadow: 0 4px 20px rgba(99,102,241,.45); }
+    50%      { box-shadow: 0 4px 32px rgba(99,102,241,.8), 0 0 0 5px rgba(99,102,241,.1); }
+}
+@keyframes ctaShine {
+    0%   { background-position: 0 0, 200% 0; }
+    55%  { background-position: 0 0, -40% 0; }
+    100% { background-position: 0 0, -40% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .cta-primary { animation: none; }
 }
 .cta-secondary {
     background: rgba(255,255,255,.07);
@@ -424,6 +458,77 @@ body {
         transform: none;
         transition: none;
     }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   APPLICATION MOBILE — bandeau "bientôt sur Google Play"
+════════════════════════════════════════════════════════════════ */
+.app-section {
+    background: linear-gradient(160deg, #100c31 0%, #1a1155 55%, #211368 100%);
+    border-radius: 24px;
+    margin: 0 24px 90px;
+    padding: 56px 48px;
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; gap: 48px; flex-wrap: wrap;
+    box-shadow: 0 8px 48px rgba(139,92,246,.2), 0 0 0 1px rgba(255,255,255,.03) inset;
+}
+.app-section::before {
+    content: '';
+    position: absolute; right: -100px; top: -100px;
+    width: 420px; height: 420px;
+    background: radial-gradient(circle, rgba(139,92,246,.22) 0%, rgba(109,40,217,.08) 45%, transparent 70%);
+    pointer-events: none;
+}
+.app-section-text { flex: 1; min-width: 280px; position: relative; z-index: 1; }
+.app-section-text h2 {
+    font-family: var(--display);
+    font-size: clamp(24px, 3.2vw, 34px); font-weight: 700; color: #fff;
+    letter-spacing: -.5px; margin: 0 0 12px; line-height: 1.2;
+}
+.app-section-text h2 span { color: var(--indigo-lt); }
+.app-section-text p { font-size: 14.5px; color: rgba(255,255,255,.6); line-height: 1.7; margin: 0 0 26px; max-width: 460px; }
+
+.store-badge {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: #0a0a1e; border: 1px solid rgba(255,255,255,.14);
+    border-radius: 12px; padding: 11px 20px 11px 16px;
+    position: relative; cursor: default; user-select: none;
+}
+.store-badge-ico { font-size: 24px; color: #a5b4fc; flex-shrink: 0; line-height: 1; }
+.store-badge-txt { display: flex; flex-direction: column; }
+.store-badge-sub { font-size: 10px; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: .6px; }
+.store-badge-title { font-size: 17px; font-weight: 700; color: #fff; font-family: var(--display); line-height: 1.25; }
+.store-badge-tag {
+    position: absolute; top: -9px; right: 14px;
+    background: var(--green); color: #fff; font-size: 10px; font-weight: 700;
+    padding: 2px 10px; border-radius: 20px; letter-spacing: .3px;
+    box-shadow: 0 2px 8px rgba(99,102,241,.5);
+}
+
+.app-section-phone { flex: 0 0 260px; position: relative; z-index: 1; display: flex; justify-content: center; }
+@keyframes floatBox { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+@media (prefers-reduced-motion: reduce) {
+    .pm-photo { animation: none !important; }
+}
+@media (max-width: 900px) {
+    .app-section { margin: 0 16px 60px; padding: 40px 28px; flex-direction: column; text-align: center; }
+    .app-section-text p { margin-left: auto; margin-right: auto; }
+    .store-badge { margin: 0 auto; }
+    .app-section-phone { flex-basis: auto; }
+}
+
+/* ── Photo téléphone ── */
+.pm-wrap { position: relative; width: 250px; }
+.pm-glow {
+    position: absolute; inset: -30px; z-index: 0;
+    background: radial-gradient(ellipse at 50% 40%, rgba(139,92,246,.35) 0%, rgba(99,102,241,.14) 45%, transparent 72%);
+    pointer-events: none;
+}
+.pm-photo {
+    position: relative; z-index: 1; width: 100%; display: block;
+    border-radius: 22px;
+    box-shadow: 0 26px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.08), 0 0 70px rgba(99,102,241,.2);
+    animation: floatBox 4.2s ease-in-out infinite;
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -1302,10 +1407,14 @@ footer.app-footer { display: none !important; }
         Plateforme de gestion boutique & livraisons
     </div>
 
-    {{-- Titre principal --}}
+    {{-- Titre principal — animation mot par mot --}}
     <h1 class="hero-title">
-        Gérez votre boutique<br>
-        <span>comme un pro</span>
+        <span class="hw" style="--i:0">Gérez</span>
+        <span class="hw" style="--i:1">votre</span>
+        <span class="hw" style="--i:2">boutique</span><br>
+        <span class="hw hw-grad" style="--i:3">comme</span>
+        <span class="hw hw-grad" style="--i:4">un</span>
+        <span class="hw hw-grad" style="--i:5">pro</span>
     </h1>
 
     {{-- Sous-titre --}}
@@ -1667,10 +1776,8 @@ footer.app-footer { display: none !important; }
     <div class="section-inner">
         <div style="text-align:center;margin-bottom:48px">
 @php
-$proXof = number_format(config('genuispay.plans.pro', 7600), 0, ',', ' ');
-$proGnf = number_format(config('genuispay.plans_gnf.pro', 100000), 0, ',', ' ');
-$bizXof = number_format(config('genuispay.plans.business', 11400), 0, ',', ' ');
-$bizGnf = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', ' ');
+$proGnf = number_format(150000, 0, ',', ' ');
+$bizGnf = number_format(100000, 0, ',', ' ');
 @endphp
             <div class="section-badge reveal">Tarification</div>
                <h2 class="section-title reveal" style="--reveal-delay:80ms">Des tarifs <span>transparents</span></h2>
@@ -1681,7 +1788,7 @@ $bizGnf = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', 
           {{-- Plan Gratuit (Boutiques & Entreprises) --}}
             <div class="pricing-card">
                 <div class="pricing-name">Gratuit</div>
-                <div class="pricing-price">0 <span>XOF/mois</span></div>
+                <div class="pricing-price">0 <span>GNF/mois</span></div>
                 <div class="pricing-desc">Pour démarrer et découvrir la plateforme.</div>
                 <ul class="pricing-features">
 
@@ -1723,8 +1830,7 @@ $bizGnf = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', 
                 <div class="pricing-popular-badge">BOUTIQUES</div>
                 <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--green);margin-bottom:4px">🛍 Pour les boutiques</div>
                 <div class="pricing-name">Plan Pro</div>
-                <div class="pricing-price">{{ $proXof }} <span>XOF/mois</span></div>
-                <div style="font-size:12px;font-weight:700;color:#d97706;margin-bottom:4px">≈ {{ $proGnf }} GNF 🇬🇳</div>
+                <div class="pricing-price">{{ $proGnf }} <span>GNF/mois</span></div>
                 <div class="pricing-desc">Tout illimité pour votre boutique pendant 1 mois.</div>
                 <ul class="pricing-features">
                     <li>Produits illimités</li>
@@ -1750,8 +1856,7 @@ $bizGnf = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', 
                 <div class="pricing-popular-badge" style="background:linear-gradient(135deg,#7c3aed,#4f46e5)">ENTREPRISES</div>
                 <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#7c3aed;margin-bottom:4px">🚚 Pour les entreprises de livraison</div>
                 <div class="pricing-name">Plan Business</div>
-                <div class="pricing-price">{{ $bizXof }} <span>XOF/mois</span></div>
-                <div style="font-size:12px;font-weight:700;color:#d97706;margin-bottom:4px">≈ {{ $bizGnf }} GNF 🇬🇳</div>
+                <div class="pricing-price">{{ $bizGnf }} <span>GNF/mois</span></div>
                 <div class="pricing-desc">Tout illimité pour votre entreprise de livraison pendant 1 mois.</div>
                 <ul class="pricing-features">
                     <li>Chauffeurs illimités</li>
@@ -1852,6 +1957,31 @@ $bizGnf = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', 
                 <div class="faq-q">Comment contacter le support ? <span class="arrow">+</span></div>
                 <div class="faq-a">Un système de tickets est intégré directement dans la plateforme. Créez un ticket et notre équipe vous répond dans les 24h ouvrées.</div>
             </div>
+        </div>
+    </div>
+</section>
+
+{{-- ══════════════════════════════════════════
+     APPLICATION MOBILE
+══════════════════════════════════════════ --}}
+<section class="app-section reveal" id="app-download">
+    <div class="app-section-text">
+        <div class="section-badge" style="margin-bottom:18px">Application mobile</div>
+        <h2>Emportez <span>{{ config('app.name', 'Shopio') }}</span> partout avec vous</h2>
+        <p>Commandez, suivez vos livraisons en direct et gérez votre boutique depuis votre téléphone. Notre application Android arrive très bientôt.</p>
+        <div class="store-badge">
+            <span class="store-badge-tag">Bientôt</span>
+            <span class="store-badge-ico">▶</span>
+            <div class="store-badge-txt">
+                <span class="store-badge-sub">Disponible prochainement sur</span>
+                <span class="store-badge-title">Google Play</span>
+            </div>
+        </div>
+    </div>
+    <div class="app-section-phone">
+        <div class="pm-wrap">
+            <div class="pm-glow"></div>
+            <img src="{{ asset('images/tel.jpeg') }}" alt="Application Shopio sur mobile" loading="lazy" width="250" height="527" class="pm-photo">
         </div>
     </div>
 </section>

@@ -19,6 +19,9 @@
 /storage/*.key
 /storage/pail
 /storage/app/firebase
+/keystore
+/android/app/*.jks
+/android/keystore.properties
 /vendor
 Homestead.json
 Homestead.yaml

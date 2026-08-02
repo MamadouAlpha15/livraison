@@ -29,7 +29,7 @@
 use Illuminate\Support\Facades\Route;
 
 /* ── Contrôleurs : Paiement & Abonnements ── */
-use App\Http\Controllers\Payment\GenuisPayController;
+use App\Http\Controllers\Payment\ChapChapPayController;
 use App\Http\Controllers\Boutique\SubscriptionController as BoutiqueSubscriptionController;
 use App\Http\Controllers\Company\SubscriptionController as CompanySubscriptionController;
 
@@ -154,6 +154,9 @@ Route::get('/manifest.json', function () {
 
 /* Page d'accueil */
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
+
+/* Conditions d'utilisation et politique de confidentialité */
+Route::view('/conditions-utilisation', 'legal.terms')->name('legal.terms');
 
 /* Page d'accueil alternative — affiche directement produits, flash, boutiques (style Alibaba) */
 Route::get('/accueil-produits', [WelcomeController::class, 'catalogue'])->name('welcome.produits');
@@ -854,24 +857,24 @@ Route::prefix('client')->name('client.')->group(function () {
 ══════════════════════════════════════════════════════════════════════════ */
 
 /* ══════════════════════════════════════════════════════════════════════════
-|  PAIEMENT & ABONNEMENTS (GenuisPay)
-|  Routes publiques pour le webhook (pas de CSRF)
+|  PAIEMENT & ABONNEMENTS (ChapChap Pay)
+|  Route publique pour le webhook (pas de CSRF)
 |  Routes auth pour le checkout et les pages upgrade
 ══════════════════════════════════════════════════════════════════════════ */
 
-/* Webhook GenuisPay : pas d'auth, pas de CSRF (vérifié par signature HMAC) */
-Route::post('/payment/callback', [GenuisPayController::class, 'callback'])
+/* Webhook ChapChap Pay : pas d'auth, pas de CSRF (vérifié par signature HMAC) */
+Route::post('/payment/callback', [ChapChapPayController::class, 'callback'])
     ->name('payment.callback')
     ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
-/* Pages de retour après paiement (accessibles sans auth car GenuisPay redirige) */
-Route::get('/payment/success', [GenuisPayController::class, 'success'])->name('payment.success');
-Route::get('/payment/failed',  [GenuisPayController::class, 'failed']) ->name('payment.failed');
+/* Pages de retour après paiement */
+Route::get('/payment/success', [ChapChapPayController::class, 'success'])->name('payment.success');
+Route::get('/payment/failed',  [ChapChapPayController::class, 'failed']) ->name('payment.failed');
 
 /* Checkout et initiation de paiement → nécessite être connecté */
 Route::middleware('auth')->group(function () {
-    Route::get('/payment/checkout',  [GenuisPayController::class, 'checkout']) ->name('payment.checkout');
-    Route::post('/payment/initiate', [GenuisPayController::class, 'initiate']) ->name('payment.initiate');
+    Route::get('/payment/checkout',  [ChapChapPayController::class, 'checkout']) ->name('payment.checkout');
+    Route::post('/payment/initiate', [ChapChapPayController::class, 'initiate']) ->name('payment.initiate');
 });
 
 /* Page upgrade boutique (plan Pro) */

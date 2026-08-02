@@ -268,6 +268,15 @@ $countries = [
             @error('address')<p class="f-error">{{ $message }}</p>@enderror
         </div>
 
+        {{-- Conditions d'utilisation --}}
+        <div class="f-group">
+            <label class="f-check">
+                <input type="checkbox" name="terms" id="terms" value="1" {{ old('terms') ? 'checked' : '' }} required>
+                <span>J'accepte les <a href="{{ route('legal.terms') }}" target="_blank" class="auth-link">conditions d'utilisation et la politique de confidentialité</a> de Shopio</span>
+            </label>
+            @error('terms')<p class="f-error">{{ $message }}</p>@enderror
+        </div>
+
         <div class="step-nav">
             <button type="button" class="btn-back" onclick="goStep1()">← Retour</button>
             <button type="submit" class="btn-next" id="regSubmitBtn">Créer mon compte ✓</button>

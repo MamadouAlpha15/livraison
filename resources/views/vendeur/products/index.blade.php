@@ -820,6 +820,12 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                 Partager ma boutique
             </button>
+            @if($shop)
+            <a href="{{ route('public.shops.products', $shop) }}" target="_blank" title="Voir ma boutique comme un client"
+               class="filter-btn" style="font-size:13px;padding:10px 14px;display:inline-flex;align-items:center;gap:7px">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </a>
+            @endif
             @if(!$isPro && $totalProducts >= 5)
                 <span style="font-size:13px;padding:10px 20px;border-radius:var(--r-sm);background:#f1f5f9;color:#94a3b8;border:1px solid #cbd5e1;display:inline-flex;align-items:center;gap:7px;cursor:not-allowed;font-weight:700">
                     {!! $I['plus_pg'] !!} Limite atteinte

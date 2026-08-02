@@ -111,12 +111,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
             <div class="order-amount-row">
                 <div>
                     <div>
-                        <span class="order-amount-v">{{ number_format($amountXof, 0, ',', ' ') }}</span>
-                        <span class="order-amount-c">XOF</span>
+                        <span class="order-amount-v">{{ number_format($amount, 0, ',', ' ') }}</span>
+                        <span class="order-amount-c">GNF</span>
                     </div>
-                    @if($userCountry === 'GN')
-                    <div class="order-amount-note">≈ {{ number_format($amount, 0, ',', ' ') }} GNF 🇬🇳 — équivalent en francs guinéens</div>
-                    @endif
                     <div class="order-amount-note">Valable 30 jours · Renouvellement manuel</div>
                 </div>
                 <div class="order-plan-badge">⚡ Plan {{ ucfirst($plan) }}</div>
@@ -137,9 +134,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
             <div class="methods-info">
                 <div class="methods-info-title">Moyens de paiement acceptés</div>
                 <div class="methods-grid">
+                    <div class="method-chip"><span>💳</span> PayCard</div>
                     <div class="method-chip"><span>🟠</span> Orange Money</div>
                     <div class="method-chip"><span>🟡</span> MTN MoMo</div>
-                    <div class="method-chip"><span>🔵</span> Wave</div>
                     <div class="method-chip"><span>💳</span> Visa / MasterCard</div>
                 </div>
             </div>
@@ -151,7 +148,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 
                 <button type="submit" class="pay-btn" id="payBtn">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                    Payer {{ number_format($amountXof, 0, ',', ' ') }} XOF
+                    Payer {{ number_format($amount, 0, ',', ' ') }} GNF
                 </button>
             </form>
 
@@ -166,7 +163,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
                         Chiffrement SSL
                     </div>
                 </div>
-                <div class="powered">Propulsé par <strong>GenuisPay</strong> — vous choisirez votre méthode sur la page suivante</div>
+                <div class="powered">Propulsé par <strong>ChapChap Pay</strong> — vous choisirez votre méthode sur la page suivante</div>
             </div>
 
         </div>
@@ -177,7 +174,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 document.getElementById('payForm').addEventListener('submit', function() {
     const btn = document.getElementById('payBtn');
     btn.disabled = true;
-    btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Redirection vers GenuisPay…';
+    btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Redirection vers ChapChap Pay…';
 });
 </script>
 </body>

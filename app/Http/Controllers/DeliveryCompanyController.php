@@ -262,19 +262,14 @@ class DeliveryCompanyController extends Controller
     $maxOrders   = \App\Services\SubscriptionService::COMP_FREE_MAX_ORDERS;
     $usedOrders  = $baseOrders()->whereYear('created_at', now()->year)->whereMonth('created_at', now()->month)->count();
     $totalZones  = $company->zones()->count();
-    $isGuinea       = ($company->country ?? '') === 'GN';
-    $bizXof         = number_format(config('genuispay.plans.business', 11400), 0, ',', ' ');
-    $bizGnf         = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', ' ');
-    $bizPriceLabel  = $isGuinea
-        ? "{$bizXof} XOF/mois (≈ {$bizGnf} GNF 🇬🇳)"
-        : "{$bizXof} XOF/mois";
+    $bizGnf         = number_format(100000, 0, ',', ' ');
+    $bizPriceLabel  = "{$bizGnf} GNF/mois";
 
     $recentPayment = \App\Models\Subscription::where('subscriber_type', \App\Models\DeliveryCompany::class)
         ->where('subscriber_id', $company->id)
         ->where('status', 'active')
         ->where('updated_at', '>=', now()->subMinutes(10))
-        ->where('payment_method', 'genuispay')
-        ->exists();
+        ->exists() || session('payment_success');
 
     return view('company.dashboard', compact(
         'company', 'drivers', 'recentPayment',
@@ -294,7 +289,7 @@ class DeliveryCompanyController extends Controller
         'devise',
         'isBusiness', 'daysLeft',
         'maxDrivers', 'maxZones', 'maxOrders', 'usedOrders', 'totalZones',
-        'isGuinea', 'bizXof', 'bizGnf', 'bizPriceLabel'
+        'bizGnf', 'bizPriceLabel'
     ));
 }
 

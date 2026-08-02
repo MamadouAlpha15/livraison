@@ -26,6 +26,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->appendToGroup('web', \App\Http\Middleware\SetLocale::class);
         $middleware->appendToGroup('web', \App\Http\Middleware\ForcePasswordChange::class);
+
+        // Fait confiance aux en-têtes X-Forwarded-* (ngrok, load balancer, etc.)
+        // pour que route()/url() détectent correctement le HTTPS du tunnel/proxy,
+        // sans casser l'accès direct en HTTP (ex: 127.0.0.1 en local sans tunnel).
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

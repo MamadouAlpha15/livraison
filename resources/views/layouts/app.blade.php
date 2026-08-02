@@ -53,6 +53,12 @@
             0%,100% { transform:scale(1);    box-shadow:0 8px 28px rgba(5,150,105,.25); }
             50%      { transform:scale(1.06); box-shadow:0 12px 36px rgba(5,150,105,.4); }
         }
+
+        /* ── Securite anti-flash : ces modals ne sont stylees (display/visibility)
+           que par un CSS externe charge en differe. Sur mobile lent, ce CSS peut
+           arriver apres le premier rendu et laisser apparaitre le contenu brut
+           le temps du chargement. On les cache ici, avant tout CSS externe. ── */
+        .bq-chat-overlay, .chat-overlay { display:none; }
     </style>
 
 
@@ -266,6 +272,14 @@
     <div id="pg-loader-spin"></div>
     <span id="pg-loader-txt">Chargement…</span>
 </div>
+<script>
+/* Masquer l'écran de démarrage natif dès que possible, sans attendre le
+   téléchargement complet du reste de la page (potentiellement lourde) —
+   placé volontairement tout en haut du body, avant tout le contenu. */
+if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+    try { window.Capacitor.Plugins.SplashScreen.hide(); } catch (e) {}
+}
+</script>
 
     {{-- ═══ NAVBAR (cachée sur dashboard via body.is-dashboard) ═══ --}}
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top app-navbar">
@@ -547,7 +561,8 @@
         setTimeout(function () { loader.remove(); }, 350);
     }
 
-    /* Attendre DOM + polices pour éviter le flash de texte non stylé */
+    /* Attendre DOM + polices + feuilles de style pour éviter le flash de contenu non stylé
+       (ex : modales cachées seulement par du CSS externe, comme .bq-chat-overlay) */
     var domReady = document.readyState !== 'loading'
         ? Promise.resolve()
         : new Promise(function (r) { document.addEventListener('DOMContentLoaded', r); });
@@ -556,15 +571,29 @@
         ? document.fonts.ready
         : Promise.resolve();
 
-    Promise.all([domReady, fontsReady]).then(function () {
+    var stylesReady = (function () {
+        var pending = Array.prototype.filter.call(
+            document.querySelectorAll('link[rel="stylesheet"]'),
+            function (l) { return !l.sheet; }
+        );
+        if (!pending.length) return Promise.resolve();
+        return Promise.all(pending.map(function (l) {
+            return new Promise(function (res) {
+                l.addEventListener('load', res, { once: true });
+                l.addEventListener('error', res, { once: true });
+            });
+        }));
+    })();
+
+    Promise.all([domReady, fontsReady, stylesReady]).then(function () {
         /* 2 frames pour laisser le navigateur finaliser le rendu des fonts */
         requestAnimationFrame(function () {
             requestAnimationFrame(hide);
         });
     });
 
-    /* Sécurité absolue : 4s max */
-    setTimeout(hide, 4000);
+    /* Sécurité absolue : 7s max (pages lourdes type dashboard sur réseau lent) */
+    setTimeout(hide, 7000);
 })();
 
 /* ══ NProgress — barre de progression instantanée ══ */

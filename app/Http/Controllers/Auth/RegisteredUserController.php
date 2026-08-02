@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OtpVerificationMail;
 use App\Models\User;
 use App\Models\Shop;
 use App\Models\Order;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 use App\Models\DeliveryCompany;
@@ -60,13 +61,19 @@ class RegisteredUserController extends Controller
         // Validation des champs
         $request->validate([
             'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'email'    => [
+                'required', 'string', 'lowercase', 'email', 'max:255',
+                // Une adresse déjà utilisée par un compte VÉRIFIÉ reste bloquée ;
+                // une inscription abandonnée (jamais vérifiée) libère l'email pour une nouvelle tentative.
+                Rule::unique(User::class)->where(fn ($q) => $q->whereNotNull('email_verified_at')),
+            ],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role'     => ['required', 'in:client,admin,company,livreur'],
             'phone'    => ['nullable', 'string', 'max:20'],
             'address'  => ['nullable', 'string', 'max:255'],
             'country'  => ['required', 'string', 'size:2'],
             'shop_id'  => ['nullable', 'exists:shops,id'],
+            'terms'    => ['required', 'accepted'],
         ], [
             'name.required'      => 'Le nom complet est obligatoire.',
             'name.max'           => 'Le nom ne peut pas dépasser 255 caractères.',
@@ -81,6 +88,8 @@ class RegisteredUserController extends Controller
             'role.in'            => 'Le type de compte sélectionné est invalide.',
             'country.required'   => 'Veuillez sélectionner votre pays.',
             'country.size'       => 'Le pays sélectionné est invalide.',
+            'terms.required'     => 'Vous devez accepter les conditions d\'utilisation pour créer un compte.',
+            'terms.accepted'     => 'Vous devez accepter les conditions d\'utilisation pour créer un compte.',
         ]);
 
         // Code de parrainage : champ du formulaire en priorité, sinon celui mémorisé en session
@@ -92,7 +101,10 @@ class RegisteredUserController extends Controller
             }
         }
 
-        // Création du compte utilisateur
+        // Une éventuelle inscription précédente avec cet email n'a jamais été vérifiée : on repart de zéro
+        User::where('email', $request->email)->whereNull('email_verified_at')->delete();
+
+        // Création du compte utilisateur (email non vérifié tant que le code OTP n'est pas confirmé)
         $user = User::create([
             'name'        => $request->name,
             'email'       => $request->email,
@@ -105,9 +117,6 @@ class RegisteredUserController extends Controller
         ]);
 
         session()->forget('referral_code');
-
-        event(new Registered($user));
-        Auth::login($user);
 
         Order::attachGuestOrderFromSession($user);
 
@@ -123,25 +132,26 @@ class RegisteredUserController extends Controller
             }
         }
 
-        // Si le client vient d'une page produit, le renvoyer directement dessus
+        // Si le client vient d'une page produit, mémoriser la destination pour après vérification
         if ($user->role === 'client' && $request->filled('redirect')) {
             $target = $request->redirect;
             // Sécurité : on n'accepte que les URLs du même domaine
             if (str_starts_with($target, url('/'))) {
-                return redirect($target);
+                session(['product_redirect' => $target]);
             }
         }
 
-        // Redirections selon le rôle
-        switch ($user->role) {
-            case 'admin':
-                return redirect()->route('boutique.dashboard');
-            case 'company':
-                return redirect()->route('company.dashboard');
-            case 'livreur':
-                return redirect()->route('livreur.dashboard');
-            default:
-                return redirect()->route('client.dashboard');
-        }
+        // Génère et envoie le code de vérification par email
+        $code = (string) random_int(100000, 999999);
+        $user->forceFill([
+            'otp_code'       => $code,
+            'otp_expires_at' => now()->addMinutes(10),
+        ])->save();
+
+        Mail::to($user->email)->send(new OtpVerificationMail($user->name, $code));
+
+        session(['otp_user_id' => $user->id]);
+
+        return redirect()->route('verification.otp.show');
     }
 }

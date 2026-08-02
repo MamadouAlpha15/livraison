@@ -4,9 +4,7 @@
 @php
 $isBusiness = $currentPlan === 'business';
 $daysLeft   = $isBusiness ? (int) now()->diffInDays($company->plan_expires_at, false) : 0;
-$bizXof     = number_format(config('genuispay.plans.business', 11400), 0, ',', ' ');
-$bizGnf     = number_format(config('genuispay.plans_gnf.business', 150000), 0, ',', ' ');
-$isGuinea   = ($company->country ?? '') === 'GN';
+$bizGnf     = number_format(100000, 0, ',', ' ');
 @endphp
 
 <style>
@@ -131,12 +129,9 @@ $isGuinea   = ($company->country ?? '') === 'GN';
                 <div class="plan-badge business">🚀 Business</div>
                 <div class="plan-name">Plan Business</div>
                 <div class="plan-price">
-                    <span class="plan-price-v">{{ $bizXof }}</span>
-                    <span class="plan-price-c">XOF</span>
+                    <span class="plan-price-v">{{ $bizGnf }}</span>
+                    <span class="plan-price-c">GNF</span>
                 </div>
-                @if($isGuinea)
-                <div class="plan-period" style="color:#d97706;font-weight:700;margin-bottom:2px">≈ {{ $bizGnf }} GNF 🇬🇳</div>
-                @endif
                 <div class="plan-period">par mois · renouvellement manuel</div>
             </div>
             <div class="plan-divider" style="margin:0 22px"></div>
@@ -197,7 +192,7 @@ $isGuinea   = ($company->country ?? '') === 'GN';
         </div>
         <div class="faq-item" onclick="this.classList.toggle('open')">
             <div class="faq-q">Comment payer ? <span class="faq-arr">▾</span></div>
-            <div class="faq-a">Orange Money, Waves, Mobile Money et Carte Visa — via GenuisPay, sécurisé et instantané.</div>
+            <div class="faq-a">Orange Money, MTN MoMo et Carte Visa / MasterCard — paiement sécurisé et instantané.</div>
         </div>
     </div>
 </div>

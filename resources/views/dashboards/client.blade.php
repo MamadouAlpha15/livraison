@@ -3339,6 +3339,9 @@ $rGrads = [
                                        onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(240,106,15,.1)'"
                                        onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
                             </div>
+                            @if($user->email_verified_at)
+                            <div style="font-size:11px;color:#16a34a;margin-top:5px">✅ Email vérifié</div>
+                            @endif
                         </div>
 
                         {{-- Téléphone --}}
@@ -3525,7 +3528,16 @@ $rGrads = [
 
                     <div style="padding:0 24px;display:flex;flex-direction:column;gap:14px">
 
-                        {{-- Mot de passe actuel --}}
+                        {{-- Mot de passe actuel (caché pour les comptes Google) --}}
+                        @if($user->google_id)
+                        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px">
+                            <span style="font-size:20px;flex-shrink:0">🔗</span>
+                            <div>
+                                <div style="font-size:13px;font-weight:700;color:#15803d">Compte connecté via Google</div>
+                                <div style="font-size:12px;color:#166534;margin-top:2px">Vous pouvez définir un mot de passe directement sans saisir l'ancien. Vous pourrez toujours vous connecter avec Google aussi.</div>
+                            </div>
+                        </div>
+                        @else
                         <div>
                             <label style="display:block;font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.6px">Mot de passe actuel</label>
                             <div style="position:relative">
@@ -3538,6 +3550,7 @@ $rGrads = [
                                         style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);z-index:1">👁</button>
                             </div>
                         </div>
+                        @endif
 
                         {{-- Nouveau mot de passe --}}
                         <div>
@@ -3676,6 +3689,7 @@ $rGrads = [
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
 <script>
 /* ══════════════════════════════════════════
    AVATAR MENU
@@ -4522,6 +4536,14 @@ function confirmDel() {
 document.addEventListener('DOMContentLoaded', () => {
     @if(session('status') === 'profile-updated')
         openProfileModal('info');
+        if (window.Swal) {
+            Swal.fire({ icon: 'success', title: 'Modifié avec succès !', text: 'Vos informations ont bien été mises à jour.', confirmButtonColor: '#f06a0f' });
+        }
+    @endif
+    @if(session('status') === 'password-updated')
+        if (window.Swal) {
+            Swal.fire({ icon: 'success', title: 'Modifié avec succès !', text: 'Votre mot de passe a bien été changé.', confirmButtonColor: '#f06a0f' });
+        }
     @endif
     @if($errors->updatePassword->any())
         openProfileModal('pwd');
