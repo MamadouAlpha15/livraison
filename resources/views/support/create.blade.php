@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 @section('title', 'Nouveau ticket · Support')
 @php $bodyClass = 'is-dashboard'; @endphp
 

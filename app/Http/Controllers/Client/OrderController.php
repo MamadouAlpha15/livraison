@@ -20,10 +20,12 @@ use App\Models\OrderItem;    // Table "order_items" — les lignes d'une command
 use App\Models\Product;      // Table "products" — les produits
 use App\Models\Payment;      // Table "payments" — les paiements liés aux commandes
 use App\Models\Shop;         // Table "shops" — les boutiques
+use App\Models\PromoCode;    // Table "promo_codes" — les codes de réduction boutique
 use App\Models\ShopMessage;  // Table "shop_messages" — les messages entre client et vendeur
 use App\Services\SubscriptionService; // Vérification des limites du plan
 use App\Services\PushService;
 use App\Services\LoyaltyService;
+use App\Services\PromoCodeService;
 
 // On importe Request : objet qui contient toutes les données envoyées par le formulaire (POST, GET...)
 use Illuminate\Http\Request;
@@ -264,6 +266,18 @@ class OrderController extends Controller
         $variants = $product->activeVariants()->get();
         $selectedVariantId = $request->integer('variant_id') ?: null;
 
+        // Code promo actif de la boutique à mettre en avant sur la fiche produit (le plus récent, s'il en existe un valide)
+        $activePromo = PromoCode::where('shop_id', $shop->id)
+            ->active()
+            ->where(function ($q) {
+                $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+            })
+            ->where(function ($q) {
+                $q->whereNull('max_uses')->orWhereColumn('uses_count', '<', 'max_uses');
+            })
+            ->latest()
+            ->first();
+
         // On retourne la vue avec le produit et les messages
         return view('client.orders.create_from_product', [
             'product'  => $product,   // Les infos du produit
@@ -271,6 +285,7 @@ class OrderController extends Controller
             'loyaltyBalance' => $client->loyalty_points ?? 0, // Solde de points du client (0 si invité)
             'variants' => $variants,
             'selectedVariantId' => $selectedVariantId,
+            'activePromo' => $activePromo,
         ]);
     }
 
@@ -328,7 +343,20 @@ class OrderController extends Controller
         // On calcule le total : prix unitaire × quantité
         $total = $unitPrice * $request->quantity;
 
-        // Points fidélité : le client peut utiliser jusqu'à 50% du total en points (1 point = 1 GNF)
+        // Code promo : appliqué en premier, sur le sous-total avant réduction fidélité
+        $promo         = null;
+        $promoDiscount = 0;
+        if ($request->filled('promo_code')) {
+            $result = app(PromoCodeService::class)->findValid($request->promo_code, $product->shop, $total);
+            if (!$result['promo']) {
+                return back()->withErrors(['promo_code' => $result['error']]);
+            }
+            $promo         = $result['promo'];
+            $promoDiscount = $result['discount'];
+            $total         = $total - $promoDiscount;
+        }
+
+        // Points fidélité : le client peut utiliser jusqu'à 50% du total (déjà réduit du code promo) en points (1 point = 1 GNF)
         $pointsToUse = 0;
         $user = Auth::user();
         if ($user) {
@@ -344,6 +372,8 @@ class OrderController extends Controller
             'shop_id'              => $product->shop->id,
             'total'                => $total,
             'loyalty_points_used'  => $pointsToUse,
+            'promo_code_id'        => $promo?->id,
+            'discount_amount'      => $promoDiscount,
             'status'               => Order::STATUS_EN_ATTENTE,
             'delivery_destination' => $request->delivery_destination,
             'client_phone'         => $request->client_phone,
@@ -351,6 +381,10 @@ class OrderController extends Controller
 
         if ($pointsToUse > 0) {
             app(LoyaltyService::class)->redeemPoints($user, $pointsToUse, $order->id);
+        }
+
+        if ($promo) {
+            app(PromoCodeService::class)->redeem($promo);
         }
 
         // On crée la ligne de commande (order item = détail du produit commandé)
@@ -417,6 +451,30 @@ class OrderController extends Controller
 
         return redirect()->route('client.orders.index')
             ->with('success', "Commande passée avec succès ! Vous recevrez une confirmation. 🎉");
+    }
+
+    // ============================================================
+    // MÉTHODE : checkPromoCode()
+    // ROUTE   : POST /client/orders/promo/check
+    // RÔLE    : Vérifie un code promo en AJAX pour l'aperçu du total
+    //           (la validation définitive a lieu à nouveau dans storeProduct())
+    // ============================================================
+    public function checkPromoCode(Request $request)
+    {
+        $request->validate([
+            'code'     => 'required|string|max:30',
+            'shop_id'  => 'required|exists:shops,id',
+            'subtotal' => 'required|numeric|min:0',
+        ]);
+
+        $shop   = Shop::findOrFail($request->shop_id);
+        $result = app(PromoCodeService::class)->findValid($request->code, $shop, (float) $request->subtotal);
+
+        if (!$result['promo']) {
+            return response()->json(['valid' => false, 'message' => $result['error']]);
+        }
+
+        return response()->json(['valid' => true, 'discount' => $result['discount']]);
     }
 
     // ============================================================

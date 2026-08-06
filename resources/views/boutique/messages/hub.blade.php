@@ -1,4 +1,4 @@
-﻿{{-- resources/views/boutique/messages/hub.blade.php --}}
+{{-- resources/views/boutique/messages/hub.blade.php --}}
 <!DOCTYPE html>
 <html lang="fr">
 <head>

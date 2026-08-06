@@ -559,6 +559,11 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                                         {{ $cat }}
                                     </option>
                                     @endforeach
+                                    @foreach($customCats ?? [] as $cat)
+                                    @if($cat !== $currentCat)
+                                    <option value="{{ $cat }}">{{ $cat }}</option>
+                                    @endif
+                                    @endforeach
                                     @if($isCustomCat)
                                     <option value="{{ $currentCat }}" selected>{{ $currentCat }}</option>
                                     @endif

@@ -1,4 +1,4 @@
-﻿{{-- resources/views/vendeur/orders/show.blade.php --}}
+{{-- resources/views/vendeur/orders/show.blade.php --}}
 @extends('layouts.app')
 @section('title', 'Commande #' . $order->id)
 @php $bodyClass = 'is-dashboard'; @endphp
@@ -333,6 +333,7 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
             @if($pendingCount > 0)<span class="sb-badge">{{ $pendingCount }}</span>@endif
         </a>
         <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">🏷️</span> Produits</a>
+        <a href="{{ route('boutique.promo-codes.index') }}" class="sb-item"><span class="ico">🎟️</span> Codes promo</a>
         <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">👥</span> Clients</a>
         <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">🧑‍💼</span> Équipe</a>
         <div class="sb-section">Livraison</div>

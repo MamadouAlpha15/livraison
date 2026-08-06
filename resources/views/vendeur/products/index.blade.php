@@ -1,4 +1,4 @@
-﻿{{--
+{{--
     resources/views/vendeur/products/index.blade.php
     Variables : $products, $categories, $devise, $totalProducts, $activeProducts, $outOfStock
 --}}
@@ -695,6 +695,11 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <span class="ico">{!! $I['tag_nav'] !!}</span> Produits
             @if(!$isPro)<span class="sb-badge" style="background:{{ $_sbProdClr }};color:#fff;font-size:10px;padding:1px 5px;border-radius:8px;margin-left:auto">{{ $totalProducts }}/{{ $_sbProdMax }}</span>@endif
         </a>
+        @if($isPro)
+        <a href="{{ route('boutique.promo-codes.index') }}" class="sb-item"><span class="ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></span> Codes promo</a>
+        @else
+        <a href="{{ route('boutique.subscription.upgrade') }}" class="sb-item" style="opacity:.6;" title="Plan Pro requis"><span class="ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></span> Codes promo <span class="sb-badge" style="background:#f59e0b;">🔒</span></a>
+        @endif
         <a href="{{ route('boutique.clients.index') }}" class="sb-item">
             <span class="ico">{!! $I['users_nav'] !!}</span> Clients
         </a>
@@ -835,6 +840,9 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     ✦ Passer au Plan Pro
                 </a>
             @else
+                <a href="{{ route('products.quick-add') }}" class="filter-btn" style="font-size:13px;padding:10px 18px;background:#eef2ff;border-color:#c7d2fe;color:#4338ca;display:inline-flex;align-items:center;gap:7px">
+                    ⚡ Ajout rapide
+                </a>
                 <a href="{{ route('products.create') }}" class="filter-btn filter-btn-primary" style="font-size:13px;padding:10px 20px">
                     {!! $I['plus_pg'] !!} Ajouter un produit
                 </a>

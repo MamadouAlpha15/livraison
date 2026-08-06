@@ -1,4 +1,4 @@
-﻿{{--
+{{--
 =====================================================
 WELCOME.BLADE.PHP — Page d'accueil moderne & attractive
 =====================================================
@@ -13,7 +13,11 @@ Variables injectées depuis WelcomeController :
 
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript>
 <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</noscript>
 
 <style>
 /* Welcome page : annuler le container Bootstrap injecté par layouts.app */
@@ -834,6 +838,11 @@ body {
     content: '✓'; color: var(--green);
     font-weight: 700; font-size: 13px; flex-shrink: 0;
 }
+/* Fonctionnalité non incluse dans ce plan : coche grisée au lieu de opacity
+   (l'opacité seule fait chuter le contraste texte sous le seuil d'accessibilité) */
+.pricing-features li[style*="line-through"]::before {
+    content: '✕'; color: #9ca3af;
+}
 .pricing-btn {
     display: block; width: 100%; text-align: center;
     padding: 12px; border-radius: var(--r-sm);
@@ -1093,10 +1102,10 @@ body {
     font-size: 14px;
 }
 .footer-desc { font-size: 12.5px; line-height: 1.65; }
-.footer-col h4 {
+.footer-col h3 {
     font-size: 12px; font-weight: 700; text-transform: uppercase;
     letter-spacing: 1px; color: rgba(255,255,255,.6);
-    margin-bottom: 14px;
+    margin: 0 0 14px;
 }
 .footer-col a {
     display: block; font-size: 13px; color: rgba(255,255,255,.4);
@@ -1590,22 +1599,22 @@ footer.app-footer { display: none !important; }
         <div class="steps-grid">
             <div class="step-item reveal">
                 <div class="step-num">1</div>
-                <h4 class="step-title">Créez votre compte</h4>
+                <h3 class="step-title">Créez votre compte</h3>
                 <p class="step-desc">Inscrivez-vous en moins de 2 minutes. Choisissez votre rôle : boutique, livreur ou client.</p>
             </div>
             <div class="step-item reveal">
                 <div class="step-num">2</div>
-                <h4 class="step-title">Configurez votre boutique</h4>
+                <h3 class="step-title">Configurez votre boutique</h3>
                 <p class="step-desc">Ajoutez vos produits, définissez vos prix et personnalisez votre espace en quelques clics.</p>
             </div>
             <div class="step-item reveal">
                 <div class="step-num">3</div>
-                <h4 class="step-title">Recevez des commandes</h4>
+                <h3 class="step-title">Recevez des commandes</h3>
                 <p class="step-desc">Les clients commandent directement sur votre boutique. Vous êtes notifié en temps réel.</p>
             </div>
             <div class="step-item reveal">
                 <div class="step-num">4</div>
-                <h4 class="step-title">Livrez & encaissez</h4>
+                <h3 class="step-title">Livrez & encaissez</h3>
                 <p class="step-desc">Assignez un livreur, suivez la livraison GPS et recevez votre paiement automatiquement.</p>
             </div>
         </div>
@@ -1798,12 +1807,12 @@ $bizGnf = number_format(100000, 0, ',', ' ');
                     </li>
                     <li>Jusqu'à 5 produits</li>
                     <li>10 commandes / mois</li>
-                    <li style="opacity:.5;text-decoration:line-through">Livreurs & partenaires</li>
-                    <li style="opacity:.5;text-decoration:line-through">Rapports & exports</li>
-                    <li style="opacity:.5;text-decoration:line-through">Statistiques & graphiques</li>
-                    <li style="opacity:.5;text-decoration:line-through">Gestion d'équipe</li>
-                    <li style="opacity:.5;text-decoration:line-through">✨ Shopio IA — Plan Pro</li>
-                    <li style="opacity:.5;text-decoration:line-through">🗺️ Carte GPS — Plan Pro</li>
+                    <li style="color:#6b7280;text-decoration:line-through">Livreurs & partenaires</li>
+                    <li style="color:#6b7280;text-decoration:line-through">Rapports & exports</li>
+                    <li style="color:#6b7280;text-decoration:line-through">Statistiques & graphiques</li>
+                    <li style="color:#6b7280;text-decoration:line-through">Gestion d'équipe</li>
+                    <li style="color:#6b7280;text-decoration:line-through">✨ Shopio IA — Plan Pro</li>
+                    <li style="color:#6b7280;text-decoration:line-through">🗺️ Carte GPS — Plan Pro</li>
 
                     {{-- Séparateur Entreprises --}}
                     <li style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#7c3aed;padding-bottom:2px;border-bottom:1px solid #e2e8f0;list-style:none;margin-top:6px">
@@ -1812,10 +1821,10 @@ $bizGnf = number_format(100000, 0, ',', ' ');
                     <li>10 commandes / mois</li>
                     <li>1 chauffeur maximum</li>
                     <li>5 zones de livraison max</li>
-                    <li style="opacity:.5;text-decoration:line-through">Carte en direct (GPS)</li>
-                    <li style="opacity:.5;text-decoration:line-through">Rapports & exports</li>
-                    <li style="opacity:.5;text-decoration:line-through">Statistiques & graphiques</li>
-                    <li style="opacity:.5;text-decoration:line-through">Gestion utilisateurs</li>
+                    <li style="color:#6b7280;text-decoration:line-through">Carte en direct (GPS)</li>
+                    <li style="color:#6b7280;text-decoration:line-through">Rapports & exports</li>
+                    <li style="color:#6b7280;text-decoration:line-through">Statistiques & graphiques</li>
+                    <li style="color:#6b7280;text-decoration:line-through">Gestion utilisateurs</li>
 
                 </ul>
                 @auth
@@ -1999,14 +2008,14 @@ $bizGnf = number_format(100000, 0, ',', ' ');
             <p class="footer-desc">La plateforme tout-en-un pour gérer votre boutique, vos livraisons et vos clients en Guinée.</p>
         </div>
         <div class="footer-col">
-            <h4>Plateforme</h4>
+            <h3>Plateforme</h3>
             <a href="#features">Fonctionnalités</a>
             <a href="#pricing">Tarifs</a>
             <a href="#how">Comment ça marche</a>
             <a href="{{ route('delivery.companies.index') }}">Entreprises livraison</a>
         </div>
         <div class="footer-col">
-            <h4>Compte</h4>
+            <h3>Compte</h3>
             <a href="{{ route('login') }}">Connexion</a>
             <a href="{{ route('register') }}">Inscription</a>
             @auth
@@ -2014,7 +2023,7 @@ $bizGnf = number_format(100000, 0, ',', ' ');
             @endauth
         </div>
         <div class="footer-col">
-            <h4>Support</h4>
+            <h3>Support</h3>
             <a href="{{ route('support.index') }}">Centre d'aide</a>
             <a href="{{ route('support.create') }}">Ouvrir un ticket</a>
         </div>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -18,6 +18,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @auth<meta name="vapid-public-key" content="{{ config('app.vapid_public_key') }}">@endauth
     <meta name="theme-color" content="#059669">
+    <meta name="description" content="{{ $description ?? 'Shopio — la plateforme tout-en-un pour créer votre boutique en ligne, gérer vos livraisons et vos clients en Guinée.' }}">
     <title>{{ $title ?? config('app.name', 'Shopio') }}</title>
 
     {{-- ══ Loader plein écran — inline pour s'afficher avant tout CSS ══ --}}
@@ -76,9 +77,17 @@
         #nprogress .peg { box-shadow:0 0 10px #059669,0 0 5px #059669;opacity:1;width:100px;height:100%;position:absolute;right:0; }
     </style>
 
-    {{-- ══ Bootstrap CSS — chargement normal (bloquant voulu : évite le flash de page non stylée) ══ --}}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    {{-- ══ Bootstrap CSS — chargement non-bloquant (astuce media="print" → "all" au onload).
+         Le flash de page non stylée est de toute façon déjà évité par #pg-loader plus bas,
+         qui masque tout le contenu tant que les feuilles de style ne sont pas chargées. ══ --}}
+    <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    </noscript>
 
     <style>
         :root {
@@ -268,7 +277,7 @@
 
 {{-- ══ Loader plein écran ══ --}}
 <div id="pg-loader">
-    <img id="pg-loader-logo" src="{{ asset('images/shopio-logo-192.png') }}" alt="Shopio" data-no-skeleton>
+    <img id="pg-loader-logo" src="{{ asset('images/shopio-logo-192.png') }}" alt="Shopio" data-no-skeleton fetchpriority="high">
     <div id="pg-loader-spin"></div>
     <span id="pg-loader-txt">Chargement…</span>
 </div>

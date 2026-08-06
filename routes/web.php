@@ -573,6 +573,11 @@ Route::middleware(['auth', 'role:admin'])
             /* Gestion de l'équipe (employés/vendeurs) */
             Route::resource('employees', \App\Http\Controllers\Vendeur\EmployeeController::class)->except(['show']);
 
+            /* Codes promo — création/modification via modale sur la page liste (pas de vues create/edit dédiées) */
+            Route::resource('promo-codes', \App\Http\Controllers\Boutique\PromoCodeController::class)->only(['index', 'store', 'update', 'destroy']);
+            Route::post('promo-codes/{promoCode}/toggle', [\App\Http\Controllers\Boutique\PromoCodeController::class, 'toggleActive'])
+                ->name('promo-codes.toggle');
+
             /* Rapports & Statistiques */
             Route::get('reports',        [ReportController::class, 'index']) ->name('reports.index');
             Route::get('reports/export', [ReportController::class, 'export'])->name('reports.export');
@@ -669,6 +674,11 @@ Route::middleware(['auth', 'role:vendeur,admin'])->group(function () {
 
     /* ── Produits ── */
     Route::get('products/top-ventes', [ProductController::class, 'topSales'])->name('products.top');
+
+    /* Ajout rapide de plusieurs produits d'un coup (chacun avec sa propre galerie/prix) */
+    Route::get('products/ajout-rapide',  [ProductController::class, 'quickAdd'])     ->name('products.quick-add');
+    Route::post('products/ajout-rapide', [ProductController::class, 'quickAddStore'])->name('products.quick-add.store');
+
     Route::resource('products', ProductController::class)->except(['show']);
 
     /* Actions supplémentaires produits */
@@ -849,6 +859,9 @@ Route::prefix('client')->name('client.')->group(function () {
     /* Commander depuis un produit spécifique — invité ou client connecté */
     Route::get('/orders/create-from-product/{product}', [ClientOrderController::class, 'createFromProduct'])->name('orders.createFromProduct');
     Route::post('/orders/store-product',                 [ClientOrderController::class, 'storeProduct'])     ->name('orders.storeProduct');
+
+    /* Vérification AJAX d'un code promo (aperçu du total avant validation de la commande) */
+    Route::post('/orders/promo/check', [ClientOrderController::class, 'checkPromoCode'])->name('orders.promo.check');
 });
 
 

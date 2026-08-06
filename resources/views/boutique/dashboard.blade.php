@@ -1,4 +1,4 @@
-﻿{{--
+{{--
     resources/views/boutique/dashboard.blade.php
     Route : GET /boutique/dashboard  → ShopController@admin  → name('boutique.dashboard')
 --}}
@@ -11,7 +11,13 @@
 
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=block" rel="stylesheet">
+{{-- display=swap (au lieu de "block") : le texte s'affiche tout de suite avec une police de
+     secours au lieu de rester invisible jusqu'à 3s en attendant la police custom. --}}
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</noscript>
 @vite(['resources/css/boutique-dashboard.css'])
 @endpush
 
@@ -27,6 +33,7 @@ $I = [
     'msg'       => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
     'box'       => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
     'tag'       => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>',
+    'promo'     => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>',
     'users'     => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
     'briefcase' => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>',
     'bike'      => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1m-2 1l3 6H5.5m2.5-6h2l4 6"/></svg>',
@@ -340,6 +347,11 @@ $I = [
             <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">{!! $I['tag'] !!}</span> Produits
                 @if(!$isPro)<span class="sb-badge" style="background:{{ $prodClass === 'danger' ? '#ef4444' : ($prodClass === 'warn' ? '#f59e0b' : '#8b5cf6') }};color:#fff;font-size:10px;padding:1px 5px;border-radius:8px;margin-left:auto">{{ $totalProduits }}/{{ $maxProduits }}</span>@endif
             </a>
+            @if($isPro)
+            <a href="{{ route('boutique.promo-codes.index') }}" class="sb-item"><span class="ico">{!! $I['promo'] !!}</span> Codes promo</a>
+            @else
+            <a href="{{ route('boutique.subscription.upgrade') }}" class="sb-item" style="opacity:.6;" title="Plan Pro requis"><span class="ico">{!! $I['promo'] !!}</span> Codes promo <span class="sb-badge" style="background:#f59e0b;">🔒</span></a>
+            @endif
             <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">{!! $I['users'] !!}</span> Clients</a>
             @if($isPro)
             <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">{!! $I['briefcase'] !!}</span> Équipe</a>
@@ -1194,7 +1206,7 @@ $I = [
                 <div style="display:flex;flex-wrap:wrap;gap:0;padding:0">
                     @foreach($produitsRisque as $product)
                     <div class="risk-row" style="flex:1;min-width:180px;border-right:1px solid #f3f6f4;border-bottom:none">
-                        @if(!empty($product->image))<img src="{{ asset('storage/'.$product->image) }}" alt="{{ $product->name }}" class="risk-img">
+                        @if(!empty($product->image))<img src="{{ \App\Services\ImageOptimizer::url($product->image, 'thumb') ?? asset('storage/'.$product->image) }}" alt="{{ $product->name }}" class="risk-img" loading="lazy" width="38" height="38">
                         @else<div class="risk-img-placeholder">{!! $I['tag_ph'] !!}</div>@endif
                         <div class="risk-info">
                             <div class="risk-name" title="{{ $product->name }}">{{ Str::limit($product->name, 20) }}</div>

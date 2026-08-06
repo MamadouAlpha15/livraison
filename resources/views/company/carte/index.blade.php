@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 @section('title', 'Carte en direct · ' . $company->name)
 @php
     $bodyClass = 'cx-dashboard';

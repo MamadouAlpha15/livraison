@@ -1,4 +1,4 @@
-﻿{{--
+{{--
     resources/views/public/shops/products.blade.php
     Route     : GET /shops/{shop}/products → Public\ShopController@products
     Variables :

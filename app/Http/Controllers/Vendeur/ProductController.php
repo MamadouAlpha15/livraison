@@ -115,21 +115,9 @@ class ProductController extends Controller
 
         $products      = $query->paginate(12)->withQueryString();
 
-        /* Catégories prédéfinies + catégories personnalisées saisies manuellement
-         * On récupère toutes les catégories utilisées dans les produits de la boutique
-         * puis on soustrait les prédéfinies pour isoler les personnalisées */
-        $predefinedCats  = self::CATEGORIES;
-        $usedCats        = $shop->products()
-            ->whereNotNull('category')
-            ->where('category', '!=', '')
-            ->distinct()
-            ->pluck('category')
-            ->toArray();
-        $customCats      = array_values(array_diff($usedCats, $predefinedCats));
-        sort($customCats);
-
-        /* $categories = prédéfinies + personnalisées (passées séparément à la vue) */
-        $categories = $predefinedCats;
+        /* Catégories prédéfinies + catégories personnalisées saisies manuellement */
+        $customCats = $this->customCategoriesFor($shop);
+        $categories = self::CATEGORIES;
 
         $devise        = $shop->currency ?? 'GNF';
         $totalProducts = $shop->products()->count();
@@ -151,6 +139,25 @@ class ProductController extends Controller
     }
 
     /* ─────────────────────────────────────────────
+     | Catégories personnalisées déjà utilisées par la boutique
+     | (saisies manuellement via "➕ Saisir une catégorie…")
+     ───────────────────────────────────────────── */
+    private function customCategoriesFor($shop): array
+    {
+        $usedCats = $shop->products()
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->pluck('category')
+            ->toArray();
+
+        $customCats = array_values(array_diff($usedCats, self::CATEGORIES));
+        sort($customCats);
+
+        return $customCats;
+    }
+
+    /* ─────────────────────────────────────────────
      | CREATE
      ───────────────────────────────────────────── */
     public function create()
@@ -162,10 +169,11 @@ class ProductController extends Controller
         }
 
         $categories = self::CATEGORIES;
+        $customCats = $this->customCategoriesFor($shop);
         $devise     = $shop->currency ?? 'GNF';
         $isPro      = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
 
-        return view('vendeur.products.create', compact('categories', 'devise', 'isPro'));
+        return view('vendeur.products.create', compact('categories', 'customCats', 'devise', 'isPro'));
     }
 
     /* ─────────────────────────────────────────────
@@ -243,6 +251,85 @@ class ProductController extends Controller
     }
 
     /* ─────────────────────────────────────────────
+     | AJOUT RAPIDE — plusieurs produits en une fois,
+     | chacun avec sa propre galerie et son propre prix
+     ───────────────────────────────────────────── */
+    public function quickAdd()
+    {
+        $shop = Auth::user()->shop;
+        if (!$shop || !$shop->is_approved) {
+            return redirect()->route('shop.index')
+                ->with('error', 'Votre boutique doit être validée avant d\'ajouter des produits.');
+        }
+
+        $categories = self::CATEGORIES;
+        $customCats = $this->customCategoriesFor($shop);
+        $devise     = $shop->currency ?? 'GNF';
+        $isPro      = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
+
+        $remainingSlots = $isPro
+            ? null // illimité
+            : max(0, SubscriptionService::SHOP_FREE_MAX_PRODUCTS - $shop->products()->count());
+
+        return view('vendeur.products.quick-add', compact('categories', 'customCats', 'devise', 'isPro', 'remainingSlots'));
+    }
+
+    public function quickAddStore(Request $request)
+    {
+        $shop = Auth::user()->shop;
+        abort_unless($shop, 403);
+
+        $request->validate([
+            'products'                 => 'required|array|min:1',
+            'products.*.name'          => 'required|string|max:255',
+            'products.*.price'         => 'required|numeric|min:0',
+            'products.*.description'   => 'nullable|string|max:2000',
+            'products.*.category'      => 'nullable|string|max:100',
+            'products.*.stock'         => 'nullable|integer|min:0',
+            'products.*.image_uploaded'   => 'nullable|string|max:500',
+            'products.*.gallery_uploaded'   => 'nullable|array|max:20',
+            'products.*.gallery_uploaded.*' => 'nullable|string|max:500',
+        ]);
+
+        $items = $request->input('products', []);
+
+        // Limite plan gratuit : on vérifie l'ensemble du lot d'un coup, pour ne
+        // jamais créer une partie des produits en laissant l'autre en erreur.
+        if (!app(SubscriptionService::class)->canCreateProduct($shop) ||
+            (!($shop->plan === 'pro' && $shop->plan_expires_at?->isFuture())
+                && ($shop->products()->count() + count($items)) > SubscriptionService::SHOP_FREE_MAX_PRODUCTS)
+        ) {
+            $remaining = max(0, SubscriptionService::SHOP_FREE_MAX_PRODUCTS - $shop->products()->count());
+            return back()->withInput()->with('plan_error',
+                "Limite du Plan Gratuit atteinte : vous ne pouvez encore ajouter que {$remaining} produit(s) (max 5 au total). Passez au Plan Pro pour ajouter en illimité."
+            );
+        }
+
+        $created = 0;
+        foreach ($items as $item) {
+            $gallery = array_values(array_filter($item['gallery_uploaded'] ?? [], fn($p) => $p && is_string($p)));
+
+            Product::create([
+                'shop_id'      => $shop->id,
+                'name'         => $item['name'],
+                'description'  => $item['description'] ?? null,
+                'price'        => $item['price'],
+                'category'     => $item['category'] ?? null,
+                'stock'        => $item['stock'] ?? 0,
+                'unit'         => 'pièce',
+                'is_active'    => true,
+                'is_available' => true,
+                'image'        => $item['image_uploaded'] ?? null,
+                'gallery'      => !empty($gallery) ? json_encode($gallery) : null,
+            ]);
+            $created++;
+        }
+
+        return redirect()->route('products.index')
+            ->with('success', "{$created} produit(s) ajouté(s) avec succès !");
+    }
+
+    /* ─────────────────────────────────────────────
      | EDIT
      ───────────────────────────────────────────── */
     public function edit(Product $product)
@@ -251,10 +338,11 @@ class ProductController extends Controller
         abort_if(!$shop || $product->shop_id !== $shop->id, 403);
 
         $categories = self::CATEGORIES;
+        $customCats = $this->customCategoriesFor($shop);
         $devise     = $shop->currency ?? 'GNF';
         $isPro      = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
 
-        return view('vendeur.products.edit', compact('product', 'categories', 'devise', 'isPro'));
+        return view('vendeur.products.edit', compact('product', 'categories', 'customCats', 'devise', 'isPro'));
     }
 
     /* ─────────────────────────────────────────────

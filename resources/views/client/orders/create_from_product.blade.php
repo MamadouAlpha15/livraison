@@ -114,6 +114,10 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .flash-badge-order { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg,#dc2626,#f97316); color: #fff; font-size: 11px; font-weight: 800; letter-spacing: .3px; padding: 4px 12px; border-radius: 20px; margin-bottom: 8px; animation: flashPulseOrder 1.6s ease-in-out infinite; }
 @keyframes flashPulseOrder { 0%,100% { opacity: 1; } 50% { opacity: .75; } }
 .flash-countdown-order { display: inline-flex; align-items: center; gap: 6px; background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; font-size: 12px; font-weight: 700; padding: 5px 11px; border-radius: 9px; margin-bottom: 12px; font-family: ui-monospace, monospace; }
+.promo-banner-order { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--teal-lt); border: 1.5px dashed #34d399; color: #065f46; font-size: 12.5px; font-weight: 700; padding: 9px 12px; border-radius: 10px; margin-bottom: 14px; cursor: pointer; transition: background .15s; }
+.promo-banner-order:hover { background: #c8f4e2; }
+.promo-banner-order strong { font-family: monospace; letter-spacing: .3px; }
+.promo-banner-order-btn { flex-shrink: 0; background: var(--teal); color: #fff; font-size: 11px; font-weight: 800; padding: 5px 11px; border-radius: 20px; white-space: nowrap; }
 .prod-desc { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 12px; }
 
 .prod-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
@@ -328,6 +332,16 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     </div>
                     @endif
 
+                    @if($activePromo)
+                    <div class="promo-banner-order" onclick="quickUsePromo()">
+                        <span>🎁 Code <strong>{{ $activePromo->code }}</strong> :
+                            {{ $activePromo->type === 'percent' ? '-' . $activePromo->value . '%' : '-' . number_format($activePromo->value, 0, ',', ' ') . ' ' . $devise }}
+                            @if($activePromo->min_purchase_amount) dès {{ number_format($activePromo->min_purchase_amount, 0, ',', ' ') }} {{ $devise }} d'achat @endif
+                        </span>
+                        <span class="promo-banner-order-btn">Utiliser</span>
+                    </div>
+                    @endif
+
                     @if($variants->isNotEmpty())
                     <div id="variantPickerOrder" style="margin-bottom:14px">
                         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Choisissez une option</div>
@@ -492,6 +506,22 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                         </div>
                         @endif
 
+                        <div class="order-summary-sep"></div>
+
+                        {{-- Code promo --}}
+                        <div style="display:flex;gap:6px">
+                            <input type="text" id="promoInput" placeholder="Code promo"
+                                   style="flex:1;min-width:0;padding:8px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font-family:monospace;font-size:12.5px;text-transform:uppercase"
+                                   oninput="this.value = this.value.toUpperCase()">
+                            <button type="button" onclick="applyPromoCode()" style="padding:8px 14px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:transparent;color:var(--orange);font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap">Appliquer</button>
+                        </div>
+                        <div id="promoMsg" style="display:none;font-size:11.5px;font-weight:600;margin-top:-4px"></div>
+                        <input type="hidden" name="promo_code" id="promoCodeInput" value="">
+                        <div class="order-summary-row" id="promoDiscountRow" style="display:none">
+                            <span class="order-summary-row-lbl" style="color:#6ee7b7">Code promo</span>
+                            <span class="order-summary-row-val" id="promoDiscountVal" style="color:#6ee7b7">-0</span>
+                        </div>
+
                         @auth
                         @if(($loyaltyBalance ?? 0) > 0)
                         <div class="order-summary-sep"></div>
@@ -562,6 +592,19 @@ let PRICE = BASE_PRICE;
 let STOCK = BASE_STOCK;
 const LOYALTY_BALANCE = {{ (int) ($loyaltyBalance ?? 0) }};
 const MAX_REDEEM_RATIO = 0.5;
+const PROMO_CHECK_URL = @json(route('client.orders.promo.check'));
+const PROMO_CSRF = @json(csrf_token());
+const PROMO_SHOP_ID = {{ (int) $product->shop->id }};
+const ACTIVE_PROMO_CODE = @json($activePromo->code ?? null);
+let promoDiscount = 0;
+
+function quickUsePromo() {
+    const input = document.getElementById('promoInput');
+    if (!ACTIVE_PROMO_CODE || !input) return;
+    input.value = ACTIVE_PROMO_CODE;
+    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    applyPromoCode();
+}
 
 /* ══ COMPTE À REBOURS VENTE FLASH ══ */
 (function(){
@@ -686,6 +729,41 @@ function currentMaxPoints(subtotal) {
     return Math.max(0, Math.min(LOYALTY_BALANCE, Math.floor(subtotal * MAX_REDEEM_RATIO)));
 }
 
+function showPromoMsg(text, ok) {
+    const el = document.getElementById('promoMsg');
+    el.textContent = text;
+    el.style.color = ok ? '#6ee7b7' : '#fca5a5';
+    el.style.display = 'block';
+}
+
+function applyPromoCode() {
+    const code = document.getElementById('promoInput').value.trim();
+    if (!code) return;
+
+    const qty = parseInt(document.getElementById('qty')?.value || 1);
+    const subtotal = Math.round(PRICE * qty);
+
+    fetch(PROMO_CHECK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': PROMO_CSRF },
+        body: JSON.stringify({ code, shop_id: PROMO_SHOP_ID, subtotal }),
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.valid) {
+            promoDiscount = data.discount;
+            document.getElementById('promoCodeInput').value = code;
+            showPromoMsg('✓ Code appliqué', true);
+        } else {
+            promoDiscount = 0;
+            document.getElementById('promoCodeInput').value = '';
+            showPromoMsg(data.message || 'Code invalide', false);
+        }
+        updateTotal();
+    })
+    .catch(() => showPromoMsg('Erreur de vérification, réessayez.', false));
+}
+
 function togglePoints() {
     const chk = document.getElementById('usePointsChk');
     const row = document.getElementById('pointsRow');
@@ -701,8 +779,8 @@ function onPointsInput() {
 
 function usePointsMax() {
     const qty = parseInt(document.getElementById('qty')?.value || 1);
-    const subtotal = Math.round(PRICE * qty);
-    document.getElementById('pointsInput').value = currentMaxPoints(subtotal);
+    const afterPromo = Math.max(0, Math.round(PRICE * qty) - promoDiscount);
+    document.getElementById('pointsInput').value = currentMaxPoints(afterPromo);
     updateTotal();
 }
 
@@ -710,18 +788,28 @@ function updateTotal() {
     const qty = parseInt(document.getElementById('qty')?.value || 1);
     const subtotal = Math.round(PRICE * qty);
 
+    // Le code promo se réévalue seulement au clic "Appliquer" (montant figé jusqu'à la prochaine vérification)
+    if (promoDiscount > 0) {
+        document.getElementById('promoDiscountRow').style.display = 'flex';
+        document.getElementById('promoDiscountVal').textContent = '-' + Math.round(promoDiscount).toLocaleString('fr-FR');
+    } else {
+        document.getElementById('promoDiscountRow').style.display = 'none';
+    }
+
+    const afterPromo = Math.max(0, subtotal - promoDiscount);
+
     let pointsUsed = 0;
     const chk = document.getElementById('usePointsChk');
     if (chk && chk.checked) {
         const input = document.getElementById('pointsInput');
-        const max = currentMaxPoints(subtotal);
+        const max = currentMaxPoints(afterPromo);
         pointsUsed = Math.max(0, Math.min(parseInt(input.value || 0), max));
         input.value = pointsUsed;
         document.getElementById('pointsDiscountRow').style.display = 'flex';
         document.getElementById('pointsDiscountVal').textContent = '-' + pointsUsed.toLocaleString('fr-FR');
     }
 
-    const total = Math.max(0, subtotal - pointsUsed);
+    const total = Math.max(0, afterPromo - pointsUsed);
     const el = document.getElementById('totalDisplay');
     if (el) el.textContent = total.toLocaleString('fr-FR');
     const sq = document.getElementById('summaryQty');

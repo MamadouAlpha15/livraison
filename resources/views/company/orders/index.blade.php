@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 @section('title', 'Mes commandes · ' . $company->name)
 @php $bodyClass = 'is-dashboard'; @endphp
 

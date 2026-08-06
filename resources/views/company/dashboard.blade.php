@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 @section('title', 'Dashboard · ShipXpress')
 @php $bodyClass = 'cx-dashboard'; @endphp
 

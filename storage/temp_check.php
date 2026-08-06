@@ -1,4 +1,4 @@
-﻿<?php 
+<?php 
  $__env->startSection('title', 'Accueil — Marketplace'); 
  $bodyClass = 'is-dashboard'; 
  $__env->startPush('styles'); 
