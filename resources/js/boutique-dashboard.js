@@ -113,12 +113,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     })();
 
-    /* Sparklines produits */
-    document.querySelectorAll('.sp-fill').forEach((el, i) => { setTimeout(() => { el.style.width = el.dataset.pct + '%'; }, 100 + i * 90); });
+    /* Sparklines produits — animées via transform (pas de recalcul de mise en page) */
+    document.querySelectorAll('.sp-fill').forEach((el, i) => { setTimeout(() => { el.style.transform = 'scaleX(1)'; }, 100 + i * 90); });
 
-    /* Mini bars commandes */
+    /* Mini bars commandes — animées via transform (pas de recalcul de mise en page) */
     document.querySelectorAll('.mini-bar').forEach((bar, i) => {
-        setTimeout(() => { bar.style.transition = 'height .5s cubic-bezier(.23,1,.32,1)'; bar.style.height = bar.dataset.h + '%'; }, 100 + i * 60);
+        setTimeout(() => { bar.style.transform = 'scaleY(1)'; }, 100 + i * 60);
     });
 
     /* Dark mode toggle */
@@ -158,14 +158,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="tt-ca">${fmt(p.ca)} ${DEVISE}</span>
                     <span class="tt-detail">${p.nb > 0 ? p.nb + ' cmd · panier ' + fmt(pMoy) + ' ' + DEVISE : 'Aucune vente'}</span>
                 </div>
-                <div class="period-bar ${p.ca === 0 ? 'empty' : ''}" style="height:0%" data-h="${h}"></div>
+                <div class="period-bar ${p.ca === 0 ? 'empty' : ''}" style="height:${h}%;transform:scaleY(0)" data-h="${h}"></div>
             </div>`;
         }).join('');
 
         labelsEl.innerHTML = points.map(p => `<div class="period-bar-lbl">${p.label}</div>`).join('');
 
+        /* Animées via transform (pas via height) : pas de recalcul de mise en page à chaque frame */
         barsEl.querySelectorAll('.period-bar').forEach((bar, i) => {
-            setTimeout(() => { bar.style.transition = 'height .4s cubic-bezier(.23,1,.32,1)'; bar.style.height = bar.dataset.h + '%'; }, i * 30);
+            setTimeout(() => { bar.style.transform = 'scaleY(1)'; }, i * 30);
         });
     }
 

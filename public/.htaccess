@@ -14,11 +14,8 @@
     ExpiresByType image/png         "access plus 1 month"
     ExpiresByType image/gif         "access plus 1 month"
     ExpiresByType image/svg+xml     "access plus 1 month"
-    # CSS/JS compilés par Vite (public/build) ont un hash dans le nom de fichier :
-    # un nouveau déploiement = nouveau nom = jamais de contenu périmé servi.
-    # On peut donc les mettre en cache longtemps sans risque.
-    ExpiresByType text/css          "access plus 1 year"
-    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType text/css          "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
     ExpiresByType font/woff2        "access plus 1 month"
 </IfModule>
 

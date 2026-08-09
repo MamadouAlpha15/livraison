@@ -977,7 +977,7 @@ $I = [
                     <div class="mini-bar-col">
                         <div class="mini-bar {{ $cd['today'] ? 'actuel' : '' }}"
                              data-h="{{ $hPct }}"
-                             style="height:0%;{{ $cd['today'] ? 'opacity:1' : '' }}"></div>
+                             style="height:{{ $hPct }}%;transform:scaleY(0);{{ $cd['today'] ? 'opacity:1' : '' }}"></div>
                     </div>
                     @endforeach
                 </div>
@@ -1189,7 +1189,7 @@ $I = [
                     @php $pct = round(($product->order_items_count / $maxSales)*100); @endphp
                     <div class="sp-row">
                         <span class="sp-lbl" title="{{ $product->name }}">{{ Str::limit($product->name, 18) }}</span>
-                        <div class="sp-track"><div class="sp-fill" data-pct="{{ $pct }}" style="width:0%"></div></div>
+                        <div class="sp-track"><div class="sp-fill" data-pct="{{ $pct }}" style="width:{{ $pct }}%;transform:scaleX(0)"></div></div>
                         <span class="sp-val">{{ $product->order_items_count }}</span>
                     </div>
                     @endforeach
