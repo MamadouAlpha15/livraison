@@ -1,4 +1,4 @@
-const CACHE = 'shopio-v10';
+const CACHE = 'shopio-v11';
 
 const PRECACHE = [
     '/',

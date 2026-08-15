@@ -12,21 +12,22 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 :root {
-    --orange:    #f90;
-    --orange-dk: #e47911;
-    --orange-lt: #fff8e7;
-    --navy:      #131921;
-    --navy-2:    #232f3e;
+    --brand:     #6366f1;
+    --brand-dk:  #4f46e5;
+    --brand-lt:  #e0e7ff;
+    --brand-mlt: #eef2ff;
+    --navy:      #0a0a1e;
+    --navy-2:    #151538;
     --green:     #067d62;
     --green-lt:  #e8f5e9;
-    --red:       #b12704;
-    --blue:      #007185;
-    --grey:      #f3f3f3;
-    --grey-2:    #eaeded;
-    --border:    #ddd;
-    --text:      #0f1111;
+    --red:       #dc2626;
+    --blue:      #4f46e5;
+    --grey:      #f4f6fb;
+    --grey-2:    #e8ecf5;
+    --border:    #e2e8f0;
+    --text:      #0f172a;
     --text-2:    #333;
-    --muted:     #565959;
+    --muted:     #64748b;
     --surface:   #fff;
     --amber-lt:  #fff8e1;
     --rose-lt:   #fee2e2;
@@ -42,12 +43,14 @@
 }
 html { font-family: var(--font); scroll-behavior: smooth; }
 body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoothing: antialiased; }
+.ico { display: inline-block; flex-shrink: 0; vertical-align: -3px; }
 
 /* ══ NAVBAR ══ */
-.nav { background: var(--navy); height: var(--nav-h); display: flex; align-items: center; padding: 0 16px; gap: 10px; position: sticky; top: 0; z-index: 100; }
-.nav-logo { font-family: var(--display); font-size: 18px; font-weight: 900; color: var(--orange); text-decoration: none; flex-shrink: 0; }
-.nav-logo span { color: #fff; }
-.nav-back { color: rgba(255,255,255,.8); font-size: 12.5px; font-weight: 600; text-decoration: none; padding: 5px 10px; border: 1px solid transparent; border-radius: var(--r-sm); transition: all .15s; white-space: nowrap; flex-shrink: 0; }
+.nav { background: linear-gradient(120deg, var(--navy), var(--navy-2)); height: var(--nav-h); display: flex; align-items: center; padding: 0 16px; gap: 10px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,.15); }
+.nav-logo { display: flex; align-items: center; gap: 8px; font-family: var(--display); font-size: 17px; font-weight: 900; color: #fff; text-decoration: none; flex-shrink: 0; }
+.nav-logo img { width: 28px; height: 28px; border-radius: 7px; object-fit: cover; flex-shrink: 0; }
+.nav-logo span { color: var(--brand-lt); }
+.nav-back { display: inline-flex; align-items: center; gap: 5px; color: rgba(255,255,255,.8); font-size: 12.5px; font-weight: 600; text-decoration: none; padding: 5px 10px; border: 1px solid transparent; border-radius: var(--r-sm); transition: all .15s; white-space: nowrap; flex-shrink: 0; }
 .nav-back:hover { border-color: rgba(255,255,255,.4); color: #fff; }
 .nav-title { flex: 1; min-width: 0; font-size: 13px; font-weight: 700; color: rgba(255,255,255,.8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -60,9 +63,12 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .flash-danger  { background: var(--rose-lt); border-color: #fca5a5; color: var(--red); }
 
 /* ══ CARD ══ */
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow-sm); margin-bottom: 16px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow-sm); margin-bottom: 16px; animation: cardFadeUp .5s ease both; }
+.card:nth-of-type(2) { animation-delay: .08s; }
+@keyframes cardFadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .card { animation: none; } }
 .card-hd { padding: 12px 18px; border-bottom: 1px solid var(--border); background: var(--grey); display: flex; align-items: center; gap: 8px; }
-.card-hd-ico { width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; background: var(--orange-lt); border: 1px solid #fde68a; flex-shrink: 0; }
+.card-hd-ico { width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; background: var(--brand-lt); color: var(--brand-dk); border: 1px solid #c7d2fe; flex-shrink: 0; }
 .card-title { font-family: var(--display); font-size: 14px; font-weight: 800; color: var(--text); }
 .card-body { padding: 18px; }
 
@@ -95,19 +101,19 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .prod-thumbs {
     display: flex; gap: 7px; overflow-x: auto; flex-wrap: nowrap;
     padding-bottom: 4px; scroll-snap-type: x mandatory;
-    scrollbar-width: thin; scrollbar-color: var(--orange) var(--grey-2);
+    scrollbar-width: thin; scrollbar-color: var(--brand) var(--grey-2);
 }
 .prod-thumbs::-webkit-scrollbar { height: 4px; }
-.prod-thumbs::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 4px; }
+.prod-thumbs::-webkit-scrollbar-thumb { background: var(--brand); border-radius: 4px; }
 .prod-thumbs::-webkit-scrollbar-track { background: var(--grey-2); border-radius: 4px; }
 .prod-thumb { flex-shrink: 0; width: 52px; height: 52px; border-radius: var(--r-sm); object-fit: cover; border: 2.5px solid transparent; cursor: pointer; transition: all .15s; opacity: .6; scroll-snap-align: start; }
-.prod-thumb:hover, .prod-thumb.active { border-color: var(--orange); opacity: 1; transform: scale(1.06); }
+.prod-thumb:hover, .prod-thumb.active { border-color: var(--brand); opacity: 1; transform: scale(1.06); }
 
 .prod-info { flex: 1; min-width: 0; }
 .prod-cat { font-size: 10.5px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 5px; }
 .prod-name { font-family: var(--display); font-size: clamp(17px, 3vw, 24px); font-weight: 900; color: var(--text); line-height: 1.25; margin-bottom: 12px; }
 .prod-price-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-.prod-price { font-size: 28px; font-weight: 800; color: var(--red); font-family: monospace; letter-spacing: -.5px; }
+.prod-price { font-size: 28px; font-weight: 800; color: var(--brand-dk); font-family: monospace; letter-spacing: -.5px; }
 .prod-devise { font-size: 12px; color: var(--muted); font-weight: 600; }
 .prod-orig { font-size: 13px; color: var(--muted); text-decoration: line-through; font-family: monospace; }
 .prod-remise { font-size: 11px; font-weight: 800; background: #fce4e4; color: var(--red); padding: 2px 8px; border-radius: 20px; }
@@ -127,8 +133,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .prod-chip.danger { color: var(--red); background: var(--rose-lt); border-color: #fca5a5; }
 
 .variant-pill-order { padding: 8px 15px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--surface); font-size: 12.5px; font-weight: 600; color: var(--text-2); cursor: pointer; transition: all .15s; font-family: var(--font); }
-.variant-pill-order:hover:not(.disabled) { border-color: var(--orange); }
-.variant-pill-order.selected { background: var(--orange); color: var(--navy); border-color: var(--orange); }
+.variant-pill-order:hover:not(.disabled) { border-color: var(--brand); }
+.variant-pill-order.selected { background: var(--brand); color: #fff; border-color: var(--brand-dk); }
 .variant-pill-order.disabled { opacity: .45; text-decoration: line-through; cursor: not-allowed; }
 
 /* Boutique mini */
@@ -141,6 +147,11 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .shop-mini-open::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: #a8f0d4; animation: pulse 1.8s ease-in-out infinite; }
 @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
 
+/* ══ BANDEAU DE CONFIANCE (mini) ══ */
+.trust-mini-row { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 12px; }
+.trust-mini-item { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: var(--muted); }
+.trust-mini-item .ico { color: var(--brand); }
+
 /* ══ FORMULAIRE COMMANDE ══ */
 .order-grid { display: grid; grid-template-columns: 1fr 280px; gap: 16px; align-items: start; }
 
@@ -148,7 +159,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .qty-label { font-size: 12px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: .4px; }
 .qty-ctrl { display: flex; align-items: center; border: 1.5px solid var(--border); border-radius: var(--r-sm); overflow: hidden; background: var(--surface); }
 .qty-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--grey-2); border: none; cursor: pointer; font-size: 20px; font-weight: 700; color: var(--text); transition: background .12s; user-select: none; }
-.qty-btn:hover { background: var(--orange-lt); color: var(--orange-dk); }
+.qty-btn:hover { background: var(--brand-lt); color: var(--brand-dk); }
 .qty-input { width: 56px; height: 40px; border: none; outline: none; text-align: center; font-size: 15px; font-weight: 800; font-family: monospace; color: var(--text); background: var(--surface); }
 
 /* Box résumé */
@@ -169,13 +180,13 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .order-summary-row-val { color: #fff; font-weight: 600; font-family: monospace; }
 .order-total-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,.07); border-radius: var(--r-sm); padding: 12px; }
 .order-total-lbl { font-size: 12px; color: rgba(255,255,255,.5); font-weight: 700; text-transform: uppercase; letter-spacing: .4px; }
-.order-total-val { font-size: 22px; font-weight: 900; color: var(--orange); font-family: monospace; letter-spacing: -.5px; }
+.order-total-val { font-size: 22px; font-weight: 900; color: var(--brand); font-family: monospace; letter-spacing: -.5px; }
 .order-total-devise { font-size: 11px; color: rgba(255,255,255,.35); text-align: right; margin-top: 2px; }
 
 .cash-notice { display: flex; align-items: center; gap: 8px; background: rgba(245,166,35,.12); border: 1px solid rgba(245,166,35,.25); border-radius: var(--r-sm); padding: 10px 12px; font-size: 12px; color: #fde68a; }
 
-.submit-btn { width: 100%; padding: 13px; border-radius: 50px; border: none; font-size: 14px; font-weight: 800; font-family: var(--font); background: var(--orange); color: var(--navy); cursor: pointer; transition: all .15s; box-shadow: 0 4px 14px rgba(255,153,0,.4); display: flex; align-items: center; justify-content: center; gap: 7px; }
-.submit-btn:hover { background: var(--orange-dk); color: #fff; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,153,0,.5); }
+.submit-btn { width: 100%; padding: 13px; border-radius: 50px; border: none; font-size: 14px; font-weight: 800; font-family: var(--font); background: var(--brand); color: #fff; cursor: pointer; transition: all .15s; box-shadow: 0 4px 14px rgba(99,102,241,.4); display: flex; align-items: center; justify-content: center; gap: 7px; }
+.submit-btn:hover { background: var(--brand-dk); color: #fff; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99,102,241,.5); }
 .submit-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 .chat-btn { width: 100%; padding: 11px; border-radius: 50px; border: 1px solid rgba(255,255,255,.2); font-size: 13px; font-weight: 700; font-family: var(--font); background: transparent; color: rgba(255,255,255,.75); cursor: pointer; transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 7px; text-decoration: none; }
 .chat-btn:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.4); color: #fff; }
@@ -194,9 +205,16 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 /* ══ CHAMPS ADRESSE / TÉLÉPHONE ══ */
 .field-group { margin-bottom: 14px; }
-.field-label { font-size: 12px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 6px; display: block; }
+.field-label { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 6px; }
 .field-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 13.5px; font-family: var(--font); color: var(--text); background: var(--surface); outline: none; transition: border-color .15s; }
-.field-input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(255,153,0,.12); }
+.field-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(99,102,241,.12); }
+.field-input.is-invalid { border-color: #fca5a5; }
+.field-input.is-invalid:focus { box-shadow: 0 0 0 3px rgba(220,38,38,.12); }
+.field-input.is-valid { border-color: #6ee7b7; }
+.field-hint { display: none; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; margin-top: 5px; }
+.field-hint.show { display: flex; }
+.field-hint.error { color: var(--red); }
+.field-hint.ok { color: #067d62; }
 
 /* ══ RESPONSIVE ══ */
 @media (max-width: 700px) {
@@ -245,7 +263,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 {{-- LIGHTBOX --}}
 <div class="lb-overlay" id="lbOverlay" onclick="if(event.target===this)closeLb()">
-    <button class="lb-close" onclick="closeLb()">✕</button>
+    <button class="lb-close" onclick="closeLb()">{!! \App\Support\IconLibrary::svg('x', '', 16) !!}</button>
     <button class="lb-nav lb-prev" id="lbPrev" onclick="lbNav(-1)">&#8249;</button>
     <img id="lbImg" src="" alt="">
     <button class="lb-nav lb-next" id="lbNext" onclick="lbNav(1)">&#8250;</button>
@@ -254,8 +272,13 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 {{-- NAVBAR --}}
 <nav class="nav">
-    <a href="{{ auth()->check() ? route('client.dashboard') : url('/') }}" class="nav-logo">Ma<span>Boutique</span></a>
-    <a href="{{ auth()->check() ? route('client.shops.show', $shop) : route('public.shops.products', $shop) }}" class="nav-back">← {{ Str::limit($shop->name, 18) }}</a>
+    <a href="{{ auth()->check() ? route('client.dashboard') : url('/') }}" class="nav-logo">
+        <img src="/images/shopio-logo-192.png" alt="{{ config('app.name', 'Shopio') }}">
+        {{ config('app.name', 'Shopio') }}
+    </a>
+    <a href="{{ auth()->check() ? route('client.shops.show', $shop) : route('public.shops.products', $shop) }}" class="nav-back">
+        {!! \App\Support\IconLibrary::svg('arrow-left', '', 13) !!} {{ Str::limit($shop->name, 18) }}
+    </a>
     <div class="nav-title">{{ Str::limit($product->name, 40) }}</div>
 </nav>
 
@@ -263,16 +286,16 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
     {{-- FLASH --}}
     @if(session('success'))
-    <div class="flash flash-success"><span>✓</span>{{ session('success') }}</div>
+    <div class="flash flash-success">{!! \App\Support\IconLibrary::svg('check', '', 15) !!}{{ session('success') }}</div>
     @endif
     @if($errors->any())
-    <div class="flash flash-danger"><span>⚠</span>{{ $errors->first() }}</div>
+    <div class="flash flash-danger">{!! \App\Support\IconLibrary::svg('alert', '', 15) !!}{{ $errors->first() }}</div>
     @endif
 
     {{-- ══ FICHE PRODUIT ══ --}}
     <div class="card">
         <div class="card-hd">
-            <div class="card-hd-ico">🏷️</div>
+            <div class="card-hd-ico">{!! \App\Support\IconLibrary::svg('tag', '', 14) !!}</div>
             <span class="card-title">Détail du produit</span>
         </div>
         <div class="card-body">
@@ -288,7 +311,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                                  sizes="(max-width:600px) 100vw, 400px"
                                  id="mainImg" alt="{{ $product->name }}">
                         @else
-                            <div class="prod-main-img-ph">🏷️</div>
+                            <div class="prod-main-img-ph">{!! \App\Support\IconLibrary::svg('tag', '', 46) !!}</div>
                         @endif
                         @if(count($allPhotos) > 1)
                         <button class="prod-nav-btn prod-nav-prev" id="photoPrev" onclick="event.stopPropagation();navPhoto(-1)">&#8249;</button>
@@ -314,7 +337,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     <h1 class="prod-name">{{ $product->name }}</h1>
 
                     @if($product->is_flash_active)
-                    <div class="flash-badge-order">⚡ VENTE FLASH −{{ $product->flash_discount_percent }}%</div>
+                    <div class="flash-badge-order">{!! \App\Support\IconLibrary::svg('zap', '', 12) !!} VENTE FLASH −{{ $product->flash_discount_percent }}%</div>
                     @endif
                     <div class="prod-price-row">
                         <span class="prod-price">{{ number_format($product->current_price, 0, ',', ' ') }}</span>
@@ -328,13 +351,13 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     </div>
                     @if($product->is_flash_active)
                     <div class="flash-countdown-order" id="flashCountdownOrder" data-ends="{{ $product->flash_ends_at->timestamp }}">
-                        ⏳ Se termine dans <span id="flashTimerOrder">--:--:--</span>
+                        {!! \App\Support\IconLibrary::svg('clock', '', 13) !!} Se termine dans <span id="flashTimerOrder">--:--:--</span>
                     </div>
                     @endif
 
                     @if($activePromo)
                     <div class="promo-banner-order" onclick="quickUsePromo()">
-                        <span>🎁 Code <strong>{{ $activePromo->code }}</strong> :
+                        <span>{!! \App\Support\IconLibrary::svg('gift', '', 14) !!} Code <strong>{{ $activePromo->code }}</strong> :
                             {{ $activePromo->type === 'percent' ? '-' . $activePromo->value . '%' : '-' . number_format($activePromo->value, 0, ',', ' ') . ' ' . $devise }}
                             @if($activePromo->min_purchase_amount) dès {{ number_format($activePromo->min_purchase_amount, 0, ',', ' ') }} {{ $devise }} d'achat @endif
                         </span>
@@ -367,24 +390,30 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
                     <div class="prod-chips" id="stockChipsWrap">
                         @if($variants->isEmpty() && $stockVal !== null)
-                            @if($stockOut)<span class="prod-chip danger">❌ Rupture de stock</span>
-                            @elseif($stockLow)<span class="prod-chip amber">⚠ {{ $stockVal }} restants</span>
-                            @else<span class="prod-chip ok">✓ En stock</span>@endif
+                            @if($stockOut)<span class="prod-chip danger">{!! \App\Support\IconLibrary::svg('x', '', 11) !!} Rupture de stock</span>
+                            @elseif($stockLow)<span class="prod-chip amber">{!! \App\Support\IconLibrary::svg('alert', '', 11) !!} {{ $stockVal }} restants</span>
+                            @else<span class="prod-chip ok">{!! \App\Support\IconLibrary::svg('check', '', 11) !!} En stock</span>@endif
                         @endif
-                        @if($product->unit)<span class="prod-chip">📦 {{ $product->unit }}</span>@endif
-                        @if($product->preparation_time)<span class="prod-chip">⏱ {{ $product->preparation_time }}min</span>@endif
+                        @if($product->unit)<span class="prod-chip">{!! \App\Support\IconLibrary::svg('package', '', 11) !!} {{ $product->unit }}</span>@endif
+                        @if($product->preparation_time)<span class="prod-chip">{!! \App\Support\IconLibrary::svg('clock', '', 11) !!} {{ $product->preparation_time }}min</span>@endif
                     </div>
 
                     <div class="shop-mini">
                         <div class="shop-mini-logo">
                             @if($shop->image)<img src="{{ asset('storage/'.$shop->image) }}" alt="">
-                            @else🛍️@endif
+                            @else{!! \App\Support\IconLibrary::svg('store', '', 18) !!}@endif
                         </div>
                         <div>
                             <div class="shop-mini-name">{{ $shop->name }}</div>
                             @if($shop->type)<div class="shop-mini-type">{{ $shop->type }}</div>@endif
                         </div>
                         <span class="shop-mini-open">Ouvert</span>
+                    </div>
+
+                    <div class="trust-mini-row">
+                        <span class="trust-mini-item">{!! \App\Support\IconLibrary::svg('shield', '', 13) !!} Boutique vérifiée</span>
+                        <span class="trust-mini-item">{!! \App\Support\IconLibrary::svg('truck', '', 13) !!} Livraison suivie</span>
+                        <span class="trust-mini-item">{!! \App\Support\IconLibrary::svg('rotate', '', 13) !!} Retour facile</span>
                     </div>
                 </div>
             </div>
@@ -394,20 +423,20 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     {{-- ══ COMMANDE ══ --}}
     <div class="card">
         <div class="card-hd">
-            <div class="card-hd-ico">🛒</div>
+            <div class="card-hd-ico">{!! \App\Support\IconLibrary::svg('cart', '', 14) !!}</div>
             <span class="card-title">Passer la commande</span>
         </div>
         <div class="card-body">
 
             @if($stockOut)
             <div style="text-align:center;padding:28px 0">
-                <div style="font-size:42px;margin-bottom:10px">😞</div>
+                <div style="width:56px;height:56px;border-radius:50%;background:var(--rose-lt);color:var(--red);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">{!! \App\Support\IconLibrary::svg('package', '', 26) !!}</div>
                 <div style="font-size:15px;font-weight:700;margin-bottom:6px">Produit indisponible</div>
                 <div style="font-size:13px;color:var(--muted)">Ce produit est en rupture de stock.</div>
             </div>
             @else
 
-            <form method="POST" action="{{ route('client.orders.storeProduct') }}" id="orderForm">
+            <form method="POST" action="{{ route('client.orders.storeProduct') }}" id="orderForm" data-ajax>
                 @csrf
                 <input type="hidden" name="product_id" value="{{ $product->id }}">
                 <input type="hidden" name="variant_id" id="variantIdInput" value="{{ $selectedVariantId ?? '' }}">
@@ -431,35 +460,39 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
                         @guest
                         <div class="field-group">
-                            <label class="field-label" for="client_name">🙍 Nom complet</label>
+                            <label class="field-label" for="client_name">{!! \App\Support\IconLibrary::svg('user', '', 11) !!} Nom complet</label>
                             <input type="text" name="client_name" id="client_name" required
                                    class="field-input" placeholder="Ex : Mamadou Diallo"
-                                   value="{{ old('client_name') }}">
+                                   value="{{ old('client_name') }}"
+                                   oninput="liveValidate(this, validateFullName)">
+                            <div class="field-hint" id="client_name_hint"></div>
                         </div>
                         @endguest
 
                         <div class="field-group">
-                            <label class="field-label" for="delivery_destination">📍 Adresse de livraison</label>
+                            <label class="field-label" for="delivery_destination">{!! \App\Support\IconLibrary::svg('map-pin', '', 11) !!} Adresse de livraison</label>
                             <input type="text" name="delivery_destination" id="delivery_destination" @guest required @endguest
                                    class="field-input" placeholder="Ex : Quartier Almamya, en face du marché…"
                                    value="{{ old('delivery_destination', auth()->user()->address ?? '') }}">
                         </div>
 
                         <div class="field-group">
-                            <label class="field-label" for="client_phone">📞 Téléphone</label>
+                            <label class="field-label" for="client_phone">{!! \App\Support\IconLibrary::svg('phone', '', 11) !!} Téléphone</label>
                             <input type="tel" name="client_phone" id="client_phone" @guest required @endguest
                                    class="field-input" placeholder="Ex : 622 00 00 00"
-                                   value="{{ old('client_phone', auth()->user()->phone ?? '') }}">
+                                   value="{{ old('client_phone', auth()->user()->phone ?? '') }}"
+                                   oninput="liveValidate(this, validateGuineaPhone)">
+                            <div class="field-hint" id="client_phone_hint"></div>
                         </div>
 
                         @if($stockLow)
-                        <div style="font-size:12.5px;color:#92400e;background:var(--amber-lt);border:1px solid #fde68a;border-radius:var(--r-sm);padding:8px 12px;margin-bottom:14px">
-                            ⚠ Plus que <strong>{{ $stockVal }}</strong> unité{{ $stockVal > 1 ? 's' : '' }} disponible{{ $stockVal > 1 ? 's' : '' }} — commandez vite !
+                        <div style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:#92400e;background:var(--amber-lt);border:1px solid #fde68a;border-radius:var(--r-sm);padding:8px 12px;margin-bottom:14px">
+                            {!! \App\Support\IconLibrary::svg('alert', '', 13) !!} Plus que <strong>{{ $stockVal }}</strong> unité{{ $stockVal > 1 ? 's' : '' }} disponible{{ $stockVal > 1 ? 's' : '' }} — commandez vite !
                         </div>
                         @endif
 
                         <div style="font-size:13px;color:var(--green);display:flex;align-items:center;gap:6px;margin-bottom:14px">
-                            ✓ Livraison disponible — paiement à la réception
+                            {!! \App\Support\IconLibrary::svg('check', '', 14) !!} Livraison disponible — paiement à la réception
                         </div>
                     </div>
 
@@ -471,12 +504,12 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                             @if($product->image)
                                 <img src="{{ \App\Services\ImageOptimizer::url($product->image, 'thumb') ?? asset('storage/'.$product->image) }}" class="order-summary-prod-img" alt="" loading="lazy">
                             @else
-                                <div class="order-summary-prod-ph">🏷️</div>
+                                <div class="order-summary-prod-ph">{!! \App\Support\IconLibrary::svg('tag', '', 16) !!}</div>
                             @endif
                             <div style="min-width:0;overflow:hidden">
                                 <div class="order-summary-prod-name">{{ Str::limit($product->name, 28) }}</div>
                                 @if($variants->isNotEmpty())
-                                <div id="summaryVariant" style="font-size:11px;font-weight:700;color:var(--orange);margin-top:3px">
+                                <div id="summaryVariant" style="font-size:11px;font-weight:700;color:var(--brand);margin-top:3px">
                                     @if($selectedVariantId ?? null)
                                         {{ $variants->firstWhere('id', $selectedVariantId)?->name }}
                                     @else
@@ -513,7 +546,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                             <input type="text" id="promoInput" placeholder="Code promo"
                                    style="flex:1;min-width:0;padding:8px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font-family:monospace;font-size:12.5px;text-transform:uppercase"
                                    oninput="this.value = this.value.toUpperCase()">
-                            <button type="button" onclick="applyPromoCode()" style="padding:8px 14px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:transparent;color:var(--orange);font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap">Appliquer</button>
+                            <button type="button" onclick="applyPromoCode()" style="padding:8px 14px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:transparent;color:var(--brand);font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap">Appliquer</button>
                         </div>
                         <div id="promoMsg" style="display:none;font-size:11.5px;font-weight:600;margin-top:-4px"></div>
                         <input type="hidden" name="promo_code" id="promoCodeInput" value="">
@@ -526,14 +559,14 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                         @if(($loyaltyBalance ?? 0) > 0)
                         <div class="order-summary-sep"></div>
                         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12.5px;color:rgba(255,255,255,.85);font-weight:600">
-                            <input type="checkbox" id="usePointsChk" onchange="togglePoints()" style="width:15px;height:15px;accent-color:var(--orange)">
-                            🎁 Utiliser mes points (solde : {{ number_format($loyaltyBalance, 0, ',', ' ') }})
+                            <input type="checkbox" id="usePointsChk" onchange="togglePoints()" style="width:15px;height:15px;accent-color:var(--brand)">
+                            {!! \App\Support\IconLibrary::svg('gift', '', 14) !!} Utiliser mes points (solde : {{ number_format($loyaltyBalance, 0, ',', ' ') }})
                         </label>
                         <div id="pointsRow" style="display:none;align-items:center;gap:8px;margin-top:8px">
                             <input type="number" id="pointsInput" name="points_to_use" value="0" min="0"
                                    style="width:90px;padding:7px 9px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font-family:monospace;font-size:13px"
                                    oninput="onPointsInput()">
-                            <button type="button" onclick="usePointsMax()" style="padding:7px 12px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:transparent;color:var(--orange);font-size:11.5px;font-weight:700;cursor:pointer">MAX</button>
+                            <button type="button" onclick="usePointsMax()" style="padding:7px 12px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:transparent;color:var(--brand);font-size:11.5px;font-weight:700;cursor:pointer">MAX</button>
                         </div>
                         <div class="order-summary-row" id="pointsDiscountRow" style="display:none">
                             <span class="order-summary-row-lbl" style="color:#6ee7b7">Réduction points</span>
@@ -555,21 +588,21 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                         </div>
 
                         <div class="cash-notice">
-                            💵 <span>Cash à la livraison — aucune carte requise</span>
+                            {!! \App\Support\IconLibrary::svg('wallet', '', 15) !!} <span>Cash à la livraison — aucune carte requise</span>
                         </div>
 
                         <button type="submit" class="submit-btn" id="submitBtn">
-                            🛒 Valider ma commande
+                            {!! \App\Support\IconLibrary::svg('cart', '', 16) !!} Valider ma commande
                         </button>
 
                         @auth
                         <a href="{{ route('client.messages.index', $product) }}" class="chat-btn">
-                            💬 Poser une question au vendeur
+                            {!! \App\Support\IconLibrary::svg('message', '', 15) !!} Poser une question au vendeur
                         </a>
                         @else
                         @php $msgUrl = route('client.messages.index', $product); @endphp
                         <a href="{{ route('register', ['redirect' => $msgUrl, 'role' => 'client']) }}" class="chat-btn">
-                            💬 Poser une question au vendeur
+                            {!! \App\Support\IconLibrary::svg('message', '', 15) !!} Poser une question au vendeur
                         </a>
                         @endauth
                     </div>
@@ -904,6 +937,55 @@ if (PHOTOS.length > 1) {
     if (next) next.style.display = 'flex';
 }
 
+/* ══ VALIDATION EN DIRECT (nom / téléphone) ══
+ * Reflète côté client les mêmes règles que le serveur (RealisticGuineaPhone /
+ * RealisticFullName), pour prévenir tout de suite un client qui tape n'importe
+ * quoi — au lieu de le découvrir seulement après l'envoi du formulaire. Le
+ * serveur reste la vraie barrière (cette vérification JS est juste un confort). */
+function validateGuineaPhone(value) {
+    const digits = (value || '').replace(/\D+/g, '').replace(/^224(\d{9})$/, '$1');
+    if (!/^6\d{8}$/.test(digits)) {
+        return "Numéro guinéen invalide (9 chiffres commençant par 6). Ex : 622 00 00 00.";
+    }
+    if (new Set(digits.split('')).size <= 2) {
+        return "Ce numéro ne semble pas valide.";
+    }
+    const diffs = [...digits].slice(1).map((d, i) => parseInt(d, 10) - parseInt(digits[i], 10));
+    if (new Set(diffs).size === 1 && (diffs[0] === 1 || diffs[0] === -1)) {
+        return "Ce numéro ne semble pas valide.";
+    }
+    return null;
+}
+
+function validateFullName(value) {
+    const name = (value || '').trim();
+    const words = name.split(/\s+/).filter(Boolean);
+    if (words.length < 2) return "Indiquez votre prénom et votre nom.";
+    if (words.some(w => w.length < 2)) return "Prénom et nom complets requis.";
+    if (!/[aeiouyàâäéèêëîïôöùûü]/i.test(name)) return "Ce nom ne semble pas valide.";
+    if (/(.)\1{3,}/i.test(name)) return "Ce nom ne semble pas valide.";
+    return null;
+}
+
+function liveValidate(input, validator) {
+    const hint = document.getElementById(input.id + '_hint');
+    const value = input.value.trim();
+    input.classList.remove('is-valid', 'is-invalid');
+    if (!hint) return;
+    if (!value) { hint.className = 'field-hint'; return; }
+
+    const error = validator(value);
+    if (error) {
+        input.classList.add('is-invalid');
+        hint.textContent = error;
+        hint.className = 'field-hint show error';
+    } else {
+        input.classList.add('is-valid');
+        hint.textContent = '✓ OK';
+        hint.className = 'field-hint show ok';
+    }
+}
+
 /* Submit */
 document.getElementById('orderForm')?.addEventListener('submit', (e) => {
     // Il faut avoir fait un choix : soit une vraie option (couleur/taille), soit "aucune préférence" (pastille nom du produit)
@@ -916,8 +998,30 @@ document.getElementById('orderForm')?.addEventListener('submit', (e) => {
         document.getElementById('variantPickerOrder')?.scrollIntoView({behavior:'smooth', block:'center'});
         return;
     }
+
+    // Bloque l'envoi si le nom ou le téléphone est manifestement invalide
+    // (le serveur revérifie de toute façon — ceci évite juste un aller-retour inutile)
+    const nameInput  = document.getElementById('client_name');
+    const phoneInput = document.getElementById('client_phone');
+    let firstInvalid = null;
+
+    if (nameInput && nameInput.value.trim() && validateFullName(nameInput.value)) {
+        liveValidate(nameInput, validateFullName);
+        firstInvalid = firstInvalid || nameInput;
+    }
+    if (phoneInput && phoneInput.value.trim() && validateGuineaPhone(phoneInput.value)) {
+        liveValidate(phoneInput, validateGuineaPhone);
+        firstInvalid = firstInvalid || phoneInput;
+    }
+    if (firstInvalid) {
+        e.preventDefault();
+        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstInvalid.focus();
+        return;
+    }
+
     const btn = document.getElementById('submitBtn');
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ Envoi en cours…'; }
+    if (btn) { btn.disabled = true; btn.innerHTML = '{!! \App\Support\IconLibrary::svg("clock", "", 15) !!} Envoi en cours…'; }
 });
 </script>
 @endpush

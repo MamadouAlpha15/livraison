@@ -4,57 +4,63 @@ namespace App\Http\Controllers;
 
 use App\Models\Shop;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
-use App\Models\User;
-use App\Models\DeliveryCompany;
+use App\Models\Review;
 use Illuminate\Http\Request;
 
 /**
  * ═══════════════════════════════════════════════════════════════
  * WelcomeController — Page d'accueil publique
  * ═══════════════════════════════════════════════════════════════
- * Injecte dans la vue welcome :
- *   $shops     → boutiques approuvées (avec nb produits)
- *   $companies → entreprises de livraison approuvées
- *   $stats     → chiffres clés pour la section hero
+ * Injecte dans la vue welcome (style "Jumia" : produits + catégories
+ * affichés dès l'arrivée du visiteur) :
+ *   $flashProducts        → Collection<Product>  (ventes flash actives)
+ *   $recommendedProducts  → Collection<Product>  (produits vedette)
+ *   $shops                → Collection<Shop>     (boutiques à la une)
+ *   $products             → LengthAwarePaginator<Product> (catalogue complet)
+ *   $categories           → Collection<string>
+ *   $categoryGroups       → Collection<{name, products}> (aperçu par catégorie, hors recherche)
+ *   $bestSellers          → Collection<Product>  (meilleures ventes réelles, hors recherche/filtre)
+ *   $testimonials         → Collection<Review> (avis clients réels, note ≥ 4, hors recherche)
+ *   $favoritedIds         → array<int> (ids produits favoris du client connecté)
+ *   $shopRatings          → array<int, {avg, count}> (note moyenne des boutiques, clé = user_id du vendeur)
+ *   $stats                → array { total_shops, total_products, total_orders }
  */
 class WelcomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        /* ── Boutiques approuvées pour la vitrine ── */
-        $shops = Shop::where('is_approved', true)
-            ->withCount('products')
-            ->latest()
-            ->paginate(12);
+        $data = $this->catalogueData($request);
 
-        /* ── Entreprises de livraison (les plus actives d'abord) ── */
-        $companies = DeliveryCompany::where('approved', true)
-            ->where('active', true)
-            ->withCount('orders')
-            ->orderByDesc('orders_count')
-            ->orderByDesc('id')
-            ->get();
+        /* Requête AJAX (recherche en direct, sans rechargement de page) :
+           on ne renvoie que le fragment "résultats" au lieu de la page entière. */
+        if ($request->ajax()) {
+            return view('partials.catalogue-results', $data);
+        }
 
-        /* ── Stats sociales (compteurs animés dans le hero) ── */
-        $stats = [
-            'total_shops'    => Shop::where('is_approved', true)->count(),
-            'total_orders'   => Order::count(),
-            'total_clients'  => User::where('role', 'client')->count(),
-            'total_livreurs' => User::where('role', 'livreur')->count(),
-        ];
-
-        return view('welcome', compact('shops', 'companies', 'stats'));
+        return view('welcome', $data);
     }
 
     /**
-     * Page d'accueil alternative — style "Alibaba" : affiche directement
-     * les produits (flash, recommandés, boutiques, catalogue complet)
-     * au lieu de la page marketing. Accessible aux invités comme aux clients.
+     * Page d'accueil alternative (même contenu que index(), autre gabarit).
+     * Accessible aux invités comme aux clients.
      */
     public function catalogue(Request $request)
     {
+        return view('welcome2', $this->catalogueData($request));
+    }
+
+    /**
+     * Construit le jeu de données "catalogue" partagé par les deux gabarits
+     * d'accueil : ventes flash, produits recommandés, boutiques à la une,
+     * catalogue complet filtrable (recherche / catégorie) et catégories.
+     */
+    private function catalogueData(Request $request): array
+    {
         $user = auth()->user();
+        $isSearching = (bool) $request->get('s');
+        $isFiltering = (bool) $request->get('cat');
 
         $approvedShopFilter = function ($q) use ($user) {
             $q->where('is_approved', true);
@@ -72,7 +78,7 @@ class WelcomeController extends Controller
             ->where(function ($q) {
                 $q->whereNull('flash_starts_at')->orWhere('flash_starts_at', '<=', now());
             })
-            ->with('shop:id,name,image')
+            ->with('shop:id,name,image,user_id')
             ->latest()
             ->limit(10)
             ->get();
@@ -81,7 +87,7 @@ class WelcomeController extends Controller
         $recommendedProducts = Product::where('is_active', true)
             ->whereHas('shop', $approvedShopFilter)
             ->where('is_featured', true)
-            ->with('shop:id,name,image')
+            ->with('shop:id,name,image,user_id')
             ->latest()
             ->limit(10)
             ->get();
@@ -96,7 +102,7 @@ class WelcomeController extends Controller
         /* ── Catalogue complet (recherche / catégorie / pagination) ── */
         $query = Product::where('is_active', true)
             ->whereHas('shop', $approvedShopFilter)
-            ->with(['shop:id,name,image,country,type']);
+            ->with(['shop:id,name,image,country,type,user_id']);
 
         if ($s = $request->get('s')) {
             $query->where(function ($q) use ($s) {
@@ -110,7 +116,10 @@ class WelcomeController extends Controller
             $query->where('category', $cat);
         }
 
-        $products = $query->latest()->paginate(24)->withQueryString();
+        /* ->fragment('catalogue') : chaque lien de pagination pointe vers #catalogue,
+           pour que la page suivante/précédente atterrisse directement sur les produits
+           au lieu de tout en haut (sinon il faut redescendre à chaque clic). */
+        $products = $query->latest()->paginate(24)->withQueryString()->fragment('catalogue');
 
         $categories = Product::select('category')
             ->where('is_active', true)
@@ -122,15 +131,115 @@ class WelcomeController extends Controller
             ->filter()
             ->values();
 
-        /* ── Chiffres clés pour le hero (compteurs animés) ── */
+        /* ── Aperçus par catégorie ("Populaire en ...") — uniquement sur l'accueil
+           par défaut, pas pendant une recherche/filtre (économise des requêtes).
+           Toutes les catégories ayant au moins 2 produits sont affichées (pas
+           seulement les 4 plus fournies) : sur un jeune catalogue avec peu de
+           catégories, se limiter au "top 4" pouvait masquer la fonctionnalité
+           entière. La limite haute (12) protège juste contre un catalogue
+           très diversifié plus tard. ── */
+        $categoryGroups = collect();
+        if (!$isSearching && !$isFiltering) {
+            $topCategories = Product::where('is_active', true)
+                ->whereHas('shop', $approvedShopFilter)
+                ->whereNotNull('category')
+                ->where('category', '!=', '')
+                ->select('category')
+                ->groupBy('category')
+                ->orderByRaw('COUNT(*) DESC')
+                ->limit(12)
+                ->pluck('category');
+
+            foreach ($topCategories as $catName) {
+                $catProducts = Product::where('is_active', true)
+                    ->whereHas('shop', $approvedShopFilter)
+                    ->where('category', $catName)
+                    ->with('shop:id,name,image,user_id')
+                    ->latest()
+                    ->limit(6)
+                    ->get();
+
+                if ($catProducts->count() >= 2) {
+                    $categoryGroups->push(['name' => $catName, 'products' => $catProducts]);
+                }
+            }
+        }
+
+        /* ── Meilleures ventes réelles (quantités des commandes LIVRÉES, pas des vœux) ──
+           uniquement sur l'accueil par défaut, comme les aperçus par catégorie. ── */
+        $bestSellers = collect();
+        if (!$isSearching && !$isFiltering) {
+            $soldByProduct = OrderItem::query()
+                ->join('orders', 'orders.id', '=', 'order_items.order_id')
+                ->join('products', 'products.id', '=', 'order_items.product_id')
+                ->where('orders.status', Order::STATUS_LIVREE)
+                ->where('products.is_active', true)
+                ->selectRaw('order_items.product_id, SUM(order_items.quantity) as total_sold')
+                ->groupBy('order_items.product_id')
+                ->orderByDesc('total_sold')
+                ->limit(10)
+                ->pluck('total_sold', 'order_items.product_id');
+
+            if ($soldByProduct->isNotEmpty()) {
+                $bestSellers = Product::whereIn('id', $soldByProduct->keys())
+                    ->whereHas('shop', $approvedShopFilter)
+                    ->with('shop:id,name,image,user_id')
+                    ->get()
+                    ->sortByDesc(fn ($p) => $soldByProduct[$p->id])
+                    ->values();
+
+                $bestSellers->each(function ($p) use ($soldByProduct) {
+                    $p->total_sold = (int) $soldByProduct[$p->id];
+                });
+            }
+        }
+
+        /* ── Avis clients réels (note ≥ 4, avec commentaire) pour la section témoignages ── */
+        $testimonials = collect();
+        if (!$isSearching && !$isFiltering) {
+            $testimonials = Review::whereNotNull('comment')
+                ->where('comment', '!=', '')
+                ->where('rating', '>=', 4)
+                ->with(['client:id,name', 'vendeur:id,name'])
+                ->latest()
+                ->limit(6)
+                ->get()
+                ->filter(fn ($r) => $r->client) // évite les avis dont le client aurait été supprimé
+                ->values();
+        }
+
+        /* ── Note moyenne des boutiques (calculée depuis les avis réels de leurs commandes) ── */
+        $vendeurIds = collect([$flashProducts, $recommendedProducts, $bestSellers, collect($products->items())])
+            ->merge($categoryGroups->pluck('products'))
+            ->flatten(1)
+            ->pluck('shop.user_id')
+            ->filter()
+            ->unique()
+            ->values();
+
+        $shopRatings = $vendeurIds->isEmpty() ? [] : Review::whereIn('vendeur_id', $vendeurIds)
+            ->selectRaw('vendeur_id, AVG(rating) as avg_rating, COUNT(*) as cnt')
+            ->groupBy('vendeur_id')
+            ->get()
+            ->keyBy('vendeur_id')
+            ->map(fn ($r) => ['avg' => round((float) $r->avg_rating, 1), 'count' => (int) $r->cnt])
+            ->all();
+
+        /* ── Produits favoris du client connecté (pour l'état du cœur ♥) ── */
+        $favoritedIds = ($user && $user->role === 'client')
+            ? $user->favoriteProducts()->pluck('products.id')->all()
+            : [];
+
+        /* ── Chiffres clés (compteurs) ── */
         $stats = [
             'total_shops'    => Shop::where('is_approved', true)->count(),
             'total_products' => Product::where('is_active', true)->whereHas('shop', $approvedShopFilter)->count(),
             'total_orders'   => Order::count(),
         ];
 
-        return view('welcome2', compact(
-            'flashProducts', 'recommendedProducts', 'shops', 'products', 'categories', 'stats'
-        ));
+        return compact(
+            'flashProducts', 'recommendedProducts', 'shops', 'products', 'categories',
+            'categoryGroups', 'bestSellers', 'testimonials', 'favoritedIds', 'shopRatings', 'stats'
+        );
     }
 }

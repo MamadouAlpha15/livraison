@@ -1,2139 +1,1416 @@
 {{--
 =====================================================
-WELCOME.BLADE.PHP — Page d'accueil moderne & attractive
+WELCOME.BLADE.PHP — Page d'accueil, style "Jumia"
 =====================================================
-Variables injectées depuis WelcomeController :
-  $shops       → Collection<Shop>  (boutiques approuvées, paginées)
-  $companies   → Collection<DeliveryCompany>
-  $stats       → object { total_shops, total_orders, total_clients, total_livreurs }
+Affiche directement les produits et catégories dès l'arrivée du visiteur,
+au lieu d'une page marketing. Variables injectées depuis WelcomeController@index :
+  $flashProducts        → Collection<Product>  (ventes flash actives)
+  $recommendedProducts  → Collection<Product>  (produits vedette)
+  $shops                → Collection<Shop>     (boutiques à la une)
+  $products             → LengthAwarePaginator<Product> (catalogue complet)
+  $categories           → Collection<string>
+  $stats                → array { total_shops, total_products, total_orders }
 =====================================================
 --}}
 
 @extends('layouts.app')
 
+@section('title', config('app.name', 'Shopio') . ' — Achetez malin, faites-vous livrer')
+@php $bodyClass = 'is-dashboard'; @endphp
+
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
-<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript>
-<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </noscript>
 
 <style>
-/* Welcome page : annuler le container Bootstrap injecté par layouts.app */
-main.app-main {
-    padding: 0 !important;
-    margin: 0 !important;
-    max-width: 100% !important;
-    width: 100% !important;
-}
+*, *::before, *::after { box-sizing: border-box; }
 
 /* ════════════════════════════════════════════════════════════════
-   VARIABLES & BASE
+   VARIABLES & BASE — thème bleu de la marque
 ════════════════════════════════════════════════════════════════ */
 :root {
-    --green:     #6366f1;
-    --green-dk:  #4f46e5;
-    --green-lt:  #e0e7ff;
-    --green-mlt: #eef2ff;
-    --violet:    #8b5cf6;
-    --indigo-lt: #a5b4fc;
-    --dark:      #0a0a1e;
-    --dark-2:    #0f0f3a;
-    --text:      #0f172a;
-    --text-2:    #475569;
-    --muted:     #94a3b8;
-    --surface:   #ffffff;
-    --border:    #e2e8f0;
-    --font:      'Plus Jakarta Sans', sans-serif;
-    --display:   'Clash Display', 'Plus Jakarta Sans', sans-serif;
-    --mono:      'JetBrains Mono', monospace;
-    --r:         16px;
-    --r-sm:      10px;
+    --brand:      #6366f1;
+    --brand-dk:   #4f46e5;
+    --brand-lt:   #e0e7ff;
+    --brand-mlt:  #eef2ff;
+    --navy:       #0a0a1e;
+    --navy-2:     #151538;
+    --grey:       #f4f6fb;
+    --grey-2:     #e8ecf5;
+    --border:     #e2e8f0;
+    --text:       #0f172a;
+    --text-2:     #475569;
+    --muted:      #94a3b8;
+    --surface:    #ffffff;
+    --font:       'Plus Jakarta Sans', sans-serif;
+    --display:    'Clash Display', 'Plus Jakarta Sans', sans-serif;
+    --mono:       'JetBrains Mono', monospace;
+    --r:          14px;
+    --r-sm:       9px;
+    --shadow-sm:  0 1px 4px rgba(15,23,42,.06);
+    --shadow:     0 4px 18px rgba(15,23,42,.08);
+    --shadow-lg:  0 10px 36px rgba(15,23,42,.12);
+    --nav-h:      64px;
 }
 
-*, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body {
-    font-family: var(--font);
-    background: #f8fafc;
-    color: var(--text);
-    margin: 0;
-    -webkit-font-smoothing: antialiased;
-}
+html { font-family: var(--font); scroll-behavior: smooth; overflow-x: hidden; }
+body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+main.app-main { padding: 0 !important; margin: 0 !important; max-width: 100% !important; width: 100% !important; }
+img { max-width: 100%; }
+footer.app-footer { display: none !important; }
 
-/* ════════════════════════════════════════════════════════════════
-   NAVBAR OVERRIDE — transparente sur le hero
-════════════════════════════════════════════════════════════════ */
-.navbar { display: none !important; } /* On a notre propre nav */
-
-/* ── Notre navbar custom ── */
-.top-nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    padding: 0 40px;
-    height: 64px;
-    display: flex; align-items: center; justify-content: space-between;
-    background: rgba(10,10,30,.92);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(99,102,241,.12);
-    transition: background .3s;
-}
-.nav-brand {
-    display: flex; align-items: center; gap: 10px;
-    text-decoration: none; color: #fff;
-    font-size: 18px; font-weight: 700; letter-spacing: -.3px;
-}
-.nav-brand-icon {
-    width: 34px; height: 34px;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    border-radius: 9px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
-    box-shadow: 0 2px 10px rgba(99,102,241,.4);
-}
-.nav-logo-img {
-    height: 40px; width: 40px; object-fit: cover; border-radius: 10px;
-    border: 2px solid rgba(170,40,217,.5);
-    box-shadow: 0 0 0 3px rgba(41,29,149,.35), 0 4px 14px rgba(170,40,217,.35);
-    flex-shrink: 0;
-}
-.nav-brand-name {
-    background: linear-gradient(90deg, #c4b5fd, #e879f9);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-size: 18px; font-weight: 800; letter-spacing: -.3px;
-}
-.nav-links {
-    display: flex; align-items: center; gap: 8px;
-}
-.nav-link-item {
-    padding: 8px 16px; border-radius: 8px;
-    font-size: 13.5px; font-weight: 600;
-    text-decoration: none; transition: all .15s;
-    color: rgba(255,255,255,.7);
-}
-.nav-link-item:hover { background: rgba(255,255,255,.08); color: #fff; }
-.nav-btn {
-    padding: 8px 20px; border-radius: 8px;
-    font-size: 13.5px; font-weight: 700;
-    text-decoration: none; transition: all .15s;
-    background: var(--green); color: #fff;
-    border: 1px solid var(--green-dk);
-}
-.nav-btn:hover { background: var(--green-dk); color: #fff; }
-.nav-btn-outline {
-    background: transparent; border: 1px solid rgba(255,255,255,.2);
-    color: rgba(255,255,255,.8);
-}
-.nav-btn-outline:hover { border-color: rgba(255,255,255,.5); color: #fff; background: rgba(255,255,255,.06); }
+/* ── Icônes SVG (remplacent les émojis) ── */
+.ico { display: inline-block; flex-shrink: 0; vertical-align: -3px; }
 
 /* ════════════════════════════════════════════════════════════════
-   HERO SECTION
+   NAVBAR
 ════════════════════════════════════════════════════════════════ */
-.hero-section {
-    min-height: 100vh;
-    background: linear-gradient(90deg, #100c31, #261360, #772595);
+.navbar { display: none !important; } /* la nav custom ci-dessous remplace celle du layout */
+
+.nav {
+    height: var(--nav-h);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center;
+    padding: 0 28px; gap: 18px;
+    position: sticky; top: 0; z-index: 200;
+    box-shadow: var(--shadow-sm);
+}
+.nav-logo {
+    font-family: var(--display); font-weight: 700; font-size: 20px;
+    text-decoration: none; flex-shrink: 0;
+    display: flex; align-items: center; gap: 9px; color: var(--text);
+}
+.nav-logo img { height: 36px; width: 36px; object-fit: cover; border-radius: 9px; flex-shrink: 0; }
+.nav-logo .brand-part { color: var(--navy); }
+.nav-logo .brand-accent { color: var(--brand); }
+.nav-links { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+.nav-link {
+    padding: 9px 14px; border-radius: var(--r-sm);
+    font-size: 13.5px; font-weight: 600; color: var(--text-2);
+    text-decoration: none; transition: all .15s;
+    display: flex; align-items: center; gap: 6px; white-space: nowrap;
+}
+.nav-link:hover { background: var(--grey); color: var(--text); }
+.nav-link.active { color: var(--brand-dk); background: var(--brand-mlt); }
+.nav-search {
+    flex: 1; max-width: 460px;
+    display: flex; align-items: center;
+    border: 1.5px solid var(--border);
+    border-radius: 50px; overflow: hidden;
+    background: var(--grey);
+    transition: border-color .2s, box-shadow .2s, background .2s;
+}
+.nav-search:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(99,102,241,.12); background: var(--surface); }
+.nav-search input {
+    flex: 1; border: none; outline: none; background: transparent;
+    padding: 10px 18px; font-size: 13.5px; font-family: var(--font); color: var(--text);
+}
+.nav-search input::placeholder { color: var(--muted); }
+.nav-search-btn {
+    padding: 10px 18px; background: var(--brand); border: none; cursor: pointer;
+    color: #fff; font-size: 15px; transition: background .15s; display: flex; align-items: center;
+}
+.nav-search-btn:hover { background: var(--brand-dk); }
+.nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: auto; }
+.nav-orders-btn {
+    display: flex; align-items: center; gap: 7px;
+    padding: 9px 16px; border-radius: 50px;
+    font-size: 12.5px; font-weight: 700; font-family: var(--font);
+    border: 1.5px solid var(--border); background: var(--surface);
+    color: var(--text); cursor: pointer; text-decoration: none; transition: all .15s; white-space: nowrap;
+}
+.nav-orders-btn:hover { border-color: var(--brand); color: var(--brand-dk); background: var(--brand-mlt); }
+.nav-btn-primary {
+    padding: 10px 20px; border-radius: 50px; font-size: 12.5px; font-weight: 700; font-family: var(--font);
+    background: var(--brand); color: #fff; border: none; cursor: pointer; text-decoration: none;
+    transition: all .15s; white-space: nowrap; box-shadow: 0 3px 12px rgba(99,102,241,.35);
+}
+.nav-btn-primary:hover { background: var(--brand-dk); color: #fff; }
+
+/* ── Barre mobile (recherche) ── */
+.mobile-bar { display: none; padding: 10px 14px; gap: 8px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: var(--nav-h); z-index: 190; }
+.mobile-bar .nav-search { max-width: 100%; }
+
+/* ── Hamburger ── */
+.nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 6px; border: none; background: none; flex-shrink: 0; }
+.nav-hamburger span { display: block; width: 21px; height: 2px; background: var(--text); border-radius: 2px; transition: transform .25s, opacity .25s; }
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.nav-mobile-menu {
+    display: none; position: fixed; top: var(--nav-h); left: 0; right: 0; z-index: 199;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    padding: 10px 14px 18px; flex-direction: column; gap: 4px;
+    max-height: calc(100vh - var(--nav-h)); overflow-y: auto;
+}
+.nav-mobile-menu.open { display: flex; }
+.nav-mobile-link { display: block; padding: 12px 14px; border-radius: var(--r-sm); font-size: 14.5px; font-weight: 600; color: var(--text); text-decoration: none; transition: background .15s; }
+.nav-mobile-link:hover { background: var(--grey); }
+.nav-mobile-divider { height: 1px; background: var(--border); margin: 8px 4px; }
+.nav-mobile-btn { display: block; padding: 13px; border-radius: var(--r-sm); font-size: 14.5px; font-weight: 700; text-align: center; text-decoration: none; margin-top: 4px; background: var(--brand); color: #fff; }
+.nav-mobile-cats { display: flex; flex-direction: column; gap: 2px; }
+
+/* ════════════════════════════════════════════════════════════════
+   SIDEBAR CATÉGORIES + HERO
+════════════════════════════════════════════════════════════════ */
+.home-top { display: flex; gap: 20px; margin: 20px 28px; align-items: stretch; }
+.cat-sidebar {
+    flex: 0 0 250px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r); box-shadow: var(--shadow-sm); overflow: hidden;
     display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 100px 24px 80px;
-    position: relative; overflow: hidden;
+}
+.cat-sidebar-hd {
+    padding: 15px 18px; font-family: var(--display); font-weight: 700; font-size: 13.5px;
+    color: #fff; background: linear-gradient(135deg, var(--navy), var(--navy-2));
+    letter-spacing: .3px; display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+.cat-sidebar-list { flex: 1; overflow-y: auto; padding: 6px 0; }
+.cat-sidebar-list::-webkit-scrollbar { width: 5px; }
+.cat-sidebar-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.cat-sidebar-item {
+    display: flex; align-items: center; gap: 11px; padding: 10px 18px;
+    font-size: 13.5px; font-weight: 600; color: var(--text-2); text-decoration: none;
+    transition: all .15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cat-sidebar-item:hover { background: var(--grey); color: var(--text); }
+.cat-sidebar-item.active { background: var(--brand-mlt); color: var(--brand-dk); font-weight: 800; box-shadow: inset 3px 0 0 var(--brand); }
+.csi-ico { font-size: 15px; flex-shrink: 0; width: 18px; text-align: center; }
+
+/* ── "Autres catégories" repliable (façon Jumia) ── */
+.cat-sidebar-more { border-top: 1px solid var(--border); margin-top: 4px; }
+.cat-sidebar-more summary {
+    display: flex; align-items: center; gap: 11px; padding: 10px 18px;
+    font-size: 13.5px; font-weight: 700; color: var(--brand-dk); cursor: pointer;
+    list-style: none; user-select: none; transition: background .15s;
+}
+.cat-sidebar-more summary::-webkit-details-marker { display: none; }
+.cat-sidebar-more summary::after { content: '▾'; margin-left: auto; font-size: 11px; color: var(--muted); transition: transform .2s; }
+.cat-sidebar-more[open] summary::after { transform: rotate(180deg); }
+.cat-sidebar-more summary:hover { background: var(--grey); }
+.csi-count {
+    margin-left: auto; background: var(--brand-mlt); color: var(--brand-dk);
+    font-size: 10.5px; font-weight: 800; padding: 1px 7px; border-radius: 20px; flex-shrink: 0;
 }
 
-/* Grille de points en fond */
-.hero-section::before {
-    content: '';
+/* ── Carrousel du hero : plusieurs diapositives qui défilent automatiquement,
+      façon Jumia (points cliquables, pause au survol) ── */
+.hero-carousel { position: relative; flex: 1; min-width: 0; border-radius: var(--r); min-height: 336px; overflow: hidden; }
+.hero-slide {
     position: absolute; inset: 0;
-    background-image:
-        radial-gradient(circle at 1px 1px, rgba(255,255,255,.06) 1px, transparent 0);
-    background-size: 32px 32px;
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transform: scale(1.02);
+    transition: opacity .7s ease, transform .7s ease, visibility 0s linear .7s;
+}
+.hero-slide.is-active {
+    opacity: 1; visibility: visible; pointer-events: auto; transform: scale(1); z-index: 1;
+    transition: opacity .7s ease, transform .7s ease, visibility 0s linear 0s;
+}
+.hero-dots {
+    position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 3;
+    display: flex; align-items: center; gap: 7px;
+}
+.hero-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.4);
+    border: none; padding: 0; cursor: pointer; transition: all .25s; flex-shrink: 0;
+}
+.hero-dot:hover { background: rgba(255,255,255,.7); }
+.hero-dot.is-active { background: #fff; width: 22px; border-radius: 5px; }
+
+.hero {
+    background: linear-gradient(120deg, var(--navy) 0%, #241a6b 50%, var(--brand) 100%);
+    border-radius: var(--r);
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    overflow: hidden;
+    padding: 40px 42px; height: 100%;
+}
+/* Photo de fond de la diapositive (vraie image, chargée en <img> pour un
+   vrai lazy-loading / priorité réseau — pas en CSS background-image) */
+.hero-bg-img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; object-position: center; z-index: 0;
+}
+.hero-scrim {
+    position: absolute; inset: 0; z-index: 0;
+    background: linear-gradient(100deg,
+        rgba(8,8,26,.94) 0%, rgba(10,10,32,.86) 32%,
+        rgba(10,10,32,.45) 60%, rgba(10,10,32,.18) 100%);
+}
+.hero::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.06) 1px, transparent 0);
+    background-size: 28px 28px; pointer-events: none;
+}
+.hero::after {
+    content: ''; position: absolute; right: -80px; bottom: -100px; width: 320px; height: 320px;
+    border-radius: 50%; background: radial-gradient(circle, rgba(165,180,252,.28) 0%, transparent 70%);
     pointer-events: none;
 }
-
-/* Halo indigo/violet derrière le titre */
-.hero-glow {
-    position: absolute;
-    width: 700px; height: 700px;
-    background: radial-gradient(circle, rgba(99,102,241,.22) 0%, rgba(139,92,246,.1) 45%, transparent 70%);
-    top: 50%; left: 50%; transform: translate(-50%, -60%);
+/* Balayage lumineux qui traverse la bannière (effet "vivant") */
+.hero-shine {
+    position: absolute; top: 0; left: -35%; width: 30%; height: 100%; z-index: 1;
+    background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,.14) 50%, transparent 100%);
+    transform: skewX(-18deg);
+    animation: heroShineSweep 5.5s ease-in-out infinite;
     pointer-events: none;
 }
-
+@keyframes heroShineSweep { 0% { left: -35%; } 55% { left: 130%; } 100% { left: 130%; } }
+.hero-text { flex: 1; position: relative; z-index: 2; }
 .hero-badge {
     display: inline-flex; align-items: center; gap: 7px;
-    background: rgba(99,102,241,.14);
-    border: 1px solid rgba(99,102,241,.3);
-    color: #a5b4fc;
-    font-size: 12px; font-weight: 700;
-    padding: 6px 14px; border-radius: 20px;
-    margin-bottom: 24px;
-    animation: fadeDown .6s ease both;
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+    color: #e0e7ff; font-size: 11.5px; font-weight: 700;
+    padding: 5px 13px; border-radius: 20px; margin-bottom: 16px;
+    animation: heroFadeUp .6s ease both;
 }
-.hero-badge-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: #a5b4fc;
-    box-shadow: 0 0 6px #a5b4fc;
-    animation: blink 2s ease-in-out infinite;
-}
+.hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #a5b4fc; box-shadow: 0 0 6px #a5b4fc; animation: blink 2s ease-in-out infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-
-.hero-title {
-    font-family: var(--display);
-    font-size: clamp(42px, 7vw, 76px);
-    font-weight: 700;
-    color: #fff;
-    text-align: center;
-    line-height: 1.07;
-    letter-spacing: -2px;
-    max-width: 820px;
-    margin: 0 auto 20px;
+@keyframes heroFadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.hero-title { font-family: var(--display); font-weight: 700; font-size: clamp(24px, 3.4vw, 38px); color: #fff; line-height: 1.15; margin-bottom: 12px; letter-spacing: -.6px; animation: heroFadeUp .65s .08s ease both; }
+.hero-sub { font-size: 14.5px; color: rgba(255,255,255,.72); margin-bottom: 22px; max-width: 460px; line-height: 1.6; animation: heroFadeUp .65s .16s ease both; }
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; animation: heroFadeUp .65s .24s ease both; }
+.hero-btn-primary {
+    padding: 13px 26px; border-radius: 50px; font-size: 13.5px; font-weight: 700; font-family: var(--font);
+    background: #fff; color: var(--brand-dk); border: none; cursor: pointer; text-decoration: none;
+    transition: all .15s; display: inline-flex; align-items: center; gap: 7px; box-shadow: 0 6px 20px rgba(0,0,0,.2);
 }
-.hero-title .hw {
-    display: inline-block;
-    opacity: 0;
-    filter: blur(6px);
-    transform: translateY(30px) scale(.95);
-    animation: heroWordIn .8s cubic-bezier(.16,1,.3,1) both;
-    animation-delay: calc(var(--i) * 100ms + 150ms);
+.hero-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,.28); color: var(--brand-dk); }
+.hero-btn-secondary {
+    padding: 13px 26px; border-radius: 50px; font-size: 13.5px; font-weight: 700; font-family: var(--font);
+    background: rgba(255,255,255,.1); color: #fff; border: 1.5px solid rgba(255,255,255,.28);
+    cursor: pointer; text-decoration: none; transition: all .15s; display: inline-flex; align-items: center; gap: 7px;
+    backdrop-filter: blur(8px);
 }
-.hero-title .hw-grad {
-    background: linear-gradient(135deg, #a5b4fc, #6366f1, #8b5cf6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-@keyframes heroWordIn {
-    0%   { opacity: 0; filter: blur(6px); transform: translateY(30px) scale(.95); }
-    60%  { filter: blur(0); }
-    100% { opacity: 1; filter: blur(0); transform: translateY(0) scale(1); }
-}
+.hero-btn-secondary:hover { background: rgba(255,255,255,.2); color: #fff; transform: translateY(-2px); }
 @media (prefers-reduced-motion: reduce) {
-    .hero-title .hw { animation: none; opacity: 1; filter: none; transform: none; }
+    .hero-badge-dot, .hero-shine,
+    .hero-badge, .hero-title, .hero-sub, .hero-btns,
+    .flash-section, .flash-card-badge, .reveal { animation: none !important; }
+    .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+    .hero-slide { transition: opacity .3s ease !important; transform: none !important; }
 }
 
-.hero-sub {
-    font-size: 17px; color: rgba(255,255,255,.55);
-    text-align: center; max-width: 520px;
-    margin: 0 auto 36px; line-height: 1.7;
-    font-weight: 400;
-    animation: fadeDown .7s .2s ease both;
-}
-
-.hero-cta {
+/* ── Cartes latérales (aide / vendre / boutiques), façon colonne droite Jumia ── */
+.side-cards { flex: 0 0 220px; display: flex; flex-direction: column; gap: 12px; }
+.side-card {
     display: flex; align-items: center; gap: 12px;
-    flex-wrap: wrap; justify-content: center;
-    animation: fadeDown .7s .3s ease both;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--r);
+    padding: 14px 15px; text-decoration: none; color: inherit;
+    box-shadow: var(--shadow-sm); transition: box-shadow .2s, transform .2s, border-color .2s;
 }
-.cta-btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 14px 28px; border-radius: 12px;
-    font-size: 14.5px; font-weight: 700; font-family: var(--font);
-    text-decoration: none; transition: all .2s;
-    border: none; cursor: pointer;
+.side-card:hover { border-color: var(--brand-lt); box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+.side-card-ico {
+    width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+    background: var(--brand-mlt); color: var(--brand-dk);
+    display: flex; align-items: center; justify-content: center;
 }
-.cta-primary {
-    position: relative; color: #fff; background-repeat: no-repeat;
-    background-image:
-        linear-gradient(135deg,#6366f1,#4f46e5),
-        linear-gradient(120deg, transparent 35%, rgba(255,255,255,.6) 50%, transparent 65%);
-    background-size: 100% 100%, 220% 100%;
-    background-position: 0 0, 200% 0;
-    box-shadow: 0 4px 20px rgba(99,102,241,.45);
-    animation: ctaGlow 2.6s ease-in-out infinite, ctaShine 3.4s ease-in-out infinite;
-}
-.cta-primary:hover {
-    color: #fff;
-    filter: brightness(1.08);
-    box-shadow: 0 6px 30px rgba(99,102,241,.65);
-    transform: translateY(-1px);
-}
-@keyframes ctaGlow {
-    0%, 100% { box-shadow: 0 4px 20px rgba(99,102,241,.45); }
-    50%      { box-shadow: 0 4px 32px rgba(99,102,241,.8), 0 0 0 5px rgba(99,102,241,.1); }
-}
-@keyframes ctaShine {
-    0%   { background-position: 0 0, 200% 0; }
-    55%  { background-position: 0 0, -40% 0; }
-    100% { background-position: 0 0, -40% 0; }
-}
-@media (prefers-reduced-motion: reduce) {
-    .cta-primary { animation: none; }
-}
-.cta-secondary {
-    background: rgba(255,255,255,.07);
-    border: 1px solid rgba(255,255,255,.15);
-    color: rgba(255,255,255,.85);
-}
-.cta-secondary:hover {
-    background: rgba(255,255,255,.12);
-    color: #fff; transform: translateY(-1px);
-}
+.side-card-body { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.side-card-title { font-size: 12.5px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.side-card-sub { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* ── Stats rapides sous le hero ── */
-.hero-stats {
-    display: flex; gap: 40px; flex-wrap: wrap;
-    justify-content: center; margin-top: 56px;
-    animation: fadeDown .7s .4s ease both;
-}
-.hero-stat { text-align: center; }
-.hero-stat-val {
-    font-size: 28px; font-weight: 700; color: #fff;
-    font-family: var(--mono); letter-spacing: -1px;
-    display: block;
-}
-.hero-stat-lbl {
-    font-size: 12px; color: rgba(255,255,255,.4);
-    font-weight: 500; display: block; margin-top: 3px;
-}
-.hero-stat-sep {
-    width: 1px; background: rgba(255,255,255,.1);
-    align-self: stretch;
-}
-
-/* ── Image dashboard mockup ── */
-.hero-mockup {
-    margin-top: 64px; width: 100%; max-width: 1020px;
-    animation: fadeUp .9s .5s ease both;
-    position: relative;
-}
-
-/* Halo lumineux derrière */
-.hero-mockup::before {
-    content: '';
-    position: absolute;
-    inset: -40px -60px;
-    background: radial-gradient(ellipse at 50% 60%, rgba(99,102,241,.25) 0%, rgba(139,92,246,.1) 50%, transparent 75%);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 0;
-}
-
-/* Grille déco derrière */
-.hero-mockup::after {
-    content: '';
-    position: absolute;
-    inset: 20px -20px -20px;
-    background-image:
-        linear-gradient(rgba(99,102,241,.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(99,102,241,.08) 1px, transparent 1px);
-    background-size: 36px 36px;
-    border-radius: 20px;
-    z-index: 0;
-    mask-image: radial-gradient(ellipse at 50% 50%, black 30%, transparent 80%);
-}
-
-.hero-mockup-outer {
-    position: relative; z-index: 1;
-    transform: perspective(1600px) rotateX(3deg);
-    transform-origin: center bottom;
-    transition: transform .6s ease;
-}
-.hero-mockup-outer:hover { transform: perspective(1600px) rotateX(0deg); }
-
-.hero-mockup-inner {
-    position: relative;
-    border-radius: 14px; overflow: hidden;
-    box-shadow:
-        0 0 0 1px rgba(255,255,255,.10),
-        0 2px 0 rgba(255,255,255,.06),
-        0 20px 60px rgba(0,0,0,.7),
-        0 60px 120px rgba(0,0,0,.5),
-        0 0 80px rgba(99,102,241,.18),
-        inset 0 1px 0 rgba(255,255,255,.08);
-}
-
-/* Barre navigateur réaliste */
-.hero-mockup-bar {
-    background: linear-gradient(180deg, #252f3e 0%, #1e2a38 100%);
-    height: 40px; display: flex; align-items: center; gap: 10px; padding: 0 16px;
-    border-bottom: 1px solid rgba(255,255,255,.07);
-    position: relative;
-}
-.mockup-dots { display: flex; gap: 7px; flex-shrink: 0; }
-.mockup-dot  { width: 11px; height: 11px; border-radius: 50%; }
-.mockup-url  {
-    flex: 1; max-width: 340px; margin: 0 auto;
-    background: rgba(255,255,255,.07); border-radius: 6px;
-    height: 24px; display: flex; align-items: center; padding: 0 10px; gap: 6px;
-    font-size: 11px; color: rgba(255,255,255,.45); font-family: monospace;
-    border: 1px solid rgba(255,255,255,.06);
-}
-.mockup-url-lock { font-size: 10px; color: #10b981; }
-.mockup-actions { display: flex; gap: 4px; flex-shrink: 0; }
-.mockup-action-btn {
-    width: 24px; height: 18px; border-radius: 4px;
-    background: rgba(255,255,255,.06); display: flex; align-items: center; justify-content: center;
-    font-size: 9px; color: rgba(255,255,255,.3);
-}
-
-.hero-mockup img {
-    width: 100%; display: block;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
-    will-change: transform;
-    filter: url(#img-sharpen) contrast(1.06) saturate(1.04);
-    -webkit-filter: contrast(1.06) saturate(1.04);
-    image-rendering: -webkit-optimize-contrast;
-}
-
-/* Cartes stat flottantes */
-.mockup-float {
-    position: absolute; z-index: 4;
-    background: rgba(10, 10, 30, 0.9);
-    backdrop-filter: blur(12px) saturate(1.4);
-    -webkit-backdrop-filter: blur(12px) saturate(1.4);
-    border: 1px solid rgba(99,102,241,.2);
-    border-radius: 12px; padding: 10px 14px;
-    box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(99,102,241,.12);
-    animation: floatCard 3s ease-in-out infinite;
-    min-width: 140px;
-}
-.mockup-float.f1 { top: 14%; left: -60px; animation-delay: 0s; }
-.mockup-float.f2 { top: 44%; right: -64px; animation-delay: 1s; }
-.mockup-float.f3 { bottom: 12%; left: -48px; animation-delay: 2s; }
-@keyframes floatCard {
-    0%, 100% { transform: translateY(0px); }
-    50%       { transform: translateY(-8px); }
-}
-.mf-label { font-size: 10px; color: rgba(255,255,255,.45); font-weight: 500; margin-bottom: 3px; text-transform: uppercase; letter-spacing: .06em; }
-.mf-val   { font-size: 18px; font-weight: 800; color: #fff; font-family: monospace; line-height: 1; }
-.mf-val span { font-size: 10px; font-weight: 600; color: #a5b4fc; margin-left: 4px; }
-.mf-ico   { font-size: 20px; margin-bottom: 4px; }
-.mf-bar   { height: 3px; border-radius: 2px; background: rgba(255,255,255,.1); margin-top: 6px; overflow: hidden; }
-.mf-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, #6366f1, #8b5cf6); }
-
-/* Badge "LIVE" */
-.mockup-live {
-    position: absolute; top: -14px; right: 20px; z-index: 5;
-    background: linear-gradient(135deg, #4f46e5, #6366f1);
-    color: #fff; font-size: 10px; font-weight: 700; letter-spacing: .08em;
-    padding: 4px 10px; border-radius: 20px;
-    display: flex; align-items: center; gap: 5px;
-    box-shadow: 0 4px 16px rgba(99,102,241,.45);
-}
-.mockup-live-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: #fff; animation: pulse 1.4s ease infinite;
-}
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
-
-.hero-mockup-placeholder {
-    background: linear-gradient(180deg, #0f0f2e 0%, #0a0a1e 100%);
-    height: 480px; display: flex; align-items: center; justify-content: center;
-    flex-direction: column; gap: 12px;
-}
-.hero-mockup-placeholder .ico { font-size: 48px; opacity: .4; }
-.hero-mockup-placeholder p { font-size: 13px; color: rgba(255,255,255,.3); font-weight: 500; }
-
-@media (max-width: 900px) {
-    .mockup-float.f1, .mockup-float.f2, .mockup-float.f3 { display: none; }
-    .hero-mockup-outer { transform: none !important; }
-    .hero-mockup::after { display: none; }
-}
-
-/* Animations */
-@keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-16px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-}
-
-/* Reveal au scroll */
-.reveal {
-    opacity: 0;
-    transform: translateY(28px);
-    transition: opacity .7s cubic-bezier(.2,.7,.3,1), transform .7s cubic-bezier(.2,.7,.3,1);
-    transition-delay: var(--reveal-delay, 0ms);
-}
+/* ── Reveal au scroll (fondu + glissement doux à l'apparition) ──
+   Utilise @keyframes (animation) plutôt que `transition` : la card garde
+   ainsi sa propre transition de survol (hover) sans qu'elle soit écrasée. */
+.reveal { opacity: 0; transform: translateY(26px); }
 .reveal.is-visible {
-    opacity: 1;
-    transform: translateY(0);
+    animation: revealIn .6s cubic-bezier(.2,.7,.3,1) both;
+    animation-delay: var(--rd, 0ms);
 }
-@media (prefers-reduced-motion: reduce) {
-    .reveal {
-        opacity: 1;
-        transform: none;
-        transition: none;
-    }
+@keyframes revealIn {
+    from { opacity: 0; transform: translateY(26px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ════════════════════════════════════════════════════════════════
-   APPLICATION MOBILE — bandeau "bientôt sur Google Play"
+   MAIN CONTENT
 ════════════════════════════════════════════════════════════════ */
-.app-section {
-    background: linear-gradient(160deg, #100c31 0%, #1a1155 55%, #211368 100%);
-    border-radius: 24px;
-    margin: 0 24px 90px;
-    padding: 56px 48px;
-    position: relative; overflow: hidden;
-    display: flex; align-items: center; gap: 48px; flex-wrap: wrap;
-    box-shadow: 0 8px 48px rgba(139,92,246,.2), 0 0 0 1px rgba(255,255,255,.03) inset;
-}
-.app-section::before {
-    content: '';
-    position: absolute; right: -100px; top: -100px;
-    width: 420px; height: 420px;
-    background: radial-gradient(circle, rgba(139,92,246,.22) 0%, rgba(109,40,217,.08) 45%, transparent 70%);
-    pointer-events: none;
-}
-.app-section-text { flex: 1; min-width: 280px; position: relative; z-index: 1; }
-.app-section-text h2 {
-    font-family: var(--display);
-    font-size: clamp(24px, 3.2vw, 34px); font-weight: 700; color: #fff;
-    letter-spacing: -.5px; margin: 0 0 12px; line-height: 1.2;
-}
-.app-section-text h2 span { color: var(--indigo-lt); }
-.app-section-text p { font-size: 14.5px; color: rgba(255,255,255,.6); line-height: 1.7; margin: 0 0 26px; max-width: 460px; }
+.c-main { padding: 0 28px 60px; }
+#resultsRoot.is-loading { pointer-events: none; }
+.sec-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; }
+.sec-title { font-family: var(--display); font-size: 19px; font-weight: 700; color: var(--text); letter-spacing: -.3px; display: flex; align-items: center; gap: 8px; }
+.sec-title strong { color: var(--brand-dk); }
+.sec-link { font-size: 12.5px; font-weight: 700; color: var(--brand-dk); text-decoration: none; white-space: nowrap; }
+.sec-link:hover { text-decoration: underline; }
 
-.store-badge {
-    display: inline-flex; align-items: center; gap: 12px;
-    background: #0a0a1e; border: 1px solid rgba(255,255,255,.14);
-    border-radius: 12px; padding: 11px 20px 11px 16px;
-    position: relative; cursor: default; user-select: none;
+/* ── Filtres catégories (mobile) ── */
+.cats { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; -ms-overflow-style: none; }
+.cats::-webkit-scrollbar { display: none; }
+.cat-pill {
+    display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 50px; flex-shrink: 0;
+    font-size: 13px; font-weight: 600; font-family: var(--font); border: 1.5px solid var(--border); background: var(--surface);
+    color: var(--text-2); cursor: pointer; white-space: nowrap; text-decoration: none; transition: all .18s;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
 }
-.store-badge-ico { font-size: 24px; color: #a5b4fc; flex-shrink: 0; line-height: 1; }
-.store-badge-txt { display: flex; flex-direction: column; }
-.store-badge-sub { font-size: 10px; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: .6px; }
-.store-badge-title { font-size: 17px; font-weight: 700; color: #fff; font-family: var(--display); line-height: 1.25; }
-.store-badge-tag {
-    position: absolute; top: -9px; right: 14px;
-    background: var(--green); color: #fff; font-size: 10px; font-weight: 700;
-    padding: 2px 10px; border-radius: 20px; letter-spacing: .3px;
-    box-shadow: 0 2px 8px rgba(99,102,241,.5);
-}
+.cat-pill:hover { border-color: var(--brand); color: var(--brand-dk); background: var(--brand-mlt); transform: translateY(-1px); }
+.cat-pill.active { background: linear-gradient(135deg, var(--brand), var(--brand-dk)); color: #fff; border-color: var(--brand-dk); box-shadow: 0 4px 14px rgba(99,102,241,.35); transform: translateY(-1px); }
 
-.app-section-phone { flex: 0 0 260px; position: relative; z-index: 1; display: flex; justify-content: center; }
-@keyframes floatBox { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
-@media (prefers-reduced-motion: reduce) {
-    .pm-photo { animation: none !important; }
+/* ── Recommandés (scroll horizontal) ── */
+.reco-row-outer {
+    position: relative; padding: 2px 0 16px; overflow-x: auto; overflow-y: hidden;
+    -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity;
+    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
 }
-@media (max-width: 900px) {
-    .app-section { margin: 0 16px 60px; padding: 40px 28px; flex-direction: column; text-align: center; }
-    .app-section-text p { margin-left: auto; margin-right: auto; }
-    .store-badge { margin: 0 auto; }
-    .app-section-phone { flex-basis: auto; }
+.reco-row-outer::-webkit-scrollbar { height: 6px; }
+.reco-row-outer::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.reco-row { display: flex; gap: 16px; width: max-content; }
+.reco-card {
+    flex: 0 0 190px; width: 190px; scroll-snap-align: start;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden;
+    box-shadow: var(--shadow-sm); transition: box-shadow .2s, transform .2s, border-color .2s;
+    text-decoration: none; color: inherit; display: flex; flex-direction: column;
 }
+.reco-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); border-color: var(--brand-lt); }
+.reco-card-img { height: 130px; position: relative; overflow: hidden; flex-shrink: 0; background: var(--grey); display: flex; align-items: center; justify-content: center; }
+.reco-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+.reco-card:hover .reco-card-img img { transform: scale(1.07); }
+.reco-card-ph { font-size: 32px; opacity: .3; }
+.reco-card-badge { position: absolute; top: 8px; left: 8px; background: var(--brand); color: #fff; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 20px; display: inline-flex; align-items: center; gap: 3px; }
+.reco-card-body { padding: 11px 13px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.reco-card-shop { font-size: 10.5px; color: var(--muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.reco-card-name { font-size: 12.5px; font-weight: 700; color: var(--text); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.6em; }
+.reco-card-price-row { display: flex; align-items: baseline; gap: 6px; margin-top: auto; flex-wrap: wrap; }
+.reco-card-price { font-size: 14px; font-weight: 800; color: var(--brand-dk); font-family: var(--mono); }
+.reco-card-orig { font-size: 10.5px; color: var(--muted); text-decoration: line-through; font-family: var(--mono); }
+@media (max-width: 480px) { .reco-card { flex-basis: 152px; width: 152px; } .reco-card-img { height: 105px; } }
 
-/* ── Photo téléphone ── */
-.pm-wrap { position: relative; width: 250px; }
-.pm-glow {
-    position: absolute; inset: -30px; z-index: 0;
-    background: radial-gradient(ellipse at 50% 40%, rgba(139,92,246,.35) 0%, rgba(99,102,241,.14) 45%, transparent 72%);
-    pointer-events: none;
+/* ── Ventes flash ── */
+.flash-section {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--brand-dk) 55%, var(--brand) 100%);
+    border-radius: var(--r); padding: 20px 20px 22px; position: relative; overflow: hidden; margin-bottom: 32px;
+    animation: flashGlow 2.8s ease-in-out infinite;
 }
-.pm-photo {
-    position: relative; z-index: 1; width: 100%; display: block;
-    border-radius: 22px;
-    box-shadow: 0 26px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.08), 0 0 70px rgba(99,102,241,.2);
-    animation: floatBox 4.2s ease-in-out infinite;
+@keyframes flashGlow {
+    0%, 100% { box-shadow: 0 8px 28px rgba(79,70,229,.28); }
+    50%      { box-shadow: 0 8px 40px rgba(79,70,229,.5), 0 0 0 4px rgba(99,102,241,.14); }
 }
-
-/* ════════════════════════════════════════════════════════════════
-   SECTION COMMUNE
-════════════════════════════════════════════════════════════════ */
-.section { padding: 90px 24px; }
-.section-inner { max-width: 1100px; margin: 0 auto; }
-.section-badge {
-    display: inline-block;
-    background: var(--green-mlt); color: var(--green-dk);
-    border: 1px solid var(--green-lt);
-    font-size: 11px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 1px; padding: 4px 12px; border-radius: 20px;
-    margin-bottom: 14px;
-}
-.section-title {
-    font-family: var(--display);
-    font-size: clamp(28px, 4vw, 44px);
-    font-weight: 700; color: var(--text);
-    letter-spacing: -1px; margin: 0 0 12px;
-    line-height: 1.15;
-}
-.section-title span { color: var(--green); }
-.section-sub {
-    font-size: 16px; color: var(--text-2);
-    max-width: 520px; line-height: 1.7; margin: 0 0 48px;
-}
-
-
-/* ════════════════════════════════════════════════════════════════
-   COMMENT CA MARCHE — ÉTAPES
-════════════════════════════════════════════════════════════════ */
-.how-section { background: #f8fafc; }
-
-.steps-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0; position: relative;
-}
-.steps-grid::before {
-    content: '';
-    position: absolute; top: 40px; left: 10%; right: 10%;
-    height: 2px;
-    background: linear-gradient(90deg, var(--green-lt), #6366f1, var(--green-lt));
-    z-index: 0;
-}
-.step-item {
-    display: flex; flex-direction: column;
-    align-items: center; text-align: center;
-    padding: 0 16px; position: relative; z-index: 1;
-}
-.step-num {
-    width: 52px; height: 52px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; font-weight: 800; font-family: var(--mono);
-    background: linear-gradient(135deg,#6366f1,#8b5cf6); color: #fff;
-    box-shadow: 0 4px 16px rgba(99,102,241,.4);
-    margin-bottom: 18px;
-    border: 3px solid #fff;
-}
-.step-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
-.step-desc  { font-size: 12.5px; color: var(--text-2); line-height: 1.6; }
-
-/* ════════════════════════════════════════════════════════════════
-   BOUTIQUES EN LIGNE — VITRINE
-════════════════════════════════════════════════════════════════ */
-.shops-section { background: #fff; }
-
-.shops-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    margin-bottom: 36px;
-}
-.shop-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    overflow: hidden;
-    transition: all .25s;
-    text-decoration: none;
-    display: flex; flex-direction: column;
-    box-shadow: 0 2px 8px rgba(0,0,0,.04);
-}
-.shop-card:hover {
-    box-shadow: 0 16px 48px rgba(99,102,241,.12);
-    border-color: var(--green-lt);
-    transform: translateY(-6px);
-}
-.shop-img-wrap {
-    height: 180px; overflow: hidden;
-    background: linear-gradient(135deg, #eef2ff, #f5f3ff);
-    display: flex; align-items: center; justify-content: center;
-    position: relative;
-}
-.shop-img-wrap img {
-    width: 100%; height: 100%; object-fit: cover;
-    transition: transform .45s ease;
-}
-.shop-card:hover .shop-img-wrap img { transform: scale(1.07); }
-.shop-img-placeholder { font-size: 52px; opacity: .55; }
-.shop-img-wrap .shop-badge {
-    position: absolute; top: 12px; right: 12px;
-    background: rgba(99,102,241,.9); color: #fff;
-    font-size: 10px; font-weight: 700;
-    padding: 3px 10px; border-radius: 20px;
-    backdrop-filter: blur(4px);
-}
-.shop-info { padding: 18px 20px 20px; flex: 1; display: flex; flex-direction: column; }
-.shop-name { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 5px; line-height: 1.25; }
-.shop-meta { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
-.shop-cta {
-    margin-top: auto;
-    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    padding: 9px 18px; border-radius: 10px;
-    font-size: 13px; font-weight: 700;
-    background: var(--green-mlt); color: var(--green-dk);
-    border: 1.5px solid var(--green-lt);
-    transition: all .15s;
-}
-.shop-card:hover .shop-cta {
-    background: var(--green); color: #fff; border-color: var(--green-dk);
-}
-
-/* ════════════════════════════════════════════════════════════════
-   ENTREPRISES PARTENAIRES — VITRINE
-════════════════════════════════════════════════════════════════ */
-.companies-section { background: #f0f2ff; }
-
-.companies-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 24px; margin-bottom: 40px;
-}
-.company-card {
-    background: #fff;
-    border: 1px solid rgba(99,102,241,.1);
-    border-radius: 20px;
-    padding: 28px 24px 24px;
-    transition: all .25s cubic-bezier(.23,1,.32,1);
-    display: flex; flex-direction: column;
-    box-shadow: 0 2px 12px rgba(99,102,241,.06);
-    text-decoration: none; color: inherit;
-}
-.company-card:hover {
-    box-shadow: 0 20px 52px rgba(99,102,241,.15);
-    border-color: rgba(99,102,241,.3);
-    transform: translateY(-6px);
-}
-.company-card-head {
-    display: flex; align-items: center; gap: 14px;
-    margin-bottom: 18px;
-}
-.company-logo {
-    width: 54px; height: 54px; border-radius: 14px;
-    object-fit: cover; flex-shrink: 0;
-    border: 1px solid rgba(99,102,241,.12);
-}
-.company-logo-placeholder {
-    width: 54px; height: 54px; border-radius: 14px; flex-shrink: 0;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 19px; font-weight: 800; color: #fff; letter-spacing: -.5px;
-}
-.company-verified {
-    display: inline-flex; align-items: center; gap: 4px;
-    background: rgba(99,102,241,.09); color: #6366f1;
-    border: 1px solid rgba(99,102,241,.18);
-    border-radius: 20px; padding: 3px 9px;
-    font-size: 10px; font-weight: 700; letter-spacing: .3px;
-    white-space: nowrap;
-}
-.company-card-name {
-    font-size: 15px; font-weight: 700; color: #111827;
-    margin-bottom: 5px;
-}
-.company-card-desc {
-    font-size: 13.5px; color: #6b7280; line-height: 1.6;
-    margin-bottom: 18px; flex: 1;
-}
-.company-card-meta {
-    display: flex; flex-wrap: wrap; gap: 8px;
-    font-size: 12px; color: #9ca3af;
-    margin-bottom: 20px;
-}
-.company-card-meta span {
-    display: inline-flex; align-items: center; gap: 4px;
-}
-.company-card-cta {
+.flash-section::before { content: ''; position: absolute; right: -40px; top: -40px; width: 180px; height: 180px; border-radius: 50%; background: rgba(255,255,255,.08); pointer-events: none; }
+.flash-section-hd { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; position: relative; z-index: 1; flex-wrap: wrap; }
+.flash-section-title { font-family: var(--display); font-size: 18px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
+.flash-section-title .bolt { display: inline-block; animation: boltPulse 1.4s ease-in-out infinite; }
+@keyframes boltPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.25); } }
+.flash-section-sub { font-size: 12px; color: rgba(255,255,255,.85); font-weight: 600; }
+.flash-countdown {
     display: inline-flex; align-items: center; gap: 6px;
-    padding: 9px 16px; border-radius: 10px;
-    font-size: 13px; font-weight: 700;
-    background: rgba(99,102,241,.08); color: #6366f1;
-    border: 1.5px solid rgba(99,102,241,.18);
-    transition: all .15s; align-self: flex-start;
+    background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.2);
+    color: #fff; font-size: 12px; font-weight: 600; padding: 6px 13px; border-radius: 20px;
 }
-.company-card:hover .company-card-cta {
-    background: #6366f1; color: #fff; border-color: #6366f1;
+.flash-countdown strong { font-family: var(--mono); font-weight: 800; letter-spacing: .5px; }
+.flash-row-outer {
+    position: relative; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.4) transparent;
 }
+.flash-row-outer::-webkit-scrollbar { height: 6px; }
+.flash-row-outer::-webkit-scrollbar-thumb { background: rgba(255,255,255,.4); border-radius: 4px; }
+.flash-row { display: flex; gap: 14px; width: max-content; }
+.flash-card {
+    flex: 0 0 168px; width: 168px; scroll-snap-align: start;
+    background: var(--surface); border-radius: 14px; overflow: hidden; text-decoration: none; color: inherit;
+    display: flex; flex-direction: column; box-shadow: 0 4px 14px rgba(0,0,0,.18); transition: transform .2s;
+}
+.flash-card:hover { transform: translateY(-4px); }
+.flash-card-img { height: 112px; position: relative; background: var(--grey); overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.flash-card-img img { width: 100%; height: 100%; object-fit: cover; }
+.flash-card-ph { font-size: 28px; opacity: .3; }
+.flash-card-badge { position: absolute; top: 7px; left: 7px; background: var(--navy); color: #a5b4fc; font-size: 10.5px; font-weight: 800; padding: 3px 8px; border-radius: 20px; animation: badgePulse 1.9s ease-in-out infinite; }
+@keyframes badgePulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+.flash-card-body { padding: 9px 11px 11px; display: flex; flex-direction: column; gap: 3px; }
+.flash-card-shop { font-size: 10px; color: var(--muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.flash-card-name { font-size: 12px; font-weight: 700; color: var(--text); line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.4em; }
+.flash-card-price-row { display: flex; align-items: baseline; gap: 5px; flex-wrap: wrap; }
+.flash-card-price { font-size: 14px; font-weight: 800; color: var(--brand-dk); font-family: var(--mono); }
+.flash-card-orig { font-size: 10px; color: var(--muted); text-decoration: line-through; font-family: var(--mono); }
+@media (max-width: 480px) { .flash-card { flex-basis: 138px; width: 138px; } .flash-card-img { height: 92px; } }
 
-/* ════════════════════════════════════════════════════════════════
-   TÉMOIGNAGES / SOCIAL PROOF
-════════════════════════════════════════════════════════════════ */
-.proof-section {
-    background: linear-gradient(180deg, #eef0ff 0%, #f4f6ff 50%, #f8fafc 100%);
-    padding: 100px 24px 96px;
+/* ── Grille produits (catalogue complet) ── */
+.prod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
+.prod-card {
     position: relative;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden;
+    box-shadow: var(--shadow-sm); transition: box-shadow .2s, transform .2s, border-color .2s;
+    text-decoration: none; color: inherit; display: flex; flex-direction: column;
 }
-.proof-section::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, transparent 5%, rgba(99,102,241,.35) 40%, rgba(139,92,246,.35) 60%, transparent 95%);
+.prod-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); border-color: var(--brand-lt); }
+.prod-card-img { height: 150px; position: relative; overflow: hidden; flex-shrink: 0; background: var(--grey); display: flex; align-items: center; justify-content: center; }
+.prod-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+.prod-card:hover .prod-card-img img { transform: scale(1.06); }
+.prod-card-ph { font-size: 36px; opacity: .3; }
+.prod-card-badge { position: absolute; top: 8px; left: 8px; font-size: 10px; font-weight: 800; color: #fff; padding: 3px 9px; border-radius: 20px; display: inline-flex; align-items: center; gap: 3px; }
+.prod-card-body { padding: 11px 13px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.prod-card-name { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.prod-card-shop { font-size: 11px; color: var(--muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prod-card-cat { font-size: 10.5px; color: var(--brand-dk); font-weight: 700; }
+.prod-card-footer { padding: 10px 13px 13px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid var(--grey-2); margin-top: auto; }
+.prod-card-price { font-size: 14.5px; font-weight: 800; color: var(--brand-dk); font-family: var(--mono); }
+.prod-card-orig { font-size: 10.5px; color: var(--muted); text-decoration: line-through; margin-left: 3px; font-family: var(--mono); }
+.prod-card-cta {
+    font-size: 11.5px; font-weight: 700; color: #fff; background: var(--brand); border: none; border-radius: 50px;
+    padding: 7px 14px; cursor: pointer; text-decoration: none; white-space: nowrap; transition: background .15s;
 }
+.prod-card-cta:hover { background: var(--brand-dk); color: #fff; }
+.prod-card-cta.out { background: var(--grey-2); color: var(--muted); cursor: not-allowed; }
 
-.proof-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 24px; max-width: 1100px; margin: 0 auto;
-}
-.proof-card {
-    background: #fff;
-    border: 1px solid rgba(99,102,241,.1);
-    border-radius: 20px;
-    padding: 34px 28px;
-    box-shadow: 0 4px 20px rgba(99,102,241,.07), 0 1px 4px rgba(0,0,0,.04);
-    transition: all .25s cubic-bezier(.23,1,.32,1);
-    position: relative; overflow: hidden;
-}
-.proof-card::before {
-    content: '\201C';
-    position: absolute; top: 12px; right: 20px;
-    font-size: 88px; line-height: 1; font-family: Georgia, 'Times New Roman', serif;
-    color: rgba(99,102,241,.07); pointer-events: none; user-select: none;
-}
-.proof-card::after {
-    content: '';
-    position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
-    background: linear-gradient(90deg, #6366f1, #8b5cf6);
-    opacity: 0; transition: opacity .25s;
-}
-.proof-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 20px 56px rgba(99,102,241,.14), 0 4px 16px rgba(0,0,0,.06);
-    border-color: rgba(99,102,241,.25);
-}
-.proof-card:hover::after { opacity: 1; }
-.proof-stars { color: #f59e0b; font-size: 14px; margin-bottom: 18px; letter-spacing: 3px; }
-.proof-text {
-    font-size: 14.5px; color: #374151;
-    line-height: 1.72; margin-bottom: 24px; font-style: italic;
-    position: relative; z-index: 1;
-}
-.proof-author { display: flex; align-items: center; gap: 12px; }
-.proof-av {
-    width: 44px; height: 44px; border-radius: 50%;
+/* ── Bouton favoris (♥) sur la carte produit ── */
+.prod-card-fav {
+    position: absolute; top: 8px; right: 8px; z-index: 2;
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+    background: rgba(255,255,255,.92); border: 1px solid var(--border);
     display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 800; color: #fff; flex-shrink: 0;
-    box-shadow: 0 3px 12px rgba(0,0,0,.2);
+    color: var(--muted); cursor: pointer; text-decoration: none;
+    transition: all .15s; backdrop-filter: blur(4px);
 }
-.proof-name  { font-size: 14px; font-weight: 700; color: #111827; }
-.proof-role  { font-size: 12px; color: #6b7280; margin-top: 2px; }
+.prod-card-fav:hover { color: #e11d48; border-color: #fecdd3; transform: scale(1.08); }
+.prod-card-fav.is-fav { color: #e11d48; border-color: #fecdd3; background: #fff1f2; }
+.prod-card-fav.is-fav svg { fill: currentColor; }
+.prod-card-fav.is-busy { opacity: .55; pointer-events: none; }
+
+/* ── Note moyenne de la boutique (étoiles, à partir des avis réels) ── */
+.prod-card-rating { display: flex; align-items: center; gap: 4px; }
+.prod-card-rating span { font-size: 10.5px; font-weight: 700; color: var(--text-2); }
+.prod-card-sold { display: flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 700; color: #b45309; }
+.star-ico.is-filled { color: #f59e0b; }
+.star-ico.is-empty { color: #d9dee6; }
+
+/* ── Rangées "Populaire en ..." (cartes produit en scroll horizontal) ── */
+.cat-group-row { display: flex; gap: 16px; width: max-content; }
+.prod-card--row { flex: 0 0 190px; width: 190px; }
+@media (max-width: 480px) { .prod-card--row { flex-basis: 158px; width: 158px; } }
+
+/* ── Bannière promo (boutiques vérifiées), façon bloc pub Jumia ── */
+.promo-banner {
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    background: linear-gradient(120deg, var(--brand-mlt) 0%, #f5f3ff 100%);
+    border: 1px solid var(--brand-lt); border-radius: var(--r);
+    padding: 20px 24px; margin-bottom: 32px; text-decoration: none; color: inherit;
+    transition: box-shadow .2s, transform .2s, border-color .2s;
+}
+.promo-banner:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); border-color: var(--brand); }
+.promo-banner-ico {
+    width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+    background: #fff; color: var(--brand-dk);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow-sm);
+}
+.promo-banner-body { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 200px; }
+.promo-banner-title { font-family: var(--display); font-size: 15.5px; font-weight: 700; color: var(--text); }
+.promo-banner-sub { font-size: 12.5px; color: var(--text-2); line-height: 1.5; }
+.promo-banner-cta {
+    display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;
+    background: var(--brand); color: #fff; font-size: 12.5px; font-weight: 700;
+    padding: 9px 16px; border-radius: 50px; white-space: nowrap;
+}
+
+.c-empty { grid-column: 1/-1; padding: 72px 20px; text-align: center; background: var(--surface); border-radius: var(--r); border: 1px dashed var(--border); }
+.c-empty-ico { font-size: 52px; display: block; opacity: .3; margin-bottom: 14px; }
+.c-empty-title { font-family: var(--display); font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.c-empty-sub { font-size: 13.5px; color: var(--muted); }
+.c-pagination { display: flex; justify-content: center; padding: 24px 0 8px; }
+.c-pagination .pagination { gap: 4px; }
+.c-pagination .page-link { color: var(--text-2); border-color: var(--border); border-radius: 8px; font-size: 13px; }
+.c-pagination .page-item.active .page-link { background: var(--brand); border-color: var(--brand-dk); color: #fff; }
+.c-pagination .page-link:hover { color: var(--brand-dk); border-color: var(--brand-lt); background: var(--brand-mlt); }
+.count-line { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+.reset-link { display: inline-flex; align-items: center; gap: 3px; color: var(--brand-dk); font-weight: 700; text-decoration: none; }
+.reset-link:hover { text-decoration: underline; }
+
+/* ── Bandeau "résultats de recherche" (façon Jumia) ── */
+.search-banner {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: var(--brand-mlt); border: 1px solid var(--brand-lt); color: var(--brand-dk);
+    padding: 13px 18px; border-radius: var(--r-sm); margin-bottom: 20px;
+    font-size: 13.5px; font-weight: 600;
+}
+.search-banner strong { color: var(--brand-dk); }
+.search-banner-clear {
+    margin-left: auto; display: inline-flex; align-items: center; gap: 4px;
+    background: #fff; border: 1px solid var(--brand-lt); color: var(--brand-dk);
+    padding: 6px 13px; border-radius: 20px; font-size: 12px; font-weight: 700;
+    text-decoration: none; transition: all .15s; flex-shrink: 0;
+}
+.search-banner-clear:hover { background: var(--brand); color: #fff; border-color: var(--brand-dk); }
 
 /* ════════════════════════════════════════════════════════════════
-   PRIX / PLANS
+   BANDEAU DE CONFIANCE
 ════════════════════════════════════════════════════════════════ */
-.pricing-section { background: #f8fafc; }
-
-.pricing-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+.trust-strip {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    margin: 0 28px 24px;
 }
-.pricing-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--r);
-    padding: 30px 26px;
-    position: relative; overflow: hidden;
-    transition: all .2s;
+.trust-item {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-sm);
+    padding: 12px 14px; box-shadow: var(--shadow-sm);
 }
-.pricing-card.popular {
-    border-color: var(--green);
-    box-shadow: 0 0 0 2px rgba(16,185,129,.15), 0 8px 32px rgba(16,185,129,.12);
+.trust-ico {
+    width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+    background: var(--brand-mlt); color: var(--brand-dk);
+    display: flex; align-items: center; justify-content: center;
 }
-.pricing-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 36px rgba(0,0,0,.08);
-}
-.pricing-popular-badge {
-    position: absolute; top: 16px; right: -24px;
-    background: var(--green); color: #fff;
-    font-size: 10px; font-weight: 700; letter-spacing: .5px;
-    padding: 4px 32px; transform: rotate(45deg);
-    transform-origin: top right;
-}
-.pricing-name  { font-size: 13px; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-.pricing-price { font-size: 36px; font-weight: 800; color: var(--text); font-family: var(--mono); letter-spacing: -1px; }
-.pricing-price span { font-size: 15px; font-weight: 500; color: var(--muted); }
-.pricing-desc  { font-size: 13px; color: var(--text-2); margin: 10px 0 20px; }
-.pricing-features { list-style: none; padding: 0; margin: 0 0 24px; display: flex; flex-direction: column; gap: 10px; }
-.pricing-features li {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 13px; color: var(--text-2);
-}
-.pricing-features li::before {
-    content: '✓'; color: var(--green);
-    font-weight: 700; font-size: 13px; flex-shrink: 0;
-}
-/* Fonctionnalité non incluse dans ce plan : coche grisée au lieu de opacity
-   (l'opacité seule fait chuter le contraste texte sous le seuil d'accessibilité) */
-.pricing-features li[style*="line-through"]::before {
-    content: '✕'; color: #9ca3af;
-}
-.pricing-btn {
-    display: block; width: 100%; text-align: center;
-    padding: 12px; border-radius: var(--r-sm);
-    font-size: 13.5px; font-weight: 700; font-family: var(--font);
-    text-decoration: none; transition: all .15s;
-}
-.pricing-btn-outline {
-    border: 1.5px solid var(--border);
-    color: var(--text-2); background: transparent;
-}
-.pricing-btn-outline:hover { border-color: var(--green); color: var(--green); }
-.pricing-btn-filled {
-    background: var(--green); color: #fff; border: none;
-    box-shadow: 0 4px 14px rgba(16,185,129,.3);
-}
-.pricing-btn-filled:hover { background: var(--green-dk); color: #fff; }
+.trust-txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.trust-txt strong { font-size: 12px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.trust-txt span { font-size: 10.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* ════════════════════════════════════════════════════════════════
-   CTA CLIENT — COMMANDER DANS LES BOUTIQUES
+   TÉMOIGNAGES CLIENTS
 ════════════════════════════════════════════════════════════════ */
-.client-cta {
-    background: linear-gradient(160deg, #100c31 0%, #1a1155 55%, #211368 100%);
-    border: 1px solid rgba(139,92,246,.25);
-    border-radius: 24px;
-    padding: 56px 48px 0;
-    display: flex; flex-direction: column; gap: 0;
-    position: relative; overflow: hidden;
-    margin: 0 24px;
-    box-shadow: 0 8px 48px rgba(139,92,246,.2), 0 0 0 1px rgba(255,255,255,.03) inset;
+.testi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-top: 8px; }
+.testi-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--r);
+    padding: 20px 22px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 12px;
 }
-.client-cta::before {
-    content: '';
-    position: absolute; right: -100px; top: -100px;
-    width: 420px; height: 420px;
-    background: radial-gradient(circle, rgba(139,92,246,.22) 0%, rgba(109,40,217,.08) 45%, transparent 70%);
-    pointer-events: none;
+.testi-stars { display: flex; gap: 2px; }
+.testi-text { font-size: 13px; color: var(--text-2); line-height: 1.6; font-style: italic; margin: 0; flex: 1; }
+.testi-author { display: flex; align-items: center; gap: 10px; }
+.testi-avatar {
+    width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--brand), var(--brand-dk)); color: #fff;
+    font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center;
 }
-.client-cta::after {
-    content: '';
-    position: absolute; left: -60px; bottom: 30%;
-    width: 260px; height: 260px;
-    background: radial-gradient(circle, rgba(167,139,250,.12) 0%, transparent 65%);
-    pointer-events: none;
-}
-.client-cta-top {
-    display: flex; align-items: center;
-    justify-content: space-between; gap: 32px;
-    flex-wrap: wrap; position: relative; z-index: 1;
-    padding-bottom: 44px;
-}
-.client-cta-txt h2 {
-    font-family: var(--display);
-    font-size: 30px; font-weight: 700; color: #fff;
-    letter-spacing: -.5px; margin: 0 0 8px;
-}
-.client-cta-txt p { font-size: 14.5px; color: rgba(255,255,255,.55); margin: 0; }
-.client-cta-actions { display: flex; gap: 12px; flex-shrink: 0; flex-wrap: wrap; }
-
-/* Mockup dashboard client */
-.cl-dash-scene {
-    position: relative; z-index: 1;
-    margin: 0 -48px;
-}
-.cl-dash-glow {
-    position: absolute; inset: -60px;
-    background: radial-gradient(ellipse at 50% 0%,
-        rgba(139,92,246,.5) 0%, rgba(99,102,241,.22) 35%, transparent 65%);
-    pointer-events: none; z-index: 0;
-}
-.cl-dash-grid {
-    position: absolute; inset: 0; pointer-events: none; z-index: 0;
-    background-image:
-        linear-gradient(rgba(139,92,246,.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(139,92,246,.07) 1px, transparent 1px);
-    background-size: 36px 36px;
-    mask-image: linear-gradient(to bottom, rgba(0,0,0,.6) 0%, transparent 70%);
-    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.6) 0%, transparent 70%);
-}
-.cl-dash-frame {
-    position: relative; z-index: 1;
-    background: #0d0a25;
-    border-radius: 12px 12px 0 0;
-    border: 1px solid rgba(139,92,246,.4);
-    border-bottom: none;
-    box-shadow: 0 -8px 48px rgba(139,92,246,.35), 0 0 0 1px rgba(255,255,255,.04) inset;
-    overflow: hidden;
-    margin: 20px 20px 0;
-}
-.cl-dash-bar {
-    height: 36px;
-    background: linear-gradient(90deg, #0a0820, #0d0b28);
-    border-bottom: 1px solid rgba(255,255,255,.07);
-    display: flex; align-items: center;
-    padding: 0 16px; gap: 7px;
-}
-.cl-url-pill {
-    flex: 1; max-width: 220px; margin: 0 12px;
-    background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
-    border-radius: 6px; height: 22px;
-    display: flex; align-items: center; padding: 0 10px;
-    font-size: 10px; color: rgba(255,255,255,.28); font-family: monospace;
-    gap: 5px; letter-spacing: .2px;
-}
-.cl-dash-frame img {
-    width: 100%; display: block;
-    mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-}
+.testi-author-body { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.testi-author-name { font-size: 12.5px; font-weight: 700; color: var(--text); }
+.testi-author-sub { font-size: 11px; color: var(--muted); }
 
 /* ════════════════════════════════════════════════════════════════
-   CTA ENTREPRISE DE LIVRAISON
+   RETOUR EN HAUT
 ════════════════════════════════════════════════════════════════ */
-.company-cta {
-    background: linear-gradient(160deg, #07071c 0%, #0e0e38 55%, #12103e 100%);
-    border: 1px solid rgba(99,102,241,.22);
-    border-radius: 24px;
-    padding: 56px 48px 0;
-    display: flex; flex-direction: column; gap: 0;
-    position: relative; overflow: hidden;
-    margin: 0 24px;
-    box-shadow: 0 8px 48px rgba(99,102,241,.18), 0 0 0 1px rgba(255,255,255,.03) inset;
+.back-to-top {
+    position: fixed; right: 20px; bottom: 20px; z-index: 150;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--brand); color: #fff; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 20px rgba(99,102,241,.4);
+    opacity: 0; visibility: hidden; transform: translateY(10px);
+    transition: opacity .25s, transform .25s, visibility 0s linear .25s, background .15s;
 }
-.company-cta::before {
-    content: '';
-    position: absolute; right: -100px; top: -100px;
-    width: 420px; height: 420px;
-    background: radial-gradient(circle, rgba(99,102,241,.22) 0%, rgba(139,92,246,.1) 45%, transparent 70%);
-    pointer-events: none;
-}
-.company-cta::after {
-    content: '';
-    position: absolute; left: -60px; bottom: 30%;
-    width: 260px; height: 260px;
-    background: radial-gradient(circle, rgba(139,92,246,.14) 0%, transparent 65%);
-    pointer-events: none;
-}
-.company-cta-top {
-    display: flex; align-items: center;
-    justify-content: space-between; gap: 32px;
-    flex-wrap: wrap; position: relative; z-index: 1;
-    padding-bottom: 44px;
-}
-.company-cta-txt h2 {
-    font-family: var(--display);
-    font-size: 30px; font-weight: 700; color: #fff;
-    letter-spacing: -.5px; margin: 0 0 8px;
-}
-.company-cta-txt p { font-size: 14.5px; color: rgba(255,255,255,.55); margin: 0; }
-.company-cta-actions { display: flex; gap: 12px; flex-shrink: 0; flex-wrap: wrap; }
-
-/* ── Screenshot dashboard ── */
-.cta-dash-scene {
-    position: relative; z-index: 1;
-    margin: 0 -48px;
-}
-.cta-dash-glow {
-    position: absolute; inset: -60px;
-    background: radial-gradient(ellipse at 50% 0%,
-        rgba(99,102,241,.5) 0%, rgba(139,92,246,.22) 35%, transparent 65%);
-    pointer-events: none; z-index: 0;
-}
-.cta-dash-grid {
-    position: absolute; inset: 0; pointer-events: none; z-index: 0;
-    background-image:
-        linear-gradient(rgba(99,102,241,.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(99,102,241,.07) 1px, transparent 1px);
-    background-size: 36px 36px;
-    mask-image: linear-gradient(to bottom, rgba(0,0,0,.6) 0%, transparent 70%);
-    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.6) 0%, transparent 70%);
-}
-.cta-dash-frame {
-    position: relative; z-index: 1;
-    background: #090d1f;
-    border-radius: 12px 12px 0 0;
-    border: 1px solid rgba(99,102,241,.4);
-    border-bottom: none;
-    box-shadow: 0 -8px 48px rgba(99,102,241,.35), 0 0 0 1px rgba(255,255,255,.04) inset;
-    overflow: hidden;
-    margin: 20px 20px 0;
-}
-.cta-dash-bar {
-    height: 36px;
-    background: linear-gradient(90deg, #0a0d20, #0d1128);
-    border-bottom: 1px solid rgba(255,255,255,.07);
-    display: flex; align-items: center;
-    padding: 0 16px; gap: 7px;
-}
-.cta-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
-.cta-url-pill {
-    flex: 1; max-width: 220px; margin: 0 12px;
-    background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
-    border-radius: 6px; height: 22px;
-    display: flex; align-items: center; padding: 0 10px;
-    font-size: 10px; color: rgba(255,255,255,.28); font-family: monospace;
-    gap: 5px; letter-spacing: .2px;
-}
-.cta-dash-frame img {
-    width: 100%; display: block;
-    mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-}
+.back-to-top.is-visible { opacity: 1; visibility: visible; transform: translateY(0); transition: opacity .25s, transform .25s, background .15s; }
+.back-to-top:hover { background: var(--brand-dk); }
 
 /* ════════════════════════════════════════════════════════════════
-   FAQ
+   SQUELETTE DE CHARGEMENT (recherche en direct)
 ════════════════════════════════════════════════════════════════ */
-.faq-section { background: #fff; }
-.faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.faq-item {
-    background: #f8fafc;
-    border: 1px solid var(--border);
-    border-radius: var(--r-sm);
-    padding: 20px 22px;
-    cursor: pointer;
-    transition: border-color .15s;
+.skeleton-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
+.skeleton-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.skeleton-block {
+    background: linear-gradient(90deg, var(--grey-2) 25%, #f3f4f8 37%, var(--grey-2) 63%);
+    background-size: 400% 100%; animation: skeletonShimmer 1.4s ease infinite;
 }
-.faq-item:hover { border-color: var(--green-lt); }
-.faq-q {
-    font-size: 14px; font-weight: 600; color: var(--text);
-    display: flex; justify-content: space-between; align-items: center;
-    gap: 12px; user-select: none;
-}
-.faq-q .arrow {
-    font-size: 18px; color: var(--muted);
-    transition: transform .2s; flex-shrink: 0;
-}
-.faq-item.open .faq-q .arrow { transform: rotate(45deg); color: var(--green); }
-.faq-a {
-    font-size: 13px; color: var(--text-2); line-height: 1.65;
-    margin-top: 12px; display: none;
-}
-.faq-item.open .faq-a { display: block; }
+.skeleton-card .skeleton-block.img { height: 150px; }
+.skeleton-card .skeleton-body { padding: 11px 13px; display: flex; flex-direction: column; gap: 8px; }
+.skeleton-card .skeleton-block.line { height: 11px; border-radius: 4px; }
+.skeleton-card .skeleton-block.line.w-70 { width: 70%; }
+.skeleton-card .skeleton-block.line.w-40 { width: 40%; }
+@keyframes skeletonShimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+@media (prefers-reduced-motion: reduce) { .skeleton-block { animation: none; } }
 
 /* ════════════════════════════════════════════════════════════════
    FOOTER
 ════════════════════════════════════════════════════════════════ */
-.site-footer {
-    background: var(--dark);
-    padding: 48px 40px 28px;
-    color: rgba(255,255,255,.45);
-}
-.footer-inner {
-    max-width: 1100px; margin: 0 auto;
-    display: flex; justify-content: space-between;
-    align-items: flex-start; gap: 32px; flex-wrap: wrap;
-    margin-bottom: 32px;
-}
-.footer-brand { max-width: 260px; }
-.footer-logo {
-    display: flex; align-items: center; gap: 9px;
-    font-size: 16px; font-weight: 700; color: #fff;
-    text-decoration: none; margin-bottom: 10px;
-}
-.footer-logo-ico {
-    width: 30px; height: 30px; border-radius: 7px;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px;
-}
-.footer-desc { font-size: 12.5px; line-height: 1.65; }
-.footer-col h3 {
-    font-size: 12px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 1px; color: rgba(255,255,255,.6);
-    margin: 0 0 14px;
-}
-.footer-col a {
-    display: block; font-size: 13px; color: rgba(255,255,255,.4);
-    text-decoration: none; margin-bottom: 8px; transition: color .15s;
-}
-.footer-col a:hover { color: rgba(255,255,255,.8); }
-.footer-bottom {
-    max-width: 1100px; margin: 0 auto;
-    padding-top: 20px; border-top: 1px solid rgba(255,255,255,.06);
-    display: flex; align-items: center; justify-content: space-between;
-    font-size: 12px; flex-wrap: wrap; gap: 8px;
-}
-
-/* Perspective moins agressive pour éviter le flou */
-.hero-mockup-outer {
-    transform: perspective(2400px) rotateX(2deg);
-}
-.hero-mockup-outer:hover { transform: perspective(2400px) rotateX(0deg); }
+.w-footer { background: var(--navy); padding: 48px 28px 24px; color: rgba(255,255,255,.5); margin-top: 24px; }
+.w-footer-inner { max-width: 1320px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-start; gap: 28px; flex-wrap: wrap; margin-bottom: 30px; }
+.w-footer-brand { max-width: 280px; }
+.w-footer-logo { display: flex; align-items: center; gap: 9px; font-family: var(--display); font-size: 17px; font-weight: 700; color: #fff; text-decoration: none; margin-bottom: 10px; }
+.w-footer-logo img { width: 32px; height: 32px; object-fit: cover; border-radius: 8px; }
+.w-footer-desc { font-size: 12.5px; line-height: 1.65; }
+.w-footer-col h4 { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,.7); margin: 0 0 14px; }
+.w-footer-col a { display: block; font-size: 13px; color: rgba(255,255,255,.5); text-decoration: none; margin-bottom: 8px; transition: color .15s; }
+.w-footer-col a:hover { color: #fff; }
+.w-footer-bottom { max-width: 1320px; margin: 0 auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; justify-content: space-between; font-size: 12px; flex-wrap: wrap; gap: 8px; }
 
 /* ════════════════════════════════════════════════════════════════
-   HAMBURGER MOBILE
+   RESPONSIVE — ultra adaptatif, du petit téléphone au très grand écran
 ════════════════════════════════════════════════════════════════ */
-.nav-hamburger {
-    display: none; flex-direction: column; gap: 5px;
-    cursor: pointer; padding: 6px; border: none; background: none;
-}
-.nav-hamburger span {
-    display: block; width: 22px; height: 2px;
-    background: rgba(255,255,255,.8); border-radius: 2px;
-    transition: transform .25s, opacity .25s;
-}
-.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.nav-hamburger.open span:nth-child(2) { opacity: 0; }
-.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-.nav-mobile-menu {
-    display: none; position: fixed;
-    top: 64px; left: 0; right: 0; z-index: 99;
-    background: rgba(10,10,30,.97);
-    backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(99,102,241,.12);
-    padding: 16px 20px 24px;
-    flex-direction: column; gap: 6px;
+/* ── Très grands écrans : on centre le contenu pour éviter les lignes
+      trop étirées (bannière géante, cartes trop larges) ── */
+@media (min-width: 1680px) {
+    .home-top, .c-main { max-width: 1680px; margin-left: auto; margin-right: auto; }
 }
-.nav-mobile-menu.open { display: flex; }
-.nav-mobile-link {
-    display: block; padding: 11px 14px; border-radius: 10px;
-    font-size: 15px; font-weight: 600; color: rgba(255,255,255,.75);
-    text-decoration: none; transition: background .15s, color .15s;
+@media (min-width: 1400px) {
+    .prod-grid { grid-template-columns: repeat(6, 1fr); }
 }
-.nav-mobile-link:hover { background: rgba(255,255,255,.08); color: #fff; }
-.nav-mobile-divider { height: 1px; background: rgba(255,255,255,.07); margin: 8px 0; }
-.nav-mobile-btn {
-    display: block; padding: 13px; border-radius: 10px;
-    font-size: 15px; font-weight: 700; text-align: center;
-    text-decoration: none; margin-top: 4px;
+@media (min-width: 1100px) and (max-width: 1399px) {
+    .prod-grid { grid-template-columns: repeat(5, 1fr); }
 }
-.nav-mobile-btn-outline {
-    border: 1.5px solid rgba(255,255,255,.2); color: rgba(255,255,255,.8);
-    background: transparent;
-}
-.nav-mobile-btn-green {
-    background: linear-gradient(135deg,#6366f1,#4f46e5); color: #fff;
+@media (min-width: 961px) and (max-width: 1099px) {
+    .prod-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
-/* ════════════════════════════════════════════════════════════════
-   RESPONSIVE — TABLET (≤ 1024px)
-════════════════════════════════════════════════════════════════ */
-@media (max-width: 1024px) {
-    .hero-mockup { padding: 0 12px; }
-    .pricing-grid { grid-template-columns: repeat(2,1fr); }
-    .company-cta  { padding: 44px 32px 0; }
-    .cta-dash-scene { margin: 0 -32px; }
-    .cta-dash-frame { margin: 16px 16px 0; }
+/* ── Cartes latérales (aide/vendre/boutiques) : dès que la place manque pour
+      les garder en colonne à droite, elles passent en bandeau horizontal
+      sous le carrousel au lieu de disparaître — restent visibles partout,
+      y compris sur mobile. ── */
+@media (max-width: 1200px) {
+    .home-top { flex-wrap: wrap; }
+    .side-cards { flex: 1 1 100%; flex-direction: row; }
+    .side-card { flex: 1; min-width: 0; }
 }
 
-/* ════════════════════════════════════════════════════════════════
-   RESPONSIVE — TABLETTE (≤ 900px)
-════════════════════════════════════════════════════════════════ */
-@media (max-width: 900px) {
-    /* Navbar */
-    .top-nav { padding: 0 20px; }
+/* ── Petit desktop / grande tablette : sidebar plus étroite ── */
+@media (max-width: 1080px) {
+    .cat-sidebar { flex-basis: 200px; }
+}
+
+/* ── Tablette : nav condensée, sidebar catégories remplacée par les
+      pills + le menu mobile (assez de place pour un confort tactile) ── */
+@media (max-width: 960px) {
     .nav-links { display: none; }
-    .nav-logo-img { width: 36px; height: 36px; }
-    .nav-brand-name { font-size: 16px; }
-    .nav-hamburger { display: flex; }
-
-    /* Hero */
-    .hero-section { padding: 88px 20px 60px; }
-    .hero-stats { gap: 24px; flex-wrap: wrap; }
-
-    /* Mockup */
-    .mockup-float { display: none; }
-    .hero-mockup  { padding: 0 8px; margin-top: 48px; }
-    .hero-mockup::after { display: none; }
-    .hero-mockup-outer { transform: none !important; }
-
-    /* Grilles */
-
-    .steps-grid    { grid-template-columns: repeat(2,1fr); gap: 36px 20px; }
-    .steps-grid::before { display: none; }
-    .shops-grid     { grid-template-columns: repeat(2,1fr); gap: 16px; }
-    .companies-grid { grid-template-columns: repeat(2,1fr); gap: 16px; }
-    .proof-grid     { grid-template-columns: repeat(2,1fr); gap: 16px; }
-    .proof-section  { padding: 80px 20px 72px; }
-    .pricing-grid  { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
-    .faq-grid      { grid-template-columns: 1fr; }
-
-    /* Sections */
-    .section { padding: 60px 20px; }
-    .section-sub { margin-bottom: 32px; }
-
-    /* CTA client */
-    .client-cta { margin: 0; padding: 36px 28px 0; border-radius: 16px; }
-    .client-cta-top { align-items: flex-start; }
-    .cl-dash-scene { margin: 0 -28px; }
-    .cl-dash-frame { margin: 14px 14px 0; }
-    /* CTA entreprise */
-    .company-cta { margin: 0; padding: 36px 28px 0; border-radius: 16px; }
-    .company-cta-top { align-items: flex-start; }
-    .cta-dash-scene { margin: 0 -28px; }
-    .cta-dash-frame { margin: 14px 14px 0; }
-
-    /* Footer */
-    .footer-inner { gap: 24px; }
-    .site-footer  { padding: 40px 24px 24px; }
+    .nav-hamburger { display: flex; padding: 9px; }
+    .mobile-bar { display: flex; }
+    .nav > .nav-search { display: none; } /* seule la barre de la nav desktop est cachée — pas celle de .mobile-bar (même classe) */
+    .cat-sidebar { display: none; }
+    .home-top { margin: 14px 16px; }
+    .hero { padding: 26px 24px; }
+    .hero-carousel { min-height: 280px; }
+    .prod-grid { grid-template-columns: repeat(3, 1fr); }
+    .trust-strip { grid-template-columns: repeat(2, 1fr); margin: 0 16px 20px; }
 }
 
-/* ════════════════════════════════════════════════════════════════
-   RESPONSIVE — MOBILE (≤ 640px)
-════════════════════════════════════════════════════════════════ */
+/* ── Tablette portrait / phablette ── */
+@media (max-width: 760px) {
+    .prod-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+}
+
+/* ── Mobile ── */
 @media (max-width: 640px) {
-    /* Hero : compresser le padding vertical, coller l'image aux bords */
-    .hero-section {
-        padding: 76px 16px 0;
-        min-height: auto;
-    }
-    .hero-badge   { font-size: 11px; padding: 5px 12px; margin-bottom: 18px; }
-    .hero-title   { letter-spacing: -1px; margin-bottom: 14px; }
-    .hero-sub     { font-size: 14.5px; margin-bottom: 28px; }
-    .hero-cta     { flex-direction: column; align-items: stretch; width: 100%; gap: 9px; }
-    .cta-btn      { justify-content: center; padding: 14px 20px; font-size: 14px; }
+    .nav { padding: 0 12px; gap: 8px; height: 56px; }
+    :root { --nav-h: 56px; }
+    .nav-logo img { height: 30px; width: 30px; }
+    .nav-logo { font-size: 16.5px; }
+    .nav-orders-btn svg + span { display: none; } /* cache le libellé texte seulement quand il y a une icône avant (ex: "Mes commandes") — pas "Connexion" qui n'a pas d'icône */
+    .nav-orders-btn, .nav-btn-primary { padding: 8px 12px; font-size: 12px; }
+    .nav-hamburger { min-width: 40px; min-height: 40px; justify-content: center; align-items: center; }
 
-    /* Stats : horizontaux sur 2 colonnes */
-    .hero-stats   { gap: 0; margin-top: 32px; width: 100%; display: grid; grid-template-columns: 1fr 1fr 1fr; }
-    .hero-stat-sep { display: none; }
-    .hero-stat    { padding: 14px 8px; border-top: 1px solid rgba(255,255,255,.08); }
-    .hero-stat-val { font-size: 20px; }
-    .hero-stat-lbl { font-size: 10.5px; }
+    .mobile-bar { padding: 8px 12px; }
+    .home-top { margin: 12px 12px; }
+    .trust-strip { grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 12px 18px; }
+    .trust-item { padding: 10px 11px; }
+    .back-to-top { right: 14px; bottom: 14px; width: 40px; height: 40px; }
+    .side-cards { flex-direction: column; gap: 10px; }
+    .side-card { padding: 12px 14px; }
+    .hero-carousel { min-height: 336px; border-radius: 12px; }
+    .hero-dots { bottom: 10px; }
+    .hero { padding: 22px 18px; border-radius: 12px; }
+    .hero-badge { font-size: 10.5px; padding: 4px 11px; }
+    .sec-title { font-size: 16px; }
+    .hero-title { font-size: 21px; }
+    .hero-sub { font-size: 12.5px; margin-bottom: 18px; }
+    .hero-btns { gap: 8px; flex-direction: column; align-items: stretch; }
+    .hero-btn-primary, .hero-btn-secondary { padding: 12px 18px; font-size: 13px; justify-content: center; }
 
-    /* Mockup : plein bord, pas de padding latéral superflu */
-    .hero-mockup {
-        padding: 0;
-        margin-top: 28px;
-        /* Sortir des 16px de padding de la section pour être bord à bord */
-        margin-left: -16px;
-        margin-right: -16px;
-        width: calc(100% + 32px);
-        max-width: calc(100% + 32px);
-    }
-    .hero-mockup-inner { border-radius: 0; }
-    .hero-mockup-bar   { height: 34px; padding: 0 12px; border-radius: 0; }
-    .mockup-url        { max-width: 160px; font-size: 9px; }
-    .mockup-actions    { display: none; }
-    .mockup-dot        { width: 9px; height: 9px; }
-    /* Fade bas de l'image pour transition douce vers la section suivante */
-    .hero-mockup-inner::after {
-        content: '';
-        position: absolute; bottom: 0; left: 0; right: 0;
-        height: 80px;
-        background: linear-gradient(to bottom, transparent, rgba(10,6,35,.95));
-        pointer-events: none; z-index: 2;
-    }
+    .c-main { padding: 0 12px 40px; }
+    .flash-section { padding: 16px 14px 18px; }
+    .flash-countdown { font-size: 11px; padding: 5px 10px; }
+    .cats { margin-bottom: 14px; }
 
-    /* Grilles */
+    .search-banner { flex-direction: column; align-items: flex-start; gap: 8px; padding: 14px 16px; }
+    .search-banner-clear { margin-left: 0; align-self: flex-start; }
 
-    .steps-grid    { grid-template-columns: 1fr; gap: 28px; }
-    .shops-grid     { grid-template-columns: 1fr; gap: 14px; }
-    .companies-grid { grid-template-columns: 1fr; gap: 14px; }
-    .proof-grid     { grid-template-columns: 1fr; gap: 14px; }
-    .proof-section { padding: 64px 16px 60px; }
-    .proof-card    { padding: 26px 22px; }
+    .prod-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .prod-card-img { height: 120px; }
+    .prod-card-body { padding: 10px 11px; }
+    .prod-card-footer { flex-direction: column; align-items: stretch; gap: 8px; padding: 9px 11px 11px; }
+    .prod-card-price { font-size: 13.5px; }
+    .prod-card-cta { width: 100%; text-align: center; padding: 9px 14px; }
 
-    /* Cards */
-
-    .shop-img-wrap { height: 160px; }
-
-    /* Sections */
-    .section       { padding: 48px 16px; }
-    .section-title { letter-spacing: -.5px; margin-bottom: 10px; }
-
-    /* CTA client mobile */
-    .client-cta  { margin: 0; padding: 28px 20px 0; border-radius: 14px; }
-    .client-cta-top { padding-bottom: 28px; }
-    .client-cta-txt h2 { font-size: 22px; }
-    .client-cta-actions { width: 100%; flex-direction: column; }
-    .client-cta-actions .cta-btn { justify-content: center; }
-    .cl-dash-scene { margin: 0 -20px; }
-    .cl-dash-frame { margin: 10px 10px 0; }
-    /* CTA Livraison */
-    .company-cta  { margin: 0; padding: 28px 20px 0; border-radius: 14px; }
-    .company-cta-top { padding-bottom: 28px; }
-    .company-cta-txt h2 { font-size: 22px; }
-    .company-cta-actions { width: 100%; flex-direction: column; }
-    .company-cta-actions .cta-btn { justify-content: center; }
-    .cta-dash-scene { margin: 0 -20px; }
-    .cta-dash-frame { margin: 10px 10px 0; }
-
-    /* Pricing */
-    .pricing-grid  { max-width: 100%; }
-
-    /* Footer */
-    .footer-inner  { flex-direction: column; gap: 28px; }
-    .footer-bottom { flex-direction: column; text-align: center; gap: 6px; }
-    .site-footer   { padding: 36px 16px 20px; }
+    .w-footer { padding: 32px 18px 20px; }
+    .w-footer-inner { flex-direction: column; gap: 26px; }
+    .w-footer-brand { max-width: 100%; }
+    .w-footer-bottom { flex-direction: column; text-align: center; }
 }
 
-/* ════════════════════════════════════════════════════════════════
-   RESPONSIVE — PETIT MOBILE (≤ 420px)
-════════════════════════════════════════════════════════════════ */
-@media (max-width: 420px) {
-    .hero-section   { padding: 70px 14px 0; }
-    .hero-mockup    { margin-left: -14px; margin-right: -14px; width: calc(100% + 28px); max-width: calc(100% + 28px); }
-    .hero-stats     { grid-template-columns: 1fr 1fr 1fr; }
-    .nav-logo-img   { width: 32px; height: 32px; border-radius: 8px; }
-    .nav-brand-name { font-size: 14px; }
-    .mockup-url     { display: none; }
+/* ── Très petit mobile (iPhone SE, vieux Android ≤ 380px) ── */
+@media (max-width: 380px) {
+    .nav { padding: 0 10px; }
+    .nav-actions { gap: 6px; }
+    .prod-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .hero-title { font-size: 19px; }
+    .hero-carousel { min-height: 366px; }
+    .hero { padding: 18px 15px; }
+    .flash-card, .reco-card { flex-basis: 128px; width: 128px; }
 }
-footer.app-footer { display: none !important; }
+
+/* ── Confort tactile : cibles ≥ 40px sur tout écran à pointeur grossier ── */
+@media (pointer: coarse) {
+    .nav-hamburger { min-width: 40px; min-height: 40px; }
+    .nav-search-btn { min-width: 40px; }
+    .cat-pill, .prod-card-cta, .hero-btn-primary, .hero-btn-secondary,
+    .nav-orders-btn, .nav-btn-primary, .search-banner-clear { min-height: 40px; }
+}
 </style>
 @endpush
 
 @section('content')
+@php
+    $roleMap = ['superadmin'=>'admin.dashboard','admin'=>'boutique.dashboard','vendeur'=>'vendeur.dashboard','client'=>'client.dashboard','company'=>'company.dashboard','livreur'=>'livreur.dashboard'];
+@endphp
 
-{{-- Filtre SVG invisible pour accentuer la netteté de l'image --}}
-<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden">
-    <defs>
-        <filter id="img-sharpen" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
-            <feConvolveMatrix order="3" preserveAlpha="true"
-                kernelMatrix="0 -0.6 0  -0.6 3.4 -0.6  0 -0.6 0"/>
-        </filter>
-    </defs>
-</svg>
-
-{{-- ══════════════════════════════════════════
-     NAVBAR CUSTOM
-══════════════════════════════════════════ --}}
-<nav class="top-nav">
-    <a href="{{ url('/') }}" class="nav-brand">
-        <img src="/images/shopio-logo-192.png" alt="Shopio" class="nav-logo-img">
-        <span class="nav-brand-name">{{ config('app.name', 'Shopio') }}</span>
+{{-- ══ NAVBAR ══ --}}
+<nav class="nav">
+    <a href="{{ url('/') }}" class="nav-logo">
+        <img src="/images/shopio-logo-192.png" alt="{{ config('app.name', 'Shopio') }}">
+        <span><span class="brand-part">Shop</span><span class="brand-accent">io</span></span>
     </a>
     <div class="nav-links">
-        <a href="#features"  class="nav-link-item">Fonctionnalités</a>
-        <a href="#how"       class="nav-link-item">Comment ça marche</a>
-        <a href="#shops"     class="nav-link-item">Boutiques</a>
-       <!-- <a href="#pricing"   class="nav-link-item">Tarifs</a> !-->
+        <a href="{{ url('/') }}" class="nav-link active">{!! \App\Support\IconLibrary::svg('home') !!} Accueil</a>
+        <a href="{{ route('shops.index') }}" class="nav-link">{!! \App\Support\IconLibrary::svg('store') !!} Boutiques</a>
+    </div>
+    <form method="GET" action="{{ url('/') }}" class="nav-search" data-ajax>
+        <input type="text" name="s" value="{{ request('s') }}" placeholder="Que recherchez-vous ?" autocomplete="off">
+        <button class="nav-search-btn" type="submit" aria-label="Rechercher">{!! \App\Support\IconLibrary::svg('search', '', 16) !!}</button>
+    </form>
+    <div class="nav-actions">
         @guest
-        <a href="{{ route('login') }}"    class="cta-btn nav-btn nav-btn-outline" style="padding:8px 16px;font-size:13px">Connexion</a>
-        <a href="{{ route('register') }}" class="cta-btn nav-btn" style="padding:8px 16px;font-size:13px">S'inscrire</a>
+            <a href="{{ route('login') }}" class="nav-orders-btn"><span>Connexion</span></a>
+            <a href="{{ route('register') }}" class="nav-btn-primary">S'inscrire</a>
         @else
-        @php
-            $role = Auth::user()->role;
-            $map  = ['superadmin'=>'admin.dashboard','admin'=>'boutique.dashboard','vendeur'=>'vendeur.dashboard','client'=>'client.dashboard','company'=>'company.dashboard','livreur'=>'livreur.dashboard'];
-        @endphp
-        @if(isset($map[$role]))
-        <a href="{{ route($map[$role]) }}" class="cta-btn nav-btn" style="padding:8px 16px;font-size:13px">Mon dashboard →</a>
-        @endif
+            @if(Auth::user()->role === 'client')
+                <a href="{{ route('client.orders.index') }}" class="nav-orders-btn">{!! \App\Support\IconLibrary::svg('package', '', 15) !!} <span>Mes commandes</span></a>
+            @endif
+            @if(isset($roleMap[Auth::user()->role]))
+                <a href="{{ route($roleMap[Auth::user()->role]) }}" class="nav-btn-primary">Mon dashboard →</a>
+            @endif
         @endguest
     </div>
-
-    {{-- Hamburger mobile --}}
     <button class="nav-hamburger" id="navHamburger" aria-label="Menu" aria-expanded="false">
         <span></span><span></span><span></span>
     </button>
 </nav>
 
-{{-- Menu mobile déroulant --}}
+{{-- ══ BARRE MOBILE (recherche) ══ --}}
+<div class="mobile-bar">
+    <form method="GET" action="{{ url('/') }}" class="nav-search" data-ajax>
+        <input type="text" name="s" value="{{ request('s') }}" placeholder="Rechercher un produit…" autocomplete="off">
+        <button class="nav-search-btn" type="submit" aria-label="Rechercher">{!! \App\Support\IconLibrary::svg('search', '', 16) !!}</button>
+    </form>
+</div>
+
+{{-- ══ MENU MOBILE (liens + catégories) ══ --}}
 <div class="nav-mobile-menu" id="navMobileMenu">
-    <a href="#features"  class="nav-mobile-link" onclick="closeMobileMenu()">✨ Fonctionnalités</a>
-    <a href="#how"       class="nav-mobile-link" onclick="closeMobileMenu()">🔄 Comment ça marche</a>
-    <a href="#shops"     class="nav-mobile-link" onclick="closeMobileMenu()">🏪 Boutiques</a>
-    <a href="#pricing"   class="nav-mobile-link" onclick="closeMobileMenu()">💳 Tarifs</a>
+    <a href="{{ url('/') }}" class="nav-mobile-link">{!! \App\Support\IconLibrary::svg('home') !!} Accueil</a>
+    <a href="{{ route('shops.index') }}" class="nav-mobile-link">{!! \App\Support\IconLibrary::svg('store') !!} Boutiques</a>
     <div class="nav-mobile-divider"></div>
     @guest
-    <a href="{{ route('login') }}"    class="nav-mobile-btn nav-mobile-btn-outline">Se connecter</a>
-    <a href="{{ route('register') }}" class="nav-mobile-btn nav-mobile-btn-green">🚀 Créer un compte — Gratuit</a>
+        <a href="{{ route('login') }}" class="nav-mobile-link">Connexion</a>
+        <a href="{{ route('register') }}" class="nav-mobile-btn">S'inscrire</a>
     @else
-    @php
-        $role2 = Auth::user()->role;
-        $map2  = ['superadmin'=>'admin.dashboard','admin'=>'boutique.dashboard','vendeur'=>'vendeur.dashboard','client'=>'client.dashboard','company'=>'company.dashboard','livreur'=>'livreur.dashboard'];
-    @endphp
-    @if(isset($map2[$role2]))
-    <a href="{{ route($map2[$role2]) }}" class="nav-mobile-btn nav-mobile-btn-green">Mon dashboard →</a>
-    @endif
-    @endguest
-</div>
-
-{{-- ══════════════════════════════════════════
-     HERO
-══════════════════════════════════════════ --}}
-<section class="hero-section">
-    <div class="hero-glow"></div>
-
-    {{-- Badge "plateforme active" --}}
-    <div class="hero-badge">
-        <span class="hero-badge-dot"></span>
-        Plateforme de gestion boutique & livraisons
-    </div>
-
-    {{-- Titre principal — animation mot par mot --}}
-    <h1 class="hero-title">
-        <span class="hw" style="--i:0">Gérez</span>
-        <span class="hw" style="--i:1">votre</span>
-        <span class="hw" style="--i:2">boutique</span><br>
-        <span class="hw hw-grad" style="--i:3">comme</span>
-        <span class="hw hw-grad" style="--i:4">un</span>
-        <span class="hw hw-grad" style="--i:5">pro</span>
-    </h1>
-
-    {{-- Sous-titre --}}
-    <p class="hero-sub">
-        Commandes, livraisons, paiements, clients — tout en un seul dashboard moderne.
-        Lancez-vous en moins de 5 minutes.
-    </p>
-
-    {{-- CTA buttons --}}
-    <div class="hero-cta">
-        @guest
-        <a href="{{ route('register') }}" class="cta-btn cta-primary">
-            🚀 Créer ma boutique — Gratuit
-        </a>
-        <a href="{{ route('login') }}" class="cta-btn cta-secondary">
-            Déjà inscrit ? Connexion →
-        </a>
-        @else
-        @php
-            $role = Auth::user()->role;
-            $map  = ['superadmin'=>'admin.dashboard','admin'=>'boutique.dashboard','vendeur'=>'vendeur.dashboard','client'=>'client.dashboard','company'=>'company.dashboard','livreur'=>'livreur.dashboard'];
-        @endphp
-        @if(isset($map[$role]))
-        <a href="{{ route($map[$role]) }}" class="cta-btn cta-primary">
-            Aller à mon dashboard →
-        </a>
+        @if(Auth::user()->role === 'client')
+            <a href="{{ route('client.orders.index') }}" class="nav-mobile-link">{!! \App\Support\IconLibrary::svg('package') !!} Mes commandes</a>
         @endif
-        @endguest
+        @if(isset($roleMap[Auth::user()->role]))
+            <a href="{{ route($roleMap[Auth::user()->role]) }}" class="nav-mobile-btn">Mon dashboard →</a>
+        @endif
+    @endguest
+    @if($categories->isNotEmpty())
+    <div class="nav-mobile-divider"></div>
+    <div class="nav-mobile-cats">
+        @foreach($categories as $cat)
+        <a href="{{ url('/') }}?{{ http_build_query(array_filter(['cat' => $cat, 's' => request('s')])) }}#catalogue" class="nav-mobile-link">{!! \App\Support\IconLibrary::categorySvg($cat) !!} {{ $cat }}</a>
+        @endforeach
     </div>
-
-    {{-- Stats sociales --}}
-    <div class="hero-stats">
-        <div class="hero-stat">
-            <span class="hero-stat-val" data-count="{{ $stats['total_shops'] ?? 0 }}">0</span>
-            <span class="hero-stat-lbl">Boutiques actives</span>
-        </div>
-        <div class="hero-stat-sep"></div>
-        <div class="hero-stat">
-            <span class="hero-stat-val" data-count="{{ $stats['total_orders'] ?? 0 }}">0</span>
-            <span class="hero-stat-lbl">Commandes traitées</span>
-        </div>
-        <div class="hero-stat-sep"></div>
-        <div class="hero-stat">
-            <span class="hero-stat-val" data-count="{{ $stats['total_clients'] ?? 0 }}">0</span>
-            <span class="hero-stat-lbl">Clients satisfaits</span>
-        </div>
-        <div class="hero-stat-sep"></div>
-        <div class="hero-stat">
-            <span class="hero-stat-val" data-count="{{ $stats['total_livreurs'] ?? 0 }}">0</span>
-            <span class="hero-stat-lbl">Livreurs disponibles</span>
-        </div>
-    </div>
-
-    {{-- Mockup dashboard --}}
-    <div class="hero-mockup">
-
-        {{-- Cartes flottantes --}}
-        <div class="mockup-float f1">
-            <div class="mf-ico">💰</div>
-            <div class="mf-label">CA aujourd'hui</div>
-            <div class="mf-val">2 840 000 <span>↑ +18%</span></div>
-            <div class="mf-bar"><div class="mf-bar-fill" style="width:72%"></div></div>
-        </div>
-        <div class="mockup-float f2">
-            <div class="mf-ico">📦</div>
-            <div class="mf-label">Commandes en attente</div>
-            <div class="mf-val">12 <span>en cours</span></div>
-            <div class="mf-bar"><div class="mf-bar-fill" style="width:55%"></div></div>
-        </div>
-        <div class="mockup-float f3">
-            <div class="mf-ico">🛵</div>
-            <div class="mf-label">Livreurs disponibles</div>
-            <div class="mf-val">5 <span>actifs</span></div>
-            <div class="mf-bar"><div class="mf-bar-fill" style="width:83%"></div></div>
-        </div>
-
-        <div class="hero-mockup-outer">
-            {{-- Badge LIVE --}}
-            <div class="mockup-live">
-                <span class="mockup-live-dot"></span>
-                LIVE PREVIEW
-            </div>
-
-            <div class="hero-mockup-inner">
-                {{-- Barre navigateur réaliste --}}
-                <div class="hero-mockup-bar">
-                    <div class="mockup-dots">
-                        <span class="mockup-dot" style="background:#ff5f57"></span>
-                        <span class="mockup-dot" style="background:#febc2e"></span>
-                        <span class="mockup-dot" style="background:#28c840"></span>
-                    </div>
-                    <div class="mockup-url">
-                        <span class="mockup-url-lock" style="color:#a5b4fc">🔒</span>
-                        shopio.app/boutique/dashboard
-                    </div>
-                    <div class="mockup-actions">
-                        <div class="mockup-action-btn">←</div>
-                        <div class="mockup-action-btn">→</div>
-                        <div class="mockup-action-btn">↻</div>
-                    </div>
-                </div>
-
-                @if(file_exists(public_path('images/dashboard2.png')))
-                    <img src="{{ asset('images/dashboard1.png') }}" alt="Dashboard Shopio preview" loading="lazy">
-                @else
-                    <div class="hero-mockup-placeholder">
-                        <span class="ico">📊</span>
-                        <p>Aperçu du dashboard — ajoute dashboard2.png dans public/images/</p>
-                    </div>
-                @endif
-            </div>
-        </div>
-    </div>
-</section>
-
-{{-- ══════════════════════════════════════════
-     CTA CLIENT
-══════════════════════════════════════════ --}}
-<div style="padding:72px 0 0;background:linear-gradient(180deg,#0a0a1e 0%,#f8fafc 50%)">
-    <div class="client-cta reveal">
-
-        {{-- Texte + boutons --}}
-        <div class="client-cta-top">
-            <div class="client-cta-txt">
-                <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);border-radius:30px;padding:5px 14px;margin-bottom:18px">
-                    <span style="width:7px;height:7px;border-radius:50%;background:#a78bfa;box-shadow:0 0 6px #a78bfa;flex-shrink:0;display:inline-block"></span>
-                    <span style="font-size:11.5px;font-weight:700;color:#c4b5fd;letter-spacing:.4px">Vous êtes un client ?</span>
-                </div>
-                <h2>Trouvez les boutiques<br>de votre pays et commandez.</h2>
-                <p>Parcourez les boutiques locales, choisissez vos produits et faites-vous livrer directement chez vous. Paiement cash à la livraison, suivi en temps réel.</p>
-            </div>
-            <div class="client-cta-actions">
-                <a href="{{ route('register') }}" class="cta-btn cta-primary">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
-                    Créer mon compte
-                </a>
-                <a href="{{ route('shops.index') }}" class="cta-btn cta-secondary">
-                    Voir les boutiques →
-                </a>
-            </div>
-        </div>
-
-        {{-- Screenshot dashboard client --}}
-        <div class="cl-dash-scene">
-            <div class="cl-dash-glow"></div>
-            <div class="cl-dash-grid"></div>
-            <div class="cl-dash-frame">
-                <div class="cl-dash-bar">
-                    <span class="cta-dot" style="background:#ff5f57;box-shadow:0 0 5px #ff5f57"></span>
-                    <span class="cta-dot" style="background:#febc2e;box-shadow:0 0 5px #febc2e"></span>
-                    <span class="cta-dot" style="background:#28c840;box-shadow:0 0 5px #28c840"></span>
-                    <div class="cl-url-pill">
-                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        shopio.com/commandes
-                    </div>
-                </div>
-                <img src="/images/client.png" alt="Espace client Shopio — suivez vos commandes">
-            </div>
-        </div>
-
-    </div>
+    @endif
 </div>
 
-{{-- ══════════════════════════════════════════
-     COMMENT CA MARCHE
-══════════════════════════════════════════ --}}
-<section class="section how-section" id="how">
-    <div class="section-inner">
-        <div class="section-badge reveal">Simple & rapide</div>
-        <h2 class="section-title reveal" style="--reveal-delay:80ms">Lancez-vous en <span>4 étapes</span></h2>
-        <p class="section-sub reveal" style="--reveal-delay:160ms">De l'inscription à votre première vente livrée, le processus est simple et guidé.</p>
-
-        <div class="steps-grid">
-            <div class="step-item reveal">
-                <div class="step-num">1</div>
-                <h3 class="step-title">Créez votre compte</h3>
-                <p class="step-desc">Inscrivez-vous en moins de 2 minutes. Choisissez votre rôle : boutique, livreur ou client.</p>
-            </div>
-            <div class="step-item reveal">
-                <div class="step-num">2</div>
-                <h3 class="step-title">Configurez votre boutique</h3>
-                <p class="step-desc">Ajoutez vos produits, définissez vos prix et personnalisez votre espace en quelques clics.</p>
-            </div>
-            <div class="step-item reveal">
-                <div class="step-num">3</div>
-                <h3 class="step-title">Recevez des commandes</h3>
-                <p class="step-desc">Les clients commandent directement sur votre boutique. Vous êtes notifié en temps réel.</p>
-            </div>
-            <div class="step-item reveal">
-                <div class="step-num">4</div>
-                <h3 class="step-title">Livrez & encaissez</h3>
-                <p class="step-desc">Assignez un livreur, suivez la livraison GPS et recevez votre paiement automatiquement.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-{{-- ══════════════════════════════════════════
-     BOUTIQUES EN LIGNE
-══════════════════════════════════════════ --}}
-@if(isset($shops) && $shops->count() > 0)
-<section class="section shops-section" id="shops">
-    <div class="section-inner">
-        <div class="section-badge reveal">Marketplace</div>
-        <h2 class="section-title reveal" style="--reveal-delay:80ms">Boutiques <span>disponibles</span></h2>
-        <p class="section-sub reveal" style="--reveal-delay:160ms">Découvrez les boutiques déjà présentes sur la plateforme et commandez dès maintenant.</p>
-
-        <div class="shops-grid">
-            @foreach($shops->take(3) as $shop)
-            <a href="{{ route('public.shops.products', $shop) }}" class="shop-card reveal" style="--reveal-delay:{{ $loop->index * 90 }}ms">
-                <div class="shop-img-wrap">
-                    @if(!empty($shop->image))
-                        <img src="{{ asset('storage/'.$shop->image) }}" alt="{{ $shop->name }}" loading="lazy">
-                    @else
-                        <span class="shop-img-placeholder">🛍️</span>
-                    @endif
-                    <span class="shop-badge">✓ Actif</span>
-                </div>
-                <div class="shop-info">
-                    <div class="shop-name">{{ $shop->name }}</div>
-                    <div class="shop-meta">
-                        {{ $shop->type ?? 'Boutique' }} &nbsp;·&nbsp;
-                        📦 {{ $shop->products_count ?? 0 }} produit{{ ($shop->products_count ?? 0) > 1 ? 's' : '' }}
-                        @if($shop->address) &nbsp;·&nbsp; 📍 {{ Str::limit($shop->address, 18) }} @endif
-                    </div>
-                    <span class="shop-cta">Visiter la boutique →</span>
-                </div>
-            </a>
-            @endforeach
-        </div>
-
-        <div style="text-align:center">
-            <a href="{{ route('shops.index') }}" class="cta-btn cta-primary" style="display:inline-flex;align-items:center;gap:8px">
-                🏪 Voir toutes les boutiques
-                <span style="background:rgba(255,255,255,.2);padding:2px 9px;border-radius:20px;font-size:12px">{{ $shops->count() }}+</span>
-            </a>
-        </div>
-    </div>
-</section>
-@endif
-
-{{-- ══════════════════════════════════════════
-     ENTREPRISES PARTENAIRES
-══════════════════════════════════════════ --}}
-@if(isset($companies) && $companies->count() > 0)
-<section class="section companies-section">
-    <div class="section-inner">
-        <div class="section-badge reveal" style="background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.22);color:#6366f1">Nos partenaires</div>
-        <h2 class="section-title reveal" style="--reveal-delay:80ms">Entreprises de livraison <span style="color:#6366f1">partenaires</span></h2>
-        <p class="section-sub reveal" style="--reveal-delay:160ms">Des entreprises vérifiées, prêtes à livrer vos commandes partout dans la ville.</p>
-
-        <div class="companies-grid">
-            @foreach($companies->take(3) as $company)
-            <a href="{{ route('delivery.companies.show', $company) }}" class="company-card reveal" style="--reveal-delay:{{ $loop->index * 90 }}ms">
-
-                {{-- Logo ou avatar initiales --}}
-                <div class="company-card-head">
-                    @if(!empty($company->logo))
-                        <img src="{{ asset('storage/'.$company->logo) }}" alt="{{ $company->name }}" class="company-logo">
-                    @else
-                        <div class="company-logo-placeholder">{{ strtoupper(substr($company->name, 0, 2)) }}</div>
-                    @endif
-                    <div>
-                        <div class="company-card-name">{{ $company->name }}</div>
-                        <span class="company-verified">
-                            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                            Partenaire vérifié
-                        </span>
-                    </div>
-                </div>
-
-                {{-- Description --}}
-                @if($company->description)
-                <p class="company-card-desc">{{ Str::limit($company->description, 95) }}</p>
-                @else
-                <p class="company-card-desc">Entreprise de livraison partenaire de la plateforme Shopio.</p>
-                @endif
-
-                {{-- Méta : ville + commission --}}
-                <div class="company-card-meta">
-                    @if($company->address)
-                    <span>
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                        {{ Str::limit($company->address, 24) }}
-                    </span>
-                    @endif
-                </div>
-
-                <span class="company-card-cta">Voir les détails →</span>
-
-            </a>
-            @endforeach
-        </div>
-
-        <div style="text-align:center">
-            <a href="{{ route('delivery.companies.index') }}" class="cta-btn cta-primary"
-               style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-color:#4f46e5;box-shadow:0 4px 18px rgba(99,102,241,.35)">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 4v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                Voir toutes les entreprises
-                <span style="background:rgba(255,255,255,.22);padding:2px 9px;border-radius:20px;font-size:12px">{{ $companies->count() }}+</span>
-            </a>
-        </div>
-    </div>
-</section>
-@endif
-
-{{-- ══════════════════════════════════════════
-     TÉMOIGNAGES
-══════════════════════════════════════════ --}}
-<section class="proof-section">
-    <div style="max-width:1100px;margin:0 auto">
-        <div style="text-align:center;margin-bottom:60px">
-            <div class="section-badge reveal" style="background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.22);color:#6366f1">Ils nous font confiance</div>
-            <h2 class="section-title reveal" style="margin-bottom:12px;--reveal-delay:80ms">Ce que disent<br><span style="color:#6366f1">nos utilisateurs</span></h2>
-            <p class="reveal" style="font-size:15px;color:#6b7280;margin:0 auto;max-width:480px;line-height:1.6;--reveal-delay:160ms">Des boutiques et entreprises qui font confiance à Shopio chaque jour.</p>
-        </div>
-        <div class="proof-grid">
-            <div class="proof-card reveal">
-                <div class="proof-stars">★★★★★</div>
-                <p class="proof-text">"Depuis que j'utilise cette plateforme, mes ventes ont augmenté de 40%. Le suivi des livraisons en temps réel a vraiment changé la donne avec mes clients."</p>
-                <div class="proof-author">
-                    <div class="proof-av" style="background:linear-gradient(135deg,#6366f1,#4338ca)">AM</div>
-                    <div>
-                        <div class="proof-name">Aminata Camara</div>
-                        <div class="proof-role">Propriétaire boutique · Conakry</div>
-                    </div>
-                </div>
-            </div>
-            <div class="proof-card reveal">
-                <div class="proof-stars">★★★★★</div>
-                <p class="proof-text">"Le dashboard est incroyablement clair. En quelques secondes je vois mon CA du jour, mes commandes en attente et mes livreurs disponibles."</p>
-                <div class="proof-author">
-                    <div class="proof-av" style="background:#2563eb">MB</div>
-                    <div>
-                        <div class="proof-name">Mamadou Barry</div>
-                        <div class="proof-role">Gérant · Boutique électronique</div>
-                    </div>
-                </div>
-            </div>
-            <div class="proof-card reveal">
-                <div class="proof-stars">★★★★★</div>
-                <p class="proof-text">"Notre entreprise de livraison a rejoint la plateforme il y a 3 mois. Nous avons maintenant des contrats réguliers avec 12 boutiques différentes."</p>
-                <div class="proof-author">
-                    <div class="proof-av" style="background:#7c3aed">FD</div>
-                    <div>
-                        <div class="proof-name">Fatoumata Diallo</div>
-                        <div class="proof-role">Directrice · Rapide Livraison</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
- 
- {{-- ══════════════════════════════════════════
-   TARIFS
-══════════════════════════════════════════ --}} 
- <section class="section pricing-section" id="pricing">
-    <div class="section-inner">
-        <div style="text-align:center;margin-bottom:48px">
+{{-- ══ SIDEBAR CATÉGORIES + HERO ══ --}}
 @php
-$proGnf = number_format(150000, 0, ',', ' ');
-$bizGnf = number_format(100000, 0, ',', ' ');
+    $catsVisibleCount = 11;
+    $catsVisible = $categories->take($catsVisibleCount);
+    $catsMore = $categories->slice($catsVisibleCount)->values();
+    $activeInMore = request('cat') && $catsMore->contains(request('cat'));
 @endphp
-            <div class="section-badge reveal">Tarification</div>
-               <h2 class="section-title reveal" style="--reveal-delay:80ms">Des tarifs <span>transparents</span></h2>
-            <p class="section-sub reveal" style="margin:0 auto;--reveal-delay:160ms">Commencez gratuitement. Passez au Plan Pro pour les boutiques ou au Plan Business pour les entreprises de livraison.</p>
-        </div>
-        <div class="pricing-grid">
+<div class="home-top">
+    @if($categories->isNotEmpty())
+    <aside class="cat-sidebar reveal">
+        <div class="cat-sidebar-hd">{!! \App\Support\IconLibrary::svg('grid', 'csi-ico') !!} Toutes les catégories</div>
+        <nav class="cat-sidebar-list">
+            <a href="{{ url('/') }}?{{ http_build_query(array_filter(['s' => request('s')])) }}#catalogue" class="cat-sidebar-item {{ !request('cat') ? 'active' : '' }}">
+                {!! \App\Support\IconLibrary::svg('eye', 'csi-ico') !!} Tout voir
+            </a>
+            @foreach($catsVisible as $cat)
+            <a href="{{ url('/') }}?{{ http_build_query(array_filter(['cat' => $cat, 's' => request('s')])) }}#catalogue" class="cat-sidebar-item {{ request('cat') === $cat ? 'active' : '' }}">
+                {!! \App\Support\IconLibrary::categorySvg($cat, 'csi-ico') !!} {{ $cat }}
+            </a>
+            @endforeach
 
-          {{-- Plan Gratuit (Boutiques & Entreprises) --}}
-            <div class="pricing-card">
-                <div class="pricing-name">Gratuit</div>
-                <div class="pricing-price">0 <span>GNF/mois</span></div>
-                <div class="pricing-desc">Pour démarrer et découvrir la plateforme.</div>
-                <ul class="pricing-features">
+            @if($catsMore->isNotEmpty())
+            <details class="cat-sidebar-more" {{ $activeInMore ? 'open' : '' }}>
+                <summary>
+                    {!! \App\Support\IconLibrary::svg('plus', 'csi-ico') !!} Autres catégories
+                    <span class="csi-count">{{ $catsMore->count() }}</span>
+                </summary>
+                @foreach($catsMore as $cat)
+                <a href="{{ url('/') }}?{{ http_build_query(array_filter(['cat' => $cat, 's' => request('s')])) }}#catalogue" class="cat-sidebar-item {{ request('cat') === $cat ? 'active' : '' }}">
+                    {!! \App\Support\IconLibrary::categorySvg($cat, 'csi-ico') !!} {{ $cat }}
+                </a>
+                @endforeach
+            </details>
+            @endif
+        </nav>
+    </aside>
+    @endif
 
-                    {{-- Séparateur Boutiques --}}
-                    <li style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--green);padding-bottom:2px;border-bottom:1px solid #e2e8f0;list-style:none">
-                        🛍 Boutiques
-                    </li>
-                    <li>Jusqu'à 5 produits</li>
-                    <li>10 commandes / mois</li>
-                    <li style="color:#6b7280;text-decoration:line-through">Livreurs & partenaires</li>
-                    <li style="color:#6b7280;text-decoration:line-through">Rapports & exports</li>
-                    <li style="color:#6b7280;text-decoration:line-through">Statistiques & graphiques</li>
-                    <li style="color:#6b7280;text-decoration:line-through">Gestion d'équipe</li>
-                    <li style="color:#6b7280;text-decoration:line-through">✨ Shopio IA — Plan Pro</li>
-                    <li style="color:#6b7280;text-decoration:line-through">🗺️ Carte GPS — Plan Pro</li>
-
-                    {{-- Séparateur Entreprises --}}
-                    <li style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#7c3aed;padding-bottom:2px;border-bottom:1px solid #e2e8f0;list-style:none;margin-top:6px">
-                        🚚 Entreprises de livraison
-                    </li>
-                    <li>10 commandes / mois</li>
-                    <li>1 chauffeur maximum</li>
-                    <li>5 zones de livraison max</li>
-                    <li style="color:#6b7280;text-decoration:line-through">Carte en direct (GPS)</li>
-                    <li style="color:#6b7280;text-decoration:line-through">Rapports & exports</li>
-                    <li style="color:#6b7280;text-decoration:line-through">Statistiques & graphiques</li>
-                    <li style="color:#6b7280;text-decoration:line-through">Gestion utilisateurs</li>
-
-                </ul>
-                @auth
-                    <a href="{{ route('register') }}" class="pricing-btn pricing-btn-outline">Votre plan actuel</a>
-                @else
-                    <a href="{{ route('register') }}" class="pricing-btn pricing-btn-outline">Commencer gratuitement</a>
-                @endauth
+    <div class="hero-carousel reveal" id="heroCarousel">
+        @php
+            /* Photos libres de droits (licence Unsplash, gratuites, usage commercial
+               autorisé sans attribution) — servies via le CDN Unsplash avec redimensionnement
+               et compression à la volée (auto=format sert du WebP/AVIF aux navigateurs
+               compatibles) pour rester légères malgré la haute qualité. */
+            $heroPhoto = fn (string $id, int $w) => "https://images.unsplash.com/{$id}?auto=format&fit=crop&w={$w}&q=60";
+            $slide1Id = 'photo-1758525223453-06095a7459ce'; // clientes souriantes, sacs de courses
+            $slide2Id = 'photo-1483985988355-763728e1935b'; // sacs de shopping en papier
+            $slide3Id = 'photo-1760001868397-e5995a577e26'; // entrée de boutique
+        @endphp
+        <section class="hero hero-slide is-active">
+            <img class="hero-bg-img" alt=""
+                 src="{{ $heroPhoto($slide1Id, 1400) }}"
+                 srcset="{{ $heroPhoto($slide1Id, 700) }} 700w, {{ $heroPhoto($slide1Id, 1100) }} 1100w, {{ $heroPhoto($slide1Id, 1600) }} 1600w"
+                 sizes="100vw" width="1400" height="560"
+                 loading="eager" fetchpriority="high" decoding="async">
+            <div class="hero-scrim"></div>
+            <div class="hero-shine"></div>
+            <div class="hero-text">
+                <div class="hero-badge"><span class="hero-badge-dot"></span> <span id="heroProductCount" data-count="{{ $stats['total_products'] ?? 0 }}">0</span> produits disponibles</div>
+                <div class="hero-title">Bienvenue sur {{ config('app.name', 'Shopio') }}</div>
+                <p class="hero-sub">Découvrez des milliers de produits dans toutes les catégories, chez les meilleures boutiques, livrés directement chez vous.</p>
+                <div class="hero-btns">
+                    <a href="#catalogue" class="hero-btn-primary">{!! \App\Support\IconLibrary::svg('cart', '', 16) !!} Voir les produits</a>
+                    <a href="{{ route('shops.index') }}" class="hero-btn-secondary">{!! \App\Support\IconLibrary::svg('store', '', 16) !!} Parcourir les boutiques</a>
+                </div>
             </div>
+        </section>
 
-           {{-- Plan Pro — Boutiques --}}
-            <div class="pricing-card popular">
-                <div class="pricing-popular-badge">BOUTIQUES</div>
-                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--green);margin-bottom:4px">🛍 Pour les boutiques</div>
-                <div class="pricing-name">Plan Pro</div>
-                <div class="pricing-price">{{ $proGnf }} <span>GNF/mois</span></div>
-                <div class="pricing-desc">Tout illimité pour votre boutique pendant 1 mois.</div>
-                <ul class="pricing-features">
-                    <li>Produits illimités</li>
-                    <li>Commandes illimitées</li>
-                    <li>Livreurs & partenaires débloqués</li>
-                    <li>Rapports & exports Excel/PDF</li>
-                    <li>Statistiques & graphiques</li>
-                    <li>Analyse par période</li>
-                    <li>Gestion d'équipe complète</li>
-                    <li><strong>✨ Shopio IA</strong> — descriptions auto par IA</li>
-                    <li><strong>🗺️ Carte GPS</strong> — suivi livreurs en temps réel</li>
-                    <li>Durée : 1 mois renouvelable</li>
-                </ul>
-                @auth
-                    <a href="{{ route('boutique.subscription.upgrade') }}" class="pricing-btn pricing-btn-filled">Passer au Plan Pro</a>
-                @else
-                    <a href="{{ route('register', ['intent' => 'pro']) }}" class="pricing-btn pricing-btn-filled">Commencer → Plan Pro</a>
-                @endauth
+        <section class="hero hero-slide">
+            <img class="hero-bg-img" alt=""
+                 src="{{ $heroPhoto($slide2Id, 1400) }}"
+                 srcset="{{ $heroPhoto($slide2Id, 700) }} 700w, {{ $heroPhoto($slide2Id, 1100) }} 1100w, {{ $heroPhoto($slide2Id, 1600) }} 1600w"
+                 sizes="100vw" width="1400" height="560"
+                 loading="lazy" decoding="async">
+            <div class="hero-scrim"></div>
+            <div class="hero-shine"></div>
+            <div class="hero-text">
+                <div class="hero-badge"><span class="hero-badge-dot"></span> Tous les jours</div>
+                <div class="hero-title">Ventes flash quotidiennes</div>
+                <p class="hero-sub">Jusqu'à -50% sur une sélection de produits chaque jour, en quantités limitées. Ne les manquez pas !</p>
+                <div class="hero-btns">
+                    <a href="#catalogue" class="hero-btn-primary">{!! \App\Support\IconLibrary::svg('zap', '', 16) !!} Voir les ventes flash</a>
+                    <a href="{{ route('shops.index') }}" class="hero-btn-secondary">{!! \App\Support\IconLibrary::svg('store', '', 16) !!} Parcourir les boutiques</a>
+                </div>
             </div>
+        </section>
 
-            {{-- Plan Business — Entreprises de Livraison --}}
-            <div class="pricing-card">
-                <div class="pricing-popular-badge" style="background:linear-gradient(135deg,#7c3aed,#4f46e5)">ENTREPRISES</div>
-                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#7c3aed;margin-bottom:4px">🚚 Pour les entreprises de livraison</div>
-                <div class="pricing-name">Plan Business</div>
-                <div class="pricing-price">{{ $bizGnf }} <span>GNF/mois</span></div>
-                <div class="pricing-desc">Tout illimité pour votre entreprise de livraison pendant 1 mois.</div>
-                <ul class="pricing-features">
-                    <li>Chauffeurs illimités</li>
-                    <li>Commandes illimitées</li>
-                    <li>Zones de livraison illimitées</li>
-                    <li>Carte en direct (GPS)</li>
-                    <li>Rapports & exports</li>
-                    <li>Statistiques & graphiques</li>
-                    <li>Gestion utilisateurs & équipe</li>
-                    <li>Durée : 1 mois renouvelable</li>
-                </ul>
-                @auth
-                    <a href="{{ route('company.subscription.upgrade') }}" class="pricing-btn pricing-btn-outline">Passer au Plan Business</a>
-                @else
-                    <a href="{{ route('register', ['role' => 'company', 'intent' => 'business']) }}" class="pricing-btn pricing-btn-outline">Commencer → Plan Business</a>
-                @endauth
+        <section class="hero hero-slide">
+            <img class="hero-bg-img" alt=""
+                 src="{{ $heroPhoto($slide3Id, 1400) }}"
+                 srcset="{{ $heroPhoto($slide3Id, 700) }} 700w, {{ $heroPhoto($slide3Id, 1100) }} 1100w, {{ $heroPhoto($slide3Id, 1600) }} 1600w"
+                 sizes="100vw" width="1400" height="560"
+                 loading="lazy" decoding="async">
+            <div class="hero-scrim"></div>
+            <div class="hero-shine"></div>
+            <div class="hero-text">
+                <div class="hero-badge"><span class="hero-badge-dot"></span> Devenez partenaire</div>
+                <div class="hero-title">Vendez sur {{ config('app.name', 'Shopio') }}</div>
+                <p class="hero-sub">Créez votre boutique en ligne en quelques minutes et touchez des milliers de clients partout en Guinée.</p>
+                <div class="hero-btns">
+                    <a href="{{ route('register') }}" class="hero-btn-primary">{!! \App\Support\IconLibrary::svg('store', '', 16) !!} Ouvrir ma boutique</a>
+                    <a href="{{ route('shops.index') }}" class="hero-btn-secondary">{!! \App\Support\IconLibrary::svg('eye', '', 16) !!} Voir les boutiques</a>
+                </div>
             </div>
-                  
+        </section>
+
+        <div class="hero-dots">
+            <button class="hero-dot is-active" type="button" data-slide-to="0" aria-label="Diapositive 1"></button>
+            <button class="hero-dot" type="button" data-slide-to="1" aria-label="Diapositive 2"></button>
+            <button class="hero-dot" type="button" data-slide-to="2" aria-label="Diapositive 3"></button>
         </div>
     </div>
-</section>
- 
 
+    <aside class="side-cards reveal">
+        @auth
+            <a href="{{ route('support.index') }}" class="side-card">
+        @else
+            <a href="{{ route('login') }}" class="side-card">
+        @endauth
+            <span class="side-card-ico">{!! \App\Support\IconLibrary::svg('search', '', 17) !!}</span>
+            <span class="side-card-body">
+                <span class="side-card-title">Centre d'aide</span>
+                <span class="side-card-sub">Besoin d'assistance ?</span>
+            </span>
+        </a>
+        <a href="{{ route('register') }}" class="side-card">
+            <span class="side-card-ico">{!! \App\Support\IconLibrary::svg('store', '', 17) !!}</span>
+            <span class="side-card-body">
+                <span class="side-card-title">Vendez sur {{ config('app.name', 'Shopio') }}</span>
+                <span class="side-card-sub">Ouvrez votre boutique</span>
+            </span>
+        </a>
+        <a href="{{ route('shops.index') }}" class="side-card">
+            <span class="side-card-ico">{!! \App\Support\IconLibrary::svg('bag', '', 17) !!}</span>
+            <span class="side-card-body">
+                <span class="side-card-title">Toutes les boutiques</span>
+                <span class="side-card-sub">Parcourir le catalogue</span>
+            </span>
+        </a>
+    </aside>
+</div>
 
-{{-- ══════════════════════════════════════════
-     CTA ENTREPRISE LIVRAISON
-══════════════════════════════════════════ --}}
-<div style="padding:72px 0 80px;background:linear-gradient(180deg,#f8fafc 0%,#fff 50%)">
-    <div class="company-cta reveal">
-
-        {{-- Texte + boutons --}}
-        <div class="company-cta-top">
-            <div class="company-cta-txt">
-                <h2>Vous avez une entreprise de livraison ?</h2>
-                <p>Rejoignez notre réseau de partenaires. Accédez aux boutiques qui ont besoin de livreurs et développez votre activité.</p>
-            </div>
-            <div class="company-cta-actions">
-                <a href="{{ route('register', ['role'=>'company']) }}" class="cta-btn cta-primary">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 4v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                    Rejoindre comme entreprise de livraison
-                </a>
-               
-            </div>
-        </div>
-
-        {{-- Screenshot dashboard --}}
-        <div class="cta-dash-scene">
-            <div class="cta-dash-glow"></div>
-            <div class="cta-dash-grid"></div>
-            <div class="cta-dash-frame">
-                <div class="cta-dash-bar">
-                    <span class="cta-dot" style="background:#ff5f57;box-shadow:0 0 5px #ff5f57"></span>
-                    <span class="cta-dot" style="background:#febc2e;box-shadow:0 0 5px #febc2e"></span>
-                    <span class="cta-dot" style="background:#28c840;box-shadow:0 0 5px #28c840"></span>
-                    <div class="cta-url-pill">
-                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        dashboard.shopio.com
-                    </div>
-                </div>
-                <img src="/images/company.png" alt="Dashboard entreprise de livraison Shopio">
-            </div>
-        </div>
-
+{{-- ══ BANDEAU DE CONFIANCE ══ --}}
+<div class="trust-strip reveal">
+    <div class="trust-item">
+        <span class="trust-ico">{!! \App\Support\IconLibrary::svg('truck', '', 20) !!}</span>
+        <span class="trust-txt"><strong>Livraison rapide</strong><span>Partout en Guinée</span></span>
+    </div>
+    <div class="trust-item">
+        <span class="trust-ico">{!! \App\Support\IconLibrary::svg('wallet', '', 20) !!}</span>
+        <span class="trust-txt"><strong>Paiement à la livraison</strong><span>Payez en toute sécurité</span></span>
+    </div>
+    <div class="trust-item">
+        <span class="trust-ico">{!! \App\Support\IconLibrary::svg('rotate', '', 20) !!}</span>
+        <span class="trust-txt"><strong>Retours faciles</strong><span>Assistance dédiée</span></span>
+    </div>
+    <div class="trust-item">
+        <span class="trust-ico">{!! \App\Support\IconLibrary::svg('shield', '', 20) !!}</span>
+        <span class="trust-txt"><strong>Boutiques vérifiées</strong><span>Vendeurs approuvés</span></span>
     </div>
 </div>
 
-{{-- ══════════════════════════════════════════
-     FAQ
-══════════════════════════════════════════ --}}
-<section class="section faq-section" id="faq">
-    <div class="section-inner">
-        <div style="text-align:center;margin-bottom:40px">
-            <div class="section-badge reveal">FAQ</div>
-            <h2 class="section-title reveal" style="--reveal-delay:80ms">Questions <span>fréquentes</span></h2>
-        </div>
-        <div class="faq-grid">
-            <div class="faq-item reveal">
-                <div class="faq-q">Comment créer ma boutique ? <span class="arrow">+</span></div>
-                <div class="faq-a">Inscrivez-vous, choisissez le rôle "Admin Boutique", puis cliquez sur "Créer une boutique". Remplissez les informations de base et vous êtes prêt en moins de 5 minutes.</div>
-            </div>
-            <div class="faq-item reveal">
-                <div class="faq-q">Comment fonctionne la livraison ? <span class="arrow">+</span></div>
-                <div class="faq-a">Vous pouvez créer vos propres livreurs ou contacter une entreprise partenaire via le chat intégré. Le suivi GPS est automatique dès que le livreur démarre sa course.</div>
-            </div>
-            <div class="faq-item reveal">
-                <div class="faq-q">Puis-je avoir plusieurs boutiques ? <span class="arrow">+</span></div>
-                <div class="faq-a">Oui, vous pouvez creé plusieurs boutiques.</div>
-            </div>
-            <div class="faq-item reveal">
-                <div class="faq-q">Comment les paiements sont-ils gérés ? <span class="arrow">+</span></div>
-                <div class="faq-a">Le système de paiement est cash à la livraison. Chaque commande livrée génère un enregistrement de paiement automatique avec calcul des commissions livreurs.</div>
-            </div>
-            <div class="faq-item reveal">
-                <div class="faq-q">Est-ce que je peux exporter mes données ? <span class="arrow">+</span></div>
-                <div class="faq-a">Oui, vous pouvez exporter vos commandes, paiements et statistiques en Excel ou PDF directement depuis votre dashboard,.</div>
-            </div>
-            <div class="faq-item reveal">
-                <div class="faq-q">Comment contacter le support ? <span class="arrow">+</span></div>
-                <div class="faq-a">Un système de tickets est intégré directement dans la plateforme. Créez un ticket et notre équipe vous répond dans les 24h ouvrées.</div>
-            </div>
-        </div>
-    </div>
-</section>
+<div class="c-main">
 
-{{-- ══════════════════════════════════════════
-     APPLICATION MOBILE
-══════════════════════════════════════════ --}}
-<section class="app-section reveal" id="app-download">
-    <div class="app-section-text">
-        <div class="section-badge" style="margin-bottom:18px">Application mobile</div>
-        <h2>Emportez <span>{{ config('app.name', 'Shopio') }}</span> partout avec vous</h2>
-        <p>Commandez, suivez vos livraisons en direct et gérez votre boutique depuis votre téléphone. Notre application Android arrive très bientôt.</p>
-        <div class="store-badge">
-            <span class="store-badge-tag">Bientôt</span>
-            <span class="store-badge-ico">▶</span>
-            <div class="store-badge-txt">
-                <span class="store-badge-sub">Disponible prochainement sur</span>
-                <span class="store-badge-title">Google Play</span>
-            </div>
-        </div>
-    </div>
-    <div class="app-section-phone">
-        <div class="pm-wrap">
-            <div class="pm-glow"></div>
-            <img src="{{ asset('images/tel.jpeg') }}" alt="Application Shopio sur mobile" loading="lazy" width="250" height="527" class="pm-photo">
-        </div>
-    </div>
-</section>
+{{-- ══ VU RÉCEMMENT (rempli en JS depuis l'historique local du navigateur) ══ --}}
+<div class="sec-hd reveal" id="recentlyViewedHd" hidden>
+    <div class="sec-title">{!! \App\Support\IconLibrary::svg('clock') !!} Vu <strong>récemment</strong></div>
+    <button type="button" class="sec-link" id="recentlyViewedClear" style="background:none;border:none;cursor:pointer">Effacer l'historique</button>
+</div>
+<div class="reco-row-outer" id="recentlyViewedRow" hidden>
+    <div class="reco-row" id="recentlyViewedList"></div>
+</div>
 
-{{-- ══════════════════════════════════════════
-     FOOTER
-══════════════════════════════════════════ --}}
-<footer class="site-footer">
-    <div class="footer-inner">
-        <div class="footer-brand">
-            <a href="{{ url('/') }}" class="footer-logo">
-                <img src="/images/shopio-logo-192.png" alt="Shopio" style="width:40px;height:40px;object-fit:cover;border-radius:10px;border:2px solid rgba(170,40,217,.4);box-shadow:0 0 0 3px rgba(41,29,149,.25)">
-                <span style="background:linear-gradient(90deg,#c4b5fd,#e879f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:800">{{ config('app.name', 'Shopio') }}</span>
+<div id="resultsRoot">
+@include('partials.catalogue-results')
+</div>
+
+{{-- ══ TÉMOIGNAGES CLIENTS (avis réels, hors recherche) ══ --}}
+@if($testimonials->isNotEmpty())
+<div class="sec-hd reveal" style="margin-top:8px">
+    <div class="sec-title">{!! \App\Support\IconLibrary::svg('sparkles') !!} Ce que disent <strong>nos clients</strong></div>
+</div>
+<div class="testi-grid">
+    @foreach($testimonials as $review)
+    <div class="testi-card reveal" style="--rd: {{ $loop->index * 70 }}ms">
+        <div class="testi-stars">{!! \App\Support\IconLibrary::stars((float) $review->rating, 13) !!}</div>
+        <p class="testi-text">&laquo;&nbsp;{{ Str::limit($review->comment, 160) }}&nbsp;&raquo;</p>
+        <div class="testi-author">
+            <span class="testi-avatar">{{ mb_strtoupper(mb_substr($review->client->name ?? '?', 0, 1)) }}</span>
+            <span class="testi-author-body">
+                <span class="testi-author-name">{{ $review->client->name ?? 'Client Shopio' }}</span>
+                @if($review->vendeur)<span class="testi-author-sub">Achat chez {{ $review->vendeur->name }}</span>@endif
+            </span>
+        </div>
+    </div>
+    @endforeach
+</div>
+@endif
+
+</div>{{-- /.c-main --}}
+
+{{-- ══ FOOTER ══ --}}
+<footer class="w-footer">
+    <div class="w-footer-inner">
+        <div class="w-footer-brand">
+            <a href="{{ url('/') }}" class="w-footer-logo">
+                <img src="/images/shopio-logo-192.png" alt="{{ config('app.name', 'Shopio') }}">
+                {{ config('app.name', 'Shopio') }}
             </a>
-            <p class="footer-desc">La plateforme tout-en-un pour gérer votre boutique, vos livraisons et vos clients en Guinée.</p>
+            <p class="w-footer-desc">La marketplace tout-en-un : boutiques, produits et livraison en Guinée.</p>
         </div>
-        <div class="footer-col">
-            <h3>Plateforme</h3>
-            <a href="#features">Fonctionnalités</a>
-            <a href="#pricing">Tarifs</a>
-            <a href="#how">Comment ça marche</a>
+        <div class="w-footer-col">
+            <h4>Plateforme</h4>
+            <a href="{{ url('/') }}">Accueil</a>
+            <a href="{{ route('shops.index') }}">Boutiques</a>
             <a href="{{ route('delivery.companies.index') }}">Entreprises livraison</a>
         </div>
-        <div class="footer-col">
-            <h3>Compte</h3>
+        <div class="w-footer-col">
+            <h4>Compte</h4>
             <a href="{{ route('login') }}">Connexion</a>
             <a href="{{ route('register') }}">Inscription</a>
-            @auth
-            <a href="{{ route('profile.edit') }}">Mon profil</a>
-            @endauth
+            @auth<a href="{{ route('profile.edit') }}">Mon profil</a>@endauth
         </div>
-        <div class="footer-col">
-            <h3>Support</h3>
-            <a href="{{ route('support.index') }}">Centre d'aide</a>
-            <a href="{{ route('support.create') }}">Ouvrir un ticket</a>
+        <div class="w-footer-col">
+            <h4>Support</h4>
+            @auth
+                <a href="{{ route('support.index') }}">Centre d'aide</a>
+                <a href="{{ route('support.create') }}">Ouvrir un ticket</a>
+            @else
+                <a href="{{ route('login') }}">Se connecter pour l'assistance</a>
+            @endauth
+            <a href="{{ route('legal.terms') }}">Conditions d'utilisation</a>
         </div>
     </div>
-    <div class="footer-bottom">
-        <span>&copy; {{ date('Y') }} {{ config('app.name', 'ShopManager') }} — Tous droits réservés</span>
-        <span>Fait avec ❤️ en Guinée 🇬🇳</span>
+    <div class="w-footer-bottom">
+        <span>&copy; {{ date('Y') }} {{ config('app.name', 'Shopio') }} — Tous droits réservés</span>
+        <span>Fait avec {!! \App\Support\IconLibrary::svg('heart', '', 12) !!} en Guinée</span>
     </div>
 </footer>
 
+{{-- ══ RETOUR EN HAUT ══ --}}
+<button type="button" id="backToTop" class="back-to-top" aria-label="Retour en haut de page">
+    {!! \App\Support\IconLibrary::svg('chevron-up', '', 20) !!}
+</button>
 @endsection
 
 @push('scripts')
 <script>
-function closeMobileMenu() {
-    const h = document.getElementById('navHamburger');
-    const m = document.getElementById('navMobileMenu');
-    if (h && m) {
-        m.classList.remove('open');
-        h.classList.remove('open');
-        h.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
-    }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
+    /* ── Compte à rebours des ventes flash (ré-exécutable après une recherche en direct) ── */
+    let flashTimer = null;
+    function initFlashCountdown() {
+        if (flashTimer) { clearInterval(flashTimer); flashTimer = null; }
+        const flashEl = document.getElementById('flashCountdown');
+        if (!flashEl) return;
+        let seconds = parseInt(flashEl.dataset.seconds, 10) || 0;
+        const valEl = document.getElementById('flashCountdownVal');
+        const tick = () => {
+            if (seconds <= 0) { valEl.textContent = '00:00:00'; return; }
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+            valEl.textContent = [h, m, s].map(n => String(n).padStart(2, '0')).join(':');
+            seconds--;
+        };
+        tick();
+        flashTimer = setInterval(tick, 1000);
+    }
+    initFlashCountdown();
 
-    /* ── Animation compteurs hero ──────────────────────────────────
-     * Les chiffres des stats s'animent de 0 vers leur valeur réelle
-     * au chargement de la page.
-     * ──────────────────────────────────────────────────────────── */
-    document.querySelectorAll('.hero-stat-val[data-count]').forEach(el => {
-        const target = parseInt(el.dataset.count) || 0;
-        if (target === 0) { el.textContent = '0'; return; }
-        const duration = 1600;
-        const step     = 16;
-        const increment = target / (duration / step);
-        let current = 0;
-        const timer = setInterval(() => {
-            current += increment;
-            if (current >= target) {
-                el.textContent = target.toLocaleString();
-                clearInterval(timer);
-            } else {
-                el.textContent = Math.floor(current).toLocaleString();
-            }
-        }, step);
-    });
+    /* ── Compteur animé "X produits disponibles" (0 → valeur réelle) ── */
+    const countEl = document.getElementById('heroProductCount');
+    if (countEl) {
+        const target = parseInt(countEl.dataset.count, 10) || 0;
+        if (target > 0) {
+            const duration = 1300, step = 16;
+            const increment = target / (duration / step);
+            let current = 0;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    countEl.textContent = target.toLocaleString('fr-FR');
+                    clearInterval(timer);
+                } else {
+                    countEl.textContent = Math.floor(current).toLocaleString('fr-FR');
+                }
+            }, step);
+        }
+    }
 
-    /* ── FAQ accordion ────────────────────────────────────────────*/
-    document.querySelectorAll('.faq-item').forEach(item => {
-        item.querySelector('.faq-q').addEventListener('click', () => {
-            const isOpen = item.classList.contains('open');
-            document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
-            if (!isOpen) item.classList.add('open');
-        });
-    });
-
-    /* ── Navbar scroll effect ─────────────────────────────────────*/
-    const nav = document.querySelector('.top-nav');
-    window.addEventListener('scroll', () => {
-        nav.style.background = window.scrollY > 60
-            ? 'rgba(10,10,30,.98)'
-            : 'rgba(10,10,30,.92)';
-    });
-
-    /* ── Hamburger menu mobile ───────────────────────────────────*/
-    const hamburger   = document.getElementById('navHamburger');
-    const mobileMenu  = document.getElementById('navMobileMenu');
+    const hamburger = document.getElementById('navHamburger');
+    const mobileMenu = document.getElementById('navMobileMenu');
     if (hamburger && mobileMenu) {
         hamburger.addEventListener('click', () => {
             const open = mobileMenu.classList.toggle('open');
             hamburger.classList.toggle('open', open);
-            hamburger.setAttribute('aria-expanded', open);
-            document.body.style.overflow = open ? 'hidden' : '';
+            hamburger.setAttribute('aria-expanded', open ? 'true' : 'false');
         });
-        // Fermer en cliquant hors du menu
-        document.addEventListener('click', e => {
-            if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
-                closeMobileMenu();
-            }
+        document.addEventListener('click', (e) => {
+            if (!mobileMenu.classList.contains('open')) return;
+            if (mobileMenu.contains(e.target) || hamburger.contains(e.target)) return;
+            mobileMenu.classList.remove('open');
+            hamburger.classList.remove('open');
+            hamburger.setAttribute('aria-expanded', 'false');
         });
     }
 
-    /* ── Reveal au scroll ─────────────────────────────────────────
-     * Chaque section (titres, cartes, CTA) apparaît en fondu/glissement
-     * doux au moment où elle entre dans le viewport, via la classe
-     * .reveal + .is-visible (voir CSS). Le délai en cascade est géré
-     * par --reveal-delay (inline) ou par l'ordre d'apparition dans
-     * le viewport pour les éléments sans délai explicite.
-     * ──────────────────────────────────────────────────────────── */
-    if ('IntersectionObserver' in window) {
-        const revealObserver = new IntersectionObserver(entries => {
-            entries.forEach((entry, i) => {
-                if (entry.isIntersecting) {
-                    if (!entry.target.style.getPropertyValue('--reveal-delay')) {
-                        entry.target.style.setProperty('--reveal-delay', (i * 70) + 'ms');
-                    }
-                    entry.target.classList.add('is-visible');
-                    revealObserver.unobserve(entry.target);
-                }
+    /* ── Reveal au scroll : titres de section, sidebar, bandeau flash,
+     *    et chaque carte produit apparaît en fondu/glissement, en cascade.
+     *    Ré-exécutable sur une portion précise du DOM (après une recherche
+     *    en direct, pour animer seulement les nouveaux résultats). ── */
+    let revealObserver = null;
+    function initReveal(root) {
+        root = root || document;
+        if (revealObserver) revealObserver.disconnect();
+        root.querySelectorAll('.flash-row, .reco-row, .prod-grid').forEach(container => {
+            Array.from(container.children).forEach((el, i) => {
+                el.classList.add('reveal');
+                el.style.setProperty('--rd', Math.min(i, 10) * 55 + 'ms');
             });
-        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-
-        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-    } else {
-        // Pas de support IntersectionObserver : on affiche tout directement
-        document.querySelectorAll('.reveal').forEach(el => el.classList.add('is-visible'));
+        });
+        if ('IntersectionObserver' in window) {
+            revealObserver = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        revealObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+            root.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+        } else {
+            root.querySelectorAll('.reveal').forEach(el => el.classList.add('is-visible'));
+        }
     }
+    initReveal();
 
+    /* ── Carrousel du hero : diapositives qui défilent automatiquement,
+     *    points cliquables, pause au survol/tactile et hors écran. ── */
+    (function initHeroCarousel() {
+        const root = document.getElementById('heroCarousel');
+        if (!root) return;
+        const slides = Array.from(root.querySelectorAll('.hero-slide'));
+        const dots = Array.from(root.querySelectorAll('.hero-dot'));
+        if (slides.length < 2) return;
+
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let current = slides.findIndex(s => s.classList.contains('is-active'));
+        if (current < 0) current = 0;
+        let timer = null;
+
+        function goTo(index) {
+            slides[current].classList.remove('is-active');
+            dots[current] && dots[current].classList.remove('is-active');
+            current = (index + slides.length) % slides.length;
+            slides[current].classList.add('is-active');
+            dots[current] && dots[current].classList.add('is-active');
+        }
+        function next() { goTo(current + 1); }
+        function stop() { if (timer) { clearInterval(timer); timer = null; } }
+        function start() {
+            stop();
+            if (reduceMotion) return; // pas de défilement auto pour les visiteurs qui limitent les animations
+            timer = setInterval(next, 5500);
+        }
+
+        dots.forEach((dot, i) => dot.addEventListener('click', () => { goTo(i); start(); }));
+        root.addEventListener('mouseenter', stop);
+        root.addEventListener('mouseleave', start);
+        root.addEventListener('touchstart', stop, { passive: true });
+        document.addEventListener('visibilitychange', () => { document.hidden ? stop() : start(); });
+
+        start();
+    })();
+
+    /* ── Favoris (♥) : bascule en AJAX sur chaque carte produit, sans recharger la page. ── */
+    (function initFavorites() {
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        if (!csrfMeta) return;
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-fav-toggle]');
+            if (!btn || btn.classList.contains('is-busy')) return;
+            e.preventDefault();
+            btn.classList.add('is-busy');
+            fetch(btn.dataset.url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfMeta.content,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            })
+                .then(r => r.ok ? r.json() : Promise.reject())
+                .then(data => {
+                    btn.classList.toggle('is-fav', !!data.favorited);
+                    btn.setAttribute('aria-pressed', data.favorited ? 'true' : 'false');
+                })
+                .catch(() => {})
+                .finally(() => btn.classList.remove('is-busy'));
+        });
+    })();
+
+    /* ── "Vu récemment" : mémorisé côté navigateur (localStorage), rien à envoyer
+     *    au serveur. Chaque clic sur une carte produit enregistre l'article ;
+     *    au chargement, on affiche les derniers produits consultés. ── */
+    (function initRecentlyViewed() {
+        // v2 : les cartes produit pointent maintenant vers le formulaire de commande
+        // (avant, vers la fiche produit) — la clé change pour purger automatiquement
+        // les anciennes URLs mémorisées avant ce changement, chez tous les visiteurs.
+        const STORAGE_KEY = 'shopio_recently_viewed_v2';
+        localStorage.removeItem('shopio_recently_viewed');
+        const MAX_ITEMS = 10;
+
+        function readList() {
+            try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch (e) { return []; }
+        }
+        function writeList(list) {
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(list.slice(0, MAX_ITEMS))); } catch (e) {}
+        }
+
+        // Enregistre un produit dès qu'on clique sur sa carte (avant la navigation).
+        document.addEventListener('click', (e) => {
+            const card = e.target.closest('.prod-card, .flash-card, .reco-card');
+            if (!card) return;
+            const link = card.matches('a') ? card : card.querySelector('a.prod-card-link');
+            const nameEl = card.querySelector('.prod-card-name, .flash-card-name, .reco-card-name');
+            const priceEl = card.querySelector('.prod-card-price, .flash-card-price, .reco-card-price');
+            const imgEl = card.querySelector('img');
+            if (!link || !nameEl) return;
+
+            const item = {
+                url: link.href,
+                name: nameEl.textContent.trim(),
+                price: priceEl ? priceEl.textContent.trim() : '',
+                img: imgEl ? imgEl.src : '',
+            };
+            let list = readList().filter(p => p.url !== item.url);
+            list.unshift(item);
+            writeList(list);
+        });
+
+        // Affiche la rangée si on a déjà un historique.
+        const hd = document.getElementById('recentlyViewedHd');
+        const rowWrap = document.getElementById('recentlyViewedRow');
+        const list = document.getElementById('recentlyViewedList');
+        const clearBtn = document.getElementById('recentlyViewedClear');
+        if (!hd || !rowWrap || !list) return;
+
+        function render() {
+            const items = readList();
+            if (!items.length) { hd.hidden = true; rowWrap.hidden = true; return; }
+            list.innerHTML = items.map(item => `
+                <a href="${item.url}" class="reco-card">
+                    <div class="reco-card-img">${item.img ? `<img src="${item.img}" alt="${item.name}" loading="lazy" width="190" height="130">` : ''}</div>
+                    <div class="reco-card-body">
+                        <div class="reco-card-name">${item.name}</div>
+                        <div class="reco-card-price-row"><span class="reco-card-price">${item.price}</span></div>
+                    </div>
+                </a>
+            `).join('');
+            hd.hidden = false;
+            rowWrap.hidden = false;
+        }
+        render();
+
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                localStorage.removeItem(STORAGE_KEY);
+                render();
+            });
+        }
+    })();
+
+    /* ── Bouton "retour en haut" ── */
+    (function initBackToTop() {
+        const btn = document.getElementById('backToTop');
+        if (!btn) return;
+        window.addEventListener('scroll', () => {
+            btn.classList.toggle('is-visible', window.scrollY > 500);
+        }, { passive: true });
+        btn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    })();
+
+    /* ── Recherche en direct : dès que le champ change (y compris quand on
+     *    l'efface complètement), la liste de produits se met à jour toute
+     *    seule, sans recharger la page — comme sur Jumia. ── */
+    const resultsRoot = document.getElementById('resultsRoot');
+    const searchInputs = Array.from(document.querySelectorAll('.nav-search input[name="s"]'));
+
+    if (resultsRoot && searchInputs.length) {
+        let searchDebounce = null;
+        let searchAbortCtrl = null;
+
+        const buildSearchUrl = (term) => {
+            const url = new URL(window.location.origin + '/');
+            const currentCat = new URLSearchParams(window.location.search).get('cat');
+            if (currentCat) url.searchParams.set('cat', currentCat);
+            if (term) url.searchParams.set('s', term);
+            return url;
+        };
+
+        const skeletonHtml = (n) => {
+            let cards = '';
+            for (let i = 0; i < n; i++) {
+                cards += '<div class="skeleton-card"><div class="skeleton-block img"></div>'
+                    + '<div class="skeleton-body">'
+                    + '<div class="skeleton-block line w-70"></div>'
+                    + '<div class="skeleton-block line w-40"></div>'
+                    + '<div class="skeleton-block line w-70"></div>'
+                    + '</div></div>';
+            }
+            return '<div class="skeleton-grid">' + cards + '</div>';
+        };
+
+        const loadResults = async (url, { pushHistory = true, scrollToCatalogue = false } = {}) => {
+            if (searchAbortCtrl) searchAbortCtrl.abort();
+            searchAbortCtrl = new AbortController();
+            resultsRoot.classList.add('is-loading');
+            resultsRoot.innerHTML = skeletonHtml(8);
+            try {
+                const res = await fetch(url, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    signal: searchAbortCtrl.signal,
+                });
+                if (!res.ok) return;
+                const html = await res.text();
+                resultsRoot.innerHTML = html;
+                if (pushHistory) {
+                    window.history.pushState({}, '', url.pathname + url.search);
+                }
+                initFlashCountdown();
+                initReveal(resultsRoot);
+                // Pagination : on atterrit directement sur les produits, pas besoin de redescendre.
+                if (scrollToCatalogue) {
+                    document.getElementById('catalogue')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            } catch (err) {
+                /* AbortError = une recherche plus récente a pris le relais, on ignore */
+            } finally {
+                resultsRoot.classList.remove('is-loading');
+                // Sécurité : s'assure que la barre de progression globale (NProgress) et le
+                // spinner de bouton ne restent jamais bloqués après une recherche en direct.
+                if (typeof NProgress !== 'undefined') NProgress.done();
+                document.querySelectorAll('.btn-loading').forEach(el => el.classList.remove('btn-loading'));
+            }
+        };
+
+        searchInputs.forEach(input => {
+            input.addEventListener('input', () => {
+                const val = input.value;
+                searchInputs.forEach(other => { if (other !== input) other.value = val; });
+                clearTimeout(searchDebounce);
+                searchDebounce = setTimeout(() => loadResults(buildSearchUrl(val.trim())), 380);
+            });
+        });
+
+        // Soumission classique du formulaire (bouton loupe / touche Entrée) : instantané, sans
+        // attendre le debounce, et on descend directement vers les résultats — sinon sur
+        // l'accueil (au-dessus de la ligne de flottaison) on ne les voit pas sans scroller soi-même.
+        document.querySelectorAll('.nav-search').forEach(form => {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                clearTimeout(searchDebounce);
+                const input = form.querySelector('input[name="s"]');
+                loadResults(buildSearchUrl((input?.value || '').trim()), { scrollToCatalogue: true });
+            });
+        });
+
+        // Liens "Effacer" / "Réinitialiser" à l'intérieur des résultats : idem, sans rechargement
+        document.addEventListener('click', (e) => {
+            const clearLink = e.target.closest('[data-live-clear]');
+            if (!clearLink) return;
+            e.preventDefault();
+            clearTimeout(searchDebounce);
+            searchInputs.forEach(input => { input.value = ''; });
+            loadResults(new URL(clearLink.href));
+        });
+
+        // Pagination (page suivante/précédente) : chargée en direct puis on atterrit
+        // directement sur les produits, au lieu de tout en haut de la page.
+        document.addEventListener('click', (e) => {
+            const pageLink = e.target.closest('#resultsRoot .c-pagination a');
+            if (!pageLink) return;
+            e.preventDefault();
+            clearTimeout(searchDebounce);
+            loadResults(new URL(pageLink.href), { scrollToCatalogue: true });
+        });
+
+        // Bouton précédent/suivant du navigateur : recharge les résultats en direct aussi
+        window.addEventListener('popstate', () => {
+            const params = new URLSearchParams(window.location.search);
+            searchInputs.forEach(input => { input.value = params.get('s') || ''; });
+            loadResults(new URL(window.location.href), { pushHistory: false });
+        });
+    }
 });
 </script>
 @endpush

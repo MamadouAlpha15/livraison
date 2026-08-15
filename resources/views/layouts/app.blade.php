@@ -56,10 +56,18 @@
         }
 
         /* ── Securite anti-flash : ces modals ne sont stylees (display/visibility)
-           que par un CSS externe charge en differe. Sur mobile lent, ce CSS peut
-           arriver apres le premier rendu et laisser apparaitre le contenu brut
-           le temps du chargement. On les cache ici, avant tout CSS externe. ── */
-        .bq-chat-overlay, .chat-overlay { display:none; }
+           que par un CSS externe charge en differe (ex: boutique-dashboard.css).
+           Sur mobile lent, ce CSS externe peut finir de charger APRES cette
+           balise <style> et — a specificite egale — gagne la cascade par ordre
+           d'apparition, ce qui peut faire repasser la modale en display:flex
+           le temps du chargement. Le !important la rend inviolable quel que
+           soit l'ordre/la vitesse de chargement des feuilles de style. ── */
+        .bq-chat-overlay:not(.open), .chat-overlay:not(.open) {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
     </style>
 
 
@@ -277,7 +285,7 @@
 
 {{-- ══ Loader plein écran ══ --}}
 <div id="pg-loader">
-    <img id="pg-loader-logo" src="{{ asset('images/shopio-logo-192.png') }}" alt="Shopio" data-no-skeleton fetchpriority="high">
+    <img id="pg-loader-logo" src="{{ \App\Support\Assets::v('images/shopio-logo-192.png') }}" alt="Shopio" data-no-skeleton fetchpriority="high">
     <div id="pg-loader-spin"></div>
     <span id="pg-loader-txt">Chargement…</span>
 </div>
@@ -514,7 +522,7 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
     ">
         <div style="width:48px;height:5px;background:#e5e7eb;border-radius:99px;margin:0 auto 22px;"></div>
         <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px">
-            <img src="{{ asset('images/shopio-logo-192.png') }}"
+            <img src="{{ \App\Support\Assets::v('images/shopio-logo-192.png') }}"
                  style="width:64px;height:64px;border-radius:16px;object-fit:cover;box-shadow:0 4px 14px rgba(5,150,105,.25)"
                  alt="Shopio">
             <div>

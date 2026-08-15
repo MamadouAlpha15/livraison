@@ -26,6 +26,8 @@ use App\Services\SubscriptionService; // Vérification des limites du plan
 use App\Services\PushService;
 use App\Services\LoyaltyService;
 use App\Services\PromoCodeService;
+use App\Rules\RealisticGuineaPhone;
+use App\Rules\RealisticFullName;
 
 // On importe Request : objet qui contient toutes les données envoyées par le formulaire (POST, GET...)
 use Illuminate\Http\Request;
@@ -298,24 +300,38 @@ class OrderController extends Controller
     public function storeProduct(Request $request)
     {
         // Règles de base
+        // client_phone est vérifié avec RealisticGuineaPhone que le client soit
+        // invité ou connecté (le champ reste modifiable dans les deux cas) : ça
+        // filtre les numéros bidons (ex: 6222222222) qui rendent la commande
+        // injoignable pour le vendeur, sans bloquer un vrai numéro guinéen.
         $rules = [
             'product_id'           => 'required|exists:products,id',
             'variant_id'           => 'nullable|integer|exists:product_variants,id',
             'quantity'             => 'required|integer|min:1',
-            'delivery_destination' => 'nullable|string|max:255',
-            'client_phone'         => 'nullable|string|max:30',
+            'delivery_destination' => ['nullable', 'string', 'min:5', 'max:255'],
+            'client_phone'         => ['nullable', 'string', 'max:30', new RealisticGuineaPhone],
         ];
 
         // Un visiteur sans compte doit obligatoirement donner son nom, son téléphone et son adresse
         // (on n'a pas de profil utilisateur pour récupérer ces infos)
         if (!Auth::check()) {
-            $rules['client_name']         = 'required|string|max:255';
-            $rules['client_phone']        = 'required|string|max:30';
-            $rules['delivery_destination'] = 'required|string|max:255';
+            $rules['client_name']          = ['required', 'string', 'max:255', new RealisticFullName];
+            $rules['client_phone']         = ['required', 'string', 'max:30', new RealisticGuineaPhone];
+            $rules['delivery_destination'] = ['required', 'string', 'min:5', 'max:255'];
         }
 
+        // Messages explicites pour les règles standard (required/min) : le projet
+        // n'a pas de lang/fr/validation.php, donc sans ça un message générique
+        // (voire une clé brute non traduite) pourrait s'afficher au client.
+        $messages = [
+            'client_name.required'          => "Merci d'indiquer votre nom complet.",
+            'client_phone.required'         => 'Le numéro de téléphone est obligatoire.',
+            'delivery_destination.required' => "L'adresse de livraison est obligatoire.",
+            'delivery_destination.min'      => 'Merci de préciser une adresse plus complète.',
+        ];
+
         // Validation des données du formulaire
-        $request->validate($rules);
+        $request->validate($rules, $messages);
 
         // On charge le produit avec sa boutique en une seule requête (optimisation)
         // findOrFail() = cherche par ID, si non trouvé renvoie une erreur 404 automatiquement
