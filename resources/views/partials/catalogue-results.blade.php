@@ -19,7 +19,7 @@ fragment soit inclus dans welcome.blade.php ou rendu seul.
 
 {{-- ══ VENTES FLASH (masqué pendant une recherche, comme Jumia) ══ --}}
 @if($flashProducts->isNotEmpty() && !request('s'))
-<div class="flash-section reveal">
+<div class="flash-section reveal" id="ventes-flash" style="scroll-margin-top:calc(var(--nav-h) + 12px)">
     <div class="flash-section-hd">
         <div class="flash-section-title">{!! \App\Support\IconLibrary::svg('zap', 'bolt', 20) !!} Ventes flash</div>
         <div class="flash-countdown" id="flashCountdown" data-seconds="{{ $flashProducts->min('flash_seconds_remaining') }}">

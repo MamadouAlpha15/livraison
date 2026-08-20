@@ -8,10 +8,10 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
-    --orange:    #f06a0f;
-    --orange-dk: #d45a00;
-    --orange-lt: #fff4ec;
-    --orange-bd: #fcd9b6;
+    --orange:    #6366f1;
+    --orange-dk: #4f46e5;
+    --orange-lt: #e0e7ff;
+    --orange-bd: #c7d2fe;
     --green:     #10b981;
     --green-lt:  #ecfdf5;
     --blue:      #3b82f6;
@@ -53,14 +53,14 @@ html, body {
 
 /* ── Top Bar ── */
 .top-bar {
-    background: linear-gradient(135deg, var(--orange) 0%, var(--orange-dk) 60%, #b84e00 100%);
+    background: linear-gradient(135deg, var(--orange) 0%, var(--orange-dk) 60%, #3730a3 100%);
     margin: -28px -16px 28px;
     padding: 0 20px;
     height: 62px;
     display: flex;
     align-items: center;
     gap: 14px;
-    box-shadow: 0 4px 18px rgba(240,106,15,.35);
+    box-shadow: 0 4px 18px rgba(99,102,241,.35);
     position: relative;
     overflow: hidden;
 }
@@ -206,7 +206,7 @@ html, body {
     background: var(--orange);
     border-color: var(--orange-dk);
     color: #fff;
-    box-shadow: 0 2px 8px rgba(240,106,15,.3);
+    box-shadow: 0 2px 8px rgba(99,102,241,.3);
 }
 .filter-btn .cnt {
     background: rgba(0,0,0,.08);
@@ -235,11 +235,11 @@ html, body {
 }
 .order-card:target {
     border-color: var(--orange);
-    box-shadow: 0 0 0 3px rgba(240,106,15,.18);
+    box-shadow: 0 0 0 3px rgba(99,102,241,.18);
     animation: orderHighlight 1.8s ease forwards;
 }
 @keyframes orderHighlight {
-    0%   { background: rgba(240,106,15,.12); }
+    0%   { background: rgba(99,102,241,.12); }
     100% { background: var(--surface); }
 }
 
@@ -250,7 +250,7 @@ html, body {
 }
 .strip-pending  { background: linear-gradient(90deg, var(--yellow), #fbbf24); }
 .strip-confirm  { background: linear-gradient(90deg, var(--blue), #60a5fa); }
-.strip-delivery { background: linear-gradient(90deg, var(--orange), #fb923c); }
+.strip-delivery { background: linear-gradient(90deg, var(--orange), #818cf8); }
 .strip-done     { background: linear-gradient(90deg, var(--green), #34d399); }
 .strip-cancel   { background: linear-gradient(90deg, var(--red), #f87171); }
 
@@ -366,7 +366,7 @@ html, body {
     position: absolute;
     top: 14px; left: 14px;
     height: 2px;
-    background: linear-gradient(90deg, var(--orange), #fb923c);
+    background: linear-gradient(90deg, var(--orange), #818cf8);
     z-index: 1;
     transition: width .4s ease;
 }
@@ -402,7 +402,7 @@ html, body {
 }
 @keyframes pulse-dot {
     0%,100% { box-shadow: 0 0 0 3px var(--orange-lt); }
-    50%      { box-shadow: 0 0 0 6px rgba(240,106,15,.15); }
+    50%      { box-shadow: 0 0 0 6px rgba(99,102,241,.15); }
 }
 .prog-lbl {
     font-size: 10px; font-weight: 600;
@@ -501,7 +501,7 @@ html, body {
     background: var(--orange) !important;
     border-color: var(--orange-dk) !important;
     color: #fff !important;
-    box-shadow: 0 2px 8px rgba(240,106,15,.3) !important;
+    box-shadow: 0 2px 8px rgba(99,102,241,.3) !important;
 }
 
 /* ── Flash ── */
@@ -683,7 +683,7 @@ $groups = $orders->getCollection()
         <div class="empty-ico">🛍️</div>
         <div class="empty-title">Aucune commande trouvée</div>
         <div class="empty-sub">Vous n'avez pas encore passé de commande.<br>Découvrez nos boutiques et commencez vos achats !</div>
-        <a href="{{ route('client.dashboard') }}" class="btn-back" style="background:linear-gradient(135deg,var(--orange),var(--orange-dk));border-color:transparent;box-shadow:0 4px 14px rgba(240,106,15,.35)">
+        <a href="{{ route('client.dashboard') }}" class="btn-back" style="background:linear-gradient(135deg,var(--orange),var(--orange-dk));border-color:transparent;box-shadow:0 4px 14px rgba(99,102,241,.35)">
             🏪 Découvrir les boutiques
         </a>
     </div>

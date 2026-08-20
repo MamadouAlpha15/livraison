@@ -20,9 +20,9 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
-    --orange:     #f06a0f;
-    --orange-dk:  #d45a08;
-    --orange-lt:  #fff3ec;
+    --orange:     #6366f1;
+    --orange-dk:  #4f46e5;
+    --orange-lt:  #e0e7ff;
     --navy:       #2c3e50;
     --navy-2:     #34495e;
     --grey:       #f4f6f8;
@@ -87,7 +87,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 }
 .nav-search:focus-within {
     border-color: var(--orange);
-    box-shadow: 0 0 0 3px rgba(240,106,15,.1);
+    box-shadow: 0 0 0 3px rgba(99,102,241,.1);
     background: var(--surface);
 }
 .nav-search input {
@@ -428,7 +428,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 }
 .msg-reply-input:focus {
     border-color: var(--orange); background: var(--surface);
-    box-shadow: 0 0 0 3px rgba(240,106,15,.1);
+    box-shadow: 0 0 0 3px rgba(99,102,241,.1);
 }
 .msg-send-btn {
     width: 42px; height: 42px; border-radius: 50%;
@@ -436,7 +436,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     cursor: pointer; font-size: 16px;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0; transition: all .15s;
-    box-shadow: 0 2px 8px rgba(240,106,15,.3);
+    box-shadow: 0 2px 8px rgba(99,102,241,.3);
 }
 .msg-send-btn:hover { background: var(--orange-dk); transform: scale(1.08); }
 
@@ -457,7 +457,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     content: '';
     position: absolute; right: 100px; bottom: -80px;
     width: 200px; height: 200px; border-radius: 50%;
-    background: rgba(240,106,15,.12); pointer-events: none;
+    background: rgba(99,102,241,.12); pointer-events: none;
 }
 .hero-text { flex: 1; position: relative; z-index: 1; }
 .hero-title {
@@ -595,12 +595,12 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     border-color: var(--orange); color: var(--orange);
     background: var(--orange-lt);
     transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(240,106,15,.18);
+    box-shadow: 0 3px 10px rgba(99,102,241,.18);
 }
 .cat-pill.active {
     background: linear-gradient(135deg, var(--orange), var(--orange-dk));
     color: #fff; border-color: var(--orange-dk);
-    box-shadow: 0 4px 14px rgba(240,106,15,.35);
+    box-shadow: 0 4px 14px rgba(99,102,241,.35);
     transform: translateY(-1px);
 }
 .cat-pill.active:hover { opacity: .9; }
@@ -615,13 +615,14 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 }
 .cat-pill.active .cat-pill-cnt { background: rgba(255,255,255,.25); }
 
-/* ══ GRILLE BOUTIQUES ══ */
-.shops-grid {
+/* ══ GRILLE PRODUITS ══ */
+.prod-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 16px;
     margin-bottom: 28px;
 }
+.prod-grid .reco-card { width: 100%; }
 
 /* ══ RECOMMANDÉ POUR VOUS (carrousel produits — défilement automatique) ══ */
 .reco-row-outer {
@@ -689,14 +690,43 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .reco-card-price { font-size: 14px; font-weight: 800; color: var(--orange); font-family: monospace; }
 .reco-card-orig { font-size: 10.5px; color: var(--muted); text-decoration: line-through; font-family: monospace; }
 
+/* Bouton "Ajouter au panier" sur les cartes produit */
+.reco-card-addcart {
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    width: 100%; margin-top: 8px; padding: 7px 0;
+    border: 1.5px solid var(--orange); border-radius: 30px;
+    background: var(--surface); color: var(--orange-dk);
+    font-size: 11px; font-weight: 700; font-family: var(--font);
+    cursor: pointer; transition: all .15s;
+}
+.reco-card-addcart:hover { background: var(--orange); color: #fff; }
+.reco-card-addcart.added { background: #10b981; border-color: #10b981; color: #fff; }
+.reco-card-addcart:disabled { opacity: .7; cursor: default; }
+
+/* Boutons "Commander" / "Contacter" sur les cartes produit */
+.reco-card-actions-row { display: flex; gap: 6px; margin-top: 6px; }
+.reco-card-order, .reco-card-contact {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px;
+    padding: 7px 4px; border-radius: 30px;
+    font-size: 10.5px; font-weight: 700; font-family: var(--font);
+    text-decoration: none; border: 1.5px solid var(--border); background: var(--surface);
+    color: var(--text-2); transition: all .15s; white-space: nowrap; cursor: pointer;
+}
+.reco-card-order:hover, .reco-card-contact:hover { border-color: var(--orange); color: var(--orange-dk); background: var(--orange-lt); }
+
 @media (max-width: 480px) {
     .reco-card { flex-basis: 152px; width: 152px; }
     .reco-card-img { height: 105px; }
+    /* Carte trop étroite pour mettre "Commander" et "Contacter" côte à côte avec le
+       texte lisible : on les empile en pleine largeur (comme le bouton "Ajouter"),
+       au lieu de les serrer ou de cacher le texte. */
+    .reco-card-actions-row { flex-direction: column; gap: 5px; }
+    .reco-card-order, .reco-card-contact { width: 100%; padding: 7px 0; font-size: 10px; }
 }
 
 /* ══ VENTES FLASH (défilement automatique, urgence) ══ */
 .flash-section {
-    background: linear-gradient(135deg, #7c2d12 0%, #dc2626 55%, #f97316 100%);
+    background: linear-gradient(135deg, var(--navy) 0%, var(--orange-dk) 55%, var(--orange) 100%);
     border-radius: var(--r); padding: 20px 20px 22px;
     position: relative; overflow: hidden; margin-bottom: 28px;
     box-shadow: 0 8px 28px rgba(220,38,38,.25);
@@ -727,8 +757,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .flash-row-outer::before, .flash-row-outer::after {
     content: ''; position: absolute; top: 0; bottom: 0; width: 32px; z-index: 2; pointer-events: none;
 }
-.flash-row-outer::before { left: 0;  background: linear-gradient(to right, #ad1f0f, transparent); }
-.flash-row-outer::after  { right: 0; background: linear-gradient(to left,  #f97316, transparent); }
+.flash-row-outer::before { left: 0;  background: linear-gradient(to right, var(--navy), transparent); }
+.flash-row-outer::after  { right: 0; background: linear-gradient(to left,  var(--orange), transparent); }
 
 .flash-row { display: flex; gap: 14px; width: max-content; }
 .flash-card { scroll-snap-align: start; }
@@ -745,7 +775,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .flash-card-img img { width: 100%; height: 100%; object-fit: cover; }
 .flash-card-badge {
     position: absolute; top: 7px; left: 7px;
-    background: #111; color: #fde047; font-size: 10.5px; font-weight: 900;
+    background: var(--navy); color: #c7d2fe; font-size: 10.5px; font-weight: 900;
     padding: 3px 8px; border-radius: 20px;
 }
 .flash-card-body { padding: 9px 11px 11px; display: flex; flex-direction: column; gap: 3px; }
@@ -756,7 +786,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     min-height: 2.4em;
 }
 .flash-card-price-row { display: flex; align-items: baseline; gap: 5px; flex-wrap: wrap; }
-.flash-card-price { font-size: 14px; font-weight: 900; color: #dc2626; font-family: monospace; }
+.flash-card-price { font-size: 14px; font-weight: 900; color: var(--orange); font-family: monospace; }
 .flash-card-orig { font-size: 10px; color: var(--muted); text-decoration: line-through; font-family: monospace; }
 .flash-card-countdown {
     margin-top: 4px; display: inline-flex; align-items: center; gap: 4px;
@@ -953,8 +983,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 /* ══ FIDÉLITÉ (sidebar) ══ */
 .sb-loyalty-card {
-    background: linear-gradient(135deg, #fff7ed, #ffedd5);
-    border: 1px solid #fed7aa;
+    background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+    border: 1px solid #c7d2fe;
     border-radius: var(--r); padding: 14px 16px;
     box-shadow: var(--shadow-sm);
 }
@@ -963,7 +993,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .sb-loyalty-pts { font-family: var(--display); font-size: 16px; font-weight: 900; color: var(--orange-dk); line-height: 1.1; }
 .sb-loyalty-pts span { font-size: 11px; font-weight: 600; color: var(--text-2); }
 .sb-loyalty-value { font-size: 11px; color: var(--text-2); margin-top: 2px; }
-.sb-loyalty-bar-wrap { height: 7px; background: rgba(240,106,15,.15); border-radius: 20px; overflow: hidden; margin-bottom: 6px; }
+.sb-loyalty-bar-wrap { height: 7px; background: rgba(99,102,241,.15); border-radius: 20px; overflow: hidden; margin-bottom: 6px; }
 .sb-loyalty-bar { height: 100%; background: linear-gradient(90deg, var(--orange), var(--orange-dk)); border-radius: 20px; transition: width .4s ease; }
 .sb-loyalty-next { font-size: 10.5px; color: var(--text-2); line-height: 1.4; margin-bottom: 10px; text-decoration: none; display: block; }
 .sb-loyalty-refer {
@@ -1153,7 +1183,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 }
 .hero-title .country {
     color: var(--orange);
-    text-shadow: 0 0 24px rgba(240,106,15,.45);
+    text-shadow: 0 0 24px rgba(99,102,241,.45);
 }
 .hero-subtitle {
     font-size: 12.5px; color: rgba(255,255,255,.58);
@@ -1199,7 +1229,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     font-size: 20px; flex-shrink: 0;
 }
 .stat-ico.s1 { background: #eff6ff; color: #3b82f6; }
-.stat-ico.s2 { background: #fff7ed; color: var(--orange); }
+.stat-ico.s2 { background: #eef2ff; color: var(--orange); }
 .stat-ico.s3 { background: #f0fdf4; color: #22c55e; }
 .stat-ico.s4 { background: #fdf4ff; color: #a855f7; }
 .stat-val {
@@ -1225,7 +1255,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     box-shadow: var(--shadow-sm); text-decoration: none;
     flex-shrink: 0; min-width: 90px; text-align: center;
 }
-.pop-cat-chip:hover { border-color: var(--orange); box-shadow: 0 4px 14px rgba(240,106,15,.18); transform: translateY(-2px); }
+.pop-cat-chip:hover { border-color: var(--orange); box-shadow: 0 4px 14px rgba(99,102,241,.18); transform: translateY(-2px); }
 .pop-cat-chip.active { background: var(--orange-lt); border-color: var(--orange); }
 .pop-cat-chip.active .pop-cat-name { color: var(--orange); }
 .pop-cat-ico { font-size: 24px; line-height: 1; }
@@ -1297,6 +1327,27 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     display: none;
 }
 .nav-fav-badge.show { display: block; }
+
+/* Bouton panier navbar */
+.nav-cart-btn {
+    position: relative;
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 1.5px solid var(--border); background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .15s; flex-shrink: 0; color: var(--text-2);
+    text-decoration: none;
+}
+.nav-cart-btn:hover { border-color: var(--orange); background: var(--orange-lt); color: var(--orange-dk); }
+.nav-cart-badge {
+    position: absolute; top: -4px; right: -4px;
+    background: var(--orange); color: #fff;
+    font-size: 9px; font-weight: 800;
+    border-radius: 20px; padding: 1px 5px;
+    min-width: 16px; text-align: center;
+    font-family: monospace; border: 1.5px solid var(--surface);
+    display: none;
+}
+.nav-cart-badge.show { display: block; }
 
 /* ══ DRAWER FAVORIS ══ */
 .fav-overlay {
@@ -1515,7 +1566,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     /* Grilles */
     .stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .top-shops-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .shops-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+    .prod-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
 }
 
 /* ══════════════════════════════════════════
@@ -1621,8 +1672,11 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     body.is-dashboard .cats { flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; gap: 6px !important; padding-bottom: 6px !important; margin-bottom: 0 !important; }
     body.is-dashboard .cat-pill { padding: 6px 12px !important; font-size: 11px !important; flex-shrink: 0 !important; }
 
-    /* ── Grille boutiques 2 colonnes ── */
-    body.is-dashboard .shops-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+    /* ── Grille produits 2 colonnes ── */
+    body.is-dashboard .prod-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+    body.is-dashboard .prod-grid .reco-card-img { height: 110px !important; }
+    body.is-dashboard .prod-grid .reco-card-body { padding: 8px 9px !important; gap: 3px !important; }
+    body.is-dashboard .prod-grid .reco-card-name { font-size: 11.5px !important; }
     body.is-dashboard .shop-card-img { height: 110px !important; }
     body.is-dashboard .shop-card-body { padding: 7px 8px !important; gap: 2px !important; }
     body.is-dashboard .shop-card-footer { padding: 6px 8px !important; display: flex !important; align-items: center !important; justify-content: space-between !important; }
@@ -1656,7 +1710,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     body.is-dashboard .stat-sub { font-size: 8px !important; }
     body.is-dashboard .top-shop-card { width: 150px !important; min-width: 150px !important; max-width: 150px !important; }
     body.is-dashboard .top-shop-img { height: 90px !important; }
-    body.is-dashboard .shops-grid { gap: 6px !important; }
+    body.is-dashboard .prod-grid { gap: 6px !important; }
     body.is-dashboard .shop-card-img { height: 95px !important; }
     body.is-dashboard .page-wrap { padding-bottom: 70px !important; }
     body.is-dashboard .order-amount { font-size: 11px !important; }
@@ -1672,7 +1726,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     body.is-dashboard .hero-title { font-size: 15px !important; }
     body.is-dashboard .top-shop-card { width: 135px !important; min-width: 135px !important; max-width: 135px !important; }
     body.is-dashboard .top-shop-img { height: 80px !important; }
-    body.is-dashboard .shops-grid { gap: 5px !important; }
+    body.is-dashboard .prod-grid { gap: 5px !important; }
     body.is-dashboard .shop-card-img { height: 95px !important; }
     body.is-dashboard .shop-card-footer { flex-direction: column !important; gap: 4px !important; align-items: stretch !important; }
     body.is-dashboard .shop-card-cta { text-align: center !important; justify-content: center !important; width: 100% !important; }
@@ -1694,7 +1748,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     body.is-dashboard .stat-val { font-size: 13px !important; }
     body.is-dashboard .stat-lbl { font-size: 9px !important; }
     body.is-dashboard .stat-sub { display: none !important; }
-    body.is-dashboard .shops-grid { grid-template-columns: 1fr 1fr !important; gap: 4px !important; }
+    body.is-dashboard .prod-grid { grid-template-columns: 1fr 1fr !important; gap: 4px !important; }
     body.is-dashboard .shop-card-img { height: 80px !important; }
     body.is-dashboard .shop-card-name { font-size: 10px !important; }
     body.is-dashboard .shop-card-footer { flex-direction: column !important; gap: 3px !important; align-items: stretch !important; }
@@ -1848,14 +1902,14 @@ html, body { overscroll-behavior-y: none; }
 .shop-prod-match {
     display: none; align-items: center; gap: 4px;
     font-size: 10.5px; font-weight: 700;
-    color: var(--orange); background: rgba(240,106,15,.08);
-    border: 1px solid rgba(240,106,15,.25);
+    color: var(--orange); background: rgba(99,102,241,.08);
+    border: 1px solid rgba(99,102,241,.25);
     padding: 2px 8px; border-radius: 20px;
     margin-top: 4px; width: fit-content;
 }
 .shop-card.prod-match .shop-prod-match { display: inline-flex; }
 .shop-name-clamp mark {
-    background: rgba(240,106,15,.18); color: var(--orange-dk);
+    background: rgba(99,102,241,.18); color: var(--orange-dk);
     border-radius: 3px; padding: 0 2px; font-style: normal;
 }
 #searchLiveInfo {
@@ -2256,8 +2310,8 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
         </div>
     </div>
     <div class="fav-drawer-footer" id="favDrawerFooter" style="{{ $favCount === 0 ? 'display:none' : '' }}">
-        <a href="#boutiques" onclick="closeFavDrawer()" class="fav-visit-all-btn">
-            {!! $si('store',16) !!} Explorer toutes les boutiques
+        <a href="{{ route('client.dashboard') }}#catalogue" onclick="closeFavDrawer()" class="fav-visit-all-btn">
+            {!! $si('bag',16) !!} Découvrir des produits
         </a>
     </div>
 </div>
@@ -2311,7 +2365,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 
     <div class="nav-links">
         <a href="{{ route('client.dashboard') }}" class="nav-link active">{!! $si('home',17) !!} Accueil</a>
-        <a href="#boutiques" class="nav-link">{!! $si('store',17) !!} Boutiques</a>
+        <a href="#catalogue" class="nav-link">{!! $si('bag',17) !!} Produits</a>
         <a href="#categories" class="nav-link">{!! $si('grid',17) !!} Catégories</a>
     </div>
 
@@ -2354,11 +2408,18 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
             </div>
         </div>
 
+        {{-- Bouton panier --}}
+        <a href="{{ route('client.cart.index') }}" class="nav-cart-btn" id="navCartBtn" title="Mon panier">
+            {!! $si('cart',20) !!}
+            <span class="nav-cart-badge {{ ($cartCount ?? 0) > 0 ? 'show' : '' }}" id="navCartBadge">{{ ($cartCount ?? 0) > 0 ? $cartCount : '' }}</span>
+        </a>
+
         {{-- Bouton favoris --}}
-        <button class="nav-fav-btn" id="navFavBtn" onclick="openFavDrawer()" title="Mes boutiques favorites">
+        @php $favProdCount = count($favoriteProductIds ?? []); @endphp
+        <a href="{{ route('client.wishlist.index') }}" class="nav-fav-btn" id="navFavBtn" title="Mes favoris">
             {!! $si('heart',20) !!}
-            <span class="nav-fav-badge {{ $favCount > 0 ? 'show' : '' }}" id="navFavBadge">{{ $favCount > 0 ? $favCount : '' }}</span>
-        </button>
+            <span class="nav-fav-badge {{ $favProdCount > 0 ? 'show' : '' }}" id="navFavBadge">{{ $favProdCount > 0 ? $favProdCount : '' }}</span>
+        </a>
 
         <a href="{{ route('client.messages.hub') }}" class="nav-msg-btn" title="Mes messages" style="text-decoration:none">
             {!! $si('chat',20) !!}
@@ -2396,7 +2457,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
                 <a href="{{ route('client.orders.index') }}">{!! $si('package',15) !!} Mes commandes</a>
                 <a href="{{ route('client.loyalty.index') }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
                     <span style="display:flex;align-items:center;gap:8px">🎁 Mes points &amp; Parrainage</span>
-                    <span style="background:var(--orange,#f90);color:#111;font-size:10.5px;font-weight:800;padding:1px 7px;border-radius:20px">{{ number_format(auth()->user()->loyalty_points ?? 0, 0, ',', ' ') }}</span>
+                    <span style="background:var(--orange,#6366f1);color:#fff;font-size:10.5px;font-weight:800;padding:1px 7px;border-radius:20px">{{ number_format(auth()->user()->loyalty_points ?? 0, 0, ',', ' ') }}</span>
                 </a>
                 <a href="{{ route('client.wishlist.index') }}">❤️ Ma liste de souhaits</a>
                 <div class="sep"></div>
@@ -2438,11 +2499,11 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
     <div class="sb-card sb-card-explorer">
         <div class="sb-hd">{!! $si('grid',15) !!} Explorer</div>
         <div class="sb-cat-wrap-mob">
-        <button class="sb-cat-item active" data-cat-type="" onclick="filterByCat('')">
+        <a href="{{ route('client.dashboard') }}#catalogue" class="sb-cat-item {{ !request('cat') ? 'active' : '' }}">
             <span class="sb-cat-ico">{!! $si('store',17) !!}</span>
             <span class="sb-cat-name">Toutes</span>
-            <span class="sb-cat-cnt">{{ $shopCount ?? $shops->total() }}</span>
-        </button>
+            <span class="sb-cat-cnt">{{ $products->total() }}</span>
+        </a>
         @php
             $sbIcoMap = [
                 'alimentation'=>'utensils','restaurant'=>'utensils','épicerie'=>'cart','epicerie'=>'cart',
@@ -2470,11 +2531,11 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
             };
         @endphp
         @foreach($categories as $cat)
-        <button class="sb-cat-item" data-cat-type="{{ $cat->type }}" onclick="filterByCat(this.dataset.catType)">
+        <a href="{{ route('client.dashboard', ['cat' => $cat->type]) }}#catalogue" class="sb-cat-item {{ request('cat') === $cat->type ? 'active' : '' }}">
             <span class="sb-cat-ico">{!! $getSbEmoji($cat->type) !!}</span>
             <span class="sb-cat-name">{{ $cat->type }}</span>
             <span class="sb-cat-cnt">{{ $cat->shop_count }}</span>
-        </button>
+        </a>
         @endforeach
         </div>
     </div>
@@ -2496,43 +2557,6 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 
    
 
-    {{-- Top boutiques --}}
-    @if(isset($topShops) && $topShops->isNotEmpty())
-    <div class="sb-card sb-card-topshops">
-        <div class="sb-hd" style="justify-content:space-between">
-            <span>🏆 Meilleures boutiques</span>
-            <button onclick="openRankingModal()" style="background:var(--orange);color:#fff;border:none;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font);flex-shrink:0">Classement →</button>
-        </div>
-        @foreach($topShops as $i => $ts)
-        @php
-            $sbParts = explode(' ', $ts->name);
-            $sbInit  = strtoupper(substr($sbParts[0],0,1)) . strtoupper(substr($sbParts[1] ?? 'X',0,1));
-            $sbGrads = [
-                'linear-gradient(135deg,#667eea,#764ba2)',
-                'linear-gradient(135deg,#f5576c,#f093fb)',
-                'linear-gradient(135deg,#4facfe,#00c6fb)',
-                'linear-gradient(135deg,#cc2b5e,#753a88)',
-                'linear-gradient(135deg,#ee0979,#ff6a00)',
-                'linear-gradient(135deg,#24c6dc,#514a9d)',
-                'linear-gradient(135deg,#11998e,#38ef7d)',
-                'linear-gradient(135deg,#f59e0b,#f97316)',
-            ];
-            $sbGrad = $sbGrads[abs(crc32($ts->name)) % count($sbGrads)];
-        @endphp
-        <a href="{{ route('client.shops.show', $ts) }}" class="sb-top-shop" data-shop-id="{{ $ts->id }}">
-            <span class="sb-top-num">{{ $i + 1 }}</span>
-            <div class="sb-top-av" style="background:{{ $sbGrad }}">{{ $sbInit }}</div>
-            <div class="sb-top-info">
-                <div class="sb-top-name">{{ $ts->name }}</div>
-                <div class="sb-top-rating">
-                    ⭐ {{ $ts->avg_rating ? number_format($ts->avg_rating, 1) : '—' }}
-                    <span style="color:var(--muted);font-weight:400"> · +{{ number_format($ts->sales_count ?? 0) }} ventes</span>
-                </div>
-            </div>
-        </a>
-        @endforeach
-    </div>
-    @endif
 
 </aside>
 
@@ -2606,18 +2630,18 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
     <div class="hero-content">
         <div class="hero-welcome">Bienvenue sur Shopio 👋</div>
         <h1 class="hero-title">
-            Le meilleur des boutiques de <span class="country">{{ $countryName ?: 'Guinée' }}</span>, au même endroit.
+            Les meilleurs produits de <span class="country">{{ $countryName ?: 'Guinée' }}</span>, au même endroit.
         </h1>
         <p class="hero-subtitle">
-            Découvrez des boutiques vérifiées, des produits de qualité
+            Découvrez des milliers de produits de qualité
             et une livraison rapide <strong>dans tout le pays.</strong>
         </p>
         <div class="hero-badges">
             <span class="hero-badge">
                 <span class="hero-badge-ico">{!! $si('shield-ok',15) !!}</span>
                 <span class="hero-badge-txt">
-                    <span class="hero-badge-label">Boutiques vérifiées</span>
-                    <span class="hero-badge-sub">Sélectionnées avec soin</span>
+                    <span class="hero-badge-label">Produits vérifiés</span>
+                    <span class="hero-badge-sub">Sélectionnés avec soin</span>
                 </span>
             </span>
             <span class="hero-badge">
@@ -2643,13 +2667,9 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
             </span>
         </div>
         <div class="hero-btns" style="display:flex;gap:12px;margin-top:22px;flex-wrap:wrap">
-            <a href="{{ route('client.products.index') }}"
-               style="display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:14px;background:linear-gradient(135deg,#ff6a00,#ee0979);color:#fff;font-size:14px;font-weight:700;text-decoration:none;box-shadow:0 4px 16px rgba(238,9,121,.35);transition:.2s">
+            <a href="#catalogue"
+               style="display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:14px;background:linear-gradient(135deg,var(--orange),var(--orange-dk));color:#fff;font-size:14px;font-weight:700;text-decoration:none;box-shadow:0 4px 16px rgba(99,102,241,.35);transition:.2s">
                 {!! $si('tag',16) !!} Voir tous les produits
-            </a>
-            <a href="#boutiques"
-               style="display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:14px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);color:#fff;font-size:14px;font-weight:700;text-decoration:none;backdrop-filter:blur(8px);transition:.2s">
-                {!! $si('store',16) !!} Explorer les boutiques
             </a>
         </div>
     </div>
@@ -2810,7 +2830,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
                         @endif
                         <button class="reco-card-fav {{ in_array($rp->id, $favoriteProductIds ?? []) ? 'favorited' : '' }}"
                                 data-product-id="{{ $rp->id }}"
-                                onclick="event.preventDefault();toggleProductFavorite({{ $rp->id }}, this)"
+                                onclick="event.preventDefault();event.stopPropagation();toggleProductFavorite({{ $rp->id }}, this)"
                                 title="{{ in_array($rp->id, $favoriteProductIds ?? []) ? 'Retirer des favoris' : 'Ajouter aux favoris' }}">
                             {!! $si('heart', 13) !!}
                         </button>
@@ -2827,6 +2847,13 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
                             @endif
                             <span style="font-size:10px;color:var(--muted)">{{ $rp->shop->currency ?? 'GNF' }}</span>
                         </div>
+                        <button type="button" class="reco-card-addcart" onclick="event.preventDefault();event.stopPropagation();addToCart({{ $rp->id }}, this)">
+                            {!! $si('cart', 13) !!} Ajouter
+                        </button>
+                        <div class="reco-card-actions-row">
+                            <button type="button" class="reco-card-order" title="Commander" onclick="event.preventDefault();event.stopPropagation();window.location.href='{{ route('client.orders.createFromProduct', $rp) }}'">{!! $si('bag', 12) !!} Commander</button>
+                            <button type="button" class="reco-card-contact" title="Contacter le vendeur" onclick="event.preventDefault();event.stopPropagation();window.location.href='{{ route('client.messages.index', $rp) }}'">{!! $si('chat', 12) !!} Contacter</button>
+                        </div>
                     </div>
                 </a>
                 @endforeach
@@ -2836,30 +2863,91 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 </div>
 @endif
 
+{{-- Populaire par catégorie — meilleures ventes réelles, groupées ("Populaire en Parfums", "Populaire en Montres"…) --}}
+@if(isset($categoryGroups) && $categoryGroups->isNotEmpty())
+@foreach($categoryGroups as $group)
+<div>
+    <div class="sec-hd">
+        <div class="sec-title">{!! \App\Support\IconLibrary::categorySvg($group['name'], '', 18) !!} Populaire en <strong>{{ $group['name'] }}</strong></div>
+        <a href="{{ route('client.dashboard', ['cat' => $group['name']]) }}#catalogue" class="sec-link">Voir tout →</a>
+    </div>
+    <div class="reco-row-outer">
+        <div class="reco-row">
+            @foreach($group['products'] as $gp)
+            @php $gpHasPromo = $gp->original_price && $gp->original_price > $gp->price; @endphp
+            <a href="{{ route('client.products.show', $gp) }}" class="reco-card">
+                <div class="reco-card-img">
+                    @if($gp->image)
+                        <img src="{{ \App\Services\ImageOptimizer::url($gp->image, 'medium') }}" alt="{{ $gp->name }}" loading="lazy">
+                    @else
+                        <div class="reco-card-ph">{!! $si('bag', 30) !!}</div>
+                    @endif
+                    @if($gp->is_flash_active)
+                        <span class="reco-card-badge">⚡ -{{ $gp->flash_discount_percent }}%</span>
+                    @elseif(isset($gp->total_sold) && $gp->total_sold > 0)
+                        <span class="reco-card-badge">🏆 {{ $gp->total_sold }} vendus</span>
+                    @elseif($gpHasPromo)
+                        <span class="reco-card-badge">-{{ $gp->discount_percent }}%</span>
+                    @endif
+                    <button class="reco-card-fav {{ in_array($gp->id, $favoriteProductIds ?? []) ? 'favorited' : '' }}"
+                            data-product-id="{{ $gp->id }}"
+                            onclick="event.preventDefault();event.stopPropagation();toggleProductFavorite({{ $gp->id }}, this)"
+                            title="{{ in_array($gp->id, $favoriteProductIds ?? []) ? 'Retirer des favoris' : 'Ajouter aux favoris' }}">
+                        {!! $si('heart', 13) !!}
+                    </button>
+                </div>
+                <div class="reco-card-body">
+                    <div class="reco-card-shop">{{ $gp->shop->name ?? '' }}</div>
+                    <div class="reco-card-name">{{ $gp->name }}</div>
+                    <div class="reco-card-price-row">
+                        <span class="reco-card-price">{{ number_format($gp->current_price, 0, ',', ' ') }}</span>
+                        @if($gp->is_flash_active)
+                            <span class="reco-card-orig">{{ number_format($gp->price, 0, ',', ' ') }}</span>
+                        @elseif($gpHasPromo)
+                            <span class="reco-card-orig">{{ number_format($gp->original_price, 0, ',', ' ') }}</span>
+                        @endif
+                        <span style="font-size:10px;color:var(--muted)">{{ $gp->shop->currency ?? 'GNF' }}</span>
+                    </div>
+                    <button type="button" class="reco-card-addcart" onclick="event.preventDefault();event.stopPropagation();addToCart({{ $gp->id }}, this)">
+                        {!! $si('cart', 13) !!} Ajouter
+                    </button>
+                    <div class="reco-card-actions-row">
+                        <button type="button" class="reco-card-order" title="Commander" onclick="event.preventDefault();event.stopPropagation();window.location.href='{{ route('client.orders.createFromProduct', $gp) }}'">{!! $si('bag', 12) !!} Commander</button>
+                        <button type="button" class="reco-card-contact" title="Contacter le vendeur" onclick="event.preventDefault();event.stopPropagation();window.location.href='{{ route('client.messages.index', $gp) }}'">{!! $si('chat', 12) !!} Contacter</button>
+                    </div>
+                </div>
+            </a>
+            @endforeach
+        </div>
+    </div>
+</div>
+@endforeach
+@endif
+
 {{-- Catégories populaires --}}
 @if(isset($categories) && $categories->isNotEmpty())
 <div id="categories" style="scroll-margin-top:80px">
    
     <div class="pop-cats-row" id="popCatsRow">
-        <button class="pop-cat-chip active" data-cat-type="" onclick="filterByCat('')">
+        <a href="{{ route('client.dashboard') }}#catalogue" class="pop-cat-chip {{ !request('cat') ? 'active' : '' }}">
             <span class="pop-cat-ico">{!! $si('store',22) !!}</span>
             <span class="pop-cat-name">Toutes</span>
-            <span class="pop-cat-cnt">{{ $shopCount ?? $shops->total() }} boutiques</span>
-        </button>
+            <span class="pop-cat-cnt">{{ $products->total() }} produits</span>
+        </a>
         @foreach($categories->take(6) as $cat)
-        <button class="pop-cat-chip" data-cat-type="{{ $cat->type }}" onclick="filterByCat(this.dataset.catType)">
+        <a href="{{ route('client.dashboard', ['cat' => $cat->type]) }}#catalogue" class="pop-cat-chip {{ request('cat') === $cat->type ? 'active' : '' }}">
             <span class="pop-cat-ico">{!! $getSbEmoji($cat->type) !!}</span>
             <span class="pop-cat-name">{{ $cat->type }}</span>
-            <span class="pop-cat-cnt">{{ $cat->shop_count }} boutique{{ $cat->shop_count > 1 ? 's' : '' }}</span>
-        </button>
+            <span class="pop-cat-cnt">{{ $cat->shop_count }} produit{{ $cat->shop_count > 1 ? 's' : '' }}</span>
+        </a>
         @endforeach
         @if($categories->count() > 6)
         @foreach($categories->skip(6) as $cat)
-        <button class="pop-cat-chip pop-cat-extra" data-cat-type="{{ $cat->type }}" onclick="filterByCat(this.dataset.catType)" style="display:none">
+        <a href="{{ route('client.dashboard', ['cat' => $cat->type]) }}#catalogue" class="pop-cat-chip pop-cat-extra {{ request('cat') === $cat->type ? 'active' : '' }}" style="display:none">
             <span class="pop-cat-ico">{!! $getSbEmoji($cat->type) !!}</span>
             <span class="pop-cat-name">{{ $cat->type }}</span>
-            <span class="pop-cat-cnt">{{ $cat->shop_count }} boutique{{ $cat->shop_count > 1 ? 's' : '' }}</span>
-        </button>
+            <span class="pop-cat-cnt">{{ $cat->shop_count }} produit{{ $cat->shop_count > 1 ? 's' : '' }}</span>
+        </a>
         @endforeach
         @endif
     </div>
@@ -2874,276 +2962,79 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 </div>
 @endif
 
-{{-- Boutiques populaires --}}
-@if(isset($topShops) && $topShops->isNotEmpty())
-<div>
+{{-- Tous les produits --}}
+<div id="catalogue" style="scroll-margin-top:80px">
     <div class="sec-hd">
         <div class="sec-title">
-            <strong>Boutiques</strong> populaires
-            <span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:500;color:var(--muted);font-family:var(--font)">{!! $si('trending',14) !!} Tendances cette semaine</span>
-        </div>
-        <button onclick="openRankingModal()" style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:var(--orange);color:#fff;border:none;border-radius:50px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 3px 10px rgba(240,106,15,.3);transition:background .15s,transform .1s;flex-shrink:0" onmouseover="this.style.background='var(--orange-dk)'" onmouseout="this.style.background='var(--orange)'">🏆 Voir le classement</button>
-    </div>
-    <div class="top-shops-grid">
-        @foreach($topShops as $ts)
-        @php
-            [$tsIcoKey, $tsBg] = $typeIco[$ts->type ?? ''] ?? ['bag', 'bg-default'];
-            $tsParts  = explode(' ', $ts->name);
-            $tsInit   = strtoupper(substr($tsParts[0],0,1)) . strtoupper(substr($tsParts[1] ?? 'X',0,1));
-            $avGrads  = [
-                'linear-gradient(135deg,#667eea,#764ba2)',
-                'linear-gradient(135deg,#f5576c,#f093fb)',
-                'linear-gradient(135deg,#4facfe,#00c6fb)',
-                'linear-gradient(135deg,#cc2b5e,#753a88)',
-                'linear-gradient(135deg,#ee0979,#ff6a00)',
-                'linear-gradient(135deg,#24c6dc,#514a9d)',
-                'linear-gradient(135deg,#11998e,#38ef7d)',
-                'linear-gradient(135deg,#fc4a1a,#f7b733)',
-            ];
-            $tsGrad = $avGrads[abs(crc32($ts->name)) % count($avGrads)];
-        @endphp
-        <div class="top-shop-card" data-shop-id="{{ $ts->id }}">
-            {{-- Image --}}
-            <div class="top-shop-img">
-                @if($ts->image)
-                    <img src="{{ \App\Services\ImageOptimizer::url($ts->image, 'medium') }}" alt="{{ $ts->name }}" loading="lazy">
-                @else
-                    <div class="top-shop-img-ph">{!! $si($tsIcoKey, 36) !!}</div>
-                @endif
-                <span class="top-shop-open-badge">● Ouvert</span>
-                <button class="top-shop-heart {{ in_array($ts->id, $favoriteIds) ? 'favorited' : '' }}"
-                        data-shop-id="{{ $ts->id }}"
-                        onclick="event.preventDefault();toggleFavorite({{ $ts->id }}, this)"
-                        title="{{ in_array($ts->id, $favoriteIds) ? 'Retirer des favoris' : 'Ajouter aux favoris' }}">
-                    {!! $si('heart',14) !!}
-                </button>
-            </div>
-            {{-- Body --}}
-            <div class="top-shop-body">
-                <div class="top-shop-body-row">
-                    <div class="shop-av" style="background:{{ $tsGrad }};width:50px;height:50px;font-size:15px">{{ $tsInit }}</div>
-                    <div style="flex:1;min-width:0;padding-top:2px">
-                        @if($ts->type)
-                        <span class="top-shop-tag">{{ strtoupper($ts->type) }}</span>
-                        @endif
-                        <div style="display:flex;align-items:flex-start;gap:4px;margin:2px 0 4px">
-                            <span class="shop-name-clamp top-shop-name" style="font-size:13.5px;flex:1;min-width:0">{{ $ts->name }}</span>
-                            <span class="top-shop-verified" style="margin-top:1px;flex-shrink:0" title="Boutique vérifiée">{!! $si('verified',14) !!}</span>
-                        </div>
-                        <p class="top-shop-desc">{{ $ts->description ?? 'Boutique vérifiée sur Shopio.' }}</p>
-                        <div class="top-shop-loc">
-                            {!! $si('pin',12) !!}
-                            {{ $ts->address ?? ($ts->city ?? $ts->country ?? 'Guinée') }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {{-- Footer --}}
-            <div class="top-shop-footer">
-                <div class="top-shop-stats">
-                    <div class="top-shop-rating">
-                        {!! $sif('star-o',13) !!} {{ $ts->avg_rating ? number_format($ts->avg_rating, 1) : '—' }}
-                        <span style="color:var(--muted);font-weight:400;font-size:10px"> ({{ $ts->reviews_count ?? 0 }} avis)</span>
-                    </div>
-                    <div class="top-shop-sales">{!! $si('bag',12) !!} +{{ number_format($ts->sales_count ?? 0) }} ventes</div>
-                </div>
-                <a href="{{ route('client.shops.show', $ts) }}" class="top-shop-btn">Visiter la boutique →</a>
-            </div>
-        </div>
-        @endforeach
-    </div>
-</div>
-@endif
-
-{{-- Catégories filtre pills + grille boutiques --}}
-<div id="boutiques" style="scroll-margin-top:80px">
-    <div class="sec-hd">
-        <div class="sec-title">
-            <strong>Toutes</strong> les Boutiques
+            @if(request('cat'))
+                <strong>{{ request('cat') }}</strong>
+            @else
+                <strong>Tous</strong> les produits
+            @endif
             <span style="font-size:14px;font-weight:500;color:var(--muted);font-family:var(--font)">
-                (<span id="shopCount">{{ $shops->total() }}</span>)
+                (<span id="productCount">{{ $products->total() }}</span>)
             </span>
         </div>
+        @if(request('cat'))
+        <a href="{{ route('client.dashboard') }}#catalogue" class="sec-link">Réinitialiser ✕</a>
+        @endif
     </div>
 
-    <div class="cats" id="catFilter">
-            @php
-                /* ── Emojis prédéfinis (extensible) ── */
-                $catIcoMap = [
-                    'alimentation'=>'utensils','restaurant'=>'utensils','épicerie'=>'cart','epicerie'=>'cart',
-                    'boulangerie'=>'bread','pâtisserie'=>'bread','patisserie'=>'bread',
-                    'vêtements'=>'shirt','vetements'=>'shirt','mode'=>'shirt',
-                    'bijouterie'=>'gem','bijoux'=>'gem',
-                    'électronique'=>'smartphone','electronique'=>'smartphone',
-                    'informatique'=>'monitor','téléphonie'=>'phone-call','telephonie'=>'phone-call',
-                    'beauté & cosmétiques'=>'sparkles','beaute & cosmetiques'=>'sparkles',
-                    'beauté'=>'sparkles','beaute'=>'sparkles','cosmétiques'=>'sparkles','cosmetiques'=>'sparkles',
-                    'pharmacie'=>'medical','parfumerie'=>'flower',
-                    'auto & moto'=>'car','auto'=>'car','automobile'=>'car','moto'=>'car',
-                    'sport'=>'activity','sport & loisirs'=>'activity',
-                    'jouets'=>'heart','enfants'=>'heart',
-                    'maison'=>'home','décoration'=>'home','decoration'=>'home','mobilier'=>'home',
-                    'librairie'=>'book','livres'=>'book',
-                    'musique'=>'music','téléphone'=>'smartphone','telephone'=>'smartphone',
-                    'high-tech'=>'monitor','high tech'=>'monitor',
-                    'jardin'=>'leaf','agriculture'=>'wheat',
-                    'animalerie'=>'heart','voyage'=>'globe','artisanat'=>'sparkles','art'=>'sparkles',
-                    'santé'=>'health','sante'=>'health','médical'=>'medical','medical'=>'medical',
-                    'construction'=>'wrench','quincaillerie'=>'wrench','outillage'=>'wrench',
-                    'fournitures'=>'tag','bureau'=>'tag',
-                    'supermarché'=>'cart','supermarche'=>'cart',
-                    'épices'=>'utensils','épice'=>'utensils','boissons'=>'utensils',
-                    'chaussures'=>'shoe','accessoires'=>'handbag','sacs'=>'handbag',
-                ];
-
-                /* Récupère TOUS les types distincts des boutiques approuvées du pays */
-                $existingTypes = \App\Models\Shop::where('is_approved', true)
-                    ->whereNotNull('type')
-                    ->where('type', '!=', '')
-                    ->when(auth()->user()?->country, fn($q, $c) => $q->where('country', $c))
-                    ->distinct()
-                    ->orderBy('type')
-                    ->pluck('type')
-                    ->toArray();
-
-                $getEmoji = function(string $type) use ($catIcoMap, $si): string {
-                    $key = mb_strtolower(trim($type));
-                    if (isset($catIcoMap[$key])) return $si($catIcoMap[$key], 15);
-                    foreach ($catIcoMap as $k => $icoKey) { if (str_contains($key, $k)) return $si($icoKey, 15); }
-                    return $si('store', 15);
-                };
-            @endphp
-
-            {{-- Pill "Toutes" --}}
-            <button class="cat-pill {{ $activeType === '' ? 'active' : '' }}"
-                    onclick="filterByType('', this)">
-                {!! $si('store',15) !!} Toutes <span class="cat-pill-cnt" id="catCntAll">{{ $shops->total() }}</span>
-            </button>
-
-            {{-- Une pill par type existant en base --}}
-            @foreach($existingTypes as $t)
-            <button class="cat-pill {{ $activeType === $t ? 'active' : '' }}"
-                    data-type-val="{{ $t }}"
-                    onclick="filterByType(this.dataset.typeVal, this)">
-                {!! $getEmoji($t) !!} {{ $t }}
-                <span class="cat-pill-cnt" data-cat="{{ $t }}">…</span>
-            </button>
-            @endforeach
-        </div>
+    @if($products->isEmpty())
+    <div class="c-empty">
+        <span class="c-empty-ico">{!! $si('bag',48) !!}</span>
+        <div class="c-empty-title">Aucun produit disponible</div>
+        <p class="c-empty-sub">Revenez bientôt.</p>
     </div>
-
-        <div class="shops-grid" id="shopsGrid">
-            @forelse($shops as $shop)
-            @php
-                [$icoKey, $bgClass] = $typeIco[$shop->type ?? ''] ?? ['bag', 'bg-default'];
-                $isNew   = $shop->created_at->diffInDays(now()) <= 7;
-                $sParts  = explode(' ', $shop->name);
-                $sInit   = strtoupper(substr($sParts[0],0,1)) . strtoupper(substr($sParts[1] ?? 'X',0,1));
-                $sGrads  = [
-                    'linear-gradient(135deg,#667eea,#764ba2)',
-                    'linear-gradient(135deg,#f5576c,#f093fb)',
-                    'linear-gradient(135deg,#4facfe,#00c6fb)',
-                    'linear-gradient(135deg,#cc2b5e,#753a88)',
-                    'linear-gradient(135deg,#ee0979,#ff6a00)',
-                    'linear-gradient(135deg,#24c6dc,#514a9d)',
-                    'linear-gradient(135deg,#0f2027,#203a43,#2c5364)',
-                    'linear-gradient(135deg,#c94b4b,#4b134f)',
-                    'linear-gradient(135deg,#11998e,#38ef7d)',
-                    'linear-gradient(135deg,#fc4a1a,#f7b733)',
-                    'linear-gradient(135deg,#1a1a2e,#e94560)',
-                    'linear-gradient(135deg,#2c3e50,#4ca1af)',
-                ];
-                $sGrad = $sGrads[abs(crc32($shop->name)) % count($sGrads)];
-            @endphp
-            @php
-                $dProdKw = $shop->products
-                    ->map(function($p){ return strtolower($p->name.' '.($p->category ?? '')); })
-                    ->implode(' ');
-            @endphp
-            <a href="{{ route('client.shops.show', $shop) }}"
-               class="shop-card"
-               data-name="{{ strtolower($shop->name) }}"
-               data-type="{{ strtolower($shop->type ?? '') }}"
-               data-products="{{ $dProdKw }}">
-
-                <div class="shop-card-img">
-                    @if($shop->image)
-                        <img src="{{ \App\Services\ImageOptimizer::url($shop->image, 'thumb') }}"
-                             srcset="{{ \App\Services\ImageOptimizer::url($shop->image, 'thumb') }} 300w,
-                                     {{ \App\Services\ImageOptimizer::url($shop->image, 'medium') }} 800w"
-                             sizes="(max-width:600px) 50vw, (max-width:900px) 33vw, 220px"
-                             alt="{{ $shop->name }}"
-                             loading="lazy" decoding="async" width="220" height="160">
-                    @else
-                        <div class="shop-card-placeholder {{ $bgClass }}">{!! $si($icoKey, 40) !!}</div>
-                    @endif
-                    @if($isNew)
-                        <span class="shop-card-badge badge-new">✨ Nouveau</span>
-                    @else
-                        <span class="shop-card-badge badge-open">Ouvert</span>
-                    @endif
-                    <button class="shop-card-fav-btn {{ in_array($shop->id, $favoriteIds) ? 'favorited' : '' }}"
-                            data-shop-id="{{ $shop->id }}"
-                            onclick="event.preventDefault();event.stopPropagation();toggleFavorite({{ $shop->id }}, this)"
-                            title="{{ in_array($shop->id, $favoriteIds) ? 'Retirer des favoris' : 'Ajouter aux favoris' }}">
-                        {!! $si('heart',15) !!}
-                    </button>
-                </div>
-
-                <div class="shop-card-body">
-                    {{-- Ligne avatar + nom + icône vérifié --}}
-                    <div style="display:flex;gap:11px;align-items:flex-start;margin-bottom:7px">
-                        <div class="shop-av" style="background:{{ $sGrad }}">{{ $sInit }}</div>
-                        <div style="flex:1;min-width:0;padding-top:2px">
-                            @if($shop->type)
-                            <div class="shop-card-type" style="margin-bottom:2px">{{ strtoupper($shop->type) }}</div>
-                            @endif
-                            <div style="display:flex;align-items:flex-start;gap:4px">
-                                <div class="shop-name-clamp" style="flex:1;min-width:0">{{ $shop->name }}</div>
-                                <span style="color:#3b82f6;flex-shrink:0;margin-top:1px" title="Boutique approuvée">{!! $si('verified',14) !!}</span>
-                            </div>
-                        </div>
-                    </div>
-                    {{-- Description --}}
-                    @if($shop->description)
-                    <p class="shop-card-desc">{{ $shop->description }}</p>
-                    @endif
-                    {{-- Adresse --}}
-                    @if($shop->address ?? false)
-                    <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);margin-top:4px">
-                        {!! $si('pin',11) !!} {{ Str::limit($shop->address, 24) }}
-                    </div>
-                    @endif
-                    <span class="shop-prod-match">📦 A ce produit</span>
-                </div>
-
-                <div class="shop-card-footer">
-                    <div style="display:flex;flex-direction:column;gap:3px">
-                        <div class="shop-card-rating">
-                            {!! $sif('star-o',13) !!} {{ $shop->avg_rating ? number_format($shop->avg_rating, 1) : '—' }}
-                            <small>({{ $shop->reviews_count ?? 0 }} avis)</small>
-                        </div>
-                        <div style="font-size:10.5px;color:var(--muted);display:flex;align-items:center;gap:3px">
-                            {!! $si('bag',11) !!} +{{ number_format($shop->sales_count ?? 0) }} ventes
-                        </div>
-                    </div>
-                    <span class="shop-card-cta">Visiter →</span>
-                </div>
-            </a>
-            @empty
-            <div class="c-empty">
-                <span class="c-empty-ico">{!! $si('store',48) !!}</span>
-                <div class="c-empty-title">Aucune boutique disponible</div>
-                <p class="c-empty-sub">Revenez bientôt.</p>
+    @else
+    <div class="prod-grid" id="productsGrid">
+        @foreach($products as $p)
+        @php $pHasPromo = $p->original_price && $p->original_price > $p->price; @endphp
+        <a href="{{ route('client.products.show', $p) }}" class="reco-card">
+            <div class="reco-card-img">
+                @if($p->image)
+                    <img src="{{ \App\Services\ImageOptimizer::url($p->image, 'medium') }}" alt="{{ $p->name }}" loading="lazy">
+                @else
+                    <div class="reco-card-ph">{!! $si('bag', 30) !!}</div>
+                @endif
+                @if($p->is_flash_active)
+                    <span class="reco-card-badge">⚡ -{{ $p->flash_discount_percent }}%</span>
+                @elseif($pHasPromo)
+                    <span class="reco-card-badge">-{{ $p->discount_percent }}%</span>
+                @endif
+                <button class="reco-card-fav {{ in_array($p->id, $favoriteProductIds ?? []) ? 'favorited' : '' }}"
+                        data-product-id="{{ $p->id }}"
+                        onclick="event.preventDefault();event.stopPropagation();toggleProductFavorite({{ $p->id }}, this)"
+                        title="{{ in_array($p->id, $favoriteProductIds ?? []) ? 'Retirer des favoris' : 'Ajouter aux favoris' }}">
+                    {!! $si('heart', 13) !!}
+                </button>
             </div>
-            @endforelse
-        </div>
-        <div id="shopsLiveEmpty">
-            <span class="ico">🔍</span>
-            <p id="shopsLiveEmptyMsg">Aucun résultat pour votre recherche.</p>
-        </div>
+            <div class="reco-card-body">
+                <div class="reco-card-shop">{{ $p->shop->name ?? '' }}</div>
+                <div class="reco-card-name">{{ $p->name }}</div>
+                <div class="reco-card-price-row">
+                    <span class="reco-card-price">{{ number_format($p->current_price, 0, ',', ' ') }}</span>
+                    @if($p->is_flash_active)
+                        <span class="reco-card-orig">{{ number_format($p->price, 0, ',', ' ') }}</span>
+                    @elseif($pHasPromo)
+                        <span class="reco-card-orig">{{ number_format($p->original_price, 0, ',', ' ') }}</span>
+                    @endif
+                    <span style="font-size:10px;color:var(--muted)">{{ $p->shop->currency ?? 'GNF' }}</span>
+                </div>
+                <button type="button" class="reco-card-addcart" onclick="event.preventDefault();event.stopPropagation();addToCart({{ $p->id }}, this)">
+                    {!! $si('cart', 13) !!} Ajouter
+                </button>
+                <div class="reco-card-actions-row">
+                    <button type="button" class="reco-card-order" title="Commander" onclick="event.preventDefault();event.stopPropagation();window.location.href='{{ route('client.orders.createFromProduct', $p) }}'">{!! $si('bag', 12) !!} Commander</button>
+                    <button type="button" class="reco-card-contact" title="Contacter le vendeur" onclick="event.preventDefault();event.stopPropagation();window.location.href='{{ route('client.messages.index', $p) }}'">{!! $si('chat', 12) !!} Contacter</button>
+                </div>
+            </div>
+        </a>
+        @endforeach
+    </div>
 
-        <div class="c-pagination">{{ $shops->links() }}</div>
+    <div class="c-pagination">{{ $products->links() }}</div>
+    @endif
 
 </div>{{-- /.main-col --}}
 </div>{{-- /.page-wrap --}}
@@ -3157,10 +3048,10 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
                 <span>Accueil</span>
             </div>
         </a>
-        <a href="#boutiques" class="mob-nav-item" onclick="document.querySelectorAll('.mob-nav-item').forEach(i=>i.classList.remove('active'));this.classList.add('active')">
+        <a href="#catalogue" class="mob-nav-item" onclick="document.querySelectorAll('.mob-nav-item').forEach(i=>i.classList.remove('active'));this.classList.add('active')">
             <div class="mob-nav-item-wrap">
-                {!! $si('store', 21) !!}
-                <span>Boutiques</span>
+                {!! $si('bag', 21) !!}
+                <span>Produits</span>
             </div>
         </a>
         <a href="{{ route('client.orders.index') }}" class="mob-nav-item">
@@ -3244,7 +3135,7 @@ $rGrads = [
     <div style="background:#fff;border-radius:20px;width:100%;max-width:500px;max-height:90vh;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.3);animation:slideUp .28s cubic-bezier(.23,1,.32,1);display:flex;flex-direction:column">
 
         {{-- ── HEADER ── --}}
-        <div style="background:linear-gradient(135deg,#f06a0f 0%,#d45a08 100%);padding:24px 24px 20px;flex-shrink:0;position:relative;overflow:hidden">
+        <div style="background:linear-gradient(135deg,#6366f1 0%,#4f46e5 100%);padding:24px 24px 20px;flex-shrink:0;position:relative;overflow:hidden">
             {{-- Cercles déco --}}
             <div style="position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.08);pointer-events:none"></div>
             <div style="position:absolute;right:50px;bottom:-40px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none"></div>
@@ -3256,7 +3147,7 @@ $rGrads = [
                         {{ $initials }}
                     </div>
                     @if($countryFlag)
-                    <span style="position:absolute;bottom:-2px;right:-4px;font-size:18px;line-height:1;background:#fff;border-radius:50%;padding:2px;box-shadow:0 0 0 2px rgba(240,106,15,.4)">{{ $countryFlag }}</span>
+                    <span style="position:absolute;bottom:-2px;right:-4px;font-size:18px;line-height:1;background:#fff;border-radius:50%;padding:2px;box-shadow:0 0 0 2px rgba(99,102,241,.4)">{{ $countryFlag }}</span>
                     @endif
                 </div>
                 {{-- Infos --}}
@@ -3325,7 +3216,7 @@ $rGrads = [
                             <div style="position:relative">
                                 <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none">👤</span>
                                 <input type="text" name="name" value="{{ old('name', $user->name) }}" required style="{{ $iStyle }}"
-                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(240,106,15,.1)'"
+                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.1)'"
                                        onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
                             </div>
                         </div>
@@ -3336,7 +3227,7 @@ $rGrads = [
                             <div style="position:relative">
                                 <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none">✉️</span>
                                 <input type="email" name="email" value="{{ old('email', $user->email) }}" required style="{{ $iStyle }}"
-                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(240,106,15,.1)'"
+                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.1)'"
                                        onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
                             </div>
                             @if($user->email_verified_at)
@@ -3350,7 +3241,7 @@ $rGrads = [
                             <div style="position:relative">
                                 <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none">📱</span>
                                 <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" placeholder="+224 6XX XXX XXX" style="{{ $iStyle }}"
-                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(240,106,15,.1)'"
+                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.1)'"
                                        onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
                             </div>
                         </div>
@@ -3361,7 +3252,7 @@ $rGrads = [
                             <div style="position:relative">
                                 <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none">📍</span>
                                 <input type="text" name="address" value="{{ old('address', $user->address) }}" placeholder="Quartier, rue…" style="{{ $iStyle }}"
-                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(240,106,15,.1)'"
+                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.1)'"
                                        onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
                             </div>
                         </div>
@@ -3376,7 +3267,7 @@ $rGrads = [
                                 <span id="modalFlagPreview" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:20px;pointer-events:none;z-index:1;line-height:1">{{ $countryFlag ?: '🌍' }}</span>
                                 <select name="country" id="modalCountry" onchange="updateModalFlag(this)"
                                         style="width:100%;padding:10px 14px 10px 44px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:var(--font);color:var(--text);background:#fff;appearance:none;-webkit-appearance:none;cursor:pointer;outline:none;box-sizing:border-box"
-                                        onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(240,106,15,.1)'"
+                                        onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.1)'"
                                         onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
                                     <option value="">-- Sélectionner un pays --</option>
                                     @php
@@ -3484,9 +3375,9 @@ $rGrads = [
                             Annuler
                         </button>
                         <button type="submit"
-                                style="padding:10px 26px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange-dk));color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:7px;box-shadow:0 4px 14px rgba(240,106,15,.4);transition:all .15s"
-                                onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(240,106,15,.5)'"
-                                onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 14px rgba(240,106,15,.4)'">
+                                style="padding:10px 26px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange-dk));color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:7px;box-shadow:0 4px 14px rgba(99,102,241,.4);transition:all .15s"
+                                onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(99,102,241,.5)'"
+                                onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 14px rgba(99,102,241,.4)'">
                             💾 Enregistrer
                         </button>
                     </div>
@@ -3544,7 +3435,7 @@ $rGrads = [
                                 <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;z-index:1">🔑</span>
                                 <input type="password" name="current_password" id="pwdCurrent" placeholder="••••••••" autocomplete="current-password"
                                        style="width:100%;padding:10px 44px 10px 40px;border:1.5px solid {{ $errors->updatePassword->has('current_password') ? '#ef4444' : 'var(--border)' }};border-radius:9px;font-size:14px;font-family:var(--font);color:var(--text);background:#fff;outline:none;box-sizing:border-box"
-                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(240,106,15,.1)'"
+                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.1)'"
                                        onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
                                 <button type="button" onclick="togglePwd('pwdCurrent',this)"
                                         style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);z-index:1">👁</button>
@@ -3560,7 +3451,7 @@ $rGrads = [
                                 <input type="password" name="password" id="pwdNew" placeholder="Min. 8 caractères" autocomplete="new-password"
                                        oninput="evalPwdStrength(this.value)"
                                        style="width:100%;padding:10px 44px 10px 40px;border:1.5px solid {{ $errors->updatePassword->has('password') ? '#ef4444' : 'var(--border)' }};border-radius:9px;font-size:14px;font-family:var(--font);color:var(--text);background:#fff;outline:none;box-sizing:border-box"
-                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(240,106,15,.1)'"
+                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.1)'"
                                        onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
                                 <button type="button" onclick="togglePwd('pwdNew',this)"
                                         style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);z-index:1">👁</button>
@@ -3581,7 +3472,7 @@ $rGrads = [
                                 <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;z-index:1">✅</span>
                                 <input type="password" name="password_confirmation" id="pwdConfirm" placeholder="Répétez le nouveau mot de passe" autocomplete="new-password"
                                        style="width:100%;padding:10px 44px 10px 40px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:var(--font);color:var(--text);background:#fff;outline:none;box-sizing:border-box"
-                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(240,106,15,.1)'"
+                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.1)'"
                                        onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
                                 <button type="button" onclick="togglePwd('pwdConfirm',this)"
                                         style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);z-index:1">👁</button>
@@ -3596,9 +3487,9 @@ $rGrads = [
                             Annuler
                         </button>
                         <button type="submit"
-                                style="padding:10px 26px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange-dk));color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:7px;box-shadow:0 4px 14px rgba(240,106,15,.4);transition:all .15s"
-                                onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(240,106,15,.5)'"
-                                onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 14px rgba(240,106,15,.4)'">
+                                style="padding:10px 26px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange-dk));color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:7px;box-shadow:0 4px 14px rgba(99,102,241,.4);transition:all .15s"
+                                onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(99,102,241,.5)'"
+                                onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 14px rgba(99,102,241,.4)'">
                             🔒 Changer le mot de passe
                         </button>
                     </div>
@@ -3932,8 +3823,25 @@ function toggleFavorite(shopId, btn) {
 
 /* Favoris PRODUITS (carrousel "Recommandé pour vous") — même logique que toggleFavorite() mais pour un produit */
 function toggleProductFavorite(productId, btn) {
-    btn.style.opacity = '0.5';
-    btn.disabled = true;
+    // Mise à jour OPTIMISTE : le cœur change tout de suite, sans attendre le serveur
+    // (la requête part en arrière-plan). On rétablit l'état d'origine seulement en cas d'échec.
+    const cards = document.querySelectorAll(`.reco-card-fav[data-product-id="${productId}"]`);
+    const wasFavorited = btn.classList.contains('favorited');
+    const nowFavorited = !wasFavorited;
+
+    cards.forEach(b => {
+        b.classList.toggle('favorited', nowFavorited);
+        b.title = nowFavorited ? 'Retirer des favoris' : 'Ajouter aux favoris';
+        b.disabled = true;
+    });
+
+    const navBadge = document.getElementById('navFavBadge');
+    const prevBadgeCount = navBadge ? (parseInt(navBadge.textContent, 10) || 0) : 0;
+    if (navBadge) {
+        const optimisticCount = Math.max(0, prevBadgeCount + (nowFavorited ? 1 : -1));
+        navBadge.textContent = optimisticCount > 0 ? optimisticCount : '';
+        navBadge.classList.toggle('show', optimisticCount > 0);
+    }
 
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
     fetch(`/client/products/${productId}/favorite`, {
@@ -3945,23 +3853,65 @@ function toggleProductFavorite(productId, btn) {
         return r.json();
     })
     .then(data => {
-        // Met à jour TOUS les cœurs de ce produit (la boucle infinie affiche chaque carte 2 fois)
-        document.querySelectorAll(`.reco-card-fav[data-product-id="${productId}"]`).forEach(b => {
+        // Recale sur la vraie réponse du serveur (par sécurité) et réactive les boutons
+        cards.forEach(b => {
             b.disabled = false;
-            b.style.opacity = '';
-            if (data.favorited) {
-                b.classList.add('favorited');
-                b.title = 'Retirer des favoris';
-            } else {
-                b.classList.remove('favorited');
-                b.title = 'Ajouter aux favoris';
-            }
+            b.classList.toggle('favorited', data.favorited);
+            b.title = data.favorited ? 'Retirer des favoris' : 'Ajouter aux favoris';
         });
+        if (navBadge) {
+            navBadge.textContent = data.count > 0 ? data.count : '';
+            navBadge.classList.toggle('show', data.count > 0);
+        }
     })
     .catch(err => {
         console.error('Erreur favoris produit:', err);
-        btn.style.opacity = '';
+        // Échec réseau → on annule la mise à jour optimiste
+        cards.forEach(b => {
+            b.disabled = false;
+            b.classList.toggle('favorited', wasFavorited);
+            b.title = wasFavorited ? 'Retirer des favoris' : 'Ajouter aux favoris';
+        });
+        if (navBadge) {
+            navBadge.textContent = prevBadgeCount > 0 ? prevBadgeCount : '';
+            navBadge.classList.toggle('show', prevBadgeCount > 0);
+        }
+    });
+}
+
+/* ══════════════════════════════════════════
+   AJOUTER AU PANIER (depuis une carte produit)
+══════════════════════════════════════════ */
+function addToCart(productId, btn) {
+    if (btn.disabled) return;
+    btn.disabled = true;
+    const originalHtml = btn.innerHTML;
+
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+    fetch(`{{ url('/client/cart/add') }}/${productId}`, {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity: 1 })
+    })
+    .then(r => r.json().then(data => ({ ok: r.ok, data })))
+    .then(({ ok, data }) => {
+        if (!ok) throw new Error(data.message || 'Erreur');
+        btn.classList.add('added');
+        btn.innerHTML = '✓ Ajouté';
+        const navBadge = document.getElementById('navCartBadge');
+        if (navBadge) {
+            navBadge.textContent = data.count > 0 ? data.count : '';
+            navBadge.classList.toggle('show', data.count > 0);
+        }
+        setTimeout(() => {
+            btn.classList.remove('added');
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
+        }, 1600);
+    })
+    .catch(() => {
         btn.disabled = false;
+        btn.innerHTML = originalHtml;
     });
 }
 
@@ -4461,7 +4411,7 @@ function switchProfileTab(name) {
         var active = (t === name);
         body.style.display  = active ? 'block' : 'none';
         btn.style.background = active ? 'rgba(255,255,255,.95)' : 'rgba(255,255,255,.12)';
-        btn.style.color      = active ? '#f06a0f' : 'rgba(255,255,255,.75)';
+        btn.style.color      = active ? '#6366f1' : 'rgba(255,255,255,.75)';
         btn.style.fontWeight = active ? '800' : '700';
         btn.style.boxShadow  = active ? '0 2px 8px rgba(0,0,0,.12)' : 'none';
     });
@@ -4537,12 +4487,12 @@ document.addEventListener('DOMContentLoaded', () => {
     @if(session('status') === 'profile-updated')
         openProfileModal('info');
         if (window.Swal) {
-            Swal.fire({ icon: 'success', title: 'Modifié avec succès !', text: 'Vos informations ont bien été mises à jour.', confirmButtonColor: '#f06a0f' });
+            Swal.fire({ icon: 'success', title: 'Modifié avec succès !', text: 'Vos informations ont bien été mises à jour.', confirmButtonColor: '#6366f1' });
         }
     @endif
     @if(session('status') === 'password-updated')
         if (window.Swal) {
-            Swal.fire({ icon: 'success', title: 'Modifié avec succès !', text: 'Votre mot de passe a bien été changé.', confirmButtonColor: '#f06a0f' });
+            Swal.fire({ icon: 'success', title: 'Modifié avec succès !', text: 'Votre mot de passe a bien été changé.', confirmButtonColor: '#6366f1' });
         }
     @endif
     @if($errors->updatePassword->any())

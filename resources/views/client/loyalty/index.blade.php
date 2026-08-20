@@ -11,9 +11,9 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 :root {
-    --orange:    #f90;
-    --orange-dk: #e47911;
-    --orange-lt: #fff8e7;
+    --orange:    #6366f1;
+    --orange-dk: #4f46e5;
+    --orange-lt: #e0e7ff;
     --navy:      #131921;
     --navy-2:    #232f3e;
     --green:     #067d62;
@@ -38,8 +38,8 @@ html { font-family: var(--font); }
 body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoothing: antialiased; }
 
 .nav { background: var(--navy); height: var(--nav-h); display: flex; align-items: center; padding: 0 16px; gap: 10px; position: sticky; top: 0; z-index: 100; }
-.nav-logo { font-family: var(--display); font-size: 18px; font-weight: 900; color: var(--orange); text-decoration: none; flex-shrink: 0; }
-.nav-logo span { color: #fff; }
+.nav-logo { display: flex; align-items: center; font-family: var(--display); font-size: 18px; font-weight: 900; color: var(--orange); text-decoration: none; flex-shrink: 0; }
+.nav-logo img { height: 40px; width: auto; object-fit: contain; border-radius: 8px; }
 .nav-back { color: rgba(255,255,255,.8); font-size: 12.5px; font-weight: 600; text-decoration: none; padding: 5px 10px; border: 1px solid transparent; border-radius: var(--r-sm); transition: all .15s; white-space: nowrap; }
 .nav-back:hover { border-color: rgba(255,255,255,.4); color: #fff; }
 
@@ -55,7 +55,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .points-hero::before {
     content: ''; position: absolute; top: -60px; right: -40px;
     width: 220px; height: 220px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,153,0,.18) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(99,102,241,.18) 0%, transparent 70%);
 }
 .points-hero-lbl { font-size: 12.5px; font-weight: 700; color: rgba(255,255,255,.6); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; }
 .points-hero-val { font-family: var(--display); font-size: 40px; font-weight: 900; color: #fff; letter-spacing: -1px; line-height: 1; }
@@ -127,7 +127,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 @section('content')
 
 <nav class="nav">
-    <a href="{{ route('client.dashboard') }}" class="nav-logo">Ma<span>Boutique</span></a>
+    <a href="{{ route('client.dashboard') }}" class="nav-logo"><img src="{{ asset('images/shopio-logo-192.png') }}" alt="Shopio"></a>
     <a href="{{ route('client.dashboard') }}" class="nav-back">← Retour à l'accueil</a>
 </nav>
 

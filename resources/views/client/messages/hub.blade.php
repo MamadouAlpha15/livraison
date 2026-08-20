@@ -7,7 +7,7 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 :root {
-    --orange:#f90; --orange-dk:#e47911; --navy:#131921; --navy-2:#232f3e;
+    --orange:#6366f1; --orange-dk:#4f46e5; --navy:#131921; --navy-2:#232f3e;
     --blue:#007185; --green:#067d62; --green-lt:#d1fae5; --yellow:#f59e0b;
     --border:#e9edef; --text:#111b21; --muted:#667781; --surface:#fff; --bg:#f0f2f5;
     --font:'Segoe UI',sans-serif; --nav-h:60px; --sidebar-w:360px;
@@ -20,7 +20,7 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 .hub-sidebar { width:var(--sidebar-w); flex-shrink:0; display:flex; flex-direction:column; background:var(--surface); border-right:1px solid var(--border); }
 .hub-sidebar-head { padding:14px 16px 10px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; background:#f0f2f5; }
 .hub-sidebar-title { font-size:19px; font-weight:700; color:var(--text); flex:1; }
-.hub-back-dash { background:var(--orange); color:var(--navy); border:none; border-radius:50%; width:34px; height:34px; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; text-decoration:none; font-weight:700; flex-shrink:0; transition:background .15s,transform .1s; }
+.hub-back-dash { background:var(--orange); color:#fff; border:none; border-radius:50%; width:34px; height:34px; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; text-decoration:none; font-weight:700; flex-shrink:0; transition:background .15s,transform .1s; }
 .hub-back-dash:hover { background:var(--orange-dk); transform:scale(1.08); }
 .hub-search-wrap { padding:8px 10px; background:var(--surface); border-bottom:1px solid var(--border); }
 .hub-search { width:100%; padding:9px 14px; border-radius:8px; border:none; background:#f0f2f5; font-size:13.5px; color:var(--text); outline:none; }
@@ -39,7 +39,7 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 .hub-conv-preview { font-size:12.5px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .hub-conv-meta { display:flex; flex-direction:column; align-items:flex-end; gap:5px; flex-shrink:0; }
 .hub-conv-time { font-size:11px; color:var(--muted); }
-.hub-conv-badge { background:var(--orange); color:var(--navy); font-size:11px; font-weight:700; border-radius:50%; min-width:20px; height:20px; display:flex; align-items:center; justify-content:center; padding:0 5px; }
+.hub-conv-badge { background:var(--orange); color:#fff; font-size:11px; font-weight:700; border-radius:50%; min-width:20px; height:20px; display:flex; align-items:center; justify-content:center; padding:0 5px; }
 .hub-conv-empty { padding:40px 20px; text-align:center; color:var(--muted); font-size:13.5px; }
 .hub-conv-empty-ico { font-size:40px; display:block; margin-bottom:10px; opacity:.4; }
 
@@ -155,7 +155,7 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 .hub-input-zone { background:#f0f2f5; border-top:1px solid var(--border); padding:10px 14px; display:flex; flex-direction:column; gap:6px; flex-shrink:0; }
 .hub-input-row { display:flex; gap:10px; align-items:flex-end; width:100%; }
 .hub-textarea { flex:1; padding:10px 16px; border-radius:24px; border:none; background:#fff; font-size:13.5px; font-family:var(--font); outline:none; resize:none; min-height:42px; max-height:120px; line-height:1.5; box-shadow:0 1px 2px rgba(0,0,0,.1); }
-.hub-send-btn { width:44px; height:44px; border-radius:50%; background:var(--orange); color:var(--navy); border:none; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .15s,transform .1s; box-shadow:0 2px 6px rgba(255,153,0,.35); }
+.hub-send-btn { width:44px; height:44px; border-radius:50%; background:var(--orange); color:#fff; border:none; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .15s,transform .1s; box-shadow:0 2px 6px rgba(99,102,241,.35); }
 .hub-send-btn:hover { background:var(--orange-dk); transform:scale(1.06); }
 .hub-send-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
 

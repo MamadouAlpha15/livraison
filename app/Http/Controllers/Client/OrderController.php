@@ -308,7 +308,7 @@ class OrderController extends Controller
             'product_id'           => 'required|exists:products,id',
             'variant_id'           => 'nullable|integer|exists:product_variants,id',
             'quantity'             => 'required|integer|min:1',
-            'delivery_destination' => ['nullable', 'string', 'min:5', 'max:255'],
+            'delivery_destination' => ['nullable', 'string', 'min:2', 'max:255'],
             'client_phone'         => ['nullable', 'string', 'max:30', new RealisticGuineaPhone],
         ];
 
@@ -317,7 +317,7 @@ class OrderController extends Controller
         if (!Auth::check()) {
             $rules['client_name']          = ['required', 'string', 'max:255', new RealisticFullName];
             $rules['client_phone']         = ['required', 'string', 'max:30', new RealisticGuineaPhone];
-            $rules['delivery_destination'] = ['required', 'string', 'min:5', 'max:255'];
+            $rules['delivery_destination'] = ['required', 'string', 'min:2', 'max:255'];
         }
 
         // Messages explicites pour les règles standard (required/min) : le projet

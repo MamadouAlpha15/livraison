@@ -10,13 +10,20 @@
 @php $bodyClass = 'is-dashboard'; @endphp
 
 @push('styles')
-<link rel="preconnect" href="https://fonts.googleapis.com">
-{{-- display=swap (au lieu de "block") : le texte s'affiche tout de suite avec une police de
-     secours au lieu de rester invisible jusqu'à 3s en attendant la police custom. --}}
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+{{-- Anti-flash : boutique-dashboard.css est chargé en différé (non-bloquant, pour un 1er
+     affichage rapide sur réseau lent). Tant qu'il n'est pas prêt, .sb-logo-icon n'a aucune
+     taille définie → le logo (img width:100%;height:100%) peut s'afficher géant sur toute
+     la page le temps que le CSS arrive. On fige sa taille ici en inline (donc instantané,
+     zéro dépendance réseau) — même technique déjà utilisée sur les autres pages boutique/*. --}}
+<style>.sb-logo-icon{width:36px;height:36px;border-radius:9px;overflow:hidden;flex-shrink:0}</style>
+{{-- Polices auto-hébergées (avant : fonts.googleapis.com + fonts.gstatic.com) — même fichier
+     déjà servi par shopio-app.com, zéro nouvelle connexion DNS/TLS externe à négocier.
+     display=swap : le texte s'affiche tout de suite avec une police de secours au lieu de
+     rester invisible en attendant la police custom. --}}
+<link rel="preload" as="style" href="{{ \App\Support\Assets::v('fonts/dashboard-fonts.css') }}">
+<link href="{{ \App\Support\Assets::v('fonts/dashboard-fonts.css') }}" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="{{ \App\Support\Assets::v('fonts/dashboard-fonts.css') }}" rel="stylesheet">
 </noscript>
 @vite(['resources/css/boutique-dashboard.css'])
 @endpush
@@ -315,7 +322,7 @@ $I = [
     <aside class="sidebar" id="sidebar">
           <div class="sb-brand">
             <a href="{{ route('boutique.dashboard') }}" class="sb-logo">
-               <div class="sb-logo-icon"><img src="{{ \App\Support\Assets::v('images/shopio-logo-192.png') }}" alt="Shopio" style="width:100%;height:100%;object-fit:cover;border-radius:9px"></div>
+               <div class="sb-logo-icon"><img src="{{ \App\Support\Assets::v('images/shopio-logo-192.png') }}" alt="Shopio" style="width:100%;height:100%;object-fit:cover;border-radius:9px"></div> 
                 <span class="sb-shop-name">{{ $shop->name }}</span>
             </a>  
             <button class="sb-close" id="btnCloseSidebar" aria-label="Fermer le menu">{!! $I['close'] !!}</button>
@@ -448,14 +455,6 @@ $I = [
             
 
             <div class="tb-actions">
-
-                {{-- Activer sons (mobile) --}}
-                <button class="tb-icon-btn" id="btnEnableSound" title="Activer les sons de notification"
-                        onclick="enableSoundManual()"
-                        style="display:none;position:relative">
-                    🔔
-                    <span style="position:absolute;top:-3px;right:-3px;width:8px;height:8px;background:#ef4444;border-radius:50%;border:2px solid var(--surface)"></span>
-                </button>
 
                 {{-- Mode sombre --}}
                 <button class="tb-icon-btn" id="btnDarkMode" title="Mode sombre / clair">{!! $I['moon'] !!}</button>

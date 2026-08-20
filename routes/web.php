@@ -845,6 +845,13 @@ Route::middleware(['auth', 'role:client'])
         /* Favoris */
         Route::post('/favorites/{shop}/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
         Route::get('/favorites',                [FavoriteController::class, 'index']) ->name('favorites.index');
+
+        /* Panier (multi-boutiques) */
+        Route::get('/cart',                       [\App\Http\Controllers\Client\CartController::class, 'index'])          ->name('cart.index');
+        Route::post('/cart/add/{product}',         [\App\Http\Controllers\Client\CartController::class, 'add'])            ->name('cart.add');
+        Route::post('/cart/{item}/quantity',       [\App\Http\Controllers\Client\CartController::class, 'updateQuantity'])  ->name('cart.quantity');
+        Route::delete('/cart/{item}',              [\App\Http\Controllers\Client\CartController::class, 'remove'])          ->name('cart.remove');
+        Route::post('/cart/checkout',              [\App\Http\Controllers\Client\CartController::class, 'checkout'])        ->name('cart.checkout');
     });
 
 /* ══════════════════════════════════════════════════════════════════════════

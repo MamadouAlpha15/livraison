@@ -12,8 +12,8 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 :root {
-    --orange:    #f90;
-    --orange-dk: #e47911;
+    --orange:    #6366f1;
+    --orange-dk: #4f46e5;
     --navy:      #131921;
     --navy-2:    #232f3e;
     --blue:      #007185;
@@ -221,8 +221,8 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
 /* ZONE DE SAISIE */
 .chat-input-zone { background: var(--surface); border: 1px solid var(--border); border-top: 2px solid var(--orange); border-radius: 0 0 var(--r) var(--r); padding: 12px 16px; display: flex; gap: 10px; align-items: flex-end; }
 .chat-textarea { flex: 1; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 20px; font-size: 13.5px; font-family: var(--font); color: var(--text); background: var(--grey); outline: none; resize: none; min-height: 40px; max-height: 100px; line-height: 1.5; transition: border-color .15s, background .15s; }
-.chat-textarea:focus { border-color: var(--orange); background: var(--surface); box-shadow: 0 0 0 3px rgba(255,153,0,.1); }
-.chat-send-btn { width: 42px; height: 42px; border-radius: 50%; background: var(--orange); color: var(--navy); border: none; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .15s; box-shadow: 0 2px 8px rgba(255,153,0,.3); font-weight: 700; }
+.chat-textarea:focus { border-color: var(--orange); background: var(--surface); box-shadow: 0 0 0 3px rgba(99,102,241,.1); }
+.chat-send-btn { width: 42px; height: 42px; border-radius: 50%; background: var(--orange); color: #fff; border: none; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .15s; box-shadow: 0 2px 8px rgba(99,102,241,.3); font-weight: 700; }
 .chat-send-btn:hover { background: var(--orange-dk); transform: scale(1.07); }
 
 /* Toast notification */
@@ -276,7 +276,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
     display: flex; align-items: center; justify-content: center;
     font-size: 19px; transition: all .15s;
 }
-.chat-photo-btn:hover { border-color: var(--orange); color: var(--orange); background: #fff8f0; }
+.chat-photo-btn:hover { border-color: var(--orange); color: var(--orange); background: #eef2ff; }
 
 /* ── Preview avant envoi ── */
 .chat-img-preview {

@@ -374,8 +374,8 @@ footer.app-footer { display: none !important; }
 .reco-card-shop { font-size: 10.5px; color: var(--muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .reco-card-name { font-size: 12.5px; font-weight: 700; color: var(--text); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.6em; }
 .reco-card-price-row { display: flex; align-items: baseline; gap: 6px; margin-top: auto; flex-wrap: wrap; }
-.reco-card-price { font-size: 14px; font-weight: 800; color: var(--brand-dk); font-family: var(--mono); }
-.reco-card-orig { font-size: 10.5px; color: var(--muted); text-decoration: line-through; font-family: var(--mono); }
+.reco-card-price { font-size: 14px; font-weight: 800; color: var(--brand-dk); font-family: var(--mono); white-space: nowrap; }
+.reco-card-orig { font-size: 10.5px; color: var(--muted); text-decoration: line-through; font-family: var(--mono); white-space: nowrap; }
 @media (max-width: 480px) { .reco-card { flex-basis: 152px; width: 152px; } .reco-card-img { height: 105px; } }
 
 /* ── Ventes flash ── */
@@ -422,8 +422,8 @@ footer.app-footer { display: none !important; }
 .flash-card-shop { font-size: 10px; color: var(--muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .flash-card-name { font-size: 12px; font-weight: 700; color: var(--text); line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.4em; }
 .flash-card-price-row { display: flex; align-items: baseline; gap: 5px; flex-wrap: wrap; }
-.flash-card-price { font-size: 14px; font-weight: 800; color: var(--brand-dk); font-family: var(--mono); }
-.flash-card-orig { font-size: 10px; color: var(--muted); text-decoration: line-through; font-family: var(--mono); }
+.flash-card-price { font-size: 14px; font-weight: 800; color: var(--brand-dk); font-family: var(--mono); white-space: nowrap; }
+.flash-card-orig { font-size: 10px; color: var(--muted); text-decoration: line-through; font-family: var(--mono); white-space: nowrap; }
 @media (max-width: 480px) { .flash-card { flex-basis: 138px; width: 138px; } .flash-card-img { height: 92px; } }
 
 /* ── Grille produits (catalogue complet) ── */
@@ -445,8 +445,8 @@ footer.app-footer { display: none !important; }
 .prod-card-shop { font-size: 11px; color: var(--muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .prod-card-cat { font-size: 10.5px; color: var(--brand-dk); font-weight: 700; }
 .prod-card-footer { padding: 10px 13px 13px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid var(--grey-2); margin-top: auto; }
-.prod-card-price { font-size: 14.5px; font-weight: 800; color: var(--brand-dk); font-family: var(--mono); }
-.prod-card-orig { font-size: 10.5px; color: var(--muted); text-decoration: line-through; margin-left: 3px; font-family: var(--mono); }
+.prod-card-price { font-size: 14.5px; font-weight: 800; color: var(--brand-dk); font-family: var(--mono); white-space: nowrap; }
+.prod-card-orig { font-size: 10.5px; color: var(--muted); text-decoration: line-through; margin-left: 3px; font-family: var(--mono); white-space: nowrap; }
 .prod-card-cta {
     font-size: 11.5px; font-weight: 700; color: #fff; background: var(--brand); border: none; border-radius: 50px;
     padding: 7px 14px; cursor: pointer; text-decoration: none; white-space: nowrap; transition: background .15s;
@@ -478,6 +478,10 @@ footer.app-footer { display: none !important; }
 /* ── Rangées "Populaire en ..." (cartes produit en scroll horizontal) ── */
 .cat-group-row { display: flex; gap: 16px; width: max-content; }
 .prod-card--row { flex: 0 0 190px; width: 190px; }
+/* Carte étroite (190px) : prix + bouton "Commander" côte à côte ne tiennent plus
+   depuis que le prix ne se coupe plus (white-space:nowrap) — on les empile. */
+.prod-card--row .prod-card-footer { flex-direction: column; align-items: stretch; gap: 8px; }
+.prod-card--row .prod-card-cta { width: 100%; text-align: center; }
 @media (max-width: 480px) { .prod-card--row { flex-basis: 158px; width: 158px; } }
 
 /* ── Bannière promo (boutiques vérifiées), façon bloc pub Jumia ── */
@@ -895,7 +899,7 @@ footer.app-footer { display: none !important; }
                 <div class="hero-title">Ventes flash quotidiennes</div>
                 <p class="hero-sub">Jusqu'à -50% sur une sélection de produits chaque jour, en quantités limitées. Ne les manquez pas !</p>
                 <div class="hero-btns">
-                    <a href="#catalogue" class="hero-btn-primary">{!! \App\Support\IconLibrary::svg('zap', '', 16) !!} Voir les ventes flash</a>
+                    <a href="#ventes-flash" class="hero-btn-primary">{!! \App\Support\IconLibrary::svg('zap', '', 16) !!} Voir les ventes flash</a>
                     <a href="{{ route('shops.index') }}" class="hero-btn-secondary">{!! \App\Support\IconLibrary::svg('store', '', 16) !!} Parcourir les boutiques</a>
                 </div>
             </div>
@@ -1063,6 +1067,21 @@ footer.app-footer { display: none !important; }
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    /* ── Ancres "Voir les produits" / "Voir les ventes flash" du hero : on gère le
+       défilement nous-mêmes en JS plutôt que de compter sur le comportement natif
+       du navigateur pour "href=#id" (peu fiable ici, ex: bouton dans le slide actif
+       d'un carrousel avec transitions CSS). Repli sur #catalogue si la cible visée
+       n'existe pas au moment du clic (ex: aucune vente flash active). ── */
+    document.querySelectorAll('a[href="#catalogue"], a[href="#ventes-flash"]').forEach(a => {
+        a.addEventListener('click', e => {
+            const wantedId = a.getAttribute('href').slice(1);
+            const target = document.getElementById(wantedId) || document.getElementById('catalogue');
+            if (!target) return; // rien à cibler, laisser le comportement par défaut
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+
     /* ── Compte à rebours des ventes flash (ré-exécutable après une recherche en direct) ── */
     let flashTimer = null;
     function initFlashCountdown() {

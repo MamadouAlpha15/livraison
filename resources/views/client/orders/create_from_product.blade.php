@@ -117,7 +117,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .prod-devise { font-size: 12px; color: var(--muted); font-weight: 600; }
 .prod-orig { font-size: 13px; color: var(--muted); text-decoration: line-through; font-family: monospace; }
 .prod-remise { font-size: 11px; font-weight: 800; background: #fce4e4; color: var(--red); padding: 2px 8px; border-radius: 20px; }
-.flash-badge-order { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg,#dc2626,#f97316); color: #fff; font-size: 11px; font-weight: 800; letter-spacing: .3px; padding: 4px 12px; border-radius: 20px; margin-bottom: 8px; animation: flashPulseOrder 1.6s ease-in-out infinite; }
+.flash-badge-order { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg,#1a1a2e,#6366f1); color: #fff; font-size: 11px; font-weight: 800; letter-spacing: .3px; padding: 4px 12px; border-radius: 20px; margin-bottom: 8px; animation: flashPulseOrder 1.6s ease-in-out infinite; }
 @keyframes flashPulseOrder { 0%,100% { opacity: 1; } 50% { opacity: .75; } }
 .flash-countdown-order { display: inline-flex; align-items: center; gap: 6px; background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; font-size: 12px; font-weight: 700; padding: 5px 11px; border-radius: 9px; margin-bottom: 12px; font-family: ui-monospace, monospace; }
 .promo-banner-order { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--teal-lt); border: 1.5px dashed #34d399; color: #065f46; font-size: 12.5px; font-weight: 700; padding: 9px 12px; border-radius: 10px; margin-bottom: 14px; cursor: pointer; transition: background .15s; }

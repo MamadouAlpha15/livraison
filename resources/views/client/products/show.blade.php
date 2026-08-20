@@ -17,9 +17,9 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 :root {
-    --amazon:    #f90;
-    --amazon-dk: #e47911;
-    --amazon-lt: #fff8e7;
+    --amazon:    #6366f1;
+    --amazon-dk: #4f46e5;
+    --amazon-lt: #e0e7ff;
     --navy:      #131921;
     --navy-2:    #232f3e;
     --blue:      #007185;

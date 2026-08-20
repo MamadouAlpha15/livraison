@@ -136,7 +136,7 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
 /* VENTE FLASH */
 .flash-badge{
     display:inline-flex;align-items:center;gap:5px;
-    background:linear-gradient(135deg,#dc2626,#f97316);color:#fff;
+    background:linear-gradient(135deg,#1a1a2e,#6366f1);color:#fff;
     font-size:11.5px;font-weight:800;letter-spacing:.3px;
     padding:4px 12px;border-radius:20px;margin-bottom:10px;
     animation:flashPulse 1.6s ease-in-out infinite;
@@ -222,6 +222,17 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
 .btn-order:hover{background:#000;transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.2)}
 .btn-order:active{transform:scale(.97)}
 .btn-order.off{background:#e5e7eb;color:#9ca3af;pointer-events:none;cursor:default;transform:none;box-shadow:none}
+.btn-addcart{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    background:#fff;color:#6366f1;border:1.5px solid #6366f1;
+    font-size:14.5px;font-weight:800;letter-spacing:.2px;
+    padding:14px 24px;border-radius:14px;
+    text-decoration:none;transition:.18s;cursor:pointer
+}
+.btn-addcart:hover{background:#eef2ff}
+.btn-addcart:active{transform:scale(.97)}
+.btn-addcart.added{background:#10b981;border-color:#10b981;color:#fff}
+.btn-addcart:disabled{opacity:.7;cursor:default}
 .btn-back{
     display:flex;align-items:center;justify-content:center;gap:7px;
     background:#fff;border:1.5px solid #e5e7eb;color:#374151;
@@ -450,6 +461,11 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
                    id="orderCta" class="btn-order">
                     🛒 Commander maintenant
                 </a>
+                @auth
+                <button type="button" id="addCartBtn" onclick="addToCartFromPage({{ $product->id }}, this)" class="btn-addcart">
+                    🛍️ Ajouter au panier
+                </button>
+                @endauth
             @else
                 <span class="btn-order off">🚫 Indisponible actuellement</span>
             @endif
@@ -600,6 +616,37 @@ function selectVariant(btn){
         const base = orderBtn.dataset.baseHref;
         orderBtn.href = base + (base.includes('?') ? '&' : '?') + 'variant_id=' + selectedVariantId;
     }
+}
+
+/* ══ AJOUTER AU PANIER ══ */
+function addToCartFromPage(productId, btn){
+    if(btn.disabled) return;
+    btn.disabled = true;
+    const original = btn.innerHTML;
+    btn.innerHTML = 'Ajout…';
+
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+    fetch(`{{ url('/client/cart/add') }}/${productId}`, {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity: 1, variant_id: selectedVariantId || null })
+    })
+    .then(r => r.json().then(data => ({ ok: r.ok, data })))
+    .then(({ ok, data }) => {
+        if(!ok) throw new Error(data.message || 'Erreur');
+        btn.classList.add('added');
+        btn.innerHTML = '✓ Ajouté au panier';
+        setTimeout(() => {
+            btn.classList.remove('added');
+            btn.innerHTML = original;
+            btn.disabled = false;
+        }, 1800);
+    })
+    .catch((e) => {
+        btn.innerHTML = original;
+        btn.disabled = false;
+        alert(e.message || "Impossible d'ajouter ce produit au panier.");
+    });
 }
 
 async function toggleWish(productId){

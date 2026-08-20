@@ -15,7 +15,7 @@
 
     .header-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
     .header-table td { vertical-align: top; }
-    .brand { font-size: 24px; font-weight: bold; color: #f97316; }
+    .brand { font-size: 24px; font-weight: bold; color: #4f46e5; }
     .brand span { color: #0f172a; }
     .brand-tag { font-size: 10px; color: #64748b; margin-top: 2px; }
     .doc-title { font-size: 18px; font-weight: bold; text-align: right; color: #0f172a; }
@@ -44,7 +44,7 @@
     .totals-table .lbl { color: #64748b; text-align: right; padding-right: 16px; }
     .totals-table .val { text-align: right; width: 130px; font-weight: bold; }
     .totals-table .grand-row .lbl { font-size: 14px; color: #0f172a; font-weight: bold; }
-    .totals-table .grand-row .val { font-size: 16px; color: #f97316; }
+    .totals-table .grand-row .val { font-size: 16px; color: #4f46e5; }
     .totals-table .discount .val { color: #16a34a; }
 
     .payment-box { margin-top: 20px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 10px 14px; font-size: 11.5px; color: #166534; }

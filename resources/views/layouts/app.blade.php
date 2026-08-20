@@ -23,6 +23,23 @@
 
     {{-- ══ Loader plein écran — inline pour s'afficher avant tout CSS ══ --}}
     <style>
+        /* ── Verrou anti-flash absolu ──
+           Le loader ci-dessous compte sur son z-index pour RECOUVRIR le contenu, mais sur un
+           chargement très progressif (réseau lent), le navigateur peut peindre une frame
+           intermédiaire avant que cet empilement soit pleinement effectif — d'où le flash de
+           HTML brut malgré le loader. Cette règle est une sécurité indépendante : elle cache le
+           contenu réel PAR RÈGLE (pas par superposition), donc impossible à contourner par un
+           souci de timing. Le JS tout en bas retire .pg-loading du <body> une fois prêt. */
+        body.pg-loading > *:not(#pg-loader) { display: none !important; }
+    </style>
+    {{-- Sans JS (désactivé, ou en échec), le verrou ci-dessus ne serait jamais levé et
+         cacherait le site pour toujours : on l'annule dans ce cas et on masque juste le
+         loader, qui lui ne disparaîtrait jamais sans JS non plus. --}}
+    <noscript><style>
+        body.pg-loading > *:not(#pg-loader) { display: revert !important; }
+        #pg-loader { display: none !important; }
+    </style></noscript>
+    <style>
         #pg-loader {
             position:fixed;inset:0;z-index:999999;
             background:#fff;
@@ -71,13 +88,10 @@
     </style>
 
 
-    {{-- ══ Ressource hints (connexions anticipées) ══ --}}
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    {{-- ══ Bootstrap/icônes/polices auto-hébergés (avant : cdn.jsdelivr.net + fonts.google
+         + fonts.gstatic) — chaque domaine externe coûte une négociation DNS+TLS séparée,
+         très chère sur un réseau mobile lent/instable. En local, zéro coût = même connexion
+         déjà ouverte pour la page elle-même. ══ --}}
 
     {{-- ══ NProgress — chargé après Bootstrap pour ne pas bloquer ══ --}}
     <style>
@@ -85,16 +99,17 @@
         #nprogress .peg { box-shadow:0 0 10px #059669,0 0 5px #059669;opacity:1;width:100px;height:100%;position:absolute;right:0; }
     </style>
 
-    {{-- ══ Bootstrap CSS — chargement non-bloquant (astuce media="print" → "all" au onload).
-         Le flash de page non stylée est de toute façon déjà évité par #pg-loader plus bas,
-         qui masque tout le contenu tant que les feuilles de style ne sont pas chargées. ══ --}}
-    <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" media="print" onload="this.media='all'">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" media="print" onload="this.media='all'">
+    {{-- ══ Bootstrap CSS — auto-hébergé, chargement non-bloquant (astuce media="print" → "all"
+         au onload). Le flash de page non stylée est de toute façon déjà évité par #pg-loader
+         plus bas, qui masque tout le contenu tant que les feuilles de style ne sont pas
+         chargées. ══ --}}
+    <link rel="preload" as="style" href="{{ \App\Support\Assets::v('vendor/bootstrap/bootstrap.min.css') }}">
+    <link rel="preload" as="style" href="{{ \App\Support\Assets::v('vendor/bootstrap-icons/bootstrap-icons.css') }}">
+    <link href="{{ \App\Support\Assets::v('vendor/bootstrap/bootstrap.min.css') }}" rel="stylesheet" media="print" onload="this.media='all'">
+    <link href="{{ \App\Support\Assets::v('vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet" media="print" onload="this.media='all'">
     <noscript>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+        <link href="{{ \App\Support\Assets::v('vendor/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
+        <link href="{{ \App\Support\Assets::v('vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
     </noscript>
 
     <style>
@@ -281,7 +296,7 @@
 
     @stack('styles')
 </head>
-<body class="{{ $bodyClass ?? '' }}">
+<body class="pg-loading {{ $bodyClass ?? '' }}">
 
 {{-- ══ Loader plein écran ══ --}}
 <div id="pg-loader">
@@ -391,8 +406,8 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
     </main>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" defer></script>
+    <script src="{{ \App\Support\Assets::v('vendor/bootstrap/bootstrap.bundle.min.js') }}" defer></script>
+    <script src="{{ \App\Support\Assets::v('vendor/bootstrap/nprogress.min.js') }}" defer></script>
     @stack('scripts')
 
 {{-- ══ Célébration : objectif journalier du livreur atteint (gamification) ══ --}}
@@ -574,8 +589,23 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
     function hide() {
         if (done) return;
         done = true;
+        /* Révèle le vrai contenu (retire le verrou CSS anti-flash) juste avant de faire
+           disparaître le loader, pour qu'il n'y ait jamais de flash de HTML non stylé
+           en dessous — voir la règle "body.pg-loading" tout en haut du <head>. */
+        document.body.classList.remove('pg-loading');
         loader.classList.add('done');
         setTimeout(function () { loader.remove(); }, 350);
+
+        /* Si l'URL contient une ancre (#xxx), le navigateur a déjà essayé d'y sauter
+           tout seul pendant le chargement — sans succès, puisque le contenu était encore
+           caché par le verrou ci-dessus à ce moment-là (et il ne réessaie jamais après
+           coup). On refait donc le saut nous-mêmes maintenant que tout est visible. */
+        if (window.location.hash) {
+            try {
+                var hashTarget = document.querySelector(window.location.hash);
+                if (hashTarget) hashTarget.scrollIntoView({ block: 'start' });
+            } catch (e) {} // hash pouvant contenir des caractères invalides en sélecteur CSS
+        }
     }
 
     /* Attendre DOM + polices + feuilles de style pour éviter le flash de contenu non stylé
@@ -609,8 +639,17 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
         });
     });
 
-    /* Sécurité absolue : 7s max (pages lourdes type dashboard sur réseau lent) */
-    setTimeout(hide, 7000);
+    /* Réseau lent : rassurer l'utilisateur au lieu de le laisser croire que ça bloque
+       (au lieu de dévoiler du HTML non stylé, on explique juste que ça continue) */
+    var txt = document.getElementById('pg-loader-txt');
+    var slowTimer = setTimeout(function () {
+        if (!done && txt) txt.textContent = 'Connexion lente, merci de patienter…';
+    }, 4000);
+
+    /* Sécurité absolue : 20s max (réseau très lent type 2G/3G en Guinée).
+       On ne dévoile la page qu'en dernier recours — mieux vaut un loader un peu
+       plus long qu'un flash de HTML brut non stylé qui casse l'image du site. */
+    setTimeout(function () { clearTimeout(slowTimer); hide(); }, 20000);
 })();
 
 /* ══ NProgress — barre de progression instantanée ══ */

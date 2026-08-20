@@ -70,7 +70,7 @@ body { background: #0f0f1a; color: #e2e8f0; }
 }
 .search-bar input::placeholder { color: rgba(255,255,255,.3); }
 .search-bar button {
-    background: linear-gradient(135deg, #ff6a00, #ee0979);
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
     border: none;
     color: #fff;
     padding: 0 18px;
@@ -102,7 +102,7 @@ body { background: #0f0f1a; color: #e2e8f0; }
     transition: .15s;
 }
 .cat-pill:hover, .cat-pill.active {
-    background: linear-gradient(135deg, #ff6a00, #ee0979);
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
     border-color: transparent;
     color: #fff;
 }
@@ -132,7 +132,7 @@ body { background: #0f0f1a; color: #e2e8f0; }
 .p-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 12px 32px rgba(0,0,0,.35);
-    border-color: rgba(255,106,0,.35);
+    border-color: rgba(99,102,241,.35);
 }
 .p-card-img {
     position: relative;
@@ -158,7 +158,7 @@ body { background: #0f0f1a; color: #e2e8f0; }
     position: absolute;
     top: 8px;
     left: 8px;
-    background: linear-gradient(135deg, #ff6a00, #ee0979);
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
     color: #fff;
     font-size: 10px;
     font-weight: 700;
@@ -205,7 +205,7 @@ body { background: #0f0f1a; color: #e2e8f0; }
 .p-card-price {
     font-size: 14px;
     font-weight: 800;
-    color: #ff6a00;
+    color: #6366f1;
 }
 .p-card-orig {
     font-size: 11px;
@@ -223,7 +223,7 @@ body { background: #0f0f1a; color: #e2e8f0; }
     font-size: 11.5px;
     font-weight: 700;
     color: #fff;
-    background: linear-gradient(135deg, #ff6a00, #ee0979);
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
     border: none;
     border-radius: 8px;
     padding: 6px 14px;
@@ -306,7 +306,7 @@ body { background: #0f0f1a; color: #e2e8f0; }
     .p-card-price {
         font-size: 13px;
         font-weight: 900;
-        color: #ff6a00;
+        color: #6366f1;
         line-height: 1.2;
         white-space: nowrap;
     }
@@ -429,7 +429,7 @@ body { background: #0f0f1a; color: #e2e8f0; }
                     <div class="p-card-ph">🛍</div>
                 @endif
                 @if($product->is_flash_active)
-                    <span class="p-card-badge" style="background:linear-gradient(135deg,#dc2626,#f97316)">⚡ Flash −{{ $product->flash_discount_percent }}%</span>
+                    <span class="p-card-badge" style="background:linear-gradient(135deg,#1a1a2e,#6366f1)">⚡ Flash −{{ $product->flash_discount_percent }}%</span>
                 @elseif($hasPromo)
                     <span class="p-card-badge">Promo</span>
                 @endif

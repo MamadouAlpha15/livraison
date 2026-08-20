@@ -11,9 +11,9 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 :root {
-    --amazon:    #f90;
-    --amazon-dk: #e47911;
-    --amazon-lt: #fff8e7;
+    --amazon:    #6366f1;
+    --amazon-dk: #4f46e5;
+    --amazon-lt: #e0e7ff;
     --navy:      #131921;
     --navy-2:    #232f3e;
     --blue:      #007185;
@@ -162,7 +162,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .amz-card:hover {
     box-shadow: 0 14px 40px rgba(0,0,0,.16);
     transform: translateY(-5px);
-    border-color: rgba(249,144,0,.35);
+    border-color: rgba(99,102,241,.35);
 }
 .amz-card-img {
     height: 250px;
@@ -237,15 +237,15 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .amz-btn-order {
     display: flex; align-items: center; justify-content: center; gap: 6px;
     width: 100%; padding: 11px 10px; border-radius: 10px;
-    font-size: 13px; font-weight: 700; font-family: var(--font);
-    background: linear-gradient(135deg, #ffba3a, #f90);
-    color: var(--navy); border: none;
+    font-size: 13px; font-weight: 800; font-family: var(--font);
+    background: linear-gradient(135deg, #4f46e5, #4338ca);
+    color: #fff; border: none;
     cursor: pointer; text-decoration: none; transition: all .2s;
-    box-shadow: 0 3px 10px rgba(249,144,0,.32);
+    box-shadow: 0 4px 14px rgba(79,70,229,.45);
 }
 .amz-btn-order:hover {
-    background: linear-gradient(135deg, #f90, #e47911);
-    color: #fff; box-shadow: 0 6px 18px rgba(249,144,0,.48);
+    background: linear-gradient(135deg, #4338ca, #3730a3);
+    color: #fff; box-shadow: 0 6px 20px rgba(79,70,229,.6);
     transform: translateY(-1px);
 }
 .amz-btn-order.out { background: var(--grey-2); color: var(--muted); border: 1px solid var(--border); cursor: not-allowed; box-shadow: none; transform: none; }
@@ -340,8 +340,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 /* Footer modal */
 .prod-modal-ft { padding: 12px 18px; border-top: 1px solid var(--border); background: var(--grey); display: flex; gap: 10px; flex-wrap: wrap; flex-shrink: 0; }
-.prod-modal-btn-order { flex: 1; min-width: 140px; padding: 11px 14px; border-radius: 20px; font-size: 13.5px; font-weight: 700; font-family: var(--font); background: var(--amazon); color: var(--navy); border: 1px solid var(--amazon-dk); cursor: pointer; text-decoration: none; transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
-.prod-modal-btn-order:hover { background: var(--amazon-dk); color: #fff; }
+.prod-modal-btn-order { flex: 1; min-width: 140px; padding: 11px 14px; border-radius: 20px; font-size: 13.5px; font-weight: 800; font-family: var(--font); background: linear-gradient(135deg, #4f46e5, #4338ca); color: #fff; border: none; box-shadow: 0 4px 14px rgba(79,70,229,.45); cursor: pointer; text-decoration: none; transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.prod-modal-btn-order:hover { background: linear-gradient(135deg, #4338ca, #3730a3); color: #fff; box-shadow: 0 6px 20px rgba(79,70,229,.6); }
 .prod-modal-btn-order.out { background: var(--grey-2); color: var(--muted); border-color: var(--border); cursor: not-allowed; }
 .prod-modal-btn-msg { flex: 0 0 auto; padding: 11px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; font-family: var(--font); background: var(--surface); color: var(--text); border: 1px solid var(--border); cursor: pointer; text-decoration: none; transition: all .15s; display: flex; align-items: center; gap: 6px; }
 .prod-modal-btn-msg:hover { background: var(--grey-2); border-color: #999; }
@@ -755,7 +755,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     @else
                         <div class="amz-card-img-ph">🏷️</div>
                     @endif
-                    @if($product->is_flash_active)<span class="amz-card-badge" style="background:linear-gradient(135deg,#dc2626,#f97316)">⚡ Flash −{{ $product->flash_discount_percent }}%</span>
+                    @if($product->is_flash_active)<span class="amz-card-badge" style="background:linear-gradient(135deg,#1a1a2e,#6366f1)">⚡ Flash −{{ $product->flash_discount_percent }}%</span>
                     @elseif($hasPromo)<span class="amz-card-badge badge-promo">🔥 -{{ $remise }}%</span>
                     @elseif($isNew)<span class="amz-card-badge badge-nouveau">✨ Nouveau</span>
                     @elseif($product->is_featured)<span class="amz-card-badge badge-vedette">⭐ Vedette</span>

@@ -11,8 +11,8 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 :root {
-    --orange:    #f90;
-    --orange-dk: #e47911;
+    --orange:    #6366f1;
+    --orange-dk: #4f46e5;
     --navy:      #131921;
     --navy-2:    #232f3e;
     --red:       #b12704;

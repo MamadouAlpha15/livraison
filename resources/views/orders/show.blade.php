@@ -14,11 +14,11 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-    --orange:    #f06a0f;
-    --orange-dk: #d45a00;
-    --orange-lt: #fff4ec;
-    --orange-bd: #fcd9b6;
-    --orange-2:  #fb923c;
+    --orange:    #6366f1;
+    --orange-dk: #4f46e5;
+    --orange-lt: #e0e7ff;
+    --orange-bd: #c7d2fe;
+    --orange-2:  #818cf8;
     --green:     #10b981;
     --green-lt:  #ecfdf5;
     --green-dk:  #065f46;
@@ -56,12 +56,12 @@ html, body {
 
 /* ── Topbar ── */
 .topbar {
-    background: linear-gradient(135deg, var(--orange) 0%, var(--orange-dk) 60%, #b84e00 100%);
+    background: linear-gradient(135deg, var(--orange) 0%, var(--orange-dk) 60%, #3730a3 100%);
     margin: -24px -16px 24px;
     padding: 0 20px;
     height: 64px;
     display: flex; align-items: center; gap: 14px;
-    box-shadow: 0 4px 20px rgba(240,106,15,.4);
+    box-shadow: 0 4px 20px rgba(99,102,241,.4);
     position: relative; overflow: hidden;
 }
 .topbar::before {
@@ -147,7 +147,7 @@ html, body {
     bottom: 20px; left: 50%; transform: translateX(-50%);
     background: rgba(255,255,255,.96);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(240,106,15,.2);
+    border: 1px solid rgba(99,102,241,.2);
     border-radius: 40px;
     padding: 8px 18px 8px 10px;
     display: flex; align-items: center; gap: 10px;
@@ -161,7 +161,7 @@ html, body {
     background: linear-gradient(135deg, var(--orange), var(--orange-dk));
     display: flex; align-items: center; justify-content: center;
     font-size: 14px; font-weight: 800; color: #fff; flex-shrink: 0;
-    box-shadow: 0 0 0 2px rgba(240,106,15,.25);
+    box-shadow: 0 0 0 2px rgba(99,102,241,.25);
 }
 .mlo-name { font-size: 13px; font-weight: 800; color: var(--text); }
 .mlo-status { font-size: 11px; color: var(--muted); margin-top: 1px; display: flex; align-items: center; gap: 4px; }
@@ -207,7 +207,7 @@ html, body {
 }
 @keyframes step-pulse {
     0%,100%{ box-shadow:0 0 0 4px var(--orange-lt); }
-    50%     { box-shadow:0 0 0 8px rgba(240,106,15,.1); }
+    50%     { box-shadow:0 0 0 8px rgba(99,102,241,.1); }
 }
 .prog-lbl { font-size: 10.5px; font-weight: 600; color: var(--muted); text-align: center; }
 .prog-lbl.active { color: var(--orange); font-weight: 700; }
@@ -237,7 +237,7 @@ html, body {
 }
 .lc-header {
     padding: 14px 20px;
-    background: linear-gradient(135deg, var(--orange-lt), #fff8f3);
+    background: linear-gradient(135deg, var(--orange-lt), #f5f3ff);
     border-bottom: 1px solid var(--orange-bd);
     display: flex; align-items: center; gap: 10px;
 }
@@ -248,7 +248,7 @@ html, body {
     background: linear-gradient(135deg, var(--orange), var(--orange-dk));
     display: flex; align-items: center; justify-content: center;
     font-size: 18px; font-weight: 900; color: #fff; flex-shrink: 0;
-    box-shadow: 0 0 0 3px var(--orange-lt), 0 4px 12px rgba(240,106,15,.25);
+    box-shadow: 0 0 0 3px var(--orange-lt), 0 4px 12px rgba(99,102,241,.25);
 }
 .lc-name { font-size: 15px; font-weight: 800; color: var(--text); letter-spacing: -.3px; }
 .lc-info { font-size: 12px; color: var(--muted); margin-top: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
@@ -406,7 +406,7 @@ html, body {
 }
 .signup-btn-google  { background: var(--surface); border: 1.5px solid var(--border); color: var(--text); }
 .signup-btn-google:hover { background: var(--bg); }
-.signup-btn-primary { background: var(--orange); color: #fff; box-shadow: 0 4px 14px rgba(240,106,15,.35); }
+.signup-btn-primary { background: var(--orange); color: #fff; box-shadow: 0 4px 14px rgba(99,102,241,.35); }
 .signup-btn-primary:hover { background: var(--orange-dk); transform: translateY(-1px); }
 .signup-link  { display: block; font-size: 13px; color: var(--text-2); font-weight: 600; text-decoration: underline; margin-bottom: 14px; }
 .signup-later { display: block; width: 100%; background: none; border: none; color: var(--muted); font-size: 12.5px; font-weight: 600; cursor: pointer; padding: 4px; }
@@ -488,7 +488,7 @@ $init = fn(string $n): string =>
         <div class="sb-title" style="color:var(--green-dk)">Commande livrée !</div>
         <div class="sb-sub" style="color:#047857">Votre colis a bien été remis. Merci de votre confiance.</div>
         @if(!$order->review)
-        <a href="{{ route('client.reviews.create', $order) }}" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:10px 22px;background:var(--orange);color:#fff;border-radius:30px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(240,106,15,.35)">
+        <a href="{{ route('client.reviews.create', $order) }}" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:10px 22px;background:var(--orange);color:#fff;border-radius:30px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(99,102,241,.35)">
             ⭐ Laisser un avis
         </a>
         @endif
@@ -501,7 +501,7 @@ $init = fn(string $n): string =>
         <span class="sb-ico">❌</span>
         <div class="sb-title" style="color:#991b1b">Commande annulée</div>
         <div class="sb-sub" style="color:#b91c1c">Cette commande a été annulée. Aucun suivi disponible.</div>
-        <a href="{{ route('client.dashboard') }}" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:10px 22px;background:var(--orange);color:#fff;border-radius:30px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(240,106,15,.35)">
+        <a href="{{ route('client.dashboard') }}" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:10px 22px;background:var(--orange);color:#fff;border-radius:30px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(99,102,241,.35)">
             🏪 Découvrir les boutiques
         </a>
     </div>
@@ -765,12 +765,12 @@ $init = fn(string $n): string =>
 .moto-searching { animation: moto-search 1.6s ease-in-out infinite; }
 .halo-ring {
     position: absolute; inset: -5px; border-radius: 50%;
-    border: 2px solid rgba(240,106,15,.6);
+    border: 2px solid rgba(99,102,241,.6);
     animation: halo-pulse 1.8s ease-out infinite;
 }
 .halo-ring2 {
     position: absolute; inset: -5px; border-radius: 50%;
-    border: 1.5px solid rgba(240,106,15,.35);
+    border: 1.5px solid rgba(99,102,241,.35);
     animation: halo-pulse 1.8s ease-out .6s infinite;
 }
 </style>
@@ -839,9 +839,9 @@ $init = fn(string $n): string =>
                 ${searching ? '<div class="halo-ring"></div><div class="halo-ring2"></div>' : ''}
                 <div class="${searching ? 'moto-searching' : ''}" style="
                     width:32px;height:32px;border-radius:50%;
-                    background:linear-gradient(135deg,#f06a0f 0%,#d45a00 100%);
+                    background:linear-gradient(135deg,#6366f1 0%,#4f46e5 100%);
                     border:2px solid #fff;
-                    box-shadow:0 2px 10px rgba(240,106,15,.55),0 0 0 3px rgba(240,106,15,.15);
+                    box-shadow:0 2px 10px rgba(99,102,241,.55),0 0 0 3px rgba(99,102,241,.15);
                     display:flex;align-items:center;justify-content:center;
                     font-size:15px;line-height:1;cursor:pointer">🛵</div>
             </div>`,
@@ -866,7 +866,7 @@ $init = fn(string $n): string =>
     if (lname) marker.openPopup();
 
     const halo = L.circle([lat, lng], {
-        color:'#f06a0f', fillColor:'#f06a0f',
+        color:'#6366f1', fillColor:'#6366f1',
         fillOpacity: gpsFound ? .08 : .04,
         radius: gpsFound ? 65 : 200,
         weight: gpsFound ? 1.5 : 1,
@@ -879,14 +879,14 @@ $init = fn(string $n): string =>
     }).addTo(map);
 
     const trail = L.polyline([[lat,lng]], {
-        color:'#f06a0f', weight:4.5, opacity:.85, lineCap:'round', lineJoin:'round',
+        color:'#6366f1', weight:4.5, opacity:.85, lineCap:'round', lineJoin:'round',
         dashArray: IS_DELIVERED ? null : '1 0'
     }).addTo(map);
 
     let startDot = null;
     if (gpsFound) {
         startDot = L.circleMarker([lat,lng], {
-            radius:7, color:'#fff', weight:2.5, fillColor:'#f06a0f', fillOpacity:1
+            radius:7, color:'#fff', weight:2.5, fillColor:'#6366f1', fillOpacity:1
         }).addTo(map).bindTooltip('Départ', { permanent:false, direction:'top' });
     }
 
@@ -1011,7 +1011,7 @@ $init = fn(string $n): string =>
             b.innerHTML = `<span class="sb-ico">🎉</span>
                 <div class="sb-title" style="color:var(--green-dk)">Commande livrée !</div>
                 <div class="sb-sub" style="color:#047857">Votre colis a bien été remis. Merci de votre confiance.</div>
-                ${REVIEW_URL ? `<a href="${REVIEW_URL}" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:10px 22px;background:var(--orange);color:#fff;border-radius:30px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(240,106,15,.35)">⭐ Laisser un avis</a>` : ''}`;
+                ${REVIEW_URL ? `<a href="${REVIEW_URL}" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:10px 22px;background:var(--orange);color:#fff;border-radius:30px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(99,102,241,.35)">⭐ Laisser un avis</a>` : ''}`;
             wrap.insertBefore(b, wrap.firstChild);
 
         } else if (d.is_cancelled && !wrap.querySelector('.state-banner.cancelled')) {

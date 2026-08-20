@@ -19,29 +19,91 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        /* ── Boutiques approuvées — filtrées par pays du client ── */
-        $type  = request('type');
-        $query = Shop::where('is_approved', true)
-            ->withCount(['products as products_count' => fn($q) => $q->where('is_active', true)])
-            ->withCount(['orders as sales_count'])
-            ->with(['products' => function ($q) {
-                $q->select('id', 'shop_id', 'name', 'category')->where('is_active', true);
-            }])
-            ->addSelect(DB::raw('
-                (SELECT AVG(r.rating)  FROM reviews r INNER JOIN orders o ON o.id = r.order_id WHERE o.shop_id = shops.id) as avg_rating,
-                (SELECT COUNT(r.id)    FROM reviews r INNER JOIN orders o ON o.id = r.order_id WHERE o.shop_id = shops.id) as reviews_count
-            '))
-            ->orderByDesc('sales_count')
-            ->orderByDesc(DB::raw('COALESCE(avg_rating, 0)'));
+        /* ── Catalogue produits (remplace l'ancienne grille de boutiques) ──
+           Mêmes filtres pays/approbation que le reste du tableau de bord,
+           avec recherche (s) et catégorie (cat) optionnelles. */
+        $productsQuery = Product::where('is_active', true)
+            ->whereHas('shop', function ($q) use ($user) {
+                $q->where('is_approved', true);
+                if ($user->country) $q->where('country', $user->country);
+            })
+            ->with(['shop:id,name,image,country,type,currency']);
 
-        if ($user->country) {
-            $query->where('country', $user->country);
+        if ($s = request('s')) {
+            $productsQuery->where(function ($q) use ($s) {
+                $q->where('name', 'like', "%{$s}%")
+                  ->orWhere('description', 'like', "%{$s}%")
+                  ->orWhere('category', 'like', "%{$s}%");
+            });
         }
-        if ($type && $type !== 'Toutes') {
-            $query->where('type', 'LIKE', "%{$type}%");
+        if ($cat = request('cat')) {
+            $productsQuery->where('category', $cat);
         }
 
-        $shops = $query->paginate(12)->withQueryString();
+        $products = $productsQuery->latest()->paginate(24)->withQueryString()->fragment('catalogue');
+
+        /* ── Populaire par catégorie ("Populaire en Parfums", "Populaire en Montres"…) ──
+           Pour chaque grande catégorie, on montre les produits les plus VENDUS
+           (quantités des commandes livrées), pas juste les plus récents. Si une
+           catégorie n'a pas encore de vente, on retombe sur ses produits les plus
+           récents pour ne jamais afficher une section vide dès le lancement.
+           Masqué pendant une recherche/filtre (comme le reste du catalogue). */
+        $categoryGroups = collect();
+        if (!request('s') && !request('cat')) {
+            $topCategoryNames = Product::where('is_active', true)
+                ->whereHas('shop', function ($q) use ($user) {
+                    $q->where('is_approved', true);
+                    if ($user->country) $q->where('country', $user->country);
+                })
+                ->whereNotNull('category')->where('category', '!=', '')
+                ->select('category')
+                ->groupBy('category')
+                ->orderByRaw('COUNT(*) DESC')
+                ->limit(10)
+                ->pluck('category');
+
+            foreach ($topCategoryNames as $catName) {
+                $soldInCat = OrderItem::query()
+                    ->join('orders', 'orders.id', '=', 'order_items.order_id')
+                    ->join('products', 'products.id', '=', 'order_items.product_id')
+                    ->where('orders.status', Order::STATUS_LIVREE)
+                    ->where('products.category', $catName)
+                    ->where('products.is_active', true)
+                    ->selectRaw('order_items.product_id, SUM(order_items.quantity) as total_sold')
+                    ->groupBy('order_items.product_id')
+                    ->orderByDesc('total_sold')
+                    ->limit(6)
+                    ->pluck('total_sold', 'order_items.product_id');
+
+                if ($soldInCat->isNotEmpty()) {
+                    $catProducts = Product::whereIn('id', $soldInCat->keys())
+                        ->whereHas('shop', function ($q) use ($user) {
+                            $q->where('is_approved', true);
+                            if ($user->country) $q->where('country', $user->country);
+                        })
+                        ->with('shop:id,name,image,user_id,currency')
+                        ->get()
+                        ->sortByDesc(fn ($p) => $soldInCat[$p->id])
+                        ->values();
+                    $catProducts->each(fn ($p) => $p->total_sold = (int) $soldInCat[$p->id]);
+                } else {
+                    $catProducts = Product::where('is_active', true)
+                        ->where('category', $catName)
+                        ->whereHas('shop', function ($q) use ($user) {
+                            $q->where('is_approved', true);
+                            if ($user->country) $q->where('country', $user->country);
+                        })
+                        ->with('shop:id,name,image,user_id,currency')
+                        ->latest()
+                        ->limit(6)
+                        ->get();
+                }
+
+                if ($catProducts->count() >= 2) {
+                    $categoryGroups->push(['name' => $catName, 'products' => $catProducts]);
+                }
+            }
+        }
 
         /* ── Stats globales ── */
         $shopQuery = Shop::where('is_approved', true);
@@ -56,11 +118,18 @@ class DashboardController extends Controller
         $deliveredCount = Order::where('status', Order::STATUS_LIVREE)->count();
         $clientCount    = User::where('role', 'client')->count();
 
-        /* ── Catégories avec comptage ── */
-        $catQuery = Shop::where('is_approved', true)->whereNotNull('type')->where('type', '!=', '');
-        if ($user->country) $catQuery->where('country', $user->country);
-        $categories = $catQuery->groupBy('type')
-            ->selectRaw('type, count(*) as shop_count')
+        /* ── Catégories de produits avec comptage ──
+           Alias `type`/`shop_count` conservés pour rester compatibles avec la vue
+           (qui filtrait auparavant les boutiques) : elle affiche maintenant des
+           catégories de PRODUITS mais réutilise les mêmes noms de colonnes. */
+        $categories = Product::where('is_active', true)
+            ->whereNotNull('category')->where('category', '!=', '')
+            ->whereHas('shop', function ($q) use ($user) {
+                $q->where('is_approved', true);
+                if ($user->country) $q->where('country', $user->country);
+            })
+            ->groupBy('category')
+            ->selectRaw('category as type, count(*) as shop_count')
             ->orderByDesc('shop_count')
             ->get();
 
@@ -100,6 +169,7 @@ class DashboardController extends Controller
             ->toArray();
 
         $favoriteProductIds = $user->favoriteProducts()->pluck('products.id')->toArray();
+        $cartCount = (int) \App\Models\CartItem::where('user_id', $user->id)->sum('quantity');
 
         $recoQuery = Product::where('is_active', true)
             ->whereHas('shop', function ($q) use ($user) {
@@ -190,10 +260,10 @@ class DashboardController extends Controller
         $myUnread = ShopMessage::where('receiver_id', $clientId)->whereNull('read_at')->count();
 
         return view('dashboards.client', compact(
-            'shops', 'recentOrders', 'myMessages', 'myUnread',
+            'products', 'categoryGroups', 'recentOrders', 'myMessages', 'myUnread',
             'shopCount', 'productCount', 'deliveredCount', 'clientCount',
             'categories', 'topShops', 'allTopShops', 'favoriteIds',
-            'recommendedProducts', 'favoriteProductIds', 'flashProducts',
+            'recommendedProducts', 'favoriteProductIds', 'flashProducts', 'cartCount',
             'loyaltyPoints', 'loyaltyNextMilestone', 'loyaltyProgressPercent', 'loyaltyReferralBonus'
         ));
     }

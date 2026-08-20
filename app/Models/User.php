@@ -92,6 +92,11 @@ class User extends Authenticatable
         return $this->hasMany(Order::class, 'user_id');
     }
 
+    public function cartItems()
+    {
+        return $this->hasMany(\App\Models\CartItem::class);
+    }
+
     // ✅ Commandes assignées à cet utilisateur EN TANT QUE LIVREUR
     // Filtre sur livreur_id — c'est ce qu'on utilise pour compter les livraisons
     // Exemple : $lv->ordersAsLivreur()->where('status','livrée')->count()
