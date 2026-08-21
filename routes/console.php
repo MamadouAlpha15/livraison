@@ -20,3 +20,9 @@ Schedule::call(function () {
     $count = app(SubscriptionService::class)->expireOldSubscriptions();
     \Illuminate\Support\Facades\Log::info("[Scheduler] Expiration abonnements : {$count} traités.");
 })->daily()->name('expire-subscriptions')->withoutOverlapping();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Relance des paniers abandonnés (assistant IA, étape 4) : une fois par jour,
+// à 10h (heure locale du serveur), pour ne pas notifier les clients en pleine nuit.
+// ─────────────────────────────────────────────────────────────────────────────
+Schedule::command('cart:remind-abandoned')->dailyAt('10:00')->name('remind-abandoned-carts')->withoutOverlapping();

@@ -563,6 +563,10 @@ Route::middleware(['auth', 'role:admin'])
         /* KPI temps réel (AJAX polling 30s) — accessible en gratuit pour le dashboard */
         Route::get('kpi-live', \App\Http\Controllers\Boutique\KpiLiveController::class)->name('kpi.live');
 
+        /* Assistant IA d'analyse des ventes */
+        Route::post('/assistant/chat',  [\App\Http\Controllers\Boutique\AnalyticsAssistantController::class, 'chat'])  ->name('assistant.chat');
+        Route::post('/assistant/reset', [\App\Http\Controllers\Boutique\AnalyticsAssistantController::class, 'reset']) ->name('assistant.reset');
+
         /* ── Routes réservées au Plan Pro ───────────────────────────────── */
         Route::middleware('shop.plan:pro')->group(function () {
 
@@ -845,6 +849,10 @@ Route::middleware(['auth', 'role:client'])
         /* Favoris */
         Route::post('/favorites/{shop}/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
         Route::get('/favorites',                [FavoriteController::class, 'index']) ->name('favorites.index');
+
+        /* Assistant d'achat IA (chat) */
+        Route::post('/assistant/chat',  [\App\Http\Controllers\Client\AssistantController::class, 'chat'])  ->name('assistant.chat');
+        Route::post('/assistant/reset', [\App\Http\Controllers\Client\AssistantController::class, 'reset']) ->name('assistant.reset');
 
         /* Panier (multi-boutiques) */
         Route::get('/cart',                       [\App\Http\Controllers\Client\CartController::class, 'index'])          ->name('cart.index');
