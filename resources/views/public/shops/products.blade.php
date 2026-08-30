@@ -2,15 +2,41 @@
     resources/views/public/shops/products.blade.php
     Route     : GET /shops/{shop}/products → Public\ShopController@products
     Variables :
-      $shop       → Shop
-      $products   → LengthAwarePaginator<Product>
-      $categories → array
-      $devise     → string
+      $shop           → Shop
+      $products       → LengthAwarePaginator<Product>
+      $categories     → array
+      $reviewAvg      → float|null   note moyenne réelle du vendeur (null si aucun avis)
+      $reviewCount    → int          nombre d'avis réels
+      $deliveredCount → int          nombre de commandes livrées par la boutique
+      $devise         → string
 --}}
 @extends('layouts.app')
 
+@php
+    $shopDesc = trim(strip_tags($shop->description ?? '')) ?: ($shop->name . ' — découvrez tous nos produits et commandez directement en ligne sur Shopio.');
+    $shopImg  = $shop->image ? (\App\Services\ImageOptimizer::url($shop->image, 'medium') ?? asset('storage/'.$shop->image)) : asset('images/shopio-logo-192.png');
+@endphp
+
 @section('title', $shop->name . ' — Produits')
+@section('description', \Illuminate\Support\Str::limit($shopDesc, 160))
 @php $bodyClass = 'is-dashboard'; @endphp
+
+@push('meta')
+{{-- Aperçu riche quand ce lien est collé sur WhatsApp / Facebook / Messenger : c'est
+     précisément ce que le vendeur partage pour attirer des clients, donc la carte de
+     prévisualisation doit montrer la boutique (photo + nom + description), pas le site. --}}
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{ $shop->name }} — Boutique en ligne">
+<meta property="og:description" content="{{ \Illuminate\Support\Str::limit($shopDesc, 200) }}">
+<meta property="og:image" content="{{ $shopImg }}">
+<meta property="og:url" content="{{ url()->current() }}">
+<meta property="og:site_name" content="Shopio">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ $shop->name }} — Boutique en ligne">
+<meta name="twitter:description" content="{{ \Illuminate\Support\Str::limit($shopDesc, 200) }}">
+<meta name="twitter:image" content="{{ $shopImg }}">
+@endpush
+
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -239,8 +265,25 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 }
 .shop-banner-logo img { width: 100%; height: 100%; object-fit: cover; }
 .shop-banner-info { flex: 1; min-width: 0; position: relative; z-index: 1; }
-.shop-banner-name { font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 8px; letter-spacing: -.4px; }
+.shop-banner-name { font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 8px; letter-spacing: -.4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.shop-banner-verified {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 11px; font-weight: 700; color: #6ee7b7;
+    background: rgba(16,185,129,.18); border: 1px solid rgba(110,231,183,.35);
+    padding: 3px 9px; border-radius: 20px; vertical-align: middle;
+}
+.shop-banner-desc {
+    font-size: 13px; color: rgba(255,255,255,.78); line-height: 1.5;
+    max-width: 640px; margin-bottom: 12px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
 .shop-banner-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.shop-banner-rating {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; font-weight: 700; color: #fde68a;
+    background: rgba(245,158,11,.16); border: 1px solid rgba(253,230,138,.3);
+    padding: 3px 10px; border-radius: 20px;
+}
 .shop-banner-chip {
     display: inline-flex; align-items: center; gap: 4px;
     font-size: 12px; color: rgba(255,255,255,.8);
@@ -346,7 +389,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 ══════════════════════════════ */
 .amz-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
     gap: 14px;
 }
 .amz-grid.list-view { grid-template-columns: 1fr; }
@@ -362,19 +405,19 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 }
 .amz-card:hover { box-shadow: 0 8px 32px rgba(99,102,241,.13); border-color: var(--brand-lt); transform: translateY(-3px); }
 
-.amz-grid.list-view .amz-card { flex-direction: row; min-height: 160px; }
-.amz-grid.list-view .amz-card-img { width: 180px; height: auto; min-height: 160px; flex-shrink: 0; }
+.amz-grid.list-view .amz-card { flex-direction: row; min-height: 180px; }
+.amz-grid.list-view .amz-card-img { width: 210px; height: auto; min-height: 180px; flex-shrink: 0; }
 .amz-grid.list-view .amz-card-body { flex: 1; padding: 16px 18px; }
 .amz-grid.list-view .amz-card-footer { border-top: none; border-left: 1px solid var(--border); width: 180px; flex-shrink: 0; padding: 16px; display: flex; flex-direction: column; justify-content: center; }
 
 .amz-card-img {
-    height: 200px; overflow: hidden; position: relative;
+    height: 235px; overflow: hidden; position: relative;
     background: var(--grey-2); flex-shrink: 0; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
 }
 .amz-card-img img {
-    max-width: 100%; max-height: 100%; object-fit: contain;
-    transition: transform .35s; padding: 10px;
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform .35s;
 }
 .amz-card:hover .amz-card-img img { transform: scale(1.07); }
 .amz-card-img-ph { font-size: 48px; opacity: .2; }
@@ -463,7 +506,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
         grid-template-columns: repeat(2, 1fr);
     }
     .amz-grid.list-view .amz-card { flex-direction: column; min-height: unset; }
-    .amz-grid.list-view .amz-card-img { width: 100%; min-height: unset; height: 170px; }
+    .amz-grid.list-view .amz-card-img { width: 100%; min-height: unset; height: 195px; }
     .amz-grid.list-view .amz-card-footer { border-left: none; border-top: 1px solid var(--border); width: 100%; flex-direction: row; gap: 8px; padding: 10px 12px; }
 }
 @media (max-width: 640px) {
@@ -480,7 +523,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     .amz-sort-select           { font-size: 16px !important; }
     .amz-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .amz-grid.list-view { grid-template-columns: repeat(2, 1fr); }
-    .amz-card-img  { height: 148px; }
+    .amz-card-img  { height: 172px; }
     .amz-card-body { padding: 9px 10px 6px; }
     .amz-card-name { font-size: 12px; -webkit-line-clamp: 2; }
     .amz-price-main { font-size: 15px; }
@@ -531,7 +574,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .amz-card-img { cursor: zoom-in; }
 
 @media (max-width: 360px) {
-    .amz-card-img { height: 200px; }
+    .amz-card-img { height: 220px; }
     .amz-card-name { font-size: 13px; -webkit-line-clamp: 3; }
     .amz-price-main { font-size: 17px; }
     .amz-btn-order  { font-size: 13px; padding: 11px; }
@@ -681,9 +724,17 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
         @endif
     </div>
     <div class="shop-banner-info">
-        <div class="shop-banner-name">{{ $shop->name }}</div>
+        <div class="shop-banner-name">
+            {{ $shop->name }}
+            @if($shop->is_approved)<span class="shop-banner-verified">✓ Boutique vérifiée</span>@endif
+        </div>
+        @if($shop->description)
+        <div class="shop-banner-desc">{{ Str::limit(strip_tags($shop->description), 140) }}</div>
+        @endif
         <div class="shop-banner-meta">
             <span class="shop-banner-open">Ouvert</span>
+            @if($reviewAvg)<span class="shop-banner-rating">⭐ {{ number_format($reviewAvg, 1) }} <span style="opacity:.8">({{ $reviewCount }} avis)</span></span>@endif
+            @if($deliveredCount > 0)<span class="shop-banner-chip">✓ {{ $deliveredCount }} commande{{ $deliveredCount > 1 ? 's' : '' }} livrée{{ $deliveredCount > 1 ? 's' : '' }}</span>@endif
             @if($shop->type)<span class="shop-banner-chip">🏷️ {{ $shop->type }}</span>@endif
             @if($shop->address)<span class="shop-banner-chip">📍 {{ Str::limit($shop->address, 28) }}</span>@endif
             <span class="shop-banner-chip">📦 {{ $products->total() }} produit{{ $products->total() > 1 ? 's' : '' }}</span>
@@ -836,10 +887,6 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     @endif
                     <div class="amz-card-name" onclick="goToProduct('{{ route('client.products.show', $product) }}')">
                         {{ $product->name }}
-                    </div>
-                    <div class="amz-stars">
-                        <span class="amz-stars-ico">★★★★★</span>
-                        <span class="amz-stars-count">({{ rand(10,200) }})</span>
                     </div>
                     <div class="amz-price-wrap">
                         <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">

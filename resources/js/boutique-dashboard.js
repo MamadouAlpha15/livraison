@@ -1,4 +1,7 @@
-/* boutique-dashboard.js — extrait de dashboard.blade.php pour être servi en fichier statique mis en cache (voir @vite dans le blade) */
+/* boutique-dashboard.js — fichier externe mis en cache navigateur (7 jours).
+   Le CSS, lui, reste en ligne dans dashboard.blade.php (c'est le CSS qui cause
+   un flash de HTML non stylé s'il manque au premier affichage — le JS n'a
+   jamais ce problème, la page s'affiche sans l'attendre). */
 const DEVISE = window.BQ_CFG.devise;
 
 /* ── Icônes SVG JS (notification bell, toasts, boutons dynamiques) ── */

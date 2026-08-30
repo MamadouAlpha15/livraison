@@ -873,6 +873,17 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 </div>
             </div>
 
+            {{-- Bouton natif du téléphone — SEUL moyen fiable de partager sur Facebook sur mobile :
+                 le lien "facebook.com/sharer.php" est intercepté par l'appli Facebook installée
+                 sur le téléphone, qui ouvre alors un post VIDE (elle ignore le lien dans l'URL).
+                 Le menu de partage natif du téléphone, lui, transmet correctement le lien à
+                 l'appli Facebook choisie. Affiché seulement si le téléphone le permet. --}}
+            <button type="button" id="btnNativeShare" onclick="nativeShareShop()"
+                    style="display:none;width:100%;align-items:center;justify-content:center;gap:8px;padding:14px 16px;border-radius:12px;background:linear-gradient(135deg,#111,#374151);border:none;color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:16px">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                Partager via le menu de mon téléphone
+            </button>
+
             {{-- Réseaux sociaux --}}
             <div style="font-size:12px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Partager directement sur</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
@@ -887,7 +898,10 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     </div>
                 </a>
 
+                {{-- id utilisé par le JS : sur mobile, on redirige ce clic vers le partage natif
+                     du téléphone (voir plus haut) au lieu du lien sharer.php cassé dans l'appli. --}}
                 <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($shareUrl) }}"
+                   id="btnShareFacebook"
                    target="_blank" rel="noopener"
                    style="display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:12px;background:#eff6ff;border:1.5px solid #93c5fd;text-decoration:none;transition:.15s">
                     <span style="font-size:24px">👥</span>
@@ -1478,6 +1492,25 @@ function openSharePanel() {
     document.getElementById('shareOverlay').style.display = 'block';
     document.getElementById('sharePanel').style.display   = 'block';
     document.body.style.overflow = 'hidden';
+
+    /* Sur téléphone, l'appli Facebook installée intercepte le lien "facebook.com/sharer.php"
+       et ouvre un post VIDE (elle ignore le paramètre u=... de l'URL) — c'est une limite de
+       l'appli Facebook, pas un bug de ce site. Le menu de partage natif du téléphone (celui
+       qui liste WhatsApp, Messenger, SMS, Facebook…) transmet le lien correctement, donc on
+       le propose en premier sur mobile et on bascule le bouton "Facebook" dessus aussi. */
+    if (navigator.share) {
+        var nativeBtn = document.getElementById('btnNativeShare');
+        if (nativeBtn) nativeBtn.style.display = 'flex';
+    }
+}
+function nativeShareShop() {
+    var url = '{{ $shareUrl ?? "" }}';
+    if (!url || !navigator.share) return;
+    navigator.share({
+        title: {!! json_encode($shop->name ?? 'Ma boutique') !!},
+        text:  {!! json_encode('🛍 Découvrez ma boutique '.($shop->name ?? '').' sur Shopio :') !!},
+        url:   url
+    }).catch(function() { /* utilisateur a annulé le partage — rien à faire */ });
 }
 function closeSharePanel() {
     document.getElementById('shareOverlay').style.display = 'none';
@@ -1485,6 +1518,19 @@ function closeSharePanel() {
     document.body.style.overflow = '';
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSharePanel(); });
+
+/* Le bouton "Facebook" reste utilisable tel quel sur ordinateur (sharer.php ouvre une
+   fenêtre popup qui fonctionne très bien). Sur téléphone, on intercepte le clic pour
+   passer par le partage natif — voir l'explication dans openSharePanel() ci-dessus. */
+(function() {
+    var fbBtn = document.getElementById('btnShareFacebook');
+    if (fbBtn && navigator.share && /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+        fbBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            nativeShareShop();
+        });
+    }
+})();
 
 function copyShareUrl() {
     var url = '{{ $shareUrl ?? "" }}';

@@ -66,6 +66,9 @@ class DeliveryCompanyController extends Controller
 
         $company = DeliveryCompany::create($data);
 
+        // ✅ Essai gratuit : 1 mois de Plan Business offert à chaque nouvelle entreprise
+        app(\App\Services\SubscriptionService::class)->startCompanyTrial($company);
+
         // redirection DIRECTE vers le tableau de bord de l'entreprise,
         // l'utilisateur pourra accéder au dashboard et voir la page "en attente" si non approuvée
         if (session('payment_intent') === 'business') {
@@ -74,7 +77,7 @@ class DeliveryCompanyController extends Controller
         }
 
         return redirect()->route('company.dashboard')
-                         ->with('success', "Votre entreprise a été approuvée. Vous utilisez le plan gratuit.");
+                         ->with('success', "Votre entreprise a été approuvée. Vous profitez d'un essai gratuit du Plan Business pendant 30 jours.");
     }
 
     // afficher les détails d'une entreprise de livraison
@@ -257,6 +260,7 @@ class DeliveryCompanyController extends Controller
     $devise      = $company->currency ?? 'GNF';
     $isBusiness  = $company->plan === 'business' && $company->plan_expires_at?->isFuture();
     $daysLeft    = $isBusiness ? (int) now()->diffInDays($company->plan_expires_at, false) : 0;
+    $isOnTrial   = $isBusiness && app(\App\Services\SubscriptionService::class)->companyIsOnTrial($company);
     $maxDrivers  = \App\Services\SubscriptionService::COMP_FREE_MAX_DRIVERS;
     $maxZones    = \App\Services\SubscriptionService::COMP_FREE_MAX_ZONES;
     $maxOrders   = \App\Services\SubscriptionService::COMP_FREE_MAX_ORDERS;
@@ -287,7 +291,7 @@ class DeliveryCompanyController extends Controller
         'avgMins', 'avgMinsPrev',
         'avgRating', 'ratingCount', 'latestReviews',
         'devise',
-        'isBusiness', 'daysLeft',
+        'isBusiness', 'daysLeft', 'isOnTrial',
         'maxDrivers', 'maxZones', 'maxOrders', 'usedOrders', 'totalZones',
         'bizGnf', 'bizPriceLabel'
     ));

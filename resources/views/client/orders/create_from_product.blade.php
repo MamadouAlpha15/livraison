@@ -216,6 +216,18 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .field-hint.error { color: var(--red); }
 .field-hint.ok { color: #067d62; }
 
+/* ══ AUTRES PRODUITS DE LA BOUTIQUE ══ */
+.related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+.related-card { display: block; text-decoration: none; color: inherit; border: 1px solid var(--border); border-radius: var(--r-sm); overflow: hidden; background: var(--surface); transition: border-color .15s, transform .15s, box-shadow .15s; }
+.related-card:hover { border-color: var(--brand); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.related-img { width: 100%; aspect-ratio: 1 / 1; background: var(--grey); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.related-img img { width: 100%; height: 100%; object-fit: cover; }
+.related-img-ph { font-size: 28px; opacity: .25; }
+.related-body { padding: 8px 10px 10px; }
+.related-name { font-size: 12px; font-weight: 700; color: var(--text); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.6em; }
+.related-price { font-size: 13px; font-weight: 800; color: var(--brand-dk); font-family: monospace; margin-top: 4px; }
+.related-devise { font-size: 9.5px; color: var(--muted); font-weight: 600; margin-left: 2px; }
+
 /* ══ RESPONSIVE ══ */
 @media (max-width: 700px) {
     .order-grid { grid-template-columns: 1fr; }
@@ -240,6 +252,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     .submit-btn { font-size: 13px; padding: 11px; }
     .qty-btn { width: 36px; height: 36px; }
     .qty-input { width: 48px; height: 36px; }
+    .related-grid { grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 8px; }
+    .related-name { font-size: 11px; }
 }
 </style>
 @endpush
@@ -491,9 +505,12 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                         </div>
                         @endif
 
+                        {{-- Paiement en ligne temporairement désactivé (réactivation prévue plus tard) —
+                             on reste sur cash à la livraison uniquement pour l'instant. --}}
                         <div style="font-size:13px;color:var(--green);display:flex;align-items:center;gap:6px;margin-bottom:14px">
                             {!! \App\Support\IconLibrary::svg('check', '', 14) !!} Livraison disponible — paiement à la réception
                         </div>
+                        <input type="hidden" name="payment_method" id="paymentMethodInput" value="cash">
                     </div>
 
                     {{-- Droite : résumé + bouton --}}
@@ -587,8 +604,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                             </div>
                         </div>
 
-                        <div class="cash-notice">
-                            {!! \App\Support\IconLibrary::svg('wallet', '', 15) !!} <span>Cash à la livraison — aucune carte requise</span>
+                        <div class="cash-notice" id="cashNoticeBox">
+                            {!! \App\Support\IconLibrary::svg('wallet', '', 15) !!} <span id="cashNoticeTxt">Cash à la livraison — aucune carte requise</span>
                         </div>
 
                         <button type="submit" class="submit-btn" id="submitBtn">
@@ -612,6 +629,35 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
         </div>
     </div>
+
+    {{-- ══ AUTRES PRODUITS DE LA BOUTIQUE ══ --}}
+    @if($relatedProducts->isNotEmpty())
+    <div class="card">
+        <div class="card-hd">
+            <div class="card-hd-ico">{!! \App\Support\IconLibrary::svg('store', '', 14) !!}</div>
+            <span class="card-title">Autres produits de {{ Str::limit($shop->name, 24) }}</span>
+        </div>
+        <div class="card-body">
+            <div class="related-grid">
+                @foreach($relatedProducts as $rp)
+                <a href="{{ route('client.orders.createFromProduct', $rp) }}" class="related-card">
+                    <div class="related-img">
+                        @if($rp->image)
+                            <img src="{{ \App\Services\ImageOptimizer::url($rp->image, 'thumb') ?? asset('storage/'.$rp->image) }}" alt="{{ $rp->name }}" loading="lazy">
+                        @else
+                            <div class="related-img-ph">{!! \App\Support\IconLibrary::svg('tag', '', 26) !!}</div>
+                        @endif
+                    </div>
+                    <div class="related-body">
+                        <div class="related-name">{{ $rp->name }}</div>
+                        <div class="related-price">{{ number_format($rp->current_price, 0, ',', ' ') }}<span class="related-devise">{{ $devise }}</span></div>
+                    </div>
+                </a>
+                @endforeach
+            </div>
+        </div>
+    </div>
+    @endif
 
 </div>
 @endsection

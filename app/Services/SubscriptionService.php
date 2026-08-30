@@ -32,6 +32,9 @@ class SubscriptionService
     // ── Durée d'un abonnement ────────────────────────────────────────────────
     const SUBSCRIPTION_DAYS = 30;         // 30 jours = 1 mois
 
+    // ── Durée de l'essai gratuit offert à l'inscription ───────────────────────
+    const TRIAL_DAYS = 30;                // 1 mois d'essai Pro / Business offert
+
     // ─────────────────────────────────────────────────────────────────────────
     // Retourne le plan actif d'une boutique : 'pro' ou 'free'
     // On vérifie d'abord la colonne cache, puis on revalide via la table subscriptions.
@@ -65,6 +68,94 @@ class SubscriptionService
         }
 
         return 'free';
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Offre un essai gratuit du plan Pro (30 jours) à une boutique qui vient
+    // d'être créée. Crée aussi un enregistrement Subscription à 0 GNF pour que
+    // l'historique reste cohérent et que l'expiration quotidienne (routes/console.php)
+    // le traite comme n'importe quel autre abonnement arrivé à échéance.
+    // ─────────────────────────────────────────────────────────────────────────
+    public function startShopTrial(Shop $shop): void
+    {
+        $expiresAt = now()->addDays(self::TRIAL_DAYS);
+
+        $shop->update([
+            'plan'            => 'pro',
+            'plan_expires_at' => $expiresAt,
+        ]);
+
+        Subscription::create([
+            'subscriber_type'   => Shop::class,
+            'subscriber_id'     => $shop->id,
+            'plan'              => 'pro',
+            'amount'            => 0,
+            'currency'          => $shop->currency ?? 'GNF',
+            'payment_method'    => 'essai_gratuit',
+            'payment_reference' => 'trial-shop-' . $shop->id . '-' . now()->timestamp,
+            'status'            => 'active',
+            'started_at'        => now(),
+            'expires_at'        => $expiresAt,
+        ]);
+
+        Log::info("[Subscription] Boutique #{$shop->id} : essai gratuit Pro démarré jusqu'au {$expiresAt->toDateString()}");
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Offre un essai gratuit du plan Business (30 jours) à une entreprise de
+    // livraison qui vient d'être créée. Même logique que startShopTrial().
+    // ─────────────────────────────────────────────────────────────────────────
+    public function startCompanyTrial(DeliveryCompany $company): void
+    {
+        $expiresAt = now()->addDays(self::TRIAL_DAYS);
+
+        $company->update([
+            'plan'            => 'business',
+            'plan_expires_at' => $expiresAt,
+        ]);
+
+        Subscription::create([
+            'subscriber_type'   => DeliveryCompany::class,
+            'subscriber_id'     => $company->id,
+            'plan'              => 'business',
+            'amount'            => 0,
+            'currency'          => $company->currency ?? 'GNF',
+            'payment_method'    => 'essai_gratuit',
+            'payment_reference' => 'trial-company-' . $company->id . '-' . now()->timestamp,
+            'status'            => 'active',
+            'started_at'        => now(),
+            'expires_at'        => $expiresAt,
+        ]);
+
+        Log::info("[Subscription] Entreprise #{$company->id} : essai gratuit Business démarré jusqu'au {$expiresAt->toDateString()}");
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Est-ce que le plan Pro actuel de cette boutique vient d'un essai gratuit
+    // (et non d'un vrai paiement) ? Sert à afficher "Essai gratuit" au lieu de
+    // "Plan Pro actif" sur le tableau de bord.
+    // ─────────────────────────────────────────────────────────────────────────
+    public function shopIsOnTrial(Shop $shop): bool
+    {
+        return Subscription::where('subscriber_type', Shop::class)
+            ->where('subscriber_id', $shop->id)
+            ->where('payment_method', 'essai_gratuit')
+            ->where('status', 'active')
+            ->where('expires_at', '>', now())
+            ->exists();
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Équivalent de shopIsOnTrial() pour une entreprise de livraison.
+    // ─────────────────────────────────────────────────────────────────────────
+    public function companyIsOnTrial(DeliveryCompany $company): bool
+    {
+        return Subscription::where('subscriber_type', DeliveryCompany::class)
+            ->where('subscriber_id', $company->id)
+            ->where('payment_method', 'essai_gratuit')
+            ->where('status', 'active')
+            ->where('expires_at', '>', now())
+            ->exists();
     }
 
     // ─────────────────────────────────────────────────────────────────────────

@@ -18,6 +18,17 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- App Links : permet à l'app de "reprendre la main" après une action
+                 terminée dans le navigateur système (ex: connexion Google), au lieu
+                 de laisser l'utilisateur dans le navigateur. Vérifié via le fichier
+                 https://shopio-app.com/.well-known/assetlinks.json -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="shopio-app.com" />
+            </intent-filter>
         </activity>
 
         <provider

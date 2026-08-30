@@ -597,6 +597,9 @@ $I = [
         <a href="{{ route('admin.paiements.index') }}" class="sb-a">
             <span class="sb-i">{!! $I['card'] !!}</span><span>Paiements</span>
         </a>
+        <a href="{{ route('admin.payouts.index') }}" class="sb-a">
+            <span class="sb-i">{!! $I['dollar'] !!}</span><span>Règlements boutiques</span>
+        </a>
         <a href="{{ route('admin.commissions.index') }}" class="sb-a">
             <span class="sb-i">{!! $I['trend'] !!}</span><span>Commissions</span>
         </a>
@@ -955,6 +958,9 @@ $I = [
             </a>
             <a href="{{ route('admin.paiements.index') }}" class="qa">
                 <span class="qa-ico">{!! $I['card'] !!}</span><span class="qa-l">Paiements</span>
+            </a>
+            <a href="{{ route('admin.payouts.index') }}" class="qa">
+                <span class="qa-ico">{!! $I['dollar'] !!}</span><span class="qa-l">Règlements boutiques</span>
             </a>
             <a href="{{ route('admin.commissions.index') }}" class="qa">
                 <span class="qa-ico">{!! $I['trend'] !!}</span><span class="qa-l">Commissions</span>

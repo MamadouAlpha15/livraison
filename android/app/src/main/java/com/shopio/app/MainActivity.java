@@ -2,6 +2,7 @@ package com.shopio.app;
 
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,16 +19,26 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // App Links (voir AndroidManifest.xml) : si l'app est ouverte à froid via un
+        // lien https://shopio-app.com/... (ex: retour de connexion Google depuis le
+        // navigateur), on navigue directement vers CETTE page-là au lieu de toujours
+        // recharger la page d'accueil configurée par défaut.
+        handleIncomingUrl(getIntent());
+
         // Le fond d'écran de démarrage (logo Shopio) reste défini comme fond de la
         // fenêtre après la fin du splash tant que la page n'a pas fini de se dessiner
         // par-dessus : il "transparaît" dans les zones encore vides pendant un
         // chargement lent. On force un fond blanc immédiat sur la WebView pour éviter ça.
         getBridge().getWebView().setBackgroundColor(Color.WHITE);
 
-        // Filet de sécurité absolu : sur un réseau très lent, la page peut mettre
-        // du temps à envoyer ne serait-ce que son tout début (qui masque normalement
-        // l'écran de démarrage). On force donc sa disparition après 3s dans tous les
-        // cas, pour qu'il ne reste jamais "coincé" indéfiniment à l'écran.
+        // Filet de sécurité en tout dernier recours seulement : la page elle-même
+        // (layouts/app.blade.php) ferme normalement cet écran au bon moment, dès
+        // qu'elle est réellement prête à s'afficher (voir sa propre sécurité à 35s
+        // sur réseau très lent). Ce délai-ci est volontairement plus long (40s) pour
+        // ne JAMAIS se déclencher avant elle en temps normal — il ne sert qu'à éviter
+        // un écran bloqué indéfiniment si la page n'a même pas pu charger son JS du tout
+        // (échec réseau total). Un délai plus court referait apparaître le même flash
+        // de texte brut qu'on cherche justement à éliminer.
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             getBridge().getWebView().evaluateJavascript(
                 "if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SplashScreen) {" +
@@ -35,7 +46,7 @@ public class MainActivity extends BridgeActivity {
                 "}",
                 null
             );
-        }, 3000);
+        }, 40000);
 
         // Empêche le réglage "taille de police / zoom d'écran" du téléphone de fausser
         // le calcul de largeur d'écran utilisé par nos mises en page responsives (CSS),
@@ -62,5 +73,27 @@ public class MainActivity extends BridgeActivity {
                 Toast.makeText(getApplicationContext(), "Échec du téléchargement", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    // L'app est en "singleTask" (voir AndroidManifest.xml) : si elle tourne déjà
+    // en arrière-plan et qu'un lien https://shopio-app.com/... arrive (retour de
+    // connexion Google depuis le navigateur), Android réutilise cette même
+    // instance et appelle onNewIntent() au lieu de recréer l'activité.
+    @Override
+    public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleIncomingUrl(intent);
+    }
+
+    // Si le lien contient une adresse shopio-app.com précise (ex: après connexion
+    // Google), on y navigue directement au lieu de rester sur la page déjà ouverte
+    // ou de recharger la page d'accueil par défaut.
+    private void handleIncomingUrl(Intent intent) {
+        if (intent == null || !Intent.ACTION_VIEW.equals(intent.getAction())) return;
+        Uri data = intent.getData();
+        if (data != null) {
+            getBridge().getWebView().loadUrl(data.toString());
+        }
     }
 }

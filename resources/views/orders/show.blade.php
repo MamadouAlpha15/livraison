@@ -814,16 +814,36 @@ $init = fn(string $n): string =>
         { url:'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
           opts:{ attribution:'© CartoDB', subdomains:'abcd', maxZoom:20, crossOrigin:'' } },
     ];
-    let _pIdx = 0, _layer = null, _fails = 0;
+    let _pIdx = 0, _layer = null, _fails = 0, _tileTimeout = null;
     function _loadTiles(i) {
         if (i >= TILE_PROVIDERS.length) return;
         if (_layer) map.removeLayer(_layer);
+        if (_tileTimeout) clearTimeout(_tileTimeout);
         _fails = 0;
         const p = TILE_PROVIDERS[i];
         _layer = L.tileLayer(p.url, p.opts).addTo(map);
         _layer.on('tileerror', () => { if (++_fails >= 3) _loadTiles(++_pIdx); });
+        // Certaines tuiles ne renvoient jamais d'erreur, elles restent juste bloquées
+        // en chargement (réseau lent/instable) — on bascule quand même après 5s.
+        let _tilesLoaded = false;
+        _layer.on('load', () => { _tilesLoaded = true; });
+        _tileTimeout = setTimeout(() => {
+            if (!_tilesLoaded && i < TILE_PROVIDERS.length - 1) _loadTiles(++_pIdx);
+        }, 5000);
     }
     _loadTiles(0);
+    /* Observe directement le moment où <body> perd la classe "pg-loading"
+       (voir layouts/app.blade.php) : seul signal fiable de "carte enfin
+       visible" — plus fiable qu'un délai fixe ou "window.load". */
+    if (document.body.classList.contains('pg-loading')) {
+        const pgObserver = new MutationObserver(() => {
+            if (!document.body.classList.contains('pg-loading')) {
+                pgObserver.disconnect();
+                map.invalidateSize();
+            }
+        });
+        pgObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    }
     setTimeout(() => map.invalidateSize(), 150);
     setTimeout(() => map.invalidateSize(), 700);
     window.addEventListener('load', () => map.invalidateSize());

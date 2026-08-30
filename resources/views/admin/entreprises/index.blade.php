@@ -381,6 +381,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
         <a href="{{ route('admin.paiements.index') }}" class="sb-a">
             <span class="sb-i">{!! $I['card'] !!}</span><span>Paiements</span>
         </a>
+        <a href="{{ route('admin.payouts.index') }}" class="sb-a"><span class="sb-i">{!! $I['dollar'] !!}</span><span>Règlements boutiques</span></a>
         <a href="{{ route('admin.commissions.index') }}" class="sb-a">
             <span class="sb-i">{!! $I['trend'] !!}</span><span>Commissions</span>
         </a>

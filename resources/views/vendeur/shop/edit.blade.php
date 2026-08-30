@@ -811,6 +811,41 @@ textarea.field-input { resize: vertical; min-height: 90px; }
                    
                 </div>
 
+                <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-bottom:18px">
+                    <div style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">
+                        💳 Paiement en ligne
+                    </div>
+                    <p style="font-size:12px;color:var(--muted);margin:0 0 12px">
+                        Numéro Mobile Money où vous recevrez votre part des commandes payées en ligne par vos clients.
+                    </p>
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label class="field-label" for="payout_wallet_type">Type de compte</label>
+                            <select name="payout_wallet_type" id="payout_wallet_type" class="field-input {{ $errors->has('payout_wallet_type') ? 'error' : '' }}">
+                                <option value="">— Non configuré —</option>
+                                <option value="orange_money" {{ old('payout_wallet_type', $shop->payout_wallet_type) === 'orange_money' ? 'selected' : '' }}>Orange Money</option>
+                                <option value="mtn_momo"     {{ old('payout_wallet_type', $shop->payout_wallet_type) === 'mtn_momo'     ? 'selected' : '' }}>MTN MoMo</option>
+                                <option value="paycard"      {{ old('payout_wallet_type', $shop->payout_wallet_type) === 'paycard'      ? 'selected' : '' }}>PayCard</option>
+                                <option value="kulu"         {{ old('payout_wallet_type', $shop->payout_wallet_type) === 'kulu'         ? 'selected' : '' }}>Kulu</option>
+                                <option value="soutra_money" {{ old('payout_wallet_type', $shop->payout_wallet_type) === 'soutra_money' ? 'selected' : '' }}>Soutra Money</option>
+                                <option value="akiba"        {{ old('payout_wallet_type', $shop->payout_wallet_type) === 'akiba'        ? 'selected' : '' }}>Akiba</option>
+                            </select>
+                            @error('payout_wallet_type')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label" for="payout_wallet_number">Numéro du compte</label>
+                            <div class="field-wrap">
+                                <span class="field-icon">📱</span>
+                                <input type="text" name="payout_wallet_number" id="payout_wallet_number"
+                                       class="field-input {{ $errors->has('payout_wallet_number') ? 'error' : '' }}"
+                                       value="{{ old('payout_wallet_number', $shop->payout_wallet_number) }}"
+                                       placeholder="Ex : 622000000" maxlength="30">
+                            </div>
+                            @error('payout_wallet_number')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
+                        </div>
+                    </div>
+                </div>
+
                 <div class="field-group">
                     <label class="field-label" for="address">Adresse complète</label>
                     <div class="field-wrap">

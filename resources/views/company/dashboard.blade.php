@@ -1205,11 +1205,11 @@ body.cx-light .cx-chart-big { color:#111827; }
 
         {{-- ══ BANNIÈRE PLAN ══ --}}
         @if($isBusiness)
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:14px;padding:14px 20px;">
-            <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:18px">⚡</div>
-                <div>
-                    <div style="font-size:13px;font-weight:800;color:#fff">Plan Business actif</div>
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:12px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:14px;padding:14px 20px;">
+            <div style="display:flex;align-items:center;gap:10px;min-width:0">
+                <div style="width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">{{ $isOnTrial ? '🎁' : '⚡' }}</div>
+                <div style="min-width:0">
+                    <div style="font-size:13px;font-weight:800;color:#fff">{{ $isOnTrial ? 'Essai gratuit Business actif' : 'Plan Business actif' }}</div>
                     <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:1px">Expire le {{ $company->plan_expires_at->format('d/m/Y') }} — encore {{ $daysLeft }} jour{{ $daysLeft > 1 ? 's' : '' }}</div>
                 </div>
             </div>
@@ -1773,8 +1773,53 @@ document.addEventListener('DOMContentLoaded', () => {
     const MAPBOX_TOKEN = '{{ config('services.mapbox.token') }}';
     const map = L.map('cxMap', { zoomControl:false }).setView([9.537,-13.677], 13);
 
-    L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=${MAPBOX_TOKEN}`, {attribution:'© Mapbox', maxZoom:19}).addTo(map);
+    /* Plusieurs fournisseurs de tuiles, avec repli automatique si Mapbox ne répond pas
+       (quota dépassé, jeton invalide, souci réseau...) au lieu d'une carte vide. */
+    const TILE_PROVIDERS = [
+        { url:`https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=${MAPBOX_TOKEN}`,
+          opts:{ attribution:'© <a href="https://www.mapbox.com/">Mapbox</a>', maxZoom:19, crossOrigin:'' } },
+        { url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          opts:{ attribution:'© OpenStreetMap', maxZoom:19, subdomains:'abc', crossOrigin:'' } },
+        { url:'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+          opts:{ attribution:'© CartoDB', subdomains:'abcd', maxZoom:20, crossOrigin:'' } },
+    ];
+    let _tileIdx = 0, _tileLayer = null, _tileFails = 0, _tileTimeout = null;
+    function _loadTiles(i) {
+        if (i >= TILE_PROVIDERS.length) return;
+        if (_tileLayer) map.removeLayer(_tileLayer);
+        if (_tileTimeout) clearTimeout(_tileTimeout);
+        _tileFails = 0;
+        const p = TILE_PROVIDERS[i];
+        _tileLayer = L.tileLayer(p.url, p.opts).addTo(map);
+        _tileLayer.on('tileerror', () => { if (++_tileFails >= 3) _loadTiles(++_tileIdx); });
+        // Certaines tuiles ne renvoient jamais d'erreur, elles restent juste bloquées
+        // en chargement (réseau lent/instable) — on bascule quand même après 5s.
+        let _tilesLoaded = false;
+        _tileLayer.on('load', () => { _tilesLoaded = true; });
+        _tileTimeout = setTimeout(() => {
+            if (!_tilesLoaded && i < TILE_PROVIDERS.length - 1) _loadTiles(++_tileIdx);
+        }, 5000);
+    }
+    _loadTiles(0);
+    /* La carte s'initialise pendant que la page est encore cachée par l'écran de
+       chargement (#pg-loader) : Leaflet la calcule alors avec une taille de 0×0.
+       Ni un setTimeout fixe ni "window.load" ne sont fiables à 100% (le loader
+       peut se lever avant ou après selon la vitesse du réseau/polices/CSS) — on
+       observe donc directement le moment exact où <body> perd la classe
+       "pg-loading" (voir layouts/app.blade.php), ce qui est le seul signal fiable
+       de "la carte est enfin visible à l'écran".  */
+    if (document.body.classList.contains('pg-loading')) {
+        const pgObserver = new MutationObserver(() => {
+            if (!document.body.classList.contains('pg-loading')) {
+                pgObserver.disconnect();
+                map.invalidateSize();
+            }
+        });
+        pgObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    }
     setTimeout(() => map.invalidateSize(), 60);
+    setTimeout(() => map.invalidateSize(), 700);
+    window.addEventListener('load', () => map.invalidateSize());
     window.addEventListener('resize', () => map.invalidateSize());
     screen.orientation?.addEventListener('change', () => { setTimeout(() => map.invalidateSize(), 150); });
     L.control.zoom({ position:'bottomright' }).addTo(map);

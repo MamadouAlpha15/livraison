@@ -10,6 +10,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Navigation · Commande #{{ $order->id }}</title>
+<link rel="preconnect" href="https://api.mapbox.com" crossorigin>
+<link rel="dns-prefetch" href="https://api.mapbox.com">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -331,7 +333,32 @@ const _initLat = VENDOR.lat || CLIENT.lat || 9.641;
 const _initLng = VENDOR.lng || CLIENT.lng || -13.578;
 const map = L.map('navMap', { zoomControl: true, attributionControl: false })
     .setView([_initLat, _initLng], 13);
-L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=${MAPBOX_TOKEN}`, { attribution:'© Mapbox', maxZoom:19 }).addTo(map);
+/* Plusieurs fournisseurs de tuiles, avec repli automatique si Mapbox ne répond pas
+   (quota dépassé, jeton invalide, souci réseau...) au lieu d'une carte vide. */
+const TILE_PROVIDERS = [
+    { url:`https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=${MAPBOX_TOKEN}`,
+      opts:{ attribution:'© <a href="https://www.mapbox.com/">Mapbox</a>', maxZoom:19, crossOrigin:'' } },
+    { url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      opts:{ attribution:'© OpenStreetMap', maxZoom:19, subdomains:'abc', crossOrigin:'' } },
+    { url:'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+      opts:{ attribution:'© CartoDB', subdomains:'abcd', maxZoom:20, crossOrigin:'' } },
+];
+let _tileIdx = 0, _tileLayer = null, _tileFails = 0, _tileTimeout = null;
+function _loadTiles(i) {
+    if (i >= TILE_PROVIDERS.length) return;
+    if (_tileLayer) map.removeLayer(_tileLayer);
+    if (_tileTimeout) clearTimeout(_tileTimeout);
+    _tileFails = 0;
+    const p = TILE_PROVIDERS[i];
+    _tileLayer = L.tileLayer(p.url, p.opts).addTo(map);
+    _tileLayer.on('tileerror', () => { if (++_tileFails >= 3) _loadTiles(++_tileIdx); });
+    let _tilesLoaded = false;
+    _tileLayer.on('load', () => { _tilesLoaded = true; });
+    _tileTimeout = setTimeout(() => {
+        if (!_tilesLoaded && i < TILE_PROVIDERS.length - 1) _loadTiles(++_tileIdx);
+    }, 5000);
+}
+_loadTiles(0);
 
 function makeIcon(emoji, color, size = 42) {
     return L.divIcon({

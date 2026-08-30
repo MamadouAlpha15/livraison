@@ -74,14 +74,17 @@ class ShopController extends Controller
             $validated['image'] = ImageOptimizer::store($request->file('image'), 'shops');
         }
 
-        // ✅ Création de la boutique — auto-approuvée, plan gratuit par défaut
+        // ✅ Création de la boutique — auto-approuvée, plan Pro offert 30 jours (essai gratuit)
         $shop = new Shop($validated);
         $shop->user_id     = Auth::id();
         $shop->country     = Auth::user()->country;
         $shop->currency    = \App\Models\DeliveryCompany::currencyForCountry(Auth::user()->country ?? '');
         $shop->is_approved = true;   // approbation automatique, les limites sont gérées par le plan
-        $shop->plan        = 'free'; // plan gratuit par défaut
+        $shop->plan        = 'free'; // valeur par défaut, écrasée juste après par startShopTrial()
         $shop->save();
+
+        // ✅ Essai gratuit : 1 mois de Plan Pro offert à chaque nouvelle boutique
+        app(\App\Services\SubscriptionService::class)->startShopTrial($shop);
 
         // ✅ Mise à jour du vendeur → il devient admin de sa boutique
         $user = Auth::user();
@@ -98,7 +101,7 @@ class ShopController extends Controller
 
         return redirect()
             ->route('boutique.dashboard')
-            ->with('success', "Boutique créée avec succès ! Vous êtes sur le Plan Gratuit.");
+            ->with('success', "Boutique créée avec succès ! Vous profitez d'un essai gratuit du Plan Pro pendant 30 jours.");
     }
 
     /**
@@ -136,6 +139,9 @@ public function update(Request $request, \App\Models\Shop $shop)
         'image'           => ['nullable','image','mimes:jpg,jpeg,png,webp'],
         'currency'        => ['nullable','string','max:10'],
         'country'         => ['nullable','string','size:2'],
+        // Mobile Money où reverser les paiements en ligne (ChapChap Pay)
+        'payout_wallet_type'   => ['nullable', Rule::in(['paycard','orange_money','mtn_momo','kulu','soutra_money','akiba'])],
+        'payout_wallet_number' => ['nullable','string','max:30'],
     ]);
 
     // 🔁 Convertir 10 → 0.10, 15 → 0.15, etc.

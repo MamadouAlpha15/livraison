@@ -125,6 +125,101 @@ class ChapChapPayService
     }
 
     /**
+     * Envoie une demande de règlement (reversement) vers le Mobile Money d'une
+     * boutique. POST /payout/{access_code}/request
+     * Utilise l'agent "Règlements" dédié (config chapchappay.payout_access_code/pin),
+     * distinct de l'API Key principale utilisée pour encaisser.
+     * Retourne ['success', 'payout_request_id', 'status', 'raw']
+     */
+    public function createPayoutRequest(
+        float  $amountGnf,
+        string $walletType,
+        string $walletAccountNumber,
+        string $note = ''
+    ): array {
+        $accessCode = config('chapchappay.payout_access_code', '');
+        $pin        = config('chapchappay.payout_pin', '');
+
+        if (empty($accessCode) || empty($pin)) {
+            Log::error('[ChapChapPay] Agent de règlement non configuré (CHAPCHAPPAY_PAYOUT_ACCESS_CODE/PIN manquants)');
+            return ['success' => false, 'message' => 'Agent de règlement non configuré.'];
+        }
+
+        try {
+            $payload = [
+                'agent_pin'     => $pin,
+                'payout_amount' => $amountGnf,
+                'payout_mode'   => 'wallet_transfer',
+                'payout_data'   => [
+                    'wallet_type'           => $walletType,
+                    'wallet_account_number' => $walletAccountNumber,
+                ],
+                'note' => $note,
+            ];
+
+            $body = json_encode($payload);
+
+            $response = $this->http()
+                ->withHeaders(['CCP-HMAC-Signature' => $this->sign($body)])
+                ->withBody($body, 'application/json')
+                ->post($this->baseUrl . '/payout/' . $accessCode . '/request');
+
+            $data = $response->json();
+
+            Log::info('[ChapChapPay] createPayoutRequest', [
+                'wallet_type' => $walletType,
+                'amount'      => $amountGnf,
+                'http_status' => $response->status(),
+                'response'    => $data,
+            ]);
+
+            if ($response->successful() && !empty($data['payout_request_id'])) {
+                return [
+                    'success'          => true,
+                    'payout_request_id' => $data['payout_request_id'],
+                    'status'           => $data['payout_request_status'] ?? 'new',
+                    'raw'              => $data,
+                ];
+            }
+
+            $msg = $data['message'] ?? 'Erreur lors de la demande de règlement.';
+            return ['success' => false, 'message' => $msg, 'raw' => $data];
+
+        } catch (\Throwable $e) {
+            Log::error('[ChapChapPay] createPayoutRequest exception', ['error' => $e->getMessage()]);
+            return ['success' => false, 'message' => 'Erreur de connexion à ChapChap Pay.'];
+        }
+    }
+
+    /**
+     * Vérifie le statut d'une demande de règlement.
+     * GET /payout/{access_code}/request/{payout_request_id}
+     */
+    public function verifyPayoutRequest(string $payoutRequestId): array
+    {
+        $accessCode = config('chapchappay.payout_access_code', '');
+
+        try {
+            $response = $this->http()->get($this->baseUrl . '/payout/' . $accessCode . '/request/' . $payoutRequestId);
+            $data = $response->json();
+
+            if ($response->successful()) {
+                return [
+                    'success' => true,
+                    'status'  => $data['payout_request_status'] ?? 'unknown',
+                    'raw'     => $data,
+                ];
+            }
+
+            return ['success' => false, 'status' => 'error', 'raw' => $data];
+
+        } catch (\Throwable $e) {
+            Log::error('[ChapChapPay] verifyPayoutRequest exception', ['error' => $e->getMessage()]);
+            return ['success' => false, 'status' => 'error'];
+        }
+    }
+
+    /**
      * Vérifie la signature HMAC-SHA256 d'un webhook ChapChap Pay.
      * En-tête CCP-HMAC-Signature = HMAC-SHA256(corps JSON brut, clé d'encryptage), hex minuscule.
      */

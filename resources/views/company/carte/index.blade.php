@@ -550,9 +550,52 @@ const MAPBOX_TOKEN = '{{ config('services.mapbox.token') }}';
 /* ── Initialisation Leaflet ── */
 const map = L.map('map', { center:[9.537,-13.677], zoom:13, zoomControl:true });
 
-L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=${MAPBOX_TOKEN}`, {attribution:'© Mapbox', maxZoom:19}).addTo(map);
+/* Plusieurs fournisseurs de tuiles, avec repli automatique si Mapbox ne répond pas
+   (quota dépassé, jeton invalide, souci réseau...) au lieu d'une carte vide. */
+const TILE_PROVIDERS = [
+    { url:`https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=${MAPBOX_TOKEN}`,
+      opts:{ attribution:'© <a href="https://www.mapbox.com/">Mapbox</a>', maxZoom:19, crossOrigin:'' } },
+    { url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      opts:{ attribution:'© OpenStreetMap', maxZoom:19, subdomains:'abc', crossOrigin:'' } },
+    { url:'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+      opts:{ attribution:'© CartoDB', subdomains:'abcd', maxZoom:20, crossOrigin:'' } },
+];
+let _tileIdx = 0, _tileLayer = null, _tileFails = 0, _tileTimeout = null;
+function _loadTiles(i) {
+    if (i >= TILE_PROVIDERS.length) return;
+    if (_tileLayer) map.removeLayer(_tileLayer);
+    if (_tileTimeout) clearTimeout(_tileTimeout);
+    _tileFails = 0;
+    const p = TILE_PROVIDERS[i];
+    _tileLayer = L.tileLayer(p.url, p.opts).addTo(map);
+    _tileLayer.on('tileerror', () => { if (++_tileFails >= 3) _loadTiles(++_tileIdx); });
+    // Certaines tuiles ne renvoient jamais d'erreur, elles restent juste bloquées
+    // en chargement (réseau lent/instable) — on bascule quand même après 5s.
+    let _tilesLoaded = false;
+    _tileLayer.on('load', () => { _tilesLoaded = true; });
+    _tileTimeout = setTimeout(() => {
+        if (!_tilesLoaded && i < TILE_PROVIDERS.length - 1) _loadTiles(++_tileIdx);
+    }, 5000);
+}
+_loadTiles(0);
+/* La carte s'initialise pendant que la page est encore cachée par l'écran de
+   chargement (#pg-loader) : Leaflet la calcule alors avec une taille de 0×0.
+   Un setTimeout fixe n'est pas fiable (le loader peut se lever avant ou après
+   selon le réseau/polices/CSS) — on observe donc directement le moment exact
+   où <body> perd la classe "pg-loading" (voir layouts/app.blade.php), seul
+   signal fiable de "la carte est enfin visible à l'écran". */
+if (document.body.classList.contains('pg-loading')) {
+    const pgObserver = new MutationObserver(() => {
+        if (!document.body.classList.contains('pg-loading')) {
+            pgObserver.disconnect();
+            map.invalidateSize();
+        }
+    });
+    pgObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+}
 setTimeout(() => map.invalidateSize(), 50);
 setTimeout(() => map.invalidateSize(), 400);
+window.addEventListener('load', () => map.invalidateSize());
 
 // Repositionner le zoom control en bas à droite pour éviter la FAB
 map.zoomControl.setPosition('bottomright');

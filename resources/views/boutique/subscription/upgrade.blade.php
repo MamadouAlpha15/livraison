@@ -146,6 +146,10 @@ $proGnf   = number_format(150000, 0, ',', ' ');
                     <div class="feat-ico lock">🔒</div>
                     <div class="feat-txt dim">🗺️ Carte GPS — <em>Plan Pro</em></div>
                 </li>
+                <li class="feat-item">
+                    <div class="feat-ico lock">🔒</div>
+                    <div class="feat-txt dim">📊 Assistant de ventes IA — <em>Plan Pro</em></div>
+                </li>
             </ul>
             <div class="plan-btn-wrap">
                 <span class="plan-btn current">Plan actuel</span>
@@ -200,6 +204,10 @@ $proGnf   = number_format(150000, 0, ',', ' ');
                 <li class="feat-item">
                     <div class="feat-ico ok"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
                     <div class="feat-txt"><strong>🗺️ Carte GPS</strong> — suivi des livreurs en temps réel</div>
+                </li>
+                <li class="feat-item">
+                    <div class="feat-ico ok"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                    <div class="feat-txt"><strong>📊 Assistant de ventes IA</strong> — posez des questions sur vos performances, produits, stock...</div>
                 </li>
             </ul>
             <div class="plan-btn-wrap">

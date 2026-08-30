@@ -12,6 +12,7 @@ class Shop extends Model
     protected $fillable = [
         'user_id', 'name', 'type', 'description', 'address', 'phone', 'image', 'is_approved', 'email', 'status', 'commission_rate', 'currency', 'country',
         'plan', 'plan_expires_at',   // Plan d'abonnement (free/pro) + date d'expiration
+        'payout_wallet_type', 'payout_wallet_number', // Mobile Money où reverser les paiements en ligne
     ];
 
     public function owner() {

@@ -28,6 +28,8 @@ use App\Services\LoyaltyService;
 use App\Services\PromoCodeService;
 use App\Rules\RealisticGuineaPhone;
 use App\Rules\RealisticFullName;
+use App\Services\ChapChapPayService;
+use Illuminate\Support\Facades\Log;
 
 // On importe Request : objet qui contient toutes les données envoyées par le formulaire (POST, GET...)
 use Illuminate\Http\Request;
@@ -280,6 +282,20 @@ class OrderController extends Controller
             ->latest()
             ->first();
 
+        // Autres produits de la même boutique, à suggérer en bas de page (favorise le
+        // panier moyen : le client voit qu'il y a autre chose à acheter avant de repartir).
+        // On privilégie la même catégorie d'abord, puis on complète avec le reste de la
+        // boutique si besoin, en excluant toujours le produit déjà affiché.
+        $relatedProducts = Product::where('shop_id', $shop->id)
+            ->where('id', '!=', $product->id)
+            ->where('is_active', true)
+            ->when($product->category, function ($q) use ($product) {
+                $q->orderByRaw('category = ? DESC', [$product->category]);
+            })
+            ->latest()
+            ->limit(6)
+            ->get();
+
         // On retourne la vue avec le produit et les messages
         return view('client.orders.create_from_product', [
             'product'  => $product,   // Les infos du produit
@@ -288,6 +304,7 @@ class OrderController extends Controller
             'variants' => $variants,
             'selectedVariantId' => $selectedVariantId,
             'activePromo' => $activePromo,
+            'relatedProducts' => $relatedProducts,
         ]);
     }
 
@@ -310,6 +327,7 @@ class OrderController extends Controller
             'quantity'             => 'required|integer|min:1',
             'delivery_destination' => ['nullable', 'string', 'min:2', 'max:255'],
             'client_phone'         => ['nullable', 'string', 'max:30', new RealisticGuineaPhone],
+            'payment_method'       => ['nullable', 'in:cash,online'],
         ];
 
         // Un visiteur sans compte doit obligatoirement donner son nom, son téléphone et son adresse
@@ -422,13 +440,52 @@ class OrderController extends Controller
             $product->decrement('stock', $request->quantity);
         }
 
-        // On crée le paiement associé à cette commande
-        Payment::create([
-            'order_id' => $order->id,  // Lien avec la commande
-            'method'   => 'cash',      // Paiement en espèces à la livraison
-            'amount'   => $total,      // Montant du paiement = total de la commande
-            'status'   => 'en_attente',// Paiement pas encore effectué
+        // On crée le paiement associé à cette commande — cash par défaut, ou en
+        // ligne (ChapChap Pay) si le client a choisi de payer tout de suite.
+        // Paiement en ligne temporairement désactivé (réactivation prévue plus
+        // tard, une fois ChapChap Pay + le reversement aux boutiques en place) :
+        // on ignore payment_method et on reste toujours en cash pour l'instant,
+        // même si un ancien lien/formulaire envoyait encore 'online'.
+        $onlinePaymentEnabled = false;
+        $wantsOnlinePayment = $onlinePaymentEnabled && $request->input('payment_method') === 'online';
+
+        $payment = Payment::create([
+            'order_id' => $order->id,
+            'method'   => $wantsOnlinePayment ? Payment::METHOD_CHAPCHAPPAY : Payment::METHOD_CASH,
+            'amount'   => $total,
+            'status'   => 'en_attente',
         ]);
+
+        // Si paiement en ligne demandé : on initie l'opération ChapChap Pay et on
+        // redirige le client vers leur page de paiement hébergée. En cas d'échec
+        // d'initiation, on ne bloque pas la commande — elle reste valable en cash.
+        $onlinePaymentFailedMessage = null;
+        if ($wantsOnlinePayment) {
+            $result = app(ChapChapPayService::class)->createOperation(
+                amountGnf:   $total,
+                orderId:     'ORDER-' . $order->id . '-' . now()->timestamp,
+                description: 'Commande #' . $order->id . ' — ' . ($product->shop->name ?? 'Shopio'),
+                notifyUrl:   route('payment.order.callback'),
+                returnUrl:   route('payment.order.success', ['order' => $order->id]),
+                cancelUrl:   route('payment.order.failed', ['order' => $order->id]),
+            );
+
+            if ($result['success']) {
+                $payment->update(['gateway_operation_id' => $result['operation_id']]);
+                return redirect($result['payment_url']);
+            }
+
+            // Échec d'initiation : on repasse en cash pour ne pas perdre la commande,
+            // mais on prévient le client au lieu de le laisser croire qu'il a payé en ligne.
+            $payment->update(['method' => Payment::METHOD_CASH]);
+            $onlinePaymentFailedMessage = "Le paiement en ligne n'a pas pu être initié"
+                . (!empty($result['message']) ? ' (' . $result['message'] . ')' : '')
+                . " — votre commande est enregistrée en cash à la livraison.";
+            Log::warning('[OrderPayment] Initiation paiement en ligne échouée, commande conservée en cash', [
+                'order_id' => $order->id,
+                'message'  => $result['message'] ?? '',
+            ]);
+        }
 
         // Notifier le vendeur par push
         try {
@@ -459,14 +516,16 @@ class OrderController extends Controller
             }
         } catch (\Throwable $e) {}
 
+        $successMsg = "Commande passée avec succès ! Vous recevrez une confirmation. 🎉";
+
         // Un invité n'a pas de compte pour voir "Mes commandes" → on l'envoie sur le suivi public de sa commande
         if (!Auth::check()) {
-            return redirect()->route('suivi.show', $order)
-                ->with('success', "Commande passée avec succès ! Vous recevrez une confirmation. 🎉");
+            $redirect = redirect()->route('suivi.show', $order)->with('success', $successMsg);
+            return $onlinePaymentFailedMessage ? $redirect->with('warning', $onlinePaymentFailedMessage) : $redirect;
         }
 
-        return redirect()->route('client.orders.index')
-            ->with('success', "Commande passée avec succès ! Vous recevrez une confirmation. 🎉");
+        $redirect = redirect()->route('client.orders.index')->with('success', $successMsg);
+        return $onlinePaymentFailedMessage ? $redirect->with('warning', $onlinePaymentFailedMessage) : $redirect;
     }
 
     // ============================================================

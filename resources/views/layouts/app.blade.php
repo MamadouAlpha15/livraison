@@ -4,6 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    {{-- ── Préchauffe la connexion vers Mapbox (cartes de suivi/livraison) le plus tôt
+         possible : sans ça, le téléphone attend d'avoir besoin d'une tuile de carte
+         pour commencer à s'y connecter (DNS + TLS), ce qui retarde le premier
+         affichage de la carte. Inoffensif sur les pages sans carte. ── --}}
+    <link rel="preconnect" href="https://api.mapbox.com" crossorigin>
+    <link rel="dns-prefetch" href="https://api.mapbox.com">
+
     {{-- ── PWA — EN PREMIER pour que iOS le détecte avant tout autre contenu ── --}}
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -17,9 +24,14 @@
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @auth<meta name="vapid-public-key" content="{{ config('app.vapid_public_key') }}">@endauth
-    <meta name="theme-color" content="#059669">
+    <meta name="theme-color" content="#6366f1">
     <meta name="description" content="{{ $description ?? 'Shopio — la plateforme tout-en-un pour créer votre boutique en ligne, gérer vos livraisons et vos clients en Guinée.' }}">
     <title>{{ $title ?? config('app.name', 'Shopio') }}</title>
+
+    {{-- ── Aperçu de lien (WhatsApp, Facebook, Messenger…) — une page peut définir
+         ses propres balises via @push('meta') pour afficher sa photo + son titre
+         quand le lien est collé/partagé, au lieu de l'aperçu générique du site. ── --}}
+    @stack('meta')
 
     {{-- ══ Loader plein écran — inline pour s'afficher avant tout CSS ══ --}}
     <style>
@@ -596,6 +608,20 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
         loader.classList.add('done');
         setTimeout(function () { loader.remove(); }, 350);
 
+        /* Dans l'application Capacitor (Android) : l'écran de démarrage natif (logo
+           Shopio plein écran, différent de ce loader web) se ferme normalement tout
+           seul après un délai fixe très court (~0,6s), sans savoir si CETTE page est
+           vraiment prête — d'où un flash de texte brut découvert trop tôt. On l'a
+           donc configuré pour ne PLUS se fermer automatiquement (launchAutoHide:false
+           dans capacitor.config.json) et on le ferme nous-mêmes ici, exactement au
+           même moment où ce loader web disparaît — donc jamais avant que la page ne
+           soit réellement prête, peu importe le réseau. Sans effet hors de l'app. */
+        try {
+            if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+                window.Capacitor.Plugins.SplashScreen?.hide();
+            }
+        } catch (e) {}
+
         /* Si l'URL contient une ancre (#xxx), le navigateur a déjà essayé d'y sauter
            tout seul pendant le chargement — sans succès, puisque le contenu était encore
            caché par le verrou ci-dessus à ce moment-là (et il ne réessaie jamais après
@@ -642,14 +668,20 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
     /* Réseau lent : rassurer l'utilisateur au lieu de le laisser croire que ça bloque
        (au lieu de dévoiler du HTML non stylé, on explique juste que ça continue) */
     var txt = document.getElementById('pg-loader-txt');
-    var slowTimer = setTimeout(function () {
+    var slowTimer  = setTimeout(function () {
         if (!done && txt) txt.textContent = 'Connexion lente, merci de patienter…';
     }, 4000);
+    var slowTimer2 = setTimeout(function () {
+        if (!done && txt) txt.textContent = 'Toujours en chargement, presque prêt…';
+    }, 15000);
 
-    /* Sécurité absolue : 20s max (réseau très lent type 2G/3G en Guinée).
-       On ne dévoile la page qu'en dernier recours — mieux vaut un loader un peu
-       plus long qu'un flash de HTML brut non stylé qui casse l'image du site. */
-    setTimeout(function () { clearTimeout(slowTimer); hide(); }, 20000);
+    /* Sécurité absolue : 35s max (réseau très lent type 2G/3G en Guinée).
+       On ne dévoile la page qu'en tout dernier recours — un flash de HTML brut
+       non stylé casse l'image du site, donc on préfère largement un loader plus
+       long. Ce délai n'est jamais atteint sur une connexion normale (le CSS met
+       quelques secondes tout au plus) : il ne sert que de filet de sécurité pour
+       ne jamais bloquer un utilisateur indéfiniment sur un réseau vraiment mort. */
+    setTimeout(function () { clearTimeout(slowTimer); clearTimeout(slowTimer2); hide(); }, 35000);
 })();
 
 /* ══ NProgress — barre de progression instantanée ══ */
@@ -741,24 +773,29 @@ document.addEventListener('click', function (e) {
 /* ══ PWA — Service Worker + Install Prompt + Badge ══ */
 let _pwaPrompt = null;
 
-/* ── Enregistrement du Service Worker ── */
+/* ── Enregistrement du Service Worker ──
+   Enregistré IMMÉDIATEMENT (pas d'attente de l'événement "load") : sur les
+   pages lourdes (tableaux de bord), attendre le chargement complet de la
+   page pouvait prendre plusieurs secondes, pendant lesquelles iOS Safari ne
+   détectait pas encore l'appli comme une vraie PWA si l'utilisateur faisait
+   "Ajouter à l'écran d'accueil" trop tôt (il l'ajoutait comme un simple
+   site). L'enregistrement du Service Worker ne bloque pas l'affichage de
+   la page — pas besoin d'attendre. */
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-            .then(reg => {
-                console.log('[SW] Enregistré');
-                /* Vérifier les mises à jour */
-                reg.addEventListener('updatefound', () => {
-                    const newSW = reg.installing;
-                    newSW?.addEventListener('statechange', () => {
-                        if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-                            newSW.postMessage({ type: 'SKIP_WAITING' });
-                        }
-                    });
+    navigator.serviceWorker.register('/sw.js')
+        .then(reg => {
+            console.log('[SW] Enregistré');
+            /* Vérifier les mises à jour */
+            reg.addEventListener('updatefound', () => {
+                const newSW = reg.installing;
+                newSW?.addEventListener('statechange', () => {
+                    if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+                        newSW.postMessage({ type: 'SKIP_WAITING' });
+                    }
                 });
-            })
-            .catch(e => console.warn('[SW] Erreur:', e));
-    });
+            });
+        })
+        .catch(e => console.warn('[SW] Erreur:', e));
 }
 
 /* ── Détecter si déjà installée (standalone) ── */

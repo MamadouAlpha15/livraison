@@ -134,8 +134,8 @@ Route::get('/manifest.json', function () {
         'id'               => '/',
         'scope'            => '/',
         'display'          => 'standalone',
-        'background_color' => '#059669',
-        'theme_color'      => '#059669',
+        'background_color' => '#6366f1',
+        'theme_color'      => '#6366f1',
         'orientation'      => 'portrait-primary',
         'lang'             => 'fr',
         'categories'       => ['shopping', 'business'],
@@ -151,6 +151,32 @@ Route::get('/manifest.json', function () {
         ],
     ], 200, ['Content-Type' => 'application/manifest+json']);
 })->name('manifest');
+
+/* Android App Links — permet à l'app Capacitor de "reprendre la main" après une
+   action terminée dans le navigateur système (ex: connexion Google, qui doit
+   obligatoirement s'ouvrir hors de la WebView de l'app pour des raisons de
+   sécurité imposées par Google). Sans ce fichier, Android n'a aucune preuve
+   que l'app com.shopio.app a le droit de s'ouvrir pour les liens shopio-app.com,
+   et laisse l'utilisateur dans le navigateur au lieu de revenir dans l'app.
+   Servi via PHP (comme /manifest.json) pour contourner le WAF Tiger Protect
+   qui bloque parfois l'accès direct aux fichiers statiques. */
+Route::get('/.well-known/assetlinks.json', function () {
+    return response()->json([
+        [
+            'relation' => ['delegate_permission/common.handle_all_urls'],
+            'target'   => [
+                'namespace'               => 'android_app',
+                'package_name'            => 'com.shopio.app',
+                'sha256_cert_fingerprints' => [
+                    // Certificat de production (keystore/shopio-upload-key.jks)
+                    '7C:3F:86:9E:45:7C:09:79:4A:38:E1:02:E4:BB:DE:E2:A9:3E:CA:03:BC:D2:E8:92:00:3C:36:D4:06:AB:AC:A4',
+                    // Certificat de debug (builds de test, ~/.android/debug.keystore)
+                    'A4:0C:DC:B9:C2:89:AF:C7:2E:F1:F3:2E:87:B9:FF:34:FE:2B:1B:D0:EA:17:26:6E:F8:2C:75:E8:F6:6B:70:ED',
+                ],
+            ],
+        ],
+    ], 200, ['Content-Type' => 'application/json']);
+})->name('assetlinks');
 
 /* Page d'accueil */
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
@@ -277,7 +303,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/company-zones/{company}',                  [DeliveryCompanyController::class, 'zonesJson'])  ->name('company.zones.json');
 
     /* Espace company + admin boutique */
-    Route::middleware('role:admin,company')->prefix('company')->group(function () {
+    Route::middleware('role:admin,company,superadmin')->prefix('company')->group(function () {
 
         /* Dashboard — accessible en plan gratuit */
         Route::get('/', [DeliveryCompanyController::class, 'dashboard'])->name('company.dashboard');
@@ -514,6 +540,10 @@ Route::middleware(['auth', 'role:superadmin'])
         Route::post('/shops/purge',       [\App\Http\Controllers\Admin\ShopController::class,       'purgeBulk'])->name('shops.purge');
         Route::post('/entreprises/purge', [\App\Http\Controllers\Admin\EntrepriseController::class,  'purgeBulk'])->name('entreprises.purge');
 
+        /* Règlements — reversement aux boutiques des commandes payées en ligne (ChapChap Pay) */
+        Route::get('/reglements',                [\App\Http\Controllers\Admin\PayoutController::class, 'index'])->name('payouts.index');
+        Route::post('/reglements/{payment}/send',[\App\Http\Controllers\Admin\PayoutController::class, 'send']) ->name('payouts.send');
+
         /* Paramètres système — gestion manuelle des plans (Pro boutique / Business entreprise) */
         Route::get('/plans',                    [\App\Http\Controllers\Admin\PlanController::class, 'index'])->name('plans.index');
         Route::put('/plans/shops/{shop}',       [\App\Http\Controllers\Admin\PlanController::class, 'updateShop'])->name('plans.shops.update');
@@ -563,12 +593,12 @@ Route::middleware(['auth', 'role:admin'])
         /* KPI temps réel (AJAX polling 30s) — accessible en gratuit pour le dashboard */
         Route::get('kpi-live', \App\Http\Controllers\Boutique\KpiLiveController::class)->name('kpi.live');
 
-        /* Assistant IA d'analyse des ventes */
-        Route::post('/assistant/chat',  [\App\Http\Controllers\Boutique\AnalyticsAssistantController::class, 'chat'])  ->name('assistant.chat');
-        Route::post('/assistant/reset', [\App\Http\Controllers\Boutique\AnalyticsAssistantController::class, 'reset']) ->name('assistant.reset');
-
         /* ── Routes réservées au Plan Pro ───────────────────────────────── */
         Route::middleware('shop.plan:pro')->group(function () {
+
+            /* Assistant IA d'analyse des ventes */
+            Route::post('/assistant/chat',  [\App\Http\Controllers\Boutique\AnalyticsAssistantController::class, 'chat'])  ->name('assistant.chat');
+            Route::post('/assistant/reset', [\App\Http\Controllers\Boutique\AnalyticsAssistantController::class, 'reset']) ->name('assistant.reset');
 
             /* Livreurs de la boutique */
             Route::get('livreurs', [\App\Http\Controllers\Boutique\LivreurController::class, 'index'])
@@ -904,6 +934,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/payment/checkout',  [ChapChapPayController::class, 'checkout']) ->name('payment.checkout');
     Route::post('/payment/initiate', [ChapChapPayController::class, 'initiate']) ->name('payment.initiate');
 });
+
+/* ── Paiement en ligne d'une COMMANDE (client, invité ou connecté) ──────────
+   Séparé des routes ci-dessus (abonnements) : l'acheteur peut ne pas être connecté. */
+Route::post('/payment/order/callback', [\App\Http\Controllers\Payment\OrderPaymentController::class, 'callback'])
+    ->name('payment.order.callback')
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::get('/payment/order/success', [\App\Http\Controllers\Payment\OrderPaymentController::class, 'success'])->name('payment.order.success');
+Route::get('/payment/order/failed',  [\App\Http\Controllers\Payment\OrderPaymentController::class, 'failed']) ->name('payment.order.failed');
 
 /* Page upgrade boutique (plan Pro) */
 Route::middleware(['auth', 'role:admin'])
