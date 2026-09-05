@@ -337,6 +337,51 @@ footer.app-footer { display: none !important; }
 .sec-link { font-size: 12.5px; font-weight: 700; color: var(--brand-dk); text-decoration: none; white-space: nowrap; }
 .sec-link:hover { text-decoration: underline; }
 
+/* ── Tri + filtre prix du catalogue ── */
+.filter-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.sort-row { display: flex; align-items: center; gap: 8px; }
+.sort-select {
+    padding: 8px 32px 8px 14px; border-radius: 50px; border: 1.5px solid var(--border);
+    background: var(--surface); color: var(--text); font-size: 12.5px; font-weight: 600; font-family: var(--font);
+    cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.05); transition: border-color .15s;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+}
+.sort-select:hover, .sort-select:focus { border-color: var(--brand); outline: none; }
+
+.price-filter-form {
+    display: flex; align-items: center; gap: 7px;
+    background: var(--surface); border: 1.5px solid var(--border); border-radius: 50px;
+    padding: 5px 8px 5px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.05); color: var(--muted);
+}
+.price-filter-form:focus-within { border-color: var(--brand); }
+.price-input {
+    width: 92px; border: none; outline: none; background: transparent;
+    font-size: 12.5px; font-family: var(--font); color: var(--text); padding: 6px 2px;
+    /* Cache les flèches +/- natives du champ numérique (peu utiles pour des montants) */
+    -moz-appearance: textfield;
+}
+.price-input::-webkit-outer-spin-button, .price-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.price-input::placeholder { color: var(--muted); }
+.price-sep { font-size: 12px; color: var(--muted); flex-shrink: 0; }
+.price-filter-btn {
+    flex-shrink: 0; padding: 7px 15px; border-radius: 50px; border: none;
+    background: var(--brand); color: #fff; font-size: 12px; font-weight: 700; font-family: var(--font);
+    cursor: pointer; transition: background .15s; white-space: nowrap;
+}
+.price-filter-btn:hover { background: var(--brand-dk); }
+.price-filter-clear {
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    width: 26px; height: 26px; border-radius: 50%; background: var(--grey);
+    color: var(--muted); text-decoration: none; transition: all .15s;
+}
+.price-filter-clear:hover { background: #fee2e2; color: #dc2626; }
+@media (max-width: 640px) {
+    .price-filter-form { flex-wrap: nowrap; width: 100%; }
+    .price-input { width: 0; flex: 1; min-width: 0; }
+}
+
 /* ── Filtres catégories (mobile) ── */
 .cats { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; -ms-overflow-style: none; }
 .cats::-webkit-scrollbar { display: none; }
@@ -737,6 +782,31 @@ footer.app-footer { display: none !important; }
     .flash-card, .reco-card { flex-basis: 128px; width: 128px; }
 }
 
+/* ── Suggestions de recherche (autocomplétion) ──
+   Conteneur SÉPARÉ de .nav-search (frère, pas enfant) : .nav-search a
+   overflow:hidden pour sa forme en pilule, ce qui couperait un menu déroulant
+   posé à l'intérieur. Ce wrapper porte le position:relative à sa place. */
+.search-wrap { position: relative; flex: 1; max-width: 460px; }
+.mobile-bar .search-wrap { max-width: 100%; }
+.search-wrap .nav-search { max-width: none; }
+.search-suggestions {
+    position: absolute; top: calc(100% + 8px); left: 0; right: 0; z-index: 250;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-sm);
+    box-shadow: var(--shadow-lg); overflow: hidden auto; max-height: 360px; display: none;
+}
+.search-suggestions.is-open { display: block; }
+.search-suggestion-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 14px;
+    text-decoration: none; color: inherit; transition: background .12s; border-bottom: 1px solid var(--grey-2);
+}
+.search-suggestion-item:last-child { border-bottom: none; }
+.search-suggestion-item:hover, .search-suggestion-item.is-active { background: var(--grey); }
+.search-suggestion-img { width: 34px; height: 34px; border-radius: 7px; object-fit: cover; flex-shrink: 0; background: var(--grey); }
+.search-suggestion-body { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 1px; }
+.search-suggestion-name { font-size: 12.5px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.search-suggestion-meta { font-size: 10.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.search-suggestion-price { font-size: 12px; font-weight: 700; color: var(--brand-dk); font-family: var(--mono); flex-shrink: 0; white-space: nowrap; }
+
 /* ── Confort tactile : cibles ≥ 40px sur tout écran à pointeur grossier ── */
 @media (pointer: coarse) {
     .nav-hamburger { min-width: 40px; min-height: 40px; }
@@ -762,10 +832,13 @@ footer.app-footer { display: none !important; }
         <a href="{{ url('/') }}" class="nav-link active">{!! \App\Support\IconLibrary::svg('home') !!} Accueil</a>
         <a href="{{ route('shops.index') }}" class="nav-link">{!! \App\Support\IconLibrary::svg('store') !!} Boutiques</a>
     </div>
-    <form method="GET" action="{{ url('/') }}" class="nav-search" data-ajax>
-        <input type="text" name="s" value="{{ request('s') }}" placeholder="Que recherchez-vous ?" autocomplete="off">
-        <button class="nav-search-btn" type="submit" aria-label="Rechercher">{!! \App\Support\IconLibrary::svg('search', '', 16) !!}</button>
-    </form>
+    <div class="search-wrap">
+        <form method="GET" action="{{ url('/') }}" class="nav-search" data-ajax>
+            <input type="text" name="s" value="{{ request('s') }}" placeholder="Que recherchez-vous ?" autocomplete="off">
+            <button class="nav-search-btn" type="submit" aria-label="Rechercher">{!! \App\Support\IconLibrary::svg('search', '', 16) !!}</button>
+        </form>
+        <div class="search-suggestions" role="listbox"></div>
+    </div>
     <div class="nav-actions">
         @guest
             <a href="{{ route('login') }}" class="nav-orders-btn"><span>Connexion</span></a>
@@ -786,10 +859,13 @@ footer.app-footer { display: none !important; }
 
 {{-- ══ BARRE MOBILE (recherche) ══ --}}
 <div class="mobile-bar">
-    <form method="GET" action="{{ url('/') }}" class="nav-search" data-ajax>
-        <input type="text" name="s" value="{{ request('s') }}" placeholder="Rechercher un produit…" autocomplete="off">
-        <button class="nav-search-btn" type="submit" aria-label="Rechercher">{!! \App\Support\IconLibrary::svg('search', '', 16) !!}</button>
-    </form>
+    <div class="search-wrap">
+        <form method="GET" action="{{ url('/') }}" class="nav-search" data-ajax>
+            <input type="text" name="s" value="{{ request('s') }}" placeholder="Rechercher un produit…" autocomplete="off">
+            <button class="nav-search-btn" type="submit" aria-label="Rechercher">{!! \App\Support\IconLibrary::svg('search', '', 16) !!}</button>
+        </form>
+        <div class="search-suggestions" role="listbox"></div>
+    </div>
 </div>
 
 {{-- ══ MENU MOBILE (liens + catégories) ══ --}}
@@ -1430,6 +1506,70 @@ document.addEventListener('DOMContentLoaded', () => {
             loadResults(new URL(window.location.href), { pushHistory: false });
         });
     }
+
+    /* ── Suggestions de recherche (autocomplétion) ──
+     *    Indépendant de la recherche en direct ci-dessus (débounce plus court,
+     *    résultat cliquable qui va droit au produit au lieu de filtrer la liste).
+     *    Un menu par barre de recherche (desktop + mobile), chacun dans son
+     *    propre .search-wrap (voir le CSS — évite le overflow:hidden de .nav-search). ── */
+    document.querySelectorAll('.search-wrap').forEach(wrap => {
+        const input = wrap.querySelector('input[name="s"]');
+        const box = wrap.querySelector('.search-suggestions');
+        if (!input || !box) return;
+
+        let debounceT = null, abortCtrl = null, activeIndex = -1;
+
+        function close() { box.classList.remove('is-open'); box.innerHTML = ''; activeIndex = -1; }
+
+        function render(items) {
+            if (!items.length) { close(); return; }
+            box.innerHTML = items.map(it => `
+                <a href="${it.url}" class="search-suggestion-item" role="option">
+                    ${it.image ? `<img src="${it.image}" class="search-suggestion-img" alt="" loading="lazy">` : '<div class="search-suggestion-img"></div>'}
+                    <div class="search-suggestion-body">
+                        <div class="search-suggestion-name">${it.name}</div>
+                        ${it.shop ? `<div class="search-suggestion-meta">${it.shop}</div>` : ''}
+                    </div>
+                    <div class="search-suggestion-price">${it.price}</div>
+                </a>
+            `).join('');
+            box.classList.add('is-open');
+            activeIndex = -1;
+        }
+
+        function setActive(items) {
+            items.forEach((el, i) => el.classList.toggle('is-active', i === activeIndex));
+            if (activeIndex >= 0) items[activeIndex].scrollIntoView({ block: 'nearest' });
+        }
+
+        input.addEventListener('input', () => {
+            const term = input.value.trim();
+            clearTimeout(debounceT);
+            if (term.length < 2) { close(); return; }
+            debounceT = setTimeout(() => {
+                if (abortCtrl) abortCtrl.abort();
+                abortCtrl = new AbortController();
+                fetch(`{{ route('search.suggestions') }}?q=${encodeURIComponent(term)}`, { signal: abortCtrl.signal })
+                    .then(r => r.ok ? r.json() : null)
+                    .then(data => { if (data) render(data.suggestions); })
+                    .catch(() => {}); // AbortError attendu si une frappe plus récente a pris le relais
+            }, 220);
+        });
+
+        input.addEventListener('keydown', (e) => {
+            const items = Array.from(box.querySelectorAll('.search-suggestion-item'));
+            if (!items.length) return;
+            if (e.key === 'ArrowDown') { e.preventDefault(); activeIndex = Math.min(activeIndex + 1, items.length - 1); setActive(items); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); activeIndex = Math.max(activeIndex - 1, 0); setActive(items); }
+            else if (e.key === 'Enter' && activeIndex >= 0) { e.preventDefault(); items[activeIndex].click(); }
+            else if (e.key === 'Escape') { close(); }
+        });
+
+        // Clic à l'extérieur : ferme. Sur le blur du champ, petit délai pour laisser
+        // le temps au clic sur une suggestion de s'exécuter avant la fermeture.
+        document.addEventListener('click', (e) => { if (!wrap.contains(e.target)) close(); });
+        input.addEventListener('blur', () => setTimeout(close, 150));
+    });
 });
 </script>
 @endpush

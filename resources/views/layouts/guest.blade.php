@@ -114,7 +114,11 @@
         }
         .role-card:hover { border-color:#6366f1; background:#eef2ff; }
         .role-card.active { border-color:#6366f1; background:#eef2ff; color:#3730a3; }
-        .role-card .rc-ico { font-size:22px; }
+        .role-card .rc-ico { font-size:22px; display:inline-flex; }
+        /* Icônes SVG (IconLibrary) au lieu d'emoji : taille pilotée par le
+           font-size ci-dessus (et ses variantes responsive plus bas) via em,
+           pour garder le même comportement qu'avant sur petit écran. */
+        .role-card .rc-ico svg { width:1em; height:1em; }
         .role-input-hidden { display:none; }
         .f-check { display:flex; align-items:center; gap:8px; cursor:pointer; }
         .f-check input[type=checkbox] { width:16px; height:16px; accent-color:#6366f1; cursor:pointer; flex-shrink:0; }

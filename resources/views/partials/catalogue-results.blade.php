@@ -161,14 +161,50 @@ fragment soit inclus dans welcome.blade.php ou rendu seul.
 </div>
 @endif
 
+@php
+    /* Base commune des filtres actifs à préserver d'un contrôle à l'autre (catégorie,
+       tri, prix min/max) — ex: changer le tri ne doit pas faire perdre le filtre prix. */
+    $baseParams = ['s' => request('s'), 'cat' => request('cat'), 'min_price' => $minPrice, 'max_price' => $maxPrice, 'sort' => $sort !== 'newest' ? $sort : null];
+@endphp
+
 @if($categories->isNotEmpty())
 <div class="cats">
-    <a href="{{ url('/') }}?{{ http_build_query(array_filter(['s' => request('s')])) }}" class="cat-pill {{ !request('cat') ? 'active' : '' }}">Toutes</a>
+    <a href="{{ url('/') }}?{{ http_build_query(array_filter(array_merge($baseParams, ['cat' => null]))) }}" class="cat-pill {{ !request('cat') ? 'active' : '' }}">Toutes</a>
     @foreach($categories as $cat)
-    <a href="{{ url('/') }}?{{ http_build_query(array_filter(['cat' => $cat, 's' => request('s')])) }}" class="cat-pill {{ request('cat') === $cat ? 'active' : '' }}">{!! \App\Support\IconLibrary::categorySvg($cat, '', 14) !!} {{ $cat }}</a>
+    <a href="{{ url('/') }}?{{ http_build_query(array_filter(array_merge($baseParams, ['cat' => $cat]))) }}" class="cat-pill {{ request('cat') === $cat ? 'active' : '' }}">{!! \App\Support\IconLibrary::categorySvg($cat, '', 14) !!} {{ $cat }}</a>
     @endforeach
 </div>
 @endif
+
+{{-- ══ TRI + FILTRE PRIX ══ --}}
+@php
+    $sortLabels = ['newest' => 'Plus récents', 'price_asc' => 'Prix croissant', 'price_desc' => 'Prix décroissant', 'popular' => 'Plus vendus'];
+    $sortUrl = fn ($v) => url('/') . '?' . http_build_query(array_filter(array_merge($baseParams, ['sort' => $v !== 'newest' ? $v : null]))) . '#catalogue';
+@endphp
+<div class="filter-row">
+    <div class="sort-row">
+        {!! \App\Support\IconLibrary::svg('sort', '', 14) !!}
+        <select class="sort-select" onchange="location.href=this.value" aria-label="Trier les produits">
+            @foreach($sortLabels as $val => $label)
+            <option value="{{ $sortUrl($val) }}" {{ $sort === $val ? 'selected' : '' }}>{{ $label }}</option>
+            @endforeach
+        </select>
+    </div>
+
+    <form method="GET" action="{{ url('/') }}#catalogue" class="price-filter-form">
+        <input type="hidden" name="s" value="{{ request('s') }}">
+        <input type="hidden" name="cat" value="{{ request('cat') }}">
+        @if($sort !== 'newest')<input type="hidden" name="sort" value="{{ $sort }}">@endif
+        {!! \App\Support\IconLibrary::svg('wallet', '', 14) !!}
+        <input type="number" name="min_price" value="{{ $minPrice }}" placeholder="Prix min" min="0" step="1000" inputmode="numeric" class="price-input">
+        <span class="price-sep">—</span>
+        <input type="number" name="max_price" value="{{ $maxPrice }}" placeholder="Prix max" min="0" step="1000" inputmode="numeric" class="price-input">
+        <button type="submit" class="price-filter-btn">Filtrer</button>
+        @if($minPrice !== null || $maxPrice !== null)
+        <a href="{{ url('/') }}?{{ http_build_query(array_filter(array_merge($baseParams, ['min_price' => null, 'max_price' => null]))) }}#catalogue" class="price-filter-clear" aria-label="Effacer le filtre prix">{!! \App\Support\IconLibrary::svg('x', '', 12) !!}</a>
+        @endif
+    </form>
+</div>
 
 @if($products->isEmpty())
 <div class="prod-grid">

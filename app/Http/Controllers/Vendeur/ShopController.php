@@ -232,10 +232,21 @@ $clientMessages = ShopMessage::where('shop_id', $shop->id)
             ->where('updated_at', '>=', now()->subMinutes(10))
             ->exists();
 
-        $visitesToday = ShopVisit::where('shop_id', $shop->id)->where('visited_on', today())->value('count') ?? 0;
-        $visitesWeek  = ShopVisit::where('shop_id', $shop->id)->where('visited_on', '>=', now()->startOfWeek())->sum('count');
-        $visitesMonth = ShopVisit::where('shop_id', $shop->id)->where('visited_on', '>=', now()->startOfMonth())->sum('count');
-        $visitesTotal = ShopVisit::where('shop_id', $shop->id)->sum('count');
+        // Performance : 4 requêtes séparées (aujourd'hui/semaine/mois/total) fusionnées
+        // en une seule via des sommes conditionnelles — même résultat, 1 aller-retour
+        // vers la base au lieu de 4.
+        $visitStats = ShopVisit::where('shop_id', $shop->id)
+            ->selectRaw(
+                'SUM(CASE WHEN visited_on = ? THEN count ELSE 0 END) as today,
+                 SUM(CASE WHEN visited_on >= ? THEN count ELSE 0 END) as week,
+                 SUM(CASE WHEN visited_on >= ? THEN count ELSE 0 END) as month,
+                 SUM(count) as total',
+                [today(), now()->startOfWeek(), now()->startOfMonth()]
+            )->first();
+        $visitesToday = (int) ($visitStats->today ?? 0);
+        $visitesWeek  = (int) ($visitStats->week ?? 0);
+        $visitesMonth = (int) ($visitStats->month ?? 0);
+        $visitesTotal = (int) ($visitStats->total ?? 0);
 
         return view('boutique.dashboard', [
             'shop'                => $shop,

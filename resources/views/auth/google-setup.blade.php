@@ -39,7 +39,8 @@
         .role-card{padding:12px 10px;border-radius:10px;border:2px solid #e5e7eb;background:#f9fafb;text-align:center;cursor:pointer;transition:all .18s;font-size:13px;font-weight:600;color:#6b7280;display:flex;flex-direction:column;align-items:center;gap:4px;}
         .role-card:hover{border-color:#a5b4fc;background:#eef2ff;color:#4338ca;}
         .role-card.active{border-color:#6366f1;background:#eef2ff;color:#4338ca;box-shadow:0 0 0 3px rgba(99,102,241,.12);}
-        .rc-ico{font-size:22px;}
+        .rc-ico{font-size:22px;display:inline-flex;}
+        .rc-ico svg{width:1em;height:1em;}
 
         /* Country */
         .f-select{width:100%;padding:10px 36px 10px 12px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:13.5px;color:#111827;background:#fff;outline:none;transition:border-color .15s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:16px;font-family:inherit;}
@@ -95,13 +96,13 @@
             <input type="hidden" name="role" id="roleInput" value="{{ old('role','client') }}">
             <div class="role-cards">
                 <div class="role-card {{ old('role','client') === 'client'  ? 'active':'' }}" onclick="setRole('client',this)">
-                    <span class="rc-ico">🛒</span> Client
+                    <span class="rc-ico">{!! \App\Support\IconLibrary::svg('cart', '', 22) !!}</span> Client
                 </div>
                 <div class="role-card {{ old('role') === 'admin' ? 'active':'' }}" onclick="setRole('admin',this)">
-                    <span class="rc-ico">🏪</span> Admin boutique
+                    <span class="rc-ico">{!! \App\Support\IconLibrary::svg('store', '', 22) !!}</span> Vendeur
                 </div>
                 <div class="role-card {{ old('role') === 'company' ? 'active':'' }}" onclick="setRole('company',this)">
-                    <span class="rc-ico">🚚</span> Entreprise livraison
+                    <span class="rc-ico">{!! \App\Support\IconLibrary::svg('truck', '', 22) !!}</span> Entreprise livraison
                 </div>
                
             </div>

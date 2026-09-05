@@ -52,6 +52,45 @@ class WelcomeController extends Controller
     }
 
     /**
+     * GET /search-suggestions?q=... — autocomplétion de la barre de recherche
+     * (accueil). Renvoie quelques produits correspondants, avant même que le
+     * visiteur ait fini de taper ou appuyé sur "Rechercher".
+     */
+    public function suggestions(Request $request)
+    {
+        $q = trim((string) $request->get('q', ''));
+        if (mb_strlen($q) < 2) {
+            return response()->json(['suggestions' => []]);
+        }
+
+        $user = auth()->user();
+        $approvedShopFilter = function ($qq) use ($user) {
+            $qq->where('is_approved', true);
+            if ($user && $user->country) {
+                $qq->where('country', $user->country);
+            }
+        };
+
+        $products = Product::where('is_active', true)
+            ->whereHas('shop', $approvedShopFilter)
+            ->where('name', 'like', "%{$q}%")
+            ->with('shop:id,name')
+            ->latest()
+            ->limit(6)
+            ->get();
+
+        return response()->json([
+            'suggestions' => $products->map(fn ($p) => [
+                'name'  => $p->name,
+                'price' => number_format($p->current_price, 0, ',', ' ') . ' GNF',
+                'image' => $p->image ? asset('storage/' . $p->image) : null,
+                'shop'  => $p->shop->name ?? null,
+                'url'   => route('client.orders.createFromProduct', $p),
+            ]),
+        ]);
+    }
+
+    /**
      * Construit le jeu de données "catalogue" partagé par les deux gabarits
      * d'accueil : ventes flash, produits recommandés, boutiques à la une,
      * catalogue complet filtrable (recherche / catégorie) et catégories.
@@ -116,10 +155,49 @@ class WelcomeController extends Controller
             $query->where('category', $cat);
         }
 
+        /* ── Prix RÉELLEMENT appliqué (vente flash comprise) — même règle que
+           Product::getCurrentPriceAttribute() (accesseur PHP, pas une colonne, donc
+           pas filtrable/triable directement, d'où l'expression SQL équivalente
+           ci-dessous). Réutilisée à la fois pour le filtre min/max et pour le tri
+           par prix juste après : sinon un produit en vente flash à 5 000 GNF
+           s'afficherait comme "cher" ou hors filtre à cause de son prix barré
+           (10 000 GNF) au lieu du prix réel. */
+        $currentPriceSql = "CASE WHEN flash_price IS NOT NULL AND flash_ends_at IS NOT NULL AND flash_ends_at > NOW() AND (flash_starts_at IS NULL OR flash_starts_at <= NOW()) THEN flash_price ELSE price END";
+
+        $minPrice = $request->get('min_price');
+        $maxPrice = $request->get('max_price');
+        if ($minPrice !== null && $minPrice !== '' && is_numeric($minPrice)) {
+            $query->whereRaw("{$currentPriceSql} >= ?", [(float) $minPrice]);
+        }
+        if ($maxPrice !== null && $maxPrice !== '' && is_numeric($maxPrice)) {
+            $query->whereRaw("{$currentPriceSql} <= ?", [(float) $maxPrice]);
+        }
+
+        /* ── Tri ── */
+        $sort = $request->get('sort', 'newest');
+        if (!in_array($sort, ['newest', 'price_asc', 'price_desc', 'popular'], true)) {
+            $sort = 'newest';
+        }
+        switch ($sort) {
+            case 'price_asc':
+                $query->orderByRaw("{$currentPriceSql} ASC");
+                break;
+            case 'price_desc':
+                $query->orderByRaw("{$currentPriceSql} DESC");
+                break;
+            case 'popular':
+                $query->withCount(['orderItems as sold_count' => function ($q) {
+                    $q->whereHas('order', fn ($o) => $o->where('status', 'livrée'));
+                }])->orderByDesc('sold_count');
+                break;
+            default:
+                $query->latest();
+        }
+
         /* ->fragment('catalogue') : chaque lien de pagination pointe vers #catalogue,
            pour que la page suivante/précédente atterrisse directement sur les produits
            au lieu de tout en haut (sinon il faut redescendre à chaque clic). */
-        $products = $query->latest()->paginate(24)->withQueryString()->fragment('catalogue');
+        $products = $query->paginate(24)->withQueryString()->fragment('catalogue');
 
         $categories = Product::select('category')
             ->where('is_active', true)
@@ -239,7 +317,8 @@ class WelcomeController extends Controller
 
         return compact(
             'flashProducts', 'recommendedProducts', 'shops', 'products', 'categories',
-            'categoryGroups', 'bestSellers', 'testimonials', 'favoritedIds', 'shopRatings', 'stats'
+            'categoryGroups', 'bestSellers', 'testimonials', 'favoritedIds', 'shopRatings', 'stats', 'sort',
+            'minPrice', 'maxPrice'
         );
     }
 }

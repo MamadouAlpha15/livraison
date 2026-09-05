@@ -103,6 +103,49 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 }
 .nav-search-btn:hover { background: var(--orange-dk); }
 
+/* ── Tri + filtre prix du catalogue (même principe que l'accueil) ── */
+.filter-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.sort-row { display: flex; align-items: center; gap: 8px; }
+.sort-select {
+    padding: 8px 32px 8px 14px; border-radius: 50px; border: 1.5px solid var(--border);
+    background: var(--surface); color: var(--text); font-size: 12.5px; font-weight: 600; font-family: var(--font);
+    cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.05); transition: border-color .15s;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a9bb0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+}
+.sort-select:hover, .sort-select:focus { border-color: var(--orange); outline: none; }
+.price-filter-form {
+    display: flex; align-items: center; gap: 7px;
+    background: var(--surface); border: 1.5px solid var(--border); border-radius: 50px;
+    padding: 5px 8px 5px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.05); color: var(--muted);
+}
+.price-filter-form:focus-within { border-color: var(--orange); }
+.price-input {
+    width: 92px; border: none; outline: none; background: transparent;
+    font-size: 12.5px; font-family: var(--font); color: var(--text); padding: 6px 2px;
+    -moz-appearance: textfield;
+}
+.price-input::-webkit-outer-spin-button, .price-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.price-input::placeholder { color: var(--muted); }
+.price-sep { font-size: 12px; color: var(--muted); flex-shrink: 0; }
+.price-filter-btn {
+    flex-shrink: 0; padding: 7px 15px; border-radius: 50px; border: none;
+    background: var(--orange); color: #fff; font-size: 12px; font-weight: 700; font-family: var(--font);
+    cursor: pointer; transition: background .15s; white-space: nowrap;
+}
+.price-filter-btn:hover { background: var(--orange-dk); }
+.price-filter-clear {
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    width: 26px; height: 26px; border-radius: 50%; background: var(--grey);
+    color: var(--muted); text-decoration: none; transition: all .15s;
+}
+.price-filter-clear:hover { background: #fee2e2; color: #dc2626; }
+@media (max-width: 640px) {
+    .price-filter-form { flex-wrap: nowrap; width: 100%; }
+    .price-input { width: 0; flex: 1; min-width: 0; }
+}
+
 /* Nav actions */
 .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .nav-orders-btn {
@@ -2125,6 +2168,12 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 @endphp
 
 @php
+    // Paramètres de filtre/tri courants, réutilisés par tous les liens de catégorie
+    // (sidebar, chips, "voir tout") pour ne jamais réinitialiser un filtre actif.
+    $baseParams = ['s' => request('s'), 'cat' => request('cat'), 'min_price' => $minPrice, 'max_price' => $maxPrice, 'sort' => ($sort ?? 'newest') !== 'newest' ? $sort : null];
+@endphp
+
+@php
     $user      = auth()->user();
     $parts     = explode(' ', $user->name);
     $initials  = strtoupper(substr($parts[0],0,1)) . strtoupper(substr($parts[1] ?? 'X',0,1));
@@ -2370,10 +2419,13 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
     </div>
 
     <div style="flex:1;max-width:420px;display:flex;flex-direction:column;gap:0">
-        <div class="nav-search" style="max-width:100%">
-            <input type="text" id="globalSearch" placeholder="Que recherchez-vous ?" autocomplete="off">
-            <button class="nav-search-btn" onclick="doSearch()">{!! $si('search',16) !!}</button>
-        </div>
+        {{-- Recherche PRODUITS (rechargement, comme l'accueil — le serveur filtre déjà
+             $products via ?s=..., voir DashboardController@index) EN PLUS du filtrage
+             instantané des boutiques déjà affichées ci-dessous (doSearch(), inchangé). --}}
+        <form method="GET" action="{{ route('client.dashboard') }}#catalogue" class="nav-search" style="max-width:100%">
+            <input type="text" id="globalSearch" name="s" value="{{ request('s') }}" placeholder="Que recherchez-vous ?" autocomplete="off">
+            <button class="nav-search-btn" type="submit">{!! $si('search',16) !!}</button>
+        </form>
         <div id="searchLiveInfo"></div>
     </div>
 
@@ -2499,7 +2551,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
     <div class="sb-card sb-card-explorer">
         <div class="sb-hd">{!! $si('grid',15) !!} Explorer</div>
         <div class="sb-cat-wrap-mob">
-        <a href="{{ route('client.dashboard') }}#catalogue" class="sb-cat-item {{ !request('cat') ? 'active' : '' }}">
+        <a href="{{ route('client.dashboard') }}?{{ http_build_query(array_filter(array_merge($baseParams, ['cat' => null]))) }}#catalogue" class="sb-cat-item {{ !request('cat') ? 'active' : '' }}">
             <span class="sb-cat-ico">{!! $si('store',17) !!}</span>
             <span class="sb-cat-name">Toutes</span>
             <span class="sb-cat-cnt">{{ $products->total() }}</span>
@@ -2531,7 +2583,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
             };
         @endphp
         @foreach($categories as $cat)
-        <a href="{{ route('client.dashboard', ['cat' => $cat->type]) }}#catalogue" class="sb-cat-item {{ request('cat') === $cat->type ? 'active' : '' }}">
+        <a href="{{ route('client.dashboard') }}?{{ http_build_query(array_filter(array_merge($baseParams, ['cat' => $cat->type]))) }}#catalogue" class="sb-cat-item {{ request('cat') === $cat->type ? 'active' : '' }}">
             <span class="sb-cat-ico">{!! $getSbEmoji($cat->type) !!}</span>
             <span class="sb-cat-name">{{ $cat->type }}</span>
             <span class="sb-cat-cnt">{{ $cat->shop_count }}</span>
@@ -2869,7 +2921,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 <div>
     <div class="sec-hd">
         <div class="sec-title">{!! \App\Support\IconLibrary::categorySvg($group['name'], '', 18) !!} Populaire en <strong>{{ $group['name'] }}</strong></div>
-        <a href="{{ route('client.dashboard', ['cat' => $group['name']]) }}#catalogue" class="sec-link">Voir tout →</a>
+        <a href="{{ route('client.dashboard') }}?{{ http_build_query(array_filter(array_merge($baseParams, ['cat' => $group['name']]))) }}#catalogue" class="sec-link">Voir tout →</a>
     </div>
     <div class="reco-row-outer">
         <div class="reco-row">
@@ -2929,13 +2981,13 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 <div id="categories" style="scroll-margin-top:80px">
    
     <div class="pop-cats-row" id="popCatsRow">
-        <a href="{{ route('client.dashboard') }}#catalogue" class="pop-cat-chip {{ !request('cat') ? 'active' : '' }}">
+        <a href="{{ route('client.dashboard') }}?{{ http_build_query(array_filter(array_merge($baseParams, ['cat' => null]))) }}#catalogue" class="pop-cat-chip {{ !request('cat') ? 'active' : '' }}">
             <span class="pop-cat-ico">{!! $si('store',22) !!}</span>
             <span class="pop-cat-name">Toutes</span>
             <span class="pop-cat-cnt">{{ $products->total() }} produits</span>
         </a>
         @foreach($categories->take(6) as $cat)
-        <a href="{{ route('client.dashboard', ['cat' => $cat->type]) }}#catalogue" class="pop-cat-chip {{ request('cat') === $cat->type ? 'active' : '' }}">
+        <a href="{{ route('client.dashboard') }}?{{ http_build_query(array_filter(array_merge($baseParams, ['cat' => $cat->type]))) }}#catalogue" class="pop-cat-chip {{ request('cat') === $cat->type ? 'active' : '' }}">
             <span class="pop-cat-ico">{!! $getSbEmoji($cat->type) !!}</span>
             <span class="pop-cat-name">{{ $cat->type }}</span>
             <span class="pop-cat-cnt">{{ $cat->shop_count }} produit{{ $cat->shop_count > 1 ? 's' : '' }}</span>
@@ -2943,7 +2995,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
         @endforeach
         @if($categories->count() > 6)
         @foreach($categories->skip(6) as $cat)
-        <a href="{{ route('client.dashboard', ['cat' => $cat->type]) }}#catalogue" class="pop-cat-chip pop-cat-extra {{ request('cat') === $cat->type ? 'active' : '' }}" style="display:none">
+        <a href="{{ route('client.dashboard') }}?{{ http_build_query(array_filter(array_merge($baseParams, ['cat' => $cat->type]))) }}#catalogue" class="pop-cat-chip pop-cat-extra {{ request('cat') === $cat->type ? 'active' : '' }}" style="display:none">
             <span class="pop-cat-ico">{!! $getSbEmoji($cat->type) !!}</span>
             <span class="pop-cat-name">{{ $cat->type }}</span>
             <span class="pop-cat-cnt">{{ $cat->shop_count }} produit{{ $cat->shop_count > 1 ? 's' : '' }}</span>
@@ -2978,6 +3030,36 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
         @if(request('cat'))
         <a href="{{ route('client.dashboard') }}#catalogue" class="sec-link">Réinitialiser ✕</a>
         @endif
+    </div>
+
+    {{-- ══ TRI + FILTRE PRIX (même principe que l'accueil) ══ --}}
+    @php
+        $sortLabels = ['newest' => 'Plus récents', 'price_asc' => 'Prix croissant', 'price_desc' => 'Prix décroissant', 'popular' => 'Plus vendus'];
+        $sortUrl = fn ($v) => route('client.dashboard') . '?' . http_build_query(array_filter(array_merge($baseParams, ['sort' => $v !== 'newest' ? $v : null]))) . '#catalogue';
+    @endphp
+    <div class="filter-row">
+        <div class="sort-row">
+            {!! \App\Support\IconLibrary::svg('sort', '', 14) !!}
+            <select class="sort-select" onchange="location.href=this.value" aria-label="Trier les produits">
+                @foreach($sortLabels as $val => $label)
+                <option value="{{ $sortUrl($val) }}" {{ $sort === $val ? 'selected' : '' }}>{{ $label }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <form method="GET" action="{{ route('client.dashboard') }}#catalogue" class="price-filter-form">
+            <input type="hidden" name="s" value="{{ request('s') }}">
+            <input type="hidden" name="cat" value="{{ request('cat') }}">
+            @if($sort !== 'newest')<input type="hidden" name="sort" value="{{ $sort }}">@endif
+            {!! \App\Support\IconLibrary::svg('wallet', '', 14) !!}
+            <input type="number" name="min_price" value="{{ $minPrice }}" placeholder="Prix min" min="0" step="1000" inputmode="numeric" class="price-input">
+            <span class="price-sep">—</span>
+            <input type="number" name="max_price" value="{{ $maxPrice }}" placeholder="Prix max" min="0" step="1000" inputmode="numeric" class="price-input">
+            <button type="submit" class="price-filter-btn">Filtrer</button>
+            @if($minPrice !== null || $maxPrice !== null)
+            <a href="{{ route('client.dashboard') }}?{{ http_build_query(array_filter(array_merge($baseParams, ['min_price' => null, 'max_price' => null]))) }}#catalogue" class="price-filter-clear" aria-label="Effacer le filtre prix">{!! \App\Support\IconLibrary::svg('x', '', 12) !!}</a>
+            @endif
+        </form>
     </div>
 
     @if($products->isEmpty())

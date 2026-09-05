@@ -181,6 +181,9 @@ Route::get('/.well-known/assetlinks.json', function () {
 /* Page d'accueil */
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
+/* Suggestions de recherche (autocomplétion) — accessible sans compte, comme le catalogue */
+Route::get('/search-suggestions', [WelcomeController::class, 'suggestions'])->name('search.suggestions');
+
 /* Conditions d'utilisation et politique de confidentialité */
 Route::view('/conditions-utilisation', 'legal.terms')->name('legal.terms');
 

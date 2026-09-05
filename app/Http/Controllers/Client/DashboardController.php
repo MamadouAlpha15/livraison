@@ -40,7 +40,43 @@ class DashboardController extends Controller
             $productsQuery->where('category', $cat);
         }
 
-        $products = $productsQuery->latest()->paginate(24)->withQueryString()->fragment('catalogue');
+        /* ── Prix RÉELLEMENT appliqué (vente flash comprise) — même règle que
+           Product::getCurrentPriceAttribute() (accesseur PHP, pas une colonne, donc
+           pas filtrable/triable directement, d'où l'expression SQL équivalente
+           ci-dessous). Identique à WelcomeController (page d'accueil), pour un
+           comportement cohérent partout sur le site. */
+        $currentPriceSql = "CASE WHEN flash_price IS NOT NULL AND flash_ends_at IS NOT NULL AND flash_ends_at > NOW() AND (flash_starts_at IS NULL OR flash_starts_at <= NOW()) THEN flash_price ELSE price END";
+
+        $minPrice = request('min_price');
+        $maxPrice = request('max_price');
+        if ($minPrice !== null && $minPrice !== '' && is_numeric($minPrice)) {
+            $productsQuery->whereRaw("{$currentPriceSql} >= ?", [(float) $minPrice]);
+        }
+        if ($maxPrice !== null && $maxPrice !== '' && is_numeric($maxPrice)) {
+            $productsQuery->whereRaw("{$currentPriceSql} <= ?", [(float) $maxPrice]);
+        }
+
+        $sort = request('sort', 'newest');
+        if (!in_array($sort, ['newest', 'price_asc', 'price_desc', 'popular'], true)) {
+            $sort = 'newest';
+        }
+        switch ($sort) {
+            case 'price_asc':
+                $productsQuery->orderByRaw("{$currentPriceSql} ASC");
+                break;
+            case 'price_desc':
+                $productsQuery->orderByRaw("{$currentPriceSql} DESC");
+                break;
+            case 'popular':
+                $productsQuery->withCount(['orderItems as sold_count' => function ($q) {
+                    $q->whereHas('order', fn ($o) => $o->where('status', 'livrée'));
+                }])->orderByDesc('sold_count');
+                break;
+            default:
+                $productsQuery->latest();
+        }
+
+        $products = $productsQuery->paginate(24)->withQueryString()->fragment('catalogue');
 
         /* ── Populaire par catégorie ("Populaire en Parfums", "Populaire en Montres"…) ──
            Pour chaque grande catégorie, on montre les produits les plus VENDUS
@@ -264,7 +300,8 @@ class DashboardController extends Controller
             'shopCount', 'productCount', 'deliveredCount', 'clientCount',
             'categories', 'topShops', 'allTopShops', 'favoriteIds',
             'recommendedProducts', 'favoriteProductIds', 'flashProducts', 'cartCount',
-            'loyaltyPoints', 'loyaltyNextMilestone', 'loyaltyProgressPercent', 'loyaltyReferralBonus'
+            'loyaltyPoints', 'loyaltyNextMilestone', 'loyaltyProgressPercent', 'loyaltyReferralBonus',
+            'sort', 'minPrice', 'maxPrice'
         ));
     }
 }

@@ -18,6 +18,38 @@ const _SVG = {
     sun:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
 };
 
+/* ── Requêtes réseau avec délai d'expiration (timeout) ──
+   Sur réseau lent/instable, un fetch() normal peut rester bloqué indéfiniment
+   sans jamais échouer — l'utilisateur reste alors face à un bouton grisé ou un
+   chargement qui tourne sans fin. On force donc un échec propre après un délai,
+   pour que chaque appel puisse toujours retomber sur son .catch(). */
+function fetchTimeout(url, options, ms) {
+    const ctrl = new AbortController();
+    const id = setTimeout(() => ctrl.abort(), ms || 12000);
+    return fetch(url, Object.assign({}, options, { signal: ctrl.signal })).finally(() => clearTimeout(id));
+}
+// Exposé sur window : ce fichier est chargé en module (@vite), dont les déclarations de haut
+// niveau ne sont PAS globales — le <script> inline de l'assistant IA (dashboard.blade.php) en
+// a besoin. Sans risque d'ordre : sendVaChat() n'est appelée qu'au clic, bien après que ce
+// module (chargé en <script type="module">, donc différé) ait fini de s'exécuter.
+window.fetchTimeout = fetchTimeout;
+
+/* ── Signal réseau visible, mais sans spammer ──
+   Le sondage tourne toutes les 6s : si on affichait un message à chaque échec,
+   une simple coupure réseau de quelques minutes enchaînerait des dizaines de
+   messages. On n'affiche donc qu'une fois par coupure (au moment où ça bascule
+   de "ça marchait" à "ça ne marche plus"), puis on se tait jusqu'au rétablissement. */
+window._bqNetworkOk = true;
+function _bqNetworkFail() {
+    if (window._bqNetworkOk) {
+        window._bqNetworkOk = false;
+        if (typeof window.showToast === 'function') {
+            window.showToast('⚠️ <div>Connexion instable — nouvelle tentative en cours…</div>', 'network');
+        }
+    }
+}
+function _bqNetworkRecover() { window._bqNetworkOk = true; }
+
 /* SIDEBAR */
 function toggleGroup(btn) {
     const sub = btn.nextElementSibling;
@@ -180,9 +212,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (labelEl) labelEl.innerHTML = 'Période : <strong>' + (periodLabels[period] || period) + '</strong>';
         loading.classList.add('show'); statsWrap.style.opacity = '.3';
         try {
-            const res = await fetch(`${window.BQ_CFG.periodStatsUrl}?period=${period}`, {
+            const res = await fetchTimeout(`${window.BQ_CFG.periodStatsUrl}?period=${period}`, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
-            });
+            }, 12000);
             if (!res.ok) throw new Error('HTTP ' + res.status);
             const data = await res.json();
             document.getElementById('pCA').textContent     = fmt(data.ca);
@@ -214,6 +246,9 @@ document.addEventListener('DOMContentLoaded', () => {
             drawBars(data.points);
         } catch (err) {
             console.error(err); document.getElementById('pCA').textContent = '—';
+            if (typeof window.showToast === 'function') {
+                window.showToast('⚠️ <div>Impossible de charger ces statistiques — vérifiez votre connexion</div>', 'network');
+            }
         } finally {
             loading.classList.remove('show'); statsWrap.style.opacity = '1';
         }
@@ -260,13 +295,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* ── Sync cross-device : charger l'état depuis le serveur au démarrage ── */
     /* Retourne une promesse — le polling attend sa résolution avant de démarrer */
-    const _serverSyncReady = fetch('/user/notif-state', { headers: { 'Accept': 'application/json' } })
+    const _serverSyncReady = fetchTimeout('/user/notif-state', { headers: { 'Accept': 'application/json' } }, 8000)
         .then(r => r.json())
         .then(state => {
             if (state.msg_id     > _lastSeenMsgId)        { _lastSeenMsgId        = state.msg_id;     try { localStorage.setItem(_KEY_MSG, _lastSeenMsgId); } catch(e){} }
             if (state.co_msg_id  > _lastSeenCompanyMsgId) { _lastSeenCompanyMsgId = state.co_msg_id;  try { localStorage.setItem(_KEY_CO,  _lastSeenCompanyMsgId); } catch(e){} }
             if (state.support_id > _lastSeenSupportId)    { _lastSeenSupportId    = state.support_id; try { localStorage.setItem(_KEY_SUP, _lastSeenSupportId); } catch(e){} }
         })
+        // Réseau lent/mort au démarrage : on n'attend plus indéfiniment, le sondage
+        // démarre quand même (avec l'état local déjà connu depuis localStorage).
         .catch(() => {});
 
     /* ── Pousser l'état vers le serveur (debouncé 1.5s) ── */
@@ -274,11 +311,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function _pushNotifState() {
         clearTimeout(_syncTimer);
         _syncTimer = setTimeout(() => {
-            fetch('/user/notif-state', {
+            fetchTimeout('/user/notif-state', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
                 body: JSON.stringify({ msg_id: _lastSeenMsgId, co_msg_id: _lastSeenCompanyMsgId, support_id: _lastSeenSupportId }),
-            }).catch(() => {});
+            }, 8000).catch(() => {});
         }, 1500);
     }
 
@@ -395,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const t = document.createElement('div');
         t.style.cssText = `
             position:fixed;bottom:${20 + document.querySelectorAll('.rt-toast').length * 60}px;
-            right:20px;background:${type==='order'?'#111118':type==='msg'?'#1e40af':type==='company'?'#4f46e5':type==='support'?'#166534':'#1f2937'};
+            right:20px;background:${type==='order'?'#111118':type==='msg'?'#1e40af':type==='company'?'#4f46e5':type==='support'?'#166534':type==='network'?'#b45309':'#1f2937'};
             color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:600;
             z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,.25);
             animation:slideInRight .3s cubic-bezier(.23,1,.32,1);
@@ -405,10 +442,11 @@ document.addEventListener('DOMContentLoaded', () => {
         t.innerHTML = msg;
         t.onclick   = () => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); };
         document.body.appendChild(t);
-        playBeep();
+        if (type !== 'network') playBeep(); // pas de bip pour un simple avertissement réseau
         setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(120%)';
             t.style.transition='all .3s'; setTimeout(()=>t.remove(),300); }, 5000);
     }
+    window.showToast = showToast; // accessible depuis les autres sections du fichier (fetchTimeout/_bqNetworkFail)
 
     /* ── Dropdown notifications ── */
     let _alertIdSeq = 0;
@@ -569,11 +607,12 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ── Polling principal ── */
     async function pollNotifications() {
         try {
-            const res = await fetch('/boutique/notifications/poll', {
+            const res = await fetchTimeout('/boutique/notifications/poll', {
                 headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }
-            });
+            }, 10000);
             if (!res.ok) return;
             const d = await res.json();
+            _bqNetworkRecover();
 
             /* Messages */
             setBadge('sbMsgBadge', d.messages_unread);
@@ -756,13 +795,22 @@ document.addEventListener('DOMContentLoaded', () => {
             if (totalEl) totalEl.textContent = _alerts.length;
 
             if (_notifOpen) renderNotifList();
-        } catch(e) {}
+        } catch(e) { _bqNetworkFail(); }
     }
 
-    /* ── Démarrage : attendre la sync serveur avant le 1er poll ── */
+    /* ── Démarrage : attendre la sync serveur avant le 1er poll ──
+       L'intervalle continue de tourner même en arrière-plan (coût nul, c'est
+       juste un minuteur), mais on ne relance une requête réseau que si l'app
+       est réellement visible — pas la peine de consommer batterie/données pour
+       sonder le serveur pendant que l'utilisateur ne regarde même pas l'écran.
+       Au retour au premier plan, on resynchronise tout de suite (pas d'attente
+       jusqu'au prochain tic des 6s). */
     _serverSyncReady.then(() => {
         pollNotifications();
-        setInterval(pollNotifications, 6000);
+        setInterval(() => { if (document.visibilityState === 'visible') pollNotifications(); }, 6000);
+    });
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') pollNotifications();
     });
 
     /* ── Animation CSS + scrollbar notifList ── */
@@ -851,7 +899,8 @@ document.addEventListener('DOMContentLoaded', () => {
         /* Charger messages + commandes */
         bqLoadMessages(true);
         bqLoadPendingOrders();
-        _bqInterval = setInterval(() => bqLoadMessages(false), 3000);
+        // Pas de requête pendant que l'app est en arrière-plan (économie batterie/données).
+        _bqInterval = setInterval(() => { if (document.visibilityState === 'visible') bqLoadMessages(false); }, 3000);
     };
 
     /* ── Charge les commandes non assignées ── */
@@ -859,9 +908,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const zone = document.getElementById('bqConfierZone');
         const list = document.getElementById('bqOrdersList');
 
-        fetch('/employe/orders/pending-json', {
+        fetchTimeout('/employe/orders/pending-json', {
             headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
-        })
+        }, 12000)
         .then(r => r.json())
         .then(orders => {
             list.innerHTML = '';
@@ -907,7 +956,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (ml) ml.scrollTop = ml.scrollHeight;
             });
         })
-        .catch(() => { _bqHideConfierZone(); });
+        .catch(() => {
+            _bqHideConfierZone();
+            if (typeof window.showToast === 'function') {
+                window.showToast('⚠️ <div>Impossible de charger les commandes — vérifiez votre connexion</div>', 'network');
+            }
+        });
     }
 
     /* ── Met à jour le bouton confier ── */
@@ -966,9 +1020,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!_bqCompanyId) return;
 
-        fetch(`/company-zones/${_bqCompanyId}`, {
+        fetchTimeout(`/company-zones/${_bqCompanyId}`, {
             headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
-        })
+        }, 12000)
         .then(r => r.json())
         .then(zones => {
             if (!zones || !zones.length) return;
@@ -976,7 +1030,7 @@ document.addEventListener('DOMContentLoaded', () => {
             bqFilterZones('');
             wrap.style.display = 'block';
         })
-        .catch(() => {});
+        .catch(() => {}); // secondaire, déclenché avec bqLoadPendingOrders qui alerte déjà en cas de coupure réseau
     }
 
     /* ── Filtre et affiche les zones en temps réel ── */
@@ -1084,11 +1138,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (zoneId)                  formData.append('delivery_zone_id', zoneId);
             if (_bqSelectedZone?.price)  formData.append('delivery_fee', _bqSelectedZone.price);
             try {
-                const r    = await fetch(`/employe/orders/${orderId}/send-to-company`, {
+                const r    = await fetchTimeout(`/employe/orders/${orderId}/send-to-company`, {
                     method: 'POST',
                     headers: { 'X-CSRF-TOKEN': CSRF, 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
                     body: formData
-                });
+                }, 15000);
                 const data = await r.json();
                 if (data.success) {
                     successCount++;
@@ -1208,18 +1262,28 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Escape') window.bqCloseChatModal();
     });
 
-    /* ── Charge les messages ── */
+    /* ── Charge les messages ──
+       Le sondage tourne toutes les 3s (voir _bqInterval) : sur réseau lent, une
+       requête peut prendre plus de 3s à répondre — sans garde, la suivante
+       partirait quand même par-dessus, empilant les requêtes. On ignore donc un
+       nouvel appel de sondage (pas un envoi manuel) tant que le précédent
+       n'est pas terminé. */
+    let _bqMsgInFlight = false;
     function bqLoadMessages(initial) {
         if (!_bqCompanyId) return;
+        if (_bqMsgInFlight && !initial) return;
+        _bqMsgInFlight = true;
+
         const url = new URL(`/employe/companies/${_bqCompanyId}/chat/messages`, location.origin);
         url.searchParams.set('shop_id', SHOP_ID);
         if (_bqLastMsgTime && !initial) url.searchParams.set('after', _bqLastMsgTime);
 
-        fetch(url.toString(), {
+        fetchTimeout(url.toString(), {
             headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
-        })
+        }, 10000)
         .then(r => r.json())
         .then(data => {
+            _bqNetworkRecover();
             const msgs = data.messages || [];
             if (msgs.length) {
                 bqRenderMessages(msgs, initial);
@@ -1237,10 +1301,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         })
         .catch(() => {
+            _bqNetworkFail();
+            /* Message trompeur évité : "Aucun message" ne doit s'afficher que si la
+               conversation est réellement vide, pas quand le réseau a coupé. */
             if (initial)
                 document.getElementById('bqChatMsgList').innerHTML =
-                    '<div class="bq-chat-empty" id="bqChatEmpty">Aucun message. Commencez la discussion !</div>';
-        });
+                    '<div class="bq-chat-empty" id="bqChatEmpty">Connexion instable — impossible de charger les messages.</div>';
+        })
+        .finally(() => { _bqMsgInFlight = false; });
     }
 
     /* ── Rend les messages ── */
@@ -1292,7 +1360,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const sendBtn = document.getElementById('bqChatSendBtn');
         sendBtn.disabled = true;
 
-        fetch(`/employe/companies/${_bqCompanyId}/chat/send`, {
+        fetchTimeout(`/employe/companies/${_bqCompanyId}/chat/send`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1301,7 +1369,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Accept': 'application/json'
             },
             body: JSON.stringify({ message: msg, shop_id: SHOP_ID })
-        })
+        }, 15000)
         .then(r => r.json())
         .then(data => {
             input.value = '';
@@ -1313,7 +1381,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 bqLoadMessages(false);
             }
         })
-        .catch(() => { sendBtn.disabled = false; });
+        .catch(() => {
+            // Avant : le bouton se réactivait en silence, sans jamais dire à
+            // l'utilisateur que son message n'était PAS parti (il pouvait croire
+            // l'envoi réussi). Le texte reste dans le champ pour pouvoir réessayer.
+            sendBtn.disabled = false;
+            if (typeof window.showToast === 'function') {
+                window.showToast('⚠️ <div>Message non envoyé — vérifiez votre connexion</div>', 'network');
+            }
+        });
     };
 })();
 
@@ -1341,12 +1417,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function pollKpi() {
-        fetch(KPI_URL, {
+        fetchTimeout(KPI_URL, {
             headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': CSRF }
-        })
+        }, 10000)
         .then(r => r.ok ? r.json() : null)
         .then(d => {
             if (!d) return;
+            _bqNetworkRecover();
 
             /* KPI Revenu net */
             set('kpiCaVal', d.ca_month);
@@ -1417,11 +1494,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 else               { cmdBadge.classList.add('flat'); cmdBadge.textContent = '→ ' + d.cmd_today + ' aujourd\'hui'; }
             }
         })
-        .catch(() => {});
+        .catch(() => { _bqNetworkFail(); });
     }
 
-    /* Premier appel après 30s puis toutes les 30s */
-    setInterval(pollKpi, 30000);
+    /* Premier appel après 30s puis toutes les 30s — en pause en arrière-plan
+       (économie batterie/données), rafraîchi immédiatement au retour. */
+    setInterval(() => { if (document.visibilityState === 'visible') pollKpi(); }, 30000);
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') pollKpi();
+    });
 })();
 
 /* ── Auto-refresh toutes les 90 secondes ── */

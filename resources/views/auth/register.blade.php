@@ -123,13 +123,13 @@ $countries = [
             <input type="hidden" name="role" id="roleInput" value="{{ old('role', $defaultRole ?? 'client') }}">
             <div class="role-cards">
                 <div class="role-card {{ old('role', $defaultRole ?? 'client') === 'client'  ? 'active':'' }}" onclick="setRole('client',this)">
-                    <span class="rc-ico">🛒</span>Client
+                    <span class="rc-ico">{!! \App\Support\IconLibrary::svg('cart', '', 22) !!}</span>Client
                 </div>
                 <div class="role-card {{ old('role', $defaultRole ?? 'client') === 'admin'   ? 'active':'' }}" onclick="setRole('admin',this)">
-                    <span class="rc-ico">🏪</span>Admin boutique
+                    <span class="rc-ico">{!! \App\Support\IconLibrary::svg('store', '', 22) !!}</span>Vendeur
                 </div>
                 <div class="role-card {{ old('role', $defaultRole ?? 'client') === 'company' ? 'active':'' }}" onclick="setRole('company',this)">
-                    <span class="rc-ico">🚚</span>Entreprise livraison
+                    <span class="rc-ico">{!! \App\Support\IconLibrary::svg('truck', '', 22) !!}</span>Entreprise livraison
                 </div>
                
             </div>

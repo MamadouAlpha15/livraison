@@ -19,6 +19,11 @@ Route::get('auth/google/callback', [GoogleController::class, 'callback'])    ->n
 Route::get('auth/google/setup',    [GoogleController::class, 'setup'])       ->name('google.setup');
 Route::post('auth/google/setup',   [GoogleController::class, 'storeSetup']) ->name('google.setup.store');
 
+/* App mobile Flutter : même redirect_uri Google que le site (fixé côté Google
+   Cloud Console), mais un flag en session fait bifurquer callback() vers un
+   retour par jeton (Sanctum) + Android App Links au lieu d'une session web. */
+Route::get('auth/google/mobile', [GoogleController::class, 'redirectMobile'])->name('google.redirect.mobile');
+
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');

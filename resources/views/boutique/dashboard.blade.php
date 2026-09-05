@@ -10,12 +10,13 @@
 @php $bodyClass = 'is-dashboard'; @endphp
 
 @push('styles')
-{{-- Anti-flash : boutique-dashboard.css est chargé en différé (non-bloquant, pour un 1er
-     affichage rapide sur réseau lent). Tant qu'il n'est pas prêt, .sb-logo-icon n'a aucune
-     taille définie → le logo (img width:100%;height:100%) peut s'afficher géant sur toute
-     la page le temps que le CSS arrive. On fige sa taille ici en inline (donc instantané,
-     zéro dépendance réseau) — même technique déjà utilisée sur les autres pages boutique/*. --}}
-<style>.sb-logo-icon{width:36px;height:36px;border-radius:9px;overflow:hidden;flex-shrink:0}</style>
+{{-- Page lourde (beaucoup d'images : logo, photos produits, graphiques) — on demande
+     au loader du layout (voir layouts/app.blade.php) d'attendre AUSSI que toutes les
+     images de la page soient chargées avant de la révéler, pas seulement le CSS/police.
+     Ce drapeau doit s'exécuter avant le script du loader plus bas dans le document —
+     @push('styles') est rendu dans le <head>, avant le loader qui est dans le <body>.
+     N'affecte que cette page : les autres continuent comme avant. --}}
+<script>window.__pgWaitImages = true;</script>
 {{-- Polices auto-hébergées (avant : fonts.googleapis.com + fonts.gstatic.com) — même fichier
      déjà servi par shopio-app.com, zéro nouvelle connexion DNS/TLS externe à négocier.
      display=swap : le texte s'affiche tout de suite avec une police de secours au lieu de
@@ -1174,33 +1175,82 @@ $I = [
     $cmdYest  = $shop->orders()->whereDate('created_at', today()->subDay())->whereNotIn('status',['annulée','cancelled'])->count();
     $cmdLivreesMonth = $shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->where('status','livrée')->count();
     $panier          = $cmdLivreesMonth > 0 ? round($caMonth / $cmdLivreesMonth) : 0;
+
+    /* ── Comparaison sectorielle (Plan Pro) ──
+       Moyenne anonyme du revenu du mois chez les autres boutiques du même type
+       (ex: "Pharmacie") et du même pays. Seuil minimum de 3 boutiques pour rester
+       anonyme (jamais assez pour deviner le chiffre d'une boutique en particulier)
+       et statistiquement pertinent — sinon la carte ne s'affiche pas du tout. */
+    $sectorAvg = null; $sectorDelta = null; $sectorCount = 0;
+    if ($shop->type) {
+        $sectorShopIds = \App\Models\Shop::where('type', $shop->type)
+            ->where('country', $shop->country)
+            ->where('is_approved', true)
+            ->where('id', '!=', $shop->id)
+            ->pluck('id');
+        $sectorCount = $sectorShopIds->count();
+        if ($sectorCount >= 3) {
+            $sectorTotal = (float) \App\Models\Order::whereIn('shop_id', $sectorShopIds)
+                ->whereMonth('created_at', $now->month)->whereYear('created_at', $now->year)
+                ->where('status', 'livrée')->sum('total');
+            $sectorAvg = $sectorTotal / $sectorCount;
+            $sectorDelta = $sectorAvg > 0 ? round((($caGrossMonth - $sectorAvg) / $sectorAvg) * 100, 1) : ($caGrossMonth > 0 ? 100 : 0);
+        }
+    }
     $cmdLivreesPrev  = $shop->orders()->whereMonth('created_at',$now->copy()->subMonth()->month)->whereYear('created_at',$now->copy()->subMonth()->year)->where('status','livrée')->count();
     $panierPrev      = $cmdLivreesPrev > 0 ? round($caNetPrev / $cmdLivreesPrev) : 0;
     $panierDelta     = $panierPrev > 0 ? round((($panier - $panierPrev) / $panierPrev) * 100, 1) : ($panier > 0 ? 100 : 0);
     $totalCmdMonth = $shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->whereNotIn('status',['annulée','cancelled'])->count();
-    $livres        = $shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->where('status','livrée')->count();
+    // $livres était une requête strictement identique à $cmdLivreesMonth (calculée juste
+    // au-dessus) — réutilisée au lieu d'interroger la base une 2e fois pour la même chose.
+    $livres        = $cmdLivreesMonth;
     $tauxLiv       = $totalCmdMonth > 0 ? round(($livres / $totalCmdMonth) * 100, 1) : 0;
-    $days7 = collect(range(6,0))->map(function ($i) use ($shop, $now, $_dayLabel) {
-        $day      = $now->copy()->subDays($i)->toDateString();
-        $caJour   = (float) $shop->orders()->whereDate('created_at', $day)->where('status','livrée')->sum('total');
-        $commJour = (float) \App\Models\CourierCommission::whereHas('order', function ($q) use ($shop, $day) {
-            $q->where('shop_id', $shop->id)->whereDate('created_at', $day);
-        })->where('status', 'payée')->sum('amount');
-        $d = $now->copy()->subDays($i);
+    /* Performance : ces 3 blocs (revenu/commissions/commandes des 14 derniers jours)
+       tournaient auparavant en boucle jour par jour — 2 à 3 requêtes SQL séparées
+       PAR JOUR, soit ~35 requêtes rien que pour ça. Remplacé par une requête groupée
+       par jour pour chaque source de données (3 requêtes au total), puis simple
+       lecture en mémoire dans les boucles ci-dessous — mêmes résultats, beaucoup
+       moins d'allers-retours vers la base de données. */
+    $range14Start   = $now->copy()->subDays(13)->startOfDay();
+    $revenueByDay   = $shop->orders()->where('status', 'livrée')->where('created_at', '>=', $range14Start)
+        ->selectRaw('DATE(created_at) as d, SUM(total) as t')->groupBy('d')->pluck('t', 'd');
+    $commissionsByDay = \App\Models\CourierCommission::query()
+        ->join('orders', 'orders.id', '=', 'courier_commissions.order_id')
+        ->where('orders.shop_id', $shop->id)->where('courier_commissions.status', 'payée')
+        ->where('orders.created_at', '>=', $range14Start)
+        ->selectRaw('DATE(orders.created_at) as d, SUM(courier_commissions.amount) as t')->groupBy('d')->pluck('t', 'd');
+
+    $days7 = collect(range(6,0))->map(function ($i) use ($now, $_dayLabel, $revenueByDay, $commissionsByDay) {
+        $d        = $now->copy()->subDays($i);
+        $caJour   = (float) ($revenueByDay[$d->toDateString()] ?? 0);
+        $commJour = (float) ($commissionsByDay[$d->toDateString()] ?? 0);
         return ['label' => $_dayLabel($d), 'value' => max(0, $caJour - $commJour), 'today' => $i === 0];
     })->values();
     $max7 = $days7->max('value') ?: 1;
-    $prev7Total = (float) collect(range(13,7))->sum(function ($i) use ($shop, $now) {
-        $day      = $now->copy()->subDays($i)->toDateString();
-        $caJ      = (float) $shop->orders()->whereDate('created_at', $day)->where('status','livrée')->sum('total');
-        $commJ    = (float) \App\Models\CourierCommission::whereHas('order', function ($q) use ($shop, $day) {
-            $q->where('shop_id', $shop->id)->whereDate('created_at', $day);
-        })->where('status', 'payée')->sum('amount');
+    $prev7Total = (float) collect(range(13,7))->sum(function ($i) use ($now, $revenueByDay, $commissionsByDay) {
+        $day = $now->copy()->subDays($i)->toDateString();
+        $caJ   = (float) ($revenueByDay[$day] ?? 0);
+        $commJ = (float) ($commissionsByDay[$day] ?? 0);
         return max(0, $caJ - $commJ);
     });
     $recentOrders = $shop->orders()->with('user')->latest()->take(6)->get();
-    $topProducts = $shop->products()->withCount('orderItems')->orderByDesc('order_items_count')->take(5)->get();
-    $maxSales    = $topProducts->max('order_items_count') ?: 1;
+    /* Bug corrigé : la carte affiche "ventes du mois" mais comptait en fait TOUTES
+       les ventes depuis toujours (aucun filtre de date) — désormais bien limité au
+       mois en cours, comme "Produits à risque" juste en dessous sur la page, et
+       comme la page de classement complète (route products.top) qui elle était déjà
+       correcte. On exclut aussi les commandes annulées (une vente annulée n'est pas
+       un succès) et on compte les UNITÉS vendues (somme des quantités), pas juste le
+       nombre de commandes : un produit acheté ×3 dans une même commande doit compter
+       plus qu'un produit acheté ×1 dans 3 commandes différentes. */
+    $topProducts = $shop->products()
+        ->withSum(['orderItems as unites_vendues' => function ($q) use ($now) {
+            $q->whereHas('order', function ($o) use ($now) {
+                $o->whereMonth('created_at', $now->month)->whereYear('created_at', $now->year)
+                  ->whereNotIn('status', ['annulée', 'cancelled']);
+            });
+        }], 'quantity')
+        ->having('unites_vendues', '>', 0)->orderByDesc('unites_vendues')->take(5)->get();
+    $maxSales    = $topProducts->max('unites_vendues') ?: 1;
     $statusMap = [
         'livrée'=>['label'=>'Livré','cls'=>'p-success'],
         'pending'=>['label'=>'En attente','cls'=>'p-warning'],
@@ -1233,7 +1283,7 @@ $I = [
         ['key'=>'en_attente',  'label'=>'En attente','count'=>$shop->orders()->whereIn('status',['pending','en attente','en_attente'])->count(),'color'=>'#f59e0b','bg'=>'#fffbeb','ico'=>$I['clock_k']],
         ['key'=>'confirmees',  'label'=>'Confirmées','count'=>$shop->orders()->whereIn('status',['confirmed','confirmée','processing'])->count(),'color'=>'#10b981','bg'=>'#ecfdf5','ico'=>$I['check_k']],
         ['key'=>'en_livraison','label'=>'En livraison','count'=>$shop->orders()->whereIn('status',['en_livraison','delivering','shipped'])->count(),'color'=>'#6366f1','bg'=>'#eef2ff','ico'=>$I['truck_k']],
-        ['key'=>'terminees',   'label'=>'Terminées','count'=>$shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->where('status','livrée')->count(),'color'=>'#22c55e','bg'=>'#dcfce7','ico'=>$I['trophy_k']],
+        ['key'=>'terminees',   'label'=>'Terminées','count'=>$cmdLivreesMonth,'color'=>'#22c55e','bg'=>'#dcfce7','ico'=>$I['trophy_k']], // même valeur que $cmdLivreesMonth, calculée plus haut — requête en moins
         ['key'=>'annulees',    'label'=>'Annulées','count'=>$shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->whereIn('status',['annulée','cancelled'])->count(),'color'=>'#ef4444','bg'=>'#fef2f2','ico'=>$I['x_k']],
     ];
     $hasLivreurs  = $livreursDisponibles->isNotEmpty();
@@ -1249,10 +1299,11 @@ $I = [
     $livreursActifsCount = $livreursDisponibles->count();
     $partenairesCount = isset($deliveryCompanies) ? $deliveryCompanies->count() : 0;
     /* Mini bar chart commandes 7j */
-    $cmdDays7 = collect(range(6,0))->map(function($i) use ($shop, $now, $_dayLabel) {
-        $day = $now->copy()->subDays($i)->toDateString();
-        $cnt = $shop->orders()->whereDate('created_at', $day)->whereNotIn('status',['annulée','cancelled'])->count();
+    $countsByDay = $shop->orders()->whereNotIn('status', ['annulée', 'cancelled'])->where('created_at', '>=', $now->copy()->subDays(6)->startOfDay())
+        ->selectRaw('DATE(created_at) as d, COUNT(*) as c')->groupBy('d')->pluck('c', 'd');
+    $cmdDays7 = collect(range(6,0))->map(function($i) use ($now, $_dayLabel, $countsByDay) {
         $d   = $now->copy()->subDays($i);
+        $cnt = (int) ($countsByDay[$d->toDateString()] ?? 0);
         return ['label' => $_dayLabel($d), 'count' => $cnt, 'today' => $i === 0];
     })->values();
     $maxCmd7 = $cmdDays7->max('count') ?: 1;
@@ -2207,13 +2258,49 @@ $I = [
                 <div class="card-hd"><span class="card-title" style="cursor:pointer;display:inline-flex;align-items:center;gap:5px" onclick="window.location='{{ route('products.top') }}'">Top produits — ventes du mois {!! $I['trophy_t'] !!}</span><a href="{{ route('products.top') }}" class="btn btn-ghost btn-sm">Voir le classement →</a></div>
                 <div class="card-bd">
                     @foreach($topProducts as $product)
-                    @php $pct = round(($product->order_items_count / $maxSales)*100); @endphp
+                    @php $pct = round(($product->unites_vendues / $maxSales)*100); @endphp
                     <div class="sp-row">
                         <span class="sp-lbl" title="{{ $product->name }}">{{ Str::limit($product->name, 18) }}</span>
                         <div class="sp-track"><div class="sp-fill" data-pct="{{ $pct }}" style="width:{{ $pct }}%;transform:scaleX(0)"></div></div>
-                        <span class="sp-val">{{ $product->order_items_count }}</span>
+                        <span class="sp-val">{{ $product->unites_vendues }}</span>
                     </div>
                     @endforeach
+                </div>
+            </div>
+            @endif
+
+            {{-- COMPARAISON SECTEUR (Plan Pro) --}}
+            @if($sectorAvg !== null)
+            <div class="card" style="margin-top:22px">
+                <div class="card-hd"><span class="card-title" style="display:inline-flex;align-items:center;gap:5px">📊 Comparaison avec votre secteur — {{ $shop->type }}</span></div>
+                <div class="plan-locked-wrap">
+                @if(!$isPro)
+                <div class="plan-locked-overlay">
+                    <div class="plan-locked-ico">📈</div>
+                    <div class="plan-locked-title">Comparaison secteur — Plan Pro requis</div>
+                    <div class="plan-locked-sub">Découvrez comment vous vous situez face aux autres boutiques {{ $shop->type }} de votre pays — une info que vous ne trouverez nulle part ailleurs. Réservé au Plan Pro.</div>
+                    <a href="{{ route('boutique.subscription.upgrade') }}" class="plan-locked-btn">✦ Débloquer la comparaison — {{ $proPriceLabel }}</a>
+                </div>
+                @endif
+                <div style="padding:20px 18px;{{ !$isPro ? 'filter:blur(4px);pointer-events:none;user-select:none' : '' }}">
+                    <div style="display:flex;align-items:center;justify-content:center;gap:22px;flex-wrap:wrap;text-align:center">
+                        <div>
+                            <div style="font-size:10.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px">Votre revenu ce mois</div>
+                            <div style="font-size:21px;font-weight:900;color:var(--text);margin-top:2px">{{ number_format($caGrossMonth,0,',',' ') }} {{ $devise }}</div>
+                        </div>
+                        <div style="font-size:13px;color:var(--muted);font-weight:700">vs</div>
+                        <div>
+                            <div style="font-size:10.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px">Moyenne du secteur</div>
+                            <div style="font-size:21px;font-weight:900;color:var(--muted);margin-top:2px">{{ number_format($sectorAvg,0,',',' ') }} {{ $devise }}</div>
+                        </div>
+                    </div>
+                    <div style="text-align:center;margin-top:16px">
+                        <span style="display:inline-block;font-size:13px;font-weight:800;padding:7px 18px;border-radius:20px;background:{{ $sectorDelta >= 0 ? '#ecfdf5' : '#fef2f2' }};color:{{ $sectorDelta >= 0 ? '#065f46' : '#991b1b' }}">
+                            {{ $sectorDelta >= 0 ? '↑' : '↓' }} Vous vendez {{ number_format(abs($sectorDelta),1,',',' ') }}% {{ $sectorDelta >= 0 ? 'de plus' : 'de moins' }} que la moyenne des boutiques {{ $shop->type }} de {{ $shop->country }}
+                        </span>
+                    </div>
+                    <div style="text-align:center;margin-top:8px;font-size:10.5px;color:var(--muted)">Basé sur {{ $sectorCount }} boutique{{ $sectorCount > 1 ? 's' : '' }} {{ $shop->type }} approuvée{{ $sectorCount > 1 ? 's' : '' }} — comparaison anonyme, aucune boutique individuelle n'est identifiable</div>
+                </div>
                 </div>
             </div>
             @endif
@@ -2470,10 +2557,11 @@ function toggleVaChat() {
 
 function resetVaChat() {
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
-    fetch(@json(route('boutique.assistant.reset')), {
+    const _fetch = typeof window.fetchTimeout === 'function' ? window.fetchTimeout : fetch;
+    _fetch(@json(route('boutique.assistant.reset')), {
         method: 'POST',
         headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }
-    }).catch(() => {});
+    }, 10000).catch(() => {});
     const body = document.getElementById('vaChatBody');
     if (body) body.innerHTML = '<div class="va-msg bot">Nouvelle conversation démarrée. Que voulez-vous savoir ?</div>';
 }
@@ -2507,11 +2595,14 @@ function sendVaChat() {
     sendBtn.disabled = true;
 
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
-    fetch(@json(route('boutique.assistant.chat')), {
+    // fetchTimeout (défini dans boutique-dashboard.js, exposé sur window) : sans délai
+    // d'expiration, une requête bloquée sur réseau lent laisserait le bouton grisé indéfiniment.
+    const _fetch = typeof window.fetchTimeout === 'function' ? window.fetchTimeout : fetch;
+    _fetch(@json(route('boutique.assistant.chat')), {
         method: 'POST',
         headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json', 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: msg })
-    })
+    }, 20000)
     .then(r => r.json())
     .then(data => {
         document.getElementById('vaTypingIndicator')?.remove();

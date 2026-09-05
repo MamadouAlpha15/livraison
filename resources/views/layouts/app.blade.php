@@ -57,9 +57,14 @@
             background:#fff;
             display:flex;flex-direction:column;
             align-items:center;justify-content:center;gap:20px;
-            transition:opacity .35s ease;
         }
-        #pg-loader.done { opacity:0;pointer-events:none; }
+        /* Pas de fondu (transition) volontairement : pendant les 350ms d'un fondu
+           d'opacité, le loader devient semi-transparent et laisse voir la vraie page
+           déjà chargée EN DESSOUS par transparence — leurs textes se superposent
+           visuellement un instant ("Connexion lente..." par-dessus "Commandes ce
+           mois...", par exemple). Bascule instantanée à la place : jamais deux
+           contenus visibles en même temps, même une fraction de seconde. */
+        #pg-loader.done { display:none; }
         #pg-loader-logo {
             width:80px;height:80px;border-radius:20px;
             object-fit:cover;
@@ -601,12 +606,13 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
     function hide() {
         if (done) return;
         done = true;
-        /* Révèle le vrai contenu (retire le verrou CSS anti-flash) juste avant de faire
-           disparaître le loader, pour qu'il n'y ait jamais de flash de HTML non stylé
-           en dessous — voir la règle "body.pg-loading" tout en haut du <head>. */
+        /* Révèle le vrai contenu (retire le verrou CSS anti-flash) et cache le loader
+           dans le MÊME cycle JS (donc le même frame peint par le navigateur) : jamais
+           d'étape intermédiaire où les deux se superposent — voir la règle
+           "body.pg-loading" tout en haut du <head> et #pg-loader.done plus haut. */
         document.body.classList.remove('pg-loading');
         loader.classList.add('done');
-        setTimeout(function () { loader.remove(); }, 350);
+        loader.remove();
 
         /* Dans l'application Capacitor (Android) : l'écran de démarrage natif (logo
            Shopio plein écran, différent de ce loader web) se ferme normalement tout
@@ -658,7 +664,46 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
         }));
     })();
 
-    Promise.all([domReady, fontsReady, stylesReady]).then(function () {
+    /* Certaines pages (ex : dashboard boutique, très riche en images — logo, photos
+       produits, graphiques) demandent en plus d'attendre que TOUTES les images soient
+       chargées avant de révéler la page — pas seulement le CSS/police. Optionnel : la
+       page doit poser window.__pgWaitImages = true AVANT ce script (voir
+       boutique/dashboard.blade.php). N'affecte aucune autre page par défaut. Une image
+       cassée/en erreur compte comme "terminée" (on ne bloque jamais indéfiniment
+       dessus) — le filet de sécurité 35s ci-dessous reste de toute façon la limite
+       absolue si des images traînent vraiment sur un réseau très lent.
+       Important : on ne lit document.images qu'APRÈS domReady — ce script s'exécute
+       potentiellement avant la fin du parsing HTML (d'où domReady plus haut), donc lire
+       la liste des images trop tôt en ignorerait celles pas encore parsées plus bas.
+       Les images loading="lazy" sont EXCLUES de l'attente : le navigateur ne les
+       télécharge exprès que quand elles approchent de l'écran visible — or tant que le
+       loader recouvre la page, l'utilisateur ne peut jamais faire défiler jusqu'à elles.
+       Sans cette exclusion, ces images ne se chargent jamais → le loader attend pour
+       rien jusqu'au filet de sécurité de 35s (c'est exactement ce qui rendait le loader
+       très long sur le dashboard boutique, qui a une longue liste de produits en bas de
+       page avec des vignettes en chargement différé). */
+    var imagesReady = domReady.then(function () {
+        if (!window.__pgWaitImages) return;
+        var pending = Array.prototype.filter.call(document.images, function (img) {
+            return !img.complete && img.loading !== 'lazy';
+        });
+        if (!pending.length) return;
+        var allImages = Promise.all(pending.map(function (img) {
+            return new Promise(function (res) {
+                img.addEventListener('load', res, { once: true });
+                img.addEventListener('error', res, { once: true });
+            });
+        }));
+        /* Limite dédiée de 6s pour les images, indépendante du filet global de 35s :
+           beaucoup d'images (même non "lazy") ne doivent jamais, à elles seules,
+           allonger l'attente au-delà de ce qui est raisonnable — passé ce délai, la
+           page se révèle avec les images restantes qui continuent à apparaître au fur
+           et à mesure, comme sur une page web normale. */
+        var imagesTimeout = new Promise(function (res) { setTimeout(res, 6000); });
+        return Promise.race([allImages, imagesTimeout]);
+    });
+
+    Promise.all([domReady, fontsReady, stylesReady, imagesReady]).then(function () {
         /* 2 frames pour laisser le navigateur finaliser le rendu des fonts */
         requestAnimationFrame(function () {
             requestAnimationFrame(hide);

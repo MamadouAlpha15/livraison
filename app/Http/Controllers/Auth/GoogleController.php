@@ -37,11 +37,29 @@ class GoogleController extends Controller
         return $this->driver()->redirect();
     }
 
+    /**
+     * GET /auth/google/mobile — point d'entrée pour l'app Flutter (ouvert dans
+     * le navigateur externe). Même redirect_uri Google que le site (le client
+     * OAuth n'en a qu'un seul d'enregistré) ; un flag en session fait bifurquer
+     * callback() vers un retour par jeton au lieu d'une session web classique.
+     */
+    public function redirectMobile(Request $request)
+    {
+        session(['mobile_google_auth' => true]);
+
+        return $this->driver()->redirect();
+    }
+
     public function callback()
     {
+        $isMobile = session()->pull('mobile_google_auth', false);
+
         try {
             $googleUser = $this->driver()->user();
         } catch (\Exception $e) {
+            if ($isMobile) {
+                return $this->returnToMobileApp(['error' => 'Connexion Google échouée.']);
+            }
             return redirect()->route('login')->with('error', 'Connexion Google échouée.');
         }
 
@@ -62,11 +80,31 @@ class GoogleController extends Controller
             if ($updates) {
                 $user->update($updates);
             }
+
+            if ($isMobile) {
+                // App mobile réservée aux clients (voir Api\V1\AuthController::login)
+                if ($user->role !== 'client') {
+                    return $this->returnToMobileApp(['error' => "Ce compte n'est pas un compte client."]);
+                }
+                return $this->returnToMobileApp(['token' => $user->createToken('flutter-client')->plainTextToken]);
+            }
+
             Auth::login($user, true);
             return $this->redirectToDashboard($user);
         }
 
-        // Nouvel utilisateur → stocker dans la session et choisir rôle + pays
+        // Nouvel utilisateur mobile → pas de session web, tout se termine dans
+        // l'app via POST /api/v1/auth/google/complete (pays + CGU)
+        if ($isMobile) {
+            return $this->returnToMobileApp([
+                'needs_setup'  => '1',
+                'google_id'    => $googleUser->getId(),
+                'google_name'  => $googleUser->getName(),
+                'google_email' => $googleUser->getEmail(),
+            ]);
+        }
+
+        // Nouvel utilisateur (site) → stocker dans la session et choisir rôle + pays
         session([
             'google_id'     => $googleUser->getId(),
             'google_name'   => $googleUser->getName(),
@@ -75,6 +113,16 @@ class GoogleController extends Controller
         ]);
 
         return redirect()->route('google.setup');
+    }
+
+    /**
+     * Redirige vers une URL https://shopio-app.com/... interceptée par l'app
+     * mobile via Android App Links (déjà en place pour l'app Capacitor) — sert
+     * aussi de page de secours si l'app n'intercepte pas.
+     */
+    private function returnToMobileApp(array $params)
+    {
+        return redirect(route('api.v1.auth.google.return') . '?' . http_build_query($params));
     }
 
     public function setup()

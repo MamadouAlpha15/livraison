@@ -34,6 +34,7 @@ class IconLibrary
         'grid'       => '<rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><rect x="14" y="14" width="7" height="7" rx="1.2"/>',
         'eye'        => '<path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/>',
         'plus'       => '<path d="M12 5v14M5 12h14"/>',
+        'sort'       => '<path d="M7 4v16M4 7l3-3 3 3"/><path d="M17 20V4M14 17l3 3 3-3"/>',
         'smartphone' => '<rect x="6" y="2" width="12" height="20" rx="2.2"/><path d="M11 18h2"/>',
         'laptop'     => '<rect x="3" y="4" width="18" height="12" rx="1.2"/><path d="M2 20h20"/>',
         'shirt'      => '<path d="M8 3 4 6l1.5 3L8 8v13h8V8l2.5 1L20 6l-4-3-2 2h-4L8 3Z"/>',
