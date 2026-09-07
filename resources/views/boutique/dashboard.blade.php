@@ -2180,7 +2180,7 @@ $I = [
                             <div class="co-list">
                                 @foreach($deliveryCompanies->take(4) as $company)
                                 <div class="co-row" onclick="window.location='{{ route('company.chat.show', $company) }}'" title="Ouvrir la discussion">
-                                    <div class="co-logo">@if(!empty($company->logo))<img src="{{ asset('storage/'.$company->logo) }}" alt="{{ $company->name }}">@else {!! $I['truck_co'] !!} @endif</div>
+                                    <div class="co-logo">@if(!empty($company->logo))<img src="{{ \App\Services\ImageOptimizer::url($company->logo, 'thumb') ?? asset('storage/'.$company->logo) }}" alt="{{ $company->name }}" loading="lazy" width="28" height="28">@else {!! $I['truck_co'] !!} @endif</div>
                                     <div class="co-info"><div class="co-nm">{{ $company->name }}</div><div class="co-mt">{{ $company->phone ?? 'Contact non renseigné' }}</div></div>
                                     @if($company->commission_rate)<span class="co-commission">{{ number_format($company->commission_rate*100,1) }}%</span>@endif
                                     <a href="{{ route('company.chat.show', $company) }}" class="btn btn-sm btn-primary" onclick="event.stopPropagation()" style="gap:4px">{!! $I['msg_btn'] !!} Contacter</a>
@@ -2231,7 +2231,7 @@ $I = [
                             <div class="co-list">
                                 @foreach($deliveryCompanies->take(4) as $company)
                                 <div class="co-row">
-                                    <div class="co-logo">@if(!empty($company->logo))<img src="{{ asset('storage/'.$company->logo) }}" alt="{{ $company->name }}">@else {!! $I['truck_co'] !!} @endif</div>
+                                    <div class="co-logo">@if(!empty($company->logo))<img src="{{ \App\Services\ImageOptimizer::url($company->logo, 'thumb') ?? asset('storage/'.$company->logo) }}" alt="{{ $company->name }}" loading="lazy" width="28" height="28">@else {!! $I['truck_co'] !!} @endif</div>
                                     <div class="co-info"><div class="co-nm">{{ $company->name }}</div><div class="co-mt">{{ $company->phone ?? 'Contact non renseigné' }}</div></div>
                                     @if($company->commission_rate)<span class="co-commission">{{ number_format($company->commission_rate*100,1) }}%</span>@endif
                                 </div>
