@@ -709,7 +709,7 @@ footer.app-footer { display: none !important; }
     .nav-links { display: none; }
     .nav-hamburger { display: flex; padding: 9px; }
     .mobile-bar { display: flex; }
-    .nav > .nav-search { display: none; } /* seule la barre de la nav desktop est cachée — pas celle de .mobile-bar (même classe) */
+    .nav > .search-wrap { display: none; } /* seule la barre de la nav desktop est cachée — pas celle de .mobile-bar (même classe .search-wrap, mais pas enfant direct de .nav) */
     .cat-sidebar { display: none; }
     .home-top { margin: 14px 16px; }
     .hero { padding: 26px 24px; }
