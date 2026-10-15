@@ -1139,6 +1139,81 @@ footer.app-footer { display: none !important; }
     .track-mock { aspect-ratio: 4 / 4.2; }
 }
 
+/* ════════════════════════════════════════════════════════════════
+   CATALOGUE — filtres en direct, puces actives, pagination, microinteractions
+════════════════════════════════════════════════════════════════ */
+/* Bord droit en fondu : indique qu'on peut faire défiler les catégories */
+@media (max-width: 960px) {
+    .cats { -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); padding-right: 24px; }
+}
+.cat-pill:focus-visible, .sort-select:focus-visible, .active-chip:focus-visible,
+.cpg-btn:focus-visible, .prod-card-cta:focus-visible, .prod-card-fav:focus-visible, .c-empty-cta:focus-visible {
+    outline: 3px solid var(--brand); outline-offset: 2px;
+}
+
+.active-chips { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: -2px 0 16px; }
+.active-chip {
+    display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 6px 12px 6px 14px;
+    border-radius: 50px; background: var(--brand-mlt); border: 1px solid var(--brand-lt);
+    color: var(--brand-dk); font-size: 12.5px; font-weight: 700; text-decoration: none;
+    animation: chipIn var(--t-enter) var(--ease-out) both;
+    transition: background var(--t-micro), border-color var(--t-micro), color var(--t-micro);
+}
+.active-chip:hover { background: var(--brand); border-color: var(--brand); color: #fff; }
+.active-chips-reset { font-size: 12.5px; font-weight: 700; color: var(--text-2); text-decoration: underline; text-underline-offset: 3px; padding: 6px 4px; }
+.active-chips-reset:hover { color: var(--brand-dk); }
+@keyframes chipIn { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: none; } }
+
+/* Résultats qui se remplacent : léger fondu pendant le chargement en direct */
+#resultsRoot { transition: opacity var(--t-micro) var(--ease-out); }
+#resultsRoot.is-loading .skeleton-grid { animation: chipIn .3s var(--ease-out) both; }
+
+.c-empty-cta {
+    display: inline-flex; align-items: center; gap: 7px; margin-top: 18px; min-height: 44px;
+    padding: 11px 22px; border-radius: 50px; background: var(--brand); color: #fff;
+    font-size: 13.5px; font-weight: 700; text-decoration: none;
+    box-shadow: 0 6px 18px rgba(99,102,241,.3);
+    transition: transform var(--t-micro) var(--ease-out), background var(--t-micro);
+}
+.c-empty-cta:hover { background: var(--brand-dk); color: #fff; transform: translateY(-2px); }
+
+/* Stock faible (donnée réelle : stock ≤ 5) */
+.prod-card-stock { display: flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 700; color: #b45309; }
+
+/* Prix lisibles : chiffres tabulaires */
+.prod-card-price, .prod-card-orig, .reco-card-price, .flash-card-price, .count-line, .cpg { font-variant-numeric: tabular-nums; }
+
+/* Boutons de carte : pression + favoris qui "rebondissent" */
+.prod-card-cta { transition: background var(--t-micro), transform var(--t-micro) var(--ease-out); }
+.prod-card-cta:not(.out):active { transform: scale(.95); }
+.prod-card-fav.is-pop svg { animation: favPop .45s var(--ease-spring); }
+@keyframes favPop { 0% { transform: scale(1); } 40% { transform: scale(1.35); } 100% { transform: scale(1); } }
+
+/* ── Pagination du catalogue ── */
+.cpg { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 28px 0 8px; }
+.cpg-info { margin: 0; font-size: 13px; color: var(--muted); }
+.cpg-info strong { color: var(--text); font-weight: 700; }
+.cpg-list { list-style: none; margin: 0; padding: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.cpg-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    min-width: 42px; height: 42px; padding: 0 12px; border-radius: 12px;
+    background: var(--surface); border: 1.5px solid var(--border); color: var(--text-2);
+    font-size: 13.5px; font-weight: 700; text-decoration: none;
+    transition: border-color var(--t-micro), color var(--t-micro), background var(--t-micro), transform var(--t-micro) var(--ease-out);
+}
+a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background: var(--brand-mlt); transform: translateY(-1px); }
+.cpg-btn.is-active { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 4px 14px rgba(99,102,241,.35); }
+.cpg-btn.is-disabled { opacity: .45; cursor: not-allowed; }
+.cpg-dots { display: inline-flex; align-items: flex-end; height: 42px; padding: 0 4px; color: var(--muted); }
+.cpg-flip { display: inline-flex; transform: scaleX(-1); }
+.cpg-compact { display: none; font-size: 13px; font-weight: 700; color: var(--text-2); padding: 0 6px; }
+@media (max-width: 640px) {
+    .cpg-num { display: none; }
+    .cpg-compact { display: block; }
+    .cpg-list { flex-wrap: nowrap; gap: 10px; }
+    .cpg-nav { padding: 0 16px; }
+}
+
 /* ── Mouvement réduit : tout est affiché d'emblée, sans déplacement ── */
 @media (prefers-reduced-motion: reduce) {
     .how-line-fill, .how-badge, .dash-kpi-bar, .dash-line, .dash-area, .dash-dot, .dash-toast,
@@ -1981,6 +2056,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(data => {
                     btn.classList.toggle('is-fav', !!data.favorited);
                     btn.setAttribute('aria-pressed', data.favorited ? 'true' : 'false');
+                    if (data.favorited) {
+                        btn.classList.remove('is-pop');
+                        void btn.offsetWidth; // relance l'animation à chaque ajout
+                        btn.classList.add('is-pop');
+                    }
                 })
                 .catch(() => {})
                 .finally(() => btn.classList.remove('is-busy'));
@@ -2165,14 +2245,34 @@ document.addEventListener('DOMContentLoaded', () => {
             loadResults(new URL(clearLink.href));
         });
 
-        // Pagination (page suivante/précédente) : chargée en direct puis on atterrit
-        // directement sur les produits, au lieu de tout en haut de la page.
+        // Pagination, catégories, puces de filtres actifs : chargés en direct puis on
+        // atterrit directement sur les produits, au lieu de tout en haut de la page.
         document.addEventListener('click', (e) => {
-            const pageLink = e.target.closest('#resultsRoot .c-pagination a');
-            if (!pageLink) return;
+            const link = e.target.closest('#resultsRoot .cpg a, #resultsRoot [data-live-link]');
+            if (!link || e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return; // nouvel onglet : comportement natif
             e.preventDefault();
             clearTimeout(searchDebounce);
-            loadResults(new URL(pageLink.href), { scrollToCatalogue: true });
+            loadResults(new URL(link.href), { scrollToCatalogue: true });
+        });
+
+        // Tri : la liste se réorganise sans rechargement
+        document.addEventListener('change', (e) => {
+            const select = e.target.closest('#resultsRoot [data-live-sort]');
+            if (!select) return;
+            loadResults(new URL(select.value, window.location.origin), { scrollToCatalogue: true });
+        });
+
+        // Filtre prix : idem, en ne gardant que les champs remplis
+        document.addEventListener('submit', (e) => {
+            const form = e.target.closest('#resultsRoot [data-live-form]');
+            if (!form) return;
+            e.preventDefault();
+            const url = new URL(form.getAttribute('action'), window.location.origin);
+            url.search = '';
+            new FormData(form).forEach((value, key) => {
+                if (String(value).trim() !== '') url.searchParams.set(key, String(value).trim());
+            });
+            loadResults(url, { scrollToCatalogue: true });
         });
 
         // Bouton précédent/suivant du navigateur : recharge les résultats en direct aussi

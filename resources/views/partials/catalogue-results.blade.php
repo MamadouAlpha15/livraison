@@ -154,10 +154,7 @@ fragment soit inclus dans welcome.blade.php ou rendu seul.
     </div>
 </div>
 <div class="count-line">
-    {{ number_format($products->total()) }} produit{{ $products->total() > 1 ? 's' : '' }} {{ $isFiltering ? 'trouvé' : 'disponible' }}{{ $products->total() > 1 ? 's' : '' }}
-    @if($isFiltering)
-        — <a href="{{ url('/') }}" class="reset-link" data-live-clear data-noprogress>{!! \App\Support\IconLibrary::svg('x', '', 11) !!} Réinitialiser</a>
-    @endif
+    {{ number_format($products->total(), 0, ',', ' ') }} produit{{ $products->total() > 1 ? 's' : '' }} {{ $isFiltering ? 'trouvé' : 'disponible' }}{{ $products->total() > 1 ? 's' : '' }}
 </div>
 @endif
 
@@ -165,33 +162,47 @@ fragment soit inclus dans welcome.blade.php ou rendu seul.
     /* Base commune des filtres actifs à préserver d'un contrôle à l'autre (catégorie,
        tri, prix min/max) — ex: changer le tri ne doit pas faire perdre le filtre prix. */
     $baseParams = ['s' => request('s'), 'cat' => request('cat'), 'min_price' => $minPrice, 'max_price' => $maxPrice, 'sort' => $sort !== 'newest' ? $sort : null];
+    $catalogueUrl = fn (array $overrides) => url('/') . '?' . http_build_query(array_filter(array_merge($baseParams, $overrides))) . '#catalogue';
+    $sortLabels = ['newest' => 'Plus récents', 'price_asc' => 'Prix croissant', 'price_desc' => 'Prix décroissant', 'popular' => 'Plus vendus'];
+    $sortUrl = fn ($v) => $catalogueUrl(['sort' => $v !== 'newest' ? $v : null]);
+    $gnf = fn ($v) => number_format((float) $v, 0, ',', ' ') . ' GNF';
+
+    /* Filtres actifs, chacun retirable d'un clic (la recherche texte a déjà son bandeau) */
+    $activeChips = [];
+    if (request('cat')) {
+        $activeChips[] = ['label' => request('cat'), 'url' => $catalogueUrl(['cat' => null])];
+    }
+    if ($minPrice !== null || $maxPrice !== null) {
+        $priceLabel = $minPrice !== null && $maxPrice !== null ? $gnf($minPrice) . ' – ' . $gnf($maxPrice)
+            : ($minPrice !== null ? 'Dès ' . $gnf($minPrice) : 'Jusqu\'à ' . $gnf($maxPrice));
+        $activeChips[] = ['label' => $priceLabel, 'url' => $catalogueUrl(['min_price' => null, 'max_price' => null])];
+    }
+    if ($sort !== 'newest') {
+        $activeChips[] = ['label' => $sortLabels[$sort], 'url' => $catalogueUrl(['sort' => null])];
+    }
 @endphp
 
 @if($categories->isNotEmpty())
-<div class="cats">
-    <a href="{{ url('/') }}?{{ http_build_query(array_filter(array_merge($baseParams, ['cat' => null]))) }}" class="cat-pill {{ !request('cat') ? 'active' : '' }}">Toutes</a>
+<div class="cats" role="list" aria-label="Catégories">
+    <a href="{{ $catalogueUrl(['cat' => null]) }}" class="cat-pill {{ !request('cat') ? 'active' : '' }}" data-live-link role="listitem" @if(!request('cat')) aria-current="true" @endif>Toutes</a>
     @foreach($categories as $cat)
-    <a href="{{ url('/') }}?{{ http_build_query(array_filter(array_merge($baseParams, ['cat' => $cat]))) }}" class="cat-pill {{ request('cat') === $cat ? 'active' : '' }}">{!! \App\Support\IconLibrary::categorySvg($cat, '', 14) !!} {{ $cat }}</a>
+    <a href="{{ $catalogueUrl(['cat' => $cat]) }}" class="cat-pill {{ request('cat') === $cat ? 'active' : '' }}" data-live-link role="listitem" @if(request('cat') === $cat) aria-current="true" @endif>{!! \App\Support\IconLibrary::categorySvg($cat, '', 14) !!} {{ $cat }}</a>
     @endforeach
 </div>
 @endif
 
 {{-- ══ TRI + FILTRE PRIX ══ --}}
-@php
-    $sortLabels = ['newest' => 'Plus récents', 'price_asc' => 'Prix croissant', 'price_desc' => 'Prix décroissant', 'popular' => 'Plus vendus'];
-    $sortUrl = fn ($v) => url('/') . '?' . http_build_query(array_filter(array_merge($baseParams, ['sort' => $v !== 'newest' ? $v : null]))) . '#catalogue';
-@endphp
 <div class="filter-row">
     <div class="sort-row">
         {!! \App\Support\IconLibrary::svg('sort', '', 14) !!}
-        <select class="sort-select" onchange="location.href=this.value" aria-label="Trier les produits">
+        <select class="sort-select" data-live-sort aria-label="Trier les produits">
             @foreach($sortLabels as $val => $label)
             <option value="{{ $sortUrl($val) }}" {{ $sort === $val ? 'selected' : '' }}>{{ $label }}</option>
             @endforeach
         </select>
     </div>
 
-    <form method="GET" action="{{ url('/') }}#catalogue" class="price-filter-form">
+    <form method="GET" action="{{ url('/') }}#catalogue" class="price-filter-form" data-live-form data-ajax>
         <input type="hidden" name="s" value="{{ request('s') }}">
         <input type="hidden" name="cat" value="{{ request('cat') }}">
         @if($sort !== 'newest')<input type="hidden" name="sort" value="{{ $sort }}">@endif
@@ -201,10 +212,24 @@ fragment soit inclus dans welcome.blade.php ou rendu seul.
         <input type="number" name="max_price" value="{{ $maxPrice }}" placeholder="Prix max" min="0" step="1000" inputmode="numeric" class="price-input">
         <button type="submit" class="price-filter-btn">Filtrer</button>
         @if($minPrice !== null || $maxPrice !== null)
-        <a href="{{ url('/') }}?{{ http_build_query(array_filter(array_merge($baseParams, ['min_price' => null, 'max_price' => null]))) }}#catalogue" class="price-filter-clear" aria-label="Effacer le filtre prix">{!! \App\Support\IconLibrary::svg('x', '', 12) !!}</a>
+        <a href="{{ $catalogueUrl(['min_price' => null, 'max_price' => null]) }}" class="price-filter-clear" data-live-link aria-label="Effacer le filtre prix">{!! \App\Support\IconLibrary::svg('x', '', 12) !!}</a>
         @endif
     </form>
 </div>
+
+{{-- ══ FILTRES ACTIFS (puces retirables) ══ --}}
+@if(count($activeChips))
+<div class="active-chips" aria-label="Filtres actifs">
+    @foreach($activeChips as $chip)
+    <a href="{{ $chip['url'] }}" class="active-chip" data-live-link aria-label="Retirer le filtre {{ $chip['label'] }}">
+        {{ $chip['label'] }} {!! \App\Support\IconLibrary::svg('x', '', 11) !!}
+    </a>
+    @endforeach
+    @if(count($activeChips) > 1)
+    <a href="{{ url('/') }}?{{ http_build_query(array_filter(['s' => request('s')])) }}#catalogue" class="active-chips-reset" data-live-link>Tout effacer</a>
+    @endif
+</div>
+@endif
 
 @if($products->isEmpty())
 <div class="prod-grid">
@@ -217,7 +242,13 @@ fragment soit inclus dans welcome.blade.php ou rendu seul.
                 Aucun produit trouvé
             @endif
         </div>
-        <div class="c-empty-sub">Essayez une autre recherche ou catégorie.</div>
+        @if($isSearching || $isFiltering || $minPrice !== null || $maxPrice !== null)
+            <div class="c-empty-sub">Essayez un autre mot-clé, une autre catégorie ou une autre fourchette de prix.</div>
+            <a href="{{ url('/') }}#catalogue" class="c-empty-cta" data-live-clear data-noprogress>{!! \App\Support\IconLibrary::svg('eye', '', 15) !!} Voir tous les produits</a>
+        @else
+            <div class="c-empty-sub">Les boutiques ajoutent de nouveaux produits chaque jour. Revenez bientôt !</div>
+            <a href="{{ route('shops.index') }}" class="c-empty-cta">{!! \App\Support\IconLibrary::svg('store', '', 15) !!} Parcourir les boutiques</a>
+        @endif
     </div>
 </div>
 @else
@@ -227,5 +258,5 @@ fragment soit inclus dans welcome.blade.php ou rendu seul.
     @endforeach
 </div>
 
-<div class="c-pagination">{{ $products->links() }}</div>
+{{ $products->onEachSide(1)->links('partials.catalogue-pagination') }}
 @endif
