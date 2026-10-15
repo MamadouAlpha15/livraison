@@ -240,7 +240,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
     text-decoration: none;
     display: flex; flex-direction: column;
     transition: box-shadow .25s, border-color .25s, transform .25s;
-    animation: fadeUp .35s ease both;
+    animation: fadeUp .45s cubic-bezier(.22,1,.36,1) backwards; /* backwards : ne fige pas transform, le survol reste actif */
     box-shadow: 0 2px 10px rgba(0,0,0,.04);
 }
 .shop-card:hover {
@@ -519,6 +519,28 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
     .sc-body { padding: 14px 16px 16px; }
     .sc-btn { font-size: .83rem; padding: .65rem 1rem; }
 }
+
+/* ═══════════════════════════════════════════
+   ICÔNES, NOTES RÉELLES, ACCESSIBILITÉ, MOUVEMENT
+═══════════════════════════════════════════ */
+.search-btn { color: #fff; }
+.sc-img-ph { display: flex; color: var(--gr-dk); }
+.sc-badge { display: inline-flex; align-items: center; gap: 4px; }
+.sc-meta-item .ico, .sc-prod-match .ico { flex-shrink: 0; }
+.sc-stars { display: flex; align-items: center; gap: 6px; font-size: 12px; letter-spacing: 0; }
+.sc-stars span { color: var(--txt2); font-weight: 700; }
+.shops-empty-ico, #liveEmpty .ico { display: flex; justify-content: center; color: var(--muted); }
+.shops-empty a { display: inline-flex; align-items: center; gap: 6px; }
+.sc-btn { transition: background .2s cubic-bezier(.22,1,.36,1), color .2s, gap .2s; }
+.shop-card:hover .sc-btn { gap: 10px; }
+.shop-card:focus-visible, .type-chip:focus-visible, .search-btn:focus-visible, .search-input:focus-visible {
+    outline: 3px solid var(--gr); outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+    .shop-card, .sc-img img, .sc-img::after, .sc-btn { animation: none !important; transition: none !important; }
+    .shop-card:hover { transform: none; }
+    html { scroll-behavior: auto; }
+}
 </style>
 @endpush
 
@@ -556,7 +578,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
     <div class="nav-mobile-divider"></div>
     @guest
     <a href="{{ route('login') }}"    class="nav-mobile-btn nav-mobile-btn-outline">Se connecter</a>
-    <a href="{{ route('register') }}" class="nav-mobile-btn nav-mobile-btn-indigo">🚀 S'inscrire — Gratuit</a>
+    <a href="{{ route('register') }}" class="nav-mobile-btn nav-mobile-btn-indigo">S'inscrire — Gratuit</a>
     @else
     @php
         $role3 = Auth::user()->role;
@@ -592,7 +614,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
                placeholder="Rechercher une boutique, un type..."
                value="{{ $q }}"
                autocomplete="off">
-        <button type="submit" class="search-btn">🔍</button>
+        <button type="submit" class="search-btn" aria-label="Rechercher">{!! \App\Support\IconLibrary::svg('search', '', 18) !!}</button>
     </form>
 
     <div id="liveSearchInfo"></div>
@@ -640,9 +662,6 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
             @endif
         </div>
 
-        <div class="shops-view-opts">
-            <div class="view-opt active" title="Grille">⊞</div>
-        </div>
     </div>
 
     {{-- Grille boutiques --}}
@@ -667,9 +686,9 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
                     <img src="{{ \App\Services\ImageOptimizer::url($shop->image, 'thumb') }}"
                          alt="{{ $shop->name }}" loading="lazy">
                 @else
-                    <span class="sc-img-ph">🛍️</span>
+                    <span class="sc-img-ph">{!! \App\Support\IconLibrary::svg('store', '', 44) !!}</span>
                 @endif
-                <span class="sc-badge">✓ Actif</span>
+                <span class="sc-badge">{!! \App\Support\IconLibrary::svg('check', '', 11) !!} Vérifiée</span>
             </div>
 
             {{-- Corps --}}
@@ -680,20 +699,23 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
                     <div class="sc-type">{{ $shop->type }}</div>
                 @endif
 
-                <div class="sc-stars">★★★★★</div>
+                @php $rating = $shop->user_id ? ($shopRatings[$shop->user_id] ?? null) : null; @endphp
+                @if($rating && $rating->cnt > 0)
+                <div class="sc-stars" aria-label="Note {{ number_format($rating->avg_rating, 1) }} sur 5">{!! \App\Support\IconLibrary::stars((float) $rating->avg_rating, 13) !!} <span>{{ number_format($rating->avg_rating, 1) }} ({{ $rating->cnt }} avis)</span></div>
+                @endif
 
                 <div class="sc-meta">
                     <span class="sc-meta-item">
-                        📦 {{ $shop->products_count ?? 0 }} produit{{ ($shop->products_count ?? 0) > 1 ? 's' : '' }}
+                        {!! \App\Support\IconLibrary::svg('package', '', 12) !!} {{ $shop->products_count ?? 0 }} produit{{ ($shop->products_count ?? 0) > 1 ? 's' : '' }}
                     </span>
                     @if($shop->country)
-                    <span class="sc-meta-item">🌍 {{ $shop->country }}</span>
+                    <span class="sc-meta-item">{!! \App\Support\IconLibrary::svg('globe', '', 12) !!} {{ $shop->country }}</span>
                     @elseif($shop->address)
-                    <span class="sc-meta-item">📍 {{ Str::limit($shop->address, 16) }}</span>
+                    <span class="sc-meta-item">{!! \App\Support\IconLibrary::svg('map-pin', '', 12) !!} {{ Str::limit($shop->address, 16) }}</span>
                     @endif
                 </div>
 
-                <span class="sc-prod-match">📦 A ce produit</span>
+                <span class="sc-prod-match">{!! \App\Support\IconLibrary::svg('package', '', 12) !!} A ce produit</span>
 
                 <span class="sc-btn">
                     Visiter la boutique
@@ -706,7 +728,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 
     {{-- Empty live search --}}
     <div id="liveEmpty">
-        <span class="ico">🔍</span>
+        <span class="ico">{!! \App\Support\IconLibrary::svg('search', '', 40) !!}</span>
         <h3>Aucune boutique trouvée</h3>
         <p id="liveEmptyMsg">Aucun résultat pour votre recherche.</p>
     </div>
@@ -719,7 +741,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
     @else
     {{-- Empty state --}}
     <div class="shops-empty">
-        <span class="shops-empty-ico">🏪</span>
+        <span class="shops-empty-ico">{!! \App\Support\IconLibrary::svg('store', '', 48) !!}</span>
         <h3>Aucune boutique trouvée</h3>
         <p>
             @if($q)
@@ -730,7 +752,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
                 Aucune boutique disponible pour le moment.
             @endif
         </p>
-        <a href="{{ route('shops.index') }}">🔄 Voir toutes les boutiques</a>
+        <a href="{{ route('shops.index') }}">{!! \App\Support\IconLibrary::svg('rotate', '', 15) !!} Voir toutes les boutiques</a>
     </div>
     @endif
 
@@ -794,16 +816,30 @@ document.addEventListener('DOMContentLoaded', () => {
     /* Échappe les caractères spéciaux regex */
     function escRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
-    /* Surligne le texte qui correspond à la recherche */
-    function hlText(text, q) {
-        if (!q) return text;
-        return text.replace(new RegExp('(' + escRe(q) + ')', 'gi'), '<mark>$1</mark>');
+    /* Échappe le HTML : le texte tapé (ou reçu via ?q= dans l'URL) et les noms de
+       boutique ne doivent JAMAIS être interprétés comme du HTML (faille XSS sinon,
+       ex. /shops?q=<img src=x onerror=...>). */
+    function escHtml(s) {
+        return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
 
-    /* Scroll vers un élément en tenant compte de la navbar fixe */
-    function scrollTo(el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    /* Surligne le texte qui correspond à la recherche (texte échappé d'abord, puis <mark>) */
+    function hlText(text, q) {
+        if (!q) return escHtml(text);
+        return text.split(new RegExp('(' + escRe(q) + ')', 'gi'))
+            .map((part, i) => i % 2 ? '<mark>' + escHtml(part) + '</mark>' : escHtml(part))
+            .join('');
     }
+
+    /* Scroll vers un élément seulement s'il n'est pas déjà visible (évite que la page
+       saute à chaque lettre tapée) */
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function scrollTo(el) {
+        const r = el.getBoundingClientRect();
+        if (r.top >= navH() && r.top < window.innerHeight * 0.75) return;
+        el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    }
+    const HAS_MORE_PAGES = {{ $shops->hasPages() ? 'true' : 'false' }};
 
     let timer;
     searchInput.addEventListener('input', function () {
@@ -852,9 +888,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         /* Info live sous la barre de recherche */
         if (ql) {
+            const qSafe = escHtml(q);
+            // La recherche en direct ne parcourt que la page affichée : on le dit, et on
+            // indique comment chercher dans toutes les boutiques (Entrée = recherche serveur).
+            const scope = HAS_MORE_PAGES ? ' sur cette page — appuyez sur Entrée pour chercher partout' : '';
             liveInfo.innerHTML = visible > 0
-                ? `${visible} boutique${visible > 1 ? 's' : ''} pour <strong>"${q}"</strong>`
-                : `Aucun résultat pour <strong>"${q}"</strong>`;
+                ? `${visible} boutique${visible > 1 ? 's' : ''} pour <strong>"${qSafe}"</strong>${scope}`
+                : `Aucun résultat pour <strong>"${qSafe}"</strong>${scope}`;
             liveInfo.style.display = 'block';
         } else {
             liveInfo.style.display = 'none';

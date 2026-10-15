@@ -38,8 +38,16 @@ class PublicShopController extends Controller
         $totalShops  = Shop::where('is_approved', true)->count();
         $types       = Shop::where('is_approved', true)->whereNotNull('type')->distinct()->pluck('type');
 
+        // Notes réelles (avis clients) des boutiques de la page, en une seule requête —
+        // remplace les 5 étoiles décoratives affichées avant sur toutes les cartes.
+        $shopRatings = Review::whereIn('vendeur_id', $shops->pluck('user_id')->filter()->unique())
+            ->selectRaw('vendeur_id, COUNT(*) as cnt, AVG(rating) as avg_rating')
+            ->groupBy('vendeur_id')
+            ->get()
+            ->keyBy('vendeur_id');
+
         $q = $search;
-        return view('shops.index', compact('shops', 'totalShops', 'types', 'type', 'q'));
+        return view('shops.index', compact('shops', 'totalShops', 'types', 'type', 'q', 'shopRatings'));
     }
 
     public function products(Shop $shop)
