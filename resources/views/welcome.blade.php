@@ -1214,11 +1214,169 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
     .cpg-nav { padding: 0 16px; }
 }
 
+/* ════════════════════════════════════════════════════════════════
+   PANNEAUX NUMÉROTÉS 01 → 06 (reprend la maquette : bandes pleine largeur,
+   onglet numéroté dans le coin haut-gauche, alternance clair / sombre)
+════════════════════════════════════════════════════════════════ */
+.band-num {
+    position: absolute; top: 0; left: 0; z-index: 3;
+    min-width: 64px; padding: 14px 18px 14px 20px;
+    background: var(--brand); color: #fff;
+    font-family: var(--display); font-weight: 700; font-size: 22px; line-height: 1; letter-spacing: .5px;
+    border-bottom-right-radius: 24px; font-variant-numeric: tabular-nums;
+    box-shadow: 0 6px 18px rgba(99,102,241,.3);
+}
+.bands > .mk:nth-of-type(odd) .band-num { background: var(--brand-dk); }  /* 02, 04, 06 (alternance comme la maquette) */
+.mk-split--dark .band-num { background: var(--brand); box-shadow: 0 6px 22px rgba(99,102,241,.45); }
+
+/* Bandes pleine largeur, contenu centré sur 1240 px */
+.bands { display: flex; flex-direction: column; }
+.bands > .mk {
+    margin: 0; border-radius: 0; border-left: 0; border-right: 0; border-top: 0;
+    box-shadow: none; min-height: 0;
+    padding: 72px max(28px, calc((100% - 1240px) / 2)) 64px;
+}
+.bands > .mk:not(.mk-split--dark):not(.final-cta) { background: linear-gradient(180deg, #fbfbff 0%, var(--surface) 100%); border-bottom: 1px solid var(--border); }
+.bands > .final-cta { border-bottom: 1px solid var(--brand-lt); }
+.bands > .mk-split::after { right: -160px; top: -160px; width: 560px; height: 560px; }
+.bands .mk-title { font-size: clamp(28px, 3.4vw, 42px); }
+
+/* ── 01 · HERO ── */
+.hero01 {
+    position: relative; overflow: hidden; isolation: isolate;
+    background: linear-gradient(180deg, #fbfbff 0%, var(--grey) 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 64px max(28px, calc((100% - 1240px) / 2)) 56px;
+}
+.hero01::before { /* grande forme indigo derrière les écrans, comme la vague verte de la maquette */
+    content: ''; position: absolute; z-index: -1; right: -12%; top: -30%; width: 62%; height: 160%;
+    background: radial-gradient(closest-side, rgba(99,102,241,.95), rgba(79,70,229,.85) 55%, rgba(79,70,229,0) 100%);
+    border-radius: 50%; transform: rotate(-12deg);
+}
+.hero01::after {
+    content: ''; position: absolute; z-index: -1; inset: 0; pointer-events: none;
+    background-image: radial-gradient(circle at 1px 1px, rgba(99,102,241,.12) 1px, transparent 0);
+    background-size: 26px 26px; mask-image: linear-gradient(90deg, transparent 40%, #000 100%);
+    -webkit-mask-image: linear-gradient(90deg, transparent 40%, #000 100%);
+}
+.hero01-inner { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 40px; align-items: center; }
+.hero01-copy { min-width: 0; animation: heroFadeUp var(--t-enter) var(--ease-out) both; }
+.hero01-brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; margin-bottom: 26px; font-family: var(--display); font-weight: 700; font-size: 26px; color: var(--navy); }
+.hero01-brand img { width: 40px; height: 40px; border-radius: 10px; }
+.hero01-brand b { color: var(--brand); font-weight: 700; }
+.hero01-title {
+    margin: 0 0 16px; font-family: var(--display); font-weight: 700; text-transform: uppercase;
+    font-size: clamp(28px, 3.1vw, 44px); line-height: 1.06; letter-spacing: -.5px; color: var(--navy);
+}
+.hero01-title span { display: block; color: var(--brand); white-space: nowrap; }
+@media (max-width: 420px) { .hero01-title span { white-space: normal; } }
+.hero01-sub { margin: 0 0 26px; font-size: 17px; line-height: 1.6; color: var(--text-2); max-width: 480px; }
+.hero01-btns { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 34px; }
+.hero01-feats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 560px; }
+.hero01-feats a {
+    display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; text-decoration: none;
+    font-size: 12.5px; font-weight: 600; line-height: 1.35; color: var(--text-2); padding: 6px 4px; border-radius: 12px;
+    transition: color var(--t-micro), background var(--t-micro);
+}
+.hero01-feats a:hover { color: var(--brand-dk); background: var(--brand-mlt); }
+.hero01-feats a:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+.hero01-feat-ico {
+    width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+    background: var(--surface); color: var(--brand); border: 1px solid var(--brand-lt); box-shadow: var(--shadow-sm);
+    transition: transform var(--t-micro) var(--ease-spring);
+}
+.hero01-feats a:hover .hero01-feat-ico { transform: translateY(-3px); }
+
+/* Ordinateur portable (réutilisé par le panneau 02) */
+.hero01-visual { position: relative; min-width: 0; padding: 10px 70px 30px 0; animation: heroFadeUp .8s var(--ease-out) .15s both; }
+.laptop { position: relative; }
+.laptop-screen {
+    background: #0b0b1a; border-radius: 16px 16px 4px 4px; padding: 12px 12px 14px;
+    box-shadow: 0 30px 60px rgba(10,10,30,.35);
+}
+.laptop-base {
+    height: 14px; margin: 0 -7%; border-radius: 2px 2px 14px 14px;
+    background: linear-gradient(180deg, #d9dce6, #a9adbb); position: relative;
+}
+.laptop-base::before { content: ''; position: absolute; left: 50%; top: 0; transform: translateX(-50%); width: 16%; height: 5px; border-radius: 0 0 6px 6px; background: #8d91a1; }
+.laptop--dash .laptop-screen .dash-mock { border-radius: 8px; box-shadow: none; }
+
+/* Mini site affiché dans les écrans (illustratif, non interactif) */
+.mini-site { background: var(--grey); border-radius: 8px; overflow: hidden; }
+.mini-nav { display: flex; align-items: center; gap: 10px; background: var(--surface); padding: 8px 12px; border-bottom: 1px solid var(--border); }
+.mini-logo { display: inline-flex; align-items: center; gap: 5px; font-family: var(--display); font-weight: 700; font-size: 12px; color: var(--navy); }
+.mini-logo img { width: 16px; height: 16px; border-radius: 4px; }
+.mini-logo b { color: var(--brand); font-weight: 700; }
+.mini-nav-links { display: flex; gap: 8px; margin-left: auto; }
+.mini-nav-links i { display: block; width: 26px; height: 5px; border-radius: 3px; background: var(--grey-2); }
+.mini-nav-btn { font-size: 8px; font-weight: 700; color: #fff; background: var(--brand); padding: 4px 9px; border-radius: 20px; }
+.mini-hero { background: linear-gradient(120deg, var(--navy) 0%, #241a6b 55%, var(--brand) 100%); padding: 16px 16px 18px; }
+.mini-hero-title { font-family: var(--display); font-weight: 700; font-size: 15px; line-height: 1.2; color: #fff; margin-bottom: 10px; }
+.mini-search { display: flex; align-items: center; gap: 6px; background: #fff; border-radius: 20px; padding: 6px 6px 6px 10px; font-size: 8.5px; color: var(--muted); }
+.mini-search span { margin-left: auto; width: 20px; height: 16px; border-radius: 10px; background: var(--brand); color: #fff; display: flex; align-items: center; justify-content: center; }
+.mini-cats { display: flex; gap: 6px; padding: 10px 12px 4px; }
+.mini-cat { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 7.5px; font-weight: 600; color: var(--text-2); white-space: nowrap; overflow: hidden; }
+.mini-cat i { width: 28px; height: 28px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--brand-dk); }
+.mini-sec { font-family: var(--display); font-weight: 700; font-size: 10px; color: var(--text); padding: 8px 12px 6px; }
+.mini-prods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; padding: 0 12px 12px; }
+.mini-prod { background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 5px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.mini-prod img, .mini-prod > i { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 5px; background: var(--brand-mlt); }
+.mini-prod b { font-size: 7px; font-weight: 800; color: var(--brand-dk); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+.mini-prod em { display: block; height: 5px; width: 60%; border-radius: 3px; background: var(--brand-lt); }
+
+/* Téléphone posé devant l'ordinateur */
+.hero01-phone {
+    position: absolute; right: 0; bottom: 0; width: 30%; max-width: 190px; aspect-ratio: 9 / 18.5;
+    background: #0b0b1a; border-radius: 26px; padding: 7px; box-shadow: 0 24px 50px rgba(10,10,30,.4);
+}
+.hero01-phone-screen { position: relative; height: 100%; border-radius: 20px; overflow: hidden; background: var(--grey); }
+.hero01-phone-notch { position: absolute; top: 5px; left: 50%; transform: translateX(-50%); width: 38%; height: 12px; border-radius: 8px; background: #0b0b1a; z-index: 2; }
+.mini-nav--phone { padding-top: 22px; }
+.mini-hero--phone { padding: 12px 10px; }
+.mini-hero--phone .mini-hero-title { font-size: 11px; }
+.mini-cats--phone { padding: 8px 10px 0; }
+.mini-cats--phone .mini-cat i { width: 22px; height: 22px; }
+.mini-prods--phone { grid-template-columns: 1fr 1fr; padding: 0 10px 10px; }
+
+/* ── 05 · Application en 3 colonnes (texte | téléphone | liste) ── */
+.mk-split--three { grid-template-columns: 1fr auto 1fr; }
+.mk-split--three .phone { width: 230px; }
+.app-side { min-width: 0; }
+.app-side-title { font-family: var(--display); font-size: 22px; font-weight: 700; color: #fff; margin: 0 0 18px; }
+.app-side-link { display: inline-flex; align-items: center; gap: 8px; color: #e0e7ff; font-size: 15px; font-weight: 600; text-decoration: none; }
+.app-side-link:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+
+/* ── Responsive des panneaux ── */
+@media (max-width: 1100px) {
+    .mk-split--three { grid-template-columns: 1fr 1fr; }
+    .mk-split--three .app-side { grid-column: 1 / -1; }
+}
+@media (max-width: 960px) {
+    .hero01 { padding: 64px 24px 44px; }
+    .hero01-inner { grid-template-columns: 1fr; gap: 28px; }
+    .hero01::before { right: -40%; top: 34%; width: 120%; height: 90%; }
+    .hero01-visual { padding-right: 56px; max-width: 640px; }
+    .bands > .mk { padding: 68px 24px 48px; }
+    .mk-split--three { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+    .band-num { min-width: 52px; padding: 11px 14px 11px 16px; font-size: 18px; border-bottom-right-radius: 18px; }
+    .hero01 { padding: 58px 16px 36px; }
+    .hero01-brand { font-size: 22px; margin-bottom: 18px; }
+    .hero01-sub { font-size: 16px; }
+    .hero01-btns { flex-direction: column; align-items: stretch; }
+    .hero01-feats { grid-template-columns: repeat(2, 1fr); }
+    .hero01-visual { padding: 0 40px 24px 0; }
+    .mini-hero-title { font-size: 12px; }
+    .bands > .mk { padding: 60px 16px 36px; }
+}
+
 /* ── Mouvement réduit : tout est affiché d'emblée, sans déplacement ── */
 @media (prefers-reduced-motion: reduce) {
     .how-line-fill, .how-badge, .dash-kpi-bar, .dash-line, .dash-area, .dash-dot, .dash-toast,
     .track-route, .track-steps li, .pay-shield-ico, .phone-notif, .final-arrow, .final-bag,
     .mk-btn, .pay-card, .mk-feat-ico { transition: none !important; }
+    .hero01-copy, .hero01-visual { animation: none !important; }
     .dash-kpi-bar { transform: scaleX(var(--w, .7)); }
     .dash-line, .track-route, .final-arrow { stroke-dashoffset: 0; }
     .dash-area, .dash-dot, .dash-toast, .track-steps li, .pay-shield-ico, .phone-notif, .final-bag { opacity: 1; transform: none; }
@@ -1303,179 +1461,348 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
     @endif
 </div>
 
-{{-- ══ SIDEBAR CATÉGORIES + HERO ══ --}}
+{{-- ══ 01 · HERO « LE E-COMMERCE NOUVELLE GÉNÉRATION » (aperçu ordinateur + téléphone avec les vrais produits) ══ --}}
 @php
-    $catsVisibleCount = 11;
-    $catsVisible = $categories->take($catsVisibleCount);
-    $catsMore = $categories->slice($catsVisibleCount)->values();
-    $activeInMore = request('cat') && $catsMore->contains(request('cat'));
+    /* Produits réels pour l'aperçu : meilleures ventes, puis recommandés, puis catalogue — avec photo uniquement */
+    $heroShowcase = collect($bestSellers ?? [])
+        ->merge($recommendedProducts ?? [])
+        ->merge($products->getCollection())
+        ->filter(fn ($p) => $p->image)
+        ->unique('id')
+        ->take(4)
+        ->values();
+    $heroCats = $categories->take(5);
 @endphp
-<div class="home-top">
-    @if($categories->isNotEmpty())
-    <aside class="cat-sidebar reveal">
-        <div class="cat-sidebar-hd">{!! \App\Support\IconLibrary::svg('grid', 'csi-ico') !!} Toutes les catégories</div>
-        <nav class="cat-sidebar-list">
-            <a href="{{ url('/') }}?{{ http_build_query(array_filter(['s' => request('s')])) }}#catalogue" class="cat-sidebar-item {{ !request('cat') ? 'active' : '' }}">
-                {!! \App\Support\IconLibrary::svg('eye', 'csi-ico') !!} Tout voir
+<section class="hero01" aria-labelledby="hero01Title">
+    <span class="band-num" aria-hidden="true">01</span>
+    <div class="hero01-inner">
+        <div class="hero01-copy">
+            <a href="{{ url('/') }}" class="hero01-brand">
+                <img src="/images/shopio-logo-192.png" alt="" width="40" height="40">
+                <span>Shop<b>io</b></span>
             </a>
-            @foreach($catsVisible as $cat)
-            <a href="{{ url('/') }}?{{ http_build_query(array_filter(['cat' => $cat, 's' => request('s')])) }}#catalogue" class="cat-sidebar-item {{ request('cat') === $cat ? 'active' : '' }}" data-cat-preview="{{ $cat }}">
-                {!! \App\Support\IconLibrary::categorySvg($cat, 'csi-ico') !!} {{ $cat }}
-            </a>
-            @endforeach
+            <h1 class="hero01-title" id="hero01Title">Le e-commerce <span>nouvelle génération</span></h1>
+            <p class="hero01-sub">Vendez. Gérez. Développez.<br>Tout est plus simple avec {{ config('app.name', 'Shopio') }} : boutiques vérifiées, livraison partout en Guinée et paiement à la livraison.</p>
+            <div class="hero01-btns">
+                <a href="#catalogue" class="mk-btn mk-btn--primary">{!! \App\Support\IconLibrary::svg('cart', '', 16) !!} Voir les produits</a>
+                <a href="{{ route('register') }}" class="mk-btn mk-btn--ghost">{!! \App\Support\IconLibrary::svg('store', '', 16) !!} Ouvrir ma boutique</a>
+            </div>
+            <ul class="hero01-feats">
+                <li><a href="{{ route('shops.index') }}"><span class="hero01-feat-ico">{!! \App\Support\IconLibrary::svg('store', '', 22) !!}</span>Marketplace<br>multi-vendeurs</a></li>
+                <li><a href="#paiements"><span class="hero01-feat-ico">{!! \App\Support\IconLibrary::svg('shield', '', 22) !!}</span>Paiements<br>sécurisés</a></li>
+                <li><a href="#livraison"><span class="hero01-feat-ico">{!! \App\Support\IconLibrary::svg('truck', '', 22) !!}</span>Livraison suivie<br>en temps réel</a></li>
+                <li><a href="#vendre"><span class="hero01-feat-ico">{!! \App\Support\IconLibrary::svg('trophy', '', 22) !!}</span>Outils puissants<br>pour grandir</a></li>
+            </ul>
+        </div>
 
-            @if($catsMore->isNotEmpty())
-            <details class="cat-sidebar-more" {{ $activeInMore ? 'open' : '' }}>
-                <summary>
-                    {!! \App\Support\IconLibrary::svg('plus', 'csi-ico') !!} Autres catégories
-                    <span class="csi-count">{{ $catsMore->count() }}</span>
-                </summary>
-                @foreach($catsMore as $cat)
-                <a href="{{ url('/') }}?{{ http_build_query(array_filter(['cat' => $cat, 's' => request('s')])) }}#catalogue" class="cat-sidebar-item {{ request('cat') === $cat ? 'active' : '' }}" data-cat-preview="{{ $cat }}">
-                    {!! \App\Support\IconLibrary::categorySvg($cat, 'csi-ico') !!} {{ $cat }}
-                </a>
-                @endforeach
-            </details>
-            @endif
-        </nav>
-    </aside>
+        <div class="hero01-visual" aria-hidden="true">
+            {{-- Ordinateur portable --}}
+            <div class="laptop">
+                <div class="laptop-screen">
+                    <div class="mini-site">
+                        <div class="mini-nav">
+                            <span class="mini-logo"><img src="/images/shopio-logo-192.png" alt=""> <span>Shop<b>io</b></span></span>
+                            <span class="mini-nav-links"><i></i><i></i><i></i></span>
+                            <span class="mini-nav-btn">S'inscrire</span>
+                        </div>
+                        <div class="mini-hero">
+                            <div class="mini-hero-title">Tout ce que vous cherchez,<br>au même endroit</div>
+                            <div class="mini-search">{!! \App\Support\IconLibrary::svg('search', '', 10) !!} Rechercher un produit, une catégorie…<span>{!! \App\Support\IconLibrary::svg('search', '', 9) !!}</span></div>
+                        </div>
+                        <div class="mini-cats">
+                            @forelse($heroCats as $cat)
+                                <span class="mini-cat"><i>{!! \App\Support\IconLibrary::categorySvg($cat, '', 13) !!}</i>{{ Str::limit($cat, 11, '') }}</span>
+                            @empty
+                                @foreach(['shirt' => 'Mode', 'smartphone' => 'Électronique', 'watch' => 'Montres', 'sparkles' => 'Beauté', 'shoe' => 'Chaussures'] as $ico => $lbl)
+                                <span class="mini-cat"><i>{!! \App\Support\IconLibrary::svg($ico, '', 13) !!}</i>{{ $lbl }}</span>
+                                @endforeach
+                            @endforelse
+                            <span class="mini-cat"><i>{!! \App\Support\IconLibrary::svg('grid', '', 13) !!}</i>Plus</span>
+                        </div>
+                        <div class="mini-sec">Meilleures ventes</div>
+                        <div class="mini-prods">
+                            @for($i = 0; $i < 4; $i++)
+                                @php $hp = $heroShowcase[$i] ?? null; @endphp
+                                <div class="mini-prod">
+                                    @if($hp)
+                                        <img src="{{ \App\Services\ImageOptimizer::url($hp->image, 'thumb') ?? asset('storage/' . $hp->image) }}" alt="" loading="eager" decoding="async">
+                                        <b>{{ number_format($hp->current_price, 0, ',', ' ') }} GNF</b>
+                                    @else
+                                        <i></i><em></em>
+                                    @endif
+                                </div>
+                            @endfor
+                        </div>
+                    </div>
+                </div>
+                <div class="laptop-base"></div>
+            </div>
 
-    {{-- ══ APERÇU CATÉGORIE (survol d'une catégorie dans la barre, desktop only) ══ --}}
-    <div class="cat-preview-pop" id="catPreviewPop">
-        <div class="cat-preview-pop-arrow"></div>
-        <div class="cat-preview-pop-body" id="catPreviewBody"></div>
-    </div>
-    @endif
-
-    <div class="hero-carousel reveal" id="heroCarousel">
-        @php
-            /* Photos libres de droits (licence Unsplash, gratuites, usage commercial
-               autorisé sans attribution) — servies via le CDN Unsplash avec redimensionnement
-               et compression à la volée (auto=format sert du WebP/AVIF aux navigateurs
-               compatibles) pour rester légères malgré la haute qualité. */
-            $heroPhoto = fn (string $id, int $w) => "https://images.unsplash.com/{$id}?auto=format&fit=crop&w={$w}&q=60";
-            $slide1Id = 'photo-1758525223453-06095a7459ce'; // clientes souriantes, sacs de courses
-            $slide2Id = 'photo-1483985988355-763728e1935b'; // sacs de shopping en papier
-            $slide3Id = 'photo-1760001868397-e5995a577e26'; // entrée de boutique
-        @endphp
-        <section class="hero hero-slide is-active">
-            <img class="hero-bg-img" alt=""
-                 src="{{ $heroPhoto($slide1Id, 1400) }}"
-                 srcset="{{ $heroPhoto($slide1Id, 700) }} 700w, {{ $heroPhoto($slide1Id, 1100) }} 1100w, {{ $heroPhoto($slide1Id, 1600) }} 1600w"
-                 sizes="100vw" width="1400" height="560"
-                 loading="eager" fetchpriority="high" decoding="async">
-            <div class="hero-scrim"></div>
-            <div class="hero-shine"></div>
-            <div class="hero-text">
-                @php $totalProducts = (int) ($stats['total_products'] ?? 0); @endphp
-                {{-- Valeur réelle rendue côté serveur (lisible sans JS) ; jamais "0 produits" --}}
-                @if($totalProducts > 0)
-                <div class="hero-badge"><span class="hero-badge-dot"></span> <span id="heroProductCount" data-count="{{ $totalProducts }}">{{ number_format($totalProducts, 0, ',', ' ') }}</span> produits disponibles</div>
-                @else
-                <div class="hero-badge"><span class="hero-badge-dot"></span> Boutiques vérifiées en Guinée</div>
-                @endif
-                <h1 class="hero-title">Achetez en toute confiance.<br>Payez à la livraison.</h1>
-                <p class="hero-sub">La marketplace tout-en-un : boutiques vérifiées, produits et livraison rapide partout en Guinée.</p>
-                <div class="hero-btns">
-                    <a href="#catalogue" class="hero-btn-primary">{!! \App\Support\IconLibrary::svg('cart', '', 16) !!} Voir les produits</a>
-                    <a href="{{ route('register') }}" class="hero-btn-secondary">{!! \App\Support\IconLibrary::svg('store', '', 16) !!} Ouvrir ma boutique</a>
+            {{-- Téléphone --}}
+            <div class="hero01-phone">
+                <div class="hero01-phone-screen">
+                    <span class="hero01-phone-notch"></span>
+                    <div class="mini-nav mini-nav--phone">
+                        <span class="mini-logo"><img src="/images/shopio-logo-192.png" alt=""> <span>Shop<b>io</b></span></span>
+                    </div>
+                    <div class="mini-hero mini-hero--phone">
+                        <div class="mini-hero-title">Tout ce que vous cherchez, au même endroit</div>
+                        <div class="mini-search">{!! \App\Support\IconLibrary::svg('search', '', 9) !!} Rechercher…</div>
+                    </div>
+                    <div class="mini-cats mini-cats--phone">
+                        @for($i = 0; $i < 4; $i++)<span class="mini-cat"><i></i></span>@endfor
+                    </div>
+                    <div class="mini-sec">Meilleures ventes</div>
+                    <div class="mini-prods mini-prods--phone">
+                        @for($i = 0; $i < 2; $i++)
+                            @php $hp = $heroShowcase[$i] ?? null; @endphp
+                            <div class="mini-prod">
+                                @if($hp)
+                                    <img src="{{ \App\Services\ImageOptimizer::url($hp->image, 'thumb') ?? asset('storage/' . $hp->image) }}" alt="" loading="eager" decoding="async">
+                                    <b>{{ number_format($hp->current_price, 0, ',', ' ') }} GNF</b>
+                                @else
+                                    <i></i><em></em>
+                                @endif
+                            </div>
+                        @endfor
+                    </div>
                 </div>
             </div>
-        </section>
-
-        <section class="hero hero-slide">
-            <img class="hero-bg-img" alt=""
-                 src="{{ $heroPhoto($slide2Id, 1400) }}"
-                 srcset="{{ $heroPhoto($slide2Id, 700) }} 700w, {{ $heroPhoto($slide2Id, 1100) }} 1100w, {{ $heroPhoto($slide2Id, 1600) }} 1600w"
-                 sizes="100vw" width="1400" height="560"
-                 loading="lazy" decoding="async">
-            <div class="hero-scrim"></div>
-            <div class="hero-shine"></div>
-            <div class="hero-text">
-                <div class="hero-badge"><span class="hero-badge-dot"></span> Tous les jours</div>
-                <div class="hero-title">Ventes flash quotidiennes</div>
-                <p class="hero-sub">Jusqu'à -50% sur une sélection de produits chaque jour, en quantités limitées. Ne les manquez pas !</p>
-                <div class="hero-btns">
-                    <a href="#ventes-flash" class="hero-btn-primary">{!! \App\Support\IconLibrary::svg('zap', '', 16) !!} Voir les ventes flash</a>
-                    <a href="{{ route('shops.index') }}" class="hero-btn-secondary">{!! \App\Support\IconLibrary::svg('store', '', 16) !!} Parcourir les boutiques</a>
-                </div>
-            </div>
-        </section>
-
-        <section class="hero hero-slide">
-            <img class="hero-bg-img" alt=""
-                 src="{{ $heroPhoto($slide3Id, 1400) }}"
-                 srcset="{{ $heroPhoto($slide3Id, 700) }} 700w, {{ $heroPhoto($slide3Id, 1100) }} 1100w, {{ $heroPhoto($slide3Id, 1600) }} 1600w"
-                 sizes="100vw" width="1400" height="560"
-                 loading="lazy" decoding="async">
-            <div class="hero-scrim"></div>
-            <div class="hero-shine"></div>
-            <div class="hero-text">
-                <div class="hero-badge"><span class="hero-badge-dot"></span> Devenez partenaire</div>
-                <div class="hero-title">Vendez sur {{ config('app.name', 'Shopio') }}</div>
-                <p class="hero-sub">Créez votre boutique en ligne en quelques minutes et touchez des milliers de clients partout en Guinée.</p>
-                <div class="hero-btns">
-                    <a href="{{ route('register') }}" class="hero-btn-primary">{!! \App\Support\IconLibrary::svg('store', '', 16) !!} Ouvrir ma boutique</a>
-                    <a href="{{ route('shops.index') }}" class="hero-btn-secondary">{!! \App\Support\IconLibrary::svg('eye', '', 16) !!} Voir les boutiques</a>
-                </div>
-            </div>
-        </section>
-
-        <div class="hero-dots">
-            <button class="hero-dot is-active" type="button" data-slide-to="0" aria-label="Diapositive 1"></button>
-            <button class="hero-dot" type="button" data-slide-to="1" aria-label="Diapositive 2"></button>
-            <button class="hero-dot" type="button" data-slide-to="2" aria-label="Diapositive 3"></button>
         </div>
     </div>
+</section>
 
-    <aside class="side-cards reveal">
-        @auth
-            <a href="{{ route('support.index') }}" class="side-card">
-        @else
-            <a href="{{ route('login') }}" class="side-card">
-        @endauth
-            <span class="side-card-ico">{!! \App\Support\IconLibrary::svg('search', '', 17) !!}</span>
-            <span class="side-card-body">
-                <span class="side-card-title">Centre d'aide</span>
-                <span class="side-card-sub">Besoin d'assistance ?</span>
-            </span>
-        </a>
-        <a href="{{ route('register') }}" class="side-card">
-            <span class="side-card-ico">{!! \App\Support\IconLibrary::svg('store', '', 17) !!}</span>
-            <span class="side-card-body">
-                <span class="side-card-title">Vendez sur {{ config('app.name', 'Shopio') }}</span>
-                <span class="side-card-sub">Ouvrez votre boutique</span>
-            </span>
-        </a>
-        <a href="{{ route('shops.index') }}" class="side-card">
-            <span class="side-card-ico">{!! \App\Support\IconLibrary::svg('bag', '', 17) !!}</span>
-            <span class="side-card-body">
-                <span class="side-card-title">Toutes les boutiques</span>
-                <span class="side-card-sub">Parcourir le catalogue</span>
-            </span>
-        </a>
-    </aside>
-</div>
+{{-- ══ 02 → 06 : PANNEAUX NUMÉROTÉS (masqués pendant une recherche pour garder les résultats en haut) ══ --}}
+@unless(request('s'))
+<div class="bands">
 
-{{-- ══ BANDEAU DE CONFIANCE ══ --}}
-<div class="trust-strip reveal">
-    <div class="trust-item">
-        <span class="trust-ico">{!! \App\Support\IconLibrary::svg('truck', '', 20) !!}</span>
-        <span class="trust-txt"><strong>Livraison rapide</strong><span>Partout en Guinée</span></span>
+{{-- ══ VENDEZ SUR SHOPIO (aperçu animé du tableau de bord vendeur) ══ --}}
+<section class="mk mk-split reveal" id="vendre" aria-labelledby="sellTitle">
+    <span class="band-num" aria-hidden="true">02</span>
+    <div class="mk-copy">
+        <span class="mk-eyebrow">{!! \App\Support\IconLibrary::svg('store', '', 13) !!} Vendeurs</span>
+        <h2 class="mk-title" id="sellTitle">Vendez plus. <strong>Gérez mieux.</strong></h2>
+        <p class="mk-sub">Ouvrez votre boutique sur {{ config('app.name', 'Shopio') }} sans créer de site : vos produits sont visibles par les acheteurs partout en Guinée.</p>
+        <ul class="mk-list">
+            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Gestion facile de votre boutique</li>
+            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Suivi des commandes en temps réel</li>
+            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Statistiques de vos ventes</li>
+            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Livraison assurée par nos partenaires</li>
+        </ul>
+        <div class="mk-btns">
+            <a href="{{ route('register') }}" class="mk-btn mk-btn--primary">{!! \App\Support\IconLibrary::svg('store', '', 16) !!} Ouvrir ma boutique</a>
+            <a href="{{ route('shops.index') }}" class="mk-btn mk-btn--ghost">Voir les boutiques</a>
+        </div>
     </div>
-    <div class="trust-item">
-        <span class="trust-ico">{!! \App\Support\IconLibrary::svg('wallet', '', 20) !!}</span>
-        <span class="trust-txt"><strong>Paiement à la livraison</strong><span>Payez en toute sécurité</span></span>
+    <div class="mk-visual">
+        <div class="laptop laptop--dash" aria-hidden="true"><div class="laptop-screen">
+        <div class="dash-mock">
+            <div class="dash-bar"><span></span><span></span><span></span><span class="dash-url">{{ config('app.name', 'Shopio') }} · Tableau de bord</span></div>
+            <div class="dash-body">
+                <div class="dash-side">
+                    <span class="dash-nav is-active">{!! \App\Support\IconLibrary::svg('grid', '', 12) !!} Tableau de bord</span>
+                    <span class="dash-nav">{!! \App\Support\IconLibrary::svg('tag', '', 12) !!} Produits</span>
+                    <span class="dash-nav">{!! \App\Support\IconLibrary::svg('package', '', 12) !!} Commandes</span>
+                    <span class="dash-nav">{!! \App\Support\IconLibrary::svg('user', '', 12) !!} Clients</span>
+                    <span class="dash-nav">{!! \App\Support\IconLibrary::svg('sliders', '', 12) !!} Paramètres</span>
+                </div>
+                <div class="dash-main">
+                    <div class="dash-h">Tableau de bord</div>
+                    <div class="dash-kpis">
+                        <div class="dash-kpi"><span class="dash-kpi-lbl">Ventes</span><span class="dash-kpi-bar" style="--w:.85"></span><span class="dash-kpi-trend">{!! \App\Support\IconLibrary::svg('chevron-up', '', 11) !!} en hausse</span></div>
+                        <div class="dash-kpi"><span class="dash-kpi-lbl">Commandes</span><span class="dash-kpi-bar" style="--w:.65"></span><span class="dash-kpi-trend">{!! \App\Support\IconLibrary::svg('chevron-up', '', 11) !!} en hausse</span></div>
+                        <div class="dash-kpi"><span class="dash-kpi-lbl">Clients</span><span class="dash-kpi-bar" style="--w:.75"></span><span class="dash-kpi-trend">{!! \App\Support\IconLibrary::svg('chevron-up', '', 11) !!} en hausse</span></div>
+                    </div>
+                    <div class="dash-chart">
+                        <div class="dash-kpi-lbl" style="margin-bottom:6px">Évolution des ventes</div>
+                        <svg viewBox="0 0 310 110" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="dashGrad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0" stop-color="#6366f1" stop-opacity=".28"/>
+                                    <stop offset="1" stop-color="#6366f1" stop-opacity="0"/>
+                                </linearGradient>
+                            </defs>
+                            <g stroke="#e8ecf5" stroke-width="1"><line x1="0" y1="30" x2="310" y2="30"/><line x1="0" y1="60" x2="310" y2="60"/><line x1="0" y1="90" x2="310" y2="90"/></g>
+                            <path class="dash-area" d="M0 92 L40 80 L80 84 L120 62 L160 68 L200 44 L240 50 L298 16 L298 110 L0 110 Z" fill="url(#dashGrad)"/>
+                            <path class="dash-line" d="M0 92 L40 80 L80 84 L120 62 L160 68 L200 44 L240 50 L298 16" fill="none" stroke="#6366f1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle class="dash-dot" cx="298" cy="16" r="5" fill="#4f46e5" stroke="#fff" stroke-width="2"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="dash-toast">
+                <span class="dash-toast-ico">{!! \App\Support\IconLibrary::svg('bag', '', 16) !!}</span>
+                <span><strong>Nouvelle commande reçue</strong><span>à l'instant</span></span>
+            </div>
+        </div>
+        </div><div class="laptop-base"></div></div>{{-- /.laptop --}}
     </div>
-    <div class="trust-item">
-        <span class="trust-ico">{!! \App\Support\IconLibrary::svg('rotate', '', 20) !!}</span>
-        <span class="trust-txt"><strong>Retours faciles</strong><span>Assistance dédiée</span></span>
+</section>
+
+{{-- ══ LIVRAISON & SUIVI (itinéraire qui se dessine + étapes de la commande) ══ --}}
+<section class="mk mk-split mk-split--dark reveal" id="livraison" aria-labelledby="trackTitle">
+    <span class="band-num" aria-hidden="true">03</span>
+    <div class="mk-copy">
+        <span class="mk-eyebrow">{!! \App\Support\IconLibrary::svg('truck', '', 13) !!} Livraison</span>
+        <h2 class="mk-title" id="trackTitle">Livraison rapide. <strong>Suivi en temps réel.</strong></h2>
+        <p class="mk-sub">Des livreurs partenaires apportent vos commandes partout en Guinée, et vous suivez chaque étape jusqu'à votre porte.</p>
+        <div class="mk-feats">
+            <div class="mk-feat"><span class="mk-feat-ico">{!! \App\Support\IconLibrary::svg('map-pin', '', 20) !!}</span> Suivi de votre commande</div>
+            <div class="mk-feat"><span class="mk-feat-ico">{!! \App\Support\IconLibrary::svg('phone', '', 20) !!}</span> Notifications en temps réel</div>
+            <div class="mk-feat"><span class="mk-feat-ico">{!! \App\Support\IconLibrary::svg('shield', '', 20) !!}</span> Livraison sûre et fiable</div>
+        </div>
+        <div class="mk-btns">
+            <a href="{{ route('register') }}" class="mk-btn mk-btn--primary">{!! \App\Support\IconLibrary::svg('truck', '', 16) !!} Devenir livreur partenaire</a>
+            <a href="{{ route('delivery.companies.index') }}" class="mk-btn mk-btn--ghost">Entreprises de livraison</a>
+        </div>
     </div>
-    <div class="trust-item">
-        <span class="trust-ico">{!! \App\Support\IconLibrary::svg('shield', '', 20) !!}</span>
-        <span class="trust-txt"><strong>Boutiques vérifiées</strong><span>Vendeurs approuvés</span></span>
+    <div class="mk-visual">
+        <div class="track-mock">
+            <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <g stroke="rgba(255,255,255,.07)" stroke-width="10" fill="none" stroke-linecap="round">
+                    <path d="M-10 70 L410 40"/><path d="M-10 190 L410 150"/><path d="M90 -10 L130 310"/><path d="M260 -10 L300 310"/><path d="M-10 270 Q200 230 410 260"/>
+                </g>
+                <path d="M70 240 C120 225 115 175 170 165 S255 150 265 105 S315 60 345 55" fill="none" stroke="rgba(165,180,252,.25)" stroke-width="5" stroke-dasharray="2 10" stroke-linecap="round"/>
+                <path class="track-route" d="M70 240 C120 225 115 175 170 165 S255 150 265 105 S315 60 345 55" fill="none" stroke="#a5b4fc" stroke-width="5" stroke-linecap="round"/>
+                <circle cx="70" cy="240" r="9" fill="#6366f1" stroke="#fff" stroke-width="3"/>
+                <g transform="translate(345 55)">
+                    <path d="M0 0 C-12 -14 -14 -20 -14 -26 A14 14 0 0 1 14 -26 C14 -20 12 -14 0 0 Z" fill="#6366f1" stroke="#fff" stroke-width="2.5"/>
+                    <circle cx="0" cy="-26" r="5" fill="#fff"/>
+                </g>
+                <circle r="8" fill="#fff" stroke="#4f46e5" stroke-width="4" cx="70" cy="240" id="trackRider">
+                    <animateMotion id="trackRiderMotion" dur="2.2s" begin="indefinite" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines=".65 0 .35 1"
+                        path="M0 0 C50 -15 45 -65 100 -75 S185 -90 195 -135 S245 -180 275 -185"/>
+                </circle>
+            </svg>
+            <div class="track-card" aria-hidden="true">
+                <div class="track-card-hd">
+                    <span class="ico-wrap">{!! \App\Support\IconLibrary::svg('package', '', 17) !!}</span>
+                    <span><strong>Votre commande</strong><span>En cours de livraison</span></span>
+                </div>
+                <ul class="track-steps">
+                    <li class="is-done" style="--i:0"><span class="track-dot">{!! \App\Support\IconLibrary::svg('check', '', 10) !!}</span> Commande confirmée</li>
+                    <li class="is-done" style="--i:1"><span class="track-dot">{!! \App\Support\IconLibrary::svg('check', '', 10) !!}</span> En préparation</li>
+                    <li class="is-current" style="--i:2"><span class="track-dot"></span> En cours de livraison</li>
+                    <li class="is-todo" style="--i:3"><span class="track-dot"></span> Livrée</li>
+                </ul>
+            </div>
+        </div>
     </div>
-</div>
+</section>
+
+{{-- ══ PAIEMENTS (uniquement les moyens réellement proposés au tunnel de commande) ══ --}}
+<section class="mk mk-split reveal" id="paiements" aria-labelledby="payTitle">
+    <span class="band-num" aria-hidden="true">04</span>
+    <div class="mk-copy">
+        <span class="mk-eyebrow">{!! \App\Support\IconLibrary::svg('lock', '', 13) !!} Paiement</span>
+        <h2 class="mk-title" id="payTitle">Paiements sécurisés. <strong>Plusieurs options.</strong></h2>
+        <p class="mk-sub">Payez comme vous préférez : en espèces à la réception de votre colis, ou en ligne par Mobile Money.</p>
+        <div class="mk-btns">
+            <a href="#catalogue" class="mk-btn mk-btn--primary">{!! \App\Support\IconLibrary::svg('cart', '', 16) !!} Voir les produits</a>
+        </div>
+    </div>
+    <div class="mk-visual">
+        <div class="pay-grid">
+            <div class="pay-card">
+                <span class="pay-card-ico">{!! \App\Support\IconLibrary::svg('wallet', '', 22) !!}</span>
+                <strong>Paiement à la livraison</strong>
+                <p>Vous payez seulement quand vous recevez votre commande.</p>
+            </div>
+            <div class="pay-card">
+                <span class="pay-card-ico">{!! \App\Support\IconLibrary::svg('smartphone', '', 22) !!}</span>
+                <strong>Mobile Money</strong>
+                <p>Paiement en ligne sécurisé depuis votre téléphone.</p>
+            </div>
+            <div class="pay-shield">
+                <span class="pay-shield-ico">{!! \App\Support\IconLibrary::svg('shield', '', 28) !!}</span>
+                <span><strong>Achats protégés</strong><span>Boutiques vérifiées avant de vendre et retours facilités en cas de problème.</span></span>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{-- ══ APPLICATION (PWA installable — masquée si déjà ouverte depuis l'appli) ══ --}}
+<section class="mk mk-split mk-split--dark mk-split--three reveal" id="application" aria-labelledby="appTitle">
+    <span class="band-num" aria-hidden="true">05</span>
+    <div class="mk-copy">
+        <span class="mk-eyebrow">{!! \App\Support\IconLibrary::svg('smartphone', '', 13) !!} Application</span>
+        <h2 class="mk-title" id="appTitle">{{ config('app.name', 'Shopio') }} est partout <strong>avec vous.</strong></h2>
+        <p class="mk-sub">Gérez votre boutique, vos commandes et vos clients depuis votre téléphone.</p>
+        <div class="mk-btns">
+            <button type="button" class="mk-btn mk-btn--primary" id="appInstallBtn">{!! \App\Support\IconLibrary::svg('smartphone', '', 16) !!} Installer l'application</button>
+        </div>
+    </div>
+    <div class="mk-visual">
+        <div class="phone" aria-hidden="true">
+            <div class="phone-screen">
+                <span class="phone-notch"></span>
+                <div class="phone-notifs">
+                    <div class="phone-notif" style="--i:0">
+                        <span class="phone-notif-ico">{!! \App\Support\IconLibrary::svg('check', '', 13) !!}</span>
+                        <span><strong>Commande confirmée</strong><span>La boutique prépare votre colis</span></span>
+                    </div>
+                    <div class="phone-notif" style="--i:1">
+                        <span class="phone-notif-ico">{!! \App\Support\IconLibrary::svg('truck', '', 13) !!}</span>
+                        <span><strong>Votre colis est en route</strong><span>Le livreur arrive bientôt</span></span>
+                    </div>
+                </div>
+                <div class="phone-hd">
+                    <div class="phone-logo"><img src="/images/shopio-logo-192.png" alt=""> <span>Shop<b>io</b></span></div>
+                    <div class="phone-search">{!! \App\Support\IconLibrary::svg('search', '', 11) !!} Que recherchez-vous ?</div>
+                </div>
+                <div class="phone-grid">
+                    @for($i = 0; $i < 4; $i++)
+                    <div class="phone-tile"><i></i><b></b><em></em></div>
+                    @endfor
+                </div>
+                <div class="phone-tabs">
+                    <span>{!! \App\Support\IconLibrary::svg('home', '', 16) !!}</span>
+                    <span>{!! \App\Support\IconLibrary::svg('grid', '', 16) !!}</span>
+                    <span>{!! \App\Support\IconLibrary::svg('cart', '', 16) !!}</span>
+                    <span>{!! \App\Support\IconLibrary::svg('user', '', 16) !!}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="app-side">
+        <h3 class="app-side-title">Tout {{ config('app.name', 'Shopio') }} dans votre poche</h3>
+        <ul class="mk-list">
+            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Notifications instantanées</li>
+            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Accès direct depuis l'écran d'accueil</li>
+            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Installation en un clic, sans store</li>
+        </ul>
+        <a href="{{ url('/') }}" class="app-side-link">{!! \App\Support\IconLibrary::svg('globe', '', 16) !!} {{ request()->getHost() }}</a>
+    </div>
+</section>
+
+{{-- ══ APPEL FINAL ══ --}}
+<section class="mk final-cta reveal" aria-labelledby="finalTitle">
+    <span class="band-num" aria-hidden="true">06</span>
+    <div>
+        <h2 class="mk-title" id="finalTitle">Rejoignez les vendeurs qui réussissent déjà avec <strong>{{ config('app.name', 'Shopio') }}.</strong></h2>
+        <p class="mk-sub">Créez votre boutique en quelques minutes et commencez à vendre dès aujourd'hui.</p>
+        <div class="mk-btns">
+            <a href="{{ route('register') }}" class="mk-btn mk-btn--primary">Commencer maintenant <span aria-hidden="true">→</span></a>
+        </div>
+    </div>
+    <div class="final-art" aria-hidden="true">
+        <svg viewBox="0 0 320 200">
+            <g fill="#e0e7ff"><rect x="30" y="140" width="22" height="40" rx="5"/><rect x="62" y="120" width="22" height="60" rx="5"/><rect x="94" y="100" width="22" height="80" rx="5"/></g>
+            <path class="final-arrow" d="M20 170 C80 160 120 120 170 110 S250 70 295 25" fill="none" stroke="#6366f1" stroke-width="5" stroke-linecap="round"/>
+            <path class="final-arrow" d="M276 22 L297 23 L295 44" fill="none" stroke="#6366f1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <g class="final-bag">
+                <path d="M190 80 h70 l8 100 h-86 z" fill="#6366f1"/>
+                <path d="M190 80 h70 l8 100 h-86 z" fill="url(#finalShade)"/>
+                <path d="M208 92 v-14 a17 17 0 0 1 34 0 v14" fill="none" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
+                <path d="M210 128 l12 12 l22 -24" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+            <defs><linearGradient id="finalShade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".18"/><stop offset="1" stop-color="#000" stop-opacity=".12"/></linearGradient></defs>
+        </svg>
+    </div>
+</section>
+
+</div>{{-- /.bands --}}
+@endunless
 
 <div class="c-main">
 
@@ -1527,147 +1854,6 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
 @include('partials.catalogue-results')
 </div>
 
-<div style="height:40px"></div>
-
-{{-- ══ VENDEZ SUR SHOPIO (aperçu animé du tableau de bord vendeur) ══ --}}
-<section class="mk mk-split reveal" id="vendre" aria-labelledby="sellTitle">
-    <div class="mk-copy">
-        <span class="mk-eyebrow">{!! \App\Support\IconLibrary::svg('store', '', 13) !!} Vendeurs</span>
-        <h2 class="mk-title" id="sellTitle">Vendez plus. <strong>Gérez mieux.</strong></h2>
-        <p class="mk-sub">Ouvrez votre boutique sur {{ config('app.name', 'Shopio') }} sans créer de site : vos produits sont visibles par les acheteurs partout en Guinée.</p>
-        <ul class="mk-list">
-            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Gestion facile de votre boutique</li>
-            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Suivi des commandes en temps réel</li>
-            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Statistiques de vos ventes</li>
-            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Livraison assurée par nos partenaires</li>
-        </ul>
-        <div class="mk-btns">
-            <a href="{{ route('register') }}" class="mk-btn mk-btn--primary">{!! \App\Support\IconLibrary::svg('store', '', 16) !!} Ouvrir ma boutique</a>
-            <a href="{{ route('shops.index') }}" class="mk-btn mk-btn--ghost">Voir les boutiques</a>
-        </div>
-    </div>
-    <div class="mk-visual">
-        <div class="dash-mock" aria-hidden="true">
-            <div class="dash-bar"><span></span><span></span><span></span><span class="dash-url">{{ config('app.name', 'Shopio') }} · Tableau de bord</span></div>
-            <div class="dash-body">
-                <div class="dash-side">
-                    <span class="dash-nav is-active">{!! \App\Support\IconLibrary::svg('grid', '', 12) !!} Tableau de bord</span>
-                    <span class="dash-nav">{!! \App\Support\IconLibrary::svg('tag', '', 12) !!} Produits</span>
-                    <span class="dash-nav">{!! \App\Support\IconLibrary::svg('package', '', 12) !!} Commandes</span>
-                    <span class="dash-nav">{!! \App\Support\IconLibrary::svg('user', '', 12) !!} Clients</span>
-                    <span class="dash-nav">{!! \App\Support\IconLibrary::svg('sliders', '', 12) !!} Paramètres</span>
-                </div>
-                <div class="dash-main">
-                    <div class="dash-h">Tableau de bord</div>
-                    <div class="dash-kpis">
-                        <div class="dash-kpi"><span class="dash-kpi-lbl">Ventes</span><span class="dash-kpi-bar" style="--w:.85"></span><span class="dash-kpi-trend">{!! \App\Support\IconLibrary::svg('chevron-up', '', 11) !!} en hausse</span></div>
-                        <div class="dash-kpi"><span class="dash-kpi-lbl">Commandes</span><span class="dash-kpi-bar" style="--w:.65"></span><span class="dash-kpi-trend">{!! \App\Support\IconLibrary::svg('chevron-up', '', 11) !!} en hausse</span></div>
-                        <div class="dash-kpi"><span class="dash-kpi-lbl">Clients</span><span class="dash-kpi-bar" style="--w:.75"></span><span class="dash-kpi-trend">{!! \App\Support\IconLibrary::svg('chevron-up', '', 11) !!} en hausse</span></div>
-                    </div>
-                    <div class="dash-chart">
-                        <div class="dash-kpi-lbl" style="margin-bottom:6px">Évolution des ventes</div>
-                        <svg viewBox="0 0 310 110" preserveAspectRatio="none">
-                            <defs>
-                                <linearGradient id="dashGrad" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0" stop-color="#6366f1" stop-opacity=".28"/>
-                                    <stop offset="1" stop-color="#6366f1" stop-opacity="0"/>
-                                </linearGradient>
-                            </defs>
-                            <g stroke="#e8ecf5" stroke-width="1"><line x1="0" y1="30" x2="310" y2="30"/><line x1="0" y1="60" x2="310" y2="60"/><line x1="0" y1="90" x2="310" y2="90"/></g>
-                            <path class="dash-area" d="M0 92 L40 80 L80 84 L120 62 L160 68 L200 44 L240 50 L298 16 L298 110 L0 110 Z" fill="url(#dashGrad)"/>
-                            <path class="dash-line" d="M0 92 L40 80 L80 84 L120 62 L160 68 L200 44 L240 50 L298 16" fill="none" stroke="#6366f1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                            <circle class="dash-dot" cx="298" cy="16" r="5" fill="#4f46e5" stroke="#fff" stroke-width="2"/>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-            <div class="dash-toast">
-                <span class="dash-toast-ico">{!! \App\Support\IconLibrary::svg('bag', '', 16) !!}</span>
-                <span><strong>Nouvelle commande reçue</strong><span>à l'instant</span></span>
-            </div>
-        </div>
-    </div>
-</section>
-
-{{-- ══ LIVRAISON & SUIVI (itinéraire qui se dessine + étapes de la commande) ══ --}}
-<section class="mk mk-split mk-split--dark mk-split--reverse reveal" id="livraison" aria-labelledby="trackTitle">
-    <div class="mk-copy">
-        <span class="mk-eyebrow">{!! \App\Support\IconLibrary::svg('truck', '', 13) !!} Livraison</span>
-        <h2 class="mk-title" id="trackTitle">Livraison rapide. <strong>Suivi en temps réel.</strong></h2>
-        <p class="mk-sub">Des livreurs partenaires apportent vos commandes partout en Guinée, et vous suivez chaque étape jusqu'à votre porte.</p>
-        <div class="mk-feats">
-            <div class="mk-feat"><span class="mk-feat-ico">{!! \App\Support\IconLibrary::svg('map-pin', '', 20) !!}</span> Suivi de votre commande</div>
-            <div class="mk-feat"><span class="mk-feat-ico">{!! \App\Support\IconLibrary::svg('phone', '', 20) !!}</span> Notifications en temps réel</div>
-            <div class="mk-feat"><span class="mk-feat-ico">{!! \App\Support\IconLibrary::svg('shield', '', 20) !!}</span> Livraison sûre et fiable</div>
-        </div>
-        <div class="mk-btns">
-            <a href="{{ route('register') }}" class="mk-btn mk-btn--primary">{!! \App\Support\IconLibrary::svg('truck', '', 16) !!} Devenir livreur partenaire</a>
-            <a href="{{ route('delivery.companies.index') }}" class="mk-btn mk-btn--ghost">Entreprises de livraison</a>
-        </div>
-    </div>
-    <div class="mk-visual">
-        <div class="track-mock">
-            <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-                <g stroke="rgba(255,255,255,.07)" stroke-width="10" fill="none" stroke-linecap="round">
-                    <path d="M-10 70 L410 40"/><path d="M-10 190 L410 150"/><path d="M90 -10 L130 310"/><path d="M260 -10 L300 310"/><path d="M-10 270 Q200 230 410 260"/>
-                </g>
-                <path d="M70 240 C120 225 115 175 170 165 S255 150 265 105 S315 60 345 55" fill="none" stroke="rgba(165,180,252,.25)" stroke-width="5" stroke-dasharray="2 10" stroke-linecap="round"/>
-                <path class="track-route" d="M70 240 C120 225 115 175 170 165 S255 150 265 105 S315 60 345 55" fill="none" stroke="#a5b4fc" stroke-width="5" stroke-linecap="round"/>
-                <circle cx="70" cy="240" r="9" fill="#6366f1" stroke="#fff" stroke-width="3"/>
-                <g transform="translate(345 55)">
-                    <path d="M0 0 C-12 -14 -14 -20 -14 -26 A14 14 0 0 1 14 -26 C14 -20 12 -14 0 0 Z" fill="#6366f1" stroke="#fff" stroke-width="2.5"/>
-                    <circle cx="0" cy="-26" r="5" fill="#fff"/>
-                </g>
-                <circle r="8" fill="#fff" stroke="#4f46e5" stroke-width="4" cx="70" cy="240" id="trackRider">
-                    <animateMotion id="trackRiderMotion" dur="2.2s" begin="indefinite" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines=".65 0 .35 1"
-                        path="M0 0 C50 -15 45 -65 100 -75 S185 -90 195 -135 S245 -180 275 -185"/>
-                </circle>
-            </svg>
-            <div class="track-card" aria-hidden="true">
-                <div class="track-card-hd">
-                    <span class="ico-wrap">{!! \App\Support\IconLibrary::svg('package', '', 17) !!}</span>
-                    <span><strong>Votre commande</strong><span>En cours de livraison</span></span>
-                </div>
-                <ul class="track-steps">
-                    <li class="is-done" style="--i:0"><span class="track-dot">{!! \App\Support\IconLibrary::svg('check', '', 10) !!}</span> Commande confirmée</li>
-                    <li class="is-done" style="--i:1"><span class="track-dot">{!! \App\Support\IconLibrary::svg('check', '', 10) !!}</span> En préparation</li>
-                    <li class="is-current" style="--i:2"><span class="track-dot"></span> En cours de livraison</li>
-                    <li class="is-todo" style="--i:3"><span class="track-dot"></span> Livrée</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</section>
-
-{{-- ══ PAIEMENTS (uniquement les moyens réellement proposés au tunnel de commande) ══ --}}
-<section class="mk mk-split reveal" id="paiements" aria-labelledby="payTitle">
-    <div class="mk-copy">
-        <span class="mk-eyebrow">{!! \App\Support\IconLibrary::svg('lock', '', 13) !!} Paiement</span>
-        <h2 class="mk-title" id="payTitle">Paiements sécurisés. <strong>Plusieurs options.</strong></h2>
-        <p class="mk-sub">Payez comme vous préférez : en espèces à la réception de votre colis, ou en ligne par Mobile Money.</p>
-        <div class="mk-btns">
-            <a href="#catalogue" class="mk-btn mk-btn--primary">{!! \App\Support\IconLibrary::svg('cart', '', 16) !!} Voir les produits</a>
-        </div>
-    </div>
-    <div class="mk-visual">
-        <div class="pay-grid">
-            <div class="pay-card">
-                <span class="pay-card-ico">{!! \App\Support\IconLibrary::svg('wallet', '', 22) !!}</span>
-                <strong>Paiement à la livraison</strong>
-                <p>Vous payez seulement quand vous recevez votre commande.</p>
-            </div>
-            <div class="pay-card">
-                <span class="pay-card-ico">{!! \App\Support\IconLibrary::svg('smartphone', '', 22) !!}</span>
-                <strong>Mobile Money</strong>
-                <p>Paiement en ligne sécurisé depuis votre téléphone.</p>
-            </div>
-            <div class="pay-shield">
-                <span class="pay-shield-ico">{!! \App\Support\IconLibrary::svg('shield', '', 28) !!}</span>
-                <span><strong>Achats protégés</strong><span>Boutiques vérifiées avant de vendre et retours facilités en cas de problème.</span></span>
-            </div>
-        </div>
-    </div>
-</section>
 
 {{-- ══ TÉMOIGNAGES CLIENTS (avis réels, hors recherche) ══ --}}
 @if($testimonials->isNotEmpty())
@@ -1692,79 +1878,6 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
 <div style="height:40px"></div>
 @endif
 
-{{-- ══ APPLICATION (PWA installable — masquée si déjà ouverte depuis l'appli) ══ --}}
-<section class="mk mk-split mk-split--dark reveal" id="application" aria-labelledby="appTitle">
-    <div class="mk-copy">
-        <span class="mk-eyebrow">{!! \App\Support\IconLibrary::svg('smartphone', '', 13) !!} Application</span>
-        <h2 class="mk-title" id="appTitle">{{ config('app.name', 'Shopio') }} est partout <strong>avec vous.</strong></h2>
-        <p class="mk-sub">Installez l'application sur votre téléphone : vos boutiques, vos commandes et vos livraisons toujours à portée de main.</p>
-        <ul class="mk-list">
-            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Notifications instantanées</li>
-            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Accès direct depuis l'écran d'accueil</li>
-            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Installation en un clic, sans store</li>
-        </ul>
-        <div class="mk-btns">
-            <button type="button" class="mk-btn mk-btn--primary" id="appInstallBtn">{!! \App\Support\IconLibrary::svg('smartphone', '', 16) !!} Installer l'application</button>
-        </div>
-    </div>
-    <div class="mk-visual">
-        <div class="phone" aria-hidden="true">
-            <div class="phone-screen">
-                <span class="phone-notch"></span>
-                <div class="phone-notifs">
-                    <div class="phone-notif" style="--i:0">
-                        <span class="phone-notif-ico">{!! \App\Support\IconLibrary::svg('check', '', 13) !!}</span>
-                        <span><strong>Commande confirmée</strong><span>La boutique prépare votre colis</span></span>
-                    </div>
-                    <div class="phone-notif" style="--i:1">
-                        <span class="phone-notif-ico">{!! \App\Support\IconLibrary::svg('truck', '', 13) !!}</span>
-                        <span><strong>Votre colis est en route</strong><span>Le livreur arrive bientôt</span></span>
-                    </div>
-                </div>
-                <div class="phone-hd">
-                    <div class="phone-logo"><img src="/images/shopio-logo-192.png" alt=""> Shop<b>io</b></div>
-                    <div class="phone-search">{!! \App\Support\IconLibrary::svg('search', '', 11) !!} Que recherchez-vous ?</div>
-                </div>
-                <div class="phone-grid">
-                    @for($i = 0; $i < 4; $i++)
-                    <div class="phone-tile"><i></i><b></b><em></em></div>
-                    @endfor
-                </div>
-                <div class="phone-tabs">
-                    <span>{!! \App\Support\IconLibrary::svg('home', '', 16) !!}</span>
-                    <span>{!! \App\Support\IconLibrary::svg('grid', '', 16) !!}</span>
-                    <span>{!! \App\Support\IconLibrary::svg('cart', '', 16) !!}</span>
-                    <span>{!! \App\Support\IconLibrary::svg('user', '', 16) !!}</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-{{-- ══ APPEL FINAL ══ --}}
-<section class="mk final-cta reveal" aria-labelledby="finalTitle">
-    <div>
-        <h2 class="mk-title" id="finalTitle">Rejoignez les vendeurs qui réussissent déjà avec <strong>{{ config('app.name', 'Shopio') }}.</strong></h2>
-        <p class="mk-sub">Créez votre boutique en quelques minutes et commencez à vendre dès aujourd'hui.</p>
-        <div class="mk-btns">
-            <a href="{{ route('register') }}" class="mk-btn mk-btn--primary">Commencer maintenant <span aria-hidden="true">→</span></a>
-        </div>
-    </div>
-    <div class="final-art" aria-hidden="true">
-        <svg viewBox="0 0 320 200">
-            <g fill="#e0e7ff"><rect x="30" y="140" width="22" height="40" rx="5"/><rect x="62" y="120" width="22" height="60" rx="5"/><rect x="94" y="100" width="22" height="80" rx="5"/></g>
-            <path class="final-arrow" d="M20 170 C80 160 120 120 170 110 S250 70 295 25" fill="none" stroke="#6366f1" stroke-width="5" stroke-linecap="round"/>
-            <path class="final-arrow" d="M276 22 L297 23 L295 44" fill="none" stroke="#6366f1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-            <g class="final-bag">
-                <path d="M190 80 h70 l8 100 h-86 z" fill="#6366f1"/>
-                <path d="M190 80 h70 l8 100 h-86 z" fill="url(#finalShade)"/>
-                <path d="M208 92 v-14 a17 17 0 0 1 34 0 v14" fill="none" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
-                <path d="M210 128 l12 12 l22 -24" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-            </g>
-            <defs><linearGradient id="finalShade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".18"/><stop offset="1" stop-color="#000" stop-opacity=".12"/></linearGradient></defs>
-        </svg>
-    </div>
-</section>
 
 </div>{{-- /.c-main --}}
 
