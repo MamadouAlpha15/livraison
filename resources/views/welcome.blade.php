@@ -300,7 +300,7 @@ footer.app-footer { display: none !important; }
 .hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #a5b4fc; box-shadow: 0 0 6px #a5b4fc; animation: blink 2s ease-in-out infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 @keyframes heroFadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-.hero-title { font-family: var(--display); font-weight: 700; font-size: clamp(24px, 3.4vw, 38px); color: #fff; line-height: 1.15; margin-bottom: 12px; letter-spacing: -.6px; animation: heroFadeUp .65s .08s ease both; }
+.hero-title { font-family: var(--display); font-weight: 700; font-size: clamp(24px, 3.4vw, 38px); color: #fff; line-height: 1.15; margin: 0 0 12px; letter-spacing: -.6px; animation: heroFadeUp .65s .08s ease both; }
 .hero-sub { font-size: 14.5px; color: rgba(255,255,255,.72); margin-bottom: 22px; max-width: 460px; line-height: 1.6; animation: heroFadeUp .65s .16s ease both; }
 .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; animation: heroFadeUp .65s .24s ease both; }
 .hero-btn-primary {
@@ -843,6 +843,311 @@ footer.app-footer { display: none !important; }
     .cat-pill, .prod-card-cta, .hero-btn-primary, .hero-btn-secondary,
     .nav-orders-btn, .nav-btn-primary, .search-banner-clear { min-height: 40px; }
 }
+
+/* ════════════════════════════════════════════════════════════════
+   MOTION TOKENS — mêmes courbes et durées partout dans les sections
+════════════════════════════════════════════════════════════════ */
+:root {
+    --ease-out:    cubic-bezier(.22, 1, .36, 1);   /* entrées */
+    --ease-in:     cubic-bezier(.55, 0, 1, .45);   /* sorties */
+    --ease-io:     cubic-bezier(.65, 0, .35, 1);   /* déplacements d'interface */
+    --ease-spring: cubic-bezier(.34, 1.56, .64, 1); /* microinteractions */
+    --t-micro:     200ms;
+    --t-enter:     600ms;
+    --t-move:      800ms;
+}
+.reveal.is-visible { animation-duration: var(--t-enter); animation-timing-function: var(--ease-out); }
+
+/* ════════════════════════════════════════════════════════════════
+   SECTIONS NARRATIVES (comment ça marche, vendeurs, livraison,
+   paiements, application, appel final)
+════════════════════════════════════════════════════════════════ */
+.mk { margin: 0 0 40px; scroll-margin-top: calc(var(--nav-h) + 12px); }
+.mk-eyebrow {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase;
+    color: var(--brand-dk); background: var(--brand-mlt);
+    padding: 5px 12px; border-radius: 20px; margin-bottom: 14px;
+}
+.mk-title {
+    font-family: var(--display); font-weight: 700; font-size: clamp(26px, 3.2vw, 38px);
+    line-height: 1.12; letter-spacing: -.6px; color: var(--text); margin: 0 0 14px;
+}
+.mk-title strong { display: block; color: var(--brand); font-weight: 700; }
+.mk-sub { font-size: 16px; line-height: 1.6; color: var(--text-2); margin: 0 0 22px; max-width: 470px; }
+.mk-list { list-style: none; padding: 0; margin: 0 0 26px; display: grid; gap: 12px; }
+.mk-list li { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; color: var(--text); }
+.mk-check {
+    width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+    background: var(--brand-mlt); color: var(--brand-dk);
+    display: flex; align-items: center; justify-content: center;
+}
+.mk-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+.mk-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 46px; padding: 12px 24px; border-radius: 50px;
+    font-size: 14px; font-weight: 700; font-family: var(--font); text-decoration: none;
+    border: 1.5px solid transparent; cursor: pointer; white-space: nowrap;
+    transition: transform var(--t-micro) var(--ease-out), box-shadow var(--t-micro) var(--ease-out),
+                background var(--t-micro), border-color var(--t-micro), color var(--t-micro);
+}
+.mk-btn:active { transform: scale(.97); }
+.mk-btn:focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; }
+.mk-btn--primary { background: var(--brand); color: #fff; box-shadow: 0 6px 18px rgba(99,102,241,.35); }
+.mk-btn--primary:hover { background: var(--brand-dk); color: #fff; transform: translateY(-2px); box-shadow: 0 10px 26px rgba(99,102,241,.42); }
+.mk-btn--ghost { background: var(--surface); color: var(--brand-dk); border-color: var(--brand-lt); }
+.mk-btn--ghost:hover { background: var(--brand-mlt); border-color: var(--brand); color: var(--brand-dk); transform: translateY(-2px); }
+.mk-btn .ico { transition: transform var(--t-micro) var(--ease-out); }
+.mk-btn:hover .ico:last-child { transform: translateX(2px); }
+
+/* ── Bloc 2 colonnes (texte + visuel) ── */
+.mk-split {
+    display: grid; grid-template-columns: 1fr 1.1fr; gap: 44px; align-items: center;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 22px;
+    padding: 48px; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; isolation: isolate;
+}
+.mk-split::after {
+    content: ''; position: absolute; z-index: -1; right: -120px; top: -120px; width: 460px; height: 460px;
+    border-radius: 50%; background: radial-gradient(circle, var(--brand-mlt) 0%, transparent 68%);
+    pointer-events: none;
+}
+.mk-split--reverse .mk-copy { order: 2; }
+.mk-split--dark { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%); border-color: transparent; }
+.mk-split--dark::after { background: radial-gradient(circle, rgba(99,102,241,.32) 0%, transparent 68%); }
+.mk-split--dark::before {
+    content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.06) 1px, transparent 0);
+    background-size: 28px 28px;
+}
+.mk-split--dark .mk-title { color: #fff; }
+.mk-split--dark .mk-title strong { color: #a5b4fc; }
+.mk-split--dark .mk-sub { color: rgba(255,255,255,.72); }
+.mk-split--dark .mk-eyebrow { background: rgba(255,255,255,.1); color: #e0e7ff; }
+.mk-split--dark .mk-list li { color: #fff; }
+.mk-split--dark .mk-check { background: rgba(165,180,252,.16); color: #a5b4fc; }
+.mk-split--dark .mk-btn--ghost { background: rgba(255,255,255,.08); color: #fff; border-color: rgba(255,255,255,.25); }
+.mk-split--dark .mk-btn--ghost:hover { background: rgba(255,255,255,.16); color: #fff; }
+.mk-copy { min-width: 0; }
+.mk-visual { min-width: 0; position: relative; }
+
+/* ── Comment ça marche : ligne de progression dessinée au scroll ── */
+.how { text-align: center; padding: 8px 0 0; }
+.how .mk-sub { margin-left: auto; margin-right: auto; }
+.how-track { position: relative; max-width: 980px; margin: 8px auto 0; }
+.how-line {
+    position: absolute; top: 34px; left: 16.66%; right: 16.66%; height: 3px;
+    background: var(--grey-2); border-radius: 3px; overflow: hidden;
+}
+.how-line-fill {
+    position: absolute; inset: 0; background: linear-gradient(90deg, var(--brand), var(--brand-dk));
+    transform: scaleX(var(--p, 0)); transform-origin: left center;
+    transition: transform var(--t-move) var(--ease-io);
+}
+.how-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; position: relative; }
+.how-step { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 0 8px; }
+.how-badge {
+    width: 68px; height: 68px; border-radius: 50%; flex-shrink: 0; position: relative;
+    background: var(--surface); border: 2px solid var(--border); color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    transition: background .45s var(--ease-out), border-color .45s var(--ease-out), color .45s var(--ease-out),
+                transform .5s var(--ease-spring), box-shadow .45s var(--ease-out);
+}
+.how-num {
+    position: absolute; top: -4px; right: -4px; width: 24px; height: 24px; border-radius: 50%;
+    background: var(--grey-2); color: var(--text-2); font-size: 12px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums;
+    transition: background .45s, color .45s;
+}
+.how-step.is-on .how-badge { background: var(--brand); border-color: var(--brand); color: #fff; transform: scale(1.06); box-shadow: 0 8px 22px rgba(99,102,241,.35); }
+.how-step.is-on .how-num { background: var(--navy); color: #fff; }
+.how-step-body { display: flex; flex-direction: column; gap: 6px; }
+.how-step h3 { font-family: var(--display); font-size: 18px; font-weight: 700; margin: 0; color: var(--text); }
+.how-step p { font-size: 15px; color: var(--text-2); line-height: 1.55; margin: 0; max-width: 270px; }
+
+/* ── Aperçu tableau de bord vendeur (illustratif, sans chiffres inventés) ── */
+.dash-mock {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    box-shadow: var(--shadow-lg); overflow: hidden; position: relative;
+}
+.dash-bar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; background: var(--grey); border-bottom: 1px solid var(--border); }
+.dash-bar > span:not(.dash-url) { width: 9px; height: 9px; border-radius: 50%; background: var(--grey-2); }
+.dash-url { margin-left: 10px; font-size: 11px; font-weight: 600; color: var(--muted); }
+.dash-body { display: grid; grid-template-columns: 120px 1fr; min-height: 250px; }
+.dash-side { border-right: 1px solid var(--border); padding: 14px 10px; display: flex; flex-direction: column; gap: 6px; }
+.dash-nav { display: flex; align-items: center; gap: 7px; padding: 7px 8px; border-radius: 8px; font-size: 11px; font-weight: 600; color: var(--text-2); }
+.dash-nav.is-active { background: var(--brand); color: #fff; }
+.dash-main { padding: 14px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.dash-h { font-family: var(--display); font-size: 14px; font-weight: 700; color: var(--text); }
+.dash-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.dash-kpi { border: 1px solid var(--border); border-radius: 10px; padding: 9px 10px; display: flex; flex-direction: column; gap: 7px; }
+.dash-kpi-lbl { font-size: 10px; font-weight: 700; color: var(--muted); }
+.dash-kpi-bar { height: 8px; border-radius: 4px; background: var(--brand-lt); transform-origin: left; transform: scaleX(.15); transition: transform var(--t-move) var(--ease-out); }
+.dash-kpi-trend { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 800; color: var(--brand-dk); }
+.dash-chart { border: 1px solid var(--border); border-radius: 10px; padding: 10px; }
+.dash-chart svg { display: block; width: 100%; height: auto; }
+.dash-line { stroke-dasharray: 420; stroke-dashoffset: 420; transition: stroke-dashoffset 900ms var(--ease-io) 250ms; }
+.dash-area { opacity: 0; transition: opacity var(--t-enter) var(--ease-out) 700ms; }
+.dash-dot { opacity: 0; transform: scale(0); transform-box: fill-box; transform-origin: center; transition: opacity .3s 1.1s, transform .45s var(--ease-spring) 1.1s; }
+.dash-toast {
+    position: absolute; right: 14px; bottom: 14px; display: flex; align-items: center; gap: 10px;
+    background: var(--navy); color: #fff; border-radius: 12px; padding: 10px 14px; box-shadow: var(--shadow-lg);
+    opacity: 0; transform: translateY(14px) scale(.96);
+    transition: opacity .45s var(--ease-out) 1.25s, transform .55s var(--ease-spring) 1.25s;
+}
+.dash-toast-ico { width: 30px; height: 30px; border-radius: 9px; background: var(--brand); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.dash-toast strong { display: block; font-size: 12px; font-weight: 700; }
+.dash-toast > span > span { font-size: 10.5px; color: rgba(255,255,255,.65); }
+.is-visible .dash-kpi-bar { transform: scaleX(var(--w, .7)); }
+.is-visible .dash-line { stroke-dashoffset: 0; }
+.is-visible .dash-area { opacity: 1; }
+.is-visible .dash-dot { opacity: 1; transform: scale(1); }
+.is-visible .dash-toast { opacity: 1; transform: translateY(0) scale(1); }
+
+/* ── Suivi de livraison : carte + itinéraire qui se dessine ── */
+.track-mock {
+    position: relative; border-radius: 18px; overflow: hidden;
+    background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
+    aspect-ratio: 4 / 3; max-width: 100%;
+}
+.track-mock > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.track-route { stroke-dasharray: 520; stroke-dashoffset: 520; transition: stroke-dashoffset 1.1s var(--ease-io) 200ms; }
+.is-visible .track-route { stroke-dashoffset: 0; }
+.track-card {
+    position: absolute; left: 16px; bottom: 16px; width: min(250px, calc(100% - 32px));
+    background: var(--surface); border-radius: 14px; padding: 14px 16px; box-shadow: var(--shadow-lg);
+}
+.track-card-hd { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
+.track-card-hd .ico-wrap { width: 32px; height: 32px; border-radius: 9px; background: var(--brand-mlt); color: var(--brand-dk); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.track-card-hd strong { display: block; font-size: 13px; color: var(--text); }
+.track-card-hd > span > span { font-size: 11.5px; font-weight: 700; color: var(--brand-dk); }
+.track-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+.track-steps li {
+    display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--text-2);
+    opacity: 0; transform: translateX(-8px);
+    transition: opacity .4s var(--ease-out), transform .4s var(--ease-out);
+    transition-delay: calc(900ms + var(--i, 0) * 90ms);
+}
+.is-visible .track-steps li { opacity: 1; transform: none; }
+.track-dot { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 2px solid var(--border); background: var(--surface); color: #fff; }
+.track-steps li.is-done .track-dot { background: var(--brand); border-color: var(--brand); }
+.track-steps li.is-current { color: var(--text); font-weight: 800; }
+.track-steps li.is-current .track-dot { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-lt); }
+.track-steps li.is-todo { color: var(--muted); }
+.mk-feats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0 0 26px; }
+.mk-feat { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; font-size: 13.5px; font-weight: 600; color: rgba(255,255,255,.85); line-height: 1.4; }
+.mk-feat-ico { width: 40px; height: 40px; border-radius: 12px; background: rgba(165,180,252,.14); color: #a5b4fc; display: flex; align-items: center; justify-content: center; transition: transform var(--t-micro) var(--ease-spring); }
+.mk-feat:hover .mk-feat-ico { transform: translateY(-3px) scale(1.06); }
+
+/* ── Moyens de paiement ── */
+.pay-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.pay-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px;
+    display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shadow-sm);
+    transition: transform var(--t-micro) var(--ease-out), box-shadow var(--t-micro) var(--ease-out), border-color var(--t-micro);
+}
+.pay-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--brand-lt); }
+.pay-card-ico { width: 46px; height: 46px; border-radius: 13px; background: var(--brand-mlt); color: var(--brand-dk); display: flex; align-items: center; justify-content: center; }
+.pay-card strong { font-size: 15px; color: var(--text); }
+.pay-card p { font-size: 13.5px; color: var(--text-2); line-height: 1.5; margin: 0; }
+.pay-shield {
+    grid-column: 1 / -1; display: flex; align-items: center; gap: 16px;
+    background: linear-gradient(120deg, var(--brand-mlt), var(--surface)); border: 1px solid var(--brand-lt);
+    border-radius: 16px; padding: 18px 20px;
+}
+.pay-shield-ico {
+    width: 58px; height: 58px; border-radius: 18px; flex-shrink: 0; color: #fff;
+    background: linear-gradient(135deg, var(--brand), var(--brand-dk)); box-shadow: 0 8px 22px rgba(99,102,241,.35);
+    display: flex; align-items: center; justify-content: center;
+    transform: scale(.6); opacity: 0; transition: transform .6s var(--ease-spring) .3s, opacity .3s .3s;
+}
+.is-visible .pay-shield-ico { transform: scale(1); opacity: 1; }
+.pay-shield strong { display: block; font-size: 15px; color: var(--text); margin-bottom: 2px; }
+.pay-shield > span > span { font-size: 13.5px; color: var(--text-2); line-height: 1.5; }
+
+/* ── Application (téléphone + notifications) ── */
+.phone {
+    width: 250px; max-width: 100%; margin: 0 auto; aspect-ratio: 9 / 18.5; position: relative;
+    background: #0b0b1a; border-radius: 38px; padding: 10px; box-shadow: 0 30px 60px rgba(0,0,0,.45);
+}
+.phone-screen { position: relative; height: 100%; border-radius: 30px; overflow: hidden; background: var(--grey); display: flex; flex-direction: column; }
+.phone-notch { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 80px; height: 20px; border-radius: 12px; background: #0b0b1a; z-index: 3; }
+.phone-hd { background: var(--surface); padding: 38px 14px 12px; display: flex; flex-direction: column; gap: 10px; }
+.phone-logo { display: flex; align-items: center; gap: 6px; font-family: var(--display); font-weight: 700; font-size: 14px; color: var(--navy); }
+.phone-logo img { width: 22px; height: 22px; border-radius: 6px; }
+.phone-logo b { color: var(--brand); font-weight: 700; }
+.phone-search { height: 30px; border-radius: 15px; background: var(--grey); border: 1px solid var(--border); display: flex; align-items: center; gap: 6px; padding: 0 10px; font-size: 10px; color: var(--muted); }
+.phone-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px 14px; flex: 1; align-content: start; }
+.phone-tile { background: var(--surface); border-radius: 10px; border: 1px solid var(--border); padding: 6px; display: flex; flex-direction: column; gap: 5px; }
+.phone-tile i { display: block; height: 52px; border-radius: 7px; background: var(--brand-mlt); }
+.phone-tile b { display: block; height: 6px; width: 80%; border-radius: 3px; background: var(--grey-2); }
+.phone-tile em { display: block; height: 6px; width: 50%; border-radius: 3px; background: var(--brand-lt); }
+.phone-tabs { display: flex; justify-content: space-around; padding: 10px 6px 14px; background: var(--surface); border-top: 1px solid var(--border); color: var(--muted); }
+.phone-tabs span:first-child { color: var(--brand); }
+.phone-notifs { position: absolute; top: 34px; left: 8px; right: 8px; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
+.phone-notif {
+    display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,.96);
+    border-radius: 12px; padding: 8px 10px; box-shadow: 0 8px 20px rgba(15,23,42,.18);
+    opacity: 0; transform: translateY(-14px) scale(.96);
+    transition: opacity .45s var(--ease-out), transform .55s var(--ease-spring);
+    transition-delay: calc(500ms + var(--i, 0) * 450ms);
+}
+.is-visible .phone-notif { opacity: 1; transform: none; }
+.phone-notif-ico { width: 26px; height: 26px; border-radius: 8px; background: var(--brand); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.phone-notif strong { display: block; font-size: 10.5px; color: var(--text); }
+.phone-notif > span > span { font-size: 9.5px; color: var(--text-2); }
+
+/* ── Appel final ── */
+.final-cta {
+    display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px; align-items: center;
+    background: linear-gradient(120deg, var(--brand-mlt) 0%, #f5f3ff 100%);
+    border: 1px solid var(--brand-lt); border-radius: 22px; padding: 44px 48px; position: relative; overflow: hidden;
+}
+.final-cta .mk-title { font-size: clamp(24px, 2.8vw, 34px); }
+.final-cta .mk-title strong { display: inline; }
+.final-art { position: relative; height: 200px; }
+.final-art svg { width: 100%; height: 100%; display: block; }
+.final-arrow { stroke-dasharray: 360; stroke-dashoffset: 360; transition: stroke-dashoffset 900ms var(--ease-io) 200ms; }
+.is-visible .final-arrow { stroke-dashoffset: 0; }
+.final-bag { transform-box: fill-box; transform-origin: center bottom; transform: translateY(16px) scale(.9); opacity: 0; transition: transform .7s var(--ease-spring) .15s, opacity .4s .15s; }
+.is-visible .final-bag { transform: none; opacity: 1; }
+
+/* ── Responsive des sections narratives ── */
+@media (max-width: 960px) {
+    .mk-split { grid-template-columns: 1fr; gap: 32px; padding: 32px 28px; }
+    .mk-split--reverse .mk-copy { order: 0; }
+    .final-cta { grid-template-columns: 1fr; padding: 32px 28px; }
+    .final-art { height: 160px; max-width: 360px; }
+}
+@media (max-width: 640px) {
+    .mk { margin-bottom: 28px; }
+    .mk-split, .final-cta { padding: 26px 18px; border-radius: 18px; }
+    .mk-sub { font-size: 16px; }
+    .mk-btns { flex-direction: column; align-items: stretch; }
+    .mk-btn { width: 100%; }
+    .how { text-align: left; }
+    .how-steps { grid-template-columns: 1fr; gap: 26px; }
+    .how-step { flex-direction: row; align-items: flex-start; gap: 16px; padding: 0; }
+    .how-step-body { padding-top: 10px; }
+    .how-step p { max-width: none; }
+    .how-line { top: 34px; bottom: 34px; left: 33px; right: auto; width: 3px; height: auto; }
+    .how-line-fill { transform: scaleY(var(--p, 0)); transform-origin: center top; }
+    .dash-body { grid-template-columns: 1fr; }
+    .dash-side { display: none; }
+    .mk-feats { grid-template-columns: 1fr; gap: 10px; }
+    .mk-feat { flex-direction: row; align-items: center; font-size: 15px; }
+    .pay-grid { grid-template-columns: 1fr; }
+    .track-mock { aspect-ratio: 4 / 4.2; }
+}
+
+/* ── Mouvement réduit : tout est affiché d'emblée, sans déplacement ── */
+@media (prefers-reduced-motion: reduce) {
+    .how-line-fill, .how-badge, .dash-kpi-bar, .dash-line, .dash-area, .dash-dot, .dash-toast,
+    .track-route, .track-steps li, .pay-shield-ico, .phone-notif, .final-arrow, .final-bag,
+    .mk-btn, .pay-card, .mk-feat-ico { transition: none !important; }
+    .dash-kpi-bar { transform: scaleX(var(--w, .7)); }
+    .dash-line, .track-route, .final-arrow { stroke-dashoffset: 0; }
+    .dash-area, .dash-dot, .dash-toast, .track-steps li, .pay-shield-ico, .phone-notif, .final-bag { opacity: 1; transform: none; }
+}
 </style>
 @endpush
 
@@ -987,12 +1292,18 @@ footer.app-footer { display: none !important; }
             <div class="hero-scrim"></div>
             <div class="hero-shine"></div>
             <div class="hero-text">
-                <div class="hero-badge"><span class="hero-badge-dot"></span> <span id="heroProductCount" data-count="{{ $stats['total_products'] ?? 0 }}">0</span> produits disponibles</div>
-                <div class="hero-title">Bienvenue sur {{ config('app.name', 'Shopio') }}</div>
-                <p class="hero-sub">Découvrez des milliers de produits dans toutes les catégories, chez les meilleures boutiques, livrés directement chez vous.</p>
+                @php $totalProducts = (int) ($stats['total_products'] ?? 0); @endphp
+                {{-- Valeur réelle rendue côté serveur (lisible sans JS) ; jamais "0 produits" --}}
+                @if($totalProducts > 0)
+                <div class="hero-badge"><span class="hero-badge-dot"></span> <span id="heroProductCount" data-count="{{ $totalProducts }}">{{ number_format($totalProducts, 0, ',', ' ') }}</span> produits disponibles</div>
+                @else
+                <div class="hero-badge"><span class="hero-badge-dot"></span> Boutiques vérifiées en Guinée</div>
+                @endif
+                <h1 class="hero-title">Achetez en toute confiance.<br>Payez à la livraison.</h1>
+                <p class="hero-sub">La marketplace tout-en-un : boutiques vérifiées, produits et livraison rapide partout en Guinée.</p>
                 <div class="hero-btns">
                     <a href="#catalogue" class="hero-btn-primary">{!! \App\Support\IconLibrary::svg('cart', '', 16) !!} Voir les produits</a>
-                    <a href="{{ route('shops.index') }}" class="hero-btn-secondary">{!! \App\Support\IconLibrary::svg('store', '', 16) !!} Parcourir les boutiques</a>
+                    <a href="{{ route('register') }}" class="hero-btn-secondary">{!! \App\Support\IconLibrary::svg('store', '', 16) !!} Ouvrir ma boutique</a>
                 </div>
             </div>
         </section>
@@ -1093,6 +1404,41 @@ footer.app-footer { display: none !important; }
 
 <div class="c-main">
 
+{{-- ══ COMMENT ÇA MARCHE (ligne de progression qui se dessine au scroll) ══ --}}
+@unless(request('s'))
+<section class="mk how" aria-labelledby="howTitle">
+    <span class="mk-eyebrow reveal">Simple comme 1, 2, 3</span>
+    <h2 class="mk-title reveal" id="howTitle" style="--rd:60ms">Comment ça marche ?</h2>
+    <p class="mk-sub reveal" style="--rd:120ms">Commandez en quelques clics, recevez chez vous et ne payez qu'à la réception.</p>
+    <div class="how-track" id="howTrack">
+        <div class="how-line" aria-hidden="true"><span class="how-line-fill"></span></div>
+        <ol class="how-steps">
+            <li class="how-step">
+                <span class="how-badge" aria-hidden="true">{!! \App\Support\IconLibrary::svg('search', '', 26) !!}<span class="how-num">1</span></span>
+                <div class="how-step-body">
+                    <h3>Je choisis</h3>
+                    <p>Parcourez les produits des boutiques vérifiées et comparez les prix.</p>
+                </div>
+            </li>
+            <li class="how-step">
+                <span class="how-badge" aria-hidden="true">{!! \App\Support\IconLibrary::svg('cart', '', 26) !!}<span class="how-num">2</span></span>
+                <div class="how-step-body">
+                    <h3>Je commande</h3>
+                    <p>Indiquez votre adresse, la boutique confirme et prépare votre colis.</p>
+                </div>
+            </li>
+            <li class="how-step">
+                <span class="how-badge" aria-hidden="true">{!! \App\Support\IconLibrary::svg('wallet', '', 26) !!}<span class="how-num">3</span></span>
+                <div class="how-step-body">
+                    <h3>Je suis livré et je paie</h3>
+                    <p>Le livreur vous apporte la commande : vous payez à la réception.</p>
+                </div>
+            </li>
+        </ol>
+    </div>
+</section>
+@endunless
+
 {{-- ══ VU RÉCEMMENT (rempli en JS depuis l'historique local du navigateur) ══ --}}
 <div class="sec-hd reveal" id="recentlyViewedHd" hidden>
     <div class="sec-title">{!! \App\Support\IconLibrary::svg('clock') !!} Vu <strong>récemment</strong></div>
@@ -1105,6 +1451,148 @@ footer.app-footer { display: none !important; }
 <div id="resultsRoot">
 @include('partials.catalogue-results')
 </div>
+
+<div style="height:40px"></div>
+
+{{-- ══ VENDEZ SUR SHOPIO (aperçu animé du tableau de bord vendeur) ══ --}}
+<section class="mk mk-split reveal" id="vendre" aria-labelledby="sellTitle">
+    <div class="mk-copy">
+        <span class="mk-eyebrow">{!! \App\Support\IconLibrary::svg('store', '', 13) !!} Vendeurs</span>
+        <h2 class="mk-title" id="sellTitle">Vendez plus. <strong>Gérez mieux.</strong></h2>
+        <p class="mk-sub">Ouvrez votre boutique sur {{ config('app.name', 'Shopio') }} sans créer de site : vos produits sont visibles par les acheteurs partout en Guinée.</p>
+        <ul class="mk-list">
+            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Gestion facile de votre boutique</li>
+            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Suivi des commandes en temps réel</li>
+            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Statistiques de vos ventes</li>
+            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Livraison assurée par nos partenaires</li>
+        </ul>
+        <div class="mk-btns">
+            <a href="{{ route('register') }}" class="mk-btn mk-btn--primary">{!! \App\Support\IconLibrary::svg('store', '', 16) !!} Ouvrir ma boutique</a>
+            <a href="{{ route('shops.index') }}" class="mk-btn mk-btn--ghost">Voir les boutiques</a>
+        </div>
+    </div>
+    <div class="mk-visual">
+        <div class="dash-mock" aria-hidden="true">
+            <div class="dash-bar"><span></span><span></span><span></span><span class="dash-url">{{ config('app.name', 'Shopio') }} · Tableau de bord</span></div>
+            <div class="dash-body">
+                <div class="dash-side">
+                    <span class="dash-nav is-active">{!! \App\Support\IconLibrary::svg('grid', '', 12) !!} Tableau de bord</span>
+                    <span class="dash-nav">{!! \App\Support\IconLibrary::svg('tag', '', 12) !!} Produits</span>
+                    <span class="dash-nav">{!! \App\Support\IconLibrary::svg('package', '', 12) !!} Commandes</span>
+                    <span class="dash-nav">{!! \App\Support\IconLibrary::svg('user', '', 12) !!} Clients</span>
+                    <span class="dash-nav">{!! \App\Support\IconLibrary::svg('sliders', '', 12) !!} Paramètres</span>
+                </div>
+                <div class="dash-main">
+                    <div class="dash-h">Tableau de bord</div>
+                    <div class="dash-kpis">
+                        <div class="dash-kpi"><span class="dash-kpi-lbl">Ventes</span><span class="dash-kpi-bar" style="--w:.85"></span><span class="dash-kpi-trend">{!! \App\Support\IconLibrary::svg('chevron-up', '', 11) !!} en hausse</span></div>
+                        <div class="dash-kpi"><span class="dash-kpi-lbl">Commandes</span><span class="dash-kpi-bar" style="--w:.65"></span><span class="dash-kpi-trend">{!! \App\Support\IconLibrary::svg('chevron-up', '', 11) !!} en hausse</span></div>
+                        <div class="dash-kpi"><span class="dash-kpi-lbl">Clients</span><span class="dash-kpi-bar" style="--w:.75"></span><span class="dash-kpi-trend">{!! \App\Support\IconLibrary::svg('chevron-up', '', 11) !!} en hausse</span></div>
+                    </div>
+                    <div class="dash-chart">
+                        <div class="dash-kpi-lbl" style="margin-bottom:6px">Évolution des ventes</div>
+                        <svg viewBox="0 0 310 110" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="dashGrad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0" stop-color="#6366f1" stop-opacity=".28"/>
+                                    <stop offset="1" stop-color="#6366f1" stop-opacity="0"/>
+                                </linearGradient>
+                            </defs>
+                            <g stroke="#e8ecf5" stroke-width="1"><line x1="0" y1="30" x2="310" y2="30"/><line x1="0" y1="60" x2="310" y2="60"/><line x1="0" y1="90" x2="310" y2="90"/></g>
+                            <path class="dash-area" d="M0 92 L40 80 L80 84 L120 62 L160 68 L200 44 L240 50 L298 16 L298 110 L0 110 Z" fill="url(#dashGrad)"/>
+                            <path class="dash-line" d="M0 92 L40 80 L80 84 L120 62 L160 68 L200 44 L240 50 L298 16" fill="none" stroke="#6366f1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle class="dash-dot" cx="298" cy="16" r="5" fill="#4f46e5" stroke="#fff" stroke-width="2"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="dash-toast">
+                <span class="dash-toast-ico">{!! \App\Support\IconLibrary::svg('bag', '', 16) !!}</span>
+                <span><strong>Nouvelle commande reçue</strong><span>à l'instant</span></span>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{-- ══ LIVRAISON & SUIVI (itinéraire qui se dessine + étapes de la commande) ══ --}}
+<section class="mk mk-split mk-split--dark mk-split--reverse reveal" id="livraison" aria-labelledby="trackTitle">
+    <div class="mk-copy">
+        <span class="mk-eyebrow">{!! \App\Support\IconLibrary::svg('truck', '', 13) !!} Livraison</span>
+        <h2 class="mk-title" id="trackTitle">Livraison rapide. <strong>Suivi en temps réel.</strong></h2>
+        <p class="mk-sub">Des livreurs partenaires apportent vos commandes partout en Guinée, et vous suivez chaque étape jusqu'à votre porte.</p>
+        <div class="mk-feats">
+            <div class="mk-feat"><span class="mk-feat-ico">{!! \App\Support\IconLibrary::svg('map-pin', '', 20) !!}</span> Suivi de votre commande</div>
+            <div class="mk-feat"><span class="mk-feat-ico">{!! \App\Support\IconLibrary::svg('phone', '', 20) !!}</span> Notifications en temps réel</div>
+            <div class="mk-feat"><span class="mk-feat-ico">{!! \App\Support\IconLibrary::svg('shield', '', 20) !!}</span> Livraison sûre et fiable</div>
+        </div>
+        <div class="mk-btns">
+            <a href="{{ route('register') }}" class="mk-btn mk-btn--primary">{!! \App\Support\IconLibrary::svg('truck', '', 16) !!} Devenir livreur partenaire</a>
+            <a href="{{ route('delivery.companies.index') }}" class="mk-btn mk-btn--ghost">Entreprises de livraison</a>
+        </div>
+    </div>
+    <div class="mk-visual">
+        <div class="track-mock">
+            <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <g stroke="rgba(255,255,255,.07)" stroke-width="10" fill="none" stroke-linecap="round">
+                    <path d="M-10 70 L410 40"/><path d="M-10 190 L410 150"/><path d="M90 -10 L130 310"/><path d="M260 -10 L300 310"/><path d="M-10 270 Q200 230 410 260"/>
+                </g>
+                <path d="M70 240 C120 225 115 175 170 165 S255 150 265 105 S315 60 345 55" fill="none" stroke="rgba(165,180,252,.25)" stroke-width="5" stroke-dasharray="2 10" stroke-linecap="round"/>
+                <path class="track-route" d="M70 240 C120 225 115 175 170 165 S255 150 265 105 S315 60 345 55" fill="none" stroke="#a5b4fc" stroke-width="5" stroke-linecap="round"/>
+                <circle cx="70" cy="240" r="9" fill="#6366f1" stroke="#fff" stroke-width="3"/>
+                <g transform="translate(345 55)">
+                    <path d="M0 0 C-12 -14 -14 -20 -14 -26 A14 14 0 0 1 14 -26 C14 -20 12 -14 0 0 Z" fill="#6366f1" stroke="#fff" stroke-width="2.5"/>
+                    <circle cx="0" cy="-26" r="5" fill="#fff"/>
+                </g>
+                <circle r="8" fill="#fff" stroke="#4f46e5" stroke-width="4" cx="70" cy="240" id="trackRider">
+                    <animateMotion id="trackRiderMotion" dur="2.2s" begin="indefinite" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines=".65 0 .35 1"
+                        path="M0 0 C50 -15 45 -65 100 -75 S185 -90 195 -135 S245 -180 275 -185"/>
+                </circle>
+            </svg>
+            <div class="track-card" aria-hidden="true">
+                <div class="track-card-hd">
+                    <span class="ico-wrap">{!! \App\Support\IconLibrary::svg('package', '', 17) !!}</span>
+                    <span><strong>Votre commande</strong><span>En cours de livraison</span></span>
+                </div>
+                <ul class="track-steps">
+                    <li class="is-done" style="--i:0"><span class="track-dot">{!! \App\Support\IconLibrary::svg('check', '', 10) !!}</span> Commande confirmée</li>
+                    <li class="is-done" style="--i:1"><span class="track-dot">{!! \App\Support\IconLibrary::svg('check', '', 10) !!}</span> En préparation</li>
+                    <li class="is-current" style="--i:2"><span class="track-dot"></span> En cours de livraison</li>
+                    <li class="is-todo" style="--i:3"><span class="track-dot"></span> Livrée</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{-- ══ PAIEMENTS (uniquement les moyens réellement proposés au tunnel de commande) ══ --}}
+<section class="mk mk-split reveal" id="paiements" aria-labelledby="payTitle">
+    <div class="mk-copy">
+        <span class="mk-eyebrow">{!! \App\Support\IconLibrary::svg('lock', '', 13) !!} Paiement</span>
+        <h2 class="mk-title" id="payTitle">Paiements sécurisés. <strong>Plusieurs options.</strong></h2>
+        <p class="mk-sub">Payez comme vous préférez : en espèces à la réception de votre colis, ou en ligne par Mobile Money.</p>
+        <div class="mk-btns">
+            <a href="#catalogue" class="mk-btn mk-btn--primary">{!! \App\Support\IconLibrary::svg('cart', '', 16) !!} Voir les produits</a>
+        </div>
+    </div>
+    <div class="mk-visual">
+        <div class="pay-grid">
+            <div class="pay-card">
+                <span class="pay-card-ico">{!! \App\Support\IconLibrary::svg('wallet', '', 22) !!}</span>
+                <strong>Paiement à la livraison</strong>
+                <p>Vous payez seulement quand vous recevez votre commande.</p>
+            </div>
+            <div class="pay-card">
+                <span class="pay-card-ico">{!! \App\Support\IconLibrary::svg('smartphone', '', 22) !!}</span>
+                <strong>Mobile Money</strong>
+                <p>Paiement en ligne sécurisé depuis votre téléphone.</p>
+            </div>
+            <div class="pay-shield">
+                <span class="pay-shield-ico">{!! \App\Support\IconLibrary::svg('shield', '', 28) !!}</span>
+                <span><strong>Achats protégés</strong><span>Boutiques vérifiées avant de vendre et retours facilités en cas de problème.</span></span>
+            </div>
+        </div>
+    </div>
+</section>
 
 {{-- ══ TÉMOIGNAGES CLIENTS (avis réels, hors recherche) ══ --}}
 @if($testimonials->isNotEmpty())
@@ -1126,7 +1614,82 @@ footer.app-footer { display: none !important; }
     </div>
     @endforeach
 </div>
+<div style="height:40px"></div>
 @endif
+
+{{-- ══ APPLICATION (PWA installable — masquée si déjà ouverte depuis l'appli) ══ --}}
+<section class="mk mk-split mk-split--dark reveal" id="application" aria-labelledby="appTitle">
+    <div class="mk-copy">
+        <span class="mk-eyebrow">{!! \App\Support\IconLibrary::svg('smartphone', '', 13) !!} Application</span>
+        <h2 class="mk-title" id="appTitle">{{ config('app.name', 'Shopio') }} est partout <strong>avec vous.</strong></h2>
+        <p class="mk-sub">Installez l'application sur votre téléphone : vos boutiques, vos commandes et vos livraisons toujours à portée de main.</p>
+        <ul class="mk-list">
+            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Notifications instantanées</li>
+            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Accès direct depuis l'écran d'accueil</li>
+            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Installation en un clic, sans store</li>
+        </ul>
+        <div class="mk-btns">
+            <button type="button" class="mk-btn mk-btn--primary" id="appInstallBtn">{!! \App\Support\IconLibrary::svg('smartphone', '', 16) !!} Installer l'application</button>
+        </div>
+    </div>
+    <div class="mk-visual">
+        <div class="phone" aria-hidden="true">
+            <div class="phone-screen">
+                <span class="phone-notch"></span>
+                <div class="phone-notifs">
+                    <div class="phone-notif" style="--i:0">
+                        <span class="phone-notif-ico">{!! \App\Support\IconLibrary::svg('check', '', 13) !!}</span>
+                        <span><strong>Commande confirmée</strong><span>La boutique prépare votre colis</span></span>
+                    </div>
+                    <div class="phone-notif" style="--i:1">
+                        <span class="phone-notif-ico">{!! \App\Support\IconLibrary::svg('truck', '', 13) !!}</span>
+                        <span><strong>Votre colis est en route</strong><span>Le livreur arrive bientôt</span></span>
+                    </div>
+                </div>
+                <div class="phone-hd">
+                    <div class="phone-logo"><img src="/images/shopio-logo-192.png" alt=""> Shop<b>io</b></div>
+                    <div class="phone-search">{!! \App\Support\IconLibrary::svg('search', '', 11) !!} Que recherchez-vous ?</div>
+                </div>
+                <div class="phone-grid">
+                    @for($i = 0; $i < 4; $i++)
+                    <div class="phone-tile"><i></i><b></b><em></em></div>
+                    @endfor
+                </div>
+                <div class="phone-tabs">
+                    <span>{!! \App\Support\IconLibrary::svg('home', '', 16) !!}</span>
+                    <span>{!! \App\Support\IconLibrary::svg('grid', '', 16) !!}</span>
+                    <span>{!! \App\Support\IconLibrary::svg('cart', '', 16) !!}</span>
+                    <span>{!! \App\Support\IconLibrary::svg('user', '', 16) !!}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{-- ══ APPEL FINAL ══ --}}
+<section class="mk final-cta reveal" aria-labelledby="finalTitle">
+    <div>
+        <h2 class="mk-title" id="finalTitle">Rejoignez les vendeurs qui réussissent déjà avec <strong>{{ config('app.name', 'Shopio') }}.</strong></h2>
+        <p class="mk-sub">Créez votre boutique en quelques minutes et commencez à vendre dès aujourd'hui.</p>
+        <div class="mk-btns">
+            <a href="{{ route('register') }}" class="mk-btn mk-btn--primary">Commencer maintenant <span aria-hidden="true">→</span></a>
+        </div>
+    </div>
+    <div class="final-art" aria-hidden="true">
+        <svg viewBox="0 0 320 200">
+            <g fill="#e0e7ff"><rect x="30" y="140" width="22" height="40" rx="5"/><rect x="62" y="120" width="22" height="60" rx="5"/><rect x="94" y="100" width="22" height="80" rx="5"/></g>
+            <path class="final-arrow" d="M20 170 C80 160 120 120 170 110 S250 70 295 25" fill="none" stroke="#6366f1" stroke-width="5" stroke-linecap="round"/>
+            <path class="final-arrow" d="M276 22 L297 23 L295 44" fill="none" stroke="#6366f1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <g class="final-bag">
+                <path d="M190 80 h70 l8 100 h-86 z" fill="#6366f1"/>
+                <path d="M190 80 h70 l8 100 h-86 z" fill="url(#finalShade)"/>
+                <path d="M208 92 v-14 a17 17 0 0 1 34 0 v14" fill="none" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
+                <path d="M210 128 l12 12 l22 -24" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+            <defs><linearGradient id="finalShade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".18"/><stop offset="1" stop-color="#000" stop-opacity=".12"/></linearGradient></defs>
+        </svg>
+    </div>
+</section>
 
 </div>{{-- /.c-main --}}
 
@@ -1258,7 +1821,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let revealObserver = null;
     function initReveal(root) {
         root = root || document;
-        if (revealObserver) revealObserver.disconnect();
+        // Pas de disconnect() : les sections hors de #resultsRoot (vendeurs, livraison,
+        // application…) encore sous la ligne de flottaison doivent rester observées
+        // après une recherche en direct, sinon elles resteraient invisibles.
         root.querySelectorAll('.flash-row, .reco-row, .prod-grid').forEach(container => {
             Array.from(container.children).forEach((el, i) => {
                 el.classList.add('reveal');
@@ -1266,7 +1831,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         if ('IntersectionObserver' in window) {
-            revealObserver = new IntersectionObserver(entries => {
+            revealObserver = revealObserver || new IntersectionObserver(entries => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('is-visible');
@@ -1280,6 +1845,82 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     initReveal();
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ── "Comment ça marche" : chaque étape s'active quand elle entre à l'écran,
+     *    la ligne de progression se remplit jusqu'à la dernière étape active. ── */
+    (function initHowSteps() {
+        const track = document.getElementById('howTrack');
+        if (!track) return;
+        const steps = Array.from(track.querySelectorAll('.how-step'));
+        const fill = track.querySelector('.how-line-fill');
+        const update = () => {
+            const last = steps.reduce((acc, s, i) => s.classList.contains('is-on') ? i : acc, -1);
+            fill.style.setProperty('--p', last <= 0 ? 0 : last / (steps.length - 1));
+        };
+        if (!('IntersectionObserver' in window) || prefersReducedMotion) {
+            steps.forEach(s => s.classList.add('is-on'));
+            update();
+            return;
+        }
+        let queue = Promise.resolve();
+        const obs = new IntersectionObserver(entries => {
+            entries.filter(e => e.isIntersecting)
+                .sort((a, b) => steps.indexOf(a.target) - steps.indexOf(b.target))
+                .forEach(entry => {
+                    obs.unobserve(entry.target);
+                    // Activation séquentielle (≈180 ms d'écart) même si plusieurs étapes entrent ensemble
+                    queue = queue.then(() => new Promise(res => setTimeout(() => {
+                        steps.slice(0, steps.indexOf(entry.target) + 1).forEach(s => s.classList.add('is-on'));
+                        update();
+                        res();
+                    }, 180)));
+                });
+        }, { threshold: 0.6, rootMargin: '0px 0px -10% 0px' });
+        steps.forEach(s => obs.observe(s));
+    })();
+
+    /* ── Suivi de livraison : le livreur parcourt l'itinéraire une seule fois,
+     *    quand la carte devient visible. ── */
+    (function initTrackRider() {
+        const motion = document.getElementById('trackRiderMotion');
+        const section = document.getElementById('livraison');
+        if (!motion || !section || typeof motion.beginElement !== 'function') return;
+        if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+            const rider = document.getElementById('trackRider');
+            rider.setAttribute('cx', 265); rider.setAttribute('cy', 105); // posé sur l'itinéraire, sans mouvement
+            motion.remove();
+            return;
+        }
+        const obs = new IntersectionObserver(entries => {
+            if (!entries[0].isIntersecting) return;
+            obs.disconnect();
+            setTimeout(() => motion.beginElement(), 350);
+        }, { threshold: 0.4 });
+        obs.observe(section);
+    })();
+
+    /* ── "Installer l'application" : invite native si le navigateur la propose,
+     *    sinon la fenêtre d'aide du layout (instructions iOS). ── */
+    (function initAppInstall() {
+        const section = document.getElementById('application');
+        const btn = document.getElementById('appInstallBtn');
+        if (!section || !btn) return;
+        const standalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+        if (standalone) { section.remove(); return; } // déjà dans l'application installée
+        btn.addEventListener('click', () => {
+            if (typeof _pwaPrompt !== 'undefined' && _pwaPrompt && typeof pwaInstall === 'function') {
+                pwaInstall();
+                return;
+            }
+            const hint = document.getElementById('pwaIosHint');
+            const installBtn = document.getElementById('pwaInstallBtn');
+            if (hint) hint.style.display = 'block';
+            if (installBtn) installBtn.style.display = 'none';
+            if (typeof pwaShowModal === 'function') pwaShowModal();
+        });
+    })();
 
     /* ── Carrousel du hero : diapositives qui défilent automatiquement,
      *    points cliquables, pause au survol/tactile et hors écran. ── */
