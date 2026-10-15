@@ -22,8 +22,48 @@ class DashboardController extends Controller
         $activity = $this->buildActivity();
         $allShops     = Shop::with('owner')->latest()->get(['id','name','user_id','created_at','is_approved']);
         $allCompanies = DeliveryCompany::latest()->get(['id','name','user_id','created_at','approved']);
+        $sys          = $this->buildSystemStatus();
 
-        return view('dashboards.SuperAdmin', compact('pendingCompanies', 'kpis', 'chart', 'activity', 'allShops', 'allCompanies'));
+        return view('dashboards.SuperAdmin', compact('pendingCompanies', 'kpis', 'chart', 'activity', 'allShops', 'allCompanies', 'sys'));
+    }
+
+    /**
+     * Statut système RÉEL (remplace l'ancienne liste codée en dur qui affichait
+     * toujours "Actif"/"Connectée" quel que soit l'état réel — trompeur).
+     */
+    private function buildSystemStatus(): array
+    {
+        $dbOk = true;
+        try {
+            \DB::select('select 1');
+        } catch (\Throwable $e) {
+            $dbOk = false;
+        }
+
+        $cacheDriver = config('cache.default', 'file');
+        $cacheOk     = true;
+        try {
+            \Illuminate\Support\Facades\Cache::put('__sys_status_check', 1, 5);
+            $cacheOk = \Illuminate\Support\Facades\Cache::get('__sys_status_check') === 1;
+        } catch (\Throwable $e) {
+            $cacheOk = false;
+        }
+
+        $sandbox   = (bool) config('chapchappay.sandbox', true);
+        $mailHost  = config('mail.mailers.smtp.host');
+        $mailOk    = filled($mailHost);
+        $googleOk  = filled(config('services.google.client_id'));
+        $exportsOk = class_exists(\Maatwebsite\Excel\Facades\Excel::class) && class_exists(\Barryvdh\DomPDF\Facade\Pdf::class);
+
+        return [
+            ['n' => 'Application Laravel', 'c' => 'g', 'l' => 'En ligne'],
+            ['n' => 'Base de données',     'c' => $dbOk ? 'g' : 'r', 'l' => $dbOk ? 'Connectée' : 'Injoignable'],
+            ['n' => 'Cache (' . ucfirst($cacheDriver) . ')', 'c' => $cacheOk ? 'g' : 'r', 'l' => $cacheOk ? 'Actif' : 'Hors service'],
+            ['n' => 'Paiements (ChapChap Pay)', 'c' => $sandbox ? 'a' : 'g', 'l' => $sandbox ? 'Sandbox (test)' : 'Production'],
+            ['n' => 'Emails (SMTP)', 'c' => $mailOk ? 'g' : 'a', 'l' => $mailOk ? 'Configuré' : 'À configurer'],
+            ['n' => 'Google OAuth', 'c' => $googleOk ? 'g' : 'a', 'l' => $googleOk ? 'Actif' : 'À configurer'],
+            ['n' => 'PDF / Excel', 'c' => $exportsOk ? 'g' : 'r', 'l' => $exportsOk ? 'Opérationnel' : 'Indisponible'],
+        ];
     }
 
     public function stats()
@@ -138,14 +178,30 @@ class DashboardController extends Controller
 
     private function buildChart(): array
     {
+        // 2 requêtes groupées au lieu de 14 (une paire par jour dans une boucle) —
+        // même logique, même résultat, juste calculé en une passe par la base de données.
+        $start = now()->subDays(6)->startOfDay();
+        $end   = now()->endOfDay();
+
+        $ordersByDay = Order::selectRaw('DATE(created_at) as d, COUNT(*) as c')
+            ->whereBetween('created_at', [$start, $end])
+            ->groupBy('d')
+            ->pluck('c', 'd');
+
+        $deliveriesByDay = Order::selectRaw('DATE(created_at) as d, COUNT(*) as c')
+            ->whereBetween('created_at', [$start, $end])
+            ->whereNotNull('livreur_id')
+            ->groupBy('d')
+            ->pluck('c', 'd');
+
         $rows = [];
         for ($i = 6; $i >= 0; $i--) {
             $date   = now()->subDays($i);
+            $key    = $date->toDateString();
             $rows[] = [
                 'label'      => ucfirst($date->locale('fr')->isoFormat('ddd')),
-                'orders'     => Order::whereDate('created_at', $date->toDateString())->count(),
-                'deliveries' => Order::whereDate('created_at', $date->toDateString())
-                                     ->whereNotNull('livreur_id')->count(),
+                'orders'     => (int) ($ordersByDay[$key] ?? 0),
+                'deliveries' => (int) ($deliveriesByDay[$key] ?? 0),
             ];
         }
         return $rows;

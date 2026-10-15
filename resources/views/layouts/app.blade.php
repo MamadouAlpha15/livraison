@@ -1,6 +1,26 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
+    {{-- ── Mode sombre — appliqué AVANT tout CSS/peinture pour éviter un flash de
+         thème clair au chargement. Persiste par navigateur (localStorage), pas
+         par compte : chaque appareil garde son propre réglage. Le mode sombre n'a
+         été construit QUE pour les vues boutique/vendeur/employe (+ le rapport
+         admin) — jamais pour les pages publiques ou les vues client. On exclut
+         donc ces familles de routes entières plutôt qu'une page à la fois : sinon
+         elles héritent quand même de l'attribut (même navigateur = même réglage
+         partagé) sans jamais avoir eu le CSS sombre qui va avec, et s'affichent
+         à moitié cassées. ── --}}
+    @unless(request()->routeIs('welcome*') || request()->routeIs('client.*'))
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('shopio_dark_mode') === '1') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
+    @endunless
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -145,6 +165,23 @@
             .dropdown-item  { color: var(--text); }
             .dropdown-item:hover { background: rgba(255,255,255,.06); }
             footer { background: var(--card); }
+        }
+        /* ── Mode sombre manuel — pages simples sans style propre (Bootstrap par
+             défaut) : ex. "pas encore de boutique", "avis" ── */
+        [data-theme="dark"] {
+            --text: #e6e9f0; --muted: #7b869c; --card: #141925; --bg: #0b0f1a;
+        }
+        [data-theme="dark"] body { background: var(--bg); color: var(--text); }
+        [data-theme="dark"] .card { background: var(--card); color: var(--text); border-color: #262d3d; }
+        [data-theme="dark"] .table { color: var(--text); }
+        [data-theme="dark"] .table > :not(caption) > * > * { background: var(--card); color: var(--text); border-color: #262d3d; }
+        [data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > * { background-color: rgba(255,255,255,.03); }
+        [data-theme="dark"] .table-primary, [data-theme="dark"] .table-primary > * { background-color: rgba(99,102,241,.15); color: var(--text); }
+        [data-theme="dark"] .alert-info { background: rgba(59,130,246,.12); color: #93c5fd; border-color: rgba(59,130,246,.3); }
+        [data-theme="dark"] .dropdown-menu  { background: var(--card); color: var(--text); }
+        [data-theme="dark"] .dropdown-item  { color: var(--text); }
+        [data-theme="dark"] .dropdown-item:hover { background: rgba(255,255,255,.06); }
+        [data-theme="dark"] footer { background: var(--card); }
         }
 
         html, body { height: 100%; margin: 0; }
@@ -750,6 +787,22 @@ document.addEventListener('submit', function (e) {
 });
 
 window.addEventListener('pageshow', function () { _np(() => NProgress.done()); });
+
+/* ══ Mobile : forcer le réaffichage quand l'onglet revient au premier plan ══
+   Sur téléphone, verrouiller l'écran / changer d'appli peut endormir l'onglet
+   pour économiser la mémoire (pages lourdes). Au retour, le navigateur recharge
+   la page mais reste figé en blanc tant qu'aucune interaction tactile n'a lieu.
+   On force un repaint immédiat dès que la page redevient visible, sans attendre
+   un touch. */
+document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible') {
+        requestAnimationFrame(function () {
+            document.body.style.display = 'none';
+            void document.body.offsetHeight;
+            document.body.style.display = '';
+        });
+    }
+});
 window.addEventListener('load', function () {
     if (typeof NProgress !== 'undefined') {
         NProgress.configure({ showSpinner: false, trickleSpeed: 150, minimum: 0.08 });
@@ -1125,6 +1178,41 @@ pollGlobalBadgeCompany();
 updatePwaBadge(0);
 @endif
 @endauth
+</script>
+
+{{-- ══ Mode sombre — bascule globale et persistante (par navigateur), réutilisable
+     sur n'importe quelle page : ajouter un bouton avec data-dark-toggle, et
+     data-moon-icon / data-sun-icon pour son icône clair/sombre. ══ --}}
+<script>
+window.isDarkMode = function () {
+    return document.documentElement.getAttribute('data-theme') === 'dark';
+};
+window.toggleDarkMode = function () {
+    var goingDark = !window.isDarkMode();
+    if (goingDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        try { localStorage.setItem('shopio_dark_mode', '1'); } catch (e) {}
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+        try { localStorage.setItem('shopio_dark_mode', '0'); } catch (e) {}
+    }
+    _syncDarkToggleButtons();
+    window.dispatchEvent(new CustomEvent('shopio:theme-changed', { detail: { dark: goingDark } }));
+};
+function _syncDarkToggleButtons() {
+    var dark = window.isDarkMode();
+    document.querySelectorAll('[data-dark-toggle]').forEach(function (btn) {
+        var icon = dark ? btn.getAttribute('data-sun-icon') : btn.getAttribute('data-moon-icon');
+        if (icon) btn.innerHTML = icon;
+        btn.setAttribute('title', dark ? 'Mode clair' : 'Mode sombre');
+    });
+}
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('[data-dark-toggle]').forEach(function (btn) {
+        btn.addEventListener('click', window.toggleDarkMode);
+    });
+    _syncDarkToggleButtons();
+});
 </script>
 
 </body>

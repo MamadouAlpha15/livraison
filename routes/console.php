@@ -26,3 +26,10 @@ Schedule::call(function () {
 // à 10h (heure locale du serveur), pour ne pas notifier les clients en pleine nuit.
 // ─────────────────────────────────────────────────────────────────────────────
 Schedule::command('cart:remind-abandoned')->dailyAt('10:00')->name('remind-abandoned-carts')->withoutOverlapping();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Vérifie chaque nuit que les photos produits existent réellement sur le disque
+// (détecte les uploads cassés) — signale au SuperAdmin, qui peut prévenir le
+// vendeur concerné directement dans son compte Shopio.
+// ─────────────────────────────────────────────────────────────────────────────
+Schedule::command('products:check-images')->dailyAt('03:00')->name('check-product-images')->withoutOverlapping();

@@ -68,6 +68,69 @@
     --top-h:      58px;
 }
 
+/* ══ MODE SOMBRE — activé via data-theme="dark" sur <html> (bouton en haut à droite) ══ */
+[data-theme="dark"] {
+    --brand-lt:   rgba(99,102,241,.16);
+    --brand-mlt:  rgba(99,102,241,.09);
+
+    --bg:         #0b0f1a;
+    --surface:    #141925;
+    --border:     #262d3d;
+    --border-dk:  #343d52;
+
+    --text:       #e6e9f0;
+    --text-2:     #b0b8c9;
+    --muted:      #7b869c;
+
+    --shadow-sm:  0 1px 3px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.25);
+    --shadow:     0 4px 20px rgba(0,0,0,.4), 0 1px 4px rgba(0,0,0,.25);
+    --shadow-lg:  0 10px 40px rgba(0,0,0,.5);
+}
+/* Surfaces "neutres" codées en dur (pas via variable) qui doivent aussi passer en sombre */
+[data-theme="dark"] .tab-bar,
+[data-theme="dark"] .bq-chat-panel,
+[data-theme="dark"] .bq-msg-row.theirs .bq-msg-bubble,
+[data-theme="dark"] .bq-chat-input-zone,
+[data-theme="dark"] .bq-order-select,
+[data-theme="dark"] .bq-order-card,
+[data-theme="dark"] .bq-zone-result,
+[data-theme="dark"] .bq-zone-chip-change,
+[data-theme="dark"] .bq-notif-panel,
+[data-theme="dark"] .bq-order-card-thumb {
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+    color: var(--text);
+}
+[data-theme="dark"] .bq-chat-msgs,
+[data-theme="dark"] .lv-row:hover,
+[data-theme="dark"] .bq-zone-empty,
+[data-theme="dark"] .rc-delta.flat,
+[data-theme="dark"] .p-muted {
+    background: #10131d !important;
+}
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+    background: var(--surface);
+    color: var(--text);
+    border-color: var(--border-dk);
+}
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder { color: var(--muted); }
+[data-theme="dark"] .sb-badge.warn { color: #0b0f1a; }
+/* Ombres de survol (cartes/KPI) recalées pour le fond sombre */
+[data-theme="dark"] .kpi:hover { box-shadow: 0 8px 28px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.3); }
+[data-theme="dark"] .card:hover { box-shadow: var(--shadow-lg); }
+/* Barre "Visites boutique" — couleurs codées en dur (bleu clair) */
+[data-theme="dark"] .visits-banner {
+    background: rgba(2,132,199,.1) !important;
+    border-color: rgba(2,132,199,.3) !important;
+}
+[data-theme="dark"] .visits-pill { background: rgba(2,132,199,.18) !important; color: #7dd3fc !important; }
+[data-theme="dark"] .visits-label { color: #7dd3fc !important; }
+/* Barres de progression "Top produits" */
+[data-theme="dark"] .sp-track { background: var(--border) !important; }
+
 html { font-family: var(--font); }
 body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smoothing: antialiased; }
 
@@ -1079,6 +1142,7 @@ $I = [
     // ── Topbar 16px ──
     'bell'      => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
     'moon'      => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+    'sun'       => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>',
     // ── Notification dropdown 14px ──
     'box_sm'    => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
     'msg_sm'    => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$s.'><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
@@ -1512,6 +1576,18 @@ $I = [
         </div>
         @endif
 
+        {{-- ══ ALERTES PHOTOS NON AFFICHÉES (envoyées par le SuperAdmin) ══ --}}
+        @foreach($brokenImageAlerts ?? [] as $alert)
+        <div style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:12px;border-radius:12px;margin:16px 16px 0;box-shadow:0 4px 20px rgba(245,158,11,.35);">
+            <span style="font-size:22px">🖼️</span>
+            <div style="flex:1">
+                <strong style="font-size:15px">{{ $alert->data['title'] ?? 'Photo non affichée' }} — « {{ $alert->data['product_name'] ?? 'un produit' }} »</strong>
+                <div style="font-size:12.5px;opacity:.9;margin-top:2px">{{ $alert->data['body'] ?? "Une photo que vous avez ajoutée ne s'affiche pas correctement pour vos clients." }}</div>
+            </div>
+            <a href="{{ route('notifications.read', $alert->id) }}" style="background:rgba(255,255,255,.22);border:none;color:#fff;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:12.5px;font-weight:700;text-decoration:none;white-space:nowrap">{{ ($alert->data['title'] ?? '') === 'Produit sans photo' ? 'Ajouter une photo' : 'Vérifier la photo' }}</a>
+        </div>
+        @endforeach
+
         {{-- ══ TOPBAR RESPONSIVE ══ --}}
         <div class="topbar">
             <button class="btn-hamburger" id="btnMenu" aria-label="Menu">{!! $I['menu'] !!}</button>
@@ -1528,7 +1604,9 @@ $I = [
             <div class="tb-actions">
 
                 {{-- Mode sombre --}}
-                <button class="tb-icon-btn" id="btnDarkMode" title="Mode sombre / clair">{!! $I['moon'] !!}</button>
+                <button class="tb-icon-btn" id="btnDarkMode" data-dark-toggle
+                        data-moon-icon="{{ $I['moon'] }}" data-sun-icon="{{ $I['sun'] }}"
+                        title="Mode sombre">{!! $I['moon'] !!}</button>
 
                 {{-- Cloche notifications temps réel --}}
                 <div class="bq-notif-backdrop" id="bqNotifBackdrop"></div>
@@ -1724,14 +1802,14 @@ $I = [
             </div>
 
             {{-- Barre visites --}}
-            <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:12px 18px;margin-bottom:22px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <div class="visits-banner" style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:12px 18px;margin-bottom:22px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                <span style="font-size:12px;font-weight:700;color:#0284c7;text-transform:uppercase;letter-spacing:.4px;margin-right:6px">Visites boutique</span>
-                <span style="font-size:12px;color:#0369a1;background:#e0f2fe;padding:3px 10px;border-radius:20px;font-weight:700">{{ number_format($visitesToday,0,',',' ') }} aujourd'hui</span>
+                <span class="visits-label" style="font-size:12px;font-weight:700;color:#0284c7;text-transform:uppercase;letter-spacing:.4px;margin-right:6px">Visites boutique</span>
+                <span class="visits-pill" style="font-size:12px;color:#0369a1;background:#e0f2fe;padding:3px 10px;border-radius:20px;font-weight:700">{{ number_format($visitesToday,0,',',' ') }} aujourd'hui</span>
                 <span style="color:#bae6fd">·</span>
-                <span style="font-size:12px;color:#0369a1;background:#e0f2fe;padding:3px 10px;border-radius:20px;font-weight:700">{{ number_format($visitesWeek,0,',',' ') }} cette semaine</span>
+                <span class="visits-pill" style="font-size:12px;color:#0369a1;background:#e0f2fe;padding:3px 10px;border-radius:20px;font-weight:700">{{ number_format($visitesWeek,0,',',' ') }} cette semaine</span>
                 <span style="color:#bae6fd">·</span>
-                <span style="font-size:12px;color:#0369a1;background:#e0f2fe;padding:3px 10px;border-radius:20px;font-weight:700">{{ number_format($visitesMonth,0,',',' ') }} ce mois</span>
+                <span class="visits-pill" style="font-size:12px;color:#0369a1;background:#e0f2fe;padding:3px 10px;border-radius:20px;font-weight:700">{{ number_format($visitesMonth,0,',',' ') }} ce mois</span>
                 <span style="color:#bae6fd">·</span>
                 <span style="font-size:12px;color:#64748b;margin-left:2px">{{ number_format($visitesTotal,0,',',' ') }} au total</span>
             </div>
@@ -2230,10 +2308,11 @@ $I = [
                             </div>
                             <div class="co-list">
                                 @foreach($deliveryCompanies->take(4) as $company)
-                                <div class="co-row">
+                                <div class="co-row" onclick="window.location='{{ route('company.chat.show', $company) }}'" title="Ouvrir la discussion">
                                     <div class="co-logo">@if(!empty($company->logo))<img src="{{ \App\Services\ImageOptimizer::url($company->logo, 'thumb') ?? asset('storage/'.$company->logo) }}" alt="{{ $company->name }}" loading="lazy" width="28" height="28">@else {!! $I['truck_co'] !!} @endif</div>
                                     <div class="co-info"><div class="co-nm">{{ $company->name }}</div><div class="co-mt">{{ $company->phone ?? 'Contact non renseigné' }}</div></div>
                                     @if($company->commission_rate)<span class="co-commission">{{ number_format($company->commission_rate*100,1) }}%</span>@endif
+                                    <a href="{{ route('company.chat.show', $company) }}" class="btn btn-sm btn-primary" onclick="event.stopPropagation()" style="gap:4px">{!! $I['msg_btn'] !!} Contacter</a>
                                 </div>
                                 @endforeach
                             </div>

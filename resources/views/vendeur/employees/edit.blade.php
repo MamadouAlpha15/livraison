@@ -18,6 +18,19 @@
 .emp-submit:hover { opacity:.9; }
 .emp-back-btn { display:inline-flex; align-items:center; gap:8px; padding:10px 18px; background:#131921; color:#fff; border:none; border-radius:10px; font-size:13.5px; font-weight:700; text-decoration:none; transition:all .15s; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,.18); }
 .emp-back-btn:hover { background:#232f3e; color:#f90; transform:translateX(-3px); }
+
+/* ══ MODE SOMBRE ══ */
+[data-theme="dark"] .emp-card { background: #141925; }
+[data-theme="dark"] .emp-field label { color: #b0b8c9; }
+[data-theme="dark"] .emp-field input, [data-theme="dark"] .emp-field select {
+    background: #141925; color: #e6e9f0; border-color: #343d52;
+}
+[data-theme="dark"] .emp-eye { color: #7b869c; }
+[data-theme="dark"] .emp-info-box { background: rgba(59,130,246,.12); border-color: rgba(59,130,246,.3); color: #93c5fd; }
+[data-theme="dark"] .emp-copy-box { background: rgba(99,102,241,.1); border-color: rgba(99,102,241,.3); }
+[data-theme="dark"] .emp-copy-box p { color: #c4b5fd; }
+[data-theme="dark"] .emp-copy-row { color: #b0b8c9; }
+[data-theme="dark"] .emp-copy-row span { background: #0b0f1a; border-color: #343d52; color: #e6e9f0; }
 </style>
 
 <a href="{{ route('boutique.employees.index') }}" class="emp-back-btn">

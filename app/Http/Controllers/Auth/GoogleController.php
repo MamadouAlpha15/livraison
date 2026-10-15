@@ -7,6 +7,8 @@ use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Services\PushService;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -16,7 +18,12 @@ class GoogleController extends Controller
     {
         return Socialite::driver('google')
             ->stateless()
-            ->setHttpClient(new \GuzzleHttp\Client(['verify' => true]));
+            ->setHttpClient(new \GuzzleHttp\Client(['verify' => true]))
+            // Sans ce paramètre, Google reconnecte silencieusement au compte déjà
+            // actif sur l'appareil/navigateur sans jamais proposer le choix — gênant
+            // si l'utilisateur a plusieurs comptes Google et veut en choisir un autre
+            // (ex: créer un compte Shopio avec une adresse différente).
+            ->with(['prompt' => 'select_account']);
     }
 
     public function redirect(Request $request)
@@ -50,13 +57,31 @@ class GoogleController extends Controller
         return $this->driver()->redirect();
     }
 
+    /**
+     * GET /auth/google/app — point d'entrée pour l'app Capacitor, ouvert
+     * directement dans le navigateur externe (voir auth.php). Un flag en
+     * session (qui survit puisque tout le flux reste dans ce même navigateur)
+     * fait bifurquer callback() vers un retour par URL signée + Android App
+     * Links, pour établir la session DANS l'app plutôt que dans le navigateur.
+     */
+    public function redirectCapacitor(Request $request)
+    {
+        session(['capacitor_google_auth' => true]);
+
+        return $this->driver()->redirect();
+    }
+
     public function callback()
     {
-        $isMobile = session()->pull('mobile_google_auth', false);
+        $isCapacitor = session()->pull('capacitor_google_auth', false);
+        $isMobile    = session()->pull('mobile_google_auth', false);
 
         try {
             $googleUser = $this->driver()->user();
         } catch (\Exception $e) {
+            if ($isCapacitor) {
+                return redirect()->route('login')->with('error', 'Connexion Google échouée.');
+            }
             if ($isMobile) {
                 return $this->returnToMobileApp(['error' => 'Connexion Google échouée.']);
             }
@@ -89,8 +114,24 @@ class GoogleController extends Controller
                 return $this->returnToMobileApp(['token' => $user->createToken('flutter-client')->plainTextToken]);
             }
 
+            if ($isCapacitor) {
+                return redirect(URL::temporarySignedRoute('google.mobile-bridge', now()->addMinutes(3), ['user' => $user->id]));
+            }
+
             Auth::login($user, true);
             return $this->redirectToDashboard($user);
+        }
+
+        // Nouvel utilisateur Capacitor → les infos Google transitent par une URL
+        // signée (pas la session, perdue entre navigateur externe et webview de
+        // l'app) jusqu'à ce qu'une vraie session s'établisse DANS l'app.
+        if ($isCapacitor) {
+            return redirect(URL::temporarySignedRoute('google.mobile-bridge-setup', now()->addMinutes(3), [
+                'google_id'    => $googleUser->getId(),
+                'google_name'  => $googleUser->getName(),
+                'google_email' => $googleUser->getEmail(),
+                'google_avatar'=> $googleUser->getAvatar(),
+            ]));
         }
 
         // Nouvel utilisateur mobile → pas de session web, tout se termine dans
@@ -110,6 +151,49 @@ class GoogleController extends Controller
             'google_name'   => $googleUser->getName(),
             'google_email'  => $googleUser->getEmail(),
             'google_avatar' => $googleUser->getAvatar(),
+        ]);
+
+        return redirect()->route('google.setup');
+    }
+
+    /**
+     * GET /auth/mobile-bridge — établit la vraie session DANS l'app Capacitor.
+     * Ouverte via une URL signée (pas de session/cookie requis) interceptée par
+     * Android App Links puis chargée dans la webview de l'app elle-même
+     * (MainActivity::handleIncomingUrl) : Auth::login() ici pose donc le cookie
+     * de session dans le bon contexte (celui de l'app), pas celui du navigateur
+     * externe utilisé pour le passage par Google.
+     */
+    public function mobileBridge(Request $request)
+    {
+        $user = User::find($request->query('user'));
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Lien de connexion expiré, réessayez.');
+        }
+
+        Auth::login($user, true);
+        return $this->redirectToDashboard($user);
+    }
+
+    /**
+     * GET /auth/mobile-bridge/setup — même principe que mobileBridge() mais pour
+     * un nouvel utilisateur Google : transfère les infos Google (transmises dans
+     * l'URL signée) vers la session DANS l'app, puis affiche normalement la
+     * page de choix rôle + pays.
+     */
+    public function mobileBridgeSetup(Request $request)
+    {
+        $request->validate([
+            'google_id'    => ['required', 'string'],
+            'google_name'  => ['required', 'string'],
+            'google_email' => ['required', 'email'],
+        ]);
+
+        session([
+            'google_id'     => $request->query('google_id'),
+            'google_name'   => $request->query('google_name'),
+            'google_email'  => $request->query('google_email'),
+            'google_avatar' => $request->query('google_avatar'),
         ]);
 
         return redirect()->route('google.setup');
@@ -169,6 +253,14 @@ class GoogleController extends Controller
 
         session()->forget(['google_id', 'google_name', 'google_email', 'google_avatar']);
 
+        try {
+            app(PushService::class)->notifySuperadmins(
+                'Nouvel inscrit',
+                $user->name . ' vient de s\'inscrire (' . $user->role . ')',
+                route('admin.users.index')
+            );
+        } catch (\Throwable $e) {}
+
         Auth::login($user, true);
 
         return $this->redirectToDashboard($user);
@@ -187,6 +279,7 @@ class GoogleController extends Controller
 
         return match($user->role) {
             'superadmin' => redirect()->route('admin.dashboard'),
+            'staff'      => redirect()->route('admin.dashboard'),
             'admin'      => redirect()->route('boutique.dashboard'),
             'company'    => redirect()->route('company.dashboard'),
             'livreur'    => redirect()->route('livreur.dashboard'),

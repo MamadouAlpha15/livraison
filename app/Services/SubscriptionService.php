@@ -15,6 +15,7 @@ use App\Mail\SubscriptionConfirmedMail;
 use App\Models\DeliveryCompany;
 use App\Models\Shop;
 use App\Models\Subscription;
+use App\Services\PushService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -185,6 +186,7 @@ class SubscriptionService
             ]);
             Log::info("[Subscription] Boutique #{$subscriber->id} activée en Pro jusqu'au {$expiresAt->toDateString()}");
             $this->sendConfirmationEmail($subscription, $subscriber->name, route('boutique.dashboard'));
+            $this->notifySuperadminsOfPayment($subscriber->name, 'Pro', (float) $subscription->amount);
         }
 
         if ($subscriber instanceof DeliveryCompany) {
@@ -194,7 +196,19 @@ class SubscriptionService
             ]);
             Log::info("[Subscription] Entreprise #{$subscriber->id} activée en Business jusqu'au {$expiresAt->toDateString()}");
             $this->sendConfirmationEmail($subscription, $subscriber->name, route('company.dashboard'));
+            $this->notifySuperadminsOfPayment($subscriber->name, 'Business', (float) $subscription->amount);
         }
+    }
+
+    private function notifySuperadminsOfPayment(string $subscriberName, string $planLabel, float $amount): void
+    {
+        try {
+            app(PushService::class)->notifySuperadmins(
+                'Abonnement payé 💰',
+                $subscriberName . ' vient de payer le Plan ' . $planLabel . ' — ' . number_format($amount, 0, ',', ' ') . ' GNF',
+                route('admin.dashboard')
+            );
+        } catch (\Throwable $e) {}
     }
 
     private function sendConfirmationEmail(Subscription $subscription, string $name, string $dashUrl): void

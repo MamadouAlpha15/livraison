@@ -57,6 +57,9 @@ class ShopController extends Controller
                     'description' => 'nullable|string',
                     'commission_rate' => ['nullable','numeric','between:0,100'],
                     'currency' => ['nullable','string','max:10'],
+                    // Mobile Money où reverser les paiements en ligne (ChapChap Pay)
+                    'payout_wallet_type'   => ['nullable', Rule::in(['paycard','orange_money','mtn_momo','kulu','soutra_money','akiba'])],
+                    'payout_wallet_number' => ['nullable','string','max:30'],
                 ]);
 
                 // Si email vide → utilise l'email d'inscription automatiquement
@@ -248,7 +251,14 @@ $clientMessages = ShopMessage::where('shop_id', $shop->id)
         $visitesMonth = (int) ($visitStats->month ?? 0);
         $visitesTotal = (int) ($visitStats->total ?? 0);
 
+        // Alertes "photo non affichée" envoyées par le SuperAdmin — bannière visible
+        // jusqu'à ce que le vendeur clique dessus (marque comme lue) ou reposte la photo.
+        $brokenImageAlerts = $user->unreadNotifications()
+            ->where('type', \App\Notifications\BrokenProductImageNotification::class)
+            ->get();
+
         return view('boutique.dashboard', [
+            'brokenImageAlerts'   => $brokenImageAlerts,
             'shop'                => $shop,
             'livreursDisponibles' => $livreursDisponibles,
             'deliveryCompanies'   => $deliveryCompanies,

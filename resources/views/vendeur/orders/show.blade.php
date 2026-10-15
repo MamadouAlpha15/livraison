@@ -29,6 +29,26 @@
     --sb-w:     232px; --top-h: 60px;
 }
 
+/* ══ MODE SOMBRE ══ */
+[data-theme="dark"] {
+    --brand-lt: rgba(99,102,241,.16);
+    --brand-mlt: rgba(99,102,241,.09);
+    --bg: #0b0f1a;
+    --surface: #141925;
+    --border: #262d3d;
+    --border-dk: #343d52;
+    --text: #e6e9f0;
+    --text-2: #b0b8c9;
+    --muted: #7b869c;
+    --shadow: 0 4px 20px rgba(0,0,0,.4), 0 1px 4px rgba(0,0,0,.25);
+    --shadow-md: 0 4px 24px rgba(0,0,0,.4);
+}
+[data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
+    background: var(--surface, var(--card)); color: var(--text); border-color: var(--border-dk, var(--border, var(--bd)));
+}
+[data-theme="dark"] input::placeholder, [data-theme="dark"] textarea::placeholder { color: var(--muted); }
+
+
 html, body { font-family: var(--font); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
 
 /* ─── Layout ─── */

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Mail\OtpVerificationMail;
 use App\Models\User;
+use App\Services\PushService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -58,6 +59,16 @@ class OtpVerificationController extends Controller
             'otp_code'          => null,
             'otp_expires_at'    => null,
         ])->save();
+
+        // On notifie seulement une fois le compte réellement vérifié (pas à
+        // chaque tentative d'inscription abandonnée/non confirmée).
+        try {
+            app(PushService::class)->notifySuperadmins(
+                'Nouvel inscrit',
+                $user->name . ' vient de s\'inscrire (' . $user->role . ')',
+                route('admin.users.index')
+            );
+        } catch (\Throwable $e) {}
 
         session()->forget('otp_user_id');
 

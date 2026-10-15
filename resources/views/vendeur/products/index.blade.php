@@ -1,8 +1,9 @@
-{{--
+﻿{{--
     resources/views/vendeur/products/index.blade.php
     Variables : $products, $categories, $devise, $totalProducts, $activeProducts, $outOfStock
 --}}
 @extends('layouts.app')
+
 @section('title', 'Mes Produits')
 @php $bodyClass = 'is-dashboard'; @endphp
 
@@ -78,6 +79,28 @@ $I = [
     --sb-w:       232px;
     --top-h:      58px;
 }
+
+/* ══ MODE SOMBRE ══ */
+[data-theme="dark"] {
+    --brand-lt: rgba(99,102,241,.16);
+    --brand-mlt: rgba(99,102,241,.09);
+    --bg: #0b0f1a;
+    --surface: #141925;
+    --border: #262d3d;
+    --border-dk: #343d52;
+    --text: #e6e9f0;
+    --text-2: #b0b8c9;
+    --muted: #7b869c;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.25);
+    --shadow: 0 4px 20px rgba(0,0,0,.4), 0 1px 4px rgba(0,0,0,.25);
+}
+[data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
+    background: var(--surface, var(--card)); color: var(--text); border-color: var(--border-dk, var(--border, var(--bd)));
+}
+[data-theme="dark"] input::placeholder, [data-theme="dark"] textarea::placeholder { color: var(--muted); }
+[data-theme="dark"] #sharePanel { background: var(--surface) !important; }
+[data-theme="dark"] #sharePanel button { background: var(--surface) !important; color: var(--text) !important; border-color: var(--border-dk) !important; }
+
 html { font-family: var(--font); }
 body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smoothing: antialiased; }
 

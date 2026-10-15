@@ -5,9 +5,12 @@ namespace App\Services;
 // ─────────────────────────────────────────────────────────────────────────────
 // ShopPayoutService
 // Gère le reversement aux boutiques de leur part sur les commandes payées en
-// ligne (ChapChap Pay). Shopio prélève une commission (config chapchappay.
-// platform_fee_percent, 1% par défaut) sur chaque paiement en ligne, puis
-// reverse le reste vers le Mobile Money enregistré par la boutique.
+// ligne (ChapChap Pay). La commission Shopio (config chapchappay.
+// platform_fee_percent, 5% par défaut) est ajoutée EN PLUS du prix du vendeur
+// et payée par le CLIENT — la boutique reçoit donc toujours l'intégralité du
+// prix qu'elle a fixé, sans aucune retenue. Cette marge couvre à la fois le
+// revenu de Shopio et d'éventuels frais que ChapChap Pay prélèverait lui-même
+// sur le reversement (retrait) vers la boutique.
 //
 // Étape 1 (actuelle) : reversement déclenché manuellement par l'admin, commande
 // par commande, depuis /admin/reglements. Rien n'est automatique pour l'instant
@@ -21,28 +24,34 @@ class ShopPayoutService
 {
     public function __construct(private ChapChapPayService $chapChapPay) {}
 
-    // ── Calcule la commission Shopio et le montant net dû à la boutique ───────
-    public function computeShares(float $amountGnf): array
+    // ── Calcule ce que le client doit payer (prix vendeur + commission Shopio)
+    // quand il choisit de payer en ligne. Appelé AVANT le paiement, pour savoir
+    // quel montant demander à ChapChap Pay. ────────────────────────────────────
+    public function computeClientCharge(float $vendorAmountGnf): array
     {
-        $feePercent = (float) config('chapchappay.platform_fee_percent', 1);
-        $fee = (int) round($amountGnf * $feePercent / 100);
-        $net = (int) round($amountGnf) - $fee;
+        $feePercent = (float) config('chapchappay.platform_fee_percent', 5);
+        $vendorAmount = (int) round($vendorAmountGnf);
+        $fee = (int) round($vendorAmountGnf * $feePercent / 100);
 
-        return ['fee' => $fee, 'net' => $net];
+        return ['vendor_amount' => $vendorAmount, 'fee' => $fee, 'client_charge' => $vendorAmount + $fee];
     }
 
     // ─────────────────────────────────────────────────────────────────────────
     // Appelé juste après confirmation d'un paiement en ligne (webhook 'success') :
-    // fige la commission et le montant dû, marque le paiement "à reverser".
+    // fige la commission et le montant dû à la boutique, marque le paiement
+    // "à reverser". Le montant dû = le prix de la commande (order->total),
+    // intégralement — PAS une part de ce que le client a payé (qui inclut déjà
+    // la commission Shopio en plus).
     // ─────────────────────────────────────────────────────────────────────────
     public function markDue(Payment $payment): void
     {
-        $shares = $this->computeShares((float) $payment->amount);
+        $vendorAmount = (int) round((float) ($payment->order->total ?? 0));
+        $fee = max(0, (int) round((float) $payment->amount) - $vendorAmount);
 
         $payment->update([
             'payout_status'        => Payment::PAYOUT_DUE,
-            'platform_fee_amount'  => $shares['fee'],
-            'payout_amount'        => $shares['net'],
+            'platform_fee_amount'  => $fee,
+            'payout_amount'        => $vendorAmount,
         ]);
     }
 

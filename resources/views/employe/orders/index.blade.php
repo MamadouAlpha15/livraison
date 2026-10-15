@@ -86,6 +86,39 @@ $I = [
     --r:14px;--r-sm:9px;--shadow-sm:0 1px 3px rgba(0,0,0,.06);--shadow:0 4px 16px rgba(0,0,0,.07);
     --sb-w:232px;--top-h:58px;
 }
+
+/* ══ MODE SOMBRE ══ */
+[data-theme="dark"] {
+    --brand-lt: rgba(99,102,241,.16);
+    --brand-mlt: rgba(99,102,241,.09);
+    --bg: #0b0f1a;
+    --surface: #141925;
+    --border: #262d3d;
+    --border-dk: #343d52;
+    --text: #e6e9f0;
+    --text-2: #b0b8c9;
+    --muted: #7b869c;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.25);
+    --shadow: 0 4px 20px rgba(0,0,0,.4), 0 1px 4px rgba(0,0,0,.25);
+}
+[data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
+    background: var(--surface, var(--card)); color: var(--text); border-color: var(--border-dk, var(--border, var(--bd)));
+}
+[data-theme="dark"] input::placeholder, [data-theme="dark"] textarea::placeholder { color: var(--muted); }
+[data-theme="dark"] .bulk-btn-driver,
+[data-theme="dark"] .chat-panel,
+[data-theme="dark"] .msg-row.theirs .msg-bubble,
+[data-theme="dark"] .chat-input-zone,
+[data-theme="dark"] .zone-result,
+[data-theme="dark"] .zone-chip-change,
+[data-theme="dark"] .plm-box,
+[data-theme="dark"] .rate-box,
+[data-theme="dark"] .vpos-modal,
+[data-theme="dark"] #zoneSearch {
+    background: var(--surface) !important;
+    color: var(--text);
+}
+
 html{font-family:var(--font);}
 body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:antialiased;}
 .dash-wrap{display:flex;min-height:100vh;}
@@ -190,6 +223,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .p-success{background:#e0e7ff;color:#3730a3;}
 .p-warning{background:#fef3c7;color:#92400e;}
 .p-info{background:#dbeafe;color:#1e40af;}
+.p-paid-online{background:#dcfce7;color:#166534;}
 .p-danger{background:#fee2e2;color:#991b1b;}
 .p-purple{background:#f5f3ff;color:#5b21b6;}
 .p-muted{background:#f3f6f4;color:#6b7280;}
@@ -1275,6 +1309,9 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         </td>
                         <td>
                             <div class="amount">{{ number_format($order->total,0,',',' ') }} <small>{{ $devise }}</small></div>
+                            @if($order->payment && $order->payment->method === \App\Models\Payment::METHOD_CHAPCHAPPAY && $order->payment->status === \App\Models\Payment::STATUS_PAYE)
+                            <div class="pill p-paid-online" style="margin-top:3px">💳 Payé en ligne</div>
+                            @endif
                             @if($order->loyalty_points_used > 0)
                             <div style="font-size:10px;color:#b45309;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;padding:2px 6px;margin-top:3px;display:inline-block;white-space:nowrap">🎁 -{{ number_format($order->loyalty_points_used,0,',',' ') }} {{ $devise }} (points fidélité)</div>
                             @endif
@@ -1402,6 +1439,9 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         @php $mAddr = $order->delivery_destination ?: ($client?->address ?? ''); @endphp
                         @if($mAddr)<div class="m-row"><span class="m-lbl">Adresse</span><span style="font-size:12px;color:var(--text-2);text-align:right;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{{ $mAddr }}">{!! $I['pin_addr'] !!} {{ $mAddr }}</span></div>@endif
                         <div class="m-row"><span class="m-lbl">Montant</span><span class="amount">{{ number_format($order->total,0,',',' ') }} <small>{{ $devise }}</small></span></div>
+                        @if($order->payment && $order->payment->method === \App\Models\Payment::METHOD_CHAPCHAPPAY && $order->payment->status === \App\Models\Payment::STATUS_PAYE)
+                        <div class="m-row"><span class="m-lbl"></span><span class="pill p-paid-online">💳 Payé en ligne</span></div>
+                        @endif
                         @if($order->loyalty_points_used > 0)
                         <div class="m-row"><span class="m-lbl">🎁 Points fidélité</span><span style="font-size:11.5px;font-weight:700;color:#b45309;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;padding:2px 8px">-{{ number_format($order->loyalty_points_used,0,',',' ') }} {{ $devise }}</span></div>
                         @endif

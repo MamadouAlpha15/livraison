@@ -54,8 +54,51 @@ class UsersController extends Controller
                       $q2->whereNotNull('company_id')->where('role', '!=', 'livreur');
                   });
             })->count(),
+            'staff'      => User::where('role', 'staff')->count(),
         ];
 
         return view('admin.users.index', compact('users', 'stats', 'role', 'search', 'meInit'));
+    }
+
+    /**
+     * Crée un membre du personnel plateforme (rôle "staff") : accès à tout le
+     * panneau SuperAdmin en lecture/opérationnel, SANS accès à la zone de
+     * suppression définitive (réservée au superadmin, fondateur). Réservé au
+     * superadmin (voir middleware sur la route) — un staff ne peut pas créer
+     * d'autre staff.
+     */
+    public function storeStaff(Request $request)
+    {
+        $data = $request->validate([
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8'],
+        ]);
+
+        User::create([
+            'name'              => $data['name'],
+            'email'             => $data['email'],
+            'password'          => bcrypt($data['password']),
+            'role'              => 'staff',
+            'email_verified_at' => now(),
+        ]);
+
+        return back()->with('success', "Membre du personnel « {$data['name']} » créé avec succès. Il/elle peut se connecter avec l'email et le mot de passe fournis.");
+    }
+
+    /**
+     * Retire un membre du personnel (supprime le compte staff — pas les comptes
+     * client/vendeur/livreur/etc., uniquement role=staff, par sécurité).
+     */
+    public function destroyStaff(User $user)
+    {
+        if ($user->role !== 'staff') {
+            abort(403, 'Seuls les comptes du personnel plateforme peuvent être retirés ici.');
+        }
+
+        $name = $user->name;
+        $user->delete();
+
+        return back()->with('success', "Accès de « {$name} » retiré.");
     }
 }

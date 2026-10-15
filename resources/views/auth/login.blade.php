@@ -28,7 +28,7 @@
         <div class="f-group">
             <label class="f-label" for="email">Adresse email</label>
             <div class="f-icon-wrap">
-                <span class="f-ico">✉️</span>
+                <span class="f-ico">{!! \App\Support\IconLibrary::svg('mail', '', 16) !!}</span>
                 <input id="email" class="f-input {{ $errors->has('email') ? 'f-input-err':'' }}"
                        type="email" name="email" value="{{ old('email') }}"
                        required autofocus autocomplete="username"
@@ -41,12 +41,12 @@
         <div class="f-group">
             <label class="f-label" for="password">Mot de passe</label>
             <div class="f-icon-wrap f-pw-wrap">
-                <span class="f-ico">🔒</span>
+                <span class="f-ico">{!! \App\Support\IconLibrary::svg('lock', '', 16) !!}</span>
                 <input id="password" class="f-input {{ $errors->has('password') ? 'f-input-err':'' }}"
                        type="password" name="password"
                        required autocomplete="current-password"
                        placeholder="••••••••">
-                <button type="button" class="f-pw-eye" onclick="togglePw('password',this)" title="Afficher">👁️</button>
+                <button type="button" class="f-pw-eye" onclick="togglePw('password',this)" title="Afficher">{!! \App\Support\IconLibrary::svg('eye', '', 16) !!}</button>
             </div>
             @error('password')<p class="f-error">{{ $message }}</p>@enderror
         </div>
@@ -92,10 +92,13 @@
     </p>
 
     <script>
+        const ICO_EYE     = @json(\App\Support\IconLibrary::svg('eye', '', 16));
+        const ICO_EYE_OFF = @json(\App\Support\IconLibrary::svg('eye-off', '', 16));
+
         function togglePw(id, btn) {
             const inp = document.getElementById(id);
-            if (inp.type === 'password') { inp.type = 'text';     btn.textContent = '🙈'; }
-            else                         { inp.type = 'password'; btn.textContent = '👁️'; }
+            if (inp.type === 'password') { inp.type = 'text';     btn.innerHTML = ICO_EYE_OFF; }
+            else                         { inp.type = 'password'; btn.innerHTML = ICO_EYE; }
         }
 
         document.getElementById('loginForm').addEventListener('submit', function () {
@@ -104,12 +107,43 @@
             btn.innerHTML = '<span class="btn-spinner"></span> Connexion…';
         });
 
-        document.getElementById('googleBtn').addEventListener('click', function () {
+        {{-- Dans l'app Capacitor, le flux Google doit s'ouvrir dans le vrai navigateur
+             (Google bloque les webviews intégrées) plutôt que dans la webview de l'app —
+             sinon la session Google finit dans un contexte que l'app ne peut pas lire. --}}
+        const isCapacitorApp = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+        const googleBtn = document.getElementById('googleBtn');
+        const googleBtnOriginalHtml = googleBtn.innerHTML;
+
+        if (isCapacitorApp) {
+            googleBtn.href = "{{ route('google.redirect.app') }}";
+        }
+
+        function resetGoogleBtn() {
+            googleBtn.style.pointerEvents = '';
+            googleBtn.style.opacity = '';
+            googleBtn.innerHTML = googleBtnOriginalHtml;
+        }
+
+        googleBtn.addEventListener('click', function (e) {
             this.style.pointerEvents = 'none';
             this.style.opacity = '.7';
             document.getElementById('googleBtnIco').outerHTML = '<span class="btn-spinner-dark"></span>';
             document.getElementById('googleBtnTxt').textContent = 'Connexion…';
+
+            if (isCapacitorApp) {
+                e.preventDefault();
+                window.open(this.href, '_system');
+            }
         });
+
+        {{-- Si l'utilisateur revient dans l'app sans avoir terminé (ex: fermé le
+             navigateur externe), le bouton resterait sinon bloqué en "Connexion…"
+             indéfiniment, puisque cette page-ci ne navigue jamais ailleurs. --}}
+        if (isCapacitorApp) {
+            document.addEventListener('visibilitychange', function () {
+                if (document.visibilityState === 'visible') resetGoogleBtn();
+            });
+        }
     </script>
 
 </x-guest-layout>

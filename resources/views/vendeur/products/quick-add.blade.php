@@ -18,6 +18,25 @@
     --green:#10b981; --red:#ef4444; --amber:#f59e0b;
     --font:'Segoe UI',system-ui,sans-serif; --r:14px; --r-sm:9px;
 }
+
+/* ══ MODE SOMBRE ══ */
+[data-theme="dark"] {
+    --brand-lt: rgba(99,102,241,.16);
+    --brand-mlt: rgba(99,102,241,.09);
+    --bg: #0b0f1a;
+    --surface: #141925;
+    --border: #262d3d;
+    --border-dk: #343d52;
+    --text: #e6e9f0;
+    --text2: #b0b8c9;
+    --muted: #7b869c;
+}
+[data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
+    background: var(--surface, var(--card)); color: var(--text); border-color: var(--border-dk, var(--border, var(--bd)));
+}
+[data-theme="dark"] input::placeholder, [data-theme="dark"] textarea::placeholder { color: var(--muted); }
+[data-theme="dark"] .qa-input:focus, [data-theme="dark"] .qa-select:focus, [data-theme="dark"] .qa-main-upload img, [data-theme="dark"] .qa-btn-ghost { background: var(--surface); }
+
 body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text); }
 a { text-decoration:none; color:inherit; }
 

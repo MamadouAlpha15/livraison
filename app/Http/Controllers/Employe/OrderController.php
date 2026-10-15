@@ -39,7 +39,7 @@ class OrderController extends Controller
             }
         }
 
-        $q = Order::with(['client', 'shop', 'livreur', 'driver', 'deliveryCompany', 'items.product'])
+        $q = Order::with(['client', 'shop', 'livreur', 'driver', 'deliveryCompany', 'items.product', 'payment'])
             ->inShop($shopId)
             ->latest();
 

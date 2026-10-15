@@ -132,6 +132,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .amz-nav-search-btn {
     background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none;
     padding: 0 16px; cursor: pointer; font-size: 16px; transition: opacity .15s;
+    color: #fff; display: flex; align-items: center; justify-content: center;
 }
 .amz-nav-search-btn:hover { opacity: .85; }
 .amz-nav-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
@@ -164,6 +165,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .mobile-search-wrap button {
     background: var(--brand); border: none; padding: 0 14px;
     font-size: 15px; cursor: pointer;
+    color: #fff; display: flex; align-items: center; justify-content: center;
 }
 .btn-filter-open {
     display: flex; align-items: center; gap: 6px;
@@ -223,6 +225,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     border-radius: var(--r-sm); border: 1.5px solid var(--border);
     background: var(--grey); color: var(--text-2); font-size: 13px;
     font-weight: 600; font-family: var(--font); cursor: pointer; transition: all .15s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
 }
 .drawer-reset:hover { border-color: var(--red); color: var(--red); background: var(--red-lt); }
 .drawer-apply {
@@ -232,6 +235,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     color: #fff; font-size: 14px; font-weight: 700;
     font-family: var(--font); cursor: pointer;
     box-shadow: 0 4px 14px rgba(99,102,241,.3);
+    display: flex; align-items: center; justify-content: center; gap: 6px;
 }
 
 /* ══════════════════════════════
@@ -381,6 +385,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     padding: 7px 10px; border: 1.5px solid var(--border);
     background: var(--surface); border-radius: var(--r-sm);
     cursor: pointer; font-size: 14px; transition: all .15s; color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
 }
 .amz-view-btn.active { background: var(--brand-mlt); border-color: var(--brand-lt); color: var(--brand-dk); }
 
@@ -459,9 +464,9 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .amz-price-orig { font-size: 12px; color: var(--muted); text-decoration: line-through; }
 .amz-price-remise { font-size: 11px; color: var(--red); font-weight: 700; background: var(--red-lt); padding: 1px 6px; border-radius: 4px; }
 .amz-delivery { font-size: 12px; color: var(--green); display: flex; align-items: center; gap: 4px; font-weight: 500; }
-.amz-stock-ok  { font-size: 12px; color: var(--green); font-weight: 600; }
-.amz-stock-low { font-size: 12px; color: var(--amber); font-weight: 600; }
-.amz-stock-out { font-size: 12px; color: var(--red); font-weight: 600; }
+.amz-stock-ok  { font-size: 12px; color: var(--green); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+.amz-stock-low { font-size: 12px; color: var(--amber); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+.amz-stock-out { font-size: 12px; color: var(--red); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
 
 .amz-card-footer { padding: 10px 14px 14px; }
 .amz-btn-order {
@@ -596,11 +601,11 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
         <img src="/images/shopio-logo-192.png" alt="Shopio" class="nav-logo-img" width="36" height="36">
         <span class="nav-brand-name">Shopio</span>
     </a>
-    <a href="{{ url('/') }}" class="amz-back-home">🏠 <span class="txt">Accueil</span></a>
-    <a href="{{ route('shops.index') }}" class="amz-back">← Boutiques</a>
+    <a href="{{ url('/') }}" class="amz-back-home">{!! \App\Support\IconLibrary::svg('home', '', 14) !!} <span class="txt">Accueil</span></a>
+    <a href="{{ route('shops.index') }}" class="amz-back">{!! \App\Support\IconLibrary::svg('arrow-left', '', 13) !!} Boutiques</a>
     <div class="amz-nav-search">
         <input type="text" id="prodSearch" placeholder="Rechercher dans {{ $shop->name }}…" autocomplete="off">
-        <button class="amz-nav-search-btn" type="button">🔍</button>
+        <button class="amz-nav-search-btn" type="button">{!! \App\Support\IconLibrary::svg('search', '', 16) !!}</button>
     </div>
     <div class="amz-nav-right">
         @auth
@@ -617,10 +622,10 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 <div class="mobile-bar">
     <div class="mobile-search-wrap">
         <input type="text" id="prodSearchMobile" placeholder="Rechercher un produit…" autocomplete="off">
-        <button type="button">🔍</button>
+        <button type="button">{!! \App\Support\IconLibrary::svg('search', '', 15) !!}</button>
     </div>
     <button class="btn-filter-open" type="button" onclick="openDrawer()">
-        ⚙️ Filtres
+        {!! \App\Support\IconLibrary::svg('sliders', '', 15) !!} Filtres
         <span class="filter-badge" id="filterBadge">0</span>
     </button>
 </div>
@@ -630,8 +635,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 <div class="drawer-panel" id="drawerPanel">
     <div class="drawer-handle"></div>
     <div class="drawer-header">
-        <span class="drawer-title">⚙️ Affiner les résultats</span>
-        <button class="drawer-close" onclick="closeDrawer()">✕</button>
+        <span class="drawer-title" style="display:flex;align-items:center;gap:7px">{!! \App\Support\IconLibrary::svg('sliders', '', 16) !!} Affiner les résultats</span>
+        <button class="drawer-close" onclick="closeDrawer()">{!! \App\Support\IconLibrary::svg('x', '', 15) !!}</button>
     </div>
     <div class="drawer-body">
 
@@ -696,18 +701,18 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
             </div>
             <div class="amz-filter-item" onclick="setSort('featured', this, true)">
                 <input type="radio" name="sort_m" id="msort-feat">
-                <label for="msort-feat">⭐ Vedettes en premier</label>
+                <label for="msort-feat" style="display:inline-flex;align-items:center;gap:5px">{!! \App\Support\IconLibrary::svg('star', '', 13) !!} Vedettes en premier</label>
             </div>
         </div>
 
-        <button class="drawer-reset" onclick="resetFilters()">🔄 Réinitialiser les filtres</button>
-        <button class="drawer-apply" onclick="applyAndClose()">✓ Appliquer</button>
+        <button class="drawer-reset" onclick="resetFilters()">{!! \App\Support\IconLibrary::svg('rotate', '', 14) !!} Réinitialiser les filtres</button>
+        <button class="drawer-apply" onclick="applyAndClose()">{!! \App\Support\IconLibrary::svg('check', '', 14) !!} Appliquer</button>
     </div>
 </div>
 
 {{-- ══ LIGHTBOX ══ --}}
 <div class="lb-overlay" id="lbOverlay" onclick="closeLb(event)">
-    <button class="lb-close" onclick="closeLb()">✕</button>
+    <button class="lb-close" onclick="closeLb()">{!! \App\Support\IconLibrary::svg('x', '', 18) !!}</button>
     <img class="lb-img" id="lbImg" src="" alt="">
 </div>
 
@@ -720,25 +725,25 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                  width="72" height="72"
                  fetchpriority="high">
         @else
-            🛍️
+            <span style="display:flex;color:#fff">{!! \App\Support\IconLibrary::svg('store', '', 32) !!}</span>
         @endif
     </div>
     <div class="shop-banner-info">
         <div class="shop-banner-name">
             {{ $shop->name }}
-            @if($shop->is_approved)<span class="shop-banner-verified">✓ Boutique vérifiée</span>@endif
+            @if($shop->is_approved)<span class="shop-banner-verified">{!! \App\Support\IconLibrary::svg('check', '', 11) !!} Boutique vérifiée</span>@endif
         </div>
         @if($shop->description)
         <div class="shop-banner-desc">{{ Str::limit(strip_tags($shop->description), 140) }}</div>
         @endif
         <div class="shop-banner-meta">
             <span class="shop-banner-open">Ouvert</span>
-            @if($reviewAvg)<span class="shop-banner-rating">⭐ {{ number_format($reviewAvg, 1) }} <span style="opacity:.8">({{ $reviewCount }} avis)</span></span>@endif
-            @if($deliveredCount > 0)<span class="shop-banner-chip">✓ {{ $deliveredCount }} commande{{ $deliveredCount > 1 ? 's' : '' }} livrée{{ $deliveredCount > 1 ? 's' : '' }}</span>@endif
-            @if($shop->type)<span class="shop-banner-chip">🏷️ {{ $shop->type }}</span>@endif
-            @if($shop->address)<span class="shop-banner-chip">📍 {{ Str::limit($shop->address, 28) }}</span>@endif
-            <span class="shop-banner-chip">📦 {{ $products->total() }} produit{{ $products->total() > 1 ? 's' : '' }}</span>
-            @if($shop->phone)<span class="shop-banner-chip">📞 {{ $shop->phone }}</span>@endif
+            @if($reviewAvg)<span class="shop-banner-rating">{!! \App\Support\IconLibrary::svg('star', '', 12) !!} {{ number_format($reviewAvg, 1) }} <span style="opacity:.8">({{ $reviewCount }} avis)</span></span>@endif
+            @if($deliveredCount > 0)<span class="shop-banner-chip">{!! \App\Support\IconLibrary::svg('check', '', 12) !!} {{ $deliveredCount }} commande{{ $deliveredCount > 1 ? 's' : '' }} livrée{{ $deliveredCount > 1 ? 's' : '' }}</span>@endif
+            @if($shop->type)<span class="shop-banner-chip">{!! \App\Support\IconLibrary::svg('tag', '', 12) !!} {{ $shop->type }}</span>@endif
+            @if($shop->address)<span class="shop-banner-chip">{!! \App\Support\IconLibrary::svg('map-pin', '', 12) !!} {{ Str::limit($shop->address, 28) }}</span>@endif
+            <span class="shop-banner-chip">{!! \App\Support\IconLibrary::svg('package', '', 12) !!} {{ $products->total() }} produit{{ $products->total() > 1 ? 's' : '' }}</span>
+            @if($shop->phone)<span class="shop-banner-chip">{!! \App\Support\IconLibrary::svg('phone', '', 12) !!} {{ $shop->phone }}</span>@endif
         </div>
     </div>
 </div>
@@ -808,7 +813,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
             </div>
             <div class="amz-filter-item" onclick="setSort('featured', this, false)">
                 <input type="radio" name="sort_d" id="dsort-feat">
-                <label for="dsort-feat">⭐ Vedettes en premier</label>
+                <label for="dsort-feat" style="display:inline-flex;align-items:center;gap:5px">{!! \App\Support\IconLibrary::svg('star', '', 13) !!} Vedettes en premier</label>
             </div>
         </div>
     </aside>
@@ -837,8 +842,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     </select>
                 </div>
                 <div class="amz-view-btns">
-                    <button class="amz-view-btn active" id="btnGrid" onclick="setView('grid')" title="Grille">⊞</button>
-                    <button class="amz-view-btn" id="btnList" onclick="setView('list')" title="Liste">≡</button>
+                    <button class="amz-view-btn active" id="btnGrid" onclick="setView('grid')" title="Grille">{!! \App\Support\IconLibrary::svg('grid', '', 14) !!}</button>
+                    <button class="amz-view-btn" id="btnList" onclick="setView('list')" title="Liste">{!! \App\Support\IconLibrary::svg('list', '', 14) !!}</button>
                 </div>
             </div>
         </div>
@@ -871,12 +876,12 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                              loading="{{ $loop->index < 2 ? 'eager' : 'lazy' }}"
                              {{ $loop->index < 2 ? 'fetchpriority=high' : '' }}>
                     @else
-                        <div class="amz-card-img-ph">🏷️</div>
+                        <div class="amz-card-img-ph">{!! \App\Support\IconLibrary::svg('image', '', 44) !!}</div>
                     @endif
-                    @if($product->is_flash_active)<span class="amz-card-badge" style="background:linear-gradient(135deg,#dc2626,#f97316)">⚡ Flash −{{ $product->flash_discount_percent }}%</span>
+                    @if($product->is_flash_active)<span class="amz-card-badge" style="background:linear-gradient(135deg,#dc2626,#f97316)">{!! \App\Support\IconLibrary::svg('zap', '', 11) !!} Flash −{{ $product->flash_discount_percent }}%</span>
                     @elseif($hasPromo)<span class="amz-card-badge badge-promo">-{{ $remise }}%</span>
-                    @elseif($isNew)<span class="amz-card-badge badge-nouveau">✨ Nouveau</span>
-                    @elseif($product->is_featured)<span class="amz-card-badge badge-vedette">⭐ Vedette</span>
+                    @elseif($isNew)<span class="amz-card-badge badge-nouveau">{!! \App\Support\IconLibrary::svg('sparkles', '', 11) !!} Nouveau</span>
+                    @elseif($product->is_featured)<span class="amz-card-badge badge-vedette">{!! \App\Support\IconLibrary::svg('star', '', 11) !!} Vedette</span>
                     @elseif($stockOut)<span class="amz-card-badge badge-rupture">Rupture</span>
                     @endif
                 </div>
@@ -885,7 +890,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     @if($product->category)
                     <div class="amz-card-cat">{{ $product->category }}</div>
                     @endif
-                    <div class="amz-card-name" onclick="goToProduct('{{ route('client.products.show', $product) }}')">
+                    <div class="amz-card-name" onclick="goToProduct('{{ route('client.orders.createFromProduct', $product) }}')">
                         {{ $product->name }}
                     </div>
                     <div class="amz-price-wrap">
@@ -899,12 +904,12 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                             <span class="amz-price-remise">-{{ $remise }}%</span>
                             @endif
                         </div>
-                        <div class="amz-delivery">✓ Livraison disponible</div>
+                        <div class="amz-delivery">{!! \App\Support\IconLibrary::svg('check', '', 12) !!} Livraison disponible</div>
                     </div>
                     @if($stockVal !== null)
-                        @if($stockOut)<div class="amz-stock-out">❌ Rupture de stock</div>
-                        @elseif($stockLow)<div class="amz-stock-low">⚠️ Plus que {{ $stockVal }} en stock</div>
-                        @else<div class="amz-stock-ok">✓ En stock</div>
+                        @if($stockOut)<div class="amz-stock-out">{!! \App\Support\IconLibrary::svg('x', '', 12) !!} Rupture de stock</div>
+                        @elseif($stockLow)<div class="amz-stock-low">{!! \App\Support\IconLibrary::svg('alert', '', 12) !!} Plus que {{ $stockVal }} en stock</div>
+                        @else<div class="amz-stock-ok">{!! \App\Support\IconLibrary::svg('check', '', 12) !!} En stock</div>
                         @endif
                     @endif
                 </div>
@@ -913,28 +918,28 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     @auth
                         @if(Auth::user()->role === 'client')
                             @if(!$stockOut)
-                            <a href="{{ route('client.orders.createFromProduct', $product) }}" class="amz-btn-order">🛒 Commander</a>
+                            <a href="{{ route('client.orders.createFromProduct', $product) }}" class="amz-btn-order">{!! \App\Support\IconLibrary::svg('cart', '', 14) !!} Commander</a>
                             @else
                             <div class="amz-btn-order out">Indisponible</div>
                             @endif
-                            <a href="{{ route('client.messages.index', $product) }}" class="amz-btn-msg">💬 Poser une question</a>
+                            <a href="{{ route('client.messages.index', $product) }}" class="amz-btn-msg">{!! \App\Support\IconLibrary::svg('message', '', 13) !!} Poser une question</a>
                         @endif
                     @else
                         @if(!$stockOut)
-                        <a href="{{ route('client.orders.createFromProduct', $product) }}" class="amz-btn-order">🛒 Commander</a>
+                        <a href="{{ route('client.orders.createFromProduct', $product) }}" class="amz-btn-order">{!! \App\Support\IconLibrary::svg('cart', '', 14) !!} Commander</a>
                         @else
                         <div class="amz-btn-order out">Indisponible</div>
                         @endif
                         @php $msgUrl = route('client.messages.index', $product); @endphp
                         <a href="{{ route('register', ['redirect' => $msgUrl, 'role' => 'client']) }}" class="amz-btn-msg">
-                            💬 Poser une question
+                            {!! \App\Support\IconLibrary::svg('message', '', 13) !!} Poser une question
                         </a>
                     @endauth
                 </div>
             </div>
             @empty
             <div class="amz-empty">
-                <div style="font-size:52px;opacity:.2;margin-bottom:14px">📭</div>
+                <div style="display:flex;justify-content:center;opacity:.2;margin-bottom:14px">{!! \App\Support\IconLibrary::svg('package', '', 52) !!}</div>
                 <div style="font-size:18px;font-weight:800;margin-bottom:8px;color:var(--text)">Aucun produit trouvé</div>
                 <p style="color:var(--muted);font-size:14px;margin:0">Cette boutique n'a pas encore de produits.</p>
             </div>

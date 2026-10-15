@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\NewSupportTicket;
+use App\Services\PushService;
 
 class SupportTicketController extends Controller
 {
@@ -120,6 +121,13 @@ class SupportTicketController extends Controller
         foreach (User::where('role', 'superadmin')->get() as $to) {
             $to->notify(new NewSupportTicket($ticket));
         }
+        try {
+            app(PushService::class)->notifySuperadmins(
+                'Nouveau ticket support',
+                $u->name . ' — ' . $data['subject'],
+                route('admin.support.index')
+            );
+        } catch (\Throwable $e) {}
 
         return redirect()->route('support.show', $ticket)->with('success','Ticket créé.');
     }

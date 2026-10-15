@@ -39,6 +39,28 @@
     --shadow-lg: 0 20px 60px rgba(0,0,0,.12);
 }
 
+/* ══ MODE SOMBRE ══ */
+[data-theme="dark"] {
+    --brand-lt: rgba(99,102,241,.16);
+    --brand-mlt: rgba(99,102,241,.09);
+    --bg: #0b0f1a;
+    --surface: #141925;
+    --border: #262d3d;
+    --border-dk: #343d52;
+    --text: #e6e9f0;
+    --text-2: #b0b8c9;
+    --muted: #7b869c;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.25);
+    --shadow: 0 4px 20px rgba(0,0,0,.4), 0 1px 4px rgba(0,0,0,.25);
+    --shadow-lg: 0 10px 40px rgba(0,0,0,.5);
+}
+[data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
+    background: var(--surface, var(--card)); color: var(--text); border-color: var(--border-dk, var(--border, var(--bd)));
+}
+[data-theme="dark"] input::placeholder, [data-theme="dark"] textarea::placeholder { color: var(--muted); }
+[data-theme="dark"] #notifSettingsCard { background: var(--surface) !important; border-color: var(--border) !important; }
+
+
 html, body {
     font-family: var(--font);
     background: var(--bg);
@@ -964,6 +986,35 @@ textarea.field-input { resize: vertical; min-height: 90px; }
                     <div class="field-hint">La devise sera affichée sur toutes vos commandes et factures.</div>
                 </div>
 
+                {{-- Mobile Money — où Shopio vous reverse les paiements en ligne --}}
+                <div class="field-group">
+                    <label class="field-label">Mobile Money (paiements en ligne)</label>
+                    <div class="field-wrap">
+                        <span class="field-icon">📱</span>
+                        <select name="payout_wallet_type" id="payout_wallet_type" class="field-input">
+                            <option value="">Non renseigné</option>
+                            <option value="orange_money" {{ old('payout_wallet_type', $shop->payout_wallet_type ?? '') === 'orange_money' ? 'selected' : '' }}>Orange Money</option>
+                            <option value="mtn_momo" {{ old('payout_wallet_type', $shop->payout_wallet_type ?? '') === 'mtn_momo' ? 'selected' : '' }}>MTN MoMo</option>
+                            <option value="paycard" {{ old('payout_wallet_type', $shop->payout_wallet_type ?? '') === 'paycard' ? 'selected' : '' }}>PayCard</option>
+                            <option value="kulu" {{ old('payout_wallet_type', $shop->payout_wallet_type ?? '') === 'kulu' ? 'selected' : '' }}>Kulu</option>
+                            <option value="soutra_money" {{ old('payout_wallet_type', $shop->payout_wallet_type ?? '') === 'soutra_money' ? 'selected' : '' }}>Soutra Money</option>
+                            <option value="akiba" {{ old('payout_wallet_type', $shop->payout_wallet_type ?? '') === 'akiba' ? 'selected' : '' }}>Akiba</option>
+                        </select>
+                    </div>
+                    @error('payout_wallet_type')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">Numéro Mobile Money</label>
+                    <div class="field-wrap">
+                        <span class="field-icon">☎️</span>
+                        <input type="text" name="payout_wallet_number" id="payout_wallet_number" class="field-input"
+                               placeholder="Ex : 622 00 00 00"
+                               value="{{ old('payout_wallet_number', $shop->payout_wallet_number ?? '') }}">
+                    </div>
+                    <div class="field-hint">C'est le numéro sur lequel Shopio vous envoie l'argent de vos ventes payées en ligne. Sans ça, impossible de vous reverser vos paiements en ligne.</div>
+                    @error('payout_wallet_number')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
+                </div>
 
                 <div class="form-nav">
                     <button type="button" class="btn-back" onclick="goToStep(2)">← Retour</button>

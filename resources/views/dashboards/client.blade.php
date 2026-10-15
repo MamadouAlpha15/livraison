@@ -43,7 +43,12 @@
 }
 
 html { font-family: var(--font); scroll-behavior: smooth; overflow-x: hidden; }
-body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+/* Pas de overflow-x ici : html le gère déjà, et un overflow-x sans overflow-y
+   explicite force ce dernier à devenir "auto" (règle CSS), ce qui transforme
+   body en une deuxième zone de défilement cachée — cassant "position:sticky"
+   pour tout élément (ex: la sidebar) dont body devient alors le plus proche
+   ancêtre défilant, au lieu de la page elle-même. */
+body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoothing: antialiased; }
 
 /* ══ NAVBAR ══ */
 .nav {
@@ -702,10 +707,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     text-decoration: none; color: inherit;
     display: flex; flex-direction: column;
 }
-.reco-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); border-color: var(--orange); }
 .reco-card-img { height: 130px; position: relative; overflow: hidden; flex-shrink: 0; background: var(--grey); }
 .reco-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
-.reco-card:hover .reco-card-img img { transform: scale(1.07); }
 .reco-card-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
 .reco-card-badge {
     position: absolute; top: 8px; left: 8px;
@@ -719,7 +722,6 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     display: flex; align-items: center; justify-content: center;
     color: var(--text-2); transition: all .15s;
 }
-.reco-card-fav:hover { transform: scale(1.08); }
 .reco-card-fav.favorited { background: #fff0f0; color: #e53e3e; }
 .reco-card-fav.favorited svg { stroke: #e53e3e; fill: #e53e3e; }
 .reco-card-body { padding: 11px 13px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
@@ -729,6 +731,9 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     min-height: 2.6em;
 }
+.reco-card-rating { display: flex; align-items: center; gap: 3px; font-size: 11px; color: var(--muted); }
+.reco-card-rating svg { width: 12px; height: 12px; fill: #f59e0b; stroke: #f59e0b; flex-shrink: 0; }
+.reco-card-rating strong { color: var(--text); font-weight: 700; }
 .reco-card-price-row { display: flex; align-items: baseline; gap: 6px; margin-top: auto; flex-wrap: wrap; }
 .reco-card-price { font-size: 14px; font-weight: 800; color: var(--orange); font-family: monospace; }
 .reco-card-orig { font-size: 10.5px; color: var(--muted); text-decoration: line-through; font-family: monospace; }
@@ -742,7 +747,6 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     font-size: 11px; font-weight: 700; font-family: var(--font);
     cursor: pointer; transition: all .15s;
 }
-.reco-card-addcart:hover { background: var(--orange); color: #fff; }
 .reco-card-addcart.added { background: #10b981; border-color: #10b981; color: #fff; }
 .reco-card-addcart:disabled { opacity: .7; cursor: default; }
 
@@ -755,7 +759,16 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     text-decoration: none; border: 1.5px solid var(--border); background: var(--surface);
     color: var(--text-2); transition: all .15s; white-space: nowrap; cursor: pointer;
 }
-.reco-card-order:hover, .reco-card-contact:hover { border-color: var(--orange); color: var(--orange-dk); background: var(--orange-lt); }
+/* Effets "survol" uniquement sur souris réelle — sur mobile/tactile, un
+   tap peut déclencher :hover et le laisser "coincé" (transform actif en
+   permanence), ce qui produit un artefact de rendu flou sur la carte. */
+@media (hover: hover) and (pointer: fine) {
+    .reco-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); border-color: var(--orange); }
+    .reco-card:hover .reco-card-img img { transform: scale(1.07); }
+    .reco-card-fav:hover { transform: scale(1.08); }
+    .reco-card-addcart:hover { background: var(--orange); color: #fff; }
+    .reco-card-order:hover, .reco-card-contact:hover { border-color: var(--orange); color: var(--orange-dk); background: var(--orange-lt); }
+}
 
 @media (max-width: 480px) {
     .reco-card { flex-basis: 152px; width: 152px; }
@@ -967,22 +980,30 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 /* ══ PAGE WRAP (sidebar + main) ══ */
 .page-wrap {
-    display: flex; gap: 22px; align-items: flex-start;
+    display: flex; gap: 22px; align-items: stretch;
     max-width: 1440px; margin: 0 auto;
     padding: 20px 24px 60px;
 }
 
-/* ══ SIDEBAR ══ */
-.sidebar {
-    width: 260px; flex-shrink: 0;
+/* ══ SIDEBAR ══
+   .sidebar (colonne flex, pleine hauteur, "align-items:stretch" du parent la
+   fait s'étirer jusqu'à la hauteur de la colonne principale) contient
+   .sidebar-sticky (le contenu réel, collé en haut de l'écran pendant le
+   scroll). Sans ce découpage en deux niveaux, le "position:sticky" restait
+   collé seulement le temps de SA PROPRE hauteur (plus courte que la liste de
+   produits) puis disparaissait, laissant un vide à gauche pour le reste du
+   scroll — .sidebar donne maintenant au sticky une hauteur de référence
+   aussi longue que la page, donc il reste visible jusqu'en bas. */
+.sidebar { width: 260px; flex-shrink: 0; }
+.sidebar-sticky {
     display: flex; flex-direction: column; gap: 14px;
     position: sticky; top: calc(var(--nav-h) + 14px);
     max-height: calc(100vh - var(--nav-h) - 28px);
     overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent;
 }
-.sidebar::-webkit-scrollbar { width: 4px; }
-.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar-sticky::-webkit-scrollbar { width: 4px; }
+.sidebar-sticky::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.sidebar-sticky::-webkit-scrollbar-track { background: transparent; }
 
 .sb-card {
     background: var(--surface); border: 1px solid var(--border);
@@ -1580,8 +1601,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
         padding: 12px 12px 60px;
         gap: 14px;
     }
-    .sidebar {
-        width: 100%;
+    .sidebar { width: 100%; }
+    .sidebar-sticky {
         position: static;
         max-height: none;
         overflow-y: visible;
@@ -1635,9 +1656,10 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     body.is-dashboard .main-col { gap: 14px !important; order: 1 !important; }
 
     /* ── Sidebar : on cache les cartes inutiles, on garde 🏆 top boutiques ── */
-    body.is-dashboard .sidebar { display: flex !important; flex-direction: column !important; order: 2 !important; width: 100% !important; gap: 0 !important; position: static !important; max-height: none !important; overflow-y: visible !important; }
+    body.is-dashboard .sidebar { display: flex !important; flex-direction: column !important; order: 2 !important; width: 100% !important; }
+    body.is-dashboard .sidebar-sticky { gap: 0 !important; position: static !important; max-height: none !important; overflow-y: visible !important; }
     body.is-dashboard .sb-card-explorer { display: none !important; }
-    body.is-dashboard .sidebar > .sb-card:not(.sb-card-topshops):not(.sb-card-explorer) { display: none !important; }
+    body.is-dashboard .sidebar-sticky > .sb-card:not(.sb-card-topshops):not(.sb-card-explorer) { display: none !important; }
     body.is-dashboard .sb-card-topshops { display: block !important; border-radius: 10px !important; overflow: hidden !important; }
 
     /* ── Hero mobile ── */
@@ -1715,11 +1737,16 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     body.is-dashboard .cats { flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; gap: 6px !important; padding-bottom: 6px !important; margin-bottom: 0 !important; }
     body.is-dashboard .cat-pill { padding: 6px 12px !important; font-size: 11px !important; flex-shrink: 0 !important; }
 
-    /* ── Grille produits 2 colonnes ── */
-    body.is-dashboard .prod-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
-    body.is-dashboard .prod-grid .reco-card-img { height: 110px !important; }
-    body.is-dashboard .prod-grid .reco-card-body { padding: 8px 9px !important; gap: 3px !important; }
-    body.is-dashboard .prod-grid .reco-card-name { font-size: 11.5px !important; }
+    /* ── Grille produits 2 colonnes (espacée, uniforme) ── */
+    body.is-dashboard .prod-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 14px !important; }
+    body.is-dashboard .prod-grid .reco-card { border-radius: 14px !important; }
+    body.is-dashboard .prod-grid .reco-card-img { height: 150px !important; }
+    body.is-dashboard .prod-grid .reco-card-body { padding: 12px !important; gap: 6px !important; }
+    body.is-dashboard .prod-grid .reco-card-shop { font-size: 10.5px !important; }
+    body.is-dashboard .prod-grid .reco-card-name { font-size: 12.5px !important; min-height: 2.4em !important; }
+    body.is-dashboard .prod-grid .reco-card-price { font-size: 14px !important; }
+    body.is-dashboard .prod-grid .reco-card-addcart { padding: 8px 0 !important; font-size: 11px !important; margin-top: 8px !important; }
+    body.is-dashboard .prod-grid .reco-card-actions-row { margin-top: 6px !important; }
     body.is-dashboard .shop-card-img { height: 110px !important; }
     body.is-dashboard .shop-card-body { padding: 7px 8px !important; gap: 2px !important; }
     body.is-dashboard .shop-card-footer { padding: 6px 8px !important; display: flex !important; align-items: center !important; justify-content: space-between !important; }
@@ -1753,7 +1780,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     body.is-dashboard .stat-sub { font-size: 8px !important; }
     body.is-dashboard .top-shop-card { width: 150px !important; min-width: 150px !important; max-width: 150px !important; }
     body.is-dashboard .top-shop-img { height: 90px !important; }
-    body.is-dashboard .prod-grid { gap: 6px !important; }
+    body.is-dashboard .prod-grid { gap: 11px !important; }
+    body.is-dashboard .prod-grid .reco-card-img { height: 135px !important; }
     body.is-dashboard .shop-card-img { height: 95px !important; }
     body.is-dashboard .page-wrap { padding-bottom: 70px !important; }
     body.is-dashboard .order-amount { font-size: 11px !important; }
@@ -1769,7 +1797,9 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     body.is-dashboard .hero-title { font-size: 15px !important; }
     body.is-dashboard .top-shop-card { width: 135px !important; min-width: 135px !important; max-width: 135px !important; }
     body.is-dashboard .top-shop-img { height: 80px !important; }
-    body.is-dashboard .prod-grid { gap: 5px !important; }
+    body.is-dashboard .prod-grid { gap: 9px !important; }
+    body.is-dashboard .prod-grid .reco-card-img { height: 125px !important; }
+    body.is-dashboard .prod-grid .reco-card-body { padding: 10px !important; }
     body.is-dashboard .shop-card-img { height: 95px !important; }
     body.is-dashboard .shop-card-footer { flex-direction: column !important; gap: 4px !important; align-items: stretch !important; }
     body.is-dashboard .shop-card-cta { text-align: center !important; justify-content: center !important; width: 100% !important; }
@@ -1791,7 +1821,10 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     body.is-dashboard .stat-val { font-size: 13px !important; }
     body.is-dashboard .stat-lbl { font-size: 9px !important; }
     body.is-dashboard .stat-sub { display: none !important; }
-    body.is-dashboard .prod-grid { grid-template-columns: 1fr 1fr !important; gap: 4px !important; }
+    body.is-dashboard .prod-grid { grid-template-columns: 1fr 1fr !important; gap: 7px !important; }
+    body.is-dashboard .prod-grid .reco-card-img { height: 110px !important; }
+    body.is-dashboard .prod-grid .reco-card-body { padding: 8px !important; gap: 4px !important; }
+    body.is-dashboard .prod-grid .reco-card-name { font-size: 11.5px !important; min-height: 2.2em !important; }
     body.is-dashboard .shop-card-img { height: 80px !important; }
     body.is-dashboard .shop-card-name { font-size: 10px !important; }
     body.is-dashboard .shop-card-footer { flex-direction: column !important; gap: 3px !important; align-items: stretch !important; }
@@ -1902,7 +1935,7 @@ a, button, [role="button"],
 .msg-conv-list, .msg-thread,
 .fav-list, .pop-cats-row,
 .top-shops-grid, .cats,
-.sidebar, .cn-drop-list {
+.sidebar-sticky, .cn-drop-list {
     -webkit-overflow-scrolling: touch;
 }
 
@@ -2527,6 +2560,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 
 {{-- ══ SIDEBAR ══ --}}
 <aside class="sidebar">
+<div class="sidebar-sticky">
 
     {{-- Fidélité --}}
     <div class="sb-loyalty-card">
@@ -2607,9 +2641,9 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
     </div>
     @endif
 
-   
 
 
+</div>
 </aside>
 
 {{-- ══ MAIN COLUMN ══ --}}
@@ -2868,7 +2902,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
         <div class="reco-row {{ $recoLoop ? 'reco-auto' : '' }}" id="recoRow">
             @for ($pass = 0; $pass < $recoPasses; $pass++)
                 @foreach($recommendedProducts as $rp)
-                <a href="{{ route('client.products.show', $rp) }}" class="reco-card" @if($pass > 0) aria-hidden="true" tabindex="-1" @endif>
+                <a href="{{ route('client.orders.createFromProduct', $rp) }}" class="reco-card" @if($pass > 0) aria-hidden="true" tabindex="-1" @endif>
                     <div class="reco-card-img">
                         @if($rp->image)
                             <img src="{{ \App\Services\ImageOptimizer::url($rp->image, 'medium') }}" alt="{{ $rp->name }}" loading="lazy">
@@ -2890,6 +2924,10 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
                     <div class="reco-card-body">
                         <div class="reco-card-shop">{{ $rp->shop->name ?? '' }}</div>
                         <div class="reco-card-name">{{ $rp->name }}</div>
+                        @php $srRp = $shopRatings[$rp->shop_id] ?? null; @endphp
+                        @if($srRp && $srRp->cnt > 0)
+                        <div class="reco-card-rating">{!! \App\Support\IconLibrary::svg('star', '', 12) !!} <strong>{{ number_format($srRp->avg_rating, 1) }}</strong> ({{ $srRp->cnt }})</div>
+                        @endif
                         <div class="reco-card-price-row">
                             <span class="reco-card-price">{{ number_format($rp->current_price, 0, ',', ' ') }}</span>
                             @if($rp->is_flash_active)
@@ -2927,7 +2965,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
         <div class="reco-row">
             @foreach($group['products'] as $gp)
             @php $gpHasPromo = $gp->original_price && $gp->original_price > $gp->price; @endphp
-            <a href="{{ route('client.products.show', $gp) }}" class="reco-card">
+            <a href="{{ route('client.orders.createFromProduct', $gp) }}" class="reco-card">
                 <div class="reco-card-img">
                     @if($gp->image)
                         <img src="{{ \App\Services\ImageOptimizer::url($gp->image, 'medium') }}" alt="{{ $gp->name }}" loading="lazy">
@@ -2951,6 +2989,10 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
                 <div class="reco-card-body">
                     <div class="reco-card-shop">{{ $gp->shop->name ?? '' }}</div>
                     <div class="reco-card-name">{{ $gp->name }}</div>
+                    @php $srGp = $shopRatings[$gp->shop_id] ?? null; @endphp
+                    @if($srGp && $srGp->cnt > 0)
+                    <div class="reco-card-rating">{!! \App\Support\IconLibrary::svg('star', '', 12) !!} <strong>{{ number_format($srGp->avg_rating, 1) }}</strong> ({{ $srGp->cnt }})</div>
+                    @endif
                     <div class="reco-card-price-row">
                         <span class="reco-card-price">{{ number_format($gp->current_price, 0, ',', ' ') }}</span>
                         @if($gp->is_flash_active)
@@ -3072,7 +3114,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
     <div class="prod-grid" id="productsGrid">
         @foreach($products as $p)
         @php $pHasPromo = $p->original_price && $p->original_price > $p->price; @endphp
-        <a href="{{ route('client.products.show', $p) }}" class="reco-card">
+        <a href="{{ route('client.orders.createFromProduct', $p) }}" class="reco-card">
             <div class="reco-card-img">
                 @if($p->image)
                     <img src="{{ \App\Services\ImageOptimizer::url($p->image, 'medium') }}" alt="{{ $p->name }}" loading="lazy">
@@ -3094,6 +3136,10 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
             <div class="reco-card-body">
                 <div class="reco-card-shop">{{ $p->shop->name ?? '' }}</div>
                 <div class="reco-card-name">{{ $p->name }}</div>
+                @php $srP = $shopRatings[$p->shop_id] ?? null; @endphp
+                @if($srP && $srP->cnt > 0)
+                <div class="reco-card-rating">{!! \App\Support\IconLibrary::svg('star', '', 12) !!} <strong>{{ number_format($srP->avg_rating, 1) }}</strong> ({{ $srP->cnt }})</div>
+                @endif
                 <div class="reco-card-price-row">
                     <span class="reco-card-price">{{ number_format($p->current_price, 0, ',', ' ') }}</span>
                     @if($p->is_flash_active)

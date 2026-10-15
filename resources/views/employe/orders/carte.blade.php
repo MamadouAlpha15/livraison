@@ -13,6 +13,22 @@
     --green:#10b981;--amber:#f59e0b;--red:#ef4444;--blue:#3b82f6;
     --top-h:54px;--panel-w:290px;--r:12px;
 }
+
+/* ══ MODE SOMBRE ══ */
+[data-theme="dark"] {
+    --bg: #0b0f1a;
+    --surface: #141925;
+    --border: #262d3d;
+    --text: #e6e9f0;
+    --text-2: #b0b8c9;
+    --muted: #7b869c;
+}
+[data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
+    background: var(--surface, var(--card)); color: var(--text); border-color: var(--border-dk, var(--border, var(--bd)));
+}
+[data-theme="dark"] input::placeholder, [data-theme="dark"] textarea::placeholder { color: var(--muted); }
+[data-theme="dark"] .cp-card:hover { background: var(--surface) !important; filter: brightness(1.15); }
+
 html,body{margin:0;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);height:100%;overflow:hidden}
 a{text-decoration:none;color:inherit}
 

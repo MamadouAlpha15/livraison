@@ -62,6 +62,16 @@ class PushService
         }
     }
 
+    // Notifie tous les superadmins (jamais le staff — accès limité) : nouvelle
+    // inscription, nouvel abonnement Pro/Business payé, etc. Même mécanisme de
+    // push réel que pour les vendeurs, pas besoin d'avoir l'onglet ouvert.
+    public function notifySuperadmins(string $title, string $body, string $url = '/'): void
+    {
+        foreach (User::where('role', 'superadmin')->get() as $admin) {
+            $this->sendToUser($admin, $title, $body, 1, $url);
+        }
+    }
+
     public function sendToUser(User $user, string $title, string $body, int $badge = 0, string $url = '/'): void
     {
         $subscriptions = PushSubscription::where('user_id', $user->id)->get();

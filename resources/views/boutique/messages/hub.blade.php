@@ -1,4 +1,4 @@
-{{-- resources/views/boutique/messages/hub.blade.php --}}
+﻿{{-- resources/views/boutique/messages/hub.blade.php --}}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -7,6 +7,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Messages — {{ $shop->name }}</title>
+<script>
+(function () {
+    try {
+        if (localStorage.getItem('shopio_dark_mode') === '1') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    } catch (e) {}
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
 <style>
@@ -18,6 +27,31 @@
     --text: #111b21; --muted: #667781; --surface: #fff; --bg: #f0f2f5;
     --font: 'Inter', sans-serif; --nav-h: 56px; --sidebar-w: 360px;
 }
+
+/* ══ MODE SOMBRE ══ */
+[data-theme="dark"] {
+    --border: #262d3d;
+    --text: #e6e9f0; --muted: #7b869c; --surface: #141925; --bg: #0b0f1a;
+    --brand-lt: rgba(99,102,241,.16);
+}
+[data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
+    background: var(--surface); color: var(--text); border-color: var(--border);
+}
+[data-theme="dark"] input::placeholder, [data-theme="dark"] textarea::placeholder { color: var(--muted); }
+[data-theme="dark"] .hub-prod-strip,
+[data-theme="dark"] .hub-date-sep span,
+[data-theme="dark"] .hub-textarea,
+[data-theme="dark"] .img-sending-bubble,
+[data-theme="dark"] .hub-attach-btn,
+[data-theme="dark"] .hub-msg-row.theirs .hub-msg-bubble,
+[data-theme="dark"] .hub-msg-row.theirs .msg-img-bubble,
+[data-theme="dark"] .prod-modal,
+[data-theme="dark"] .hub-sidebar-head,
+[data-theme="dark"] .hub-search {
+    background: var(--surface) !important;
+    color: var(--text);
+}
+
 html, body { height: 100%; font-family: var(--font); background: var(--bg); color: var(--text); overflow: hidden; }
 
 /* ═══════════ TOPBAR ═══════════ */
@@ -628,6 +662,13 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 </head>
 <body>
 
+@php
+$hubIconStroke = 'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+$hubIcons = [
+    'moon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$hubIconStroke.'><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+    'sun'  => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$hubIconStroke.'><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>',
+];
+@endphp
 {{-- Topbar --}}
 <header class="topbar">
     <a href="{{ route('boutique.dashboard') }}" class="topbar-logo">
@@ -636,6 +677,9 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     </a>
     <div class="topbar-sep"></div>
     <span class="topbar-title">💬 Messages clients</span>
+    <button type="button" class="topbar-dark-btn" id="hubBtnDarkMode" data-dark-toggle
+            data-moon-icon="{{ $hubIcons['moon'] }}" data-sun-icon="{{ $hubIcons['sun'] }}"
+            title="Mode sombre" style="margin-left:auto;background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.85);width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;">{!! $hubIcons['moon'] !!}</button>
     <a href="{{ route('boutique.dashboard') }}" class="topbar-back">← Tableau de bord</a>
 </header>
 
@@ -1913,6 +1957,39 @@ function buildOrderCard(msg) {
         });
     }
 })();
+</script>
+
+{{-- ══ Mode sombre — bascule globale et persistante (page autonome, pas de layout parent) ══ --}}
+<script>
+window.isDarkMode = function () {
+    return document.documentElement.getAttribute('data-theme') === 'dark';
+};
+window.toggleDarkMode = function () {
+    var goingDark = !window.isDarkMode();
+    if (goingDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        try { localStorage.setItem('shopio_dark_mode', '1'); } catch (e) {}
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+        try { localStorage.setItem('shopio_dark_mode', '0'); } catch (e) {}
+    }
+    _syncDarkToggleButtons();
+    window.dispatchEvent(new CustomEvent('shopio:theme-changed', { detail: { dark: goingDark } }));
+};
+function _syncDarkToggleButtons() {
+    var dark = window.isDarkMode();
+    document.querySelectorAll('[data-dark-toggle]').forEach(function (btn) {
+        var icon = dark ? btn.getAttribute('data-sun-icon') : btn.getAttribute('data-moon-icon');
+        if (icon) btn.innerHTML = icon;
+        btn.setAttribute('title', dark ? 'Mode clair' : 'Mode sombre');
+    });
+}
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('[data-dark-toggle]').forEach(function (btn) {
+        btn.addEventListener('click', window.toggleDarkMode);
+    });
+    _syncDarkToggleButtons();
+});
 </script>
 </body>
 </html>

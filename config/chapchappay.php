@@ -22,8 +22,12 @@ return [
     'payout_access_code' => env('CHAPCHAPPAY_PAYOUT_ACCESS_CODE', ''),
     'payout_pin'          => env('CHAPCHAPPAY_PAYOUT_PIN', ''),
 
-    // Commission Shopio sur chaque commande payée en ligne (en %)
-    'platform_fee_percent' => env('CHAPCHAPPAY_PLATFORM_FEE_PERCENT', 1),
+    // Commission Shopio sur chaque commande payée en ligne (en %). Ajoutée EN
+    // PLUS du prix affiché par le vendeur, à la charge du client — le vendeur
+    // reçoit toujours l'intégralité de son prix, sans aucune retenue. Cette
+    // marge doit notamment couvrir les frais que ChapChap Pay pourrait lui-même
+    // prélever sur les reversements (retraits) vers la boutique.
+    'platform_fee_percent' => env('CHAPCHAPPAY_PLATFORM_FEE_PERCENT', 5),
 
     // Tarifs des abonnements en GNF (devise unique — ChapChap Pay opère en Guinée)
     'plans' => [

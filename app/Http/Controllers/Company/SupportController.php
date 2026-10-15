@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Notifications\NewSupportTicket;
 use App\Notifications\NewSupportMessage;
 use App\Services\SubscriptionService;
+use App\Services\PushService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -39,6 +40,13 @@ class SupportController extends Controller
             foreach (User::where('role', 'superadmin')->get() as $admin) {
                 $admin->notify(new NewSupportTicket($ticket));
             }
+            try {
+                app(PushService::class)->notifySuperadmins(
+                    'Nouveau ticket support',
+                    $company->name . ' — ' . $ticket->subject,
+                    route('admin.support.index')
+                );
+            } catch (\Throwable $e) {}
         }
 
         $messages = $ticket->messages()->with('author:id,name,role')->oldest()->get();
@@ -76,6 +84,13 @@ class SupportController extends Controller
         foreach (User::where('role', 'superadmin')->get() as $admin) {
             $admin->notify(new NewSupportMessage($msg));
         }
+        try {
+            app(PushService::class)->notifySuperadmins(
+                'Nouveau message support',
+                $user->name . ' — ' . $ticket->subject,
+                route('admin.support.index')
+            );
+        } catch (\Throwable $e) {}
 
         return response()->json(['ok' => true, 'msg' => $msg->load('author:id,name,role')]);
     }

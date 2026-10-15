@@ -91,6 +91,46 @@ class WelcomeController extends Controller
     }
 
     /**
+     * GET /categories/preview?cat=... — aperçu rapide de quelques produits
+     * d'une catégorie, affiché au survol de la barre de catégories sur
+     * l'accueil (sans recharger toute la page).
+     */
+    public function categoryPreview(Request $request)
+    {
+        $catName = trim((string) $request->get('cat', ''));
+        if ($catName === '') {
+            return response()->json(['products' => []]);
+        }
+
+        $user = auth()->user();
+        $approvedShopFilter = function ($q) use ($user) {
+            $q->where('is_approved', true);
+            if ($user && $user->country) {
+                $q->where('country', $user->country);
+            }
+        };
+
+        $products = Product::where('is_active', true)
+            ->whereHas('shop', $approvedShopFilter)
+            ->where('category', $catName)
+            ->with('shop:id,name')
+            ->latest()
+            ->limit(4)
+            ->get();
+
+        return response()->json([
+            'name' => $catName,
+            'products' => $products->map(fn ($p) => [
+                'name'  => $p->name,
+                'price' => number_format($p->current_price, 0, ',', ' ') . ' GNF',
+                'image' => $p->image ? asset('storage/' . $p->image) : null,
+                'url'   => route('client.orders.createFromProduct', $p),
+            ]),
+            'more_url' => url('/') . '?' . http_build_query(['cat' => $catName]) . '#catalogue',
+        ]);
+    }
+
+    /**
      * Construit le jeu de données "catalogue" partagé par les deux gabarits
      * d'accueil : ventes flash, produits recommandés, boutiques à la une,
      * catalogue complet filtrable (recherche / catégorie) et catégories.

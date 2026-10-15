@@ -29,7 +29,7 @@ class OrderController extends Controller
                 ->with('error', 'Aucune boutique rattachée à ce compte.');
         }
 
-        $orders = Order::with(['items.product', 'client', 'livreur'])
+        $orders = Order::with(['items.product', 'client', 'livreur', 'payment'])
             ->where('shop_id', $shopId)               // <= filtre strict
             ->latest()
             ->paginate(10);

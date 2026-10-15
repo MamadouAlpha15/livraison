@@ -40,7 +40,8 @@
         .al-sub { font-size:14.5px; color:rgba(255,255,255,.7); line-height:1.65; margin-bottom:36px; }
         .al-features { display:flex; flex-direction:column; gap:18px; }
         .al-feature { display:flex; align-items:flex-start; gap:14px; }
-        .al-ico { width:40px; height:40px; border-radius:10px; background:rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0; }
+        .al-ico { width:40px; height:40px; border-radius:10px; background:rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0; color:#fff; }
+        .al-ico svg { width:20px; height:20px; }
         .al-ftxt strong { display:block; font-size:13.5px; font-weight:700; color:#fff; margin-bottom:1px; }
         .al-ftxt span { font-size:12px; color:rgba(255,255,255,.6); }
         .al-footer { position:relative; z-index:1; font-size:11.5px; color:rgba(255,255,255,.35); }
@@ -64,10 +65,12 @@
         .f-input-err { border-color:#ef4444 !important; }
         .f-icon-wrap { position:relative; }
         .f-icon-wrap .f-input { padding-left:42px; }
-        .f-icon-wrap .f-ico  { position:absolute; left:13px; top:50%; transform:translateY(-50%); font-size:16px; pointer-events:none; }
+        .f-icon-wrap .f-ico  { position:absolute; left:13px; top:50%; transform:translateY(-50%); font-size:16px; pointer-events:none; display:inline-flex; color:#9ca3af; }
+        .f-icon-wrap .f-ico svg { width:1em; height:1em; }
         .f-pw-wrap { position:relative; }
         .f-pw-wrap .f-input  { padding-left:42px; padding-right:44px; }
-        .f-pw-eye { position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:17px; color:#9ca3af; padding:0; line-height:1; }
+        .f-pw-eye { position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:17px; color:#9ca3af; padding:0; line-height:1; display:inline-flex; align-items:center; }
+        .f-pw-eye svg { width:1em; height:1em; }
         .f-pw-eye:hover { color:#6b7280; }
         .f-select {
             width:100%; padding:11px 36px 11px 14px; border:1.5px solid #e5e7eb; border-radius:10px;
@@ -162,6 +165,7 @@
             .al-title { font-size: 24px; }
             .al-features { gap: 14px; }
             .al-ico { width: 34px; height: 34px; font-size: 16px; }
+            .al-ico svg { width: 17px; height: 17px; }
             .al-ftxt strong { font-size: 12.5px; }
             .al-ftxt span { font-size: 11px; }
         }
@@ -223,10 +227,10 @@
             <div class="al-title">La marketplace<br>pour <span>tous</span> 🌍</div>
             <p class="al-sub">Commandez, vendez et livrez en toute confiance.<br>Des milliers de boutiques à portée de main.</p>
             <div class="al-features">
-                <div class="al-feature"><div class="al-ico">🛒</div><div class="al-ftxt"><strong>Commandes faciles</strong><span>Parcourez et commandez en quelques clics</span></div></div>
-                <div class="al-feature"><div class="al-ico">🚚</div><div class="al-ftxt"><strong>Livraison rapide</strong><span>Suivi en temps réel de vos colis</span></div></div>
-                <div class="al-feature"><div class="al-ico">🏪</div><div class="al-ftxt"><strong>Ouvrez votre boutique</strong><span>Vendez vos produits partout dans le monde</span></div></div>
-                <div class="al-feature"><div class="al-ico">🔒</div><div class="al-ftxt"><strong>Transactions sécurisées</strong><span>Vos données et paiements sont protégés</span></div></div>
+                <div class="al-feature"><div class="al-ico">{!! \App\Support\IconLibrary::svg('cart') !!}</div><div class="al-ftxt"><strong>Commandes faciles</strong><span>Parcourez et commandez en quelques clics</span></div></div>
+                <div class="al-feature"><div class="al-ico">{!! \App\Support\IconLibrary::svg('truck') !!}</div><div class="al-ftxt"><strong>Livraison rapide</strong><span>Suivi en temps réel de vos colis</span></div></div>
+                <div class="al-feature"><div class="al-ico">{!! \App\Support\IconLibrary::svg('store') !!}</div><div class="al-ftxt"><strong>Ouvrez votre boutique</strong><span>Vendez vos produits partout dans le monde</span></div></div>
+                <div class="al-feature"><div class="al-ico">{!! \App\Support\IconLibrary::svg('lock') !!}</div><div class="al-ftxt"><strong>Transactions sécurisées</strong><span>Vos données et paiements sont protégés</span></div></div>
             </div>
         </div>
         <div class="al-footer">© {{ date('Y') }} Shopio · Tous droits réservés</div>

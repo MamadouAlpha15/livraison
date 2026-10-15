@@ -18,6 +18,20 @@ $proGnf   = number_format(150000, 0, ',', ' ');
     --text:#0f172a;--muted:#64748b;
     --font:'Segoe UI',system-ui,sans-serif;
 }
+
+/* ══ MODE SOMBRE ══ */
+[data-theme="dark"] {
+    --bg: #0b0f1a;
+    --card: #141925;
+    --bd: #262d3d;
+    --text: #e6e9f0;
+    --muted: #7b869c;
+}
+[data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
+    background: var(--surface, var(--card)); color: var(--text); border-color: var(--border-dk, var(--border, var(--bd)));
+}
+[data-theme="dark"] input::placeholder, [data-theme="dark"] textarea::placeholder { color: var(--muted); }
+
 .upg-wrap{max-width:860px;margin:0 auto;padding:32px 16px}
 .upg-head{text-align:center;margin-bottom:36px}
 .upg-head h1{font-size:26px;font-weight:900;color:var(--text);margin:0 0 8px;letter-spacing:-.5px}

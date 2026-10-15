@@ -630,5 +630,25 @@ function _refreshHeaderCount() {
     });
     _refreshHeaderCount();
 })();
+
+/* En visitant cette page, on considère les messages support "vus" — synchronise
+   le compteur local utilisé par la cloche de notification du dashboard, sinon
+   son badge reste bloqué tant qu'on n'a pas cliqué dessus DANS la cloche elle-même
+   (ce qui n'arrive jamais si on arrive ici via la notification push). */
+fetch('{{ route('admin.dashboard.stats') }}').then(r => r.json()).then(data => {
+    try {
+        const k = data.kpis || {};
+        const s = JSON.parse(localStorage.getItem('sa_notif_seen') || '{}');
+        s.unreadMessages = k.unreadMessages || 0;
+        localStorage.setItem('sa_notif_seen', JSON.stringify(s));
+
+        // Remet aussi à jour l'icône de l'app (PWA) tout de suite, sans attendre
+        // un retour sur le tableau de bord — ne retire QUE la part "support" du
+        // badge, les boutiques/entreprises en attente restent comptées.
+        const remaining = Math.max(0,(k.shopsPending||0)-(s.shops||0))
+                         + Math.max(0,(k.pendingAppr||0)-(s.comp||0));
+        if (window.updatePwaBadge) window.updatePwaBadge(remaining);
+    } catch (e) {}
+}).catch(() => {});
 </script>
 @endpush

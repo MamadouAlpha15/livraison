@@ -140,7 +140,7 @@ $countries = [
         <div class="f-group">
             <label class="f-label" for="name">Nom complet</label>
             <div class="f-icon-wrap">
-                <span class="f-ico">👤</span>
+                <span class="f-ico">{!! \App\Support\IconLibrary::svg('user', '', 16) !!}</span>
                 <input id="name" class="f-input {{ $errors->has('name') ? 'f-input-err':'' }}"
                        type="text" name="name" value="{{ old('name') }}"
                        autocomplete="name" placeholder="Votre nom complet"
@@ -155,7 +155,7 @@ $countries = [
         <div class="f-group">
             <label class="f-label" for="email">Adresse email</label>
             <div class="f-icon-wrap">
-                <span class="f-ico">✉️</span>
+                <span class="f-ico">{!! \App\Support\IconLibrary::svg('mail', '', 16) !!}</span>
                 <input id="email" class="f-input {{ $errors->has('email') ? 'f-input-err':'' }}"
                        type="email" name="email" value="{{ old('email') }}"
                        autocomplete="username" placeholder="exemple@email.com"
@@ -170,11 +170,11 @@ $countries = [
         <div class="f-group">
             <label class="f-label" for="password">Mot de passe</label>
             <div class="f-icon-wrap f-pw-wrap">
-                <span class="f-ico">🔒</span>
+                <span class="f-ico">{!! \App\Support\IconLibrary::svg('lock', '', 16) !!}</span>
                 <input id="password" class="f-input {{ $errors->has('password') ? 'f-input-err':'' }}"
                        type="password" autocomplete="new-password" placeholder="Min. 8 caractères"
                        oninput="liveCheck(this,'pwErr','password')">
-                <button type="button" class="f-pw-eye" onclick="togglePw('password',this)">👁️</button>
+                <button type="button" class="f-pw-eye" onclick="togglePw('password',this)">{!! \App\Support\IconLibrary::svg('eye', '', 16) !!}</button>
             </div>
             <p class="f-inline-err {{ $errors->has('password') ? 'show':'' }}" id="pwErr">
                 {{ $errors->first('password') ?? 'Minimum 8 caractères requis.' }}
@@ -185,11 +185,11 @@ $countries = [
         <div class="f-group">
             <label class="f-label" for="password_confirmation">Confirmer le mot de passe</label>
             <div class="f-icon-wrap f-pw-wrap">
-                <span class="f-ico">🔒</span>
+                <span class="f-ico">{!! \App\Support\IconLibrary::svg('lock', '', 16) !!}</span>
                 <input id="password_confirmation" class="f-input"
                        type="password" autocomplete="new-password" placeholder="Répéter le mot de passe"
                        oninput="checkConfirm()">
-                <button type="button" class="f-pw-eye" onclick="togglePw('password_confirmation',this)">👁️</button>
+                <button type="button" class="f-pw-eye" onclick="togglePw('password_confirmation',this)">{!! \App\Support\IconLibrary::svg('eye', '', 16) !!}</button>
             </div>
             <p class="f-inline-err" id="confirmErr">Les mots de passe ne correspondent pas.</p>
         </div>
@@ -229,7 +229,7 @@ $countries = [
 
         {{-- Pays --}}
         <div class="f-group">
-            <label class="f-label" for="country">🌍 Votre pays</label>
+            <label class="f-label" for="country" style="display:flex;align-items:center;gap:5px;">{!! \App\Support\IconLibrary::svg('globe', '', 14) !!} Votre pays</label>
             <div class="f-flag-wrap">
                 <span class="f-flag-preview" id="flagPreview">🌍</span>
                 <select id="country" name="country" class="f-select {{ $errors->has('country') ? 'f-input-err':'' }}"
@@ -250,7 +250,7 @@ $countries = [
         <div class="f-group" id="phoneField">
             <label class="f-label" for="phone">Téléphone</label>
             <div class="f-icon-wrap">
-                <span class="f-ico">📞</span>
+                <span class="f-ico">{!! \App\Support\IconLibrary::svg('phone', '', 16) !!}</span>
                 <input id="phone" class="f-input {{ $errors->has('phone') ? 'f-input-err':'' }}"
                        type="text" name="phone" value="{{ old('phone') }}" placeholder="+224 6XX XX XX XX">
             </div>
@@ -261,7 +261,7 @@ $countries = [
         <div class="f-group" id="addressField">
             <label class="f-label" for="address">Adresse de livraison</label>
             <div class="f-icon-wrap">
-                <span class="f-ico">📍</span>
+                <span class="f-ico">{!! \App\Support\IconLibrary::svg('map-pin', '', 16) !!}</span>
                 <input id="address" class="f-input {{ $errors->has('address') ? 'f-input-err':'' }}"
                        type="text" name="address" value="{{ old('address') }}" placeholder="Votre adresse complète">
             </div>
@@ -385,18 +385,52 @@ function updateFlag(select) {
     document.getElementById('flagPreview').textContent = flag;
 }
 
+var ICO_EYE     = @json(\App\Support\IconLibrary::svg('eye', '', 16));
+var ICO_EYE_OFF = @json(\App\Support\IconLibrary::svg('eye-off', '', 16));
+
 function togglePw(id, btn) {
     var inp = document.getElementById(id);
-    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
-    else { inp.type = 'password'; btn.textContent = '👁️'; }
+    if (inp.type === 'password') { inp.type = 'text'; btn.innerHTML = ICO_EYE_OFF; }
+    else { inp.type = 'password'; btn.innerHTML = ICO_EYE; }
 }
 
-document.getElementById('googleBtn').addEventListener('click', function () {
+{{-- Dans l'app Capacitor, le flux Google doit s'ouvrir dans le vrai navigateur
+     (Google bloque les webviews intégrées) plutôt que dans la webview de l'app —
+     sinon la session Google finit dans un contexte que l'app ne peut pas lire. --}}
+const isCapacitorApp = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+const googleBtn = document.getElementById('googleBtn');
+const googleBtnOriginalHtml = googleBtn.innerHTML;
+
+if (isCapacitorApp) {
+    googleBtn.href = "{{ route('google.redirect.app') }}";
+}
+
+function resetGoogleBtn() {
+    googleBtn.style.pointerEvents = '';
+    googleBtn.style.opacity = '';
+    googleBtn.innerHTML = googleBtnOriginalHtml;
+}
+
+googleBtn.addEventListener('click', function (e) {
     this.style.pointerEvents = 'none';
     this.style.opacity = '.7';
     document.getElementById('googleBtnIco').outerHTML = '<span class="btn-spinner-dark"></span>';
     document.getElementById('googleBtnTxt').textContent = 'Connexion…';
+
+    if (isCapacitorApp) {
+        e.preventDefault();
+        window.open(this.href, '_system');
+    }
 });
+
+{{-- Si l'utilisateur revient dans l'app sans avoir terminé (ex: fermé le
+     navigateur externe), le bouton resterait sinon bloqué en "Connexion…"
+     indéfiniment, puisque cette page-ci ne navigue jamais ailleurs. --}}
+if (isCapacitorApp) {
+    document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible') resetGoogleBtn();
+    });
+}
 
 document.addEventListener('DOMContentLoaded', function () {
     // Init flag

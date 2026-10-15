@@ -22,6 +22,12 @@ class ImageOptimizer
         return $disk === 'local' ? 'public' : $disk;
     }
 
+    /** Accès public au disk actif — utilisé par les outils de diagnostic (ex: vérification d'images cassées). */
+    public static function activeDisk(): string
+    {
+        return self::disk();
+    }
+
     /**
      * Optimise et stocke une image uploadée.
      * Génère 3 tailles : thumb (300px), medium (800px), large (1600px)

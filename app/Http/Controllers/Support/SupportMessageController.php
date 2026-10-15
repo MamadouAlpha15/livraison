@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SupportTicket;
 use App\Models\SupportMessage;
 use App\Notifications\NewSupportMessage;
+use App\Services\PushService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -30,6 +31,13 @@ class SupportMessageController extends Controller
             $notify = collect([$ticket->creator]);
         } else {
             $notify = \App\Models\User::where('role', 'superadmin')->get();
+            try {
+                app(PushService::class)->notifySuperadmins(
+                    'Nouveau message support',
+                    $sender->name . ' — ' . $ticket->subject,
+                    route('admin.support.index')
+                );
+            } catch (\Throwable $e) {}
         }
         foreach ($notify as $u) {
             $u->notify(new NewSupportMessage($msg));

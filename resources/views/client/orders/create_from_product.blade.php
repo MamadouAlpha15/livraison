@@ -211,6 +211,21 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .field-input.is-invalid { border-color: #fca5a5; }
 .field-input.is-invalid:focus { box-shadow: 0 0 0 3px rgba(220,38,38,.12); }
 .field-input.is-valid { border-color: #6ee7b7; }
+
+/* ══ MODE DE PAIEMENT ══ */
+.pay-method-opts { display: flex; flex-direction: column; gap: 8px; }
+.pay-method-opt {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 12px; border: 1.5px solid var(--border); border-radius: var(--r-sm);
+    cursor: pointer; transition: border-color .15s, background .15s;
+}
+.pay-method-opt:hover { border-color: var(--brand); }
+.pay-method-opt.active { border-color: var(--brand); background: rgba(99,102,241,.06); }
+.pay-method-opt input[type="radio"] { width: 16px; height: 16px; accent-color: var(--brand); flex-shrink: 0; }
+.pay-method-opt-ico { font-size: 17px; flex-shrink: 0; }
+.pay-method-opt-txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.pay-method-opt-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.pay-method-opt-sub { font-size: 11px; color: var(--muted); }
 .field-hint { display: none; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; margin-top: 5px; }
 .field-hint.show { display: flex; }
 .field-hint.error { color: var(--red); }
@@ -505,10 +520,26 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                         </div>
                         @endif
 
-                        {{-- Paiement en ligne temporairement désactivé (réactivation prévue plus tard) —
-                             on reste sur cash à la livraison uniquement pour l'instant. --}}
-                        <div style="font-size:13px;color:var(--green);display:flex;align-items:center;gap:6px;margin-bottom:14px">
-                            {!! \App\Support\IconLibrary::svg('check', '', 14) !!} Livraison disponible — paiement à la réception
+                        <div class="field-group">
+                            <label class="field-label">{!! \App\Support\IconLibrary::svg('wallet', '', 11) !!} Mode de paiement</label>
+                            <div class="pay-method-opts">
+                                <label class="pay-method-opt active" id="payOptCash">
+                                    <input type="radio" name="payment_method_choice" value="cash" checked onchange="setPaymentMethod('cash')">
+                                    <span class="pay-method-opt-ico">💵</span>
+                                    <span class="pay-method-opt-txt">
+                                        <span class="pay-method-opt-title">Cash à la livraison</span>
+                                        <span class="pay-method-opt-sub">Vous payez quand vous recevez la commande</span>
+                                    </span>
+                                </label>
+                                <label class="pay-method-opt" id="payOptOnline">
+                                    <input type="radio" name="payment_method_choice" value="online" onchange="setPaymentMethod('online')">
+                                    <span class="pay-method-opt-ico">📱</span>
+                                    <span class="pay-method-opt-txt">
+                                        <span class="pay-method-opt-title">Payer en ligne maintenant</span>
+                                        <span class="pay-method-opt-sub">Mobile Money — paiement sécurisé</span>
+                                    </span>
+                                </label>
+                            </div>
                         </div>
                         <input type="hidden" name="payment_method" id="paymentMethodInput" value="cash">
                     </div>
@@ -592,6 +623,11 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                         @endif
                         @endauth
 
+                        <div class="order-summary-row" id="onlineFeeRow" style="display:none">
+                            <span class="order-summary-row-lbl">Commission paiement en ligne</span>
+                            <span class="order-summary-row-val" id="onlineFeeVal">+0</span>
+                        </div>
+
                         <div class="order-summary-sep"></div>
 
                         <div class="order-total-row">
@@ -665,6 +701,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 @push('scripts')
 <script>
 const HAS_VARIANTS = {{ $variants->isNotEmpty() ? 'true' : 'false' }};
+const ONLINE_FEE_PERCENT = {{ (float) config('chapchappay.platform_fee_percent', 5) }};
 const BASE_PRICE = {{ (float) $product->current_price }};
 const BASE_STOCK = {{ $variants->isNotEmpty() ? 999 : ($stockVal ?? 999) }};
 let PRICE = BASE_PRICE;
@@ -843,6 +880,29 @@ function applyPromoCode() {
     .catch(() => showPromoMsg('Erreur de vérification, réessayez.', false));
 }
 
+function setPaymentMethod(method) {
+    document.getElementById('paymentMethodInput').value = method;
+    document.getElementById('payOptCash').classList.toggle('active', method === 'cash');
+    document.getElementById('payOptOnline').classList.toggle('active', method === 'online');
+
+    const txt = document.getElementById('cashNoticeTxt');
+    const box = document.getElementById('cashNoticeBox');
+    if (txt && box) {
+        if (method === 'online') {
+            txt.textContent = 'Vous serez redirigé vers la page de paiement sécurisée après validation';
+            box.style.background = 'rgba(99,102,241,.12)';
+            box.style.borderColor = 'rgba(99,102,241,.3)';
+            box.style.color = '#c7d2fe';
+        } else {
+            txt.textContent = 'Cash à la livraison — aucune carte requise';
+            box.style.background = 'rgba(245,166,35,.12)';
+            box.style.borderColor = 'rgba(245,166,35,.25)';
+            box.style.color = '#fde68a';
+        }
+    }
+    updateTotal();
+}
+
 function togglePoints() {
     const chk = document.getElementById('usePointsChk');
     const row = document.getElementById('pointsRow');
@@ -888,7 +948,23 @@ function updateTotal() {
         document.getElementById('pointsDiscountVal').textContent = '-' + pointsUsed.toLocaleString('fr-FR');
     }
 
-    const total = Math.max(0, afterPromo - pointsUsed);
+    let total = Math.max(0, afterPromo - pointsUsed);
+
+    // Paiement en ligne : commission Shopio ajoutée EN PLUS, à la charge du
+    // client — le vendeur reçoit toujours le prix plein affiché.
+    const isOnline = document.getElementById('paymentMethodInput')?.value === 'online';
+    const feeRow = document.getElementById('onlineFeeRow');
+    if (isOnline && total > 0) {
+        const fee = Math.round(total * ONLINE_FEE_PERCENT / 100);
+        total += fee;
+        if (feeRow) {
+            feeRow.style.display = 'flex';
+            document.getElementById('onlineFeeVal').textContent = '+' + fee.toLocaleString('fr-FR');
+        }
+    } else if (feeRow) {
+        feeRow.style.display = 'none';
+    }
+
     const el = document.getElementById('totalDisplay');
     if (el) el.textContent = total.toLocaleString('fr-FR');
     const sq = document.getElementById('summaryQty');

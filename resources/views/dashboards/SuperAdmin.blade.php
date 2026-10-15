@@ -511,6 +511,8 @@ $I = [
 'receipt'=> '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M14 8H8m8 4H8m5 4H8"/></svg>',
 'star'   => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
 'ticket' => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3Z"/></svg>',
+'megaphone' => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>',
+'image_ico' => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>',
 'cog'    => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>',
 'bell'   => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
 'logout' => '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" '.$s.'><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
@@ -555,7 +557,7 @@ $I = [
         <div class="sb-av">{{ $meInit }}</div>
         <div style="min-width:0">
             <div class="sb-name">{{ Str::limit($meName,22) }}</div>
-            <div class="sb-badge-role">Fondateur &amp; Développeur</div>
+            <div class="sb-badge-role">{{ $me->role === 'superadmin' ? 'Fondateur & Développeur' : 'Personnel plateforme' }}</div>
         </div>
     </div>
     <nav class="sb-nav">
@@ -578,6 +580,9 @@ $I = [
         </a>
         <a href="{{ route('admin.clients.index') }}" class="sb-a">
             <span class="sb-i">{!! $I['user'] !!}</span><span>Clients boutiques</span>
+        </a>
+        <a href="{{ route('admin.image-health.index') }}" class="sb-a">
+            <span class="sb-i">{!! $I['image_ico'] !!}</span><span>Santé des images</span>
         </a>
         <div class="sb-sec livr">── SaaS Livraison</div>
         <a href="{{ route('admin.entreprises.index') }}" class="sb-a">
@@ -612,9 +617,6 @@ $I = [
         <a href="{{ route('admin.revenus.index') }}" class="sb-a">
             <span class="sb-i">{!! $I['dollar'] !!}</span><span>Revenus plateforme</span>
         </a>
-        <a href="#" class="sb-a" onclick="nt();return false">
-            <span class="sb-i">{!! $I['receipt'] !!}</span><span>Factures &amp; Exports</span>
-        </a>
         <div class="sb-sec plat">── Plateforme</div>
         <a href="{{ route('admin.users.index') }}" class="sb-a">
             <span class="sb-i">{!! $I['users'] !!}</span><span>Tous les utilisateurs</span>
@@ -625,6 +627,9 @@ $I = [
         <a href="{{ route('admin.support.index') }}" class="sb-a">
             <span class="sb-i">{!! $I['ticket'] !!}</span><span>Support conversations</span>
             <span class="sb-pill a" id="sbBadgeSupport" style="display:none"></span>
+        </a>
+        <a href="{{ route('admin.broadcasts.index') }}" class="sb-a">
+            <span class="sb-i">{!! $I['megaphone'] !!}</span><span>Annonces par email</span>
         </a>
         <a href="{{ route('admin.plans.index') }}" class="sb-a"><span class="sb-i">{!! $I['cog'] !!}</span><span>Paramètres système</span></a>
     </nav>
@@ -684,7 +689,7 @@ $I = [
             <div class="tb-uav">{{ $meInit }}</div>
             <div style="text-align:left">
                 <div class="tb-uname">{{ Str::limit($meName,14) }}</div>
-                <div class="tb-urole">SuperAdmin</div>
+                <div class="tb-urole">{{ $me->role === 'superadmin' ? 'SuperAdmin' : 'Personnel' }}</div>
             </div>
             <span style="color:var(--muted);margin-left:2px">{!! $I['chevron'] !!}</span>
         </button>
@@ -711,6 +716,58 @@ $I = [
     @if(session('error')||session('danger'))
     <div class="flash err">{{ session('error')??session('danger') }}</div>
     @endif
+
+    {{-- Notifications push — nouvelles inscriptions, abonnements Pro/Business payés… --}}
+    <div id="notifSettingsCard" style="display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:16px;">
+        <span style="font-size:26px">🔔</span>
+        <div style="flex:1;min-width:160px">
+            <div style="font-weight:700;font-size:14px;color:var(--text)">Notifications push</div>
+            <div id="notifSettingsSub" style="font-size:13px;color:var(--muted);margin-top:2px">Soyez alerté des nouvelles inscriptions et des abonnements payés, même application fermée.</div>
+        </div>
+        <button type="button" id="notifSettingsBtn"
+                style="background:#059669;color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">
+            Activer les notifications
+        </button>
+    </div>
+    <script>
+    (function() {
+        var card = document.getElementById('notifSettingsCard');
+        var btn  = document.getElementById('notifSettingsBtn');
+        var sub  = document.getElementById('notifSettingsSub');
+        if (!card) return;
+
+        if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+            card.style.display = 'none';
+            return;
+        }
+
+        function refresh() {
+            if (Notification.permission === 'granted' && localStorage.getItem('push_subscribed')) {
+                sub.textContent = 'Notifications activées ✓';
+                btn.textContent = 'Déjà activées';
+                btn.disabled = true;
+                btn.style.opacity = '.6';
+                btn.style.cursor = 'default';
+            } else if (Notification.permission === 'denied') {
+                sub.textContent = 'Bloquées dans les réglages de votre navigateur — autorisez les notifications pour ce site pour les activer.';
+                btn.style.display = 'none';
+            }
+        }
+
+        btn.addEventListener('click', function() {
+            btn.disabled = true;
+            btn.textContent = 'Activation…';
+            Promise.resolve(window.enablePushNotifications ? window.enablePushNotifications() : null)
+                .finally(function() {
+                    btn.disabled = false;
+                    btn.textContent = 'Activer les notifications';
+                    refresh();
+                });
+        });
+
+        refresh();
+    })();
+    </script>
 
     <div class="bc">
         <span style="display:flex;align-items:center">{!! $I['brand'] !!}</span>
@@ -1160,15 +1217,6 @@ $I = [
                     Statut système
                 </div>
             </div>
-            @php $sys=[
-                ['n'=>'Application Laravel','c'=>'g','l'=>'En ligne'],
-                ['n'=>'Base de données','c'=>'g','l'=>'Connectée'],
-                ['n'=>'Cache Redis','c'=>'g','l'=>'Actif'],
-                ['n'=>'Paiements','c'=>'a','l'=>'Sandbox'],
-                ['n'=>'Emails (SMTP)','c'=>'a','l'=>'À configurer'],
-                ['n'=>'Google OAuth','c'=>'g','l'=>'Actif'],
-                ['n'=>'PDF / Excel','c'=>'g','l'=>'Opérationnel'],
-            ]; @endphp
             @foreach($sys as $s_)
             <div class="ss-row">
                 <span class="ss-n">{{ $s_['n'] }}</span>
@@ -1182,7 +1230,9 @@ $I = [
 
     </div>
 
-    {{-- ══ ZONE DANGER — SUPPRESSION DÉFINITIVE ══ --}}
+    {{-- ══ ZONE DANGER — SUPPRESSION DÉFINITIVE — réservée au superadmin (fondateur),
+         jamais au staff plateforme même s'il a accès au reste de ce tableau de bord ══ --}}
+    @if($me->role === 'superadmin')
     <div style="margin-top:28px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
             <div style="width:36px;height:36px;border-radius:10px;background:rgba(239,68,68,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
@@ -1285,8 +1335,10 @@ $I = [
             </form>
         </div>
     </div>
+    @endif
 
-    {{-- Modal de confirmation --}}
+    {{-- Modal de confirmation (rendu même si masqué ci-dessus : inerte sans les
+         boutons déclencheurs, laissé en place pour ne pas complexifier le JS) --}}
     <div id="purgeModal" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,.6);align-items:center;justify-content:center">
         <div style="background:#fff;border-radius:16px;padding:28px 28px 24px;width:90%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.25)">
             <div style="width:48px;height:48px;border-radius:50%;background:#fef2f2;display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
@@ -1401,9 +1453,15 @@ function updateSupportSidebarBadge(k){
 }
 function updateBellBadge(count){
     const el=document.getElementById('bellBadge');
-    if(!el)return;
-    if(count>0){el.textContent=count>99?'99+':count;el.style.display='flex';}
-    else{el.style.display='none';}
+    if(el){
+        if(count>0){el.textContent=count>99?'99+':count;el.style.display='flex';}
+        else{el.style.display='none';}
+    }
+    // Le badge sur l'icône de l'app (PWA) se pose tout seul à la réception
+    // d'une notification push, mais rien ne le remettait jamais à zéro pour
+    // le superadmin (contrairement au client/vendeur/entreprise qui ont leur
+    // propre polling) — on le synchronise ici avec le même compteur.
+    if(window.updatePwaBadge) window.updatePwaBadge(count);
 }
 function playBellSound(){
     try{
@@ -1627,7 +1685,10 @@ function updateActivity(items){
             </div>
         </div>`).join('');
 }
+let _pollTimer=null;
+function schedulePoll(){ clearTimeout(_pollTimer); _pollTimer=setTimeout(pollStats,15000); }
 function pollStats(){
+    if(document.visibilityState!=='visible'){ schedulePoll(); return; }
     fetch(STATS_URL,{headers:{'X-Requested-With':'XMLHttpRequest'}})
         .then(r=>r.json())
         .then(d=>{
@@ -1728,8 +1789,15 @@ function pollStats(){
             const ts=document.getElementById('liveTs');if(ts)ts.textContent=d.ts;
         })
         .catch(()=>{});
-    setTimeout(pollStats,15000);
+    schedulePoll();
 }
-setTimeout(pollStats,15000);
+schedulePoll();
+// Resynchronise immédiatement quand l'onglet redevient actif (au lieu d'attendre
+// jusqu'à 15s de plus) — schedulePoll() annule systématiquement le minuteur en
+// attente avant d'en reposer un, donc jamais deux boucles en parallèle même si
+// l'onglet change de visibilité plusieurs fois de suite.
+document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState==='visible')pollStats();
+});
 </script>
 @endpush

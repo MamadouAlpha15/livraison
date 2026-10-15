@@ -29,6 +29,7 @@ use App\Services\PromoCodeService;
 use App\Rules\RealisticGuineaPhone;
 use App\Rules\RealisticFullName;
 use App\Services\ChapChapPayService;
+use App\Services\ShopPayoutService;
 use Illuminate\Support\Facades\Log;
 
 // On importe Request : objet qui contient toutes les données envoyées par le formulaire (POST, GET...)
@@ -441,53 +442,27 @@ class OrderController extends Controller
         }
 
         // On crée le paiement associé à cette commande — cash par défaut, ou en
-        // ligne (ChapChap Pay) si le client a choisi de payer tout de suite.
-        // Paiement en ligne temporairement désactivé (réactivation prévue plus
-        // tard, une fois ChapChap Pay + le reversement aux boutiques en place) :
-        // on ignore payment_method et on reste toujours en cash pour l'instant,
-        // même si un ancien lien/formulaire envoyait encore 'online'.
-        $onlinePaymentEnabled = false;
-        $wantsOnlinePayment = $onlinePaymentEnabled && $request->input('payment_method') === 'online';
+        // ligne (ChapChap Pay) si le client a choisi de payer tout de suite. En
+        // ligne, le client paie le prix du vendeur + la commission Shopio EN
+        // PLUS (voir ShopPayoutService) : la boutique reçoit toujours son prix
+        // plein, sans aucune retenue.
+        $wantsOnlinePayment = $request->input('payment_method') === 'online';
+        $clientChargeAmount = $total;
+        if ($wantsOnlinePayment) {
+            $charge = app(ShopPayoutService::class)->computeClientCharge($total);
+            $clientChargeAmount = $charge['client_charge'];
+        }
 
         $payment = Payment::create([
             'order_id' => $order->id,
             'method'   => $wantsOnlinePayment ? Payment::METHOD_CHAPCHAPPAY : Payment::METHOD_CASH,
-            'amount'   => $total,
+            'amount'   => $clientChargeAmount,
             'status'   => 'en_attente',
         ]);
 
-        // Si paiement en ligne demandé : on initie l'opération ChapChap Pay et on
-        // redirige le client vers leur page de paiement hébergée. En cas d'échec
-        // d'initiation, on ne bloque pas la commande — elle reste valable en cash.
-        $onlinePaymentFailedMessage = null;
-        if ($wantsOnlinePayment) {
-            $result = app(ChapChapPayService::class)->createOperation(
-                amountGnf:   $total,
-                orderId:     'ORDER-' . $order->id . '-' . now()->timestamp,
-                description: 'Commande #' . $order->id . ' — ' . ($product->shop->name ?? 'Shopio'),
-                notifyUrl:   route('payment.order.callback'),
-                returnUrl:   route('payment.order.success', ['order' => $order->id]),
-                cancelUrl:   route('payment.order.failed', ['order' => $order->id]),
-            );
-
-            if ($result['success']) {
-                $payment->update(['gateway_operation_id' => $result['operation_id']]);
-                return redirect($result['payment_url']);
-            }
-
-            // Échec d'initiation : on repasse en cash pour ne pas perdre la commande,
-            // mais on prévient le client au lieu de le laisser croire qu'il a payé en ligne.
-            $payment->update(['method' => Payment::METHOD_CASH]);
-            $onlinePaymentFailedMessage = "Le paiement en ligne n'a pas pu être initié"
-                . (!empty($result['message']) ? ' (' . $result['message'] . ')' : '')
-                . " — votre commande est enregistrée en cash à la livraison.";
-            Log::warning('[OrderPayment] Initiation paiement en ligne échouée, commande conservée en cash', [
-                'order_id' => $order->id,
-                'message'  => $result['message'] ?? '',
-            ]);
-        }
-
-        // Notifier le vendeur par push
+        // Notifier le vendeur par push — AVANT l'initiation du paiement en ligne
+        // (qui redirige/quitte la fonction en cas de succès) : sinon le vendeur
+        // n'est jamais prévenu pour les commandes payées en ligne.
         try {
             $shopOwner = $order->shop->user ?? $product->shop->user ?? null;
             if ($shopOwner) {
@@ -515,6 +490,38 @@ class OrderController extends Controller
                 );
             }
         } catch (\Throwable $e) {}
+
+        // Si paiement en ligne demandé : on initie l'opération ChapChap Pay et on
+        // redirige le client vers leur page de paiement hébergée. En cas d'échec
+        // d'initiation, on ne bloque pas la commande — elle reste valable en cash.
+        $onlinePaymentFailedMessage = null;
+        if ($wantsOnlinePayment) {
+            $result = app(ChapChapPayService::class)->createOperation(
+                amountGnf:   $clientChargeAmount,
+                orderId:     'ORDER-' . $order->id . '-' . now()->timestamp,
+                description: 'Commande #' . $order->id . ' — ' . ($product->shop->name ?? 'Shopio'),
+                notifyUrl:   route('payment.order.callback'),
+                returnUrl:   route('payment.order.success', ['order' => $order->id]),
+                cancelUrl:   route('payment.order.failed', ['order' => $order->id]),
+            );
+
+            if ($result['success']) {
+                $payment->update(['gateway_operation_id' => $result['operation_id']]);
+                return redirect($result['payment_url']);
+            }
+
+            // Échec d'initiation : on repasse en cash pour ne pas perdre la commande
+            // (donc sans la commission en plus — elle ne s'applique qu'en ligne),
+            // mais on prévient le client au lieu de le laisser croire qu'il a payé en ligne.
+            $payment->update(['method' => Payment::METHOD_CASH, 'amount' => $total]);
+            $onlinePaymentFailedMessage = "Le paiement en ligne n'a pas pu être initié"
+                . (!empty($result['message']) ? ' (' . $result['message'] . ')' : '')
+                . " — votre commande est enregistrée en cash à la livraison.";
+            Log::warning('[OrderPayment] Initiation paiement en ligne échouée, commande conservée en cash', [
+                'order_id' => $order->id,
+                'message'  => $result['message'] ?? '',
+            ]);
+        }
 
         $successMsg = "Commande passée avec succès ! Vous recevrez une confirmation. 🎉";
 

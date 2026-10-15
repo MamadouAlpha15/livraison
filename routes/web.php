@@ -184,6 +184,9 @@ Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 /* Suggestions de recherche (autocomplétion) — accessible sans compte, comme le catalogue */
 Route::get('/search-suggestions', [WelcomeController::class, 'suggestions'])->name('search.suggestions');
 
+/* Aperçu produits d'une catégorie (survol de la barre de catégories, accueil) */
+Route::get('/categories/preview', [WelcomeController::class, 'categoryPreview'])->name('categories.preview');
+
 /* Conditions d'utilisation et politique de confidentialité */
 Route::view('/conditions-utilisation', 'legal.terms')->name('legal.terms');
 
@@ -231,6 +234,7 @@ Route::get('/dashboard', function () {
     $user = auth()->user();
     return match($user->role ?? '') {
         'superadmin' => redirect()->route('admin.dashboard'),
+        'staff'      => redirect()->route('admin.dashboard'),
         'admin'      => redirect()->route('boutique.dashboard'),
         'company'    => redirect()->route('company.dashboard'),
         'livreur'    => redirect()->route('livreur.dashboard'),
@@ -462,7 +466,7 @@ Route::middleware('auth')->group(function () {
 |  Préfixe : /admin  |  Nom : admin.*
 ══════════════════════════════════════════════════════════════════════════ */
 
-Route::middleware(['auth', 'role:superadmin'])
+Route::middleware(['auth', 'role:superadmin,staff'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
@@ -516,6 +520,17 @@ Route::middleware(['auth', 'role:superadmin'])
         /* Tous les utilisateurs (vue globale superadmin) */
         Route::get('/users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');
 
+        /* Annonces par email (diffusion ciblée : clients / vendeurs / entreprises) */
+        Route::get('/broadcasts',          [\App\Http\Controllers\Admin\BroadcastController::class, 'index'])   ->name('broadcasts.index');
+        Route::post('/broadcasts',         [\App\Http\Controllers\Admin\BroadcastController::class, 'store'])   ->name('broadcasts.store');
+        Route::get('/broadcasts/progress', [\App\Http\Controllers\Admin\BroadcastController::class, 'progress'])->name('broadcasts.progress');
+
+        /* Santé des images produits (photos cassées / non affichées) */
+        Route::get('/image-health',               [\App\Http\Controllers\Admin\ImageHealthController::class, 'index'])    ->name('image-health.index');
+        Route::post('/image-health/check-now',     [\App\Http\Controllers\Admin\ImageHealthController::class, 'checkNow'])->name('image-health.check-now');
+        Route::post('/image-health/{report}/notify',[\App\Http\Controllers\Admin\ImageHealthController::class, 'notify']) ->name('image-health.notify');
+        Route::post('/image-health/{report}/resolve',[\App\Http\Controllers\Admin\ImageHealthController::class, 'resolve'])->name('image-health.resolve');
+
         /* Revenus plateforme (vue globale superadmin) */
         Route::get('/revenus', [\App\Http\Controllers\Admin\RevenusController::class, 'index'])->name('revenus.index');
 
@@ -539,9 +554,15 @@ Route::middleware(['auth', 'role:superadmin'])
         Route::post('/companies/{company}/approve', [DashboardController::class, 'approveCompany'])
             ->name('companies.approve');
 
-        /* Suppression définitive (purge totale) */
-        Route::post('/shops/purge',       [\App\Http\Controllers\Admin\ShopController::class,       'purgeBulk'])->name('shops.purge');
-        Route::post('/entreprises/purge', [\App\Http\Controllers\Admin\EntrepriseController::class,  'purgeBulk'])->name('entreprises.purge');
+        /* Suppression définitive (purge totale) + gestion du personnel plateforme —
+           réservé au SEUL superadmin (fondateur), jamais au staff, même si le staff a
+           accès en lecture/opérationnel au reste du panneau admin ci-dessus. */
+        Route::middleware('role:superadmin')->group(function () {
+            Route::post('/shops/purge',       [\App\Http\Controllers\Admin\ShopController::class,       'purgeBulk'])->name('shops.purge');
+            Route::post('/entreprises/purge', [\App\Http\Controllers\Admin\EntrepriseController::class,  'purgeBulk'])->name('entreprises.purge');
+            Route::post('/users/staff',       [\App\Http\Controllers\Admin\UsersController::class,      'storeStaff'])->name('users.store-staff');
+            Route::delete('/users/staff/{user}', [\App\Http\Controllers\Admin\UsersController::class,   'destroyStaff'])->name('users.destroy-staff');
+        });
 
         /* Règlements — reversement aux boutiques des commandes payées en ligne (ChapChap Pay) */
         Route::get('/reglements',                [\App\Http\Controllers\Admin\PayoutController::class, 'index'])->name('payouts.index');

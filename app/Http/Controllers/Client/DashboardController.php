@@ -295,13 +295,26 @@ class DashboardController extends Controller
 
         $myUnread = ShopMessage::where('receiver_id', $clientId)->whereNull('read_at')->count();
 
+        /* ── Notes des boutiques, affichées sur chaque carte produit ──
+           Il n'existe pas de note par PRODUIT (seulement par boutique, via les avis
+           laissés après une commande) : on affiche donc la note de la boutique du
+           produit sur sa carte, plutôt que de n'afficher aucune étoile. Une seule
+           requête groupée pour toutes les boutiques, réutilisée sur toutes les
+           sections de cartes produits (recommandés, populaire par catégorie, catalogue). */
+        $shopRatings = DB::table('reviews')
+            ->join('orders', 'orders.id', '=', 'reviews.order_id')
+            ->select('orders.shop_id', DB::raw('AVG(reviews.rating) as avg_rating'), DB::raw('COUNT(reviews.id) as cnt'))
+            ->groupBy('orders.shop_id')
+            ->get()
+            ->keyBy('shop_id');
+
         return view('dashboards.client', compact(
             'products', 'categoryGroups', 'recentOrders', 'myMessages', 'myUnread',
             'shopCount', 'productCount', 'deliveredCount', 'clientCount',
             'categories', 'topShops', 'allTopShops', 'favoriteIds',
             'recommendedProducts', 'favoriteProductIds', 'flashProducts', 'cartCount',
             'loyaltyPoints', 'loyaltyNextMilestone', 'loyaltyProgressPercent', 'loyaltyReferralBonus',
-            'sort', 'minPrice', 'maxPrice'
+            'sort', 'minPrice', 'maxPrice', 'shopRatings'
         ));
     }
 }

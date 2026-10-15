@@ -20,6 +20,26 @@
     --font:'Segoe UI',system-ui,sans-serif;
     --mono:'JetBrains Mono',monospace;
 }
+
+/* ══ MODE SOMBRE ══ */
+[data-theme="dark"] {
+    --brand-lt: rgba(99,102,241,.16);
+    --brand-mlt: rgba(99,102,241,.09);
+    --bg: #0b0f1a;
+    --surface: #141925;
+    --border: #262d3d;
+    --border-dk: #343d52;
+    --text: #e6e9f0;
+    --text-2: #b0b8c9;
+    --muted: #7b869c;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.25);
+    --shadow: 0 4px 20px rgba(0,0,0,.4), 0 1px 4px rgba(0,0,0,.25);
+}
+[data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
+    background: var(--surface, var(--card)); color: var(--text); border-color: var(--border-dk, var(--border, var(--bd)));
+}
+[data-theme="dark"] input::placeholder, [data-theme="dark"] textarea::placeholder { color: var(--muted); }
+
 *, *::before, *::after { box-sizing: border-box; }
 body { font-family: var(--font); background: var(--bg); color: var(--text); }
 
@@ -124,6 +144,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); }
 .pill-done     { background: #d1fae5; color: #065f46; }
 .pill-cancel   { background: #fee2e2; color: #991b1b; }
 .pill-unknown  { background: #f3f4f6; color: #6b7280; }
+.pill-paid-online { background: #dcfce7; color: #166534; }
 
 /* Action buttons */
 .act-btn {
@@ -296,6 +317,9 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); }
                         </td>
                         <td>
                             <span class="amount">{{ number_format($order->total,0,',',' ') }} <small style="font-size:10px;color:var(--muted);font-weight:500;">{{ $devise }}</small></span>
+                            @if($order->payment && $order->payment->method === \App\Models\Payment::METHOD_CHAPCHAPPAY && $order->payment->status === \App\Models\Payment::STATUS_PAYE)
+                            <div class="pill pill-paid-online" style="margin-top:3px">💳 Payé en ligne</div>
+                            @endif
                             @if($order->loyalty_points_used > 0)
                             <div style="font-size:10px;color:#b45309;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;padding:2px 6px;margin-top:3px;display:inline-block;white-space:nowrap">🎁 -{{ number_format($order->loyalty_points_used,0,',',' ') }} {{ $devise }} (points fidélité)</div>
                             @endif
@@ -400,6 +424,9 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); }
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap;gap:6px">
                     <div>
                         <span class="amount">{{ number_format($order->total,0,',',' ') }} {{ $devise }}</span>
+                        @if($order->payment && $order->payment->method === \App\Models\Payment::METHOD_CHAPCHAPPAY && $order->payment->status === \App\Models\Payment::STATUS_PAYE)
+                        <div class="pill pill-paid-online" style="margin-top:3px">💳 Payé en ligne</div>
+                        @endif
                         @if($order->loyalty_points_used > 0)
                         <div style="font-size:11px;font-weight:700;color:#b45309;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;padding:2px 8px;margin-top:3px;display:inline-block">🎁 -{{ number_format($order->loyalty_points_used,0,',',' ') }} {{ $devise }} (points fidélité)</div>
                         @endif

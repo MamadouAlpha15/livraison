@@ -193,6 +193,35 @@ footer.app-footer { display: none !important; }
 .cat-sidebar-more summary::after { content: '▾'; margin-left: auto; font-size: 11px; color: var(--muted); transition: transform .2s; }
 .cat-sidebar-more[open] summary::after { transform: rotate(180deg); }
 .cat-sidebar-more summary:hover { background: var(--grey); }
+
+/* ── Aperçu catégorie au survol (desktop uniquement — .cat-sidebar est déjà
+     masquée ≤960px, donc rien à gérer côté tactile) ── */
+.cat-preview-pop {
+    position: fixed; z-index: 60; width: 300px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--r);
+    box-shadow: var(--shadow-lg); padding: 14px;
+    opacity: 0; visibility: hidden; transform: translateX(-6px);
+    transition: opacity .15s ease, transform .15s ease;
+    pointer-events: none;
+}
+.cat-preview-pop.open { opacity: 1; visibility: visible; transform: translateX(0); pointer-events: auto; }
+.cat-preview-pop-arrow {
+    position: absolute; left: -6px; top: 22px; width: 12px; height: 12px;
+    background: var(--surface); border-left: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    transform: rotate(45deg);
+}
+.cpp-title { font-size: 11.5px; font-weight: 800; color: var(--text-2); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 10px; }
+.cpp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.cpp-item { display: block; text-decoration: none; color: inherit; border-radius: var(--r-sm); overflow: hidden; border: 1px solid var(--border); transition: border-color .15s; }
+.cpp-item:hover { border-color: var(--brand); }
+.cpp-item-img { width: 100%; height: 72px; object-fit: cover; display: block; background: var(--grey); }
+.cpp-item-ph { width: 100%; height: 72px; display: flex; align-items: center; justify-content: center; background: var(--grey); color: var(--muted); }
+.cpp-item-name { font-size: 11px; font-weight: 600; color: var(--text); padding: 6px 7px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cpp-item-price { font-size: 11px; font-weight: 800; color: var(--brand-dk); padding: 0 7px 7px; }
+.cpp-more { display: block; text-align: center; margin-top: 10px; font-size: 12px; font-weight: 700; color: var(--brand); text-decoration: none; padding: 8px; border-radius: var(--r-sm); background: var(--brand-mlt); }
+.cpp-more:hover { background: var(--brand-lt); }
+.cpp-empty { font-size: 12.5px; color: var(--muted); padding: 10px 2px; }
+.cpp-loading { display: flex; align-items: center; justify-content: center; padding: 24px 0; color: var(--muted); }
 .csi-count {
     margin-left: auto; background: var(--brand-mlt); color: var(--brand-dk);
     font-size: 10.5px; font-weight: 800; padding: 1px 7px; border-radius: 20px; flex-shrink: 0;
@@ -910,7 +939,7 @@ footer.app-footer { display: none !important; }
                 {!! \App\Support\IconLibrary::svg('eye', 'csi-ico') !!} Tout voir
             </a>
             @foreach($catsVisible as $cat)
-            <a href="{{ url('/') }}?{{ http_build_query(array_filter(['cat' => $cat, 's' => request('s')])) }}#catalogue" class="cat-sidebar-item {{ request('cat') === $cat ? 'active' : '' }}">
+            <a href="{{ url('/') }}?{{ http_build_query(array_filter(['cat' => $cat, 's' => request('s')])) }}#catalogue" class="cat-sidebar-item {{ request('cat') === $cat ? 'active' : '' }}" data-cat-preview="{{ $cat }}">
                 {!! \App\Support\IconLibrary::categorySvg($cat, 'csi-ico') !!} {{ $cat }}
             </a>
             @endforeach
@@ -922,7 +951,7 @@ footer.app-footer { display: none !important; }
                     <span class="csi-count">{{ $catsMore->count() }}</span>
                 </summary>
                 @foreach($catsMore as $cat)
-                <a href="{{ url('/') }}?{{ http_build_query(array_filter(['cat' => $cat, 's' => request('s')])) }}#catalogue" class="cat-sidebar-item {{ request('cat') === $cat ? 'active' : '' }}">
+                <a href="{{ url('/') }}?{{ http_build_query(array_filter(['cat' => $cat, 's' => request('s')])) }}#catalogue" class="cat-sidebar-item {{ request('cat') === $cat ? 'active' : '' }}" data-cat-preview="{{ $cat }}">
                     {!! \App\Support\IconLibrary::categorySvg($cat, 'csi-ico') !!} {{ $cat }}
                 </a>
                 @endforeach
@@ -930,6 +959,12 @@ footer.app-footer { display: none !important; }
             @endif
         </nav>
     </aside>
+
+    {{-- ══ APERÇU CATÉGORIE (survol d'une catégorie dans la barre, desktop only) ══ --}}
+    <div class="cat-preview-pop" id="catPreviewPop">
+        <div class="cat-preview-pop-arrow"></div>
+        <div class="cat-preview-pop-body" id="catPreviewBody"></div>
+    </div>
     @endif
 
     <div class="hero-carousel reveal" id="heroCarousel">
@@ -1571,5 +1606,92 @@ document.addEventListener('DOMContentLoaded', () => {
         input.addEventListener('blur', () => setTimeout(close, 150));
     });
 });
+</script>
+
+{{-- ══ APERÇU CATÉGORIE AU SURVOL ══ --}}
+<script>
+(function () {
+    const pop  = document.getElementById('catPreviewPop');
+    const body = document.getElementById('catPreviewBody');
+    if (!pop || !body) return;
+
+    // Réservé aux appareils avec une vraie souris — la barre de catégories
+    // est de toute façon masquée sur petit écran / tactile (≤960px).
+    if (!window.matchMedia('(hover: hover)').matches) return;
+
+    let hoverTimer = null, hideTimer = null, currentCat = null, abortCtrl = null;
+    const cache = {};
+
+    function positionNear(item) {
+        const r = item.getBoundingClientRect();
+        const popWidth = 300;
+        let left = r.right + 14;
+        if (left + popWidth > window.innerWidth - 10) left = r.left - popWidth - 14;
+        let top = r.top - 8;
+        top = Math.min(top, window.innerHeight - 260);
+        top = Math.max(top, 10);
+        pop.style.left = left + 'px';
+        pop.style.top = top + 'px';
+    }
+
+    function render(data) {
+        if (!data.products || !data.products.length) {
+            body.innerHTML = '<div class="cpp-title">' + (data.name || '') + '</div><div class="cpp-empty">Aucun produit pour le moment.</div>';
+            return;
+        }
+        const items = data.products.map(p => `
+            <a href="${p.url}" class="cpp-item">
+                ${p.image ? `<img src="${p.image}" class="cpp-item-img" alt="" loading="lazy">` : '<div class="cpp-item-ph">🏷️</div>'}
+                <div class="cpp-item-name">${p.name}</div>
+                <div class="cpp-item-price">${p.price}</div>
+            </a>
+        `).join('');
+        body.innerHTML = `
+            <div class="cpp-title">Populaire en ${data.name}</div>
+            <div class="cpp-grid">${items}</div>
+            <a href="${data.more_url}" class="cpp-more">Voir tout →</a>
+        `;
+    }
+
+    function openFor(item) {
+        const cat = item.dataset.catPreview;
+        currentCat = cat;
+        positionNear(item);
+        pop.classList.add('open');
+
+        if (cache[cat]) { render(cache[cat]); return; }
+
+        body.innerHTML = '<div class="cpp-loading">…</div>';
+        if (abortCtrl) abortCtrl.abort();
+        abortCtrl = new AbortController();
+        fetch('{{ route('categories.preview') }}?cat=' + encodeURIComponent(cat), { signal: abortCtrl.signal })
+            .then(r => r.json())
+            .then(data => {
+                if (currentCat !== cat) return; // la souris est déjà passée ailleurs
+                cache[cat] = data;
+                render(data);
+            })
+            .catch(() => {});
+    }
+
+    document.querySelectorAll('[data-cat-preview]').forEach(item => {
+        item.addEventListener('mouseenter', () => {
+            clearTimeout(hideTimer);
+            clearTimeout(hoverTimer);
+            hoverTimer = setTimeout(() => openFor(item), 180);
+        });
+        item.addEventListener('mouseleave', () => {
+            clearTimeout(hoverTimer);
+            hideTimer = setTimeout(() => { pop.classList.remove('open'); currentCat = null; }, 220);
+        });
+    });
+
+    pop.addEventListener('mouseenter', () => clearTimeout(hideTimer));
+    pop.addEventListener('mouseleave', () => {
+        hideTimer = setTimeout(() => { pop.classList.remove('open'); currentCat = null; }, 150);
+    });
+
+    window.addEventListener('scroll', () => pop.classList.remove('open'), { passive: true });
+})();
 </script>
 @endpush
