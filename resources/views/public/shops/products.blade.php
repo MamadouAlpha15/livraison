@@ -347,7 +347,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 .amz-price-range { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
 .amz-price-input {
-    flex: 1; padding: 7px 9px; border: 1.5px solid var(--border);
+    flex: 1; min-width: 0; width: 0; padding: 7px 9px; border: 1.5px solid var(--border);
     border-radius: var(--r-sm); font-size: 13px; font-family: var(--font);
     color: var(--text); outline: none; transition: border-color .15s;
 }
@@ -587,6 +587,54 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     .shop-banner-name { font-size: 15px; }
     .amz-layout { padding: 8px 8px 40px; }
 }
+
+/* ══ MOTION TOKENS (mêmes valeurs que l'accueil) ══ */
+:root {
+    --ease-out:    cubic-bezier(.22, 1, .36, 1);
+    --ease-io:     cubic-bezier(.65, 0, .35, 1);
+    --t-micro:     200ms;
+    --t-enter:     500ms;
+}
+.amz-card { transition: box-shadow var(--t-micro) var(--ease-out), border-color var(--t-micro), transform var(--t-micro) var(--ease-out); }
+.amz-card-img img { transition: transform .4s var(--ease-out); }
+.amz-card:hover .amz-card-img img { transform: scale(1.05); }
+.amz-price-main, .amz-price-orig, #resultCount { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Apparition en cascade (ajoutée en JS ; sans JS les cartes restent simplement visibles) */
+.amz-card.is-entering { animation: cardIn var(--t-enter) var(--ease-out) backwards; animation-delay: var(--d, 0ms); }
+@keyframes cardIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* Nom du produit = vrai lien (clavier, clic molette, lecteurs d'écran) */
+a.amz-card-name { text-decoration: none; }
+.amz-card-name:focus-visible, .amz-btn-order:focus-visible, .amz-filter-item:focus-within,
+.amz-view-btn:focus-visible, .btn-filter-open:focus-visible, .amz-filtered-reset:focus-visible {
+    outline: 3px solid var(--brand); outline-offset: 2px; border-radius: 6px;
+}
+
+/* Filtres appliqués à une seule page de résultats : on le dit clairement */
+.amz-page-hint {
+    display: none; align-items: center; gap: 7px; margin: -4px 0 14px;
+    font-size: 12.5px; color: var(--text-2); background: var(--brand-mlt);
+    border: 1px solid var(--brand-lt); border-radius: var(--r-sm); padding: 9px 12px;
+}
+.amz-page-hint.show { display: flex; }
+
+/* Aucun produit ne correspond aux filtres */
+.amz-filtered-empty { display: none; grid-column: 1/-1; padding: 56px 20px; text-align: center; background: var(--surface); border-radius: var(--r); border: 1px dashed var(--border); }
+.amz-filtered-empty.show { display: block; animation: cardIn var(--t-enter) var(--ease-out) both; }
+.amz-filtered-empty strong { display: block; font-size: 17px; color: var(--text); margin-bottom: 6px; }
+.amz-filtered-empty p { margin: 0 0 18px; font-size: 14px; color: var(--muted); }
+.amz-filtered-reset {
+    display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 0 22px; border-radius: 50px;
+    border: none; background: var(--brand); color: #fff; font-size: 13.5px; font-weight: 700; font-family: var(--font); cursor: pointer;
+    box-shadow: 0 6px 18px rgba(99,102,241,.3); transition: background var(--t-micro), transform var(--t-micro) var(--ease-out);
+}
+.amz-filtered-reset:hover { background: var(--brand-dk); transform: translateY(-2px); }
+
+@media (prefers-reduced-motion: reduce) {
+    .amz-card, .amz-card-img img { transition: none !important; }
+    .amz-card.is-entering, .amz-filtered-empty.show, .shop-banner-open::before { animation: none !important; }
+}
 </style>
 @endpush
 
@@ -737,7 +785,6 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
         <div class="shop-banner-desc">{{ Str::limit(strip_tags($shop->description), 140) }}</div>
         @endif
         <div class="shop-banner-meta">
-            <span class="shop-banner-open">Ouvert</span>
             @if($reviewAvg)<span class="shop-banner-rating">{!! \App\Support\IconLibrary::svg('star', '', 12) !!} {{ number_format($reviewAvg, 1) }} <span style="opacity:.8">({{ $reviewCount }} avis)</span></span>@endif
             @if($deliveredCount > 0)<span class="shop-banner-chip">{!! \App\Support\IconLibrary::svg('check', '', 12) !!} {{ $deliveredCount }} commande{{ $deliveredCount > 1 ? 's' : '' }} livrée{{ $deliveredCount > 1 ? 's' : '' }}</span>@endif
             @if($shop->type)<span class="shop-banner-chip">{!! \App\Support\IconLibrary::svg('tag', '', 12) !!} {{ $shop->type }}</span>@endif
@@ -838,7 +885,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                         <option value="price_asc">Prix croissant</option>
                         <option value="price_desc">Prix décroissant</option>
                         <option value="name">Nom A → Z</option>
-                        <option value="featured">⭐ Vedettes en premier</option>
+                        <option value="featured">Vedettes en premier</option>
                     </select>
                 </div>
                 <div class="amz-view-btns">
@@ -847,6 +894,13 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                 </div>
             </div>
         </div>
+
+        @if($products->hasPages())
+        <div class="amz-page-hint" id="pageHint" role="status">
+            {!! \App\Support\IconLibrary::svg('alert', '', 14) !!}
+            Filtres appliqués aux {{ $products->count() }} produits de cette page (page {{ $products->currentPage() }} sur {{ $products->lastPage() }}).
+        </div>
+        @endif
 
         <div class="amz-grid" id="prodGrid">
             @forelse($products as $product)
@@ -861,7 +915,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
             <div class="amz-card"
                  data-name="{{ strtolower($product->name) }}"
                  data-cat="{{ strtolower($product->category ?? '') }}"
-                 data-price="{{ $product->price }}"
+                 data-price="{{ $product->current_price }}"
                  data-featured="{{ $product->is_featured ? '1' : '0' }}"
                  data-stock="{{ $stockOut ? 'out' : 'in' }}">
 
@@ -890,9 +944,9 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     @if($product->category)
                     <div class="amz-card-cat">{{ $product->category }}</div>
                     @endif
-                    <div class="amz-card-name" onclick="goToProduct('{{ route('client.orders.createFromProduct', $product) }}')">
+                    <a class="amz-card-name" href="{{ route('client.orders.createFromProduct', $product) }}">
                         {{ $product->name }}
-                    </div>
+                    </a>
                     <div class="amz-price-wrap">
                         <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
                             <span class="amz-price-main">{{ number_format($product->current_price, 0, ',', ' ') }}<span class="amz-price-devise"> {{ $devise }}</span></span>
@@ -944,6 +998,13 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                 <p style="color:var(--muted);font-size:14px;margin:0">Cette boutique n'a pas encore de produits.</p>
             </div>
             @endforelse
+            @if($products->isNotEmpty())
+            <div class="amz-filtered-empty" id="filteredEmpty" role="status">
+                <strong>Aucun produit ne correspond à vos filtres</strong>
+                <p>Essayez une autre catégorie, une autre fourchette de prix ou un autre mot-clé.</p>
+                <button type="button" class="amz-filtered-reset" onclick="resetFilters(true)">{!! \App\Support\IconLibrary::svg('rotate', '', 15) !!} Réinitialiser les filtres</button>
+            </div>
+            @endif
         </div>
 
         <div class="amz-pagination">{{ $products->links() }}</div>
@@ -1060,8 +1121,16 @@ function setView(type) {
 /* ── Application des filtres ──
  * Note : filtre uniquement les produits de la page courante.
  * Les produits sur d'autres pages (pagination) ne sont pas accessibles côté client. */
+var REDUCE_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 function applyFilters() {
     var cards = Array.from(document.querySelectorAll('.amz-card'));
+    /* FLIP : on mémorise la position de chaque carte visible avant le tri/filtre,
+       pour la faire glisser en douceur vers sa nouvelle place ensuite. */
+    var before = new Map();
+    if (!REDUCE_MOTION) {
+        cards.forEach(function(c) { if (c.style.display !== 'none') before.set(c, c.getBoundingClientRect()); });
+    }
     var visible = cards.filter(function(c) {
         var name  = (c.dataset.name  || '').toLowerCase();
         var cat   = (c.dataset.cat   || '').toLowerCase();
@@ -1085,6 +1154,28 @@ function applyFilters() {
     visible.forEach(function(c) { c.style.display = ''; grid.appendChild(c); });
     var el = document.getElementById('resultCount');
     if (el) el.textContent = visible.length;
+
+    var filtering = !!(state.cat || state.search || state.stockOnly || state.priceMin > 0 || state.priceMax < Infinity);
+    var empty = document.getElementById('filteredEmpty');
+    if (empty) empty.classList.toggle('show', visible.length === 0);
+    var hint = document.getElementById('pageHint');
+    if (hint) hint.classList.toggle('show', filtering);
+
+    if (REDUCE_MOTION) return;
+    visible.forEach(function(c, i) {
+        var first = before.get(c);
+        if (!first) { // carte qui réapparaît : simple fondu
+            c.classList.remove('is-entering'); void c.offsetWidth;
+            c.style.setProperty('--d', Math.min(i, 10) * 40 + 'ms');
+            c.classList.add('is-entering');
+            return;
+        }
+        var last = c.getBoundingClientRect();
+        var dx = first.left - last.left, dy = first.top - last.top;
+        if (!dx && !dy) return;
+        c.animate([{ transform: 'translate(' + dx + 'px,' + dy + 'px)' }, { transform: 'none' }],
+                  { duration: 450, easing: 'cubic-bezier(.65,0,.35,1)' });
+    });
 }
 
 /* ── Badge compteur de filtres actifs ── */
@@ -1102,8 +1193,11 @@ function updateBadge() {
 }
 
 /* ── Réinitialiser les filtres ── */
-function resetFilters() {
-    state = { cat: '', sort: 'default', stockOnly: false, priceMin: 0, priceMax: Infinity, search: state.search };
+function resetFilters(clearSearch) {
+    state = { cat: '', sort: 'default', stockOnly: false, priceMin: 0, priceMax: Infinity, search: clearSearch ? '' : state.search };
+    if (clearSearch) {
+        ['prodSearch', 'prodSearchMobile'].forEach(function(id) { var el = document.getElementById(id); if (el) el.value = ''; });
+    }
     ['mPriceMin','mPriceMax','dPriceMin','dPriceMax'].forEach(function(id) {
         var el = document.getElementById(id); if (el) el.value = '';
     });
@@ -1167,16 +1261,13 @@ document.addEventListener('DOMContentLoaded', function() {
     if (d) d.addEventListener('input', function() { onSearchInput(this.value); });
     if (m) m.addEventListener('input', function() { onSearchInput(this.value); });
 
-    /* Animation d'apparition des cards */
-    document.querySelectorAll('.amz-card').forEach(function(c, i) {
-        c.style.opacity = '0';
-        c.style.transform = 'translateY(12px)';
-        setTimeout(function() {
-            c.style.transition = 'opacity .35s ease, transform .35s ease';
-            c.style.opacity = '1';
-            c.style.transform = 'translateY(0)';
-        }, 40 + i * 30);
-    });
+    /* Apparition en cascade des cartes (plafonnée à ~500 ms au total) */
+    if (!REDUCE_MOTION) {
+        document.querySelectorAll('.amz-card').forEach(function(c, i) {
+            c.style.setProperty('--d', Math.min(i, 12) * 40 + 'ms');
+            c.classList.add('is-entering');
+        });
+    }
 });
 </script>
 @endpush
