@@ -270,6 +270,99 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     .related-grid { grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 8px; }
     .related-name { font-size: 11px; }
 }
+
+/* ══ MOTION TOKENS (mêmes valeurs que l'accueil) ══ */
+:root {
+    --ease-out:    cubic-bezier(.22, 1, .36, 1);
+    --ease-io:     cubic-bezier(.65, 0, .35, 1);
+    --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+    --t-micro:     200ms;
+    --t-enter:     600ms;
+}
+.card { animation-duration: var(--t-enter); animation-timing-function: var(--ease-out); }
+
+/* Prix et montants : chiffres tabulaires, jamais coupés */
+.prod-price, .prod-orig, .order-summary-row-val, .order-total-val, .related-price, .mobile-buy-total { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ══ ÉTAPES DE LA COMMANDE (s'allument au fil de la saisie) ══ */
+.order-steps { list-style: none; margin: 0 0 20px; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); position: relative; }
+.order-steps::before, .order-steps-fill {
+    content: ''; position: absolute; top: 14px; left: 12.5%; right: 12.5%; height: 3px; border-radius: 3px; background: var(--grey-2);
+}
+.order-steps-fill {
+    background: linear-gradient(90deg, var(--brand), var(--brand-dk));
+    transform: scaleX(var(--p, 0)); transform-origin: left center;
+    transition: transform .6s var(--ease-io);
+}
+.order-step { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: var(--muted); text-align: center; }
+.order-step-dot {
+    width: 30px; height: 30px; border-radius: 50%; background: var(--surface); border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: var(--muted);
+    transition: background .35s var(--ease-out), border-color .35s var(--ease-out), color .35s, transform .45s var(--ease-spring);
+}
+.order-step-dot .ico { display: none; }
+.order-step.is-current { color: var(--text); }
+.order-step.is-current .order-step-dot { border-color: var(--brand); color: var(--brand-dk); box-shadow: 0 0 0 4px var(--brand-mlt); }
+.order-step.is-done { color: var(--brand-dk); }
+.order-step.is-done .order-step-dot { background: var(--brand); border-color: var(--brand); color: #fff; transform: scale(1.05); }
+.order-step.is-done .order-step-dot .ico { display: block; }
+.order-step.is-done .order-step-num { display: none; }
+
+/* ══ MODE DE PAIEMENT : icônes au trait + sélection animée ══ */
+.pay-method-opt { transition: border-color var(--t-micro), background var(--t-micro), box-shadow var(--t-micro); }
+.pay-method-opt.active { box-shadow: 0 0 0 3px var(--brand-mlt); }
+.pay-method-opt-ico { width: 34px; height: 34px; border-radius: 9px; background: var(--brand-mlt); color: var(--brand-dk); display: flex; align-items: center; justify-content: center; }
+.pay-method-opt.active .pay-method-opt-ico { background: var(--brand); color: #fff; }
+
+/* ══ MICROINTERACTIONS ══ */
+.qty-btn:active { transform: scale(.92); }
+.qty-input.is-bump, .order-total-val.is-bump { animation: valueBump .35s var(--ease-spring); }
+@keyframes valueBump { 0% { transform: scale(1); } 40% { transform: scale(1.12); } 100% { transform: scale(1); } }
+.order-total-val { display: inline-block; }
+.submit-btn:active:not(:disabled) { transform: scale(.98); }
+.submit-btn:focus-visible, .qty-btn:focus-visible, .variant-pill-order:focus-visible, .chat-btn:focus-visible,
+.pay-method-opt:focus-within, .mobile-buy-btn:focus-visible, .prod-thumb:focus-visible {
+    outline: 3px solid var(--brand); outline-offset: 2px;
+}
+.variant-pill-order { transition: all var(--t-micro) var(--ease-out); }
+.variant-pill-order.selected { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,.3); }
+@media (pointer: coarse) {
+    .qty-btn { width: 44px; height: 44px; }
+    .qty-input { height: 44px; }
+    .variant-pill-order { min-height: 44px; }
+}
+
+/* ══ BARRE D'ACHAT MOBILE (total + bouton toujours à portée de pouce) ══ */
+.mobile-buy-bar {
+    display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+    background: var(--surface); border-top: 1px solid var(--border); box-shadow: 0 -6px 24px rgba(15,23,42,.1);
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+    align-items: center; gap: 12px;
+    transform: translateY(110%); transition: transform .35s var(--ease-out);
+}
+.mobile-buy-bar.is-visible { transform: none; }
+.mobile-buy-info { display: flex; flex-direction: column; min-width: 0; }
+.mobile-buy-lbl { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; }
+.mobile-buy-total { font-size: 18px; font-weight: 900; color: var(--brand-dk); font-family: monospace; }
+.mobile-buy-btn {
+    margin-left: auto; flex-shrink: 0; min-height: 46px; padding: 0 22px; border-radius: 50px; border: none;
+    background: var(--brand); color: #fff; font-size: 14px; font-weight: 800; font-family: var(--font);
+    display: inline-flex; align-items: center; gap: 7px; cursor: pointer; box-shadow: 0 4px 14px rgba(99,102,241,.4);
+}
+.mobile-buy-btn:active { transform: scale(.97); }
+@media (max-width: 700px) {
+    .mobile-buy-bar { display: flex; }
+    .page-wrap { padding-bottom: 96px; }
+}
+@media (max-width: 420px) {
+    .order-step { font-size: 10.5px; }
+}
+
+/* ══ MOUVEMENT RÉDUIT ══ */
+@media (prefers-reduced-motion: reduce) {
+    .flash-badge-order, .shop-mini-open::before, .qty-input.is-bump, .order-total-val.is-bump { animation: none !important; }
+    .order-steps-fill, .order-step-dot, .mobile-buy-bar, .variant-pill-order { transition: none !important; }
+}
 </style>
 @endpush
 
@@ -436,7 +529,9 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                             <div class="shop-mini-name">{{ $shop->name }}</div>
                             @if($shop->type)<div class="shop-mini-type">{{ $shop->type }}</div>@endif
                         </div>
-                        <span class="shop-mini-open">Ouvert</span>
+                        @if($shop->is_approved)
+                        <span class="shop-mini-open">Vérifiée</span>
+                        @endif
                     </div>
 
                     <div class="trust-mini-row">
@@ -470,7 +565,16 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                 <input type="hidden" name="product_id" value="{{ $product->id }}">
                 <input type="hidden" name="variant_id" id="variantIdInput" value="{{ $selectedVariantId ?? '' }}">
 
-               
+                {{-- Progression : Produit → Livraison → Paiement → Confirmation --}}
+                <ol class="order-steps" id="orderSteps" aria-label="Étapes de la commande">
+                    <li class="order-steps-fill" role="presentation" aria-hidden="true"></li>
+                    @foreach(['Produit', 'Livraison', 'Paiement', 'Confirmation'] as $i => $stepLabel)
+                    <li class="order-step {{ $i === 0 ? 'is-current' : '' }}" data-step="{{ $i }}">
+                        <span class="order-step-dot"><span class="order-step-num">{{ $i + 1 }}</span>{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span>
+                        {{ $stepLabel }}
+                    </li>
+                    @endforeach
+                </ol>
 
                 <div class="order-grid">
                     {{-- Gauche : quantité + adresse + téléphone --}}
@@ -525,7 +629,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                             <div class="pay-method-opts">
                                 <label class="pay-method-opt active" id="payOptCash">
                                     <input type="radio" name="payment_method_choice" value="cash" checked onchange="setPaymentMethod('cash')">
-                                    <span class="pay-method-opt-ico">💵</span>
+                                    <span class="pay-method-opt-ico" aria-hidden="true">{!! \App\Support\IconLibrary::svg('wallet', '', 17) !!}</span>
                                     <span class="pay-method-opt-txt">
                                         <span class="pay-method-opt-title">Cash à la livraison</span>
                                         <span class="pay-method-opt-sub">Vous payez quand vous recevez la commande</span>
@@ -533,7 +637,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                                 </label>
                                 <label class="pay-method-opt" id="payOptOnline">
                                     <input type="radio" name="payment_method_choice" value="online" onchange="setPaymentMethod('online')">
-                                    <span class="pay-method-opt-ico">📱</span>
+                                    <span class="pay-method-opt-ico" aria-hidden="true">{!! \App\Support\IconLibrary::svg('smartphone', '', 17) !!}</span>
                                     <span class="pay-method-opt-txt">
                                         <span class="pay-method-opt-title">Payer en ligne maintenant</span>
                                         <span class="pay-method-opt-sub">Mobile Money — paiement sécurisé</span>
@@ -573,7 +677,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
                         <div class="order-summary-row">
                             <span class="order-summary-row-lbl">Prix unitaire</span>
-                            <span class="order-summary-row-val">{{ number_format($product->price, 0, ',', ' ') }} {{ $devise }}</span>
+                            {{-- current_price = prix flash si vente flash active (comme le total) ; mis à jour en JS selon la variante --}}
+                            <span class="order-summary-row-val"><span id="summaryUnit">{{ number_format($product->current_price, 0, ',', ' ') }}</span> {{ $devise }}</span>
                         </div>
                         <div class="order-summary-row">
                             <span class="order-summary-row-lbl">Quantité</span>
@@ -636,7 +741,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                                 <div class="order-total-devise">{{ $devise }}</div>
                             </div>
                             <div style="text-align:right">
-                                <div class="order-total-val" id="totalDisplay">{{ number_format($product->price, 0, ',', ' ') }}</div>
+                                <div class="order-total-val" id="totalDisplay" aria-live="polite">{{ number_format($product->current_price, 0, ',', ' ') }}</div>
                             </div>
                         </div>
 
@@ -696,6 +801,17 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     @endif
 
 </div>
+
+{{-- ══ BARRE D'ACHAT MOBILE : visible tant que le résumé de commande n'est pas à l'écran ══ --}}
+@unless($stockOut)
+<div class="mobile-buy-bar" id="mobileBuyBar" aria-hidden="true">
+    <div class="mobile-buy-info">
+        <span class="mobile-buy-lbl">Total</span>
+        <span class="mobile-buy-total"><span id="mobileBuyTotal">{{ number_format($product->current_price, 0, ',', ' ') }}</span> {{ $devise }}</span>
+    </div>
+    <button type="button" class="mobile-buy-btn" id="mobileBuyBtn" tabindex="-1">{!! \App\Support\IconLibrary::svg('cart', '', 16) !!} Commander</button>
+</div>
+@endunless
 @endsection
 
 @push('scripts')
@@ -837,6 +953,7 @@ function changeQty(d) {
     if (!inp) return;
     let v = parseInt(inp.value || 1) + d;
     v = Math.max(1, Math.min(STOCK, v));
+    if (String(v) !== inp.value) bump(inp);
     inp.value = v;
     updateTotal();
 }
@@ -966,10 +1083,76 @@ function updateTotal() {
     }
 
     const el = document.getElementById('totalDisplay');
-    if (el) el.textContent = total.toLocaleString('fr-FR');
+    const totalTxt = total.toLocaleString('fr-FR');
+    if (el && el.textContent !== totalTxt) {
+        el.textContent = totalTxt;
+        bump(el); // le total "rebondit" à chaque changement
+    }
+    const mobileTotal = document.getElementById('mobileBuyTotal');
+    if (mobileTotal) mobileTotal.textContent = totalTxt;
+    const unit = document.getElementById('summaryUnit');
+    if (unit) unit.textContent = Math.round(PRICE).toLocaleString('fr-FR');
     const sq = document.getElementById('summaryQty');
     if (sq) sq.textContent = qty;
 }
+
+function bump(node) {
+    node.classList.remove('is-bump');
+    void node.offsetWidth; // relance l'animation
+    node.classList.add('is-bump');
+}
+
+/* ══ ÉTAPES DE LA COMMANDE ══
+ * Produit (option choisie) → Livraison (coordonnées valides) → Paiement → Confirmation (envoi).
+ * Purement indicatif : le serveur reste seul juge de la validité. */
+function updateOrderSteps(submitted) {
+    const wrap = document.getElementById('orderSteps');
+    if (!wrap) return;
+    const filled = id => { const f = document.getElementById(id); return !f || f.value.trim() !== ''; };
+    const valid = (id, fn) => { const f = document.getElementById(id); return !f || !f.value.trim() || !fn(f.value); };
+
+    const productOk = !HAS_VARIANTS || !!document.getElementById('variantIdInput').value
+        || !!document.getElementById('defaultPhotoPill')?.classList.contains('selected');
+    const deliveryOk = productOk && filled('client_name') && filled('delivery_destination') && filled('client_phone')
+        && valid('client_name', validateFullName) && valid('client_phone', validateGuineaPhone);
+    const done = submitted ? 4 : (deliveryOk ? 3 : (productOk ? 1 : 0)); // paiement : un choix par défaut existe toujours
+
+    wrap.querySelectorAll('.order-step').forEach((step, i) => {
+        step.classList.toggle('is-done', i < done);
+        step.classList.toggle('is-current', i === done);
+    });
+    wrap.querySelector('.order-steps-fill').style.setProperty('--p', Math.min(done, 3) / 3);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('orderForm');
+    if (form) {
+        form.addEventListener('input', () => updateOrderSteps(false));
+        form.addEventListener('change', () => updateOrderSteps(false));
+        form.addEventListener('click', e => { if (e.target.closest('.variant-pill-order')) setTimeout(() => updateOrderSteps(false), 0); });
+        updateOrderSteps(false);
+    }
+
+    /* ══ BARRE D'ACHAT MOBILE ══
+     * Masquée dès que le résumé (avec le vrai bouton "Valider") est visible.
+     * Le bouton mène au premier champ à compléter, sinon au résumé. */
+    const bar = document.getElementById('mobileBuyBar');
+    const summary = document.querySelector('.order-summary');
+    if (bar && summary && 'IntersectionObserver' in window) {
+        new IntersectionObserver(([entry]) => {
+            bar.classList.toggle('is-visible', !entry.isIntersecting);
+        }, { threshold: 0.15 }).observe(summary);
+
+        document.getElementById('mobileBuyBtn').addEventListener('click', () => {
+            const firstEmpty = ['client_name', 'delivery_destination', 'client_phone']
+                .map(id => document.getElementById(id))
+                .find(f => f && f.required && !f.value.trim());
+            const target = firstEmpty || document.getElementById('submitBtn');
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (firstEmpty) setTimeout(() => firstEmpty.focus({ preventScroll: true }), 350);
+        });
+    }
+});
 
 /* ══ GALERIE ══ */
 const PHOTOS = @json($allPhotos);
@@ -1142,6 +1325,7 @@ document.getElementById('orderForm')?.addEventListener('submit', (e) => {
         return;
     }
 
+    updateOrderSteps(true);
     const btn = document.getElementById('submitBtn');
     if (btn) { btn.disabled = true; btn.innerHTML = '{!! \App\Support\IconLibrary::svg("clock", "", 15) !!} Envoi en cours…'; }
 });
