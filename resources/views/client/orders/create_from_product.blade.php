@@ -12,16 +12,16 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 :root {
-    --brand:     #6366f1;
-    --brand-dk:  #4f46e5;
-    --brand-lt:  #e0e7ff;
-    --brand-mlt: #eef2ff;
-    --navy:      #0a0a1e;
-    --navy-2:    #151538;
+    --brand:     #1668D8;
+    --brand-dk:  #1260C9;
+    --brand-lt:  #D6E6FF;
+    --brand-mlt: #EAF2FF;
+    --navy:      #0B1E3D;
+    --navy-2:    #12305C;
     --green:     #067d62;
     --green-lt:  #e8f5e9;
     --red:       #dc2626;
-    --blue:      #4f46e5;
+    --blue:      #1260C9;
     --grey:      #f4f6fb;
     --grey-2:    #e8ecf5;
     --border:    #e2e8f0;
@@ -68,7 +68,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 @keyframes cardFadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .card { animation: none; } }
 .card-hd { padding: 12px 18px; border-bottom: 1px solid var(--border); background: var(--grey); display: flex; align-items: center; gap: 8px; }
-.card-hd-ico { width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; background: var(--brand-lt); color: var(--brand-dk); border: 1px solid #c7d2fe; flex-shrink: 0; }
+.card-hd-ico { width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; background: var(--brand-lt); color: var(--brand-dk); border: 1px solid #D6E6FF; flex-shrink: 0; }
 .card-title { font-family: var(--display); font-size: 14px; font-weight: 800; color: var(--text); }
 .card-body { padding: 18px; }
 
@@ -117,7 +117,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .prod-devise { font-size: 12px; color: var(--muted); font-weight: 600; }
 .prod-orig { font-size: 13px; color: var(--muted); text-decoration: line-through; font-family: monospace; }
 .prod-remise { font-size: 11px; font-weight: 800; background: #fce4e4; color: var(--red); padding: 2px 8px; border-radius: 20px; }
-.flash-badge-order { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg,#1a1a2e,#6366f1); color: #fff; font-size: 11px; font-weight: 800; letter-spacing: .3px; padding: 4px 12px; border-radius: 20px; margin-bottom: 8px; animation: flashPulseOrder 1.6s ease-in-out infinite; }
+.flash-badge-order { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg,#1a1a2e,#1668D8); color: #fff; font-size: 11px; font-weight: 800; letter-spacing: .3px; padding: 4px 12px; border-radius: 20px; margin-bottom: 8px; animation: flashPulseOrder 1.6s ease-in-out infinite; }
 @keyframes flashPulseOrder { 0%,100% { opacity: 1; } 50% { opacity: .75; } }
 .flash-countdown-order { display: inline-flex; align-items: center; gap: 6px; background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; font-size: 12px; font-weight: 700; padding: 5px 11px; border-radius: 9px; margin-bottom: 12px; font-family: ui-monospace, monospace; }
 .promo-banner-order { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--teal-lt); border: 1.5px dashed #34d399; color: #065f46; font-size: 12.5px; font-weight: 700; padding: 9px 12px; border-radius: 10px; margin-bottom: 14px; cursor: pointer; transition: background .15s; }
@@ -185,8 +185,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 .cash-notice { display: flex; align-items: center; gap: 8px; background: rgba(245,166,35,.12); border: 1px solid rgba(245,166,35,.25); border-radius: var(--r-sm); padding: 10px 12px; font-size: 12px; color: #fde68a; }
 
-.submit-btn { width: 100%; padding: 13px; border-radius: 50px; border: none; font-size: 14px; font-weight: 800; font-family: var(--font); background: var(--brand); color: #fff; cursor: pointer; transition: all .15s; box-shadow: 0 4px 14px rgba(99,102,241,.4); display: flex; align-items: center; justify-content: center; gap: 7px; }
-.submit-btn:hover { background: var(--brand-dk); color: #fff; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99,102,241,.5); }
+.submit-btn { width: 100%; padding: 13px; border-radius: 50px; border: none; font-size: 14px; font-weight: 800; font-family: var(--font); background: var(--brand); color: #fff; cursor: pointer; transition: all .15s; box-shadow: 0 4px 14px rgba(22,104,216,.4); display: flex; align-items: center; justify-content: center; gap: 7px; }
+.submit-btn:hover { background: var(--brand-dk); color: #fff; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(22,104,216,.5); }
 .submit-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 .chat-btn { width: 100%; padding: 11px; border-radius: 50px; border: 1px solid rgba(255,255,255,.2); font-size: 13px; font-weight: 700; font-family: var(--font); background: transparent; color: rgba(255,255,255,.75); cursor: pointer; transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 7px; text-decoration: none; }
 .chat-btn:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.4); color: #fff; }
@@ -207,7 +207,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .field-group { margin-bottom: 14px; }
 .field-label { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 6px; }
 .field-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 13.5px; font-family: var(--font); color: var(--text); background: var(--surface); outline: none; transition: border-color .15s; }
-.field-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(99,102,241,.12); }
+.field-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(22,104,216,.12); }
 .field-input.is-invalid { border-color: #fca5a5; }
 .field-input.is-invalid:focus { box-shadow: 0 0 0 3px rgba(220,38,38,.12); }
 .field-input.is-valid { border-color: #6ee7b7; }
@@ -220,7 +220,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     cursor: pointer; transition: border-color .15s, background .15s;
 }
 .pay-method-opt:hover { border-color: var(--brand); }
-.pay-method-opt.active { border-color: var(--brand); background: rgba(99,102,241,.06); }
+.pay-method-opt.active { border-color: var(--brand); background: rgba(22,104,216,.06); }
 .pay-method-opt input[type="radio"] { width: 16px; height: 16px; accent-color: var(--brand); flex-shrink: 0; }
 .pay-method-opt-ico { font-size: 17px; flex-shrink: 0; }
 .pay-method-opt-txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
@@ -325,7 +325,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     outline: 3px solid var(--brand); outline-offset: 2px;
 }
 .variant-pill-order { transition: all var(--t-micro) var(--ease-out); }
-.variant-pill-order.selected { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,.3); }
+.variant-pill-order.selected { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(22,104,216,.3); }
 @media (pointer: coarse) {
     .qty-btn { width: 44px; height: 44px; }
     .qty-input { height: 44px; }
@@ -347,7 +347,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .mobile-buy-btn {
     margin-left: auto; flex-shrink: 0; min-height: 46px; padding: 0 22px; border-radius: 50px; border: none;
     background: var(--brand); color: #fff; font-size: 14px; font-weight: 800; font-family: var(--font);
-    display: inline-flex; align-items: center; gap: 7px; cursor: pointer; box-shadow: 0 4px 14px rgba(99,102,241,.4);
+    display: inline-flex; align-items: center; gap: 7px; cursor: pointer; box-shadow: 0 4px 14px rgba(22,104,216,.4);
 }
 .mobile-buy-btn:active { transform: scale(.97); }
 @media (max-width: 700px) {
@@ -1007,9 +1007,9 @@ function setPaymentMethod(method) {
     if (txt && box) {
         if (method === 'online') {
             txt.textContent = 'Vous serez redirigé vers la page de paiement sécurisée après validation';
-            box.style.background = 'rgba(99,102,241,.12)';
-            box.style.borderColor = 'rgba(99,102,241,.3)';
-            box.style.color = '#c7d2fe';
+            box.style.background = 'rgba(22,104,216,.12)';
+            box.style.borderColor = 'rgba(22,104,216,.3)';
+            box.style.color = '#D6E6FF';
         } else {
             txt.textContent = 'Cash à la livraison — aucune carte requise';
             box.style.background = 'rgba(245,166,35,.12)';

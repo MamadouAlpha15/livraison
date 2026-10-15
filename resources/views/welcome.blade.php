@@ -33,12 +33,12 @@ au lieu d'une page marketing. Variables injectées depuis WelcomeController@inde
    VARIABLES & BASE — thème bleu de la marque
 ════════════════════════════════════════════════════════════════ */
 :root {
-    --brand:      #6366f1;
-    --brand-dk:   #4f46e5;
-    --brand-lt:   #e0e7ff;
-    --brand-mlt:  #eef2ff;
-    --navy:       #0a0a1e;
-    --navy-2:     #151538;
+    --brand:      #1668D8;
+    --brand-dk:   #1260C9;
+    --brand-lt:   #D6E6FF;
+    --brand-mlt:  #EAF2FF;
+    --navy:       #0B1E3D;
+    --navy-2:     #12305C;
     --grey:       #f4f6fb;
     --grey-2:     #e8ecf5;
     --border:     #e2e8f0;
@@ -47,7 +47,7 @@ au lieu d'une page marketing. Variables injectées depuis WelcomeController@inde
     --muted:      #94a3b8;
     --surface:    #ffffff;
     --font:       'Plus Jakarta Sans', sans-serif;
-    --display:    'Clash Display', 'Plus Jakarta Sans', sans-serif;
+    --display:    'Plus Jakarta Sans', system-ui, sans-serif;
     --mono:       'JetBrains Mono', monospace;
     --r:          14px;
     --r-sm:       9px;
@@ -105,7 +105,7 @@ footer.app-footer { display: none !important; }
     background: var(--grey);
     transition: border-color .2s, box-shadow .2s, background .2s;
 }
-.nav-search:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(99,102,241,.12); background: var(--surface); }
+.nav-search:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(22,104,216,.12); background: var(--surface); }
 .nav-search input {
     flex: 1; border: none; outline: none; background: transparent;
     padding: 10px 18px; font-size: 13.5px; font-family: var(--font); color: var(--text);
@@ -128,7 +128,7 @@ footer.app-footer { display: none !important; }
 .nav-btn-primary {
     padding: 10px 20px; border-radius: 50px; font-size: 12.5px; font-weight: 700; font-family: var(--font);
     background: var(--brand); color: #fff; border: none; cursor: pointer; text-decoration: none;
-    transition: all .15s; white-space: nowrap; box-shadow: 0 3px 12px rgba(99,102,241,.35);
+    transition: all .15s; white-space: nowrap; box-shadow: 0 3px 12px rgba(22,104,216,.35);
 }
 .nav-btn-primary:hover { background: var(--brand-dk); color: #fff; }
 
@@ -252,7 +252,7 @@ footer.app-footer { display: none !important; }
 .hero-dot.is-active { background: #fff; width: 22px; border-radius: 5px; }
 
 .hero {
-    background: linear-gradient(120deg, var(--navy) 0%, #241a6b 50%, var(--brand) 100%);
+    background: linear-gradient(120deg, var(--navy) 0%, #0F3F86 50%, var(--brand) 100%);
     border-radius: var(--r);
     display: flex; align-items: center; justify-content: space-between; gap: 24px;
     overflow: hidden;
@@ -277,7 +277,7 @@ footer.app-footer { display: none !important; }
 }
 .hero::after {
     content: ''; position: absolute; right: -80px; bottom: -100px; width: 320px; height: 320px;
-    border-radius: 50%; background: radial-gradient(circle, rgba(165,180,252,.28) 0%, transparent 70%);
+    border-radius: 50%; background: radial-gradient(circle, rgba(125,180,255,.28) 0%, transparent 70%);
     pointer-events: none;
 }
 /* Balayage lumineux qui traverse la bannière (effet "vivant") */
@@ -293,11 +293,11 @@ footer.app-footer { display: none !important; }
 .hero-badge {
     display: inline-flex; align-items: center; gap: 7px;
     background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
-    color: #e0e7ff; font-size: 11.5px; font-weight: 700;
+    color: #D6E6FF; font-size: 11.5px; font-weight: 700;
     padding: 5px 13px; border-radius: 20px; margin-bottom: 16px;
     animation: heroFadeUp .6s ease both;
 }
-.hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #a5b4fc; box-shadow: 0 0 6px #a5b4fc; animation: blink 2s ease-in-out infinite; }
+.hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #7DB4FF; box-shadow: 0 0 6px #7DB4FF; animation: blink 2s ease-in-out infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 @keyframes heroFadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 .hero-title { font-family: var(--display); font-weight: 700; font-size: clamp(24px, 3.4vw, 38px); color: #fff; line-height: 1.15; margin: 0 0 12px; letter-spacing: -.6px; animation: heroFadeUp .65s .08s ease both; }
@@ -421,7 +421,7 @@ footer.app-footer { display: none !important; }
     box-shadow: 0 1px 3px rgba(0,0,0,.05);
 }
 .cat-pill:hover { border-color: var(--brand); color: var(--brand-dk); background: var(--brand-mlt); transform: translateY(-1px); }
-.cat-pill.active { background: linear-gradient(135deg, var(--brand), var(--brand-dk)); color: #fff; border-color: var(--brand-dk); box-shadow: 0 4px 14px rgba(99,102,241,.35); transform: translateY(-1px); }
+.cat-pill.active { background: linear-gradient(135deg, var(--brand), var(--brand-dk)); color: #fff; border-color: var(--brand-dk); box-shadow: 0 4px 14px rgba(22,104,216,.35); transform: translateY(-1px); }
 
 /* ── Recommandés (scroll horizontal) ── */
 .reco-row-outer {
@@ -459,8 +459,8 @@ footer.app-footer { display: none !important; }
     animation: flashGlow 2.8s ease-in-out infinite;
 }
 @keyframes flashGlow {
-    0%, 100% { box-shadow: 0 8px 28px rgba(79,70,229,.28); }
-    50%      { box-shadow: 0 8px 40px rgba(79,70,229,.5), 0 0 0 4px rgba(99,102,241,.14); }
+    0%, 100% { box-shadow: 0 8px 28px rgba(18,96,201,.28); }
+    50%      { box-shadow: 0 8px 40px rgba(18,96,201,.5), 0 0 0 4px rgba(22,104,216,.14); }
 }
 .flash-section::before { content: ''; position: absolute; right: -40px; top: -40px; width: 180px; height: 180px; border-radius: 50%; background: rgba(255,255,255,.08); pointer-events: none; }
 .flash-section-hd { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; position: relative; z-index: 1; flex-wrap: wrap; }
@@ -490,7 +490,7 @@ footer.app-footer { display: none !important; }
 .flash-card-img { height: 112px; position: relative; background: var(--grey); overflow: hidden; display: flex; align-items: center; justify-content: center; }
 .flash-card-img img { width: 100%; height: 100%; object-fit: cover; }
 .flash-card-ph { font-size: 28px; opacity: .3; }
-.flash-card-badge { position: absolute; top: 7px; left: 7px; background: var(--navy); color: #a5b4fc; font-size: 10.5px; font-weight: 800; padding: 3px 8px; border-radius: 20px; animation: badgePulse 1.9s ease-in-out infinite; }
+.flash-card-badge { position: absolute; top: 7px; left: 7px; background: var(--navy); color: #7DB4FF; font-size: 10.5px; font-weight: 800; padding: 3px 8px; border-radius: 20px; animation: badgePulse 1.9s ease-in-out infinite; }
 @keyframes badgePulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 .flash-card-body { padding: 9px 11px 11px; display: flex; flex-direction: column; gap: 3px; }
 .flash-card-shop { font-size: 10px; color: var(--muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -660,7 +660,7 @@ footer.app-footer { display: none !important; }
     width: 44px; height: 44px; border-radius: 50%;
     background: var(--brand); color: #fff; border: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 6px 20px rgba(99,102,241,.4);
+    box-shadow: 0 6px 20px rgba(22,104,216,.4);
     opacity: 0; visibility: hidden; transform: translateY(10px);
     transition: opacity .25s, transform .25s, visibility 0s linear .25s, background .15s;
 }
@@ -893,8 +893,8 @@ footer.app-footer { display: none !important; }
 }
 .mk-btn:active { transform: scale(.97); }
 .mk-btn:focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; }
-.mk-btn--primary { background: var(--brand); color: #fff; box-shadow: 0 6px 18px rgba(99,102,241,.35); }
-.mk-btn--primary:hover { background: var(--brand-dk); color: #fff; transform: translateY(-2px); box-shadow: 0 10px 26px rgba(99,102,241,.42); }
+.mk-btn--primary { background: var(--brand); color: #fff; box-shadow: 0 6px 18px rgba(22,104,216,.35); }
+.mk-btn--primary:hover { background: var(--brand-dk); color: #fff; transform: translateY(-2px); box-shadow: 0 10px 26px rgba(22,104,216,.42); }
 .mk-btn--ghost { background: var(--surface); color: var(--brand-dk); border-color: var(--brand-lt); }
 .mk-btn--ghost:hover { background: var(--brand-mlt); border-color: var(--brand); color: var(--brand-dk); transform: translateY(-2px); }
 .mk-btn .ico { transition: transform var(--t-micro) var(--ease-out); }
@@ -913,18 +913,18 @@ footer.app-footer { display: none !important; }
 }
 .mk-split--reverse .mk-copy { order: 2; }
 .mk-split--dark { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%); border-color: transparent; }
-.mk-split--dark::after { background: radial-gradient(circle, rgba(99,102,241,.32) 0%, transparent 68%); }
+.mk-split--dark::after { background: radial-gradient(circle, rgba(22,104,216,.32) 0%, transparent 68%); }
 .mk-split--dark::before {
     content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
     background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.06) 1px, transparent 0);
     background-size: 28px 28px;
 }
 .mk-split--dark .mk-title { color: #fff; }
-.mk-split--dark .mk-title strong { color: #a5b4fc; }
+.mk-split--dark .mk-title strong { color: #7DB4FF; }
 .mk-split--dark .mk-sub { color: rgba(255,255,255,.72); }
-.mk-split--dark .mk-eyebrow { background: rgba(255,255,255,.1); color: #e0e7ff; }
+.mk-split--dark .mk-eyebrow { background: rgba(255,255,255,.1); color: #D6E6FF; }
 .mk-split--dark .mk-list li { color: #fff; }
-.mk-split--dark .mk-check { background: rgba(165,180,252,.16); color: #a5b4fc; }
+.mk-split--dark .mk-check { background: rgba(125,180,255,.16); color: #7DB4FF; }
 .mk-split--dark .mk-btn--ghost { background: rgba(255,255,255,.08); color: #fff; border-color: rgba(255,255,255,.25); }
 .mk-split--dark .mk-btn--ghost:hover { background: rgba(255,255,255,.16); color: #fff; }
 .mk-copy { min-width: 0; }
@@ -958,7 +958,7 @@ footer.app-footer { display: none !important; }
     display: flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums;
     transition: background .45s, color .45s;
 }
-.how-step.is-on .how-badge { background: var(--brand); border-color: var(--brand); color: #fff; transform: scale(1.06); box-shadow: 0 8px 22px rgba(99,102,241,.35); }
+.how-step.is-on .how-badge { background: var(--brand); border-color: var(--brand); color: #fff; transform: scale(1.06); box-shadow: 0 8px 22px rgba(22,104,216,.35); }
 .how-step.is-on .how-num { background: var(--navy); color: #fff; }
 .how-step-body { display: flex; flex-direction: column; gap: 6px; }
 .how-step h3 { font-family: var(--display); font-size: 18px; font-weight: 700; margin: 0; color: var(--text); }
@@ -1035,7 +1035,7 @@ footer.app-footer { display: none !important; }
 .track-steps li.is-todo { color: var(--muted); }
 .mk-feats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0 0 26px; }
 .mk-feat { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; font-size: 13.5px; font-weight: 600; color: rgba(255,255,255,.85); line-height: 1.4; }
-.mk-feat-ico { width: 40px; height: 40px; border-radius: 12px; background: rgba(165,180,252,.14); color: #a5b4fc; display: flex; align-items: center; justify-content: center; transition: transform var(--t-micro) var(--ease-spring); }
+.mk-feat-ico { width: 40px; height: 40px; border-radius: 12px; background: rgba(125,180,255,.14); color: #7DB4FF; display: flex; align-items: center; justify-content: center; transition: transform var(--t-micro) var(--ease-spring); }
 .mk-feat:hover .mk-feat-ico { transform: translateY(-3px) scale(1.06); }
 
 /* ── Moyens de paiement ── */
@@ -1056,7 +1056,7 @@ footer.app-footer { display: none !important; }
 }
 .pay-shield-ico {
     width: 58px; height: 58px; border-radius: 18px; flex-shrink: 0; color: #fff;
-    background: linear-gradient(135deg, var(--brand), var(--brand-dk)); box-shadow: 0 8px 22px rgba(99,102,241,.35);
+    background: linear-gradient(135deg, var(--brand), var(--brand-dk)); box-shadow: 0 8px 22px rgba(22,104,216,.35);
     display: flex; align-items: center; justify-content: center;
     transform: scale(.6); opacity: 0; transition: transform .6s var(--ease-spring) .3s, opacity .3s .3s;
 }
@@ -1172,7 +1172,7 @@ footer.app-footer { display: none !important; }
     display: inline-flex; align-items: center; gap: 7px; margin-top: 18px; min-height: 44px;
     padding: 11px 22px; border-radius: 50px; background: var(--brand); color: #fff;
     font-size: 13.5px; font-weight: 700; text-decoration: none;
-    box-shadow: 0 6px 18px rgba(99,102,241,.3);
+    box-shadow: 0 6px 18px rgba(22,104,216,.3);
     transition: transform var(--t-micro) var(--ease-out), background var(--t-micro);
 }
 .c-empty-cta:hover { background: var(--brand-dk); color: #fff; transform: translateY(-2px); }
@@ -1202,7 +1202,7 @@ footer.app-footer { display: none !important; }
     transition: border-color var(--t-micro), color var(--t-micro), background var(--t-micro), transform var(--t-micro) var(--ease-out);
 }
 a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background: var(--brand-mlt); transform: translateY(-1px); }
-.cpg-btn.is-active { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 4px 14px rgba(99,102,241,.35); }
+.cpg-btn.is-active { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 4px 14px rgba(22,104,216,.35); }
 .cpg-btn.is-disabled { opacity: .45; cursor: not-allowed; }
 .cpg-dots { display: inline-flex; align-items: flex-end; height: 42px; padding: 0 4px; color: var(--muted); }
 .cpg-flip { display: inline-flex; transform: scaleX(-1); }
@@ -1224,10 +1224,10 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
     background: var(--brand); color: #fff;
     font-family: var(--display); font-weight: 700; font-size: 22px; line-height: 1; letter-spacing: .5px;
     border-bottom-right-radius: 24px; font-variant-numeric: tabular-nums;
-    box-shadow: 0 6px 18px rgba(99,102,241,.3);
+    box-shadow: 0 6px 18px rgba(22,104,216,.3);
 }
 .bands > .mk:nth-of-type(odd) .band-num { background: var(--brand-dk); }  /* 02, 04, 06 (alternance comme la maquette) */
-.mk-split--dark .band-num { background: var(--brand); box-shadow: 0 6px 22px rgba(99,102,241,.45); }
+.mk-split--dark .band-num { background: var(--brand); box-shadow: 0 6px 22px rgba(22,104,216,.45); }
 
 /* Bandes pleine largeur, contenu centré sur 1240 px */
 .bands { display: flex; flex-direction: column; }
@@ -1250,12 +1250,12 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
 }
 .hero01::before { /* grande forme indigo derrière les écrans, comme la vague verte de la maquette */
     content: ''; position: absolute; z-index: -1; right: -12%; top: -30%; width: 62%; height: 160%;
-    background: radial-gradient(closest-side, rgba(99,102,241,.95), rgba(79,70,229,.85) 55%, rgba(79,70,229,0) 100%);
+    background: radial-gradient(closest-side, rgba(22,104,216,.95), rgba(18,96,201,.85) 55%, rgba(18,96,201,0) 100%);
     border-radius: 50%; transform: rotate(-12deg);
 }
 .hero01::after {
     content: ''; position: absolute; z-index: -1; inset: 0; pointer-events: none;
-    background-image: radial-gradient(circle at 1px 1px, rgba(99,102,241,.12) 1px, transparent 0);
+    background-image: radial-gradient(circle at 1px 1px, rgba(22,104,216,.12) 1px, transparent 0);
     background-size: 26px 26px; mask-image: linear-gradient(90deg, transparent 40%, #000 100%);
     -webkit-mask-image: linear-gradient(90deg, transparent 40%, #000 100%);
 }
@@ -1310,7 +1310,7 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
 .mini-nav-links { display: flex; gap: 8px; margin-left: auto; }
 .mini-nav-links i { display: block; width: 26px; height: 5px; border-radius: 3px; background: var(--grey-2); }
 .mini-nav-btn { font-size: 8px; font-weight: 700; color: #fff; background: var(--brand); padding: 4px 9px; border-radius: 20px; }
-.mini-hero { background: linear-gradient(120deg, var(--navy) 0%, #241a6b 55%, var(--brand) 100%); padding: 16px 16px 18px; }
+.mini-hero { background: linear-gradient(120deg, var(--navy) 0%, #0F3F86 55%, var(--brand) 100%); padding: 16px 16px 18px; }
 .mini-hero-title { font-family: var(--display); font-weight: 700; font-size: 15px; line-height: 1.2; color: #fff; margin-bottom: 10px; }
 .mini-search { display: flex; align-items: center; gap: 6px; background: #fff; border-radius: 20px; padding: 6px 6px 6px 10px; font-size: 8.5px; color: var(--muted); }
 .mini-search span { margin-left: auto; width: 20px; height: 16px; border-radius: 10px; background: var(--brand); color: #fff; display: flex; align-items: center; justify-content: center; }
@@ -1343,7 +1343,7 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
 .mk-split--three .phone { width: 230px; }
 .app-side { min-width: 0; }
 .app-side-title { font-family: var(--display); font-size: 22px; font-weight: 700; color: #fff; margin: 0 0 18px; }
-.app-side-link { display: inline-flex; align-items: center; gap: 8px; color: #e0e7ff; font-size: 15px; font-weight: 600; text-decoration: none; }
+.app-side-link { display: inline-flex; align-items: center; gap: 8px; color: #D6E6FF; font-size: 15px; font-weight: 600; text-decoration: none; }
 .app-side-link:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
 
 /* ── Responsive des panneaux ── */
@@ -1461,385 +1461,13 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
     @endif
 </div>
 
-{{-- ══ 01 · HERO « LE E-COMMERCE NOUVELLE GÉNÉRATION » (aperçu ordinateur + téléphone avec les vrais produits) ══ --}}
-@php
-    /* Produits réels pour l'aperçu : meilleures ventes, puis recommandés, puis catalogue — avec photo uniquement */
-    $heroShowcase = collect($bestSellers ?? [])
-        ->merge($recommendedProducts ?? [])
-        ->merge($products->getCollection())
-        ->filter(fn ($p) => $p->image)
-        ->unique('id')
-        ->take(4)
-        ->values();
-    $heroCats = $categories->take(5);
-@endphp
-<section class="hero01" aria-labelledby="hero01Title">
-    <span class="band-num" aria-hidden="true">01</span>
-    <div class="hero01-inner">
-        <div class="hero01-copy">
-            <a href="{{ url('/') }}" class="hero01-brand">
-                <img src="/images/shopio-logo-192.png" alt="" width="40" height="40">
-                <span>Shop<b>io</b></span>
-            </a>
-            <h1 class="hero01-title" id="hero01Title">Le e-commerce <span>nouvelle génération</span></h1>
-            <p class="hero01-sub">Vendez. Gérez. Développez.<br>Tout est plus simple avec {{ config('app.name', 'Shopio') }} : boutiques vérifiées, livraison partout en Guinée et paiement à la livraison.</p>
-            <div class="hero01-btns">
-                <a href="#catalogue" class="mk-btn mk-btn--primary">{!! \App\Support\IconLibrary::svg('cart', '', 16) !!} Voir les produits</a>
-                <a href="{{ route('register') }}" class="mk-btn mk-btn--ghost">{!! \App\Support\IconLibrary::svg('store', '', 16) !!} Ouvrir ma boutique</a>
-            </div>
-            <ul class="hero01-feats">
-                <li><a href="{{ route('shops.index') }}"><span class="hero01-feat-ico">{!! \App\Support\IconLibrary::svg('store', '', 22) !!}</span>Marketplace<br>multi-vendeurs</a></li>
-                <li><a href="#paiements"><span class="hero01-feat-ico">{!! \App\Support\IconLibrary::svg('shield', '', 22) !!}</span>Paiements<br>sécurisés</a></li>
-                <li><a href="#livraison"><span class="hero01-feat-ico">{!! \App\Support\IconLibrary::svg('truck', '', 22) !!}</span>Livraison suivie<br>en temps réel</a></li>
-                <li><a href="#vendre"><span class="hero01-feat-ico">{!! \App\Support\IconLibrary::svg('trophy', '', 22) !!}</span>Outils puissants<br>pour grandir</a></li>
-            </ul>
-        </div>
-
-        <div class="hero01-visual" aria-hidden="true">
-            {{-- Ordinateur portable --}}
-            <div class="laptop">
-                <div class="laptop-screen">
-                    <div class="mini-site">
-                        <div class="mini-nav">
-                            <span class="mini-logo"><img src="/images/shopio-logo-192.png" alt=""> <span>Shop<b>io</b></span></span>
-                            <span class="mini-nav-links"><i></i><i></i><i></i></span>
-                            <span class="mini-nav-btn">S'inscrire</span>
-                        </div>
-                        <div class="mini-hero">
-                            <div class="mini-hero-title">Tout ce que vous cherchez,<br>au même endroit</div>
-                            <div class="mini-search">{!! \App\Support\IconLibrary::svg('search', '', 10) !!} Rechercher un produit, une catégorie…<span>{!! \App\Support\IconLibrary::svg('search', '', 9) !!}</span></div>
-                        </div>
-                        <div class="mini-cats">
-                            @forelse($heroCats as $cat)
-                                <span class="mini-cat"><i>{!! \App\Support\IconLibrary::categorySvg($cat, '', 13) !!}</i>{{ Str::limit($cat, 11, '') }}</span>
-                            @empty
-                                @foreach(['shirt' => 'Mode', 'smartphone' => 'Électronique', 'watch' => 'Montres', 'sparkles' => 'Beauté', 'shoe' => 'Chaussures'] as $ico => $lbl)
-                                <span class="mini-cat"><i>{!! \App\Support\IconLibrary::svg($ico, '', 13) !!}</i>{{ $lbl }}</span>
-                                @endforeach
-                            @endforelse
-                            <span class="mini-cat"><i>{!! \App\Support\IconLibrary::svg('grid', '', 13) !!}</i>Plus</span>
-                        </div>
-                        <div class="mini-sec">Meilleures ventes</div>
-                        <div class="mini-prods">
-                            @for($i = 0; $i < 4; $i++)
-                                @php $hp = $heroShowcase[$i] ?? null; @endphp
-                                <div class="mini-prod">
-                                    @if($hp)
-                                        <img src="{{ \App\Services\ImageOptimizer::url($hp->image, 'thumb') ?? asset('storage/' . $hp->image) }}" alt="" loading="eager" decoding="async">
-                                        <b>{{ number_format($hp->current_price, 0, ',', ' ') }} GNF</b>
-                                    @else
-                                        <i></i><em></em>
-                                    @endif
-                                </div>
-                            @endfor
-                        </div>
-                    </div>
-                </div>
-                <div class="laptop-base"></div>
-            </div>
-
-            {{-- Téléphone --}}
-            <div class="hero01-phone">
-                <div class="hero01-phone-screen">
-                    <span class="hero01-phone-notch"></span>
-                    <div class="mini-nav mini-nav--phone">
-                        <span class="mini-logo"><img src="/images/shopio-logo-192.png" alt=""> <span>Shop<b>io</b></span></span>
-                    </div>
-                    <div class="mini-hero mini-hero--phone">
-                        <div class="mini-hero-title">Tout ce que vous cherchez, au même endroit</div>
-                        <div class="mini-search">{!! \App\Support\IconLibrary::svg('search', '', 9) !!} Rechercher…</div>
-                    </div>
-                    <div class="mini-cats mini-cats--phone">
-                        @for($i = 0; $i < 4; $i++)<span class="mini-cat"><i></i></span>@endfor
-                    </div>
-                    <div class="mini-sec">Meilleures ventes</div>
-                    <div class="mini-prods mini-prods--phone">
-                        @for($i = 0; $i < 2; $i++)
-                            @php $hp = $heroShowcase[$i] ?? null; @endphp
-                            <div class="mini-prod">
-                                @if($hp)
-                                    <img src="{{ \App\Services\ImageOptimizer::url($hp->image, 'thumb') ?? asset('storage/' . $hp->image) }}" alt="" loading="eager" decoding="async">
-                                    <b>{{ number_format($hp->current_price, 0, ',', ' ') }} GNF</b>
-                                @else
-                                    <i></i><em></em>
-                                @endif
-                            </div>
-                        @endfor
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-{{-- ══ 02 → 06 : PANNEAUX NUMÉROTÉS (masqués pendant une recherche pour garder les résultats en haut) ══ --}}
+{{-- ══ ACCUEIL 3D (maquette de référence, palette bleue Shopio) : 01 hero → notre sélection ══ --}}
+@include('partials.home-3d-assets')
 @unless(request('s'))
-<div class="bands">
-
-{{-- ══ VENDEZ SUR SHOPIO (aperçu animé du tableau de bord vendeur) ══ --}}
-<section class="mk mk-split reveal" id="vendre" aria-labelledby="sellTitle">
-    <span class="band-num" aria-hidden="true">02</span>
-    <div class="mk-copy">
-        <span class="mk-eyebrow">{!! \App\Support\IconLibrary::svg('store', '', 13) !!} Vendeurs</span>
-        <h2 class="mk-title" id="sellTitle">Vendez plus. <strong>Gérez mieux.</strong></h2>
-        <p class="mk-sub">Ouvrez votre boutique sur {{ config('app.name', 'Shopio') }} sans créer de site : vos produits sont visibles par les acheteurs partout en Guinée.</p>
-        <ul class="mk-list">
-            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Gestion facile de votre boutique</li>
-            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Suivi des commandes en temps réel</li>
-            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Statistiques de vos ventes</li>
-            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Livraison assurée par nos partenaires</li>
-        </ul>
-        <div class="mk-btns">
-            <a href="{{ route('register') }}" class="mk-btn mk-btn--primary">{!! \App\Support\IconLibrary::svg('store', '', 16) !!} Ouvrir ma boutique</a>
-            <a href="{{ route('shops.index') }}" class="mk-btn mk-btn--ghost">Voir les boutiques</a>
-        </div>
-    </div>
-    <div class="mk-visual">
-        <div class="laptop laptop--dash" aria-hidden="true"><div class="laptop-screen">
-        <div class="dash-mock">
-            <div class="dash-bar"><span></span><span></span><span></span><span class="dash-url">{{ config('app.name', 'Shopio') }} · Tableau de bord</span></div>
-            <div class="dash-body">
-                <div class="dash-side">
-                    <span class="dash-nav is-active">{!! \App\Support\IconLibrary::svg('grid', '', 12) !!} Tableau de bord</span>
-                    <span class="dash-nav">{!! \App\Support\IconLibrary::svg('tag', '', 12) !!} Produits</span>
-                    <span class="dash-nav">{!! \App\Support\IconLibrary::svg('package', '', 12) !!} Commandes</span>
-                    <span class="dash-nav">{!! \App\Support\IconLibrary::svg('user', '', 12) !!} Clients</span>
-                    <span class="dash-nav">{!! \App\Support\IconLibrary::svg('sliders', '', 12) !!} Paramètres</span>
-                </div>
-                <div class="dash-main">
-                    <div class="dash-h">Tableau de bord</div>
-                    <div class="dash-kpis">
-                        <div class="dash-kpi"><span class="dash-kpi-lbl">Ventes</span><span class="dash-kpi-bar" style="--w:.85"></span><span class="dash-kpi-trend">{!! \App\Support\IconLibrary::svg('chevron-up', '', 11) !!} en hausse</span></div>
-                        <div class="dash-kpi"><span class="dash-kpi-lbl">Commandes</span><span class="dash-kpi-bar" style="--w:.65"></span><span class="dash-kpi-trend">{!! \App\Support\IconLibrary::svg('chevron-up', '', 11) !!} en hausse</span></div>
-                        <div class="dash-kpi"><span class="dash-kpi-lbl">Clients</span><span class="dash-kpi-bar" style="--w:.75"></span><span class="dash-kpi-trend">{!! \App\Support\IconLibrary::svg('chevron-up', '', 11) !!} en hausse</span></div>
-                    </div>
-                    <div class="dash-chart">
-                        <div class="dash-kpi-lbl" style="margin-bottom:6px">Évolution des ventes</div>
-                        <svg viewBox="0 0 310 110" preserveAspectRatio="none">
-                            <defs>
-                                <linearGradient id="dashGrad" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0" stop-color="#6366f1" stop-opacity=".28"/>
-                                    <stop offset="1" stop-color="#6366f1" stop-opacity="0"/>
-                                </linearGradient>
-                            </defs>
-                            <g stroke="#e8ecf5" stroke-width="1"><line x1="0" y1="30" x2="310" y2="30"/><line x1="0" y1="60" x2="310" y2="60"/><line x1="0" y1="90" x2="310" y2="90"/></g>
-                            <path class="dash-area" d="M0 92 L40 80 L80 84 L120 62 L160 68 L200 44 L240 50 L298 16 L298 110 L0 110 Z" fill="url(#dashGrad)"/>
-                            <path class="dash-line" d="M0 92 L40 80 L80 84 L120 62 L160 68 L200 44 L240 50 L298 16" fill="none" stroke="#6366f1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                            <circle class="dash-dot" cx="298" cy="16" r="5" fill="#4f46e5" stroke="#fff" stroke-width="2"/>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-            <div class="dash-toast">
-                <span class="dash-toast-ico">{!! \App\Support\IconLibrary::svg('bag', '', 16) !!}</span>
-                <span><strong>Nouvelle commande reçue</strong><span>à l'instant</span></span>
-            </div>
-        </div>
-        </div><div class="laptop-base"></div></div>{{-- /.laptop --}}
-    </div>
-</section>
-
-{{-- ══ LIVRAISON & SUIVI (itinéraire qui se dessine + étapes de la commande) ══ --}}
-<section class="mk mk-split mk-split--dark reveal" id="livraison" aria-labelledby="trackTitle">
-    <span class="band-num" aria-hidden="true">03</span>
-    <div class="mk-copy">
-        <span class="mk-eyebrow">{!! \App\Support\IconLibrary::svg('truck', '', 13) !!} Livraison</span>
-        <h2 class="mk-title" id="trackTitle">Livraison rapide. <strong>Suivi en temps réel.</strong></h2>
-        <p class="mk-sub">Des livreurs partenaires apportent vos commandes partout en Guinée, et vous suivez chaque étape jusqu'à votre porte.</p>
-        <div class="mk-feats">
-            <div class="mk-feat"><span class="mk-feat-ico">{!! \App\Support\IconLibrary::svg('map-pin', '', 20) !!}</span> Suivi de votre commande</div>
-            <div class="mk-feat"><span class="mk-feat-ico">{!! \App\Support\IconLibrary::svg('phone', '', 20) !!}</span> Notifications en temps réel</div>
-            <div class="mk-feat"><span class="mk-feat-ico">{!! \App\Support\IconLibrary::svg('shield', '', 20) !!}</span> Livraison sûre et fiable</div>
-        </div>
-        <div class="mk-btns">
-            <a href="{{ route('register') }}" class="mk-btn mk-btn--primary">{!! \App\Support\IconLibrary::svg('truck', '', 16) !!} Devenir livreur partenaire</a>
-            <a href="{{ route('delivery.companies.index') }}" class="mk-btn mk-btn--ghost">Entreprises de livraison</a>
-        </div>
-    </div>
-    <div class="mk-visual">
-        <div class="track-mock">
-            <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-                <g stroke="rgba(255,255,255,.07)" stroke-width="10" fill="none" stroke-linecap="round">
-                    <path d="M-10 70 L410 40"/><path d="M-10 190 L410 150"/><path d="M90 -10 L130 310"/><path d="M260 -10 L300 310"/><path d="M-10 270 Q200 230 410 260"/>
-                </g>
-                <path d="M70 240 C120 225 115 175 170 165 S255 150 265 105 S315 60 345 55" fill="none" stroke="rgba(165,180,252,.25)" stroke-width="5" stroke-dasharray="2 10" stroke-linecap="round"/>
-                <path class="track-route" d="M70 240 C120 225 115 175 170 165 S255 150 265 105 S315 60 345 55" fill="none" stroke="#a5b4fc" stroke-width="5" stroke-linecap="round"/>
-                <circle cx="70" cy="240" r="9" fill="#6366f1" stroke="#fff" stroke-width="3"/>
-                <g transform="translate(345 55)">
-                    <path d="M0 0 C-12 -14 -14 -20 -14 -26 A14 14 0 0 1 14 -26 C14 -20 12 -14 0 0 Z" fill="#6366f1" stroke="#fff" stroke-width="2.5"/>
-                    <circle cx="0" cy="-26" r="5" fill="#fff"/>
-                </g>
-                <circle r="8" fill="#fff" stroke="#4f46e5" stroke-width="4" cx="70" cy="240" id="trackRider">
-                    <animateMotion id="trackRiderMotion" dur="2.2s" begin="indefinite" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines=".65 0 .35 1"
-                        path="M0 0 C50 -15 45 -65 100 -75 S185 -90 195 -135 S245 -180 275 -185"/>
-                </circle>
-            </svg>
-            <div class="track-card" aria-hidden="true">
-                <div class="track-card-hd">
-                    <span class="ico-wrap">{!! \App\Support\IconLibrary::svg('package', '', 17) !!}</span>
-                    <span><strong>Votre commande</strong><span>En cours de livraison</span></span>
-                </div>
-                <ul class="track-steps">
-                    <li class="is-done" style="--i:0"><span class="track-dot">{!! \App\Support\IconLibrary::svg('check', '', 10) !!}</span> Commande confirmée</li>
-                    <li class="is-done" style="--i:1"><span class="track-dot">{!! \App\Support\IconLibrary::svg('check', '', 10) !!}</span> En préparation</li>
-                    <li class="is-current" style="--i:2"><span class="track-dot"></span> En cours de livraison</li>
-                    <li class="is-todo" style="--i:3"><span class="track-dot"></span> Livrée</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</section>
-
-{{-- ══ PAIEMENTS (uniquement les moyens réellement proposés au tunnel de commande) ══ --}}
-<section class="mk mk-split reveal" id="paiements" aria-labelledby="payTitle">
-    <span class="band-num" aria-hidden="true">04</span>
-    <div class="mk-copy">
-        <span class="mk-eyebrow">{!! \App\Support\IconLibrary::svg('lock', '', 13) !!} Paiement</span>
-        <h2 class="mk-title" id="payTitle">Paiements sécurisés. <strong>Plusieurs options.</strong></h2>
-        <p class="mk-sub">Payez comme vous préférez : en espèces à la réception de votre colis, ou en ligne par Mobile Money.</p>
-        <div class="mk-btns">
-            <a href="#catalogue" class="mk-btn mk-btn--primary">{!! \App\Support\IconLibrary::svg('cart', '', 16) !!} Voir les produits</a>
-        </div>
-    </div>
-    <div class="mk-visual">
-        <div class="pay-grid">
-            <div class="pay-card">
-                <span class="pay-card-ico">{!! \App\Support\IconLibrary::svg('wallet', '', 22) !!}</span>
-                <strong>Paiement à la livraison</strong>
-                <p>Vous payez seulement quand vous recevez votre commande.</p>
-            </div>
-            <div class="pay-card">
-                <span class="pay-card-ico">{!! \App\Support\IconLibrary::svg('smartphone', '', 22) !!}</span>
-                <strong>Mobile Money</strong>
-                <p>Paiement en ligne sécurisé depuis votre téléphone.</p>
-            </div>
-            <div class="pay-shield">
-                <span class="pay-shield-ico">{!! \App\Support\IconLibrary::svg('shield', '', 28) !!}</span>
-                <span><strong>Achats protégés</strong><span>Boutiques vérifiées avant de vendre et retours facilités en cas de problème.</span></span>
-            </div>
-        </div>
-    </div>
-</section>
-
-{{-- ══ APPLICATION (PWA installable — masquée si déjà ouverte depuis l'appli) ══ --}}
-<section class="mk mk-split mk-split--dark mk-split--three reveal" id="application" aria-labelledby="appTitle">
-    <span class="band-num" aria-hidden="true">05</span>
-    <div class="mk-copy">
-        <span class="mk-eyebrow">{!! \App\Support\IconLibrary::svg('smartphone', '', 13) !!} Application</span>
-        <h2 class="mk-title" id="appTitle">{{ config('app.name', 'Shopio') }} est partout <strong>avec vous.</strong></h2>
-        <p class="mk-sub">Gérez votre boutique, vos commandes et vos clients depuis votre téléphone.</p>
-        <div class="mk-btns">
-            <button type="button" class="mk-btn mk-btn--primary" id="appInstallBtn">{!! \App\Support\IconLibrary::svg('smartphone', '', 16) !!} Installer l'application</button>
-        </div>
-    </div>
-    <div class="mk-visual">
-        <div class="phone" aria-hidden="true">
-            <div class="phone-screen">
-                <span class="phone-notch"></span>
-                <div class="phone-notifs">
-                    <div class="phone-notif" style="--i:0">
-                        <span class="phone-notif-ico">{!! \App\Support\IconLibrary::svg('check', '', 13) !!}</span>
-                        <span><strong>Commande confirmée</strong><span>La boutique prépare votre colis</span></span>
-                    </div>
-                    <div class="phone-notif" style="--i:1">
-                        <span class="phone-notif-ico">{!! \App\Support\IconLibrary::svg('truck', '', 13) !!}</span>
-                        <span><strong>Votre colis est en route</strong><span>Le livreur arrive bientôt</span></span>
-                    </div>
-                </div>
-                <div class="phone-hd">
-                    <div class="phone-logo"><img src="/images/shopio-logo-192.png" alt=""> <span>Shop<b>io</b></span></div>
-                    <div class="phone-search">{!! \App\Support\IconLibrary::svg('search', '', 11) !!} Que recherchez-vous ?</div>
-                </div>
-                <div class="phone-grid">
-                    @for($i = 0; $i < 4; $i++)
-                    <div class="phone-tile"><i></i><b></b><em></em></div>
-                    @endfor
-                </div>
-                <div class="phone-tabs">
-                    <span>{!! \App\Support\IconLibrary::svg('home', '', 16) !!}</span>
-                    <span>{!! \App\Support\IconLibrary::svg('grid', '', 16) !!}</span>
-                    <span>{!! \App\Support\IconLibrary::svg('cart', '', 16) !!}</span>
-                    <span>{!! \App\Support\IconLibrary::svg('user', '', 16) !!}</span>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="app-side">
-        <h3 class="app-side-title">Tout {{ config('app.name', 'Shopio') }} dans votre poche</h3>
-        <ul class="mk-list">
-            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Notifications instantanées</li>
-            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Accès direct depuis l'écran d'accueil</li>
-            <li><span class="mk-check">{!! \App\Support\IconLibrary::svg('check', '', 14) !!}</span> Installation en un clic, sans store</li>
-        </ul>
-        <a href="{{ url('/') }}" class="app-side-link">{!! \App\Support\IconLibrary::svg('globe', '', 16) !!} {{ request()->getHost() }}</a>
-    </div>
-</section>
-
-{{-- ══ APPEL FINAL ══ --}}
-<section class="mk final-cta reveal" aria-labelledby="finalTitle">
-    <span class="band-num" aria-hidden="true">06</span>
-    <div>
-        <h2 class="mk-title" id="finalTitle">Rejoignez les vendeurs qui réussissent déjà avec <strong>{{ config('app.name', 'Shopio') }}.</strong></h2>
-        <p class="mk-sub">Créez votre boutique en quelques minutes et commencez à vendre dès aujourd'hui.</p>
-        <div class="mk-btns">
-            <a href="{{ route('register') }}" class="mk-btn mk-btn--primary">Commencer maintenant <span aria-hidden="true">→</span></a>
-        </div>
-    </div>
-    <div class="final-art" aria-hidden="true">
-        <svg viewBox="0 0 320 200">
-            <g fill="#e0e7ff"><rect x="30" y="140" width="22" height="40" rx="5"/><rect x="62" y="120" width="22" height="60" rx="5"/><rect x="94" y="100" width="22" height="80" rx="5"/></g>
-            <path class="final-arrow" d="M20 170 C80 160 120 120 170 110 S250 70 295 25" fill="none" stroke="#6366f1" stroke-width="5" stroke-linecap="round"/>
-            <path class="final-arrow" d="M276 22 L297 23 L295 44" fill="none" stroke="#6366f1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-            <g class="final-bag">
-                <path d="M190 80 h70 l8 100 h-86 z" fill="#6366f1"/>
-                <path d="M190 80 h70 l8 100 h-86 z" fill="url(#finalShade)"/>
-                <path d="M208 92 v-14 a17 17 0 0 1 34 0 v14" fill="none" stroke="#4f46e5" stroke-width="6" stroke-linecap="round"/>
-                <path d="M210 128 l12 12 l22 -24" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-            </g>
-            <defs><linearGradient id="finalShade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".18"/><stop offset="1" stop-color="#000" stop-opacity=".12"/></linearGradient></defs>
-        </svg>
-    </div>
-</section>
-
-</div>{{-- /.bands --}}
+@include('partials.home-3d')
 @endunless
 
-<div class="c-main">
-
-{{-- ══ COMMENT ÇA MARCHE (ligne de progression qui se dessine au scroll) ══ --}}
-@unless(request('s'))
-<section class="mk how" aria-labelledby="howTitle">
-    <span class="mk-eyebrow reveal">Simple comme 1, 2, 3</span>
-    <h2 class="mk-title reveal" id="howTitle" style="--rd:60ms">Comment ça marche ?</h2>
-    <p class="mk-sub reveal" style="--rd:120ms">Commandez en quelques clics, recevez chez vous et ne payez qu'à la réception.</p>
-    <div class="how-track" id="howTrack">
-        <div class="how-line" aria-hidden="true"><span class="how-line-fill"></span></div>
-        <ol class="how-steps">
-            <li class="how-step">
-                <span class="how-badge" aria-hidden="true">{!! \App\Support\IconLibrary::svg('search', '', 26) !!}<span class="how-num">1</span></span>
-                <div class="how-step-body">
-                    <h3>Je choisis</h3>
-                    <p>Parcourez les produits des boutiques vérifiées et comparez les prix.</p>
-                </div>
-            </li>
-            <li class="how-step">
-                <span class="how-badge" aria-hidden="true">{!! \App\Support\IconLibrary::svg('cart', '', 26) !!}<span class="how-num">2</span></span>
-                <div class="how-step-body">
-                    <h3>Je commande</h3>
-                    <p>Indiquez votre adresse, la boutique confirme et prépare votre colis.</p>
-                </div>
-            </li>
-            <li class="how-step">
-                <span class="how-badge" aria-hidden="true">{!! \App\Support\IconLibrary::svg('wallet', '', 26) !!}<span class="how-num">3</span></span>
-                <div class="how-step-body">
-                    <h3>Je suis livré et je paie</h3>
-                    <p>Le livreur vous apporte la commande : vous payez à la réception.</p>
-                </div>
-            </li>
-        </ol>
-    </div>
-</section>
-@endunless
+<div class="c-main" style="padding-top:24px">
 
 {{-- ══ VU RÉCEMMENT (rempli en JS depuis l'historique local du navigateur) ══ --}}
 <div class="sec-hd reveal" id="recentlyViewedHd" hidden>
@@ -1851,35 +1479,15 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
 </div>
 
 <div id="resultsRoot">
-@include('partials.catalogue-results')
+@include('partials.catalogue-results', ['compactHome' => true])
 </div>
-
-
-{{-- ══ TÉMOIGNAGES CLIENTS (avis réels, hors recherche) ══ --}}
-@if($testimonials->isNotEmpty())
-<div class="sec-hd reveal" style="margin-top:8px">
-    <div class="sec-title">{!! \App\Support\IconLibrary::svg('sparkles') !!} Ce que disent <strong>nos clients</strong></div>
-</div>
-<div class="testi-grid">
-    @foreach($testimonials as $review)
-    <div class="testi-card reveal" style="--rd: {{ $loop->index * 70 }}ms">
-        <div class="testi-stars">{!! \App\Support\IconLibrary::stars((float) $review->rating, 13) !!}</div>
-        <p class="testi-text">&laquo;&nbsp;{{ Str::limit($review->comment, 160) }}&nbsp;&raquo;</p>
-        <div class="testi-author">
-            <span class="testi-avatar">{{ mb_strtoupper(mb_substr($review->client->name ?? '?', 0, 1)) }}</span>
-            <span class="testi-author-body">
-                <span class="testi-author-name">{{ $review->client->name ?? 'Client Shopio' }}</span>
-                @if($review->vendeur)<span class="testi-author-sub">Achat chez {{ $review->vendeur->name }}</span>@endif
-            </span>
-        </div>
-    </div>
-    @endforeach
-</div>
-<div style="height:40px"></div>
-@endif
-
 
 </div>{{-- /.c-main --}}
+
+{{-- ══ 02 Livraison → 06 Appel final (+ avis réels), masqués pendant une recherche ══ --}}
+@unless(request('s'))
+@include('partials.home-3d-bands')
+@endunless
 
 {{-- ══ FOOTER ══ --}}
 <footer class="w-footer">

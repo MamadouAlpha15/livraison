@@ -10,13 +10,13 @@
 /* ── 1. TOKENS ─────────────────────────────────────────────────────────── */
 :root {
     /* Marque */
-    --sh-primary-50:  #EEF2FF;
-    --sh-primary-100: #E0E7FF;
-    --sh-primary-500: #6366F1;   /* identité, icônes, liens, éléments actifs */
-    --sh-primary-600: #4F46E5;   /* fond des boutons à texte blanc (contraste ≥ 4,5:1) */
-    --sh-primary-700: #4338CA;   /* survol / pression */
+    --sh-primary-50:  #EAF2FF;
+    --sh-primary-100: #D6E6FF;
+    --sh-primary-500: #1F7CF6;   /* identité, icônes, liens, éléments actifs */
+    --sh-primary-600: #1668D8;   /* fond des boutons à texte blanc (contraste ≥ 4,5:1) */
+    --sh-primary-700: #1260C9;   /* survol / pression */
     --sh-on-primary:  #FFFFFF;
-    --sh-primary-text: #4F46E5;  /* texte indigo sur fond clair (liens, onglet actif) */
+    --sh-primary-text: #1260C9;  /* texte indigo sur fond clair (liens, onglet actif) */
 
     /* Promo : rouge déjà utilisé par le site (pas de nouvelle couleur sans validation) */
     --sh-promo-bg:    #FEE2E2;
@@ -35,7 +35,7 @@
     --sh-success:     #15803D;  --sh-success-bg: #DCFCE7;
     --sh-warning:     #B45309;  --sh-warning-bg: #FEF3C7;
     --sh-error:       #DC2626;  --sh-error-bg:   #FEE2E2;
-    --sh-info:        #4F46E5;  --sh-info-bg:    #EEF2FF;
+    --sh-info:        #1260C9;  --sh-info-bg:    #EAF2FF;
     --sh-toast-ok:    #4ADE80;  /* icône du toast (fond inversé) */
 
     /* Typographie : 2 familles */
@@ -60,9 +60,9 @@
     --sh-r-full: 999px;
 
     /* Ombres (3 niveaux, teintées indigo) */
-    --sh-shadow-rest:  0 1px 2px rgba(30, 27, 75, .06), 0 1px 3px rgba(30, 27, 75, .05);
-    --sh-shadow-hover: 0 8px 24px rgba(67, 56, 202, .14);
-    --sh-shadow-modal: 0 24px 64px rgba(30, 27, 75, .24);
+    --sh-shadow-rest:  0 1px 2px rgba(11, 30, 61, .06), 0 1px 3px rgba(11, 30, 61, .05);
+    --sh-shadow-hover: 0 8px 24px rgba(18, 96, 201, .14);
+    --sh-shadow-modal: 0 24px 64px rgba(11, 30, 61, .24);
 
     /* Motion */
     --sh-dur-fast:  150ms;   /* survol, pression */
@@ -96,12 +96,12 @@
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
         color-scheme: dark;
-        --sh-primary-500: #818CF8;
-        --sh-primary-600: #4F46E5;
-        --sh-primary-700: #4338CA;
-        --sh-primary-text: #A5B4FC;
-        --sh-primary-50:  #1E1B4B;
-        --sh-primary-100: #262364;
+        --sh-primary-500: #4A9BFF;
+        --sh-primary-600: #1260C9;
+        --sh-primary-700: #0F55B3;
+        --sh-primary-text: #7DB4FF;
+        --sh-primary-50:  #10264A;
+        --sh-primary-100: #163463;
         --sh-promo-bg:    #3F1D1D;  --sh-promo-text: #FCA5A5;
         --sh-bg:          #0B0D17;
         --sh-surface:     #151827;
@@ -113,7 +113,7 @@
         --sh-success: #4ADE80;  --sh-success-bg: #0F2E1C;
         --sh-warning: #FBBF24;  --sh-warning-bg: #2E2410;
         --sh-error:   #F87171;  --sh-error-bg:   #3A1616;
-        --sh-info:    #A5B4FC;  --sh-info-bg:    #1E1B4B;
+        --sh-info:    #7DB4FF;  --sh-info-bg:    #10264A;
         --sh-toast-ok: #15803D;
         --sh-shimmer: rgba(255,255,255,.06);
         --sh-shadow-rest:  0 1px 2px rgba(0,0,0,.4);
@@ -124,12 +124,12 @@
 /* Thème sombre — choix explicite (bouton du site) */
 :root[data-theme="dark"] {
     color-scheme: dark;
-    --sh-primary-500: #818CF8;
-    --sh-primary-600: #4F46E5;
-    --sh-primary-700: #4338CA;
-    --sh-primary-text: #A5B4FC;
-    --sh-primary-50:  #1E1B4B;
-    --sh-primary-100: #262364;
+    --sh-primary-500: #4A9BFF;
+    --sh-primary-600: #1260C9;
+    --sh-primary-700: #0F55B3;
+    --sh-primary-text: #7DB4FF;
+    --sh-primary-50:  #10264A;
+    --sh-primary-100: #163463;
     --sh-promo-bg:    #3F1D1D;  --sh-promo-text: #FCA5A5;
     --sh-bg:          #0B0D17;
     --sh-surface:     #151827;
@@ -141,7 +141,7 @@
     --sh-success: #4ADE80;  --sh-success-bg: #0F2E1C;
     --sh-warning: #FBBF24;  --sh-warning-bg: #2E2410;
     --sh-error:   #F87171;  --sh-error-bg:   #3A1616;
-    --sh-info:    #A5B4FC;  --sh-info-bg:    #1E1B4B;
+    --sh-info:    #7DB4FF;  --sh-info-bg:    #10264A;
     --sh-toast-ok: #15803D;
     --sh-shimmer: rgba(255,255,255,.06);
     --sh-shadow-rest:  0 1px 2px rgba(0,0,0,.4);

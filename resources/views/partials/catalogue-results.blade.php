@@ -17,6 +17,8 @@ fragment soit inclus dans welcome.blade.php ou rendu seul.
 =====================================================
 --}}
 
+{{-- Sur l'accueil (compactHome), ces blocs sont affichés par partials/home-3d : on ne les répète pas ici. --}}
+@unless($compactHome ?? false)
 {{-- ══ VENTES FLASH (masqué pendant une recherche, comme Jumia) ══ --}}
 @if($flashProducts->isNotEmpty() && !request('s'))
 <div class="flash-section reveal" id="ventes-flash" style="scroll-margin-top:calc(var(--nav-h) + 12px)">
@@ -129,6 +131,8 @@ fragment soit inclus dans welcome.blade.php ou rendu seul.
 </div>
 @endforeach
 @endif
+
+@endunless
 
 {{-- ══ CATALOGUE COMPLET / RÉSULTATS DE RECHERCHE ══ --}}
 @php

@@ -44,12 +44,12 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
-    --brand:     #6366f1;
-    --brand-dk:  #4f46e5;
-    --brand-lt:  #e0e7ff;
-    --brand-mlt: #eef2ff;
-    --violet:    #8b5cf6;
-    --dark:      #0a0a1e;
+    --brand:     #1668D8;
+    --brand-dk:  #1260C9;
+    --brand-lt:  #D6E6FF;
+    --brand-mlt: #EAF2FF;
+    --violet:    #1F7CF6;
+    --dark:      #0B1E3D;
     --red:       #ef4444;
     --red-lt:    #fef2f2;
     --green:     #10b981;
@@ -84,7 +84,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     display: flex; align-items: center;
     padding: 0 20px; gap: 12px;
     position: sticky; top: 0; z-index: 200;
-    border-bottom: 1px solid rgba(99,102,241,.18);
+    border-bottom: 1px solid rgba(22,104,216,.18);
 }
 .nav-logo-wrap {
     display: flex; align-items: center; gap: 9px;
@@ -105,10 +105,10 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     color: #c4b5fd; font-size: 13px; font-weight: 700;
     text-decoration: none; padding: 7px 14px;
     border: 1.5px solid rgba(196,181,253,.35); border-radius: var(--r-sm);
-    background: rgba(99,102,241,.14); transition: all .18s;
+    background: rgba(22,104,216,.14); transition: all .18s;
     white-space: nowrap; flex-shrink: 0;
 }
-.amz-back-home:hover { background: rgba(99,102,241,.26); border-color: rgba(196,181,253,.6); color: #e9d5ff; }
+.amz-back-home:hover { background: rgba(22,104,216,.26); border-color: rgba(196,181,253,.6); color: #e9d5ff; }
 .amz-back {
     display: flex; align-items: center; gap: 5px;
     color: rgba(255,255,255,.7); font-size: 13px; font-weight: 600;
@@ -122,15 +122,15 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 /* Recherche navbar */
 .amz-nav-search {
     flex: 1; display: flex; border-radius: var(--r-sm); overflow: hidden;
-    border: 2px solid rgba(99,102,241,.35); max-width: 560px; transition: border-color .2s;
+    border: 2px solid rgba(22,104,216,.35); max-width: 560px; transition: border-color .2s;
 }
-.amz-nav-search:focus-within { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.15); }
+.amz-nav-search:focus-within { border-color: #1668D8; box-shadow: 0 0 0 3px rgba(22,104,216,.15); }
 .amz-nav-search input {
     flex: 1; border: none; outline: none; padding: 9px 14px;
     font-size: 14px; font-family: var(--font); background: #fff; color: var(--text);
 }
 .amz-nav-search-btn {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none;
+    background: linear-gradient(135deg, #1668D8, #1F7CF6); border: none;
     padding: 0 16px; cursor: pointer; font-size: 16px; transition: opacity .15s;
     color: #fff; display: flex; align-items: center; justify-content: center;
 }
@@ -231,10 +231,10 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .drawer-apply {
     width: 100%; padding: 13px; margin-top: 10px;
     border-radius: var(--r-sm); border: none;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, #1668D8, #1F7CF6);
     color: #fff; font-size: 14px; font-weight: 700;
     font-family: var(--font); cursor: pointer;
-    box-shadow: 0 4px 14px rgba(99,102,241,.3);
+    box-shadow: 0 4px 14px rgba(22,104,216,.3);
     display: flex; align-items: center; justify-content: center; gap: 6px;
 }
 
@@ -351,7 +351,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     border-radius: var(--r-sm); font-size: 13px; font-family: var(--font);
     color: var(--text); outline: none; transition: border-color .15s;
 }
-.amz-price-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(99,102,241,.1); }
+.amz-price-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(22,104,216,.1); }
 .amz-price-btn {
     width: 100%; padding: 8px; background: var(--brand-mlt); border: 1.5px solid var(--brand-lt);
     border-radius: var(--r-sm); font-size: 13px; font-family: var(--font);
@@ -408,7 +408,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     transition: box-shadow .25s, border-color .25s, transform .25s;
     display: flex; flex-direction: column; position: relative;
 }
-.amz-card:hover { box-shadow: 0 8px 32px rgba(99,102,241,.13); border-color: var(--brand-lt); transform: translateY(-3px); }
+.amz-card:hover { box-shadow: 0 8px 32px rgba(22,104,216,.13); border-color: var(--brand-lt); transform: translateY(-3px); }
 
 .amz-grid.list-view .amz-card { flex-direction: row; min-height: 180px; }
 .amz-grid.list-view .amz-card-img { width: 210px; height: auto; min-height: 180px; flex-shrink: 0; }
@@ -428,7 +428,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .amz-card-img-ph { font-size: 48px; opacity: .2; }
 .amz-card-img::after {
     content: ''; position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(99,102,241,.07) 0%, transparent 60%);
+    background: linear-gradient(to top, rgba(22,104,216,.07) 0%, transparent 60%);
     opacity: 0; transition: opacity .25s;
 }
 .amz-card:hover .amz-card-img::after { opacity: 1; }
@@ -439,7 +439,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 6px; white-space: nowrap;
 }
 .badge-promo   { background: #ef4444; color: #fff; box-shadow: 0 2px 6px rgba(239,68,68,.35); }
-.badge-nouveau { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; box-shadow: 0 2px 6px rgba(99,102,241,.35); }
+.badge-nouveau { background: linear-gradient(135deg, #1668D8, #1F7CF6); color: #fff; box-shadow: 0 2px 6px rgba(22,104,216,.35); }
 .badge-vedette { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; box-shadow: 0 2px 6px rgba(245,158,11,.35); }
 .badge-rupture { background: #94a3b8; color: #fff; }
 
@@ -473,11 +473,11 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     display: flex; align-items: center; justify-content: center; gap: 6px;
     width: 100%; padding: 10px 12px; border-radius: var(--r-sm);
     font-size: 13px; font-weight: 700; font-family: var(--font);
-    background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff;
+    background: linear-gradient(135deg, #1668D8, #1F7CF6); color: #fff;
     border: none; cursor: pointer; text-decoration: none; transition: all .2s;
-    box-shadow: 0 4px 12px rgba(99,102,241,.28);
+    box-shadow: 0 4px 12px rgba(22,104,216,.28);
 }
-.amz-btn-order:hover { background: linear-gradient(135deg, #4f46e5, #7c3aed); box-shadow: 0 6px 20px rgba(99,102,241,.42); transform: translateY(-1px); color: #fff; }
+.amz-btn-order:hover { background: linear-gradient(135deg, #1260C9, #7c3aed); box-shadow: 0 6px 20px rgba(22,104,216,.42); transform: translateY(-1px); color: #fff; }
 .amz-btn-order.out { background: var(--grey-2); color: var(--muted); border: 1px solid var(--border); cursor: not-allowed; box-shadow: none; transform: none; }
 .amz-btn-msg {
     display: flex; align-items: center; justify-content: center; gap: 5px;
@@ -627,7 +627,7 @@ a.amz-card-name { text-decoration: none; }
 .amz-filtered-reset {
     display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 0 22px; border-radius: 50px;
     border: none; background: var(--brand); color: #fff; font-size: 13.5px; font-weight: 700; font-family: var(--font); cursor: pointer;
-    box-shadow: 0 6px 18px rgba(99,102,241,.3); transition: background var(--t-micro), transform var(--t-micro) var(--ease-out);
+    box-shadow: 0 6px 18px rgba(22,104,216,.3); transition: background var(--t-micro), transform var(--t-micro) var(--ease-out);
 }
 .amz-filtered-reset:hover { background: var(--brand-dk); transform: translateY(-2px); }
 
