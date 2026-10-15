@@ -704,7 +704,7 @@ if (mapPoints.length > 0) {
     mapPoints.forEach(p => {
         const m = L.marker([p.lat, p.lng], {icon: makeIcon(p.live)}).addTo(map);
         m.bindPopup(`
-            <strong>${p.label}</strong><br>
+            <strong>${String(p.label ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</strong><br>
             <span style="font-size:11px;color:#64748b">${p.ping ? '🕐 ' + p.ping : 'Pas de ping'}</span><br>
             <span style="font-size:10px;color:#64748b">${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}</span>
         `);

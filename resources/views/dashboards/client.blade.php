@@ -3361,10 +3361,10 @@ function _aiAppendProducts(products, label) {
         a.className = 'ai-product-card';
         const stockTxt = p.out_of_stock ? 'Rupture de stock' : (p.stock !== null ? p.stock + ' en stock' : 'En stock');
         a.innerHTML = `
-            <div class="ai-product-img">${p.image ? `<img src="${p.image}" alt="">` : '📦'}</div>
+            <div class="ai-product-img">${p.image ? `<img src="${escHtml(p.image)}" alt="">` : '📦'}</div>
             <div class="ai-product-info">
-                <div class="ai-product-name">${p.name}</div>
-                <div class="ai-product-price">${Number(p.price).toLocaleString('fr-FR')} ${p.currency || 'GNF'}</div>
+                <div class="ai-product-name">${escHtml(p.name)}</div>
+                <div class="ai-product-price">${Number(p.price).toLocaleString('fr-FR')} ${escHtml(p.currency || 'GNF')}</div>
                 <div class="ai-product-stock ${p.out_of_stock ? 'out' : ''}">${stockTxt}</div>
             </div>`;
         wrap.appendChild(a);
@@ -3383,7 +3383,7 @@ function _aiAppendOrderCard(order) {
             <div class="ai-order-ico">✅</div>
             <div class="ai-order-info">
                 <div class="ai-order-title">Commande #${order.order_id} confirmée</div>
-                <div class="ai-order-sub">${order.product_name} × ${order.quantity} — ${Number(order.total).toLocaleString('fr-FR')} GNF</div>
+                <div class="ai-order-sub">${escHtml(order.product_name)} × ${escHtml(order.quantity)} — ${Number(order.total).toLocaleString('fr-FR')} GNF</div>
                 <a href="{{ route('client.orders.index') }}" class="ai-order-link">Voir mes commandes →</a>
             </div>`;
     } else {
@@ -4417,7 +4417,7 @@ function loadFavList() {
         data.shops.forEach(s => {
             const shopUrl = `{{ url('/client/shops') }}/${s.id}`;
             const imgHtml = s.image
-                ? `<img src="/storage/${s.image}" alt="${s.name}" loading="lazy">`
+                ? `<img src="/storage/${escHtml(s.image)}" alt="${escHtml(s.name)}" loading="lazy">`
                 : `<div class="fav-shop-img-ph" style="background:linear-gradient(135deg,#f4f6f8,#e8ecf0)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8a9bb0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18v10a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M3 9l2-6h14l2 6"/><line x1="12" y1="9" x2="12" y2="21"/></svg></div>`;
             const card = document.createElement('div');
             card.style.cssText = 'display:flex;position:relative';
@@ -4425,15 +4425,15 @@ function loadFavList() {
                 <a href="${shopUrl}" class="fav-shop-card" style="flex:1;text-decoration:none;color:inherit">
                     <div class="fav-shop-img">${imgHtml}</div>
                     <div class="fav-shop-info">
-                        ${s.type ? `<div class="fav-shop-type">${s.type}</div>` : ''}
-                        <div class="fav-shop-name">${s.name}</div>
+                        ${s.type ? `<div class="fav-shop-type">${escHtml(s.type)}</div>` : ''}
+                        <div class="fav-shop-name">${escHtml(s.name)}</div>
                         <div class="fav-shop-meta">
                             ${s.products_count > 0 ? `<span class="fav-shop-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> ${s.products_count} produit${s.products_count > 1 ? 's' : ''}</span>` : ''}
                             ${s.sales_count > 0 ? `<span class="fav-shop-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg> +${s.sales_count} ventes</span>` : ''}
                         </div>
                     </div>
                 </a>
-                <button class="fav-shop-rm" onclick="toggleFavorite(${s.id}, this)" title="Retirer des favoris">
+                <button class="fav-shop-rm" onclick="toggleFavorite(${parseInt(s.id, 10)}, this)" title="Retirer des favoris">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>`;
             container.appendChild(card);
@@ -5081,7 +5081,7 @@ function filterByCat(type) {
                     if (ico) { ico.style.cssText = ico.style.cssText.replace(/background:[^;]+/, info.bg); ico.textContent = info.ico; }
 
                     /* Toast */
-                    showClientToast(`📦 <div>Commande <strong>#${order.id}</strong> — ${info.label}<br><small style="opacity:.75">${order.shop_name}</small></div>`, 'order');
+                    showClientToast(`📦 <div>Commande <strong>#${order.id}</strong> — ${info.label}<br><small style="opacity:.75">${escHtml(order.shop_name)}</small></div>`, 'order');
                 }
             });
 

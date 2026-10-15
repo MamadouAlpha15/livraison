@@ -1833,7 +1833,7 @@ function filterZones(raw) {
     if (clrBtn) clrBtn.style.display = q ? 'block' : 'none';
     const list = q ? _zonesAll.filter(z => z.name.toLowerCase().includes(q)) : _zonesAll;
     if (!list.length) {
-        results.innerHTML = `<div class="zone-empty">Aucune zone trouvée pour "<strong>${q}</strong>"</div>`;
+        results.innerHTML = `<div class="zone-empty">Aucune zone trouvée pour "<strong>$String(q).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))</strong>"</div>`;
         return;
     }
     results.innerHTML = '';

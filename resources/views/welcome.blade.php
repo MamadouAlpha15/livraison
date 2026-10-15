@@ -1815,6 +1815,20 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
 
 @push('scripts')
 <script>
+/* ── Échappement HTML : toute donnée insérée via innerHTML (noms de produits et de
+ *    boutiques saisis par les vendeurs, catégories, historique localStorage…) DOIT
+ *    passer par escHtml, sinon un nom piégé ("<img src=x onerror=…>") exécuterait
+ *    du code chez chaque visiteur (XSS stockée). safeUrl n'accepte que http(s) et
+ *    les chemins relatifs (bloque javascript:). Déclarées au niveau global : aussi
+ *    utilisées par le script d'aperçu catégorie plus bas. ── */
+function escHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function safeUrl(u) {
+    const s = String(u ?? '').trim();
+    return /^(https?:\/\/|\/(?!\/))/i.test(s) ? escHtml(s) : '#';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     /* ── Ancres "Voir les produits" / "Voir les ventes flash" du hero : on gère le
        défilement nous-mêmes en JS plutôt que de compter sur le comportement natif
@@ -2117,11 +2131,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const items = readList();
             if (!items.length) { hd.hidden = true; rowWrap.hidden = true; return; }
             list.innerHTML = items.map(item => `
-                <a href="${item.url}" class="reco-card">
-                    <div class="reco-card-img">${item.img ? `<img src="${item.img}" alt="${item.name}" loading="lazy" width="190" height="130">` : ''}</div>
+                <a href="${safeUrl(item.url)}" class="reco-card">
+                    <div class="reco-card-img">${item.img ? `<img src="${safeUrl(item.img)}" alt="${escHtml(item.name)}" loading="lazy" width="190" height="130">` : ''}</div>
                     <div class="reco-card-body">
-                        <div class="reco-card-name">${item.name}</div>
-                        <div class="reco-card-price-row"><span class="reco-card-price">${item.price}</span></div>
+                        <div class="reco-card-name">${escHtml(item.name)}</div>
+                        <div class="reco-card-price-row"><span class="reco-card-price">${escHtml(item.price)}</span></div>
                     </div>
                 </a>
             `).join('');
@@ -2300,13 +2314,13 @@ document.addEventListener('DOMContentLoaded', () => {
         function render(items) {
             if (!items.length) { close(); return; }
             box.innerHTML = items.map(it => `
-                <a href="${it.url}" class="search-suggestion-item" role="option">
-                    ${it.image ? `<img src="${it.image}" class="search-suggestion-img" alt="" loading="lazy">` : '<div class="search-suggestion-img"></div>'}
+                <a href="${safeUrl(it.url)}" class="search-suggestion-item" role="option">
+                    ${it.image ? `<img src="${safeUrl(it.image)}" class="search-suggestion-img" alt="" loading="lazy">` : '<div class="search-suggestion-img"></div>'}
                     <div class="search-suggestion-body">
-                        <div class="search-suggestion-name">${it.name}</div>
-                        ${it.shop ? `<div class="search-suggestion-meta">${it.shop}</div>` : ''}
+                        <div class="search-suggestion-name">${escHtml(it.name)}</div>
+                        ${it.shop ? `<div class="search-suggestion-meta">${escHtml(it.shop)}</div>` : ''}
                     </div>
-                    <div class="search-suggestion-price">${it.price}</div>
+                    <div class="search-suggestion-price">${escHtml(it.price)}</div>
                 </a>
             `).join('');
             box.classList.add('is-open');
@@ -2377,20 +2391,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function render(data) {
         if (!data.products || !data.products.length) {
-            body.innerHTML = '<div class="cpp-title">' + (data.name || '') + '</div><div class="cpp-empty">Aucun produit pour le moment.</div>';
+            body.innerHTML = '<div class="cpp-title">' + escHtml(data.name || '') + '</div><div class="cpp-empty">Aucun produit pour le moment.</div>';
             return;
         }
         const items = data.products.map(p => `
-            <a href="${p.url}" class="cpp-item">
-                ${p.image ? `<img src="${p.image}" class="cpp-item-img" alt="" loading="lazy">` : '<div class="cpp-item-ph">🏷️</div>'}
-                <div class="cpp-item-name">${p.name}</div>
-                <div class="cpp-item-price">${p.price}</div>
+            <a href="${safeUrl(p.url)}" class="cpp-item">
+                ${p.image ? `<img src="${safeUrl(p.image)}" class="cpp-item-img" alt="" loading="lazy">` : '<div class="cpp-item-ph">{!! \App\Support\IconLibrary::svg('tag', '', 20) !!}</div>'}
+                <div class="cpp-item-name">${escHtml(p.name)}</div>
+                <div class="cpp-item-price">${escHtml(p.price)}</div>
             </a>
         `).join('');
         body.innerHTML = `
-            <div class="cpp-title">Populaire en ${data.name}</div>
+            <div class="cpp-title">Populaire en ${escHtml(data.name)}</div>
             <div class="cpp-grid">${items}</div>
-            <a href="${data.more_url}" class="cpp-more">Voir tout →</a>
+            <a href="${safeUrl(data.more_url)}" class="cpp-more">Voir tout →</a>
         `;
     }
 

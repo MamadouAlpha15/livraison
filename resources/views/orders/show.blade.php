@@ -967,6 +967,7 @@ $init = fn(string $n): string =>
 
         lname = livreur.name;
         const ini = getInitials(livreur.name);
+        const _esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); // échappe les données saisies par d'autres utilisateurs
         const statusTxt = d.is_delivered ? '✅ Terminé' : d.is_ongoing ? '🟢 En route' : '🟡 Assigné';
 
         wrap.innerHTML = `
@@ -976,11 +977,11 @@ $init = fn(string $n): string =>
                 <span class="lc-title">Votre livreur</span>
             </div>
             <div class="lc-body">
-                <div class="lc-av">${ini}</div>
+                <div class="lc-av">${_esc(ini)}</div>
                 <div style="flex:1;min-width:0">
-                    <div class="lc-name">${livreur.name}</div>
+                    <div class="lc-name">${_esc(livreur.name)}</div>
                     <div class="lc-info">
-                        ${livreur.phone ? `<a href="tel:${livreur.phone}" style="color:var(--orange);font-weight:700;text-decoration:none">📞 ${livreur.phone}</a>` : ''}
+                        ${livreur.phone ? `<a href="tel:${_esc(livreur.phone)}" style="color:var(--orange);font-weight:700;text-decoration:none">📞 ${_esc(livreur.phone)}</a>` : ''}
                         <span class="lc-status">${statusTxt}</span>
                     </div>
                 </div>
