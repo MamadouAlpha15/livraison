@@ -26,6 +26,13 @@
 <div class="f-alert f-alert-success">{{ session('status') }}</div>
 @endif
 
+@if (!empty($devCode))
+{{-- Mode développement local uniquement (emails non envoyés) : voir OtpVerificationController@show --}}
+<div class="f-alert" style="background:#EAF2FF;color:#1260C9;border:1px solid #D6E6FF">
+    Mode local : les emails ne sont pas envoyés. Votre code est <strong style="font-size:18px;letter-spacing:3px">{{ $devCode }}</strong>
+</div>
+@endif
+
 @if ($errors->any())
 <div class="f-alert" style="background:#fef2f2;color:#991b1b;border:1px solid #fecaca">
     {{ $errors->first() }}

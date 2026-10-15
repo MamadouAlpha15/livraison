@@ -25,7 +25,11 @@ class OtpVerificationController extends Controller
             return redirect()->route('register');
         }
 
-        return view('auth.verify-otp', ['email' => $user->email]);
+        // En développement uniquement : les emails ne partent pas (MAIL_MAILER=log), le code
+        // est donc affiché sur la page pour pouvoir tester l'inscription. Jamais en production.
+        $devCode = (app()->environment('local') && config('mail.default') === 'log') ? $user->otp_code : null;
+
+        return view('auth.verify-otp', ['email' => $user->email, 'devCode' => $devCode]);
     }
 
     /**
