@@ -407,7 +407,28 @@
     .sp3-js .rv3.is-in { animation: rise3 600ms var(--e-out) backwards; }
     .sp3-js .rv3-line:not(.is-in) { transform: scaleX(0); }
     .sp3-js .rv3-line.is-in { transform: scaleX(1); transition: transform 900ms var(--e-io); }
+
+    /* Safari iPhone, Firefox : pas d'animation liée au défilement. Les mêmes effets 3D se
+       jouent une fois, dans le temps, quand l'élément entre à l'écran (.is-in posé en JS).
+       En pause, l'animation affiche son état de départ ; « both » garde l'état final. */
+    @keyframes flip3 { from { transform: perspective(500px) rotateY(-180deg) scale(.8); } to { transform: perspective(500px) rotateY(0); } }
+    @keyframes coin3 { from { transform: perspective(600px) rotateY(-360deg); } to { transform: perspective(600px) rotateY(0); } }
+    @keyframes ph3 { from { transform: perspective(1200px) rotateY(-42deg) rotateX(12deg) translateY(40px); } to { transform: perspective(1200px) rotateY(-10deg) rotateX(3deg); } }
+    @keyframes lp3 { from { transform: perspective(1200px) rotateY(-32deg) rotateX(14deg) translateY(40px); } to { transform: perspective(1200px) rotateY(-12deg) rotateX(5deg); } }
+    @keyframes isoin3 { from { transform: rotateX(15deg) rotateZ(0deg) scale(.92); } to { transform: rotateX(55deg) rotateZ(20deg) scale(1.08); } }
+    .sp3-js .flip3d { animation: flip3 900ms var(--e-out) both paused; }
+    .sp3-js .coin3d { animation: coin3 1300ms var(--e-out) both paused; }
+    .sp3-js .phone3d { animation: ph3 1100ms var(--e-out) both paused; }
+    .sp3-js .lap3d { animation: lp3 1100ms var(--e-out) both paused; }
+    .sp3-js .isoin3 { animation: isoin3 1200ms var(--e-out) both paused; }
+    .sp3-js .route3 { stroke-dasharray: 1; animation: draw3 1500ms var(--e-io) 500ms both paused; }
+    .sp3-js .rider3 { animation: along3 1500ms var(--e-io) 500ms both paused; }
+    .sp3-js .chartline3 { stroke-dasharray: 1; animation: draw3 1200ms var(--e-out) both paused; }
+    .sp3-js .rv3.is-in .flip3d, .sp3-js .flip3d.is-in, .sp3-js .coin3d.is-in, .sp3-js .phone3d.is-in, .sp3-js .lap3d.is-in,
+    .sp3-js .map3.is-in .isoin3, .sp3-js .map3.is-in .route3, .sp3-js .map3.is-in .rider3, .sp3-js .chartline3.is-in { animation-play-state: running; }
 }
+/* Écran tactile : la scène du hero oscille seule (pas de souris à suivre), sans transition entre images */
+.stage3.is-sway { transition: none; }
 
 /* ── Responsive ── */
 @media (max-width: 1100px) { .dlv3 { grid-template-columns: minmax(0, 1fr) 480px; } .dlv3-ph { display: none !important; } }
@@ -474,6 +495,24 @@
             move((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
         }, { passive: true });
         hero.addEventListener('pointerleave', reset);
+
+        /* Écran tactile : pas de souris à suivre (le doigt sert à défiler), la scène oscille
+           doucement d'elle-même tant que le hero est à l'écran. */
+        if (!fine) {
+            let onScreen = true;
+            const t0 = performance.now();
+            stage.classList.add('is-sway');
+            if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; }).observe(hero);
+            const sway = t => {
+                if (onScreen && !document.hidden) {
+                    const k = (t - t0) / 1000;
+                    stage.style.setProperty('--rx', (6 + Math.sin(k * 0.9) * 4).toFixed(2) + 'deg');
+                    stage.style.setProperty('--ry', (-14 + Math.sin(k * 0.6) * 11).toFixed(2) + 'deg');
+                }
+                requestAnimationFrame(sway);
+            };
+            requestAnimationFrame(sway);
+        }
     }
 
     /* ── Mise à l'échelle de la scène pour qu'elle tienne dans sa colonne ── */
@@ -591,8 +630,10 @@
             io.unobserve(en.target);
         }), { threshold: 0.15 });
         document.querySelectorAll('.sp3 .rv3, .sp3 .rv3-line, #kpi3').forEach(el => io.observe(el));
+        // Effets 3D rejoués à l'apparition quand le défilement ne les pilote pas (voir le repli CSS)
+        document.querySelectorAll('.sp3 .flip3d, .sp3 .coin3d, .sp3 .phone3d, .sp3 .lap3d, .sp3 .map3, .sp3 .chartline3').forEach(el => io.observe(el));
     } else {
-        document.querySelectorAll('.sp3 .rv3, .sp3 .rv3-line').forEach(el => el.classList.add('is-in'));
+        document.querySelectorAll('.sp3 .rv3, .sp3 .rv3-line, .sp3 .flip3d, .sp3 .coin3d, .sp3 .phone3d, .sp3 .lap3d, .sp3 .map3, .sp3 .chartline3').forEach(el => el.classList.add('is-in'));
         runKpis();
     }
 })();
