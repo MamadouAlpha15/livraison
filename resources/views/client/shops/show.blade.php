@@ -528,10 +528,12 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
             <div class="prod-modal-info">
                 <div class="prod-modal-cat" id="modalCat"></div>
                 <div class="prod-modal-name" id="modalName"></div>
+                @if($reviewAvg)
                 <div class="prod-modal-stars">
-                    <span class="prod-modal-stars-ico">★★★★★</span>
-                    <span class="prod-modal-stars-txt" id="modalStars"></span>
+                    <span class="prod-modal-stars-ico">{!! \App\Support\IconLibrary::stars((float) $reviewAvg, 12) !!}</span>
+                    <span class="prod-modal-stars-txt">Boutique notée {{ number_format($reviewAvg, 1) }}/5 — {{ $reviewCount }} avis</span>
                 </div>
+                @endif
                 <div class="prod-modal-price-wrap">
                     <div class="prod-modal-price-lbl">Prix</div>
                     <div class="prod-modal-price">
@@ -589,7 +591,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 </nav>
 
 {{-- BANNIÈRE --}}
-<div class="shop-banner">
+{{-- Liseré bas : couleur d'accent choisie par le vendeur (Ma boutique → Concevoir) --}}
+<div class="shop-banner" @if($shop->accent_color) style="border-bottom: 6px solid {{ $shop->accent_color }}" @endif>
     <div class="shop-banner-logo">
         @if($shop->image)
             <img src="{{ \App\Services\ImageOptimizer::url($shop->image, 'thumb') }}"
@@ -599,7 +602,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     <div class="shop-banner-info">
         <div class="shop-banner-name">{{ $shop->name }}</div>
         <div class="shop-banner-meta">
-            <span class="shop-banner-open">Ouvert</span>
+            @if($reviewAvg)<span class="shop-banner-chip">{!! \App\Support\IconLibrary::stars((float) $reviewAvg, 12) !!} {{ number_format($reviewAvg, 1) }} ({{ $reviewCount }} avis)</span>@endif
             @if($shop->type)<span class="shop-banner-chip">🏷️ {{ $shop->type }}</span>@endif
             @if($shop->address)<span class="shop-banner-chip">📍 {{ Str::limit($shop->address,28) }}</span>@endif
             <span class="shop-banner-chip">📦 {{ $products->total() }} produit{{ $products->total()>1?'s':'' }}</span>
@@ -740,7 +743,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
             <div class="amz-card"
                  data-name="{{ strtolower($product->name) }}"
                  data-cat="{{ strtolower($product->category ?? '') }}"
-                 data-price="{{ $product->price }}"
+                 data-price="{{ $product->current_price }}"
                  data-featured="{{ $product->is_featured ? '1' : '0' }}"
                  data-stock="{{ $stockOut ? 'out' : 'in' }}"
                  data-prod='{{ $prodData }}'>
@@ -766,10 +769,6 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                 <div class="amz-card-body">
                     @if($product->category)<div class="amz-card-cat">{{ $product->category }}</div>@endif
                     <div class="amz-card-name" onclick='openModal(JSON.parse(this.closest(".amz-card").dataset.prod))'>{{ $product->name }}</div>
-                    <div class="amz-stars">
-                        <span class="amz-stars-ico">★★★★★</span>
-                        <span class="amz-stars-count">({{ rand(10,200) }})</span>
-                    </div>
                     <div class="amz-price-wrap">
                         <div style="display:flex;align-items:baseline;gap:5px;flex-wrap:wrap">
                             <span class="amz-price-main">{{ number_format($product->current_price,0,',',' ') }} <span class="amz-price-devise">{{ $devise }}</span></span>
@@ -849,7 +848,6 @@ function openModal(prod) {
     document.body.style.overflow = 'hidden';
     document.getElementById('modalCat').textContent   = prod.cat || '';
     document.getElementById('modalName').textContent  = prod.name;
-    document.getElementById('modalStars').textContent = '4.5 — ' + (Math.floor(Math.random()*200)+10) + ' avis';
     document.getElementById('modalPrice').textContent = Number(prod.price).toLocaleString('fr-FR');
     document.getElementById('modalDevise').textContent = ' ' + prod.devise;
     const origEl = document.getElementById('modalOrig');

@@ -14,6 +14,7 @@ Carte produit réutilisée dans le catalogue complet et les rangées
 @php
     $hasPromo = $product->original_price && $product->original_price > $product->price;
     $stockOut = $product->stock !== null && $product->stock <= 0;
+    $stockLow = $product->stock !== null && $product->stock > 0 && $product->stock <= 5;
     $isFavorited = in_array($product->id, $favoritedIds ?? [], true);
     $isNew = $product->created_at && $product->created_at->gt(now()->subDays(10))
         && !$product->is_flash_active && !$hasPromo && !$product->is_featured;
@@ -62,6 +63,9 @@ Carte produit réutilisée dans le catalogue complet et les rangées
                 <div class="prod-card-rating">{!! \App\Support\IconLibrary::stars($rating['avg'], 11) !!} <span>{{ number_format($rating['avg'], 1) }} ({{ $rating['count'] }})</span></div>
             @elseif($product->category)
                 <div class="prod-card-cat">{{ $product->category }}</div>
+            @endif
+            @if($stockLow)
+                <div class="prod-card-stock">{!! \App\Support\IconLibrary::svg('alert', '', 11) !!} Plus que {{ $product->stock }} en stock</div>
             @endif
             @if($product->shop)<div class="prod-card-shop">{!! \App\Support\IconLibrary::svg('store', '', 12) !!} {{ Str::limit($product->shop->name, 22) }}</div>@endif
         </div>

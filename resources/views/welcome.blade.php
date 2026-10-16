@@ -33,12 +33,12 @@ au lieu d'une page marketing. Variables injectées depuis WelcomeController@inde
    VARIABLES & BASE — thème bleu de la marque
 ════════════════════════════════════════════════════════════════ */
 :root {
-    --brand:      #6366f1;
-    --brand-dk:   #4f46e5;
-    --brand-lt:   #e0e7ff;
-    --brand-mlt:  #eef2ff;
-    --navy:       #0a0a1e;
-    --navy-2:     #151538;
+    --brand:      #1668D8;
+    --brand-dk:   #1260C9;
+    --brand-lt:   #D6E6FF;
+    --brand-mlt:  #EAF2FF;
+    --navy:       #0B1E3D;
+    --navy-2:     #12305C;
     --grey:       #f4f6fb;
     --grey-2:     #e8ecf5;
     --border:     #e2e8f0;
@@ -47,7 +47,7 @@ au lieu d'une page marketing. Variables injectées depuis WelcomeController@inde
     --muted:      #94a3b8;
     --surface:    #ffffff;
     --font:       'Plus Jakarta Sans', sans-serif;
-    --display:    'Clash Display', 'Plus Jakarta Sans', sans-serif;
+    --display:    'Plus Jakarta Sans', system-ui, sans-serif;
     --mono:       'JetBrains Mono', monospace;
     --r:          14px;
     --r-sm:       9px;
@@ -105,7 +105,7 @@ footer.app-footer { display: none !important; }
     background: var(--grey);
     transition: border-color .2s, box-shadow .2s, background .2s;
 }
-.nav-search:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(99,102,241,.12); background: var(--surface); }
+.nav-search:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(22,104,216,.12); background: var(--surface); }
 .nav-search input {
     flex: 1; border: none; outline: none; background: transparent;
     padding: 10px 18px; font-size: 13.5px; font-family: var(--font); color: var(--text);
@@ -128,7 +128,7 @@ footer.app-footer { display: none !important; }
 .nav-btn-primary {
     padding: 10px 20px; border-radius: 50px; font-size: 12.5px; font-weight: 700; font-family: var(--font);
     background: var(--brand); color: #fff; border: none; cursor: pointer; text-decoration: none;
-    transition: all .15s; white-space: nowrap; box-shadow: 0 3px 12px rgba(99,102,241,.35);
+    transition: all .15s; white-space: nowrap; box-shadow: 0 3px 12px rgba(22,104,216,.35);
 }
 .nav-btn-primary:hover { background: var(--brand-dk); color: #fff; }
 
@@ -252,7 +252,7 @@ footer.app-footer { display: none !important; }
 .hero-dot.is-active { background: #fff; width: 22px; border-radius: 5px; }
 
 .hero {
-    background: linear-gradient(120deg, var(--navy) 0%, #241a6b 50%, var(--brand) 100%);
+    background: linear-gradient(120deg, var(--navy) 0%, #0F3F86 50%, var(--brand) 100%);
     border-radius: var(--r);
     display: flex; align-items: center; justify-content: space-between; gap: 24px;
     overflow: hidden;
@@ -277,7 +277,7 @@ footer.app-footer { display: none !important; }
 }
 .hero::after {
     content: ''; position: absolute; right: -80px; bottom: -100px; width: 320px; height: 320px;
-    border-radius: 50%; background: radial-gradient(circle, rgba(165,180,252,.28) 0%, transparent 70%);
+    border-radius: 50%; background: radial-gradient(circle, rgba(125,180,255,.28) 0%, transparent 70%);
     pointer-events: none;
 }
 /* Balayage lumineux qui traverse la bannière (effet "vivant") */
@@ -293,14 +293,14 @@ footer.app-footer { display: none !important; }
 .hero-badge {
     display: inline-flex; align-items: center; gap: 7px;
     background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
-    color: #e0e7ff; font-size: 11.5px; font-weight: 700;
+    color: #D6E6FF; font-size: 11.5px; font-weight: 700;
     padding: 5px 13px; border-radius: 20px; margin-bottom: 16px;
     animation: heroFadeUp .6s ease both;
 }
-.hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #a5b4fc; box-shadow: 0 0 6px #a5b4fc; animation: blink 2s ease-in-out infinite; }
+.hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #7DB4FF; box-shadow: 0 0 6px #7DB4FF; animation: blink 2s ease-in-out infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 @keyframes heroFadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-.hero-title { font-family: var(--display); font-weight: 700; font-size: clamp(24px, 3.4vw, 38px); color: #fff; line-height: 1.15; margin-bottom: 12px; letter-spacing: -.6px; animation: heroFadeUp .65s .08s ease both; }
+.hero-title { font-family: var(--display); font-weight: 700; font-size: clamp(24px, 3.4vw, 38px); color: #fff; line-height: 1.15; margin: 0 0 12px; letter-spacing: -.6px; animation: heroFadeUp .65s .08s ease both; }
 .hero-sub { font-size: 14.5px; color: rgba(255,255,255,.72); margin-bottom: 22px; max-width: 460px; line-height: 1.6; animation: heroFadeUp .65s .16s ease both; }
 .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; animation: heroFadeUp .65s .24s ease both; }
 .hero-btn-primary {
@@ -421,7 +421,7 @@ footer.app-footer { display: none !important; }
     box-shadow: 0 1px 3px rgba(0,0,0,.05);
 }
 .cat-pill:hover { border-color: var(--brand); color: var(--brand-dk); background: var(--brand-mlt); transform: translateY(-1px); }
-.cat-pill.active { background: linear-gradient(135deg, var(--brand), var(--brand-dk)); color: #fff; border-color: var(--brand-dk); box-shadow: 0 4px 14px rgba(99,102,241,.35); transform: translateY(-1px); }
+.cat-pill.active { background: linear-gradient(135deg, var(--brand), var(--brand-dk)); color: #fff; border-color: var(--brand-dk); box-shadow: 0 4px 14px rgba(22,104,216,.35); transform: translateY(-1px); }
 
 /* ── Recommandés (scroll horizontal) ── */
 .reco-row-outer {
@@ -459,8 +459,8 @@ footer.app-footer { display: none !important; }
     animation: flashGlow 2.8s ease-in-out infinite;
 }
 @keyframes flashGlow {
-    0%, 100% { box-shadow: 0 8px 28px rgba(79,70,229,.28); }
-    50%      { box-shadow: 0 8px 40px rgba(79,70,229,.5), 0 0 0 4px rgba(99,102,241,.14); }
+    0%, 100% { box-shadow: 0 8px 28px rgba(18,96,201,.28); }
+    50%      { box-shadow: 0 8px 40px rgba(18,96,201,.5), 0 0 0 4px rgba(22,104,216,.14); }
 }
 .flash-section::before { content: ''; position: absolute; right: -40px; top: -40px; width: 180px; height: 180px; border-radius: 50%; background: rgba(255,255,255,.08); pointer-events: none; }
 .flash-section-hd { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; position: relative; z-index: 1; flex-wrap: wrap; }
@@ -490,7 +490,7 @@ footer.app-footer { display: none !important; }
 .flash-card-img { height: 112px; position: relative; background: var(--grey); overflow: hidden; display: flex; align-items: center; justify-content: center; }
 .flash-card-img img { width: 100%; height: 100%; object-fit: cover; }
 .flash-card-ph { font-size: 28px; opacity: .3; }
-.flash-card-badge { position: absolute; top: 7px; left: 7px; background: var(--navy); color: #a5b4fc; font-size: 10.5px; font-weight: 800; padding: 3px 8px; border-radius: 20px; animation: badgePulse 1.9s ease-in-out infinite; }
+.flash-card-badge { position: absolute; top: 7px; left: 7px; background: var(--navy); color: #7DB4FF; font-size: 10.5px; font-weight: 800; padding: 3px 8px; border-radius: 20px; animation: badgePulse 1.9s ease-in-out infinite; }
 @keyframes badgePulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 .flash-card-body { padding: 9px 11px 11px; display: flex; flex-direction: column; gap: 3px; }
 .flash-card-shop { font-size: 10px; color: var(--muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -660,7 +660,7 @@ footer.app-footer { display: none !important; }
     width: 44px; height: 44px; border-radius: 50%;
     background: var(--brand); color: #fff; border: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 6px 20px rgba(99,102,241,.4);
+    box-shadow: 0 6px 20px rgba(22,104,216,.4);
     opacity: 0; visibility: hidden; transform: translateY(10px);
     transition: opacity .25s, transform .25s, visibility 0s linear .25s, background .15s;
 }
@@ -843,6 +843,544 @@ footer.app-footer { display: none !important; }
     .cat-pill, .prod-card-cta, .hero-btn-primary, .hero-btn-secondary,
     .nav-orders-btn, .nav-btn-primary, .search-banner-clear { min-height: 40px; }
 }
+
+/* ════════════════════════════════════════════════════════════════
+   MOTION TOKENS — mêmes courbes et durées partout dans les sections
+════════════════════════════════════════════════════════════════ */
+:root {
+    --ease-out:    cubic-bezier(.22, 1, .36, 1);   /* entrées */
+    --ease-in:     cubic-bezier(.55, 0, 1, .45);   /* sorties */
+    --ease-io:     cubic-bezier(.65, 0, .35, 1);   /* déplacements d'interface */
+    --ease-spring: cubic-bezier(.34, 1.56, .64, 1); /* microinteractions */
+    --t-micro:     200ms;
+    --t-enter:     600ms;
+    --t-move:      800ms;
+}
+.reveal.is-visible { animation-duration: var(--t-enter); animation-timing-function: var(--ease-out); }
+
+/* ════════════════════════════════════════════════════════════════
+   SECTIONS NARRATIVES (comment ça marche, vendeurs, livraison,
+   paiements, application, appel final)
+════════════════════════════════════════════════════════════════ */
+.mk { margin: 0 0 40px; scroll-margin-top: calc(var(--nav-h) + 12px); }
+.mk-eyebrow {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase;
+    color: var(--brand-dk); background: var(--brand-mlt);
+    padding: 5px 12px; border-radius: 20px; margin-bottom: 14px;
+}
+.mk-title {
+    font-family: var(--display); font-weight: 700; font-size: clamp(26px, 3.2vw, 38px);
+    line-height: 1.12; letter-spacing: -.6px; color: var(--text); margin: 0 0 14px;
+}
+.mk-title strong { display: block; color: var(--brand); font-weight: 700; }
+.mk-sub { font-size: 16px; line-height: 1.6; color: var(--text-2); margin: 0 0 22px; max-width: 470px; }
+.mk-list { list-style: none; padding: 0; margin: 0 0 26px; display: grid; gap: 12px; }
+.mk-list li { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; color: var(--text); }
+.mk-check {
+    width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+    background: var(--brand-mlt); color: var(--brand-dk);
+    display: flex; align-items: center; justify-content: center;
+}
+.mk-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+.mk-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 46px; padding: 12px 24px; border-radius: 50px;
+    font-size: 14px; font-weight: 700; font-family: var(--font); text-decoration: none;
+    border: 1.5px solid transparent; cursor: pointer; white-space: nowrap;
+    transition: transform var(--t-micro) var(--ease-out), box-shadow var(--t-micro) var(--ease-out),
+                background var(--t-micro), border-color var(--t-micro), color var(--t-micro);
+}
+.mk-btn:active { transform: scale(.97); }
+.mk-btn:focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; }
+.mk-btn--primary { background: var(--brand); color: #fff; box-shadow: 0 6px 18px rgba(22,104,216,.35); }
+.mk-btn--primary:hover { background: var(--brand-dk); color: #fff; transform: translateY(-2px); box-shadow: 0 10px 26px rgba(22,104,216,.42); }
+.mk-btn--ghost { background: var(--surface); color: var(--brand-dk); border-color: var(--brand-lt); }
+.mk-btn--ghost:hover { background: var(--brand-mlt); border-color: var(--brand); color: var(--brand-dk); transform: translateY(-2px); }
+.mk-btn .ico { transition: transform var(--t-micro) var(--ease-out); }
+.mk-btn:hover .ico:last-child { transform: translateX(2px); }
+
+/* ── Bloc 2 colonnes (texte + visuel) ── */
+.mk-split {
+    display: grid; grid-template-columns: 1fr 1.1fr; gap: 44px; align-items: center;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 22px;
+    padding: 48px; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; isolation: isolate;
+}
+.mk-split::after {
+    content: ''; position: absolute; z-index: -1; right: -120px; top: -120px; width: 460px; height: 460px;
+    border-radius: 50%; background: radial-gradient(circle, var(--brand-mlt) 0%, transparent 68%);
+    pointer-events: none;
+}
+.mk-split--reverse .mk-copy { order: 2; }
+.mk-split--dark { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%); border-color: transparent; }
+.mk-split--dark::after { background: radial-gradient(circle, rgba(22,104,216,.32) 0%, transparent 68%); }
+.mk-split--dark::before {
+    content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.06) 1px, transparent 0);
+    background-size: 28px 28px;
+}
+.mk-split--dark .mk-title { color: #fff; }
+.mk-split--dark .mk-title strong { color: #7DB4FF; }
+.mk-split--dark .mk-sub { color: rgba(255,255,255,.72); }
+.mk-split--dark .mk-eyebrow { background: rgba(255,255,255,.1); color: #D6E6FF; }
+.mk-split--dark .mk-list li { color: #fff; }
+.mk-split--dark .mk-check { background: rgba(125,180,255,.16); color: #7DB4FF; }
+.mk-split--dark .mk-btn--ghost { background: rgba(255,255,255,.08); color: #fff; border-color: rgba(255,255,255,.25); }
+.mk-split--dark .mk-btn--ghost:hover { background: rgba(255,255,255,.16); color: #fff; }
+.mk-copy { min-width: 0; }
+.mk-visual { min-width: 0; position: relative; }
+
+/* ── Comment ça marche : ligne de progression dessinée au scroll ── */
+.how { text-align: center; padding: 8px 0 0; }
+.how .mk-sub { margin-left: auto; margin-right: auto; }
+.how-track { position: relative; max-width: 980px; margin: 8px auto 0; }
+.how-line {
+    position: absolute; top: 34px; left: 16.66%; right: 16.66%; height: 3px;
+    background: var(--grey-2); border-radius: 3px; overflow: hidden;
+}
+.how-line-fill {
+    position: absolute; inset: 0; background: linear-gradient(90deg, var(--brand), var(--brand-dk));
+    transform: scaleX(var(--p, 0)); transform-origin: left center;
+    transition: transform var(--t-move) var(--ease-io);
+}
+.how-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; position: relative; }
+.how-step { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 0 8px; }
+.how-badge {
+    width: 68px; height: 68px; border-radius: 50%; flex-shrink: 0; position: relative;
+    background: var(--surface); border: 2px solid var(--border); color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    transition: background .45s var(--ease-out), border-color .45s var(--ease-out), color .45s var(--ease-out),
+                transform .5s var(--ease-spring), box-shadow .45s var(--ease-out);
+}
+.how-num {
+    position: absolute; top: -4px; right: -4px; width: 24px; height: 24px; border-radius: 50%;
+    background: var(--grey-2); color: var(--text-2); font-size: 12px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums;
+    transition: background .45s, color .45s;
+}
+.how-step.is-on .how-badge { background: var(--brand); border-color: var(--brand); color: #fff; transform: scale(1.06); box-shadow: 0 8px 22px rgba(22,104,216,.35); }
+.how-step.is-on .how-num { background: var(--navy); color: #fff; }
+.how-step-body { display: flex; flex-direction: column; gap: 6px; }
+.how-step h3 { font-family: var(--display); font-size: 18px; font-weight: 700; margin: 0; color: var(--text); }
+.how-step p { font-size: 15px; color: var(--text-2); line-height: 1.55; margin: 0; max-width: 270px; }
+
+/* ── Aperçu tableau de bord vendeur (illustratif, sans chiffres inventés) ── */
+.dash-mock {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    box-shadow: var(--shadow-lg); overflow: hidden; position: relative;
+}
+.dash-bar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; background: var(--grey); border-bottom: 1px solid var(--border); }
+.dash-bar > span:not(.dash-url) { width: 9px; height: 9px; border-radius: 50%; background: var(--grey-2); }
+.dash-url { margin-left: 10px; font-size: 11px; font-weight: 600; color: var(--muted); }
+.dash-body { display: grid; grid-template-columns: 120px 1fr; min-height: 250px; }
+.dash-side { border-right: 1px solid var(--border); padding: 14px 10px; display: flex; flex-direction: column; gap: 6px; }
+.dash-nav { display: flex; align-items: center; gap: 7px; padding: 7px 8px; border-radius: 8px; font-size: 11px; font-weight: 600; color: var(--text-2); }
+.dash-nav.is-active { background: var(--brand); color: #fff; }
+.dash-main { padding: 14px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.dash-h { font-family: var(--display); font-size: 14px; font-weight: 700; color: var(--text); }
+.dash-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.dash-kpi { border: 1px solid var(--border); border-radius: 10px; padding: 9px 10px; display: flex; flex-direction: column; gap: 7px; }
+.dash-kpi-lbl { font-size: 10px; font-weight: 700; color: var(--muted); }
+.dash-kpi-bar { height: 8px; border-radius: 4px; background: var(--brand-lt); transform-origin: left; transform: scaleX(.15); transition: transform var(--t-move) var(--ease-out); }
+.dash-kpi-trend { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 800; color: var(--brand-dk); }
+.dash-chart { border: 1px solid var(--border); border-radius: 10px; padding: 10px; }
+.dash-chart svg { display: block; width: 100%; height: auto; }
+.dash-line { stroke-dasharray: 420; stroke-dashoffset: 420; transition: stroke-dashoffset 900ms var(--ease-io) 250ms; }
+.dash-area { opacity: 0; transition: opacity var(--t-enter) var(--ease-out) 700ms; }
+.dash-dot { opacity: 0; transform: scale(0); transform-box: fill-box; transform-origin: center; transition: opacity .3s 1.1s, transform .45s var(--ease-spring) 1.1s; }
+.dash-toast {
+    position: absolute; right: 14px; bottom: 14px; display: flex; align-items: center; gap: 10px;
+    background: var(--navy); color: #fff; border-radius: 12px; padding: 10px 14px; box-shadow: var(--shadow-lg);
+    opacity: 0; transform: translateY(14px) scale(.96);
+    transition: opacity .45s var(--ease-out) 1.25s, transform .55s var(--ease-spring) 1.25s;
+}
+.dash-toast-ico { width: 30px; height: 30px; border-radius: 9px; background: var(--brand); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.dash-toast strong { display: block; font-size: 12px; font-weight: 700; }
+.dash-toast > span > span { font-size: 10.5px; color: rgba(255,255,255,.65); }
+.is-visible .dash-kpi-bar { transform: scaleX(var(--w, .7)); }
+.is-visible .dash-line { stroke-dashoffset: 0; }
+.is-visible .dash-area { opacity: 1; }
+.is-visible .dash-dot { opacity: 1; transform: scale(1); }
+.is-visible .dash-toast { opacity: 1; transform: translateY(0) scale(1); }
+
+/* ── Suivi de livraison : carte + itinéraire qui se dessine ── */
+.track-mock {
+    position: relative; border-radius: 18px; overflow: hidden;
+    background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
+    aspect-ratio: 4 / 3; max-width: 100%;
+}
+.track-mock > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.track-route { stroke-dasharray: 520; stroke-dashoffset: 520; transition: stroke-dashoffset 1.1s var(--ease-io) 200ms; }
+.is-visible .track-route { stroke-dashoffset: 0; }
+.track-card {
+    position: absolute; left: 16px; bottom: 16px; width: min(250px, calc(100% - 32px));
+    background: var(--surface); border-radius: 14px; padding: 14px 16px; box-shadow: var(--shadow-lg);
+}
+.track-card-hd { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
+.track-card-hd .ico-wrap { width: 32px; height: 32px; border-radius: 9px; background: var(--brand-mlt); color: var(--brand-dk); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.track-card-hd strong { display: block; font-size: 13px; color: var(--text); }
+.track-card-hd > span > span { font-size: 11.5px; font-weight: 700; color: var(--brand-dk); }
+.track-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+.track-steps li {
+    display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--text-2);
+    opacity: 0; transform: translateX(-8px);
+    transition: opacity .4s var(--ease-out), transform .4s var(--ease-out);
+    transition-delay: calc(900ms + var(--i, 0) * 90ms);
+}
+.is-visible .track-steps li { opacity: 1; transform: none; }
+.track-dot { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 2px solid var(--border); background: var(--surface); color: #fff; }
+.track-steps li.is-done .track-dot { background: var(--brand); border-color: var(--brand); }
+.track-steps li.is-current { color: var(--text); font-weight: 800; }
+.track-steps li.is-current .track-dot { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-lt); }
+.track-steps li.is-todo { color: var(--muted); }
+.mk-feats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0 0 26px; }
+.mk-feat { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; font-size: 13.5px; font-weight: 600; color: rgba(255,255,255,.85); line-height: 1.4; }
+.mk-feat-ico { width: 40px; height: 40px; border-radius: 12px; background: rgba(125,180,255,.14); color: #7DB4FF; display: flex; align-items: center; justify-content: center; transition: transform var(--t-micro) var(--ease-spring); }
+.mk-feat:hover .mk-feat-ico { transform: translateY(-3px) scale(1.06); }
+
+/* ── Moyens de paiement ── */
+.pay-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.pay-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px;
+    display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shadow-sm);
+    transition: transform var(--t-micro) var(--ease-out), box-shadow var(--t-micro) var(--ease-out), border-color var(--t-micro);
+}
+.pay-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--brand-lt); }
+.pay-card-ico { width: 46px; height: 46px; border-radius: 13px; background: var(--brand-mlt); color: var(--brand-dk); display: flex; align-items: center; justify-content: center; }
+.pay-card strong { font-size: 15px; color: var(--text); }
+.pay-card p { font-size: 13.5px; color: var(--text-2); line-height: 1.5; margin: 0; }
+.pay-shield {
+    grid-column: 1 / -1; display: flex; align-items: center; gap: 16px;
+    background: linear-gradient(120deg, var(--brand-mlt), var(--surface)); border: 1px solid var(--brand-lt);
+    border-radius: 16px; padding: 18px 20px;
+}
+.pay-shield-ico {
+    width: 58px; height: 58px; border-radius: 18px; flex-shrink: 0; color: #fff;
+    background: linear-gradient(135deg, var(--brand), var(--brand-dk)); box-shadow: 0 8px 22px rgba(22,104,216,.35);
+    display: flex; align-items: center; justify-content: center;
+    transform: scale(.6); opacity: 0; transition: transform .6s var(--ease-spring) .3s, opacity .3s .3s;
+}
+.is-visible .pay-shield-ico { transform: scale(1); opacity: 1; }
+.pay-shield strong { display: block; font-size: 15px; color: var(--text); margin-bottom: 2px; }
+.pay-shield > span > span { font-size: 13.5px; color: var(--text-2); line-height: 1.5; }
+
+/* ── Application (téléphone + notifications) ── */
+.phone {
+    width: 250px; max-width: 100%; margin: 0 auto; aspect-ratio: 9 / 18.5; position: relative;
+    background: #0b0b1a; border-radius: 38px; padding: 10px; box-shadow: 0 30px 60px rgba(0,0,0,.45);
+}
+.phone-screen { position: relative; height: 100%; border-radius: 30px; overflow: hidden; background: var(--grey); display: flex; flex-direction: column; }
+.phone-notch { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 80px; height: 20px; border-radius: 12px; background: #0b0b1a; z-index: 3; }
+.phone-hd { background: var(--surface); padding: 38px 14px 12px; display: flex; flex-direction: column; gap: 10px; }
+.phone-logo { display: flex; align-items: center; gap: 6px; font-family: var(--display); font-weight: 700; font-size: 14px; color: var(--navy); }
+.phone-logo img { width: 22px; height: 22px; border-radius: 6px; }
+.phone-logo b { color: var(--brand); font-weight: 700; }
+.phone-search { height: 30px; border-radius: 15px; background: var(--grey); border: 1px solid var(--border); display: flex; align-items: center; gap: 6px; padding: 0 10px; font-size: 10px; color: var(--muted); }
+.phone-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px 14px; flex: 1; align-content: start; }
+.phone-tile { background: var(--surface); border-radius: 10px; border: 1px solid var(--border); padding: 6px; display: flex; flex-direction: column; gap: 5px; }
+.phone-tile i { display: block; height: 52px; border-radius: 7px; background: var(--brand-mlt); }
+.phone-tile b { display: block; height: 6px; width: 80%; border-radius: 3px; background: var(--grey-2); }
+.phone-tile em { display: block; height: 6px; width: 50%; border-radius: 3px; background: var(--brand-lt); }
+.phone-tabs { display: flex; justify-content: space-around; padding: 10px 6px 14px; background: var(--surface); border-top: 1px solid var(--border); color: var(--muted); }
+.phone-tabs span:first-child { color: var(--brand); }
+.phone-notifs { position: absolute; top: 34px; left: 8px; right: 8px; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
+.phone-notif {
+    display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,.96);
+    border-radius: 12px; padding: 8px 10px; box-shadow: 0 8px 20px rgba(15,23,42,.18);
+    opacity: 0; transform: translateY(-14px) scale(.96);
+    transition: opacity .45s var(--ease-out), transform .55s var(--ease-spring);
+    transition-delay: calc(500ms + var(--i, 0) * 450ms);
+}
+.is-visible .phone-notif { opacity: 1; transform: none; }
+.phone-notif-ico { width: 26px; height: 26px; border-radius: 8px; background: var(--brand); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.phone-notif strong { display: block; font-size: 10.5px; color: var(--text); }
+.phone-notif > span > span { font-size: 9.5px; color: var(--text-2); }
+
+/* ── Appel final ── */
+.final-cta {
+    display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px; align-items: center;
+    background: linear-gradient(120deg, var(--brand-mlt) 0%, #f5f3ff 100%);
+    border: 1px solid var(--brand-lt); border-radius: 22px; padding: 44px 48px; position: relative; overflow: hidden;
+}
+.final-cta .mk-title { font-size: clamp(24px, 2.8vw, 34px); }
+.final-cta .mk-title strong { display: inline; }
+.final-art { position: relative; height: 200px; }
+.final-art svg { width: 100%; height: 100%; display: block; }
+.final-arrow { stroke-dasharray: 360; stroke-dashoffset: 360; transition: stroke-dashoffset 900ms var(--ease-io) 200ms; }
+.is-visible .final-arrow { stroke-dashoffset: 0; }
+.final-bag { transform-box: fill-box; transform-origin: center bottom; transform: translateY(16px) scale(.9); opacity: 0; transition: transform .7s var(--ease-spring) .15s, opacity .4s .15s; }
+.is-visible .final-bag { transform: none; opacity: 1; }
+
+/* ── Responsive des sections narratives ── */
+@media (max-width: 960px) {
+    .mk-split { grid-template-columns: 1fr; gap: 32px; padding: 32px 28px; }
+    .mk-split--reverse .mk-copy { order: 0; }
+    .final-cta { grid-template-columns: 1fr; padding: 32px 28px; }
+    .final-art { height: 160px; max-width: 360px; }
+}
+@media (max-width: 640px) {
+    .mk { margin-bottom: 28px; }
+    .mk-split, .final-cta { padding: 26px 18px; border-radius: 18px; }
+    .mk-sub { font-size: 16px; }
+    .mk-btns { flex-direction: column; align-items: stretch; }
+    .mk-btn { width: 100%; }
+    .how { text-align: left; }
+    .how-steps { grid-template-columns: 1fr; gap: 26px; }
+    .how-step { flex-direction: row; align-items: flex-start; gap: 16px; padding: 0; }
+    .how-step-body { padding-top: 10px; }
+    .how-step p { max-width: none; }
+    .how-line { top: 34px; bottom: 34px; left: 33px; right: auto; width: 3px; height: auto; }
+    .how-line-fill { transform: scaleY(var(--p, 0)); transform-origin: center top; }
+    .dash-body { grid-template-columns: 1fr; }
+    .dash-side { display: none; }
+    .mk-feats { grid-template-columns: 1fr; gap: 10px; }
+    .mk-feat { flex-direction: row; align-items: center; font-size: 15px; }
+    .pay-grid { grid-template-columns: 1fr; }
+    .track-mock { aspect-ratio: 4 / 4.2; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   CATALOGUE — filtres en direct, puces actives, pagination, microinteractions
+════════════════════════════════════════════════════════════════ */
+/* Bord droit en fondu : indique qu'on peut faire défiler les catégories */
+@media (max-width: 960px) {
+    .cats { -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); padding-right: 24px; }
+}
+.cat-pill:focus-visible, .sort-select:focus-visible, .active-chip:focus-visible,
+.cpg-btn:focus-visible, .prod-card-cta:focus-visible, .prod-card-fav:focus-visible, .c-empty-cta:focus-visible {
+    outline: 3px solid var(--brand); outline-offset: 2px;
+}
+
+.active-chips { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: -2px 0 16px; }
+.active-chip {
+    display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 6px 12px 6px 14px;
+    border-radius: 50px; background: var(--brand-mlt); border: 1px solid var(--brand-lt);
+    color: var(--brand-dk); font-size: 12.5px; font-weight: 700; text-decoration: none;
+    animation: chipIn var(--t-enter) var(--ease-out) both;
+    transition: background var(--t-micro), border-color var(--t-micro), color var(--t-micro);
+}
+.active-chip:hover { background: var(--brand); border-color: var(--brand); color: #fff; }
+.active-chips-reset { font-size: 12.5px; font-weight: 700; color: var(--text-2); text-decoration: underline; text-underline-offset: 3px; padding: 6px 4px; }
+.active-chips-reset:hover { color: var(--brand-dk); }
+@keyframes chipIn { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: none; } }
+
+/* Résultats qui se remplacent : léger fondu pendant le chargement en direct */
+#resultsRoot { transition: opacity var(--t-micro) var(--ease-out); }
+#resultsRoot.is-loading .skeleton-grid { animation: chipIn .3s var(--ease-out) both; }
+
+.c-empty-cta {
+    display: inline-flex; align-items: center; gap: 7px; margin-top: 18px; min-height: 44px;
+    padding: 11px 22px; border-radius: 50px; background: var(--brand); color: #fff;
+    font-size: 13.5px; font-weight: 700; text-decoration: none;
+    box-shadow: 0 6px 18px rgba(22,104,216,.3);
+    transition: transform var(--t-micro) var(--ease-out), background var(--t-micro);
+}
+.c-empty-cta:hover { background: var(--brand-dk); color: #fff; transform: translateY(-2px); }
+
+/* Stock faible (donnée réelle : stock ≤ 5) */
+.prod-card-stock { display: flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 700; color: #b45309; }
+
+/* Prix lisibles : chiffres tabulaires */
+.prod-card-price, .prod-card-orig, .reco-card-price, .flash-card-price, .count-line, .cpg { font-variant-numeric: tabular-nums; }
+
+/* Boutons de carte : pression + favoris qui "rebondissent" */
+.prod-card-cta { transition: background var(--t-micro), transform var(--t-micro) var(--ease-out); }
+.prod-card-cta:not(.out):active { transform: scale(.95); }
+.prod-card-fav.is-pop svg { animation: favPop .45s var(--ease-spring); }
+@keyframes favPop { 0% { transform: scale(1); } 40% { transform: scale(1.35); } 100% { transform: scale(1); } }
+
+/* ── Pagination du catalogue ── */
+.cpg { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 28px 0 8px; }
+.cpg-info { margin: 0; font-size: 13px; color: var(--muted); }
+.cpg-info strong { color: var(--text); font-weight: 700; }
+.cpg-list { list-style: none; margin: 0; padding: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.cpg-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    min-width: 42px; height: 42px; padding: 0 12px; border-radius: 12px;
+    background: var(--surface); border: 1.5px solid var(--border); color: var(--text-2);
+    font-size: 13.5px; font-weight: 700; text-decoration: none;
+    transition: border-color var(--t-micro), color var(--t-micro), background var(--t-micro), transform var(--t-micro) var(--ease-out);
+}
+a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background: var(--brand-mlt); transform: translateY(-1px); }
+.cpg-btn.is-active { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 4px 14px rgba(22,104,216,.35); }
+.cpg-btn.is-disabled { opacity: .45; cursor: not-allowed; }
+.cpg-dots { display: inline-flex; align-items: flex-end; height: 42px; padding: 0 4px; color: var(--muted); }
+.cpg-flip { display: inline-flex; transform: scaleX(-1); }
+.cpg-compact { display: none; font-size: 13px; font-weight: 700; color: var(--text-2); padding: 0 6px; }
+@media (max-width: 640px) {
+    .cpg-num { display: none; }
+    .cpg-compact { display: block; }
+    .cpg-list { flex-wrap: nowrap; gap: 10px; }
+    .cpg-nav { padding: 0 16px; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   PANNEAUX NUMÉROTÉS 01 → 06 (reprend la maquette : bandes pleine largeur,
+   onglet numéroté dans le coin haut-gauche, alternance clair / sombre)
+════════════════════════════════════════════════════════════════ */
+.band-num {
+    position: absolute; top: 0; left: 0; z-index: 3;
+    min-width: 64px; padding: 14px 18px 14px 20px;
+    background: var(--brand); color: #fff;
+    font-family: var(--display); font-weight: 700; font-size: 22px; line-height: 1; letter-spacing: .5px;
+    border-bottom-right-radius: 24px; font-variant-numeric: tabular-nums;
+    box-shadow: 0 6px 18px rgba(22,104,216,.3);
+}
+.bands > .mk:nth-of-type(odd) .band-num { background: var(--brand-dk); }  /* 02, 04, 06 (alternance comme la maquette) */
+.mk-split--dark .band-num { background: var(--brand); box-shadow: 0 6px 22px rgba(22,104,216,.45); }
+
+/* Bandes pleine largeur, contenu centré sur 1240 px */
+.bands { display: flex; flex-direction: column; }
+.bands > .mk {
+    margin: 0; border-radius: 0; border-left: 0; border-right: 0; border-top: 0;
+    box-shadow: none; min-height: 0;
+    padding: 72px max(28px, calc((100% - 1240px) / 2)) 64px;
+}
+.bands > .mk:not(.mk-split--dark):not(.final-cta) { background: linear-gradient(180deg, #fbfbff 0%, var(--surface) 100%); border-bottom: 1px solid var(--border); }
+.bands > .final-cta { border-bottom: 1px solid var(--brand-lt); }
+.bands > .mk-split::after { right: -160px; top: -160px; width: 560px; height: 560px; }
+.bands .mk-title { font-size: clamp(28px, 3.4vw, 42px); }
+
+/* ── 01 · HERO ── */
+.hero01 {
+    position: relative; overflow: hidden; isolation: isolate;
+    background: linear-gradient(180deg, #fbfbff 0%, var(--grey) 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 64px max(28px, calc((100% - 1240px) / 2)) 56px;
+}
+.hero01::before { /* grande forme indigo derrière les écrans, comme la vague verte de la maquette */
+    content: ''; position: absolute; z-index: -1; right: -12%; top: -30%; width: 62%; height: 160%;
+    background: radial-gradient(closest-side, rgba(22,104,216,.95), rgba(18,96,201,.85) 55%, rgba(18,96,201,0) 100%);
+    border-radius: 50%; transform: rotate(-12deg);
+}
+.hero01::after {
+    content: ''; position: absolute; z-index: -1; inset: 0; pointer-events: none;
+    background-image: radial-gradient(circle at 1px 1px, rgba(22,104,216,.12) 1px, transparent 0);
+    background-size: 26px 26px; mask-image: linear-gradient(90deg, transparent 40%, #000 100%);
+    -webkit-mask-image: linear-gradient(90deg, transparent 40%, #000 100%);
+}
+.hero01-inner { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 40px; align-items: center; }
+.hero01-copy { min-width: 0; animation: heroFadeUp var(--t-enter) var(--ease-out) both; }
+.hero01-brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; margin-bottom: 26px; font-family: var(--display); font-weight: 700; font-size: 26px; color: var(--navy); }
+.hero01-brand img { width: 40px; height: 40px; border-radius: 10px; }
+.hero01-brand b { color: var(--brand); font-weight: 700; }
+.hero01-title {
+    margin: 0 0 16px; font-family: var(--display); font-weight: 700; text-transform: uppercase;
+    font-size: clamp(28px, 3.1vw, 44px); line-height: 1.06; letter-spacing: -.5px; color: var(--navy);
+}
+.hero01-title span { display: block; color: var(--brand); white-space: nowrap; }
+@media (max-width: 420px) { .hero01-title span { white-space: normal; } }
+.hero01-sub { margin: 0 0 26px; font-size: 17px; line-height: 1.6; color: var(--text-2); max-width: 480px; }
+.hero01-btns { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 34px; }
+.hero01-feats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 560px; }
+.hero01-feats a {
+    display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; text-decoration: none;
+    font-size: 12.5px; font-weight: 600; line-height: 1.35; color: var(--text-2); padding: 6px 4px; border-radius: 12px;
+    transition: color var(--t-micro), background var(--t-micro);
+}
+.hero01-feats a:hover { color: var(--brand-dk); background: var(--brand-mlt); }
+.hero01-feats a:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+.hero01-feat-ico {
+    width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+    background: var(--surface); color: var(--brand); border: 1px solid var(--brand-lt); box-shadow: var(--shadow-sm);
+    transition: transform var(--t-micro) var(--ease-spring);
+}
+.hero01-feats a:hover .hero01-feat-ico { transform: translateY(-3px); }
+
+/* Ordinateur portable (réutilisé par le panneau 02) */
+.hero01-visual { position: relative; min-width: 0; padding: 10px 70px 30px 0; animation: heroFadeUp .8s var(--ease-out) .15s both; }
+.laptop { position: relative; }
+.laptop-screen {
+    background: #0b0b1a; border-radius: 16px 16px 4px 4px; padding: 12px 12px 14px;
+    box-shadow: 0 30px 60px rgba(10,10,30,.35);
+}
+.laptop-base {
+    height: 14px; margin: 0 -7%; border-radius: 2px 2px 14px 14px;
+    background: linear-gradient(180deg, #d9dce6, #a9adbb); position: relative;
+}
+.laptop-base::before { content: ''; position: absolute; left: 50%; top: 0; transform: translateX(-50%); width: 16%; height: 5px; border-radius: 0 0 6px 6px; background: #8d91a1; }
+.laptop--dash .laptop-screen .dash-mock { border-radius: 8px; box-shadow: none; }
+
+/* Mini site affiché dans les écrans (illustratif, non interactif) */
+.mini-site { background: var(--grey); border-radius: 8px; overflow: hidden; }
+.mini-nav { display: flex; align-items: center; gap: 10px; background: var(--surface); padding: 8px 12px; border-bottom: 1px solid var(--border); }
+.mini-logo { display: inline-flex; align-items: center; gap: 5px; font-family: var(--display); font-weight: 700; font-size: 12px; color: var(--navy); }
+.mini-logo img { width: 16px; height: 16px; border-radius: 4px; }
+.mini-logo b { color: var(--brand); font-weight: 700; }
+.mini-nav-links { display: flex; gap: 8px; margin-left: auto; }
+.mini-nav-links i { display: block; width: 26px; height: 5px; border-radius: 3px; background: var(--grey-2); }
+.mini-nav-btn { font-size: 8px; font-weight: 700; color: #fff; background: var(--brand); padding: 4px 9px; border-radius: 20px; }
+.mini-hero { background: linear-gradient(120deg, var(--navy) 0%, #0F3F86 55%, var(--brand) 100%); padding: 16px 16px 18px; }
+.mini-hero-title { font-family: var(--display); font-weight: 700; font-size: 15px; line-height: 1.2; color: #fff; margin-bottom: 10px; }
+.mini-search { display: flex; align-items: center; gap: 6px; background: #fff; border-radius: 20px; padding: 6px 6px 6px 10px; font-size: 8.5px; color: var(--muted); }
+.mini-search span { margin-left: auto; width: 20px; height: 16px; border-radius: 10px; background: var(--brand); color: #fff; display: flex; align-items: center; justify-content: center; }
+.mini-cats { display: flex; gap: 6px; padding: 10px 12px 4px; }
+.mini-cat { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 7.5px; font-weight: 600; color: var(--text-2); white-space: nowrap; overflow: hidden; }
+.mini-cat i { width: 28px; height: 28px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--brand-dk); }
+.mini-sec { font-family: var(--display); font-weight: 700; font-size: 10px; color: var(--text); padding: 8px 12px 6px; }
+.mini-prods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; padding: 0 12px 12px; }
+.mini-prod { background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 5px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.mini-prod img, .mini-prod > i { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 5px; background: var(--brand-mlt); }
+.mini-prod b { font-size: 7px; font-weight: 800; color: var(--brand-dk); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+.mini-prod em { display: block; height: 5px; width: 60%; border-radius: 3px; background: var(--brand-lt); }
+
+/* Téléphone posé devant l'ordinateur */
+.hero01-phone {
+    position: absolute; right: 0; bottom: 0; width: 30%; max-width: 190px; aspect-ratio: 9 / 18.5;
+    background: #0b0b1a; border-radius: 26px; padding: 7px; box-shadow: 0 24px 50px rgba(10,10,30,.4);
+}
+.hero01-phone-screen { position: relative; height: 100%; border-radius: 20px; overflow: hidden; background: var(--grey); }
+.hero01-phone-notch { position: absolute; top: 5px; left: 50%; transform: translateX(-50%); width: 38%; height: 12px; border-radius: 8px; background: #0b0b1a; z-index: 2; }
+.mini-nav--phone { padding-top: 22px; }
+.mini-hero--phone { padding: 12px 10px; }
+.mini-hero--phone .mini-hero-title { font-size: 11px; }
+.mini-cats--phone { padding: 8px 10px 0; }
+.mini-cats--phone .mini-cat i { width: 22px; height: 22px; }
+.mini-prods--phone { grid-template-columns: 1fr 1fr; padding: 0 10px 10px; }
+
+/* ── 05 · Application en 3 colonnes (texte | téléphone | liste) ── */
+.mk-split--three { grid-template-columns: 1fr auto 1fr; }
+.mk-split--three .phone { width: 230px; }
+.app-side { min-width: 0; }
+.app-side-title { font-family: var(--display); font-size: 22px; font-weight: 700; color: #fff; margin: 0 0 18px; }
+.app-side-link { display: inline-flex; align-items: center; gap: 8px; color: #D6E6FF; font-size: 15px; font-weight: 600; text-decoration: none; }
+.app-side-link:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+
+/* ── Responsive des panneaux ── */
+@media (max-width: 1100px) {
+    .mk-split--three { grid-template-columns: 1fr 1fr; }
+    .mk-split--three .app-side { grid-column: 1 / -1; }
+}
+@media (max-width: 960px) {
+    .hero01 { padding: 64px 24px 44px; }
+    .hero01-inner { grid-template-columns: 1fr; gap: 28px; }
+    .hero01::before { right: -40%; top: 34%; width: 120%; height: 90%; }
+    .hero01-visual { padding-right: 56px; max-width: 640px; }
+    .bands > .mk { padding: 68px 24px 48px; }
+    .mk-split--three { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+    .band-num { min-width: 52px; padding: 11px 14px 11px 16px; font-size: 18px; border-bottom-right-radius: 18px; }
+    .hero01 { padding: 58px 16px 36px; }
+    .hero01-brand { font-size: 22px; margin-bottom: 18px; }
+    .hero01-sub { font-size: 16px; }
+    .hero01-btns { flex-direction: column; align-items: stretch; }
+    .hero01-feats { grid-template-columns: repeat(2, 1fr); }
+    .hero01-visual { padding: 0 40px 24px 0; }
+    .mini-hero-title { font-size: 12px; }
+    .bands > .mk { padding: 60px 16px 36px; }
+}
+
+/* ── Mouvement réduit : tout est affiché d'emblée, sans déplacement ── */
+@media (prefers-reduced-motion: reduce) {
+    .how-line-fill, .how-badge, .dash-kpi-bar, .dash-line, .dash-area, .dash-dot, .dash-toast,
+    .track-route, .track-steps li, .pay-shield-ico, .phone-notif, .final-arrow, .final-bag,
+    .mk-btn, .pay-card, .mk-feat-ico { transition: none !important; }
+    .hero01-copy, .hero01-visual { animation: none !important; }
+    .dash-kpi-bar { transform: scaleX(var(--w, .7)); }
+    .dash-line, .track-route, .final-arrow { stroke-dashoffset: 0; }
+    .dash-area, .dash-dot, .dash-toast, .track-steps li, .pay-shield-ico, .phone-notif, .final-bag { opacity: 1; transform: none; }
+}
 </style>
 @endpush
 
@@ -923,175 +1461,13 @@ footer.app-footer { display: none !important; }
     @endif
 </div>
 
-{{-- ══ SIDEBAR CATÉGORIES + HERO ══ --}}
-@php
-    $catsVisibleCount = 11;
-    $catsVisible = $categories->take($catsVisibleCount);
-    $catsMore = $categories->slice($catsVisibleCount)->values();
-    $activeInMore = request('cat') && $catsMore->contains(request('cat'));
-@endphp
-<div class="home-top">
-    @if($categories->isNotEmpty())
-    <aside class="cat-sidebar reveal">
-        <div class="cat-sidebar-hd">{!! \App\Support\IconLibrary::svg('grid', 'csi-ico') !!} Toutes les catégories</div>
-        <nav class="cat-sidebar-list">
-            <a href="{{ url('/') }}?{{ http_build_query(array_filter(['s' => request('s')])) }}#catalogue" class="cat-sidebar-item {{ !request('cat') ? 'active' : '' }}">
-                {!! \App\Support\IconLibrary::svg('eye', 'csi-ico') !!} Tout voir
-            </a>
-            @foreach($catsVisible as $cat)
-            <a href="{{ url('/') }}?{{ http_build_query(array_filter(['cat' => $cat, 's' => request('s')])) }}#catalogue" class="cat-sidebar-item {{ request('cat') === $cat ? 'active' : '' }}" data-cat-preview="{{ $cat }}">
-                {!! \App\Support\IconLibrary::categorySvg($cat, 'csi-ico') !!} {{ $cat }}
-            </a>
-            @endforeach
+{{-- ══ ACCUEIL 3D (maquette de référence, palette bleue Shopio) : 01 hero → notre sélection ══ --}}
+@include('partials.home-3d-assets')
+@unless(request('s'))
+@include('partials.home-3d')
+@endunless
 
-            @if($catsMore->isNotEmpty())
-            <details class="cat-sidebar-more" {{ $activeInMore ? 'open' : '' }}>
-                <summary>
-                    {!! \App\Support\IconLibrary::svg('plus', 'csi-ico') !!} Autres catégories
-                    <span class="csi-count">{{ $catsMore->count() }}</span>
-                </summary>
-                @foreach($catsMore as $cat)
-                <a href="{{ url('/') }}?{{ http_build_query(array_filter(['cat' => $cat, 's' => request('s')])) }}#catalogue" class="cat-sidebar-item {{ request('cat') === $cat ? 'active' : '' }}" data-cat-preview="{{ $cat }}">
-                    {!! \App\Support\IconLibrary::categorySvg($cat, 'csi-ico') !!} {{ $cat }}
-                </a>
-                @endforeach
-            </details>
-            @endif
-        </nav>
-    </aside>
-
-    {{-- ══ APERÇU CATÉGORIE (survol d'une catégorie dans la barre, desktop only) ══ --}}
-    <div class="cat-preview-pop" id="catPreviewPop">
-        <div class="cat-preview-pop-arrow"></div>
-        <div class="cat-preview-pop-body" id="catPreviewBody"></div>
-    </div>
-    @endif
-
-    <div class="hero-carousel reveal" id="heroCarousel">
-        @php
-            /* Photos libres de droits (licence Unsplash, gratuites, usage commercial
-               autorisé sans attribution) — servies via le CDN Unsplash avec redimensionnement
-               et compression à la volée (auto=format sert du WebP/AVIF aux navigateurs
-               compatibles) pour rester légères malgré la haute qualité. */
-            $heroPhoto = fn (string $id, int $w) => "https://images.unsplash.com/{$id}?auto=format&fit=crop&w={$w}&q=60";
-            $slide1Id = 'photo-1758525223453-06095a7459ce'; // clientes souriantes, sacs de courses
-            $slide2Id = 'photo-1483985988355-763728e1935b'; // sacs de shopping en papier
-            $slide3Id = 'photo-1760001868397-e5995a577e26'; // entrée de boutique
-        @endphp
-        <section class="hero hero-slide is-active">
-            <img class="hero-bg-img" alt=""
-                 src="{{ $heroPhoto($slide1Id, 1400) }}"
-                 srcset="{{ $heroPhoto($slide1Id, 700) }} 700w, {{ $heroPhoto($slide1Id, 1100) }} 1100w, {{ $heroPhoto($slide1Id, 1600) }} 1600w"
-                 sizes="100vw" width="1400" height="560"
-                 loading="eager" fetchpriority="high" decoding="async">
-            <div class="hero-scrim"></div>
-            <div class="hero-shine"></div>
-            <div class="hero-text">
-                <div class="hero-badge"><span class="hero-badge-dot"></span> <span id="heroProductCount" data-count="{{ $stats['total_products'] ?? 0 }}">0</span> produits disponibles</div>
-                <div class="hero-title">Bienvenue sur {{ config('app.name', 'Shopio') }}</div>
-                <p class="hero-sub">Découvrez des milliers de produits dans toutes les catégories, chez les meilleures boutiques, livrés directement chez vous.</p>
-                <div class="hero-btns">
-                    <a href="#catalogue" class="hero-btn-primary">{!! \App\Support\IconLibrary::svg('cart', '', 16) !!} Voir les produits</a>
-                    <a href="{{ route('shops.index') }}" class="hero-btn-secondary">{!! \App\Support\IconLibrary::svg('store', '', 16) !!} Parcourir les boutiques</a>
-                </div>
-            </div>
-        </section>
-
-        <section class="hero hero-slide">
-            <img class="hero-bg-img" alt=""
-                 src="{{ $heroPhoto($slide2Id, 1400) }}"
-                 srcset="{{ $heroPhoto($slide2Id, 700) }} 700w, {{ $heroPhoto($slide2Id, 1100) }} 1100w, {{ $heroPhoto($slide2Id, 1600) }} 1600w"
-                 sizes="100vw" width="1400" height="560"
-                 loading="lazy" decoding="async">
-            <div class="hero-scrim"></div>
-            <div class="hero-shine"></div>
-            <div class="hero-text">
-                <div class="hero-badge"><span class="hero-badge-dot"></span> Tous les jours</div>
-                <div class="hero-title">Ventes flash quotidiennes</div>
-                <p class="hero-sub">Jusqu'à -50% sur une sélection de produits chaque jour, en quantités limitées. Ne les manquez pas !</p>
-                <div class="hero-btns">
-                    <a href="#ventes-flash" class="hero-btn-primary">{!! \App\Support\IconLibrary::svg('zap', '', 16) !!} Voir les ventes flash</a>
-                    <a href="{{ route('shops.index') }}" class="hero-btn-secondary">{!! \App\Support\IconLibrary::svg('store', '', 16) !!} Parcourir les boutiques</a>
-                </div>
-            </div>
-        </section>
-
-        <section class="hero hero-slide">
-            <img class="hero-bg-img" alt=""
-                 src="{{ $heroPhoto($slide3Id, 1400) }}"
-                 srcset="{{ $heroPhoto($slide3Id, 700) }} 700w, {{ $heroPhoto($slide3Id, 1100) }} 1100w, {{ $heroPhoto($slide3Id, 1600) }} 1600w"
-                 sizes="100vw" width="1400" height="560"
-                 loading="lazy" decoding="async">
-            <div class="hero-scrim"></div>
-            <div class="hero-shine"></div>
-            <div class="hero-text">
-                <div class="hero-badge"><span class="hero-badge-dot"></span> Devenez partenaire</div>
-                <div class="hero-title">Vendez sur {{ config('app.name', 'Shopio') }}</div>
-                <p class="hero-sub">Créez votre boutique en ligne en quelques minutes et touchez des milliers de clients partout en Guinée.</p>
-                <div class="hero-btns">
-                    <a href="{{ route('register') }}" class="hero-btn-primary">{!! \App\Support\IconLibrary::svg('store', '', 16) !!} Ouvrir ma boutique</a>
-                    <a href="{{ route('shops.index') }}" class="hero-btn-secondary">{!! \App\Support\IconLibrary::svg('eye', '', 16) !!} Voir les boutiques</a>
-                </div>
-            </div>
-        </section>
-
-        <div class="hero-dots">
-            <button class="hero-dot is-active" type="button" data-slide-to="0" aria-label="Diapositive 1"></button>
-            <button class="hero-dot" type="button" data-slide-to="1" aria-label="Diapositive 2"></button>
-            <button class="hero-dot" type="button" data-slide-to="2" aria-label="Diapositive 3"></button>
-        </div>
-    </div>
-
-    <aside class="side-cards reveal">
-        @auth
-            <a href="{{ route('support.index') }}" class="side-card">
-        @else
-            <a href="{{ route('login') }}" class="side-card">
-        @endauth
-            <span class="side-card-ico">{!! \App\Support\IconLibrary::svg('search', '', 17) !!}</span>
-            <span class="side-card-body">
-                <span class="side-card-title">Centre d'aide</span>
-                <span class="side-card-sub">Besoin d'assistance ?</span>
-            </span>
-        </a>
-        <a href="{{ route('register') }}" class="side-card">
-            <span class="side-card-ico">{!! \App\Support\IconLibrary::svg('store', '', 17) !!}</span>
-            <span class="side-card-body">
-                <span class="side-card-title">Vendez sur {{ config('app.name', 'Shopio') }}</span>
-                <span class="side-card-sub">Ouvrez votre boutique</span>
-            </span>
-        </a>
-        <a href="{{ route('shops.index') }}" class="side-card">
-            <span class="side-card-ico">{!! \App\Support\IconLibrary::svg('bag', '', 17) !!}</span>
-            <span class="side-card-body">
-                <span class="side-card-title">Toutes les boutiques</span>
-                <span class="side-card-sub">Parcourir le catalogue</span>
-            </span>
-        </a>
-    </aside>
-</div>
-
-{{-- ══ BANDEAU DE CONFIANCE ══ --}}
-<div class="trust-strip reveal">
-    <div class="trust-item">
-        <span class="trust-ico">{!! \App\Support\IconLibrary::svg('truck', '', 20) !!}</span>
-        <span class="trust-txt"><strong>Livraison rapide</strong><span>Partout en Guinée</span></span>
-    </div>
-    <div class="trust-item">
-        <span class="trust-ico">{!! \App\Support\IconLibrary::svg('wallet', '', 20) !!}</span>
-        <span class="trust-txt"><strong>Paiement à la livraison</strong><span>Payez en toute sécurité</span></span>
-    </div>
-    <div class="trust-item">
-        <span class="trust-ico">{!! \App\Support\IconLibrary::svg('rotate', '', 20) !!}</span>
-        <span class="trust-txt"><strong>Retours faciles</strong><span>Assistance dédiée</span></span>
-    </div>
-    <div class="trust-item">
-        <span class="trust-ico">{!! \App\Support\IconLibrary::svg('shield', '', 20) !!}</span>
-        <span class="trust-txt"><strong>Boutiques vérifiées</strong><span>Vendeurs approuvés</span></span>
-    </div>
-</div>
-
-<div class="c-main">
+<div class="c-main" style="padding-top:24px">
 
 {{-- ══ VU RÉCEMMENT (rempli en JS depuis l'historique local du navigateur) ══ --}}
 <div class="sec-hd reveal" id="recentlyViewedHd" hidden>
@@ -1103,32 +1479,15 @@ footer.app-footer { display: none !important; }
 </div>
 
 <div id="resultsRoot">
-@include('partials.catalogue-results')
+@include('partials.catalogue-results', ['compactHome' => true])
 </div>
-
-{{-- ══ TÉMOIGNAGES CLIENTS (avis réels, hors recherche) ══ --}}
-@if($testimonials->isNotEmpty())
-<div class="sec-hd reveal" style="margin-top:8px">
-    <div class="sec-title">{!! \App\Support\IconLibrary::svg('sparkles') !!} Ce que disent <strong>nos clients</strong></div>
-</div>
-<div class="testi-grid">
-    @foreach($testimonials as $review)
-    <div class="testi-card reveal" style="--rd: {{ $loop->index * 70 }}ms">
-        <div class="testi-stars">{!! \App\Support\IconLibrary::stars((float) $review->rating, 13) !!}</div>
-        <p class="testi-text">&laquo;&nbsp;{{ Str::limit($review->comment, 160) }}&nbsp;&raquo;</p>
-        <div class="testi-author">
-            <span class="testi-avatar">{{ mb_strtoupper(mb_substr($review->client->name ?? '?', 0, 1)) }}</span>
-            <span class="testi-author-body">
-                <span class="testi-author-name">{{ $review->client->name ?? 'Client Shopio' }}</span>
-                @if($review->vendeur)<span class="testi-author-sub">Achat chez {{ $review->vendeur->name }}</span>@endif
-            </span>
-        </div>
-    </div>
-    @endforeach
-</div>
-@endif
 
 </div>{{-- /.c-main --}}
+
+{{-- ══ 02 Livraison → 06 Appel final (+ avis réels), masqués pendant une recherche ══ --}}
+@unless(request('s'))
+@include('partials.home-3d-bands')
+@endunless
 
 {{-- ══ FOOTER ══ --}}
 <footer class="w-footer">
@@ -1177,6 +1536,20 @@ footer.app-footer { display: none !important; }
 
 @push('scripts')
 <script>
+/* ── Échappement HTML : toute donnée insérée via innerHTML (noms de produits et de
+ *    boutiques saisis par les vendeurs, catégories, historique localStorage…) DOIT
+ *    passer par escHtml, sinon un nom piégé ("<img src=x onerror=…>") exécuterait
+ *    du code chez chaque visiteur (XSS stockée). safeUrl n'accepte que http(s) et
+ *    les chemins relatifs (bloque javascript:). Déclarées au niveau global : aussi
+ *    utilisées par le script d'aperçu catégorie plus bas. ── */
+function escHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function safeUrl(u) {
+    const s = String(u ?? '').trim();
+    return /^(https?:\/\/|\/(?!\/))/i.test(s) ? escHtml(s) : '#';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     /* ── Ancres "Voir les produits" / "Voir les ventes flash" du hero : on gère le
        défilement nous-mêmes en JS plutôt que de compter sur le comportement natif
@@ -1258,7 +1631,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let revealObserver = null;
     function initReveal(root) {
         root = root || document;
-        if (revealObserver) revealObserver.disconnect();
+        // Pas de disconnect() : les sections hors de #resultsRoot (vendeurs, livraison,
+        // application…) encore sous la ligne de flottaison doivent rester observées
+        // après une recherche en direct, sinon elles resteraient invisibles.
         root.querySelectorAll('.flash-row, .reco-row, .prod-grid').forEach(container => {
             Array.from(container.children).forEach((el, i) => {
                 el.classList.add('reveal');
@@ -1266,7 +1641,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         if ('IntersectionObserver' in window) {
-            revealObserver = new IntersectionObserver(entries => {
+            revealObserver = revealObserver || new IntersectionObserver(entries => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('is-visible');
@@ -1280,6 +1655,82 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     initReveal();
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ── "Comment ça marche" : chaque étape s'active quand elle entre à l'écran,
+     *    la ligne de progression se remplit jusqu'à la dernière étape active. ── */
+    (function initHowSteps() {
+        const track = document.getElementById('howTrack');
+        if (!track) return;
+        const steps = Array.from(track.querySelectorAll('.how-step'));
+        const fill = track.querySelector('.how-line-fill');
+        const update = () => {
+            const last = steps.reduce((acc, s, i) => s.classList.contains('is-on') ? i : acc, -1);
+            fill.style.setProperty('--p', last <= 0 ? 0 : last / (steps.length - 1));
+        };
+        if (!('IntersectionObserver' in window) || prefersReducedMotion) {
+            steps.forEach(s => s.classList.add('is-on'));
+            update();
+            return;
+        }
+        let queue = Promise.resolve();
+        const obs = new IntersectionObserver(entries => {
+            entries.filter(e => e.isIntersecting)
+                .sort((a, b) => steps.indexOf(a.target) - steps.indexOf(b.target))
+                .forEach(entry => {
+                    obs.unobserve(entry.target);
+                    // Activation séquentielle (≈180 ms d'écart) même si plusieurs étapes entrent ensemble
+                    queue = queue.then(() => new Promise(res => setTimeout(() => {
+                        steps.slice(0, steps.indexOf(entry.target) + 1).forEach(s => s.classList.add('is-on'));
+                        update();
+                        res();
+                    }, 180)));
+                });
+        }, { threshold: 0.6, rootMargin: '0px 0px -10% 0px' });
+        steps.forEach(s => obs.observe(s));
+    })();
+
+    /* ── Suivi de livraison : le livreur parcourt l'itinéraire une seule fois,
+     *    quand la carte devient visible. ── */
+    (function initTrackRider() {
+        const motion = document.getElementById('trackRiderMotion');
+        const section = document.getElementById('livraison');
+        if (!motion || !section || typeof motion.beginElement !== 'function') return;
+        if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+            const rider = document.getElementById('trackRider');
+            rider.setAttribute('cx', 265); rider.setAttribute('cy', 105); // posé sur l'itinéraire, sans mouvement
+            motion.remove();
+            return;
+        }
+        const obs = new IntersectionObserver(entries => {
+            if (!entries[0].isIntersecting) return;
+            obs.disconnect();
+            setTimeout(() => motion.beginElement(), 350);
+        }, { threshold: 0.4 });
+        obs.observe(section);
+    })();
+
+    /* ── "Installer l'application" : invite native si le navigateur la propose,
+     *    sinon la fenêtre d'aide du layout (instructions iOS). ── */
+    (function initAppInstall() {
+        const section = document.getElementById('application');
+        const btn = document.getElementById('appInstallBtn');
+        if (!section || !btn) return;
+        const standalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+        if (standalone) { section.remove(); return; } // déjà dans l'application installée
+        btn.addEventListener('click', () => {
+            if (typeof _pwaPrompt !== 'undefined' && _pwaPrompt && typeof pwaInstall === 'function') {
+                pwaInstall();
+                return;
+            }
+            const hint = document.getElementById('pwaIosHint');
+            const installBtn = document.getElementById('pwaInstallBtn');
+            if (hint) hint.style.display = 'block';
+            if (installBtn) installBtn.style.display = 'none';
+            if (typeof pwaShowModal === 'function') pwaShowModal();
+        });
+    })();
 
     /* ── Carrousel du hero : diapositives qui défilent automatiquement,
      *    points cliquables, pause au survol/tactile et hors écran. ── */
@@ -1340,6 +1791,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(data => {
                     btn.classList.toggle('is-fav', !!data.favorited);
                     btn.setAttribute('aria-pressed', data.favorited ? 'true' : 'false');
+                    if (data.favorited) {
+                        btn.classList.remove('is-pop');
+                        void btn.offsetWidth; // relance l'animation à chaque ajout
+                        btn.classList.add('is-pop');
+                    }
                 })
                 .catch(() => {})
                 .finally(() => btn.classList.remove('is-busy'));
@@ -1396,11 +1852,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const items = readList();
             if (!items.length) { hd.hidden = true; rowWrap.hidden = true; return; }
             list.innerHTML = items.map(item => `
-                <a href="${item.url}" class="reco-card">
-                    <div class="reco-card-img">${item.img ? `<img src="${item.img}" alt="${item.name}" loading="lazy" width="190" height="130">` : ''}</div>
+                <a href="${safeUrl(item.url)}" class="reco-card">
+                    <div class="reco-card-img">${item.img ? `<img src="${safeUrl(item.img)}" alt="${escHtml(item.name)}" loading="lazy" width="190" height="130">` : ''}</div>
                     <div class="reco-card-body">
-                        <div class="reco-card-name">${item.name}</div>
-                        <div class="reco-card-price-row"><span class="reco-card-price">${item.price}</span></div>
+                        <div class="reco-card-name">${escHtml(item.name)}</div>
+                        <div class="reco-card-price-row"><span class="reco-card-price">${escHtml(item.price)}</span></div>
                     </div>
                 </a>
             `).join('');
@@ -1524,14 +1980,34 @@ document.addEventListener('DOMContentLoaded', () => {
             loadResults(new URL(clearLink.href));
         });
 
-        // Pagination (page suivante/précédente) : chargée en direct puis on atterrit
-        // directement sur les produits, au lieu de tout en haut de la page.
+        // Pagination, catégories, puces de filtres actifs : chargés en direct puis on
+        // atterrit directement sur les produits, au lieu de tout en haut de la page.
         document.addEventListener('click', (e) => {
-            const pageLink = e.target.closest('#resultsRoot .c-pagination a');
-            if (!pageLink) return;
+            const link = e.target.closest('#resultsRoot .cpg a, #resultsRoot [data-live-link]');
+            if (!link || e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return; // nouvel onglet : comportement natif
             e.preventDefault();
             clearTimeout(searchDebounce);
-            loadResults(new URL(pageLink.href), { scrollToCatalogue: true });
+            loadResults(new URL(link.href), { scrollToCatalogue: true });
+        });
+
+        // Tri : la liste se réorganise sans rechargement
+        document.addEventListener('change', (e) => {
+            const select = e.target.closest('#resultsRoot [data-live-sort]');
+            if (!select) return;
+            loadResults(new URL(select.value, window.location.origin), { scrollToCatalogue: true });
+        });
+
+        // Filtre prix : idem, en ne gardant que les champs remplis
+        document.addEventListener('submit', (e) => {
+            const form = e.target.closest('#resultsRoot [data-live-form]');
+            if (!form) return;
+            e.preventDefault();
+            const url = new URL(form.getAttribute('action'), window.location.origin);
+            url.search = '';
+            new FormData(form).forEach((value, key) => {
+                if (String(value).trim() !== '') url.searchParams.set(key, String(value).trim());
+            });
+            loadResults(url, { scrollToCatalogue: true });
         });
 
         // Bouton précédent/suivant du navigateur : recharge les résultats en direct aussi
@@ -1559,13 +2035,13 @@ document.addEventListener('DOMContentLoaded', () => {
         function render(items) {
             if (!items.length) { close(); return; }
             box.innerHTML = items.map(it => `
-                <a href="${it.url}" class="search-suggestion-item" role="option">
-                    ${it.image ? `<img src="${it.image}" class="search-suggestion-img" alt="" loading="lazy">` : '<div class="search-suggestion-img"></div>'}
+                <a href="${safeUrl(it.url)}" class="search-suggestion-item" role="option">
+                    ${it.image ? `<img src="${safeUrl(it.image)}" class="search-suggestion-img" alt="" loading="lazy">` : '<div class="search-suggestion-img"></div>'}
                     <div class="search-suggestion-body">
-                        <div class="search-suggestion-name">${it.name}</div>
-                        ${it.shop ? `<div class="search-suggestion-meta">${it.shop}</div>` : ''}
+                        <div class="search-suggestion-name">${escHtml(it.name)}</div>
+                        ${it.shop ? `<div class="search-suggestion-meta">${escHtml(it.shop)}</div>` : ''}
                     </div>
-                    <div class="search-suggestion-price">${it.price}</div>
+                    <div class="search-suggestion-price">${escHtml(it.price)}</div>
                 </a>
             `).join('');
             box.classList.add('is-open');
@@ -1636,20 +2112,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function render(data) {
         if (!data.products || !data.products.length) {
-            body.innerHTML = '<div class="cpp-title">' + (data.name || '') + '</div><div class="cpp-empty">Aucun produit pour le moment.</div>';
+            body.innerHTML = '<div class="cpp-title">' + escHtml(data.name || '') + '</div><div class="cpp-empty">Aucun produit pour le moment.</div>';
             return;
         }
         const items = data.products.map(p => `
-            <a href="${p.url}" class="cpp-item">
-                ${p.image ? `<img src="${p.image}" class="cpp-item-img" alt="" loading="lazy">` : '<div class="cpp-item-ph">🏷️</div>'}
-                <div class="cpp-item-name">${p.name}</div>
-                <div class="cpp-item-price">${p.price}</div>
+            <a href="${safeUrl(p.url)}" class="cpp-item">
+                ${p.image ? `<img src="${safeUrl(p.image)}" class="cpp-item-img" alt="" loading="lazy">` : '<div class="cpp-item-ph">{!! \App\Support\IconLibrary::svg('tag', '', 20) !!}</div>'}
+                <div class="cpp-item-name">${escHtml(p.name)}</div>
+                <div class="cpp-item-price">${escHtml(p.price)}</div>
             </a>
         `).join('');
         body.innerHTML = `
-            <div class="cpp-title">Populaire en ${data.name}</div>
+            <div class="cpp-title">Populaire en ${escHtml(data.name)}</div>
             <div class="cpp-grid">${items}</div>
-            <a href="${data.more_url}" class="cpp-more">Voir tout →</a>
+            <a href="${safeUrl(data.more_url)}" class="cpp-more">Voir tout →</a>
         `;
     }
 

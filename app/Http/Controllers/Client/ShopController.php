@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Models\Review;
 use App\Models\Shop;
 use App\Models\ShopVisit;
 use Illuminate\Http\Request;
@@ -43,8 +44,16 @@ class ShopController extends Controller
 
         $devise = $shop->currency ?? 'GNF';
 
+        // Note réelle du vendeur (avis clients) — remplace les étoiles et compteurs
+        // aléatoires (rand) affichés avant sur chaque produit.
+        $reviewStats = Review::where('vendeur_id', $shop->user_id)
+            ->selectRaw('COUNT(*) as cnt, AVG(rating) as avg_rating')
+            ->first();
+        $reviewCount = (int) ($reviewStats->cnt ?? 0);
+        $reviewAvg   = $reviewCount > 0 ? round((float) $reviewStats->avg_rating, 1) : null;
+
         return view('client.shops.show', compact(
-            'shop', 'products', 'categories', 'devise'
+            'shop', 'products', 'categories', 'devise', 'reviewAvg', 'reviewCount'
         ));
     }
 }

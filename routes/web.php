@@ -201,6 +201,10 @@ Route::get('/shops', [PublicShopController::class, 'index'])
 Route::get('/shops/{shop}/products', [PublicShopController::class, 'products'])
     ->name('public.shops.products');
 
+/* Catalogue produits d'une boutique pour Facebook / Instagram (lu par Meta Commerce Manager) */
+Route::get('/shops/{shop}/catalogue-meta.csv', [\App\Http\Controllers\CatalogFeedController::class, 'meta'])
+    ->name('public.shops.catalog');
+
 /* Suivi de commande (public — lien partageable) */
 Route::get('/suivi/{order}', [SuiviController::class, 'show'])
     ->name('suivi.show');
@@ -591,6 +595,19 @@ Route::middleware(['auth', 'role:admin'])
 
         /* Gestion de la boutique */
         Route::resource('shops', ShopController::class)->only(['create', 'store', 'index']);
+
+        /* Personnaliser la vitrine publique (sections, affichage des produits, bannière, couleur) */
+        Route::get('vitrine',               [\App\Http\Controllers\Vendeur\StorefrontController::class, 'edit'])  ->name('storefront.edit');
+        Route::put('vitrine',               [\App\Http\Controllers\Vendeur\StorefrontController::class, 'update'])->name('storefront.update');
+        Route::post('vitrine/reinitialiser', [\App\Http\Controllers\Vendeur\StorefrontController::class, 'reset']) ->name('storefront.reset');
+        Route::get('vitrine/qr-code',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'qr'])    ->name('storefront.qr');
+
+        /* Marketing : provenance des visites et commandes, liens de suivi, catalogue Facebook, test du pixel */
+        Route::get('marketing',                     [\App\Http\Controllers\Vendeur\MarketingController::class, 'index'])         ->name('marketing');
+        Route::post('marketing/test-pixel',         [\App\Http\Controllers\Vendeur\MarketingController::class, 'startPixelTest'])->name('marketing.pixel-test');
+        Route::post('marketing/test-pixel/arreter', [\App\Http\Controllers\Vendeur\MarketingController::class, 'stopPixelTest']) ->name('marketing.pixel-test.stop');
+        Route::post('marketing/campagnes',          [\App\Http\Controllers\Vendeur\MarketingController::class, 'storeCampaign']) ->name('marketing.campaigns.store');
+        Route::post('marketing/campagnes/{campaign}/archiver', [\App\Http\Controllers\Vendeur\MarketingController::class, 'archiveCampaign'])->name('marketing.campaigns.archive');
 
         /* Modification de la boutique (edit + update) */
         Route::get('shops/{shop}/edit',  [ShopController::class, 'edit'])  ->name('shops.edit');

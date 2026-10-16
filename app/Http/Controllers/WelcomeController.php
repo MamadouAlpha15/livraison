@@ -36,7 +36,7 @@ class WelcomeController extends Controller
         /* Requête AJAX (recherche en direct, sans rechargement de page) :
            on ne renvoie que le fragment "résultats" au lieu de la page entière. */
         if ($request->ajax()) {
-            return view('partials.catalogue-results', $data);
+            return view('partials.catalogue-results', $data + ['compactHome' => true]);
         }
 
         return view('welcome', $data);
@@ -348,6 +348,16 @@ class WelcomeController extends Controller
             ? $user->favoriteProducts()->pluck('products.id')->all()
             : [];
 
+        /* ── Nombre réel de produits par catégorie (tuiles « Achetez par catégorie ») ── */
+        $categoryCounts = Product::where('is_active', true)
+            ->whereHas('shop', $approvedShopFilter)
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->selectRaw('category, COUNT(*) as cnt')
+            ->groupBy('category')
+            ->orderByDesc('cnt')
+            ->pluck('cnt', 'category');
+
         /* ── Chiffres clés (compteurs) ── */
         $stats = [
             'total_shops'    => Shop::where('is_approved', true)->count(),
@@ -358,7 +368,7 @@ class WelcomeController extends Controller
         return compact(
             'flashProducts', 'recommendedProducts', 'shops', 'products', 'categories',
             'categoryGroups', 'bestSellers', 'testimonials', 'favoritedIds', 'shopRatings', 'stats', 'sort',
-            'minPrice', 'maxPrice'
+            'minPrice', 'maxPrice', 'categoryCounts'
         );
     }
 }

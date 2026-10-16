@@ -195,6 +195,8 @@ class CartController extends Controller
                     'status'               => Order::STATUS_EN_ATTENTE,
                     'delivery_destination' => $request->delivery_destination,
                     'client_phone'         => $request->client_phone,
+                    'source'               => \App\Support\TrafficSource::forOrder((int) $shopId), // canal d'arrivée du client
+                    'campaign_id'          => \App\Support\TrafficSource::campaignForOrder((int) $shopId),
                 ]);
 
                 foreach ($group as $item) {
@@ -250,6 +252,9 @@ class CartController extends Controller
         });
 
         $count = count($createdOrders);
+
+        // Pixel Meta des vendeurs concernés : un événement « Purchase » par commande (paiement à la livraison)
+        Order::whereIn('id', $createdOrders)->with('shop')->get()->each(fn ($o) => \App\Support\MetaPixel::queuePurchase($o));
 
         return redirect()->route('client.orders.index')->with(
             'success',

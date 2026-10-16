@@ -40,7 +40,7 @@ $I = [
 'coin_pg'        => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
 'exchange_badge' => '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s2.' stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4m0 0L3 8m4-4 4 4"/><path d="M17 8v12m0 0 4-4m-4 4-4-4"/></svg>',
 /* ── KPI 22px ── */
-'check_kpi' => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round" style="color:#a5b4fc"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+'check_kpi' => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round" style="color:#7DB4FF"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
 'clock_kpi' => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round" style="color:#fcd34d"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
 /* ── type tabs 14px ── */
 'bike_tab'  => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$_s.' stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="17" r="3"/><circle cx="19" cy="17" r="3"/><path d="M12 4h4l2 6"/><path d="M6.8 17H12l5-9"/><path d="M5 14l2.5-5H12"/></svg>',
@@ -86,10 +86,10 @@ $I = [
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
-    --brand:      #6366f1; --brand-dk:  #4f46e5;
-    --brand-lt:   #e0e7ff; --brand-mlt: #eef2ff;
-    --sb-bg:      #0e0e16; --sb-border: rgba(255,255,255,.08);
-    --sb-act:     rgba(99,102,241,.52); --sb-hov: rgba(255,255,255,.07);
+    --brand:      #1668D8; --brand-dk:  #1260C9;
+    --brand-lt:   #D6E6FF; --brand-mlt: #EAF2FF;
+    --sb-bg:      #0B1E3D; --sb-border: rgba(255,255,255,.08);
+    --sb-act:     rgba(22,104,216,.52); --sb-hov: rgba(255,255,255,.07);
     --sb-txt:     rgba(255,255,255,.62); --sb-txt-act: #fff;
     --bg:         #f8fafc; --surface:   #ffffff;
     --border:     #e2e8f0; --border-dk: #cbd5e1;
@@ -107,8 +107,8 @@ $I = [
 
 /* ══ MODE SOMBRE ══ */
 [data-theme="dark"] {
-    --brand-lt: rgba(99,102,241,.16);
-    --brand-mlt: rgba(99,102,241,.09);
+    --brand-lt: rgba(22,104,216,.16);
+    --brand-mlt: rgba(22,104,216,.09);
     --bg: #0b0f1a;
     --surface: #141925;
     --border: #262d3d;
@@ -134,17 +134,17 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 /* ══ SIDEBAR ══ */
 .sidebar {
-    background: linear-gradient(180deg,#0f0f59 0%,#0e0e16 40%,#10103a 100%);
-    border-right: 1px solid rgba(99,102,241,.15);
+    background: linear-gradient(180deg,#0B1E3D 0%,#0B1E3D 40%,#0B1E3D 100%);
+    border-right: 1px solid rgba(22,104,216,.15);
     box-shadow: 6px 0 30px rgba(0,0,0,.35);
     display: flex; flex-direction: column;
     position: fixed; top: 0; left: 0; bottom: 0;
     width: var(--sb-w); overflow-y: scroll;
-    scrollbar-width: thin; scrollbar-color: rgba(99,102,241,.35) transparent;
+    scrollbar-width: thin; scrollbar-color: rgba(22,104,216,.35) transparent;
     z-index: 40;
 }
 .sidebar::-webkit-scrollbar { width: 3px; }
-.sidebar::-webkit-scrollbar-thumb { background: rgba(99,102,241,.35); border-radius: 3px; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(22,104,216,.35); border-radius: 3px; }
 .sb-brand { padding: 18px 16px 14px; border-bottom: 1px solid var(--sb-border); flex-shrink: 0; position: relative; }
 .sb-close { display: none; position: absolute; top: 14px; right: 12px; width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.10); color: rgba(255,255,255,.6); font-size: 18px; cursor: pointer; align-items: center; justify-content: center; transition: background .15s; }
 .sb-close:hover { background: rgba(239,68,68,.18); color: #fca5a5; }
@@ -159,8 +159,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .sb-section { font-size: 9.5px; text-transform: uppercase; letter-spacing: 1.8px; color: rgba(255,255,255,.48); padding: 16px 10px 5px; font-weight: 800; }
 .sb-item { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: var(--r-sm); font-size: 13.5px; font-weight: 600; color: rgba(255,255,255,.78); text-decoration: none; letter-spacing: -.1px; transition: background .15s, color .15s; position: relative; }
 .sb-item:hover { background: var(--sb-hov); color: rgba(255,255,255,.96); }
-.sb-item.active { background: var(--sb-act); color: #fff; box-shadow: 0 2px 12px rgba(99,102,241,.25); }
-.sb-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #a5b4fc; border-radius: 0 3px 3px 0; }
+.sb-item.active { background: var(--sb-act); color: #fff; box-shadow: 0 2px 12px rgba(22,104,216,.25); }
+.sb-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #7DB4FF; border-radius: 0 3px 3px 0; }
 .sb-item .ico { font-size: 13px; width: 26px; height: 26px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 7px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.06); }
 .sb-item.active .ico { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.2); }
 .sb-badge { margin-left: auto; background: var(--brand); color: #fff; font-size: 10px; font-weight: 700; border-radius: 20px; padding: 1px 7px; font-family: var(--mono); }
@@ -178,7 +178,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .sb-footer { padding: 12px 10px; border-top: 1px solid rgba(255,255,255,.08); flex-shrink: 0; display: flex; flex-direction: column; gap: 6px; background: linear-gradient(180deg,transparent 0%,#0b0b12 25%); }
 .sb-user { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--r-sm); text-decoration: none; border: 1px solid transparent; transition: background .15s; }
 .sb-user:hover { background: rgba(255,255,255,.06); }
-.sb-av { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#4338ca); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(99,102,241,.45); }
+.sb-av { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,#1668D8,#1260C9); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(22,104,216,.45); }
 .sb-uname { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: -.2px; }
 .sb-urole { font-size: 10.5px; color: rgba(255,255,255,.52); margin-top: 1px; font-weight: 500; }
 .sb-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; border-radius: var(--r-sm); background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.15); color: rgba(252,165,165,.92); font-size: 12.5px; font-weight: 600; font-family: var(--font); cursor: pointer; text-decoration: none; transition: background .15s; text-align: left; }
@@ -205,15 +205,15 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .kpi-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 10px; }
 .kpi-card { border-radius: var(--r); padding: 18px 20px; display: flex; align-items: center; gap: 14px; position: relative; overflow: hidden; box-shadow: var(--shadow-sm); }
 .kpi-card.pending { background: linear-gradient(135deg, #451a03, #78350f); border: 1px solid rgba(245,158,11,.25); }
-.kpi-card.paid    { background: linear-gradient(135deg, #161021, #4F46E5); border: 1px solid rgba(99,102,241,.25); }
+.kpi-card.paid    { background: linear-gradient(135deg, #161021, #1260C9); border: 1px solid rgba(22,104,216,.25); }
 .kpi-card::after  { content: ''; position: absolute; right: -30px; top: -30px; width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,.04); pointer-events: none; }
 .kpi-ico { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .kpi-card.pending .kpi-ico { background: rgba(245,158,11,.15); border: 1px solid rgba(245,158,11,.25); }
-.kpi-card.paid    .kpi-ico { background: rgba(99,102,241,.15); border: 1px solid rgba(99,102,241,.25); }
+.kpi-card.paid    .kpi-ico { background: rgba(22,104,216,.15); border: 1px solid rgba(22,104,216,.25); }
 .kpi-lbl  { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
 .kpi-val  { font-size: 24px; font-weight: 800; font-family: var(--mono); letter-spacing: -1px; line-height: 1; }
 .kpi-card.pending .kpi-val { color: #fcd34d; }
-.kpi-card.paid    .kpi-val { color: #a5b4fc; }
+.kpi-card.paid    .kpi-val { color: #7DB4FF; }
 .kpi-unit { font-size: 11px; color: rgba(255,255,255,.35); margin-top: 3px; }
 .kpi-sub  { font-size: 11px; color: rgba(255,255,255,.3); margin-top: 4px; }
 
@@ -221,16 +221,16 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .kpi-detail-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
 .kpi-detail { border-radius: var(--r-sm); padding: 12px 16px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-sm); }
 .kpi-detail.shop    { background: #f0fdf4; border: 1.5px solid #86efac; }
-.kpi-detail.company { background: #eef2ff; border: 1.5px solid #c7d2fe; }
+.kpi-detail.company { background: #EAF2FF; border: 1.5px solid #D6E6FF; }
 .kpi-detail-ico { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
 .kpi-detail.shop    .kpi-detail-ico { background: #dcfce7; border: 1px solid #86efac; }
-.kpi-detail.company .kpi-detail-ico { background: #e0e7ff; border: 1px solid #c7d2fe; }
+.kpi-detail.company .kpi-detail-ico { background: #D6E6FF; border: 1px solid #D6E6FF; }
 .kpi-detail-lbl { font-size: 10.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 2px; }
 .kpi-detail.shop    .kpi-detail-lbl { color: #15803d; }
-.kpi-detail.company .kpi-detail-lbl { color: #4338ca; }
+.kpi-detail.company .kpi-detail-lbl { color: #1260C9; }
 .kpi-detail-val { font-size: 16px; font-weight: 800; font-family: var(--mono); }
 .kpi-detail.shop    .kpi-detail-val { color: #166534; }
-.kpi-detail.company .kpi-detail-val { color: #3730a3; }
+.kpi-detail.company .kpi-detail-val { color: #0B1E3D; }
 .kpi-detail-unit { font-size: 10px; color: var(--muted); font-weight: 500; margin-top: 1px; }
 
 /* ══ SECTION SÉPARATEUR ══ */
@@ -243,26 +243,26 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     content: ''; flex: 1; height: 1.5px;
 }
 .section-sep.shop::before, .section-sep.shop::after    { background: #86efac; }
-.section-sep.company::before, .section-sep.company::after { background: #c7d2fe; }
+.section-sep.company::before, .section-sep.company::after { background: #D6E6FF; }
 .section-sep .sep-pill {
     display: inline-flex; align-items: center; gap: 7px;
     padding: 6px 16px; border-radius: 20px; white-space: nowrap;
     font-size: 13px; font-weight: 800;
 }
 .section-sep.shop    .sep-pill { background: #f0fdf4; border: 1.5px solid #86efac; color: #15803d; }
-.section-sep.company .sep-pill { background: #eef2ff; border: 1.5px solid #c7d2fe; color: #4338ca; }
+.section-sep.company .sep-pill { background: #EAF2FF; border: 1.5px solid #D6E6FF; color: #1260C9; }
 
 /* ══ COMPANY INFO BOX ══ */
 .company-info-box {
-    background: #eef2ff; border: 1.5px solid #c7d2fe;
+    background: #EAF2FF; border: 1.5px solid #D6E6FF;
     border-radius: var(--r-sm); padding: 10px 14px;
-    font-size: 12.5px; color: #4338ca; font-weight: 600;
+    font-size: 12.5px; color: #1260C9; font-weight: 600;
     margin-bottom: 12px; display: flex; align-items: flex-start; gap: 8px;
 }
 .company-info-box .ico { flex-shrink: 0; margin-top: 1px; display:flex; align-items:center; justify-content:center; }
 .company-ro-note {
-    font-size: 11px; color: #4f46e5; font-weight: 600;
-    background: #eef2ff; border: 1px solid #c7d2fe;
+    font-size: 11px; color: #1260C9; font-weight: 600;
+    background: #EAF2FF; border: 1px solid #D6E6FF;
     border-radius: 6px; padding: 3px 8px; display: inline-block; margin-top: 4px;
 }
 
@@ -277,7 +277,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 }
 .type-tab:hover { border-color: var(--brand-lt); color: var(--brand-dk); background: var(--brand-mlt); }
 .type-tab.active.shop    { background: #f0fdf4; border-color: #86efac; color: #15803d; }
-.type-tab.active.company { background: #eef2ff; border-color: #c7d2fe; color: #4338ca; }
+.type-tab.active.company { background: #EAF2FF; border-color: #D6E6FF; color: #1260C9; }
 .type-tab .type-badge {
     display: inline-flex; align-items: center; justify-content: center;
     font-size: 10px; font-weight: 800; border-radius: 20px;
@@ -285,7 +285,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 }
 .type-tab:not(.active) .type-badge { background: var(--border); color: var(--muted); }
 .type-tab.active.shop    .type-badge { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
-.type-tab.active.company .type-badge { background: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe; }
+.type-tab.active.company .type-badge { background: #D6E6FF; color: #1260C9; border: 1px solid #D6E6FF; }
 
 /* ══ TABS STATUT (niveau 2) ══ */
 .status-tabs { display: flex; gap: 0; margin-bottom: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow-sm); }
@@ -320,7 +320,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     background: rgba(255,255,255,.08); border-radius: 10px; padding: 8px 13px;
     font-size: 12px; color: rgba(255,255,255,.82); font-weight: 600;
 }
-.how-to-step.final { background: rgba(99,102,241,.2); border: 1px solid rgba(99,102,241,.3); color: #a5b4fc; }
+.how-to-step.final { background: rgba(22,104,216,.2); border: 1px solid rgba(22,104,216,.3); color: #7DB4FF; }
 .step-num {
     width: 22px; height: 22px; border-radius: 50%;
     background: var(--warning); color: #fff;
@@ -336,7 +336,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     display: flex; align-items: center; gap: 10px;
     margin-bottom: 18px; box-shadow: var(--shadow); flex-wrap: wrap;
 }
-.payout-bar.has-selection { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(99,102,241,.12), var(--shadow); }
+.payout-bar.has-selection { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(22,104,216,.12), var(--shadow); }
 .payout-input {
     flex: 1; min-width: 160px; padding: 9px 14px; border-radius: var(--r-sm);
     border: 1.5px solid var(--border-dk); font-size: 13px; font-family: var(--font);
@@ -361,7 +361,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .btn { display: inline-flex; align-items: center; gap: 5px; padding: 8px 16px; border-radius: var(--r-sm); font-size: 13px; font-weight: 600; font-family: var(--font); border: 1px solid var(--border-dk); background: var(--surface); color: var(--text-2); cursor: pointer; text-decoration: none; transition: all .15s; white-space: nowrap; }
 .btn:hover { background: var(--bg); border-color: var(--brand); color: var(--brand); }
 .btn-sm { padding: 6px 12px; font-size: 12px; }
-.btn-primary { background: var(--brand); color: #fff; border-color: var(--brand-dk); box-shadow: 0 2px 8px rgba(99,102,241,.3); }
+.btn-primary { background: var(--brand); color: #fff; border-color: var(--brand-dk); box-shadow: 0 2px 8px rgba(22,104,216,.3); }
 .btn-primary:hover { background: var(--brand-dk); color: #fff; }
 .btn-primary:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
 .btn-export { background: var(--green-lt); color: #065f46; border-color: #a7f3d0; }
@@ -406,7 +406,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
 .amount { font-family: var(--mono); font-weight: 700; font-size: 13.5px; color: var(--text); white-space: nowrap; }
 .amount small { font-size: 10px; color: var(--muted); font-weight: 500; }
 .pill { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
-.p-success { background: #e0e7ff; color: #3730a3; }
+.p-success { background: #D6E6FF; color: #0B1E3D; }
 .p-warning { background: #fef3c7; color: #92400e; }
 .ref-cell { font-family: var(--mono); font-size: 11px; color: var(--muted); }
 .ref-link { font-family: var(--mono); font-size: 11.5px; color: var(--brand); font-weight: 700; text-decoration: none; }
@@ -420,7 +420,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
 
 /* ══ FLASH ══ */
 .flash { padding: 10px 14px; border-radius: var(--r-sm); border: 1px solid; font-size: 13.5px; font-weight: 600; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
-.flash-success { background: #eef2ff; border-color: #a5b4fc; color: #3730a3; }
+.flash-success { background: #EAF2FF; border-color: #7DB4FF; color: #0B1E3D; }
 .flash-danger  { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
 
 /* ══ EMPTY ══ */
@@ -469,8 +469,8 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
 .modal-footer { padding: 0 24px 24px; display: flex; gap: 10px; }
 .modal-cancel { flex: 1; padding: 11px; border-radius: var(--r-sm); border: 1.5px solid var(--border); background: var(--surface); font-size: 13.5px; font-weight: 700; font-family: var(--font); cursor: pointer; color: var(--text-2); transition: all .15s; }
 .modal-cancel:hover { border-color: var(--border-dk); background: var(--bg); }
-.modal-confirm { flex: 2; padding: 11px; border-radius: var(--r-sm); border: none; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; font-size: 13.5px; font-weight: 700; font-family: var(--font); cursor: pointer; box-shadow: 0 4px 14px rgba(99,102,241,.35); transition: all .15s; }
-.modal-confirm:hover { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+.modal-confirm { flex: 2; padding: 11px; border-radius: var(--r-sm); border: none; background: linear-gradient(135deg, #1668D8, #1F7CF6); color: #fff; font-size: 13.5px; font-weight: 700; font-family: var(--font); cursor: pointer; box-shadow: 0 4px 14px rgba(22,104,216,.35); transition: all .15s; }
+.modal-confirm:hover { background: linear-gradient(135deg, #1260C9, #1260C9); }
 
 /* ══ TOOLTIP ══ */
 .tooltip-wrap { position: relative; display: inline-flex; align-items: center; }
@@ -539,7 +539,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
     }
     .tbl tbody tr.selected {
         border-color: var(--brand);
-        box-shadow: 0 0 0 2px rgba(99,102,241,.18);
+        box-shadow: 0 0 0 2px rgba(22,104,216,.18);
     }
     .tbl tbody tr.row-warn { background: #fff7ed; }
 
@@ -614,8 +614,8 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
     $processedCount = $shop->orders()->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->where(function($q){$q->whereNotNull('livreur_id')->orWhereNotNull('delivery_company_id');})->count();
     $productCount   = $shop->products()->count();
     $_sbCmdMax = 10; $_sbProdMax = 5;
-    if ($isPro)                            { $_sbCmdClr = '#10b981'; } elseif ($processedCount >= $_sbCmdMax) { $_sbCmdClr = '#ef4444'; } elseif ($processedCount >= 7) { $_sbCmdClr = '#f59e0b'; } else { $_sbCmdClr = '#8b5cf6'; }
-    if ($isPro)                           { $_sbProdClr = '#10b981'; } elseif ($productCount >= $_sbProdMax) { $_sbProdClr = '#ef4444'; } elseif ($productCount >= 4)  { $_sbProdClr = '#f59e0b'; } else { $_sbProdClr = '#8b5cf6'; }
+    if ($isPro)                            { $_sbCmdClr = '#10b981'; } elseif ($processedCount >= $_sbCmdMax) { $_sbCmdClr = '#ef4444'; } elseif ($processedCount >= 7) { $_sbCmdClr = '#f59e0b'; } else { $_sbCmdClr = '#1F7CF6'; }
+    if ($isPro)                           { $_sbProdClr = '#10b981'; } elseif ($productCount >= $_sbProdMax) { $_sbProdClr = '#ef4444'; } elseif ($productCount >= 4)  { $_sbProdClr = '#f59e0b'; } else { $_sbProdClr = '#1F7CF6'; }
 @endphp
 
 <div class="dash-wrap">
@@ -906,7 +906,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                 @if($type === 'shop')
                 <span class="comm-card-title" style="color:#15803d;display:inline-flex;align-items:center;gap:6px">{!! $I['bike_tab'] !!} {{ $commissions->total() }} commission{{ $commissions->total() > 1 ? 's' : '' }} livreur boutique en attente</span>
                 @else
-                <span class="comm-card-title" style="color:#4338ca;display:inline-flex;align-items:center;gap:6px">{!! $I['bldg_tab'] !!} {{ $commissions->total() }} commission{{ $commissions->total() > 1 ? 's' : '' }} entreprise en attente</span>
+                <span class="comm-card-title" style="color:#1260C9;display:inline-flex;align-items:center;gap:6px">{!! $I['bldg_tab'] !!} {{ $commissions->total() }} commission{{ $commissions->total() > 1 ? 's' : '' }} entreprise en attente</span>
                 @endif
                 <label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer">
                     <input type="checkbox" id="checkAll"> Tout sélectionner
@@ -974,7 +974,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                             @endif
                             @if($type === 'company' && isset($gCount) && $gCount > 1)
                             <div style="margin-top:4px;">
-                                <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe;border-radius:5px;padding:2px 7px;white-space:nowrap;">
+                                <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;background:#EAF2FF;color:#1260C9;border:1px solid #D6E6FF;border-radius:5px;padding:2px 7px;white-space:nowrap;">
                                     {!! $I['box_tag'] !!} {{ $gCount }} commandes · 1 trajet
                                 </span>
                                 @if($clientName)
@@ -1002,10 +1002,10 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                                 @if($company->image)
                                 <img src="{{ asset('storage/' . $company->image) }}" alt="" style="width:22px;height:22px;border-radius:6px;object-fit:cover;flex-shrink:0">
                                 @else
-                                <div style="width:22px;height:22px;border-radius:6px;background:#e0e7ff;display:flex;align-items:center;justify-content:center;color:#4338ca;flex-shrink:0">{!! $I['bldg_mini'] !!}</div>
+                                <div style="width:22px;height:22px;border-radius:6px;background:#D6E6FF;display:flex;align-items:center;justify-content:center;color:#1260C9;flex-shrink:0">{!! $I['bldg_mini'] !!}</div>
                                 @endif
                                 <div>
-                                    <div style="font-size:12.5px;font-weight:700;color:#3730a3">{{ $company->name }}</div>
+                                    <div style="font-size:12.5px;font-weight:700;color:#0B1E3D">{{ $company->name }}</div>
                                     @if($company->phone)
                                     <div style="font-size:10px;color:var(--muted);display:flex;align-items:center;gap:3px">{!! $I['phone_lnk'] !!} {{ $company->phone }}</div>
                                     @endif
@@ -1017,8 +1017,8 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                         </td>
                         <td data-label="Chauffeur">
                             @if($driver ?? false)
-                            <div class="lv-chip" style="background:#eef2ff;border-color:#c7d2fe">
-                                <div class="lv-av" style="background:linear-gradient(135deg,#6366f1,#4338ca)">{{ $dInit }}</div>
+                            <div class="lv-chip" style="background:#EAF2FF;border-color:#D6E6FF">
+                                <div class="lv-av" style="background:linear-gradient(135deg,#1668D8,#1260C9)">{{ $dInit }}</div>
                                 {{ $driver->name }}
                             </div>
                             @else
@@ -1061,10 +1061,10 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                                 <span style="color:var(--muted);font-size:12px">—</span>
                             @endif
                             @if($type === 'company' && ($effectiveAmount ?? 0) > 0)
-                                <div style="text-align:right;margin-top:5px;padding-top:5px;border-top:1px dashed #c7d2fe">
-                                    <span style="font-size:13px;font-weight:700;color:#4338ca">{{ number_format($effectiveAmount, 0, ',', ' ') }}</span>
-                                    <span style="font-size:10px;color:#6366f1;font-weight:600"> {{ $devise }}</span>
-                                    <br><small style="color:#6366f1;font-size:10px">Commission fixée</small>
+                                <div style="text-align:right;margin-top:5px;padding-top:5px;border-top:1px dashed #D6E6FF">
+                                    <span style="font-size:13px;font-weight:700;color:#1260C9">{{ number_format($effectiveAmount, 0, ',', ' ') }}</span>
+                                    <span style="font-size:10px;color:#1668D8;font-weight:600"> {{ $devise }}</span>
+                                    <br><small style="color:#1668D8;font-size:10px">Commission fixée</small>
                                 </div>
                             @endif
                         </td>
@@ -1125,7 +1125,7 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
             @if($type === 'shop')
             <span class="comm-card-title" style="color:#15803d;display:inline-flex;align-items:center;gap:6px">{!! $I['bike_tab'] !!} {{ $commissions->total() }} commission{{ $commissions->total() > 1 ? 's' : '' }} livreur boutique payée{{ $commissions->total() > 1 ? 's' : '' }}</span>
             @else
-            <span class="comm-card-title" style="color:#4338ca;display:inline-flex;align-items:center;gap:6px">{!! $I['bldg_tab'] !!} {{ $commissions->total() }} commission{{ $commissions->total() > 1 ? 's' : '' }} entreprise payée{{ $commissions->total() > 1 ? 's' : '' }}</span>
+            <span class="comm-card-title" style="color:#1260C9;display:inline-flex;align-items:center;gap:6px">{!! $I['bldg_tab'] !!} {{ $commissions->total() }} commission{{ $commissions->total() > 1 ? 's' : '' }} entreprise payée{{ $commissions->total() > 1 ? 's' : '' }}</span>
             @endif
         </div>
         <div class="tbl-wrap">
@@ -1195,10 +1195,10 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                             @if($company->image)
                             <img src="{{ asset('storage/' . $company->image) }}" alt="" style="width:22px;height:22px;border-radius:6px;object-fit:cover;flex-shrink:0">
                             @else
-                            <div style="width:22px;height:22px;border-radius:6px;background:#e0e7ff;display:flex;align-items:center;justify-content:center;color:#4338ca;flex-shrink:0">{!! $I['bldg_mini'] !!}</div>
+                            <div style="width:22px;height:22px;border-radius:6px;background:#D6E6FF;display:flex;align-items:center;justify-content:center;color:#1260C9;flex-shrink:0">{!! $I['bldg_mini'] !!}</div>
                             @endif
                             <div>
-                                <div style="font-size:12.5px;font-weight:700;color:#3730a3">{{ $company->name }}</div>
+                                <div style="font-size:12.5px;font-weight:700;color:#0B1E3D">{{ $company->name }}</div>
                                 @if($company->phone)
                                 <div style="font-size:10px;color:var(--muted);display:flex;align-items:center;gap:3px">{!! $I['phone_lnk'] !!} {{ $company->phone }}</div>
                                 @endif
@@ -1210,8 +1210,8 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                     </td>
                     <td data-label="Chauffeur">
                         @if($driver ?? false)
-                        <div class="lv-chip" style="background:#eef2ff;border-color:#c7d2fe">
-                            <div class="lv-av" style="background:linear-gradient(135deg,#6366f1,#4338ca)">{{ $dInit }}</div>
+                        <div class="lv-chip" style="background:#EAF2FF;border-color:#D6E6FF">
+                            <div class="lv-av" style="background:linear-gradient(135deg,#1668D8,#1260C9)">{{ $dInit }}</div>
                             {{ $driver->name }}
                         </div>
                         @else
@@ -1236,17 +1236,17 @@ input[type=checkbox] { width: 16px; height: 16px; border-radius: 4px; accent-col
                             <span style="color:var(--muted);font-size:12px">—</span>
                         @endif
                         @if($type === 'company' && $c->amount)
-                            <div style="text-align:right;margin-top:5px;padding-top:5px;border-top:1px dashed #c7d2fe">
-                                <span style="font-size:13px;font-weight:700;color:#4338ca">{{ number_format($c->amount, 0, ',', ' ') }}</span>
-                                <span style="font-size:10px;color:#6366f1;font-weight:600"> {{ $devise }}</span>
-                                <br><small style="color:#6366f1;font-size:10px">Commission payée</small>
+                            <div style="text-align:right;margin-top:5px;padding-top:5px;border-top:1px dashed #D6E6FF">
+                                <span style="font-size:13px;font-weight:700;color:#1260C9">{{ number_format($c->amount, 0, ',', ' ') }}</span>
+                                <span style="font-size:10px;color:#1668D8;font-weight:600"> {{ $devise }}</span>
+                                <br><small style="color:#1668D8;font-size:10px">Commission payée</small>
                             </div>
                         @endif
                     </td>
                     <td data-label="Commission">
-                        <div class="amount" style="{{ $type === 'company' ? 'color:#4338ca' : '' }}">
+                        <div class="amount" style="{{ $type === 'company' ? 'color:#1260C9' : '' }}">
                             {{ number_format($c->amount, 0, ',', ' ') }}
-                            <small style="{{ $type === 'company' ? 'color:#6366f1' : '' }}">{{ $devise }}</small>
+                            <small style="{{ $type === 'company' ? 'color:#1668D8' : '' }}">{{ $devise }}</small>
                         </div>
                     </td>
                     <td data-label="Statut">
@@ -1529,4 +1529,9 @@ document.getElementById('confirmModal')?.addEventListener('click', function(e) {
     if (e.target === this) closeConfirmModal();
 });
 </script>
+@endpush
+
+{{-- Thème bleu « espace vendeur » (maquette Main.dc.html), chargé après les styles de la page --}}
+@push('styles')
+@include('boutique._partials.sv-theme')
 @endpush

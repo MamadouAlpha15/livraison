@@ -6,6 +6,10 @@ use App\Models\Order;
 use App\Models\Review;
 use App\Models\Shop;
 use App\Models\ShopVisit;
+use App\Support\Storefront;
+use App\Support\TrafficSource;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PublicShopController extends Controller
 {
@@ -38,20 +42,55 @@ class PublicShopController extends Controller
         $totalShops  = Shop::where('is_approved', true)->count();
         $types       = Shop::where('is_approved', true)->whereNotNull('type')->distinct()->pluck('type');
 
+        // Notes réelles (avis clients) des boutiques de la page, en une seule requête —
+        // remplace les 5 étoiles décoratives affichées avant sur toutes les cartes.
+        $shopRatings = Review::whereIn('vendeur_id', $shops->pluck('user_id')->filter()->unique())
+            ->selectRaw('vendeur_id, COUNT(*) as cnt, AVG(rating) as avg_rating')
+            ->groupBy('vendeur_id')
+            ->get()
+            ->keyBy('vendeur_id');
+
         $q = $search;
-        return view('shops.index', compact('shops', 'totalShops', 'types', 'type', 'q'));
+        return view('shops.index', compact('shops', 'totalShops', 'types', 'type', 'q', 'shopRatings'));
     }
 
-    public function products(Shop $shop)
+    public function products(Shop $shop, Request $request)
     {
         abort_unless($shop->is_approved, 404);
 
-        ShopVisit::record($shop->id);
+        // Réglages de la vitrine. En aperçu (éditeur « Personnaliser ma vitrine »), le
+        // propriétaire peut passer une configuration non publiée dans ?vitrine=… : elle
+        // n'est appliquée qu'à lui, jamais aux visiteurs.
+        $sf = Storefront::forShop($shop);
+        $sfAccent = $shop->accent_color ?: '#1F7CF6';
+        $isOwner = Auth::check() && ((int) Auth::id() === (int) $shop->user_id || (int) Auth::user()->shop_id === (int) $shop->id);
+        $isPreview = $isOwner && $request->filled('vitrine');
+        if ($isPreview) {
+            $sf = Storefront::fromPreviewParam($request->query('vitrine')) ?? $sf;
+            if (isset(Storefront::ACCENT_INK[$request->query('accent')])) $sfAccent = $request->query('accent');
+        }
 
-        $products = $shop->products()
-            ->where('is_active', true)
-            ->latest()
-            ->paginate(20);
+        if (!$isPreview) ShopVisit::record($shop->id);
+        // Provenance de la visite (Facebook, Instagram, WhatsApp…) pour la page Marketing
+        TrafficSource::recordLanding($shop, $request, $isPreview);
+
+        $query = $shop->products()->where('is_active', true);
+        match ($sf['sort']) {
+            'price_asc'  => $query->orderBy('price'),
+            'price_desc' => $query->orderByDesc('price'),
+            'recent'     => $query->latest(),
+            default      => $query->orderByDesc('is_featured')->latest(),
+        };
+        $products = $query->paginate(20)->withQueryString();
+
+        // Produit(s) à la une : choisis dans l'éditeur de vitrine, sinon le dernier « mis en avant »
+        $featuredProducts = Storefront::featuredProducts($shop, $sf);
+
+        // Derniers avis écrits par de vrais clients (aucun avis inventé)
+        $latestReviews = Review::where('vendeur_id', $shop->user_id)
+            ->whereNotNull('comment')->where('comment', '!=', '')
+            ->with('client:id,name')
+            ->latest()->take(3)->get();
 
         $categories = $shop->products()
             ->where('is_active', true)
@@ -74,7 +113,8 @@ class PublicShopController extends Controller
             ->count();
 
         return view('public.shops.products', compact(
-            'shop', 'products', 'categories', 'reviewAvg', 'reviewCount', 'deliveredCount'
+            'shop', 'products', 'categories', 'reviewAvg', 'reviewCount', 'deliveredCount',
+            'sf', 'sfAccent', 'isPreview', 'featuredProducts', 'latestReviews'
         ));
     }
 }

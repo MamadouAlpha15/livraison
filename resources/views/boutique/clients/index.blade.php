@@ -69,10 +69,10 @@ $I = [
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
-    --brand:      #6366f1; --brand-dk:  #4f46e5;
-    --brand-lt:   #e0e7ff; --brand-mlt: #eef2ff;
-    --sb-bg:      #0e0e16; --sb-border: rgba(255,255,255,.08);
-    --sb-act:     rgba(99,102,241,.52);
+    --brand:      #1668D8; --brand-dk:  #1260C9;
+    --brand-lt:   #D6E6FF; --brand-mlt: #EAF2FF;
+    --sb-bg:      #0B1E3D; --sb-border: rgba(255,255,255,.08);
+    --sb-act:     rgba(22,104,216,.52);
     --sb-hov:     rgba(255,255,255,.07);
     --sb-txt:     rgba(255,255,255,.62);
     --sb-txt-act: #fff;
@@ -90,8 +90,8 @@ $I = [
 
 /* ══ MODE SOMBRE ══ */
 [data-theme="dark"] {
-    --brand-lt: rgba(99,102,241,.16);
-    --brand-mlt: rgba(99,102,241,.09);
+    --brand-lt: rgba(22,104,216,.16);
+    --brand-mlt: rgba(22,104,216,.09);
     --bg: #0b0f1a;
     --surface: #141925;
     --border: #262d3d;
@@ -116,21 +116,21 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 /* ══ SIDEBAR ══ */
 .sidebar {
-    background: linear-gradient(180deg,#0f0f59 0%,#0e0e16 40%,#10103a 100%);
-    border-right: 1px solid rgba(99,102,241,.15);
+    background: linear-gradient(180deg,#0B1E3D 0%,#0B1E3D 40%,#0B1E3D 100%);
+    border-right: 1px solid rgba(22,104,216,.15);
     box-shadow: 6px 0 30px rgba(0,0,0,.35);
     display: flex; flex-direction: column;
     position: fixed; top: 0; left: 0; bottom: 0;
     width: var(--sb-w);
     overflow-y: scroll;
     scrollbar-width: thin;
-    scrollbar-color: rgba(99,102,241,.35) transparent;
+    scrollbar-color: rgba(22,104,216,.35) transparent;
     z-index: 40;
 }
 .sidebar::-webkit-scrollbar       { width: 3px; }
 .sidebar::-webkit-scrollbar-track { background: transparent; }
-.sidebar::-webkit-scrollbar-thumb { background: rgba(99,102,241,.35); border-radius: 3px; }
-.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,.6); }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(22,104,216,.35); border-radius: 3px; }
+.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(22,104,216,.6); }
 
 .sb-brand { padding: 18px 16px 14px; border-bottom: 1px solid var(--sb-border); flex-shrink: 0; position: relative; }
 .sb-close {
@@ -162,11 +162,11 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .sb-item:hover { background: var(--sb-hov); color: rgba(255,255,255,.96); }
 .sb-item.active {
     background: var(--sb-act); color: #fff;
-    box-shadow: 0 2px 12px rgba(99,102,241,.25);
+    box-shadow: 0 2px 12px rgba(22,104,216,.25);
 }
 .sb-item.active::before {
     content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
-    width: 3px; height: 20px; background: #a5b4fc;
+    width: 3px; height: 20px; background: #7DB4FF;
     border-radius: 0 3px 3px 0; box-shadow: 2px 0 8px rgba(165,180,252,.5);
 }
 .sb-item .ico {
@@ -217,7 +217,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 }
 .sb-scroll-hint.hidden { opacity: 0; }
 .sb-scroll-hint-arrow { display: flex; flex-direction: column; align-items: center; gap: 2px; animation: bounceDown 1.5s ease-in-out infinite; }
-.sb-scroll-hint-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(99,102,241,.7); }
+.sb-scroll-hint-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(22,104,216,.7); }
 .sb-scroll-hint-dot:nth-child(2) { opacity: .5; margin-top: -2px; }
 .sb-scroll-hint-dot:nth-child(3) { opacity: .25; margin-top: -2px; }
 @keyframes bounceDown { 0%,100%{transform:translateY(0)} 50%{transform:translateY(4px)} }
@@ -238,10 +238,10 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .sb-user:hover { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.07); }
 .sb-av {
     width: 34px; height: 34px; border-radius: 50%;
-    background: linear-gradient(135deg, #6366f1, #4338ca);
+    background: linear-gradient(135deg, #1668D8, #1260C9);
     display: flex; align-items: center; justify-content: center;
     font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0;
-    box-shadow: 0 0 0 2px rgba(99,102,241,.45), 0 2px 8px rgba(99,102,241,.3);
+    box-shadow: 0 0 0 2px rgba(22,104,216,.45), 0 2px 8px rgba(22,104,216,.3);
     letter-spacing: -.5px;
 }
 .sb-uname { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: -.2px; }
@@ -279,18 +279,18 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 }
 .kpi-chip {
     background: var(--surface);
-    border: 1px solid rgba(99,102,241,.1);
+    border: 1px solid rgba(22,104,216,.1);
     border-radius: var(--r);
     padding: 22px 22px 18px;
-    box-shadow: 0 4px 20px rgba(99,102,241,.05),0 1px 4px rgba(0,0,0,.03);
+    box-shadow: 0 4px 20px rgba(22,104,216,.05),0 1px 4px rgba(0,0,0,.03);
     display: flex; flex-direction: column;
     transition: transform .2s, box-shadow .2s;
     overflow: hidden; position: relative;
 }
-.kpi-chip::after { content:''; position:absolute; bottom:-16px; right:-16px; width:72px; height:72px; border-radius:50%; background:var(--k-accent,rgba(99,102,241,.07)); pointer-events:none; }
-.kpi-chip:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(99,102,241,.1),0 2px 8px rgba(0,0,0,.04); }
-.kpi-chip-ico { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:14px; background:var(--k-ico-bg,rgba(99,102,241,.1)); border:1.5px solid var(--k-ico-border,rgba(99,102,241,.2)); box-shadow:0 0 0 3px var(--k-ico-ring,rgba(99,102,241,.06)), 0 3px 10px var(--k-ico-glow,rgba(99,102,241,.15)); }
-.kpi-chip-lbl { font-size:10.5px; font-weight:700; color:var(--k-color,#6366f1); text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
+.kpi-chip::after { content:''; position:absolute; bottom:-16px; right:-16px; width:72px; height:72px; border-radius:50%; background:var(--k-accent,rgba(22,104,216,.07)); pointer-events:none; }
+.kpi-chip:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(22,104,216,.1),0 2px 8px rgba(0,0,0,.04); }
+.kpi-chip-ico { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:14px; background:var(--k-ico-bg,rgba(22,104,216,.1)); border:1.5px solid var(--k-ico-border,rgba(22,104,216,.2)); box-shadow:0 0 0 3px var(--k-ico-ring,rgba(22,104,216,.06)), 0 3px 10px var(--k-ico-glow,rgba(22,104,216,.15)); }
+.kpi-chip-lbl { font-size:10.5px; font-weight:700; color:var(--k-color,#1668D8); text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
 .kpi-chip-val { font-size:30px; font-weight:800; color:var(--text); font-family:var(--mono); letter-spacing:-1.2px; line-height:1; }
 .kpi-chip-sub { font-size:11px; color:var(--muted); margin-top:6px; }
 
@@ -394,26 +394,26 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 /* ── Table premium ── */
 .tbl thead th {
-    background: linear-gradient(135deg,rgba(99,102,241,.05),rgba(139,92,246,.03));
-    border-bottom: 1px solid rgba(99,102,241,.1);
-    color: #6366f1;
+    background: linear-gradient(135deg,rgba(22,104,216,.05),rgba(31,124,246,.03));
+    border-bottom: 1px solid rgba(22,104,216,.1);
+    color: #1668D8;
 }
-.tbl tbody tr:hover td { background: rgba(99,102,241,.025); cursor: pointer; }
-.clients-card { border: 1px solid rgba(99,102,241,.1); box-shadow: 0 4px 20px rgba(99,102,241,.05),0 1px 4px rgba(0,0,0,.03); }
+.tbl tbody tr:hover td { background: rgba(22,104,216,.025); cursor: pointer; }
+.clients-card { border: 1px solid rgba(22,104,216,.1); box-shadow: 0 4px 20px rgba(22,104,216,.05),0 1px 4px rgba(0,0,0,.03); }
 
 /* ── TOP CLIENTS PREMIUM ── */
 .top-card {
     background: var(--surface);
-    border: 1px solid rgba(99,102,241,.12);
+    border: 1px solid rgba(22,104,216,.12);
     border-radius: var(--r);
     overflow: hidden;
-    box-shadow: 0 4px 24px rgba(99,102,241,.07),0 1px 4px rgba(0,0,0,.04);
+    box-shadow: 0 4px 24px rgba(22,104,216,.07),0 1px 4px rgba(0,0,0,.04);
     margin-bottom: 28px;
 }
 .top-card-hd {
     padding: 16px 22px 14px;
-    background: linear-gradient(135deg,rgba(99,102,241,.06) 0%,rgba(139,92,246,.03) 100%);
-    border-bottom: 1px solid rgba(99,102,241,.1);
+    background: linear-gradient(135deg,rgba(22,104,216,.06) 0%,rgba(31,124,246,.03) 100%);
+    border-bottom: 1px solid rgba(22,104,216,.1);
     display: flex; align-items: center; justify-content: space-between;
 }
 .top-card-title {
@@ -547,10 +547,10 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     $parts    = explode(' ', auth()->user()->name);
     $initials = strtoupper(substr($parts[0],0,1)) . (isset($parts[1]) ? strtoupper(substr($parts[1],0,1)) : strtoupper(substr($parts[0],1,1)));
     $avPalette = [
-        'linear-gradient(135deg,#6366f1,#4338ca)',
+        'linear-gradient(135deg,#1668D8,#1260C9)',
         'linear-gradient(135deg,#10b981,#059669)',
         'linear-gradient(135deg,#f59e0b,#d97706)',
-        'linear-gradient(135deg,#8b5cf6,#6d28d9)',
+        'linear-gradient(135deg,#1F7CF6,#1260C9)',
         'linear-gradient(135deg,#ef4444,#b91c1c)',
         'linear-gradient(135deg,#14b8a6,#0d9488)',
         'linear-gradient(135deg,#f97316,#ea580c)',
@@ -565,12 +565,12 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     if ($isPro)                            { $_sbCmdClr = '#10b981'; }
     elseif ($processedCount >= $_sbCmdMax) { $_sbCmdClr = '#ef4444'; }
     elseif ($processedCount >= 7)          { $_sbCmdClr = '#f59e0b'; }
-    else                                   { $_sbCmdClr = '#8b5cf6'; }
+    else                                   { $_sbCmdClr = '#1F7CF6'; }
     $_prodCount = $shop ? $shop->products()->count() : 0;
     if ($isPro)                        { $_sbProdClr = '#10b981'; }
     elseif ($_prodCount >= $_sbProdMax){ $_sbProdClr = '#ef4444'; }
     elseif ($_prodCount >= 4)          { $_sbProdClr = '#f59e0b'; }
-    else                               { $_sbProdClr = '#8b5cf6'; }
+    else                               { $_sbProdClr = '#1F7CF6'; }
 @endphp
 
 <div class="dash-wrap">
@@ -725,24 +725,24 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
          ════════════════════════════════════════════════════════════ --}}
     <div class="kpi-mini">
 
-        <div class="kpi-chip" style="border-top:3px solid #6366f1;--k-color:#6366f1;--k-accent:rgba(99,102,241,.08);--k-ico-bg:rgba(99,102,241,.1);--k-ico-border:rgba(99,102,241,.22);--k-ico-ring:rgba(99,102,241,.06);--k-ico-glow:rgba(99,102,241,.15)">
+        <div class="kpi-chip" style="border-top:3px solid #1668D8;--k-color:#1668D8;--k-accent:rgba(22,104,216,.08);--k-ico-bg:rgba(22,104,216,.1);--k-ico-border:rgba(22,104,216,.22);--k-ico-ring:rgba(22,104,216,.06);--k-ico-glow:rgba(22,104,216,.15)">
             <div class="kpi-chip-ico">{!! $I['users_kpi'] !!}</div>
             <div class="kpi-chip-lbl">Total clients</div>
             <div class="kpi-chip-val">{{ $totalClients }}</div>
             <div class="kpi-chip-sub">clients uniques enregistrés</div>
         </div>
 
-        <div class="kpi-chip" style="border-top:3px solid #8b5cf6;--k-color:#8b5cf6;--k-accent:rgba(139,92,246,.08);--k-ico-bg:rgba(139,92,246,.1);--k-ico-border:rgba(139,92,246,.22);--k-ico-ring:rgba(139,92,246,.06);--k-ico-glow:rgba(139,92,246,.15)">
+        <div class="kpi-chip" style="border-top:3px solid #1F7CF6;--k-color:#1F7CF6;--k-accent:rgba(31,124,246,.08);--k-ico-bg:rgba(31,124,246,.1);--k-ico-border:rgba(31,124,246,.22);--k-ico-ring:rgba(31,124,246,.06);--k-ico-glow:rgba(31,124,246,.15)">
             <div class="kpi-chip-ico">{!! $I['new_kpi'] !!}</div>
             <div class="kpi-chip-lbl">Nouveaux ce mois</div>
-            <div class="kpi-chip-val" style="color:#8b5cf6">{{ $nouveauxCeMois }}</div>
+            <div class="kpi-chip-val" style="color:#1F7CF6">{{ $nouveauxCeMois }}</div>
             <div class="kpi-chip-sub">ont commandé en {{ now()->translatedFormat('F') }}</div>
         </div>
 
         <div class="kpi-chip" style="border-top:3px solid #3b82f6;--k-color:#3b82f6;--k-accent:rgba(59,130,246,.08);--k-ico-bg:rgba(59,130,246,.1);--k-ico-border:rgba(59,130,246,.22);--k-ico-ring:rgba(59,130,246,.06);--k-ico-glow:rgba(59,130,246,.15)">
             <div class="kpi-chip-ico">{!! $I['coin_kpi'] !!}</div>
             <div class="kpi-chip-lbl">CA total généré</div>
-            <div class="kpi-chip-val" style="color:#2563eb">{{ $caTotal >= 1000000 ? number_format($caTotal/1000000,1).'M' : number_format($caTotal/1000,0).'k' }}</div>
+            <div class="kpi-chip-val" style="color:#2563eb"><span style="white-space:nowrap">{{ number_format($caTotal, 0, ',', ' ') }}</span></div>
             <div class="kpi-chip-sub">{{ $shop->currency ?? 'GNF' }} cumulés</div>
         </div>
 
@@ -752,9 +752,9 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     @foreach(['success','info','warning','danger'] as $type)
         @if(session($type))
         <div style="margin-bottom:16px;padding:10px 14px;font-size:12.5px;font-weight:500;border-radius:var(--r-sm);border:1px solid;
-            background:{{ $type==='success'?'#eef2ff':($type==='danger'?'#fef2f2':($type==='info'?'#eff6ff':'#fffbeb')) }};
-            border-color:{{ $type==='success'?'#a5b4fc':($type==='danger'?'#fca5a5':($type==='info'?'#93c5fd':'#fcd34d')) }};
-            color:{{ $type==='success'?'#3730a3':($type==='danger'?'#991b1b':($type==='info'?'#1e40af':'#92400e')) }}">
+            background:{{ $type==='success'?'#EAF2FF':($type==='danger'?'#fef2f2':($type==='info'?'#eff6ff':'#fffbeb')) }};
+            border-color:{{ $type==='success'?'#7DB4FF':($type==='danger'?'#fca5a5':($type==='info'?'#93c5fd':'#fcd34d')) }};
+            color:{{ $type==='success'?'#0B1E3D':($type==='danger'?'#991b1b':($type==='info'?'#1e40af':'#92400e')) }}">
             {{ session($type) }}
         </div>
         @endif
@@ -830,8 +830,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             'linear-gradient(90deg,#f59e0b,#d97706)',
             'linear-gradient(90deg,#9ca3af,#6b7280)',
             'linear-gradient(90deg,#cd7c2b,#b45309)',
-            'linear-gradient(90deg,#818cf8,#6366f1)',
-            'linear-gradient(90deg,#818cf8,#6366f1)',
+            'linear-gradient(90deg,#7DB4FF,#1668D8)',
+            'linear-gradient(90deg,#7DB4FF,#1668D8)',
         ];
     @endphp
 
@@ -860,7 +860,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 <div class="top-bar-track">
                     <div class="top-bar-fill" data-pct="{{ $pct }}" style="width:0%;background:{{ $medalBars[$i] }}"></div>
                 </div>
-                <div class="top-amount">{{ number_format($item->total_mois/1000,0) }}k {{ $shop->currency ?? 'GNF' }}</div>
+                <div class="top-amount">{{ number_format($item->total_mois, 0, ',', ' ') }} {{ $shop->currency ?? 'GNF' }}</div>
                 <div class="top-cmds">{{ $item->nb_cmd_mois }} cmd</div>
             </a>
             @endforeach
@@ -1144,4 +1144,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
+@endpush
+{{-- Thème bleu « espace vendeur » (maquette Main.dc.html), chargé après les styles de la page --}}
+@push('styles')
+@include('boutique._partials.sv-theme')
 @endpush

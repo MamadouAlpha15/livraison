@@ -19,7 +19,7 @@
 *,*::before,*::after { box-sizing:border-box; }
 
 :root {
-    --brand:#6366f1; --brand-dk:#4f46e5; --brand-lt:#e0e7ff;
+    --brand:#1668D8; --brand-dk:#1260C9; --brand-lt:#D6E6FF;
     --navy:#0f172a;  --navy2:#1e3a5f;
     --bg:#f1f5f9;    --surface:#fff;
     --border:#e2e8f0; --muted:#64748b; --text:#0f172a;
@@ -29,7 +29,7 @@
 
 /* ══ MODE SOMBRE ══ */
 [data-theme="dark"] {
-    --brand-lt: rgba(99,102,241,.16);
+    --brand-lt: rgba(22,104,216,.16);
     --bg: #0b0f1a;
     --surface: #141925;
     --border: #262d3d;
@@ -52,7 +52,7 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 }
 .cl-hero::before {
     content:''; position:absolute; inset:0;
-    background:radial-gradient(circle at 75% 40%, rgba(99,102,241,.15) 0%, transparent 60%);
+    background:radial-gradient(circle at 75% 40%, rgba(22,104,216,.15) 0%, transparent 60%);
     pointer-events:none;
 }
 .cl-back {
@@ -70,7 +70,7 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 }
 .cl-avatar {
     width:72px; height:72px; border-radius:50%; flex-shrink:0;
-    background:linear-gradient(135deg,#818cf8,#4f46e5);
+    background:linear-gradient(135deg,#7DB4FF,#1260C9);
     display:flex; align-items:center; justify-content:center;
     font-size:24px; font-weight:800; color:#fff; letter-spacing:-.5px;
     box-shadow:0 0 0 4px rgba(255,255,255,.2);
@@ -328,7 +328,7 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 
     {{-- Total dépensé --}}
     <div class="cl-kpi">
-        <div class="cl-kpi-ico" style="background:#eef2ff;">💰</div>
+        <div class="cl-kpi-ico" style="background:#EAF2FF;">💰</div>
         <div>
             <div class="cl-kpi-lbl">Total dépensé</div>
             <div class="cl-kpi-val">{{ $fmt($stats->total_depense ?? 0) }}</div>
@@ -501,3 +501,8 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 </div>
 
 @endsection
+
+{{-- Thème bleu « espace vendeur » (maquette Main.dc.html), chargé après les styles de la page --}}
+@push('styles')
+@include('boutique._partials.sv-theme')
+@endpush

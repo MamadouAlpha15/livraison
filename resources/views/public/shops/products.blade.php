@@ -44,12 +44,12 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
-    --brand:     #6366f1;
-    --brand-dk:  #4f46e5;
-    --brand-lt:  #e0e7ff;
-    --brand-mlt: #eef2ff;
-    --violet:    #8b5cf6;
-    --dark:      #0a0a1e;
+    --brand:     #1668D8;
+    --brand-dk:  #1260C9;
+    --brand-lt:  #D6E6FF;
+    --brand-mlt: #EAF2FF;
+    --violet:    #1F7CF6;
+    --dark:      #0B1E3D;
     --red:       #ef4444;
     --red-lt:    #fef2f2;
     --green:     #10b981;
@@ -84,7 +84,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     display: flex; align-items: center;
     padding: 0 20px; gap: 12px;
     position: sticky; top: 0; z-index: 200;
-    border-bottom: 1px solid rgba(99,102,241,.18);
+    border-bottom: 1px solid rgba(22,104,216,.18);
 }
 .nav-logo-wrap {
     display: flex; align-items: center; gap: 9px;
@@ -105,10 +105,10 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     color: #c4b5fd; font-size: 13px; font-weight: 700;
     text-decoration: none; padding: 7px 14px;
     border: 1.5px solid rgba(196,181,253,.35); border-radius: var(--r-sm);
-    background: rgba(99,102,241,.14); transition: all .18s;
+    background: rgba(22,104,216,.14); transition: all .18s;
     white-space: nowrap; flex-shrink: 0;
 }
-.amz-back-home:hover { background: rgba(99,102,241,.26); border-color: rgba(196,181,253,.6); color: #e9d5ff; }
+.amz-back-home:hover { background: rgba(22,104,216,.26); border-color: rgba(196,181,253,.6); color: #e9d5ff; }
 .amz-back {
     display: flex; align-items: center; gap: 5px;
     color: rgba(255,255,255,.7); font-size: 13px; font-weight: 600;
@@ -122,15 +122,15 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 /* Recherche navbar */
 .amz-nav-search {
     flex: 1; display: flex; border-radius: var(--r-sm); overflow: hidden;
-    border: 2px solid rgba(99,102,241,.35); max-width: 560px; transition: border-color .2s;
+    border: 2px solid rgba(22,104,216,.35); max-width: 560px; transition: border-color .2s;
 }
-.amz-nav-search:focus-within { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.15); }
+.amz-nav-search:focus-within { border-color: #1668D8; box-shadow: 0 0 0 3px rgba(22,104,216,.15); }
 .amz-nav-search input {
     flex: 1; border: none; outline: none; padding: 9px 14px;
     font-size: 14px; font-family: var(--font); background: #fff; color: var(--text);
 }
 .amz-nav-search-btn {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none;
+    background: linear-gradient(135deg, #1668D8, #1F7CF6); border: none;
     padding: 0 16px; cursor: pointer; font-size: 16px; transition: opacity .15s;
     color: #fff; display: flex; align-items: center; justify-content: center;
 }
@@ -231,10 +231,10 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .drawer-apply {
     width: 100%; padding: 13px; margin-top: 10px;
     border-radius: var(--r-sm); border: none;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, #1668D8, #1F7CF6);
     color: #fff; font-size: 14px; font-weight: 700;
     font-family: var(--font); cursor: pointer;
-    box-shadow: 0 4px 14px rgba(99,102,241,.3);
+    box-shadow: 0 4px 14px rgba(22,104,216,.3);
     display: flex; align-items: center; justify-content: center; gap: 6px;
 }
 
@@ -347,11 +347,11 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 .amz-price-range { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
 .amz-price-input {
-    flex: 1; padding: 7px 9px; border: 1.5px solid var(--border);
+    flex: 1; min-width: 0; width: 0; padding: 7px 9px; border: 1.5px solid var(--border);
     border-radius: var(--r-sm); font-size: 13px; font-family: var(--font);
     color: var(--text); outline: none; transition: border-color .15s;
 }
-.amz-price-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(99,102,241,.1); }
+.amz-price-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(22,104,216,.1); }
 .amz-price-btn {
     width: 100%; padding: 8px; background: var(--brand-mlt); border: 1.5px solid var(--brand-lt);
     border-radius: var(--r-sm); font-size: 13px; font-family: var(--font);
@@ -408,7 +408,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     transition: box-shadow .25s, border-color .25s, transform .25s;
     display: flex; flex-direction: column; position: relative;
 }
-.amz-card:hover { box-shadow: 0 8px 32px rgba(99,102,241,.13); border-color: var(--brand-lt); transform: translateY(-3px); }
+.amz-card:hover { box-shadow: 0 8px 32px rgba(22,104,216,.13); border-color: var(--brand-lt); transform: translateY(-3px); }
 
 .amz-grid.list-view .amz-card { flex-direction: row; min-height: 180px; }
 .amz-grid.list-view .amz-card-img { width: 210px; height: auto; min-height: 180px; flex-shrink: 0; }
@@ -428,7 +428,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .amz-card-img-ph { font-size: 48px; opacity: .2; }
 .amz-card-img::after {
     content: ''; position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(99,102,241,.07) 0%, transparent 60%);
+    background: linear-gradient(to top, rgba(22,104,216,.07) 0%, transparent 60%);
     opacity: 0; transition: opacity .25s;
 }
 .amz-card:hover .amz-card-img::after { opacity: 1; }
@@ -439,7 +439,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 6px; white-space: nowrap;
 }
 .badge-promo   { background: #ef4444; color: #fff; box-shadow: 0 2px 6px rgba(239,68,68,.35); }
-.badge-nouveau { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; box-shadow: 0 2px 6px rgba(99,102,241,.35); }
+.badge-nouveau { background: linear-gradient(135deg, #1668D8, #1F7CF6); color: #fff; box-shadow: 0 2px 6px rgba(22,104,216,.35); }
 .badge-vedette { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; box-shadow: 0 2px 6px rgba(245,158,11,.35); }
 .badge-rupture { background: #94a3b8; color: #fff; }
 
@@ -473,11 +473,11 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     display: flex; align-items: center; justify-content: center; gap: 6px;
     width: 100%; padding: 10px 12px; border-radius: var(--r-sm);
     font-size: 13px; font-weight: 700; font-family: var(--font);
-    background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff;
+    background: linear-gradient(135deg, #1668D8, #1F7CF6); color: #fff;
     border: none; cursor: pointer; text-decoration: none; transition: all .2s;
-    box-shadow: 0 4px 12px rgba(99,102,241,.28);
+    box-shadow: 0 4px 12px rgba(22,104,216,.28);
 }
-.amz-btn-order:hover { background: linear-gradient(135deg, #4f46e5, #7c3aed); box-shadow: 0 6px 20px rgba(99,102,241,.42); transform: translateY(-1px); color: #fff; }
+.amz-btn-order:hover { background: linear-gradient(135deg, #1260C9, #7c3aed); box-shadow: 0 6px 20px rgba(22,104,216,.42); transform: translateY(-1px); color: #fff; }
 .amz-btn-order.out { background: var(--grey-2); color: var(--muted); border: 1px solid var(--border); cursor: not-allowed; box-shadow: none; transform: none; }
 .amz-btn-msg {
     display: flex; align-items: center; justify-content: center; gap: 5px;
@@ -587,13 +587,171 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     .shop-banner-name { font-size: 15px; }
     .amz-layout { padding: 8px 8px 40px; }
 }
+
+/* ══ MOTION TOKENS (mêmes valeurs que l'accueil) ══ */
+:root {
+    --ease-out:    cubic-bezier(.22, 1, .36, 1);
+    --ease-io:     cubic-bezier(.65, 0, .35, 1);
+    --t-micro:     200ms;
+    --t-enter:     500ms;
+}
+.amz-card { transition: box-shadow var(--t-micro) var(--ease-out), border-color var(--t-micro), transform var(--t-micro) var(--ease-out); }
+.amz-card-img img { transition: transform .4s var(--ease-out); }
+.amz-card:hover .amz-card-img img { transform: scale(1.05); }
+.amz-price-main, .amz-price-orig, #resultCount { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Apparition en cascade (ajoutée en JS ; sans JS les cartes restent simplement visibles) */
+.amz-card.is-entering { animation: cardIn var(--t-enter) var(--ease-out) backwards; animation-delay: var(--d, 0ms); }
+@keyframes cardIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* Nom du produit = vrai lien (clavier, clic molette, lecteurs d'écran) */
+a.amz-card-name { text-decoration: none; }
+.amz-card-name:focus-visible, .amz-btn-order:focus-visible, .amz-filter-item:focus-within,
+.amz-view-btn:focus-visible, .btn-filter-open:focus-visible, .amz-filtered-reset:focus-visible {
+    outline: 3px solid var(--brand); outline-offset: 2px; border-radius: 6px;
+}
+
+/* Filtres appliqués à une seule page de résultats : on le dit clairement */
+.amz-page-hint {
+    display: none; align-items: center; gap: 7px; margin: -4px 0 14px;
+    font-size: 12.5px; color: var(--text-2); background: var(--brand-mlt);
+    border: 1px solid var(--brand-lt); border-radius: var(--r-sm); padding: 9px 12px;
+}
+.amz-page-hint.show { display: flex; }
+
+/* Aucun produit ne correspond aux filtres */
+.amz-filtered-empty { display: none; grid-column: 1/-1; padding: 56px 20px; text-align: center; background: var(--surface); border-radius: var(--r); border: 1px dashed var(--border); }
+.amz-filtered-empty.show { display: block; animation: cardIn var(--t-enter) var(--ease-out) both; }
+.amz-filtered-empty strong { display: block; font-size: 17px; color: var(--text); margin-bottom: 6px; }
+.amz-filtered-empty p { margin: 0 0 18px; font-size: 14px; color: var(--muted); }
+.amz-filtered-reset {
+    display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 0 22px; border-radius: 50px;
+    border: none; background: var(--brand); color: #fff; font-size: 13.5px; font-weight: 700; font-family: var(--font); cursor: pointer;
+    box-shadow: 0 6px 18px rgba(22,104,216,.3); transition: background var(--t-micro), transform var(--t-micro) var(--ease-out);
+}
+.amz-filtered-reset:hover { background: var(--brand-dk); transform: translateY(-2px); }
+
+@media (prefers-reduced-motion: reduce) {
+    .amz-card, .amz-card-img img { transition: none !important; }
+    .amz-card.is-entering, .amz-filtered-empty.show, .shop-banner-open::before { animation: none !important; }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   VITRINE PERSONNALISABLE (« Personnaliser ma vitrine » côté vendeur)
+   Variables posées sur .sf-flow : --sf-accent, --sf-ink, --sf-cols
+══════════════════════════════════════════════════════════════════ */
+.shop-banner { background: radial-gradient(120% 140% at 100% 0%, rgba(31,124,246,.35), transparent 55%), linear-gradient(135deg, #0B1E3D, #132B52) !important; border-bottom: 6px solid var(--sf-accent, #1F7CF6); }
+.sf-banner-compact { padding: 14px 22px !important; gap: 14px !important; }
+.sf-banner-compact .shop-banner-desc { display: none; }
+.sf-banner-compact .shop-banner-logo { width: 52px; height: 52px; }
+.sf-banner-compact .shop-banner-name { font-size: 19px; margin-bottom: 4px; }
+.sf-slim-head { max-width: 1500px; margin: 0 auto; padding: 18px 20px 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.sf-slim-name { font-size: 22px; font-weight: 800; letter-spacing: -.02em; color: var(--text); }
+.sf-slim-badge { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 10px; border-radius: 999px; background: #E7F6EC; color: #15803D; font-size: 12px; font-weight: 800; }
+.sf-slim-meta { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--muted); }
+.sf-slim-meta .ico { color: #F59E0B; }
+
+.sf-flow { display: flex; flex-direction: column; }
+/* Dans une colonne flex, les marges auto (centrage) empêchent l'étirement : sans largeur
+   explicite, la zone produits prenait la largeur de tout le carrousel et débordait. */
+.sf-flow > .amz-layout { width: 100%; }
+.sf-wrap { width: 100%; max-width: 1500px; margin: 0 auto; padding: 18px 20px 0; }
+.sf-h2 { margin: 0 0 12px; font-size: 20px; font-weight: 800; letter-spacing: -.02em; color: var(--text); display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.sf-h2 small { font-size: 14px; font-weight: 600; color: var(--muted); }
+.sf-hint { border: 1.5px dashed var(--border); border-radius: 16px; padding: 14px 16px; color: var(--muted); font-size: 14px; background: var(--surface); }
+
+.sf-announce { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 16px; background: #0B1E3D; color: #fff; font-weight: 700; font-size: 14.5px; }
+.sf-announce-ico { width: 30px; height: 30px; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--sf-accent); color: var(--sf-ink); }
+
+.sf-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.sf-chip { min-height: 40px; padding: 0 16px; border-radius: 999px; border: 0; background: var(--surface); box-shadow: inset 0 0 0 1px var(--border); color: var(--text); font: 700 13.5px var(--font); cursor: pointer; transition: background-color .18s, color .18s, box-shadow .18s; }
+.sf-chip:hover { box-shadow: inset 0 0 0 1.5px var(--sf-accent); }
+.sf-chip.is-on { background: var(--sf-accent); color: var(--sf-ink); box-shadow: none; }
+.sf-chip:focus-visible, .sf-btn:focus-visible { outline: 3px solid #1F7CF6; outline-offset: 2px; }
+
+/* 2 ou 3 produits à la une : cartes côte à côte, image au-dessus du texte */
+.sf-featured-row { display: grid; gap: 14px; }
+.sf-featured-row.is-multi { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.sf-featured-row.is-multi .sf-featured { grid-template-columns: minmax(0, 1fr); align-content: start; gap: 14px; }
+.sf-featured-row.is-multi .sf-featured-name { font-size: 20px; }
+.sf-featured-row.is-multi .sf-featured-desc { display: none; }
+.sf-featured { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 24px; align-items: center; padding: 18px; border-radius: 24px; background: var(--brand-mlt); }
+.sf-featured-img { display: block; aspect-ratio: 1 / 1; border-radius: 18px; overflow: hidden; background: var(--surface); }
+.sf-featured-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s cubic-bezier(.22,1,.36,1); }
+.sf-featured:hover .sf-featured-img img { transform: scale(1.04); }
+.sf-featured-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--brand); }
+.sf-kicker { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--brand-dk); }
+.sf-featured-name { margin: 6px 0 8px; font-size: 26px; font-weight: 800; letter-spacing: -.02em; color: var(--text); }
+.sf-featured-price { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.sf-featured-price strong { font-size: 22px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sf-featured-price s { color: var(--muted); white-space: nowrap; }
+.sf-featured-desc { margin: 10px 0 16px; color: var(--muted); font-size: 14.5px; max-width: 60ch; }
+.sf-btn { display: inline-flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 20px; border-radius: 999px; background: var(--sf-accent); color: var(--sf-ink); font-weight: 800; text-decoration: none; transition: transform .18s, box-shadow .18s; }
+.sf-btn:hover { color: var(--sf-ink); transform: translateY(-1px); box-shadow: 0 8px 20px rgba(11,30,61,.2); }
+
+.sf-reviews { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.sf-review { background: var(--surface); border-radius: 20px; box-shadow: 0 0 0 1px var(--border); padding: 16px 18px; }
+.sf-review p { margin: 8px 0 10px; color: var(--text); font-size: 14.5px; overflow-wrap: anywhere; }
+.sf-review-meta { font-size: 13px; color: var(--muted); }
+.sf-stars .star-ico.is-filled { color: #F59E0B; }
+.sf-stars .star-ico.is-empty { color: var(--border); }
+
+.sf-info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.sf-info { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 18px; background: var(--surface); box-shadow: 0 0 0 1px var(--border); }
+.sf-info strong { display: block; color: var(--text); font-size: 14.5px; }
+.sf-info span:not(.sf-info-ico) { font-size: 13.5px; color: var(--muted); }
+.sf-info-ico { width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--brand-mlt); color: var(--brand-dk); }
+
+.sf-contact { display: flex; justify-content: space-between; align-items: center; gap: 18px 32px; flex-wrap: wrap; padding: 22px 24px; border-radius: 24px; background: #0B1E3D; color: #C9D6EA; border-bottom: 6px solid var(--sf-accent); }
+.sf-contact p { margin: 0; max-width: 48ch; }
+.sf-contact-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.sf-contact-list li { display: flex; align-items: center; gap: 10px; color: #fff; font-weight: 600; flex-wrap: wrap; }
+.sf-contact-link { color: #7DB4FF; font-weight: 800; text-underline-offset: 3px; }
+
+/* Produits : colonnes, carrousel, forme des cartes */
+@media (min-width: 1101px) {
+    .sf-grid:not(.list-view):not(.sf-carousel) { grid-template-columns: repeat(var(--sf-cols, 4), minmax(0, 1fr)); }
+}
+.sf-grid.sf-carousel { display: flex !important; overflow-x: auto; scroll-snap-type: x mandatory; gap: 14px; padding: 4px 2px 12px; scrollbar-width: thin; }
+.sf-grid.sf-carousel .amz-card { flex: 0 0 260px; scroll-snap-align: start; }
+.sf-grid.sf-carousel .amz-filtered-empty { flex: 0 0 100%; }
+.sf-cards-square .amz-card, .sf-cards-square .sf-featured, .sf-cards-square .sf-featured-img,
+.sf-cards-square .sf-review, .sf-cards-square .sf-info { border-radius: 2px !important; }
+
+@media (max-width: 960px) {
+    .sf-wrap { padding: 14px 14px 0; }
+    .sf-slim-head { padding: 14px 14px 0; }
+}
+@media (max-width: 760px) {
+    .sf-featured { grid-template-columns: minmax(0, 1fr); }
+    .sf-featured-name { font-size: 22px; }
+    .sf-reviews { grid-template-columns: minmax(0, 1fr); }
+    .sf-grid.sf-carousel .amz-card { flex-basis: 72%; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .sf-featured:hover .sf-featured-img img, .sf-btn:hover { transform: none; }
+}
 </style>
 @endpush
 
 @section('content')
 @php
     $devise = $shop->currency ?? 'GNF';
+    // Réglages de la vitrine (voir App\Support\Storefront et PublicShopController@products)
+    $sfOrder = collect($sf['sections'])->pluck('key')->flip()->all();
+    $sfOn    = collect($sf['sections'])->pluck('on', 'key')->all();
+    $sfInk   = \App\Support\Storefront::ACCENT_INK[$sfAccent] ?? '#FFFFFF';
 @endphp
+@if(\App\Support\MetaPixel::activeFor($shop, $isPreview))
+@push('scripts')
+{{-- Pixel Meta (Facebook) du vendeur : visite de sa vitrine --}}
+@include('partials.meta-pixel', ['pixelId' => $shop->meta_pixel_id])
+@endpush
+@endif
+@if($isPreview)
+{{-- Aperçu dans l'éditeur de vitrine : on masque les fenêtres du site qui gêneraient la lecture --}}
+<style>#pwaModal, #pushNotifBanner { display: none !important; }</style>
+@endif
 
 {{-- ══ NAVBAR ══ --}}
 <nav class="amz-nav">
@@ -717,7 +875,15 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 </div>
 
 {{-- ══ BANNIÈRE BOUTIQUE ══ --}}
-<div class="shop-banner">
+{{-- Taille réglable (grande, compacte, sans) ; liseré bas à la couleur d'accent du vendeur --}}
+@if($sf['banner'] === 'none')
+<div class="sf-slim-head" style="--sf-accent: {{ $sfAccent }}">
+    <span class="sf-slim-name">{{ $shop->name }}</span>
+    @if($shop->is_approved)<span class="sf-slim-badge">{!! \App\Support\IconLibrary::svg('check', '', 11) !!} Boutique vérifiée</span>@endif
+    @if($reviewAvg)<span class="sf-slim-meta">{!! \App\Support\IconLibrary::svg('star', '', 12) !!} {{ number_format($reviewAvg, 1, ',', ' ') }} ({{ $reviewCount }} avis)</span>@endif
+</div>
+@else
+<div class="shop-banner sf-banner-{{ $sf['banner'] }}" style="--sf-accent: {{ $sfAccent }}">
     <div class="shop-banner-logo">
         @if($shop->image)
             <img src="{{ \App\Services\ImageOptimizer::url($shop->image, 'thumb') ?? asset('storage/'.$shop->image) }}"
@@ -737,7 +903,6 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
         <div class="shop-banner-desc">{{ Str::limit(strip_tags($shop->description), 140) }}</div>
         @endif
         <div class="shop-banner-meta">
-            <span class="shop-banner-open">Ouvert</span>
             @if($reviewAvg)<span class="shop-banner-rating">{!! \App\Support\IconLibrary::svg('star', '', 12) !!} {{ number_format($reviewAvg, 1) }} <span style="opacity:.8">({{ $reviewCount }} avis)</span></span>@endif
             @if($deliveredCount > 0)<span class="shop-banner-chip">{!! \App\Support\IconLibrary::svg('check', '', 12) !!} {{ $deliveredCount }} commande{{ $deliveredCount > 1 ? 's' : '' }} livrée{{ $deliveredCount > 1 ? 's' : '' }}</span>@endif
             @if($shop->type)<span class="shop-banner-chip">{!! \App\Support\IconLibrary::svg('tag', '', 12) !!} {{ $shop->type }}</span>@endif
@@ -747,9 +912,15 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
         </div>
     </div>
 </div>
+@endif
 
-{{-- ══ LAYOUT ══ --}}
-<div class="amz-layout">
+{{-- ══ SECTIONS DE LA VITRINE (ordre et visibilité réglés par le vendeur) ══ --}}
+<div class="sf-flow sf-cards-{{ $sf['cards'] }}"
+     style="--sf-accent: {{ $sfAccent }}; --sf-ink: {{ $sfInk }}; --sf-cols: {{ $sf['columns'] }}">
+@include('public.shops._storefront-sections')
+
+{{-- ══ LAYOUT (section « Tous les produits ») ══ --}}
+<div class="amz-layout" id="sfProducts" style="order: {{ $sfOrder['products'] }};{{ $sfOn['products'] ? '' : ' display: none;' }}">
 
     {{-- Sidebar desktop --}}
     <aside class="amz-sidebar">
@@ -838,17 +1009,24 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                         <option value="price_asc">Prix croissant</option>
                         <option value="price_desc">Prix décroissant</option>
                         <option value="name">Nom A → Z</option>
-                        <option value="featured">⭐ Vedettes en premier</option>
+                        <option value="featured">Vedettes en premier</option>
                     </select>
                 </div>
                 <div class="amz-view-btns">
-                    <button class="amz-view-btn active" id="btnGrid" onclick="setView('grid')" title="Grille">{!! \App\Support\IconLibrary::svg('grid', '', 14) !!}</button>
-                    <button class="amz-view-btn" id="btnList" onclick="setView('list')" title="Liste">{!! \App\Support\IconLibrary::svg('list', '', 14) !!}</button>
+                    <button class="amz-view-btn {{ $sf['layout'] !== 'list' ? 'active' : '' }}" id="btnGrid" onclick="setView('grid')" title="Grille">{!! \App\Support\IconLibrary::svg('grid', '', 14) !!}</button>
+                    <button class="amz-view-btn {{ $sf['layout'] === 'list' ? 'active' : '' }}" id="btnList" onclick="setView('list')" title="Liste">{!! \App\Support\IconLibrary::svg('list', '', 14) !!}</button>
                 </div>
             </div>
         </div>
 
-        <div class="amz-grid" id="prodGrid">
+        @if($products->hasPages())
+        <div class="amz-page-hint" id="pageHint" role="status">
+            {!! \App\Support\IconLibrary::svg('alert', '', 14) !!}
+            Filtres appliqués aux {{ $products->count() }} produits de cette page (page {{ $products->currentPage() }} sur {{ $products->lastPage() }}).
+        </div>
+        @endif
+
+        <div class="amz-grid sf-grid {{ $sf['layout'] === 'list' ? 'list-view' : '' }} {{ $sf['layout'] === 'carousel' ? 'sf-carousel' : '' }}" id="prodGrid">
             @forelse($products as $product)
             @php
                 $hasPromo = $product->original_price && $product->original_price > $product->price;
@@ -861,7 +1039,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
             <div class="amz-card"
                  data-name="{{ strtolower($product->name) }}"
                  data-cat="{{ strtolower($product->category ?? '') }}"
-                 data-price="{{ $product->price }}"
+                 data-price="{{ $product->current_price }}"
                  data-featured="{{ $product->is_featured ? '1' : '0' }}"
                  data-stock="{{ $stockOut ? 'out' : 'in' }}">
 
@@ -890,9 +1068,9 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                     @if($product->category)
                     <div class="amz-card-cat">{{ $product->category }}</div>
                     @endif
-                    <div class="amz-card-name" onclick="goToProduct('{{ route('client.orders.createFromProduct', $product) }}')">
+                    <a class="amz-card-name" href="{{ route('client.orders.createFromProduct', $product) }}">
                         {{ $product->name }}
-                    </div>
+                    </a>
                     <div class="amz-price-wrap">
                         <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
                             <span class="amz-price-main">{{ number_format($product->current_price, 0, ',', ' ') }}<span class="amz-price-devise"> {{ $devise }}</span></span>
@@ -944,11 +1122,19 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                 <p style="color:var(--muted);font-size:14px;margin:0">Cette boutique n'a pas encore de produits.</p>
             </div>
             @endforelse
+            @if($products->isNotEmpty())
+            <div class="amz-filtered-empty" id="filteredEmpty" role="status">
+                <strong>Aucun produit ne correspond à vos filtres</strong>
+                <p>Essayez une autre catégorie, une autre fourchette de prix ou un autre mot-clé.</p>
+                <button type="button" class="amz-filtered-reset" onclick="resetFilters(true)">{!! \App\Support\IconLibrary::svg('rotate', '', 15) !!} Réinitialiser les filtres</button>
+            </div>
+            @endif
         </div>
 
         <div class="amz-pagination">{{ $products->links() }}</div>
     </div>
 </div>
+</div>{{-- /sf-flow --}}
 
 @endsection
 
@@ -1001,8 +1187,17 @@ function _syncRadios(fnName, activeVal) {
 
 /* ── Catégorie ── */
 function filterCat(cat) {
-    state.cat = cat;
-    _syncRadios('filterCat', cat);
+    /* Minuscules côté JS : strtolower() en PHP ne touche pas aux lettres accentuées
+       (« Électronique » restait « Électronique ») alors que les cartes sont comparées en
+       toLowerCase() → aucune carte ne correspondait aux catégories qui commencent par un accent. */
+    var raw = cat || '';
+    state.cat = raw.toLowerCase();
+    _syncRadios('filterCat', raw);
+    document.querySelectorAll('.sf-chip').forEach(function (c) {
+        var on = (c.dataset.sfCat || '').toLowerCase() === state.cat;
+        c.classList.toggle('is-on', on);
+        c.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
     updateBadge();
     applyFilters();
 }
@@ -1046,6 +1241,7 @@ function setSort(val, el, fromDrawer) {
 /* ── Vue grille / liste ── */
 function setView(type) {
     var grid = document.getElementById('prodGrid');
+    grid.classList.remove('sf-carousel'); // le visiteur reprend la main sur l'affichage choisi par le vendeur
     if (type === 'list') {
         grid.classList.add('list-view');
         document.getElementById('btnList').classList.add('active');
@@ -1060,8 +1256,16 @@ function setView(type) {
 /* ── Application des filtres ──
  * Note : filtre uniquement les produits de la page courante.
  * Les produits sur d'autres pages (pagination) ne sont pas accessibles côté client. */
+var REDUCE_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 function applyFilters() {
     var cards = Array.from(document.querySelectorAll('.amz-card'));
+    /* FLIP : on mémorise la position de chaque carte visible avant le tri/filtre,
+       pour la faire glisser en douceur vers sa nouvelle place ensuite. */
+    var before = new Map();
+    if (!REDUCE_MOTION) {
+        cards.forEach(function(c) { if (c.style.display !== 'none') before.set(c, c.getBoundingClientRect()); });
+    }
     var visible = cards.filter(function(c) {
         var name  = (c.dataset.name  || '').toLowerCase();
         var cat   = (c.dataset.cat   || '').toLowerCase();
@@ -1085,6 +1289,28 @@ function applyFilters() {
     visible.forEach(function(c) { c.style.display = ''; grid.appendChild(c); });
     var el = document.getElementById('resultCount');
     if (el) el.textContent = visible.length;
+
+    var filtering = !!(state.cat || state.search || state.stockOnly || state.priceMin > 0 || state.priceMax < Infinity);
+    var empty = document.getElementById('filteredEmpty');
+    if (empty) empty.classList.toggle('show', visible.length === 0);
+    var hint = document.getElementById('pageHint');
+    if (hint) hint.classList.toggle('show', filtering);
+
+    if (REDUCE_MOTION) return;
+    visible.forEach(function(c, i) {
+        var first = before.get(c);
+        if (!first) { // carte qui réapparaît : simple fondu
+            c.classList.remove('is-entering'); void c.offsetWidth;
+            c.style.setProperty('--d', Math.min(i, 10) * 40 + 'ms');
+            c.classList.add('is-entering');
+            return;
+        }
+        var last = c.getBoundingClientRect();
+        var dx = first.left - last.left, dy = first.top - last.top;
+        if (!dx && !dy) return;
+        c.animate([{ transform: 'translate(' + dx + 'px,' + dy + 'px)' }, { transform: 'none' }],
+                  { duration: 450, easing: 'cubic-bezier(.65,0,.35,1)' });
+    });
 }
 
 /* ── Badge compteur de filtres actifs ── */
@@ -1102,8 +1328,11 @@ function updateBadge() {
 }
 
 /* ── Réinitialiser les filtres ── */
-function resetFilters() {
-    state = { cat: '', sort: 'default', stockOnly: false, priceMin: 0, priceMax: Infinity, search: state.search };
+function resetFilters(clearSearch) {
+    state = { cat: '', sort: 'default', stockOnly: false, priceMin: 0, priceMax: Infinity, search: clearSearch ? '' : state.search };
+    if (clearSearch) {
+        ['prodSearch', 'prodSearchMobile'].forEach(function(id) { var el = document.getElementById(id); if (el) el.value = ''; });
+    }
     ['mPriceMin','mPriceMax','dPriceMin','dPriceMax'].forEach(function(id) {
         var el = document.getElementById(id); if (el) el.value = '';
     });
@@ -1161,22 +1390,28 @@ function onSearchInput(val) {
     searchTimer = setTimeout(function() { handleSearch(val); }, 220);
 }
 
+/* ── Pastilles « Catégories » de la vitrine : filtrent la liste puis y descendent ── */
+document.addEventListener('click', function (e) {
+    var chip = e.target.closest('.sf-chip');
+    if (!chip) return;
+    filterCat(chip.dataset.sfCat || '');
+    var target = document.getElementById('sfProducts');
+    if (target && target.style.display !== 'none') target.scrollIntoView({ behavior: REDUCE_MOTION ? 'auto' : 'smooth', block: 'start' });
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     var d = document.getElementById('prodSearch');
     var m = document.getElementById('prodSearchMobile');
     if (d) d.addEventListener('input', function() { onSearchInput(this.value); });
     if (m) m.addEventListener('input', function() { onSearchInput(this.value); });
 
-    /* Animation d'apparition des cards */
-    document.querySelectorAll('.amz-card').forEach(function(c, i) {
-        c.style.opacity = '0';
-        c.style.transform = 'translateY(12px)';
-        setTimeout(function() {
-            c.style.transition = 'opacity .35s ease, transform .35s ease';
-            c.style.opacity = '1';
-            c.style.transform = 'translateY(0)';
-        }, 40 + i * 30);
-    });
+    /* Apparition en cascade des cartes (plafonnée à ~500 ms au total) */
+    if (!REDUCE_MOTION) {
+        document.querySelectorAll('.amz-card').forEach(function(c, i) {
+            c.style.setProperty('--d', Math.min(i, 12) * 40 + 'ms');
+            c.classList.add('is-entering');
+        });
+    }
 });
 </script>
 @endpush

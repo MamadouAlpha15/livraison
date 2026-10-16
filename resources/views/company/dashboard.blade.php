@@ -2909,16 +2909,17 @@ document.addEventListener('DOMContentLoaded', () => {
         return drivers.map((d, i) => {
             const bg  = DRIVER_PALETTES[i % DRIVER_PALETTES.length];
             const cfg = STATUS_CFG[d.status] || STATUS_CFG.offline;
+            const _esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); // échappe les données saisies par d'autres utilisateurs
             const phoneHtml = d.phone
-                ? `<a href="tel:${d.phone}" class="cx-driv-phone" title="Appeler">📞</a>`
+                ? `<a href="tel:${_esc(d.phone)}" class="cx-driv-phone" title="Appeler">📞</a>`
                 : `<div class="cx-driv-phone" style="opacity:.35;cursor:default">📞</div>`;
             return `<div class="cx-driver">
                 <div class="cx-driv-av" style="background:${bg}">
-                    ${d.ini}<span class="cx-driv-dot" style="background:${cfg.dot}"></span>
+                    ${_esc(d.ini)}<span class="cx-driv-dot" style="background:${cfg.dot}"></span>
                 </div>
                 <div class="cx-driv-info">
-                    <div class="cx-driv-name">${d.name}</div>
-                    ${d.phone ? `<div class="cx-driv-loc">📞 ${d.phone}</div>` : ''}
+                    <div class="cx-driv-name">${_esc(d.name)}</div>
+                    ${d.phone ? `<div class="cx-driv-loc">📞 ${_esc(d.phone)}</div>` : ''}
                 </div>
                 <div class="cx-driv-right">
                     <span class="cx-driv-status ${cfg.cls}">● ${cfg.label}</span>

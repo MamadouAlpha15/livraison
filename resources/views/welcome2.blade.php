@@ -506,7 +506,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
             @else
                 <div class="shop-card-ph">🛍️</div>
             @endif
-            <span class="shop-card-badge">Ouvert</span>
+            <span class="shop-card-badge">Vérifiée</span>
         </div>
         <div class="shop-card-body">
             <div class="shop-card-name">{{ $shop->name }}</div>

@@ -13,6 +13,9 @@ class Shop extends Model
         'user_id', 'name', 'type', 'description', 'address', 'phone', 'image', 'is_approved', 'email', 'status', 'commission_rate', 'currency', 'country',
         'plan', 'plan_expires_at',   // Plan d'abonnement (free/pro) + date d'expiration
         'payout_wallet_type', 'payout_wallet_number', // Mobile Money où reverser les paiements en ligne
+        'accent_color',        // Couleur d'accent de la vitrine (Ma boutique → Concevoir)
+        'storefront',          // Réglages de la vitrine (JSON, voir App\Support\Storefront)
+        'meta_pixel_id',       // Pixel Meta (Facebook) du vendeur, chargé sur ses pages (App\Support\MetaPixel)
     ];
 
     public function owner() {
@@ -36,6 +39,7 @@ protected $casts = [
     'commission_rate'  => 'float',
     'is_approved'      => 'boolean',
     'plan_expires_at'  => 'datetime',  // Cast auto en Carbon pour isFuture() / isPast()
+    'storefront'       => 'array',     // Réglages de la vitrine (App\Support\Storefront)
 ];
 
 // 🟢 0.15 → 15 (pour l'affichage)

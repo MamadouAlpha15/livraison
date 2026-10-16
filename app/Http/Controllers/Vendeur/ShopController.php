@@ -16,6 +16,16 @@ use App\Services\ImageOptimizer;
 
 class ShopController extends Controller
 {
+    /** Couleurs d'accent proposées pour la vitrine : bleu Shopio, bleu nuit, ambre, vert. */
+    public const ACCENT_COLORS = ['#1F7CF6', '#0B1E3D', '#F59E0B', '#15803D'];
+
+    /** Refuse l'accès si la boutique n'appartient pas à l'utilisateur connecté. */
+    private function authorizeOwner(Shop $shop): void
+    {
+        $user = Auth::user();
+        abort_unless($user && ((int) $shop->user_id === (int) $user->id || (int) $user->shop_id === (int) $shop->id), 403, 'Cette boutique ne vous appartient pas.');
+    }
+
     /**
      * Afficher la boutique du vendeur connecté
      */
@@ -115,8 +125,10 @@ class ShopController extends Controller
         if (auth()->user()->role !== 'admin') {
         abort(403, 'Accès refusé');
     }
+    // Seul le propriétaire de la boutique peut la modifier (avant : n'importe quel admin
+    // de boutique pouvait ouvrir /shop/{id}/edit d'une autre boutique en changeant l'id).
+    $this->authorizeOwner($shop);
 
-    // si admin, continue
     $shop = Shop::findOrFail($shop->id);
     return view('vendeur.shop.edit', compact('shop'));
 }
@@ -131,7 +143,20 @@ class ShopController extends Controller
 
 public function update(Request $request, \App\Models\Shop $shop)
 {
+    // Même règle que edit() : on ne modifie que sa propre boutique
+    $this->authorizeOwner($shop);
+
+    // Pixel Meta : on retire espaces et tirets (id collé « 1234 5678… ») ; toute autre saisie
+    // invalide est refusée par la validation au lieu d'être vidée sans prévenir.
+    if ($request->has('meta_pixel_id')) {
+        $request->merge(['meta_pixel_id' => preg_replace('/[\s\-]+/u', '', (string) $request->input('meta_pixel_id')) ?: null]);
+    }
+
     $data = $request->validate([
+        // Pixel Meta (Facebook) du vendeur — vide = désactivé
+        'meta_pixel_id'   => ['nullable', 'regex:/^\d{10,20}$/'],
+        // Couleur d'accent de la vitrine (Ma boutique → Concevoir)
+        'accent_color'    => ['nullable', Rule::in(self::ACCENT_COLORS)],
         'name'            => ['required','string','max:255'],
         'type'            => ['nullable','string','max:100'],
         'description'     => ['nullable','string','max:2000'],
@@ -145,6 +170,8 @@ public function update(Request $request, \App\Models\Shop $shop)
         // Mobile Money où reverser les paiements en ligne (ChapChap Pay)
         'payout_wallet_type'   => ['nullable', Rule::in(['paycard','orange_money','mtn_momo','kulu','soutra_money','akiba'])],
         'payout_wallet_number' => ['nullable','string','max:30'],
+    ], [
+        'meta_pixel_id.regex' => "L'identifiant du pixel Meta doit contenir uniquement des chiffres (15 ou 16 en général).",
     ]);
 
     // 🔁 Convertir 10 → 0.10, 15 → 0.15, etc.

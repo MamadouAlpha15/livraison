@@ -22,6 +22,8 @@ use App\Models\Payment;      // Table "payments" — les paiements liés aux com
 use App\Models\Shop;         // Table "shops" — les boutiques
 use App\Models\PromoCode;    // Table "promo_codes" — les codes de réduction boutique
 use App\Models\ShopMessage;  // Table "shop_messages" — les messages entre client et vendeur
+use App\Models\Review;       // Table "reviews" — avis laissés après une commande livrée
+use App\Models\CartItem;     // Table "cart_items" — panier du client
 use App\Services\SubscriptionService; // Vérification des limites du plan
 use App\Services\PushService;
 use App\Services\LoyaltyService;
@@ -267,21 +269,28 @@ class OrderController extends Controller
                 ->update(['read_at' => now()]);        // now() = date et heure actuelle
         }
 
+        // Provenance de la visite (Facebook, Instagram, WhatsApp…) pour la page Marketing du vendeur
+        \App\Support\TrafficSource::recordLanding($shop, $request);
+        \App\Support\TrafficSource::recordProductView($product, $request);
+
         // Variantes actives du produit (taille/couleur…), + variante présélectionnée via ?variant_id=
         $variants = $product->activeVariants()->get();
         $selectedVariantId = $request->integer('variant_id') ?: null;
 
         // Code promo actif de la boutique à mettre en avant sur la fiche produit (le plus récent, s'il en existe un valide)
-        $activePromo = PromoCode::where('shop_id', $shop->id)
+        // Code promo mis en avant : celui de la campagne par laquelle le client est arrivé
+        // (lien d'influenceur, Marketing → Campagnes) s'il est encore valable, sinon le plus récent.
+        $promoQuery = PromoCode::where('shop_id', $shop->id)
             ->active()
             ->where(function ($q) {
                 $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
             })
             ->where(function ($q) {
                 $q->whereNull('max_uses')->orWhereColumn('uses_count', '<', 'max_uses');
-            })
-            ->latest()
-            ->first();
+            });
+        $campaignPromoId = \App\Support\TrafficSource::campaignPromoId($shop->id);
+        $activePromo = ($campaignPromoId ? (clone $promoQuery)->whereKey($campaignPromoId)->first() : null)
+            ?? $promoQuery->latest()->first();
 
         // Autres produits de la même boutique, à suggérer en bas de page (favorise le
         // panier moyen : le client voit qu'il y a autre chose à acheter avant de repartir).
@@ -297,6 +306,31 @@ class OrderController extends Controller
             ->limit(6)
             ->get();
 
+        // Avis réels sur CE produit : avis laissés sur les commandes qui le contenaient
+        // (un avis porte sur une commande ; on ne garde que celles où le produit figurait).
+        $productReviewQuery = Review::whereHas('order.items', fn ($q) => $q->where('product_id', $product->id));
+        $productRatingStats = (clone $productReviewQuery)->selectRaw('AVG(rating) as avg_rating, COUNT(*) as cnt')->first();
+        $productReviewCount = (int) ($productRatingStats->cnt ?? 0);
+        $productRating      = $productReviewCount > 0 ? round((float) $productRatingStats->avg_rating, 1) : null;
+        $productReviews     = (clone $productReviewQuery)
+            ->whereNotNull('comment')->where('comment', '!=', '')
+            ->with('client:id,name')
+            ->latest()
+            ->limit(6)
+            ->get();
+
+        // Note globale de la boutique (tous ses avis), affichée sur la carte vendeur
+        $shopRatingStats = Review::where('vendeur_id', $shop->user_id)
+            ->selectRaw('AVG(rating) as avg_rating, COUNT(*) as cnt')
+            ->first();
+        $shopReviewCount = (int) ($shopRatingStats->cnt ?? 0);
+        $shopRating      = $shopReviewCount > 0 ? round((float) $shopRatingStats->avg_rating, 1) : null;
+
+        $isFavorited = $client
+            ? $client->favoriteProducts()->where('product_id', $product->id)->exists()
+            : false;
+        $cartCount = $client ? (int) CartItem::where('user_id', $client->id)->sum('quantity') : 0;
+
         // On retourne la vue avec le produit et les messages
         return view('client.orders.create_from_product', [
             'product'  => $product,   // Les infos du produit
@@ -306,6 +340,13 @@ class OrderController extends Controller
             'selectedVariantId' => $selectedVariantId,
             'activePromo' => $activePromo,
             'relatedProducts' => $relatedProducts,
+            'productRating' => $productRating,
+            'productReviewCount' => $productReviewCount,
+            'productReviews' => $productReviews,
+            'shopRating' => $shopRating,
+            'shopReviewCount' => $shopReviewCount,
+            'isFavorited' => $isFavorited,
+            'cartCount' => $cartCount,
         ]);
     }
 
@@ -412,6 +453,8 @@ class OrderController extends Controller
             'status'               => Order::STATUS_EN_ATTENTE,
             'delivery_destination' => $request->delivery_destination,
             'client_phone'         => $request->client_phone,
+            'source'               => \App\Support\TrafficSource::forOrder($product->shop->id), // canal d'arrivée du client
+            'campaign_id'          => \App\Support\TrafficSource::campaignForOrder($product->shop->id),
         ]);
 
         if ($pointsToUse > 0) {
@@ -524,6 +567,10 @@ class OrderController extends Controller
         }
 
         $successMsg = "Commande passée avec succès ! Vous recevrez une confirmation. 🎉";
+
+        // Pixel Meta du vendeur : achat confirmé (paiement à la livraison). Pour le paiement en
+        // ligne réussi, l'événement part au retour de paiement (OrderPaymentController@success).
+        \App\Support\MetaPixel::queuePurchase($order);
 
         // Un invité n'a pas de compte pour voir "Mes commandes" → on l'envoie sur le suivi public de sa commande
         if (!Auth::check()) {
