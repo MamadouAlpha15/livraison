@@ -14,7 +14,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; }
 
 :root {
-    --brand:    #6366f1; --brand-dk: #4f46e5; --brand-lt: #e0e7ff; --brand-mlt: #eef2ff;
+    --brand:    #1668D8; --brand-dk: #1260C9; --brand-lt: #D6E6FF; --brand-mlt: #EAF2FF;
     --bg:       #f1f5f9; --surface:  #ffffff;
     --border:   #e2e8f0; --border-dk:#cbd5e1;
     --text:     #0f172a; --text-2:   #475569; --muted:    #94a3b8;
@@ -31,8 +31,8 @@
 
 /* ══ MODE SOMBRE ══ */
 [data-theme="dark"] {
-    --brand-lt: rgba(99,102,241,.16);
-    --brand-mlt: rgba(99,102,241,.09);
+    --brand-lt: rgba(22,104,216,.16);
+    --brand-mlt: rgba(22,104,216,.09);
     --bg: #0b0f1a;
     --surface: #141925;
     --border: #262d3d;
@@ -57,16 +57,16 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 
 /* ─── Sidebar ─── */
 .sidebar {
-    background: linear-gradient(180deg,#0f0f59 0%,#0e0e16 40%,#10103a 100%);
-    border-right: 1px solid rgba(99,102,241,.15);
+    background: linear-gradient(180deg,#0B1E3D 0%,#0B1E3D 40%,#0B1E3D 100%);
+    border-right: 1px solid rgba(22,104,216,.15);
     box-shadow: 6px 0 32px rgba(0,0,0,.4);
     display: flex; flex-direction: column;
     position: fixed; top: 0; left: 0; bottom: 0;
     width: var(--sb-w); overflow-y: scroll;
-    scrollbar-width: thin; scrollbar-color: rgba(99,102,241,.35) transparent; z-index: 40;
+    scrollbar-width: thin; scrollbar-color: rgba(22,104,216,.35) transparent; z-index: 40;
 }
 .sidebar::-webkit-scrollbar { width: 3px; }
-.sidebar::-webkit-scrollbar-thumb { background: rgba(99,102,241,.35); border-radius: 3px; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(22,104,216,.35); border-radius: 3px; }
 .sb-brand { padding: 18px 16px 14px; border-bottom: 1px solid rgba(255,255,255,.08); flex-shrink: 0; position: relative; }
 .sb-close { display: none; position: absolute; top: 14px; right: 12px; width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.10); color: rgba(255,255,255,.6); font-size: 18px; cursor: pointer; align-items: center; justify-content: center; transition: background .15s; }
 .sb-close:hover { background: rgba(239,68,68,.18); color: #fca5a5; }
@@ -81,8 +81,8 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 .sb-section { font-size: 9.5px; text-transform: uppercase; letter-spacing: 1.8px; color: rgba(255,255,255,.38); padding: 16px 10px 5px; font-weight: 800; }
 .sb-item { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: var(--r-xs); font-size: 13.5px; font-weight: 600; color: rgba(255,255,255,.75); text-decoration: none; letter-spacing: -.1px; transition: background .15s, color .15s; position: relative; }
 .sb-item:hover { background: rgba(255,255,255,.07); color: rgba(255,255,255,.96); }
-.sb-item.active { background: rgba(99,102,241,.52); color: #fff; box-shadow: 0 2px 12px rgba(99,102,241,.25); }
-.sb-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #a5b4fc; border-radius: 0 3px 3px 0; }
+.sb-item.active { background: rgba(22,104,216,.52); color: #fff; box-shadow: 0 2px 12px rgba(22,104,216,.25); }
+.sb-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #7DB4FF; border-radius: 0 3px 3px 0; }
 .sb-item .ico { font-size: 13px; width: 26px; height: 26px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 7px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.06); }
 .sb-item.active .ico { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.22); }
 .sb-badge { margin-left: auto; background: var(--brand); color: #fff; font-size: 10px; font-weight: 700; border-radius: 20px; padding: 1px 7px; }
@@ -98,7 +98,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 .sb-footer { padding: 12px 10px; border-top: 1px solid rgba(255,255,255,.08); flex-shrink: 0; display: flex; flex-direction: column; gap: 6px; }
 .sb-user { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--r-xs); text-decoration: none; transition: background .15s; }
 .sb-user:hover { background: rgba(255,255,255,.06); }
-.sb-av { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#4338ca); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(99,102,241,.45); }
+.sb-av { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,#1668D8,#1260C9); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(22,104,216,.45); }
 .sb-uname { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: -.2px; }
 .sb-urole { font-size: 10.5px; color: rgba(255,255,255,.5); margin-top: 1px; }
 .sb-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; border-radius: var(--r-xs); background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.15); color: rgba(252,165,165,.92); font-size: 12.5px; font-weight: 600; font-family: var(--font); cursor: pointer; text-decoration: none; transition: background .15s; text-align: left; }
@@ -119,7 +119,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 /* ─── Buttons ─── */
 .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: var(--r-xs); font-size: 13px; font-weight: 700; font-family: var(--font); border: 1.5px solid var(--border-dk); background: var(--surface); color: var(--text-2); cursor: pointer; text-decoration: none; transition: all .15s; white-space: nowrap; }
 .btn:hover { background: var(--bg); border-color: var(--brand); color: var(--brand); }
-.btn-primary { background: var(--brand); color: #fff; border-color: var(--brand-dk); box-shadow: 0 2px 8px rgba(99,102,241,.3); }
+.btn-primary { background: var(--brand); color: #fff; border-color: var(--brand-dk); box-shadow: 0 2px 8px rgba(22,104,216,.3); }
 .btn-primary:hover { background: var(--brand-dk); color: #fff; border-color: var(--brand-dk); }
 .btn-success { background: var(--green); color: #fff; border-color: #059669; box-shadow: 0 2px 8px rgba(16,185,129,.3); }
 .btn-success:hover { background: #059669; color: #fff; }
@@ -130,7 +130,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 /* ─── Status badges ─── */
 .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; white-space: nowrap; }
 .badge-attente  { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-.badge-confirmee{ background: #ede9fe; color: #5b21b6; border: 1px solid #ddd6fe; }
+.badge-confirmee{ background: #D6E6FF; color: #5b21b6; border: 1px solid #ddd6fe; }
 .badge-livraison{ background: #cffafe; color: #155e75; border: 1px solid #a5f3fc; }
 .badge-livree   { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
 .badge-annulee  { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
@@ -174,7 +174,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 .step-item { display: flex; align-items: center; gap: 0; }
 .step-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; border: 2px solid var(--border); background: var(--surface); color: var(--muted); flex-shrink: 0; transition: all .2s; }
 .step-dot.done  { background: var(--green); border-color: var(--green); color: #fff; }
-.step-dot.active{ background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 0 0 4px rgba(99,102,241,.15); }
+.step-dot.active{ background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 0 0 4px rgba(22,104,216,.15); }
 .step-dot.cancel{ background: var(--red); border-color: var(--red); color: #fff; }
 .step-label { font-size: 10.5px; font-weight: 600; color: var(--muted); margin-top: 4px; white-space: nowrap; }
 .step-label.done  { color: var(--green-dk); }
@@ -525,7 +525,7 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
                                         @endif
                                         <div>
                                             <div class="prod-name">{{ $prod?->name ?? 'Produit supprimé' }}</div>
-                                            @if($item->variant_name)<div class="prod-ref" style="color:#6366f1;font-weight:700">🎨 {{ $item->variant_name }}</div>@endif
+                                            @if($item->variant_name)<div class="prod-ref" style="color:#1668D8;font-weight:700">🎨 {{ $item->variant_name }}</div>@endif
                                             @if($prod?->sku)<div class="prod-ref">REF: {{ $prod->sku }}</div>@endif
                                         </div>
                                     </div>
@@ -582,7 +582,7 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
                     @if($order->client)
                     @php $cl = $order->client; @endphp
                     <div class="client-card-top">
-                        <div class="c-avatar" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">{{ $init($cl->name) }}</div>
+                        <div class="c-avatar" style="background:linear-gradient(135deg,#1F7CF6,#1260C9)">{{ $init($cl->name) }}</div>
                         <div>
                             <div class="c-name">{{ $cl->name }}</div>
                             @if($cl->email)<div class="c-email">{{ $cl->email }}</div>@endif
@@ -619,7 +619,7 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
                     @else
                     {{-- Commande passée sans compte (invité) : on affiche les infos saisies au moment de la commande --}}
                     <div class="client-card-top">
-                        <div class="c-avatar" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">{{ $init($order->display_name) }}</div>
+                        <div class="c-avatar" style="background:linear-gradient(135deg,#1F7CF6,#1260C9)">{{ $init($order->display_name) }}</div>
                         <div>
                             <div class="c-name">{{ $order->display_name }}</div>
                             <div class="c-email" style="font-size:11px;color:var(--muted)">Commande sans compte (invité)</div>
@@ -701,12 +701,12 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
                             <div class="info-row" style="align-items:center">
                                 <span class="lbl">Livreur</span>
                                 <div class="livreur-inline">
-                                    <div class="l-av" style="background:linear-gradient(135deg,#6366f1,#4f46e5);">🏢</div>
+                                    <div class="l-av" style="background:linear-gradient(135deg,#1668D8,#1260C9);">🏢</div>
                                     <div>
                                         <div class="l-name">{{ $order->deliveryCompany->name }}</div>
                                         <div class="l-avail">
                                             @if($order->driver)
-                                                <span class="l-dot" style="background:#6366f1"></span> {{ $order->driver->name }}
+                                                <span class="l-dot" style="background:#1668D8"></span> {{ $order->driver->name }}
                                             @elseif($order->status === 'livrée')
                                                 <span class="l-dot" style="background:#22c55e"></span> Livraison terminée
                                             @elseif($order->status === 'en_livraison')
@@ -887,9 +887,9 @@ function toggleGroup(btn) {
     function makeMotoIcon() {
         return L.divIcon({
             html: `<div style="width:46px;height:46px;border-radius:50%;
-                background:linear-gradient(135deg,#6366f1,#4f46e5);
+                background:linear-gradient(135deg,#1668D8,#1260C9);
                 border:3px solid #fff;
-                box-shadow:0 4px 20px rgba(99,102,241,.6),0 0 0 6px rgba(99,102,241,.15);
+                box-shadow:0 4px 20px rgba(22,104,216,.6),0 0 0 6px rgba(22,104,216,.15);
                 display:flex;align-items:center;justify-content:center;font-size:22px">🛵</div>`,
             iconSize:[46,46], iconAnchor:[23,23], className:''
         });
@@ -936,8 +936,8 @@ function toggleGroup(btn) {
         marker = L.marker([lat, lng], { icon: makeMotoIcon() }).addTo(map);
         if (lname) marker.bindPopup(`<div style="font-family:system-ui;padding:4px 2px"><strong style="font-size:13.5px">${lname}</strong></div>`, { offset:[0,-20] }).openPopup();
 
-        halo = L.circle([lat, lng], { color:'#6366f1', fillColor:'#6366f1', fillOpacity:.10, radius:60, weight:1.5 }).addTo(map);
-        trail = L.polyline([[lat, lng]], { color:'#6366f1', weight:3, opacity:.45, dashArray:'6 4' }).addTo(map);
+        halo = L.circle([lat, lng], { color:'#1668D8', fillColor:'#1668D8', fillOpacity:.10, radius:60, weight:1.5 }).addTo(map);
+        trail = L.polyline([[lat, lng]], { color:'#1668D8', weight:3, opacity:.45, dashArray:'6 4' }).addTo(map);
 
         document.addEventListener('click', e => {
             if (e.target.closest('[data-recenter]')) {
@@ -1142,4 +1142,9 @@ function toggleGroup(btn) {
 
 })();
 </script>
+@endpush
+
+{{-- Thème bleu « espace vendeur » (maquette Main.dc.html), chargé après les styles de la page --}}
+@push('styles')
+@include('boutique._partials.sv-theme')
 @endpush

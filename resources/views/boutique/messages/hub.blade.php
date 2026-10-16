@@ -21,9 +21,10 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-    --orange: rgb(77, 14, 149); --orange-dk: #e47911; --navy: #131921; --navy-2: #232f3e;
-    --green: #25d366; --green-dk: #128c7e; --border: #e9edef;
-    --brand: #6366f1; --brand-dk: #4f46e5; --brand-lt: #e0e7ff;
+    /* Palette bleue Shopio (anciens noms de variables conservés) */
+    --orange: #FFFFFF; --orange-dk: #F59E0B; --navy: #0B1E3D; --navy-2: #0B1E3D;
+    --green: #1668D8; --green-dk: #1260C9; --border: #e9edef;
+    --brand: #1668D8; --brand-dk: #1260C9; --brand-lt: #D6E6FF;
     --text: #111b21; --muted: #667781; --surface: #fff; --bg: #f0f2f5;
     --font: 'Inter', sans-serif; --nav-h: 56px; --sidebar-w: 360px;
 }
@@ -32,7 +33,7 @@
 [data-theme="dark"] {
     --border: #262d3d;
     --text: #e6e9f0; --muted: #7b869c; --surface: #141925; --bg: #0b0f1a;
-    --brand-lt: rgba(99,102,241,.16);
+    --brand-lt: rgba(22,104,216,.16);
 }
 [data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
     background: var(--surface); color: var(--text); border-color: var(--border);
@@ -183,7 +184,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     white-space: nowrap; flex-shrink: 0; padding: 7px 13px; border-radius: 8px;
     border: 1.5px solid var(--brand); background: var(--brand-lt); transition: all .15s;
 }
-.hub-prod-view-btn:hover { background: #c7d2fe; }
+.hub-prod-view-btn:hover { background: #D6E6FF; }
 
 /* Barre d'actions rapides vendeur */
 .hub-vendor-actions {
@@ -195,8 +196,8 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
     cursor: pointer; border: none; transition: all .15s; font-family: var(--font);
 }
-.hub-action-offer  { background: #e0e7ff; color: #3730a3; }
-.hub-action-offer:hover  { background: #c7d2fe; }
+.hub-action-offer  { background: #D6E6FF; color: #0B1E3D; }
+.hub-action-offer:hover  { background: #D6E6FF; }
 .hub-action-refuse { background: #fee2e2; color: #991b1b; }
 .hub-action-refuse:hover { background: #fca5a5; }
 
@@ -453,14 +454,14 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .nego-proposal { background: #fffbeb; border: 1.5px solid #f59e0b; }
 .nego-proposal .nego-card-head { background: #fef3c7; color: #92400e; }
 .nego-proposal .nego-card-price { color: #b45309; }
-.nego-btn-accept { background: #e0e7ff; color: #3730a3; }
-.nego-btn-accept:hover { background: #c7d2fe; }
+.nego-btn-accept { background: #D6E6FF; color: #0B1E3D; }
+.nego-btn-accept:hover { background: #D6E6FF; }
 .nego-btn-refuse { background: #fee2e2; color: #991b1b; }
 .nego-btn-refuse:hover { background: #fca5a5; }
 /* offer (vendeur envoyé → vert) */
-.nego-offer { background: #eef2ff; border: 1.5px solid var(--brand); }
-.nego-offer .nego-card-head { background: #e0e7ff; color: #3730a3; }
-.nego-offer .nego-card-price { color: #4f46e5; }
+.nego-offer { background: #EAF2FF; border: 1.5px solid var(--brand); }
+.nego-offer .nego-card-head { background: #D6E6FF; color: #0B1E3D; }
+.nego-offer .nego-card-price { color: #1260C9; }
 /* refused (refusé → rouge clair) */
 .nego-refused { background: #fff1f2; border: 1.5px solid #fca5a5; }
 .nego-refused .nego-card-head { background: #fee2e2; color: #991b1b; }
@@ -472,17 +473,17 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 /* status badge */
 .nego-status { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 20px; margin-bottom: 6px; }
 .nego-status.pending  { background: #fef3c7; color: #92400e; }
-.nego-status.accepted { background: #e0e7ff; color: #3730a3; }
+.nego-status.accepted { background: #D6E6FF; color: #0B1E3D; }
 .nego-status.refused  { background: #fee2e2; color: #991b1b; }
 .nego-status.confirmed{ background: #dbeafe; color: #1e40af; }
 
 /* ── Offer panel ── */
 .hub-offer-panel {
-    background: #eef2ff; border-top: 2px solid var(--brand);
+    background: #EAF2FF; border-top: 2px solid var(--brand);
     padding: 12px 16px; flex-shrink: 0; display: none; flex-direction: column; gap: 8px;
 }
 .hub-offer-panel.open { display: flex; }
-.hub-offer-panel-title { font-size: 12px; font-weight: 800; color: #3730a3; text-transform: uppercase; letter-spacing: .4px; }
+.hub-offer-panel-title { font-size: 12px; font-weight: 800; color: #0B1E3D; text-transform: uppercase; letter-spacing: .4px; }
 .hub-offer-hint { font-size: 11.5px; color: var(--muted); }
 .hub-offer-panel-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .hub-offer-input { flex: 1; padding: 9px 14px; border-radius: 8px; border: 1.5px solid var(--brand); font-size: 14px; font-family: var(--font); outline: none; min-width: 120px; }
@@ -622,7 +623,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 .prod-modal-body { padding: 18px 20px 24px; }
 .prod-modal-name { font-size: 18px; font-weight: 800; color: #111; margin-bottom: 8px; line-height: 1.3; }
 .prod-modal-price { font-size: 22px; font-weight: 900; color: #b12704; font-family: monospace; margin-bottom: 6px; }
-.prod-modal-stock { font-size: 12px; font-weight: 700; color: #3730a3; background: #e0e7ff; display: inline-flex; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
+.prod-modal-stock { font-size: 12px; font-weight: 700; color: #0B1E3D; background: #D6E6FF; display: inline-flex; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
 .prod-modal-stock.low { color: #92400e; background: #fef3c7; }
 .prod-modal-stock.out { color: #991b1b; background: #fee2e2; }
 .prod-modal-desc { font-size: 13.5px; color: #444; line-height: 1.65; white-space: pre-wrap; }
@@ -657,8 +658,10 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     transition: border-color .15s, transform .15s;
 }
 .pm-thumb:hover { border-color: var(--brand); transform: scale(1.05); }
-.pm-thumb.active { border-color: var(--brand); box-shadow: 0 0 0 2px #e0e7ff; }
+.pm-thumb.active { border-color: var(--brand); box-shadow: 0 0 0 2px #D6E6FF; }
 </style>
+{{-- Thème bleu « espace vendeur » --}}
+@include('boutique._partials.sv-theme')
 </head>
 <body>
 
@@ -698,10 +701,10 @@ $hubIcons = [
         <div class="hub-conv-list" id="convList">
             @php
             $avPalette = [
-                'linear-gradient(135deg,#6366f1,#4338ca)',
+                'linear-gradient(135deg,#1668D8,#1260C9)',
                 'linear-gradient(135deg,#10b981,#059669)',
                 'linear-gradient(135deg,#f59e0b,#d97706)',
-                'linear-gradient(135deg,#8b5cf6,#6d28d9)',
+                'linear-gradient(135deg,#1F7CF6,#1260C9)',
                 'linear-gradient(135deg,#ef4444,#b91c1c)',
                 'linear-gradient(135deg,#14b8a6,#0d9488)',
                 'linear-gradient(135deg,#f97316,#ea580c)',
@@ -804,7 +807,7 @@ $hubIcons = [
                     <a class="hub-prod-view-btn" id="hubProdViewBtn" href="#" target="_blank">Voir →</a>
                     <button class="hub-prod-view-btn" id="hubOfferTriggerBtn"
                             onclick="showOfferPanel(null, null)"
-                            style="background:#e0e7ff;border-color:var(--brand-dk);color:#3730a3;cursor:pointer;font-family:var(--font)">
+                            style="background:#D6E6FF;border-color:var(--brand-dk);color:#0B1E3D;cursor:pointer;font-family:var(--font)">
                         💰 Faire une offre
                     </button>
                 </div>
@@ -840,7 +843,7 @@ $hubIcons = [
                     <button class="hub-attach-btn" title="Envoyer des photos (max 20)" onclick="document.getElementById('hubImgInput').click()">📷</button>
 
                     @if($isPro)
-                    <button class="hub-attach-btn" id="hubAiBtn" title="Shopio IA — suggérer une réponse" onclick="suggestAiReply()" style="color:#6366f1;border-color:#c7d2fe;background:#eef2ff">✨</button>
+                    <button class="hub-attach-btn" id="hubAiBtn" title="Shopio IA — suggérer une réponse" onclick="suggestAiReply()" style="color:#1668D8;border-color:#D6E6FF;background:#EAF2FF">✨</button>
                     @else
                     <a class="hub-attach-btn" href="{{ route('boutique.subscription.upgrade') }}" title="Shopio IA — réservé au plan Pro" style="color:#9ca3af;text-decoration:none;font-size:16px">🔒</a>
                     @endif
@@ -1734,7 +1737,7 @@ function buildProposalCard(msg) {
             <textarea id="counterMessage_${msg.id}" class="nego-counter-message" placeholder="Votre message (optionnel)…" rows="2" maxlength="500"
                       style="width:100%;padding:8px 12px;border:1.5px solid #d1d5db;border-radius:10px;font-size:12.5px;font-family:inherit;resize:vertical;min-height:36px"></textarea>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            ${IS_PRO ? `<button type="button" class="nego-card-btn" onclick="suggestCounterAi(${msg.id}, this)" id="counterAiBtn_${msg.id}" style="background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe" title="Shopio IA — suggérer prix + message">✨ IA</button>` : ''}
+            ${IS_PRO ? `<button type="button" class="nego-card-btn" onclick="suggestCounterAi(${msg.id}, this)" id="counterAiBtn_${msg.id}" style="background:#EAF2FF;color:#1260C9;border:1px solid #D6E6FF" title="Shopio IA — suggérer prix + message">✨ IA</button>` : ''}
             <input type="number" class="nego-counter-input" id="counterInput_${msg.id}"
                    placeholder="Votre prix…" min="1" step="500"
                    value="${Math.round((msg.proposed_price || 0) * 1.1)}">
@@ -1791,7 +1794,7 @@ function buildCounterCard(msg) {
             <textarea id="counterMessage_${msg.id}" class="nego-counter-message" placeholder="Votre message (optionnel)…" rows="2" maxlength="500"
                       style="width:100%;padding:8px 12px;border:1.5px solid #d1d5db;border-radius:10px;font-size:12.5px;font-family:inherit;resize:vertical;min-height:36px"></textarea>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            ${IS_PRO ? `<button type="button" class="nego-card-btn" onclick="suggestCounterAi(${msg.id}, this)" id="counterAiBtn_${msg.id}" style="background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe" title="Shopio IA — suggérer prix + message">✨ IA</button>` : ''}
+            ${IS_PRO ? `<button type="button" class="nego-card-btn" onclick="suggestCounterAi(${msg.id}, this)" id="counterAiBtn_${msg.id}" style="background:#EAF2FF;color:#1260C9;border:1px solid #D6E6FF" title="Shopio IA — suggérer prix + message">✨ IA</button>` : ''}
             <input type="number" class="nego-counter-input" id="counterInput_${msg.id}"
                    placeholder="Votre prix…" min="1" step="500"
                    value="${Math.round((msg.proposed_price || 0) * 1.05)}">

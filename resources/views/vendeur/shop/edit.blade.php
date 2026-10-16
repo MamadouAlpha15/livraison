@@ -17,10 +17,10 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
-    --brand:     #6366f1;
-    --brand-dk:  #4f46e5;
-    --brand-lt:  #e0e7ff;
-    --brand-mlt: #eef2ff;
+    --brand:     #1668D8;
+    --brand-dk:  #1260C9;
+    --brand-lt:  #D6E6FF;
+    --brand-mlt: #EAF2FF;
     --bg:        #f8fafc;
     --surface:   #ffffff;
     --border:    #e2e8f0;
@@ -41,8 +41,8 @@
 
 /* ══ MODE SOMBRE ══ */
 [data-theme="dark"] {
-    --brand-lt: rgba(99,102,241,.16);
-    --brand-mlt: rgba(99,102,241,.09);
+    --brand-lt: rgba(22,104,216,.16);
+    --brand-mlt: rgba(22,104,216,.09);
     --bg: #0b0f1a;
     --surface: #141925;
     --border: #262d3d;
@@ -80,7 +80,7 @@ html, body {
 
 /* ── Panneau gauche (info + preview) ── */
 .form-sidebar {
-    background: linear-gradient(160deg, #111168 0%, #110f25 60%, #1c147a 100%);
+    background: radial-gradient(120% 60% at 100% 0%, rgba(31,124,246,.28), transparent 60%), #0B1E3D; /* bleu nuit Shopio */
     padding: 48px 40px;
     display: flex;
     flex-direction: column;
@@ -99,11 +99,11 @@ html, body {
 }
 .sidebar-logo-ico {
     width: 36px; height: 36px;
-    background: linear-gradient(135deg, var(--brand), #4f46e5);
+    background: linear-gradient(135deg, var(--brand), #1260C9);
     border-radius: 9px;
     display: flex; align-items: center; justify-content: center;
     font-size: 17px;
-    box-shadow: 0 2px 10px rgba(99,102,241,.4);
+    box-shadow: 0 2px 10px rgba(22,104,216,.4);
 }
 
 .sidebar-title {
@@ -112,7 +112,7 @@ html, body {
     line-height: 1.2; margin-bottom: 12px;
 }
 .sidebar-title span {
-    background: linear-gradient(135deg, #a5b4fc, #6366f1);
+    background: linear-gradient(135deg, #7DB4FF, #1668D8);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -133,7 +133,7 @@ html, body {
 }
 .preview-img-wrap {
     height: 140px;
-    background: linear-gradient(135deg, rgba(99,102,241,.15), rgba(79,70,229,.08));
+    background: linear-gradient(135deg, rgba(22,104,216,.15), rgba(79,70,229,.08));
     display: flex; align-items: center; justify-content: center;
     position: relative; overflow: hidden;
 }
@@ -155,8 +155,8 @@ html, body {
 }
 .preview-badge {
     font-size: 10px; font-weight: 700;
-    background: rgba(99,102,241,.2); color: #a5b4fc;
-    border: 1px solid rgba(99,102,241,.3);
+    background: rgba(22,104,216,.2); color: #7DB4FF;
+    border: 1px solid rgba(22,104,216,.3);
     padding: 2px 8px; border-radius: 20px;
 }
 .preview-currency {
@@ -180,11 +180,11 @@ html, body {
 }
 .step-row.active .step-dot {
     background: var(--brand); border-color: var(--brand-dk);
-    color: #fff; box-shadow: 0 0 12px rgba(99,102,241,.4);
+    color: #fff; box-shadow: 0 0 12px rgba(22,104,216,.4);
 }
 .step-row.done .step-dot {
-    background: rgba(99,102,241,.2); border-color: rgba(99,102,241,.4);
-    color: #a5b4fc;
+    background: rgba(22,104,216,.2); border-color: rgba(22,104,216,.4);
+    color: #7DB4FF;
 }
 .step-txt { font-size: 13px; color: rgba(255,255,255,.6); font-weight: 500; }
 .step-row.active .step-txt { color: #fff; font-weight: 600; }
@@ -260,7 +260,7 @@ html, body {
 }
 .field-input:focus {
     border-color: var(--brand);
-    box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+    box-shadow: 0 0 0 3px rgba(22,104,216,.12);
 }
 .field-input:focus + .field-icon { color: var(--brand); }
 .field-input.error { border-color: var(--danger); }
@@ -294,7 +294,7 @@ textarea.field-input { resize: vertical; min-height: 90px; }
 }
 .currency-search-box:focus {
     border-color: var(--brand);
-    box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+    box-shadow: 0 0 0 3px rgba(22,104,216,.12);
 }
 .currency-dropdown {
     position: absolute; top: calc(100% + 4px); left: 0; right: 0;
@@ -414,9 +414,9 @@ textarea.field-input { resize: vertical; min-height: 90px; }
     border: 1.5px solid var(--brand-dk);
     cursor: pointer; transition: all .15s;
     display: flex; align-items: center; gap: 7px;
-    box-shadow: 0 4px 14px rgba(99,102,241,.3);
+    box-shadow: 0 4px 14px rgba(22,104,216,.3);
 }
-.btn-next:hover { background: var(--brand-dk); box-shadow: 0 6px 20px rgba(99,102,241,.4); transform: translateY(-1px); }
+.btn-next:hover { background: var(--brand-dk); box-shadow: 0 6px 20px rgba(22,104,216,.4); transform: translateY(-1px); }
 .btn-next:disabled { opacity: .6; cursor: not-allowed; transform: none; }
 
 .btn-submit {
@@ -426,14 +426,14 @@ textarea.field-input { resize: vertical; min-height: 90px; }
     border: 1.5px solid var(--brand-dk);
     cursor: pointer; transition: all .15s;
     display: inline-flex; align-items: center; gap: 8px;
-    box-shadow: 0 4px 14px rgba(99,102,241,.3);
+    box-shadow: 0 4px 14px rgba(22,104,216,.3);
 }
 .btn-submit:hover { background: var(--brand-dk); transform: translateY(-1px); }
 
 /* ── Flash messages ── */
 .flash { padding: 11px 14px; border-radius: var(--r-sm); border: 1px solid; font-size: 13px; font-weight: 500; margin-bottom: 20px; display: flex; gap: 8px; align-items: flex-start; }
 .flash-danger  { background: var(--danger-lt); border-color: #fca5a5; color: #991b1b; }
-.flash-success { background: #eef2ff; border-color: #a5b4fc; color: #3730a3; }
+.flash-success { background: #EAF2FF; border-color: #7DB4FF; color: #0B1E3D; }
 .flash-info    { background: #eff6ff; border-color: #93c5fd; color: #1e40af; }
 .flash ul { margin: 0; padding-left: 16px; }
 .flash ul li { margin-top: 3px; font-size: 12.5px; }
@@ -465,7 +465,7 @@ textarea.field-input { resize: vertical; min-height: 90px; }
 .type-pill:hover { border-color: var(--brand); color: var(--brand-dk); background: var(--brand-mlt); }
 .type-pill.selected {
     border-color: var(--brand-dk); background: var(--brand);
-    color: #fff; box-shadow: 0 2px 8px rgba(99,102,241,.3);
+    color: #fff; box-shadow: 0 2px 8px rgba(22,104,216,.3);
 }
 .type-pill-add {
     border-style: dashed; border-color: var(--brand);
@@ -550,542 +550,546 @@ textarea.field-input { resize: vertical; min-height: 90px; }
     .section-hd h2 { font-size: 15px; }
     .btn-next, .btn-submit { padding: 11px 16px; font-size: 13px; }
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   « MA BOUTIQUE » — maquette Main.dc.html (écran Réglages)
+   Menu vendeur à gauche, colonne bleu nuit (aperçu + étapes), formulaire à droite.
+══════════════════════════════════════════════════════════════════ */
+:root { --se-r: 24px; --se-e-out: cubic-bezier(.22,1,.36,1); --se-e-io: cubic-bezier(.65,0,.35,1); --se-e-pop: cubic-bezier(.34,1.56,.64,1); }
+.se-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.se-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; position: sticky; top: 0; z-index: 30; padding: 14px 28px !important; }
+.se-top .tb-info { flex: 1 1 240px; min-width: 0; }
+.se-title { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.02em; color: var(--text); }
+.se-title-ico { color: var(--sv-blue, #1F7CF6); display: flex; }
+.se-top-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.se-content { padding: 24px 28px 48px; }
+
+/* Boutons en pilule */
+.se-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 0; font: 700 14px/1 var(--font); text-decoration: none; cursor: pointer; white-space: nowrap; transition: transform 180ms var(--se-e-out), background-color 180ms var(--se-e-out), box-shadow 180ms var(--se-e-out), color 180ms var(--se-e-out); }
+.se-btn:active:not(:disabled) { transform: scale(.97); }
+.se-btn:disabled { opacity: .5; cursor: default; }
+.se-btn-sm { min-height: 40px; padding: 0 14px; }
+.se-btn-blue { background: #1668D8; color: #fff; }
+.se-btn-blue:hover:not(:disabled) { background: #1260C9; color: #fff; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(22,104,216,.28); }
+.se-btn-line { background: var(--surface); color: var(--text); box-shadow: inset 0 0 0 1.5px var(--border); }
+.se-btn-line:hover:not(:disabled) { box-shadow: inset 0 0 0 1.5px var(--sv-blue, #1F7CF6); color: #1668D8; }
+.se-btn:focus-visible, .step-row:focus-visible, .type-pill:focus-visible, .se-swatch input:focus-visible + .se-swatch-dot { outline: 3px solid #1F7CF6; outline-offset: 3px; }
+
+.se-flash { border-radius: 18px; padding: 14px 18px; margin-bottom: 18px; font-size: 14px; }
+.se-flash ul { margin: 6px 0 0; padding-left: 18px; }
+.se-flash-ok { background: var(--sv-ok50, #E7F6EC); color: var(--sv-ok, #15803D); font-weight: 700; }
+.se-flash-err { background: var(--sv-err50, #FDECEC); color: var(--sv-err, #B91C1C); }
+.se-flash-info { background: var(--sv-b50, #EAF2FF); color: var(--text); }
+
+/* Grille principale */
+.se-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.se-hero { position: sticky; top: 96px; display: flex; flex-direction: column; gap: 18px; padding: 24px; border-radius: var(--se-r); background: #0B1E3D; color: #fff; overflow: hidden; }
+.se-hero-title { margin: 0; font-size: 30px; line-height: 1.1; font-weight: 800; letter-spacing: -.02em; color: #fff; text-wrap: balance; }
+.se-hero-title span { color: #7DB4FF; }
+.se-hero-sub { margin: 8px 0 0; color: #C9D6EA; font-size: 15px; }
+
+/* Aperçu de la boutique */
+.se-preview { border-radius: 20px; overflow: hidden; background: #132B52; transition: transform 260ms var(--se-e-out), box-shadow 260ms var(--se-e-out); }
+.se-preview:hover { transform: perspective(900px) rotateX(5deg) rotateY(-6deg) translateY(-3px); box-shadow: 12px 20px 36px rgba(0,0,0,.3); }
+.se-preview-banner { position: relative; height: 150px; background: radial-gradient(120% 120% at 80% 0%, #1F7CF6 0%, #132B52 70%); }
+.se-preview-banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.se-preview-ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #7DB4FF; }
+.se-preview-ph svg { width: 44px; height: 44px; }
+.se-preview-stripe { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; transition: background-color 300ms var(--se-e-out); }
+.se-preview-body { display: flex; align-items: center; gap: 12px; padding: 14px 16px; }
+.se-preview-logo { width: 52px; height: 52px; border-radius: 14px; margin-top: -38px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 17px; box-shadow: 0 0 0 4px #132B52, inset -5px -6px 10px rgba(0,0,0,.18), inset 4px 4px 8px rgba(255,255,255,.25); transition: background-color 300ms var(--se-e-out), color 300ms; }
+.se-preview-name { font-size: 17px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.se-preview-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 13px; color: #C9D6EA; }
+.se-preview-badge { display: inline-flex; align-items: center; height: 22px; padding: 0 9px; border-radius: 999px; font-size: 12px; font-weight: 800; transition: background-color 300ms var(--se-e-out), color 300ms; }
+
+/* Étapes (colonne bleu nuit) */
+.steps-list { display: flex; flex-direction: column; gap: 4px; }
+.step-row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 0 12px; border: 0; border-radius: 14px; background: transparent; color: #9FB3D3; font: 700 15px var(--font); text-align: left; cursor: pointer; opacity: 1; transition: background-color 180ms var(--se-e-out), color 180ms; }
+.step-row:hover { background: rgba(19,43,82,.6); color: #fff; }
+.step-row.active { background: #132B52; color: #fff; }
+.step-dot { width: 30px; height: 30px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; box-shadow: inset 0 0 0 2px #2B4A7E; background: transparent; color: inherit; flex-shrink: 0; transition: background-color 300ms var(--se-e-out), transform 300ms var(--se-e-pop); }
+.step-row.active .step-dot { background: #1F7CF6; box-shadow: none; color: #fff; transform: scale(1.06); }
+.step-row.done .step-dot { background: #1B3563; box-shadow: none; color: #7DB4FF; }
+.step-txt { color: inherit; font-size: 15px; font-weight: 700; }
+
+/* Colonne formulaire */
+.se-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.se-card { background: var(--surface); border-radius: var(--se-r); box-shadow: 0 0 0 1px var(--border); }
+.se-notif { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 16px 18px; }
+.se-notif strong { color: var(--text); }
+.se-notif-sub { font-size: 13px; color: var(--text-2); margin-top: 2px; }
+.se-tile { width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: inset -5px -6px 10px rgba(0,0,0,.18), inset 4px 4px 8px rgba(255,255,255,.3), 0 8px 16px rgba(11,30,61,.12); }
+.se-tile-amber { background: #F59E0B; color: #16162A; }
+.se-form-card { padding: 22px; display: flex; flex-direction: column; gap: 10px; }
+.progress-bar-wrap { height: 6px; border-radius: 6px; background: var(--sv-b50, #EAF2FF); overflow: hidden; }
+.progress-bar-fill { height: 100%; width: 100% !important; background: #1F7CF6; border-radius: 6px; transform-origin: left center; transform: scaleX(var(--p, .25)); transition: transform 500ms var(--se-e-io); }
+.se-step-count { font-size: 13px; font-weight: 700; color: var(--muted); }
+
+.form-section { display: none; }
+.form-section.active { display: block; }
+.form-section.is-in { animation: seTurn 450ms var(--se-e-out) backwards; transform-origin: left center; }
+@keyframes seTurn { from { opacity: 0; transform: perspective(900px) rotateY(-12deg) translateX(24px); } }
+.se-sec-title { margin: 6px 0 18px; font-size: 20px; font-weight: 800; letter-spacing: -.02em; color: var(--text); outline: none; }
+.se-sub-title { margin: 8px 0 12px; font-size: 16px; font-weight: 800; color: var(--text); }
+
+/* Champs */
+.field-group { margin-bottom: 16px; }
+.field-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+.field-label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 700; color: var(--text); text-transform: none; letter-spacing: 0; }
+.field-label span { color: var(--sv-err, #B91C1C); }
+.field-input { width: 100%; min-height: 46px; padding: 0 14px; border: 0; border-radius: 14px; background: var(--surface); color: var(--text); font: 500 15px var(--font); box-shadow: inset 0 0 0 1.5px var(--border); outline: 0; transition: box-shadow 180ms var(--se-e-out); }
+textarea.field-input { min-height: 104px; padding: 12px 14px; resize: vertical; line-height: 1.5; }
+select.field-input { appearance: auto; }
+.field-input:focus { box-shadow: inset 0 0 0 2px #1F7CF6 !important; border-color: transparent !important; }
+.field-input.error { box-shadow: inset 0 0 0 2px var(--sv-err, #B91C1C); }
+.field-hint { font-size: 13px; color: var(--muted); margin-top: 6px; }
+.field-error { font-size: 13px; font-weight: 600; color: var(--sv-err, #B91C1C); margin-top: 6px; }
+.se-fieldset { border: 0; padding: 0; margin: 0 0 16px; min-width: 0; }
+
+/* Type de boutique : pastilles (chips) */
+.type-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.type-pill { display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 0 14px; border-radius: 999px; border: 0; background: var(--surface); box-shadow: inset 0 0 0 1px var(--border); color: var(--text-2); font: 700 13px var(--font); cursor: pointer; transition: background-color 180ms var(--se-e-out), color 180ms, box-shadow 180ms; }
+.type-pill:hover { box-shadow: inset 0 0 0 1.5px #1F7CF6; }
+.type-pill.selected { background: #1668D8; color: #fff; box-shadow: none; }
+.type-pill-add { box-shadow: inset 0 0 0 1.5px #7DB4FF; color: #1668D8; border-style: none; }
+.type-custom-wrap { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.type-custom-wrap .field-input { flex: 1 1 200px; }
+
+/* Couleur d'accent : pastilles en relief */
+.se-swatches { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
+.se-swatch { position: relative; cursor: pointer; }
+.se-swatch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.se-swatch-dot { display: block; width: 48px; height: 48px; border-radius: 16px; background: var(--sw); box-shadow: inset -5px -6px 10px rgba(0,0,0,.22), inset 4px 4px 8px rgba(255,255,255,.25); transition: transform 220ms var(--se-e-pop); }
+.se-swatch:hover .se-swatch-dot { transform: perspective(400px) rotateX(12deg) rotateY(-12deg) scale(1.06); }
+.se-swatch input:checked + .se-swatch-dot { outline: 3px solid var(--text); outline-offset: 3px; }
+
+/* Devise : menu déroulant */
+.currency-wrap { position: relative; }
+.currency-search-box { cursor: pointer; }
+.currency-dropdown { display: none; position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 20; background: var(--surface); border-radius: 16px; box-shadow: 0 0 0 1px var(--border), 0 16px 32px rgba(11,30,61,.14); padding: 8px; }
+.currency-dropdown.open { display: block; }
+.currency-search-input { width: 100%; min-height: 42px; border: 0; border-radius: 12px; padding: 0 12px; background: var(--bg); color: var(--text); font: 500 15px var(--font); margin-bottom: 6px; outline: 0; }
+.currency-list { max-height: 220px; overflow-y: auto; }
+.currency-opt { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px; cursor: pointer; font-size: 14px; }
+.currency-opt:hover, .currency-opt.selected { background: var(--sv-b50, #EAF2FF); }
+.currency-code { font-weight: 800; color: var(--text); }
+.currency-name { flex: 1; min-width: 0; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.currency-country { font-size: 12px; color: var(--muted); }
+
+/* Images */
+.se-asset { display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 18px; background: var(--bg); margin-bottom: 16px; }
+.se-asset img { width: 56px; height: 56px; border-radius: 14px; object-fit: cover; flex-shrink: 0; }
+.se-asset strong { color: var(--text); }
+.upload-zone { position: relative; border-radius: 18px; padding: 26px 18px; text-align: center; background: var(--bg); box-shadow: inset 0 0 0 2px var(--border); cursor: pointer; transition: box-shadow 180ms var(--se-e-out), background-color 180ms; }
+.upload-zone:hover, .upload-zone.dragover { box-shadow: inset 0 0 0 2px #1F7CF6; background: var(--sv-b50, #EAF2FF); }
+.upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.upload-txt { font-size: 15px; font-weight: 700; color: var(--text); }
+.upload-hint { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.upload-preview { display: none; position: relative; }
+.upload-preview img { max-height: 180px; max-width: 100%; border-radius: 14px; }
+.upload-remove { position: absolute; top: 6px; right: 6px; width: 36px; height: 36px; border-radius: 999px; border: 0; background: rgba(11,30,61,.75); color: #fff; font-size: 20px; cursor: pointer; }
+
+/* Récapitulatif */
+.se-recap { border-radius: 18px; background: var(--bg); padding: 16px 18px; }
+.se-recap-title { font-size: 12px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.se-recap dl { margin: 0; display: grid; gap: 8px; }
+.se-recap dl > div { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+.se-recap dt { color: var(--text-2); }
+.se-recap dd { margin: 0; font-weight: 700; color: var(--text); text-align: right; overflow-wrap: anywhere; }
+.se-recap-dot { display: inline-block; width: 12px; height: 12px; border-radius: 999px; vertical-align: -1px; }
+
+/* Navigation des étapes */
+.se-nav { display: flex !important; flex-direction: row !important; justify-content: space-between; gap: 10px; padding-top: 14px; margin-top: 6px; border-top: 1px solid var(--border); }
+
+/* Mode sombre */
+[data-theme="dark"] .se-hero { background: #071428; }
+[data-theme="dark"] .se-swatch input:checked + .se-swatch-dot { outline-color: #EAF0FA; }
+
+/* Responsive */
+@media (max-width: 1100px) {
+    .se-grid { grid-template-columns: minmax(0, 1fr); }
+    .se-hero { position: static; }
+    .steps-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+    .se-top { padding: 10px 16px !important; }
+    .se-title { font-size: 19px; }
+    .se-hide-m { display: none; }
+    .se-content { padding: 16px; }
+    .se-hero { padding: 18px; }
+    .se-hero-title { font-size: 24px; }
+    .steps-list { grid-template-columns: minmax(0, 1fr); }
+    .se-form-card { padding: 18px; }
+    .field-row { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .se-nav .se-btn { flex: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .form-section.is-in { animation: none; }
+    .se-preview:hover, .se-swatch:hover .se-swatch-dot { transform: none; }
+    .progress-bar-fill, .step-dot { transition: none; }
+}
 </style>
 @endpush
 
 @section('content')
-<div class="form-page">
+@php
+    $accentChoices = [
+        '#1F7CF6' => ['Bleu Shopio', '#FFFFFF'],
+        '#0B1E3D' => ['Bleu nuit', '#7DB4FF'],
+        '#F59E0B' => ['Ambre', '#16162A'],
+        '#15803D' => ['Vert', '#FFFFFF'],
+    ];
+    $currentAccent = old('accent_color', $shop->accent_color ?: '#1F7CF6');
+    if (!isset($accentChoices[$currentAccent])) $currentAccent = '#1F7CF6';
+    $shopIni = collect(preg_split('/\s+/', trim($shop->name)))->filter()->take(2)->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))->implode('');
+    $stepLabels = ['Informations générales', 'Contact et localisation', 'Concevoir', 'Images et finalisation'];
+    $svgStore = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9l1.5-5h13L20 9M4 9v11h16V9M4 9c0 1.7 1.3 3 3 3s3-1.3 3-3c0 1.7 1.3 3 3 3s3-1.3 3-3c0 1.7 1.3 3 3 3M10 20v-5h4v5"/></svg>';
+@endphp
+<div class="vs-wrap">
+    @include('boutique._partials.vendor-sidebar', ['shop' => $shop, 'active' => 'settings'])
 
-    {{-- ══════ SIDEBAR GAUCHE ══════ --}}
-    <aside class="form-sidebar">
-
-        <a href="{{ route('boutique.dashboard') }}" class="sidebar-logo">
-           <div class="sb-logo-icon"><img src="/images/Shopio2.jpeg" alt="Shopio" style="width:50px;height:50px;object-fit:cover;border-radius:9px"></div>
-          
-        </a>
-
-        <h1 class="sidebar-title">
-            Modifier votre<br><span>boutique</span>
-        </h1>
-        <p class="sidebar-sub">
-            Mettez à jour les informations de votre boutique.
-            Les modifications sont appliquées immédiatement.
-        </p>
-
-        {{-- Aperçu live de la boutique — pré-rempli avec les données actuelles --}}
-        <div class="shop-preview">
-            <div class="preview-img-wrap">
-                @if($shop->image)
-                    <img id="sidebarPreviewImg"
-                         src="{{ asset('storage/' . $shop->image) }}"
-                         alt="{{ $shop->name }}">
-                    {{-- Placeholder caché si image existante --}}
-                    <span class="preview-placeholder" id="previewPlaceholder" style="display:none">🛍️</span>
-                @else
-                    <img id="sidebarPreviewImg" src="" alt="" style="display:none">
-                    <span class="preview-placeholder" id="previewPlaceholder">🛍️</span>
-                @endif
+    <main class="main vs-main">
+        {{-- ══ Barre du haut ══ --}}
+        <div class="topbar se-top">
+            <button type="button" class="vs-burger" data-vs-open aria-label="Ouvrir le menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+            </button>
+            <div class="tb-info">
+                <h1 class="se-title"><span class="se-title-ico">{!! $svgStore !!}</span> Ma boutique</h1>
+                <div class="tb-sub">{{ $shop->name }} · informations et apparence</div>
             </div>
-            <div class="preview-body">
-                <div class="preview-name" id="previewName">{{ $shop->name }}</div>
-                <div class="preview-meta">
-                    <span id="previewType" {{ $shop->type ? '' : 'style=display:none' }}>{{ $shop->type }}</span>
-                    <span class="preview-badge">✓ Boutique</span>
-                    <span class="preview-currency" id="previewCurrency">{{ $shop->currency ?? 'GNF' }}</span>
-                </div>
+            <div class="se-top-actions">
+                <a href="{{ route('public.shops.products', $shop) }}" class="se-btn se-btn-line" target="_blank" rel="noopener">Voir ma boutique</a>
+                <a href="{{ route('boutique.dashboard') }}" class="se-btn se-btn-line se-hide-m">Tableau de bord</a>
             </div>
         </div>
 
-        {{-- Étapes --}}
-        <div class="steps-list">
-            <div class="step-row active" data-step="1">
-                <div class="step-dot">1</div>
-                <span class="step-txt">Informations générales</span>
-            </div>
-            <div class="step-row" data-step="2">
-                <div class="step-dot">2</div>
-                <span class="step-txt">Contact & localisation</span>
-            </div>
-            <div class="step-row" data-step="3">
-                <div class="step-dot">3</div>
-                <span class="step-txt">Devise</span>
-            </div>
-            <div class="step-row" data-step="4">
-                <div class="step-dot">4</div>
-                <span class="step-txt">Image & finalisation</span>
-            </div>
-        </div>
-
-    </aside>
-
-    {{-- ══════ FORMULAIRE PRINCIPAL ══════ --}}
-    <main class="form-main">
-
-        {{-- Messages flash --}}
-        @if($errors->any())
-        <div class="flash flash-danger">
-            <span>⚠</span>
-            <div>
-                <strong>Veuillez corriger les erreurs suivantes :</strong>
+        <div class="se-content">
+            {{-- Messages --}}
+            @if($errors->any())
+            <div class="se-flash se-flash-err" role="alert">
+                <strong>Veuillez corriger les points suivants :</strong>
                 <ul>@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
             </div>
-        </div>
-        @endif
-        @if(session('success'))
-        <div class="flash flash-success"><span>✓</span> {{ session('success') }}</div>
-        @endif
-        @if(session('info'))
-        <div class="flash flash-info"><span>ℹ</span> {{ session('info') }}</div>
-        @endif
+            @endif
+            @if(session('success'))<div class="se-flash se-flash-ok" role="status">{{ session('success') }}</div>@endif
+            @if(session('info'))<div class="se-flash se-flash-info" role="status">{{ session('info') }}</div>@endif
 
-        {{-- Notifications push — activation manuelle si la bannière automatique n'est pas apparue --}}
-        <div id="notifSettingsCard" style="display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:16px 18px;margin-bottom:20px;">
-            <span style="font-size:26px">🔔</span>
-            <div style="flex:1;min-width:160px">
-                <div style="font-weight:700;font-size:14px;color:#0f172a">Notifications push</div>
-                <div id="notifSettingsSub" style="font-size:13px;color:#6b7280;margin-top:2px">Recevez vos commandes et messages en temps réel, même application fermée.</div>
-            </div>
-            <button type="button" id="notifSettingsBtn"
-                    style="background:#059669;color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">
-                Activer les notifications
-            </button>
-        </div>
-        <script>
-        (function() {
-            var card = document.getElementById('notifSettingsCard');
-            var btn  = document.getElementById('notifSettingsBtn');
-            var sub  = document.getElementById('notifSettingsSub');
-            if (!card) return;
-
-            if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
-                card.style.display = 'none';
-                return;
-            }
-
-            function refresh() {
-                if (Notification.permission === 'granted' && localStorage.getItem('push_subscribed')) {
-                    sub.textContent = 'Notifications activées ✓';
-                    btn.textContent = 'Déjà activées';
-                    btn.disabled = true;
-                    btn.style.opacity = '.6';
-                    btn.style.cursor = 'default';
-                } else if (Notification.permission === 'denied') {
-                    sub.textContent = 'Bloquées dans les réglages de votre navigateur — autorisez les notifications pour ce site pour les activer.';
-                    btn.style.display = 'none';
-                }
-            }
-
-            btn.addEventListener('click', function() {
-                btn.disabled = true;
-                btn.textContent = 'Activation…';
-                Promise.resolve(window.enablePushNotifications ? window.enablePushNotifications() : null)
-                    .finally(function() {
-                        btn.disabled = false;
-                        btn.textContent = 'Activer les notifications';
-                        refresh();
-                    });
-            });
-
-            refresh();
-        })();
-        </script>
-
-        {{-- Bandeau étapes mobile --}}
-        <div class="mobile-steps-bar" id="mobileStepsBar">
-            <div class="mobile-step-indicator" id="mobileStepNum">1</div>
-            <div>
-                <div class="mobile-step-txt" id="mobileStepTxt">Informations générales</div>
-                <div class="mobile-step-sub" id="mobileStepSub">Étape 1 sur 4</div>
-            </div>
-        </div>
-
-        {{-- Barre de progression --}}
-        <div class="progress-bar-wrap">
-            <div class="progress-bar-fill" id="progressBar" style="width:25%"></div>
-        </div>
-
-        {{-- Tabs étapes --}}
-        <div class="form-steps-tabs">
-            <div class="step-tab active" data-tab="1">
-                <span class="tab-num">1</span> Général
-            </div>
-            <div class="step-tab" data-tab="2">
-                <span class="tab-num">2</span> Contact
-            </div>
-            <div class="step-tab" data-tab="3">
-                <span class="tab-num">3</span> Devise
-            </div>
-            <div class="step-tab" data-tab="4">
-                <span class="tab-num">4</span> Image
-            </div>
-        </div>
-
-        {{-- Formulaire unique — même structure que la création, route PUT --}}
-        <form action="{{ route('shop.update', $shop->id) }}"
-              method="POST"
-              enctype="multipart/form-data"
-              id="shopForm">
-            @csrf
-            @method('PUT')
-
-            {{-- ══ ÉTAPE 1 : Informations générales ══ --}}
-            <div class="form-section active" id="section-1">
-                <div class="section-hd">
-                    <h2>🏪 Informations générales</h2>
-                    <p>Les informations principales de votre boutique.</p>
-                </div>
-
-                <div class="field-group">
-                    <label class="field-label" for="name">Nom de la boutique <span>*</span></label>
-                    <div class="field-wrap">
-                        <span class="field-icon">🏪</span>
-                        <input type="text" name="name" id="name"
-                               class="field-input {{ $errors->has('name') ? 'error' : '' }}"
-                               value="{{ old('name', $shop->name) }}"
-                               placeholder="Ex : Boutique Aminata"
-                               required>
+            <div class="se-grid">
+                {{-- ══ Colonne bleu nuit : titre, aperçu, étapes ══ --}}
+                <section class="se-hero" aria-label="Aperçu de la boutique">
+                    <div>
+                        <h2 class="se-hero-title">Modifier votre <span>boutique</span></h2>
+                        <p class="se-hero-sub">Les modifications sont visibles par vos clients dès l'enregistrement.</p>
                     </div>
-                    @error('name')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
-                </div>
 
-                <div class="field-group">
-                    <label class="field-label">Type de boutique 🏷️</label>
-                    <input type="hidden" name="type" id="type" value="{{ old('type', $shop->type) }}">
-                    <div class="type-pills" id="typePills">
-                        <button type="button" class="type-pill" data-val="Alimentation"         onclick="selectType('Alimentation')">🍎 Alimentation</button>
-                        <button type="button" class="type-pill" data-val="Restaurant"           onclick="selectType('Restaurant')">🍽️ Restaurant</button>
-                        <button type="button" class="type-pill" data-val="Pharmacie"            onclick="selectType('Pharmacie')">💊 Pharmacie</button>
-                        <button type="button" class="type-pill" data-val="Vêtements"            onclick="selectType('Vêtements')">👗 Vêtements</button>
-                        <button type="button" class="type-pill" data-val="Électronique"         onclick="selectType('Électronique')">📱 Électronique</button>
-                        <button type="button" class="type-pill" data-val="Beauté & Cosmétiques" onclick="selectType('Beauté & Cosmétiques')">💄 Beauté & Cosmétiques</button>
-                        <button type="button" class="type-pill" data-val="Meubles & Décoration" onclick="selectType('Meubles & Décoration')">🛋️ Meubles & Décoration</button>
-                        <button type="button" class="type-pill" data-val="Sport & Loisirs"      onclick="selectType('Sport & Loisirs')">⚽ Sport & Loisirs</button>
-                        <button type="button" class="type-pill" data-val="Librairie"            onclick="selectType('Librairie')">📚 Librairie</button>
-                        <button type="button" class="type-pill" data-val="Boulangerie"          onclick="selectType('Boulangerie')">🥐 Boulangerie</button>
-                        <button type="button" class="type-pill" data-val="Épicerie"             onclick="selectType('Épicerie')">🛒 Épicerie</button>
-                        <button type="button" class="type-pill" data-val="Bijouterie"           onclick="selectType('Bijouterie')">💎 Bijouterie</button>
-                        <button type="button" class="type-pill" data-val="Auto & Moto"          onclick="selectType('Auto & Moto')">🚗 Auto & Moto</button>
-                        <button type="button" class="type-pill" data-val="Informatique"         onclick="selectType('Informatique')">💻 Informatique</button>
-                        <button type="button" class="type-pill" data-val="Téléphonie"           onclick="selectType('Téléphonie')">📞 Téléphonie</button>
-                        <button type="button" class="type-pill" data-val="Jouets"               onclick="selectType('Jouets')">🧸 Jouets</button>
-                        <button type="button" class="type-pill" data-val="Fleurs"               onclick="selectType('Fleurs')">🌸 Fleurs</button>
-                        <button type="button" class="type-pill" data-val="Autre"                onclick="selectType('Autre')">✨ Autre</button>
-                        <button type="button" class="type-pill type-pill-add"                   onclick="showCustomType()">＋ Autre catégorie</button>
-                    </div>
-                    <div class="type-custom-wrap" id="typeCustomWrap" style="display:none">
-                        <input type="text" id="typeCustomInput" class="field-input"
-                               placeholder="Ex : Quincaillerie, Librairie…" maxlength="60">
-                        <button type="button" class="type-custom-ok"     onclick="confirmCustomType()">✓ Valider</button>
-                        <button type="button" class="type-custom-cancel" onclick="hideCustomType()">✕</button>
-                    </div>
-                </div>
-
-                <div class="field-group">
-                    <label class="field-label" for="email">Email boutique <span>*</span></label>
-                    <div class="field-wrap">
-                        <span class="field-icon">✉️</span>
-                        <input type="email" name="email" id="email"
-                               class="field-input {{ $errors->has('email') ? 'error' : '' }}"
-                               value="{{ old('email', $shop->email) }}"
-                               placeholder="boutique@email.com"
-                               required>
-                    </div>
-                    @error('email')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
-                </div>
-
-                <div class="field-group">
-                    <label class="field-label" for="description">Description</label>
-                    <textarea name="description" id="description"
-                              class="field-input"
-                              placeholder="Décrivez votre boutique en quelques mots…"
-                              rows="3">{{ old('description', $shop->description) }}</textarea>
-                    <div class="field-hint">Max 500 caractères. Une bonne description attire plus de clients.</div>
-                </div>
-
-                <div class="form-nav">
-                    <a href="{{ route('boutique.dashboard') }}" class="btn-back">← Dashboard</a>
-                    <button type="button" class="btn-next" onclick="goToStep(2)">
-                        Contact & localisation <span>→</span>
-                    </button>
-                </div>
-            </div>
-
-            {{-- ══ ÉTAPE 2 : Contact & localisation ══ --}}
-            <div class="form-section" id="section-2">
-                <div class="section-hd">
-                    <h2>📍 Contact & localisation</h2>
-                    <p>Comment vos clients peuvent vous joindre et vous trouver.</p>
-                </div>
-
-                <div class="field-row">
-                    <div class="field-group">
-                        <label class="field-label" for="phone">Téléphone</label>
-                        <div class="field-wrap">
-                            <span class="field-icon">📞</span>
-                            <input type="tel" name="phone" id="phone"
-                                   class="field-input {{ $errors->has('phone') ? 'error' : '' }}"
-                                   value="{{ old('phone', $shop->phone) }}"
-                                   placeholder="+224 6XX XXX XXX"
-                                   maxlength="20">
+                    <div class="se-preview">
+                        <div class="se-preview-banner">
+                            <img id="sidebarPreviewImg"
+                                 src="{{ $shop->image ? (\App\Services\ImageOptimizer::url($shop->image, 'medium') ?? asset('storage/' . $shop->image)) : '' }}"
+                                 alt="" @unless($shop->image) style="display:none" @endunless>
+                            <span class="se-preview-ph" id="previewPlaceholder" @if($shop->image) style="display:none" @endif aria-hidden="true">{!! $svgStore !!}</span>
+                            <span class="se-preview-stripe" id="previewStripe" style="background:{{ $currentAccent }}"></span>
                         </div>
-                        @error('phone')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
-                    </div>
-                   
-                </div>
-
-                <div class="field-group">
-                    <label class="field-label" for="address">Adresse complète</label>
-                    <div class="field-wrap">
-                        <span class="field-icon">📍</span>
-                        <input type="text" name="address" id="address"
-                               class="field-input {{ $errors->has('address') ? 'error' : '' }}"
-                               value="{{ old('address', $shop->address) }}"
-                               placeholder="Ex : Kaloum, Conakry, Guinée"
-                               maxlength="255">
-                    </div>
-                    @error('address')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
-                </div>
-
-                <div class="field-row">
-                    <div class="field-group">
-                        <label class="field-label" for="ville">Ville</label>
-                        <div class="field-wrap">
-                            <span class="field-icon">🏙️</span>
-                            <input type="text" name="ville" id="ville"
-                                   class="field-input"
-                                   value="{{ old('ville', $shop->ville ?? '') }}"
-                                   placeholder="Ex : Conakry">
-                        </div>
-                    </div>
-                    <div class="field-group">
-                        <label class="field-label" for="country">Pays de la boutique</label>
-                        @php
-                        $shopCountries = [
-                            'Afrique de l\'Ouest' => [
-                                'BJ'=>['🇧🇯','Bénin'],'BF'=>['🇧🇫','Burkina Faso'],'CV'=>['🇨🇻','Cap-Vert'],
-                                'CI'=>['🇨🇮',"Côte d'Ivoire"],'GM'=>['🇬🇲','Gambie'],'GH'=>['🇬🇭','Ghana'],
-                                'GN'=>['🇬🇳','Guinée'],'GW'=>['🇬🇼','Guinée-Bissau'],'LR'=>['🇱🇷','Libéria'],
-                                'ML'=>['🇲🇱','Mali'],'MR'=>['🇲🇷','Mauritanie'],'NE'=>['🇳🇪','Niger'],
-                                'NG'=>['🇳🇬','Nigéria'],'SN'=>['🇸🇳','Sénégal'],'SL'=>['🇸🇱','Sierra Leone'],
-                                'TG'=>['🇹🇬','Togo'],
-                            ],
-                            'Afrique Centrale' => [
-                                'CM'=>['🇨🇲','Cameroun'],'CF'=>['🇨🇫','Centrafrique'],'TD'=>['🇹🇩','Tchad'],
-                                'CG'=>['🇨🇬','Congo'],'CD'=>['🇨🇩','RD Congo'],'GA'=>['🇬🇦','Gabon'],
-                                'GQ'=>['🇬🇶','Guinée Équat.'],'RW'=>['🇷🇼','Rwanda'],'BI'=>['🇧🇮','Burundi'],
-                            ],
-                            'Afrique de l\'Est' => [
-                                'DJ'=>['🇩🇯','Djibouti'],'ET'=>['🇪🇹','Éthiopie'],'KE'=>['🇰🇪','Kenya'],
-                                'MG'=>['🇲🇬','Madagascar'],'MU'=>['🇲🇺','Maurice'],'MZ'=>['🇲🇿','Mozambique'],
-                                'SO'=>['🇸🇴','Somalie'],'SD'=>['🇸🇩','Soudan'],'TZ'=>['🇹🇿','Tanzanie'],
-                                'UG'=>['🇺🇬','Ouganda'],'ZM'=>['🇿🇲','Zambie'],'ZW'=>['🇿🇼','Zimbabwe'],
-                            ],
-                            'Afrique du Nord' => [
-                                'DZ'=>['🇩🇿','Algérie'],'EG'=>['🇪🇬','Égypte'],'LY'=>['🇱🇾','Libye'],
-                                'MA'=>['🇲🇦','Maroc'],'TN'=>['🇹🇳','Tunisie'],
-                            ],
-                            'Afrique Australe' => [
-                                'AO'=>['🇦🇴','Angola'],'BW'=>['🇧🇼','Botswana'],'NA'=>['🇳🇦','Namibie'],
-                                'ZA'=>['🇿🇦','Afrique du Sud'],'LS'=>['🇱🇸','Lesotho'],
-                            ],
-                            'Europe' => [
-                                'DE'=>['🇩🇪','Allemagne'],'AT'=>['🇦🇹','Autriche'],'BE'=>['🇧🇪','Belgique'],
-                                'DK'=>['🇩🇰','Danemark'],'ES'=>['🇪🇸','Espagne'],'FI'=>['🇫🇮','Finlande'],
-                                'FR'=>['🇫🇷','France'],'GR'=>['🇬🇷','Grèce'],'IE'=>['🇮🇪','Irlande'],
-                                'IT'=>['🇮🇹','Italie'],'LU'=>['🇱🇺','Luxembourg'],'NO'=>['🇳🇴','Norvège'],
-                                'NL'=>['🇳🇱','Pays-Bas'],'PL'=>['🇵🇱','Pologne'],'PT'=>['🇵🇹','Portugal'],
-                                'GB'=>['🇬🇧','Royaume-Uni'],'RU'=>['🇷🇺','Russie'],'SE'=>['🇸🇪','Suède'],
-                                'CH'=>['🇨🇭','Suisse'],'UA'=>['🇺🇦','Ukraine'],
-                            ],
-                            'Amériques' => [
-                                'AR'=>['🇦🇷','Argentine'],'BR'=>['🇧🇷','Brésil'],'CA'=>['🇨🇦','Canada'],
-                                'CL'=>['🇨🇱','Chili'],'CO'=>['🇨🇴','Colombie'],'US'=>['🇺🇸','États-Unis'],
-                                'MX'=>['🇲🇽','Mexique'],'PE'=>['🇵🇪','Pérou'],'VE'=>['🇻🇪','Venezuela'],
-                            ],
-                            'Asie & Moyen-Orient' => [
-                                'SA'=>['🇸🇦','Arabie Saoudite'],'AE'=>['🇦🇪','Émirats Arabes'],
-                                'CN'=>['🇨🇳','Chine'],'IN'=>['🇮🇳','Inde'],'ID'=>['🇮🇩','Indonésie'],
-                                'JP'=>['🇯🇵','Japon'],'KW'=>['🇰🇼','Koweït'],'LB'=>['🇱🇧','Liban'],
-                                'MY'=>['🇲🇾','Malaisie'],'PK'=>['🇵🇰','Pakistan'],'QA'=>['🇶🇦','Qatar'],
-                                'SG'=>['🇸🇬','Singapour'],'KR'=>['🇰🇷','Corée du Sud'],
-                                'TH'=>['🇹🇭','Thaïlande'],'TR'=>['🇹🇷','Turquie'],'VN'=>['🇻🇳','Viêt Nam'],
-                            ],
-                            'Océanie' => [
-                                'AU'=>['🇦🇺','Australie'],'NZ'=>['🇳🇿','Nouvelle-Zélande'],
-                            ],
-                        ];
-                        // Aplatir pour retrouver flag+name depuis le code ISO
-                        $flatCountries = [];
-                        foreach ($shopCountries as $grp) { $flatCountries += $grp; }
-                        $currentCountry = old('country', $shop->country ?? '');
-                        @endphp
-                        <div class="field-wrap">
-                            <span class="field-icon" id="shopCountryFlag">
-                                {{ $currentCountry && isset($flatCountries[$currentCountry]) ? $flatCountries[$currentCountry][0] : '🌍' }}
-                            </span>
-                            <select name="country" id="country" class="field-input"
-                                    onchange="onShopCountryChange(this)">
-                                <option value="">Sélectionner un pays…</option>
-                                @foreach($shopCountries as $region => $pays)
-                                    <optgroup label="{{ $region }}">
-                                        @foreach($pays as $code => [$flag, $name])
-                                        <option value="{{ $code }}"
-                                            {{ $currentCountry === $code ? 'selected' : '' }}>
-                                            {{ $flag }} {{ $name }}
-                                        </option>
-                                        @endforeach
-                                    </optgroup>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="field-hint" style="color:#4f46e5;font-weight:600">
-                            Les clients de ce pays verront votre boutique dans leur tableau de bord.
-                        </div>
-                        @error('country')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
-                    </div>
-                </div>
-
-                <div class="form-nav">
-                    <button type="button" class="btn-back" onclick="goToStep(1)">← Retour</button>
-                    <button type="button" class="btn-next" onclick="goToStep(3)">
-                        Devise <span>→</span>
-                    </button>
-                </div>
-            </div>
-
-            {{-- ══ ÉTAPE 3 : Devise ══ --}}
-            <div class="form-section" id="section-3">
-                <div class="section-hd">
-                    <h2>💱 Devise</h2>
-                    <p>Choisissez la devise utilisée dans votre boutique.</p>
-                </div>
-
-                {{-- Sélecteur de devise personnalisé --}}
-                <div class="field-group">
-                    <label class="field-label">Devise principale <span>*</span></label>
-                    <div class="currency-wrap" id="currencyWrap">
-                        <div class="field-wrap">
-                            <span class="field-icon">💱</span>
-                            <input type="text" class="currency-search-box" id="currencyDisplay"
-                                   placeholder="Sélectionner une devise…"
-                                   readonly>
-                        </div>
-                        <input type="hidden" name="currency" id="currency_hidden"
-                               value="{{ old('currency', $shop->currency ?? 'GNF') }}">
-
-                        <div class="currency-dropdown" id="currencyDropdown">
-                            <input type="text" class="currency-search-input"
-                                   id="currencySearch"
-                                   placeholder="🔍  Rechercher une devise ou un pays…"
-                                   autocomplete="off">
-                            <div class="currency-list" id="currencyList">
-                                {{-- Rempli par JS --}}
+                        <div class="se-preview-body">
+                            <span class="se-preview-logo" id="previewLogo" style="background:{{ $currentAccent }};color:{{ $accentChoices[$currentAccent][1] }}">{{ $shopIni }}</span>
+                            <div style="min-width:0">
+                                <div class="se-preview-name" id="previewName">{{ $shop->name }}</div>
+                                <div class="se-preview-meta">
+                                    <span id="previewType" @unless($shop->type) style="display:none" @endunless>{{ $shop->type }}</span>
+                                    <span class="se-preview-badge" id="previewBadge" style="background:{{ $currentAccent }};color:{{ $accentChoices[$currentAccent][1] }}">{{ $shop->is_approved ? 'Vérifiée' : 'En validation' }}</span>
+                                    <span id="previewCurrency">{{ $shop->currency ?? 'GNF' }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="field-hint">La devise sera affichée sur toutes vos commandes et factures.</div>
-                </div>
 
-                {{-- Mobile Money — où Shopio vous reverse les paiements en ligne --}}
-                <div class="field-group">
-                    <label class="field-label">Mobile Money (paiements en ligne)</label>
-                    <div class="field-wrap">
-                        <span class="field-icon">📱</span>
-                        <select name="payout_wallet_type" id="payout_wallet_type" class="field-input">
-                            <option value="">Non renseigné</option>
-                            <option value="orange_money" {{ old('payout_wallet_type', $shop->payout_wallet_type ?? '') === 'orange_money' ? 'selected' : '' }}>Orange Money</option>
-                            <option value="mtn_momo" {{ old('payout_wallet_type', $shop->payout_wallet_type ?? '') === 'mtn_momo' ? 'selected' : '' }}>MTN MoMo</option>
-                            <option value="paycard" {{ old('payout_wallet_type', $shop->payout_wallet_type ?? '') === 'paycard' ? 'selected' : '' }}>PayCard</option>
-                            <option value="kulu" {{ old('payout_wallet_type', $shop->payout_wallet_type ?? '') === 'kulu' ? 'selected' : '' }}>Kulu</option>
-                            <option value="soutra_money" {{ old('payout_wallet_type', $shop->payout_wallet_type ?? '') === 'soutra_money' ? 'selected' : '' }}>Soutra Money</option>
-                            <option value="akiba" {{ old('payout_wallet_type', $shop->payout_wallet_type ?? '') === 'akiba' ? 'selected' : '' }}>Akiba</option>
-                        </select>
-                    </div>
-                    @error('payout_wallet_type')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
-                </div>
+                    <nav class="steps-list" aria-label="Étapes">
+                        @foreach($stepLabels as $i => $label)
+                        <button type="button" class="step-row {{ $i === 0 ? 'active' : '' }}" data-step="{{ $i + 1 }}" @if($i === 0) aria-current="step" @endif>
+                            <span class="step-dot">{{ $i + 1 }}</span>
+                            <span class="step-txt">{{ $label }}</span>
+                        </button>
+                        @endforeach
+                    </nav>
+                </section>
 
-                <div class="field-group">
-                    <label class="field-label">Numéro Mobile Money</label>
-                    <div class="field-wrap">
-                        <span class="field-icon">☎️</span>
-                        <input type="text" name="payout_wallet_number" id="payout_wallet_number" class="field-input"
-                               placeholder="Ex : 622 00 00 00"
-                               value="{{ old('payout_wallet_number', $shop->payout_wallet_number ?? '') }}">
-                    </div>
-                    <div class="field-hint">C'est le numéro sur lequel Shopio vous envoie l'argent de vos ventes payées en ligne. Sans ça, impossible de vous reverser vos paiements en ligne.</div>
-                    @error('payout_wallet_number')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
-                </div>
-
-                <div class="form-nav">
-                    <button type="button" class="btn-back" onclick="goToStep(2)">← Retour</button>
-                    <button type="button" class="btn-next" onclick="goToStep(4)">
-                        Image & finalisation <span>→</span>
-                    </button>
-                </div>
-            </div>
-
-            {{-- ══ ÉTAPE 4 : Image & Finalisation ══ --}}
-            <div class="form-section" id="section-4">
-                <div class="section-hd">
-                    <h2>🖼️ Image & Finalisation</h2>
-                    <p>Mettez à jour le logo ou la photo de votre boutique.</p>
-                </div>
-
-                {{-- Image actuelle — uniquement si elle existe --}}
-                @if($shop->image)
-                <div class="field-group">
-                    <label class="field-label">Image actuelle</label>
-                    <div class="current-img-box">
-                        <img src="{{ asset('storage/' . $shop->image) }}"
-                             alt="Image actuelle — {{ $shop->name }}">
-                        <div class="current-img-label">Image actuelle · Choisissez une nouvelle image ci-dessous pour la remplacer</div>
-                    </div>
-                </div>
-                @endif
-
-                <div class="field-group">
-                    <label class="field-label">
-                        {{ $shop->image ? 'Nouvelle image (optionnel)' : 'Logo / Image de la boutique' }}
-                    </label>
-                    <div class="upload-zone" id="uploadZone">
-                        <input type="file" name="image" id="imageInput" accept="image/*">
-                        <div id="uploadPlaceholder">
-                            <div class="upload-icon">🖼️</div>
-                            <div class="upload-txt">Cliquez ou glissez votre image ici</div>
-                            <div class="upload-hint">JPG, PNG, WEBP — Max 2 Mo</div>
+                {{-- ══ Colonne formulaire ══ --}}
+                <section class="se-col">
+                    {{-- Notifications push — activation manuelle si la bannière automatique n'est pas apparue --}}
+                    <div id="notifSettingsCard" class="se-card se-notif">
+                        <span class="se-tile se-tile-amber" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20a2 2 0 0 0 4 0"/></svg>
+                        </span>
+                        <div style="flex:1 1 180px;min-width:0">
+                            <strong>Notifications push</strong>
+                            <div id="notifSettingsSub" class="se-notif-sub">Recevez vos commandes et messages en temps réel, même application fermée.</div>
                         </div>
-                        <div class="upload-preview" id="uploadPreview">
-                            <img id="previewImg" src="" alt="Aperçu">
-                            <button type="button" class="upload-remove" id="removeImg">✕</button>
-                        </div>
+                        <button type="button" id="notifSettingsBtn" class="se-btn se-btn-blue">Activer</button>
                     </div>
-                    @error('image')<div class="field-error" style="display:block;margin-top:6px">{{ $message }}</div>@enderror
-                </div>
+                    <script>
+                    (function() {
+                        var card = document.getElementById('notifSettingsCard');
+                        var btn  = document.getElementById('notifSettingsBtn');
+                        var sub  = document.getElementById('notifSettingsSub');
+                        if (!card) return;
+                        if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) { card.style.display = 'none'; return; }
+                        function refresh() {
+                            if (Notification.permission === 'granted' && localStorage.getItem('push_subscribed')) {
+                                sub.textContent = 'Notifications activées sur cet appareil.';
+                                btn.textContent = 'Activées';
+                                btn.disabled = true;
+                                btn.classList.replace('se-btn-blue', 'se-btn-line');
+                            } else if (Notification.permission === 'denied') {
+                                sub.textContent = 'Bloquées dans les réglages de votre navigateur. Autorisez les notifications pour ce site pour les activer.';
+                                btn.style.display = 'none';
+                            }
+                        }
+                        btn.addEventListener('click', function() {
+                            btn.disabled = true;
+                            btn.textContent = 'Activation…';
+                            Promise.resolve(window.enablePushNotifications ? window.enablePushNotifications() : null)
+                                .finally(function() { btn.disabled = false; btn.textContent = 'Activer'; refresh(); });
+                        });
+                        refresh();
+                    })();
+                    </script>
 
-                {{-- Récapitulatif --}}
-                <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:8px">
-                    <div style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px">
-                        ✅ Récapitulatif des modifications
-                    </div>
-                    <div style="display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--text-2)">
-                        <div><strong style="color:var(--text)">Nom :</strong> <span id="recapName">{{ $shop->name }}</span></div>
-                        <div><strong style="color:var(--text)">Type :</strong> <span id="recapType">{{ $shop->type ?? '—' }}</span></div>
-                        <div><strong style="color:var(--text)">Email :</strong> <span id="recapEmail">{{ $shop->email }}</span></div>
-                        <div><strong style="color:var(--text)">Téléphone :</strong> <span id="recapPhone">{{ $shop->phone ?? '—' }}</span></div>
-                        <div><strong style="color:var(--text)">Pays :</strong> <span id="recapCountry">{{ $currentCountry && isset($flatCountries[$currentCountry]) ? $flatCountries[$currentCountry][0].' '.$flatCountries[$currentCountry][1] : '—' }}</span></div>
-                        <div><strong style="color:var(--text)">Devise :</strong> <span id="recapCurrency">{{ $shop->currency ?? 'GNF' }}</span></div>
-                    </div>
-                </div>
+                    <div class="se-card se-form-card">
+                        <div class="progress-bar-wrap" aria-hidden="true"><div class="progress-bar-fill" id="progressBar"></div></div>
+                        <div class="se-step-count" id="mobileStepSub" aria-live="polite">Étape 1 sur 4</div>
 
-                <div class="form-nav">
-                    <button type="button" class="btn-back" onclick="goToStep(3)">← Retour</button>
-                    <button type="submit" class="btn-submit" id="submitBtn">
-                        💾 Enregistrer les modifications
-                    </button>
-                </div>
+                        {{-- Formulaire unique — route PUT --}}
+                        <form action="{{ route('shop.update', $shop->id) }}" method="POST" enctype="multipart/form-data" id="shopForm">
+                            @csrf
+                            @method('PUT')
+
+                            {{-- ══ ÉTAPE 1 : Informations générales ══ --}}
+                            <div class="form-section active" id="section-1">
+                                <h2 class="se-sec-title" tabindex="-1">Informations générales</h2>
+
+                                <div class="field-group">
+                                    <label class="field-label" for="name">Nom de la boutique <span>*</span></label>
+                                    <input type="text" name="name" id="name" class="field-input {{ $errors->has('name') ? 'error' : '' }}"
+                                           value="{{ old('name', $shop->name) }}" placeholder="Ex. Boutique Aminata" required maxlength="255">
+                                    @error('name')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="field-group">
+                                    <span class="field-label" id="typeLbl">Type de boutique</span>
+                                    <input type="hidden" name="type" id="type" value="{{ old('type', $shop->type) }}">
+                                    <div class="type-pills" id="typePills" role="group" aria-labelledby="typeLbl">
+                                        @foreach(['Alimentation','Restaurant','Pharmacie','Vêtements','Électronique','Beauté & Cosmétiques','Meubles & Décoration','Sport & Loisirs','Librairie','Boulangerie','Épicerie','Bijouterie','Auto & Moto','Informatique','Téléphonie','Jouets','Fleurs','Autre'] as $t)
+                                        <button type="button" class="type-pill" data-val="{{ $t }}" onclick="selectType(@js($t))">{{ $t }}</button>
+                                        @endforeach
+                                        <button type="button" class="type-pill type-pill-add" onclick="showCustomType()">+ Autre catégorie</button>
+                                    </div>
+                                    <div class="type-custom-wrap" id="typeCustomWrap" style="display:none">
+                                        <label for="typeCustomInput" class="se-sr">Nom de la catégorie</label>
+                                        <input type="text" id="typeCustomInput" class="field-input" placeholder="Ex. Quincaillerie" maxlength="60">
+                                        <button type="button" class="se-btn se-btn-blue se-btn-sm" onclick="confirmCustomType()">Valider</button>
+                                        <button type="button" class="se-btn se-btn-line se-btn-sm" onclick="hideCustomType()">Annuler</button>
+                                    </div>
+                                </div>
+
+                                <div class="field-group">
+                                    <label class="field-label" for="email">E-mail de la boutique <span>*</span></label>
+                                    <input type="email" name="email" id="email" class="field-input {{ $errors->has('email') ? 'error' : '' }}"
+                                           value="{{ old('email', $shop->email) }}" placeholder="boutique@email.com" required>
+                                    @error('email')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
+                                </div>
+                            </div>
+
+                            {{-- ══ ÉTAPE 2 : Contact et localisation ══ --}}
+                            <div class="form-section" id="section-2">
+                                <h2 class="se-sec-title" tabindex="-1">Contact et localisation</h2>
+
+                                <div class="field-group">
+                                    <label class="field-label" for="phone">Téléphone de la boutique</label>
+                                    <input type="tel" name="phone" id="phone" class="field-input {{ $errors->has('phone') ? 'error' : '' }}"
+                                           value="{{ old('phone', $shop->phone) }}" placeholder="+224 6XX XX XX XX" maxlength="20" inputmode="tel">
+                                    @error('phone')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="field-group">
+                                    <label class="field-label" for="address">Adresse et point de repère</label>
+                                    <input type="text" name="address" id="address" class="field-input {{ $errors->has('address') ? 'error' : '' }}"
+                                           value="{{ old('address', $shop->address) }}" placeholder="Ex. Kaloum, en face de la Banque centrale" maxlength="255">
+                                    @error('address')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
+                                </div>
+
+                                @php
+                                $shopCountries = [
+                                    'Afrique de l\'Ouest' => ['BJ'=>['🇧🇯','Bénin'],'BF'=>['🇧🇫','Burkina Faso'],'CV'=>['🇨🇻','Cap-Vert'],'CI'=>['🇨🇮',"Côte d'Ivoire"],'GM'=>['🇬🇲','Gambie'],'GH'=>['🇬🇭','Ghana'],'GN'=>['🇬🇳','Guinée'],'GW'=>['🇬🇼','Guinée-Bissau'],'LR'=>['🇱🇷','Libéria'],'ML'=>['🇲🇱','Mali'],'MR'=>['🇲🇷','Mauritanie'],'NE'=>['🇳🇪','Niger'],'NG'=>['🇳🇬','Nigéria'],'SN'=>['🇸🇳','Sénégal'],'SL'=>['🇸🇱','Sierra Leone'],'TG'=>['🇹🇬','Togo']],
+                                    'Afrique centrale' => ['CM'=>['🇨🇲','Cameroun'],'CF'=>['🇨🇫','Centrafrique'],'TD'=>['🇹🇩','Tchad'],'CG'=>['🇨🇬','Congo'],'CD'=>['🇨🇩','RD Congo'],'GA'=>['🇬🇦','Gabon'],'GQ'=>['🇬🇶','Guinée équatoriale'],'RW'=>['🇷🇼','Rwanda'],'BI'=>['🇧🇮','Burundi']],
+                                    'Afrique de l\'Est' => ['DJ'=>['🇩🇯','Djibouti'],'ET'=>['🇪🇹','Éthiopie'],'KE'=>['🇰🇪','Kenya'],'MG'=>['🇲🇬','Madagascar'],'MU'=>['🇲🇺','Maurice'],'MZ'=>['🇲🇿','Mozambique'],'SO'=>['🇸🇴','Somalie'],'SD'=>['🇸🇩','Soudan'],'TZ'=>['🇹🇿','Tanzanie'],'UG'=>['🇺🇬','Ouganda'],'ZM'=>['🇿🇲','Zambie'],'ZW'=>['🇿🇼','Zimbabwe']],
+                                    'Afrique du Nord' => ['DZ'=>['🇩🇿','Algérie'],'EG'=>['🇪🇬','Égypte'],'LY'=>['🇱🇾','Libye'],'MA'=>['🇲🇦','Maroc'],'TN'=>['🇹🇳','Tunisie']],
+                                    'Afrique australe' => ['AO'=>['🇦🇴','Angola'],'BW'=>['🇧🇼','Botswana'],'NA'=>['🇳🇦','Namibie'],'ZA'=>['🇿🇦','Afrique du Sud'],'LS'=>['🇱🇸','Lesotho']],
+                                    'Europe' => ['DE'=>['🇩🇪','Allemagne'],'AT'=>['🇦🇹','Autriche'],'BE'=>['🇧🇪','Belgique'],'DK'=>['🇩🇰','Danemark'],'ES'=>['🇪🇸','Espagne'],'FI'=>['🇫🇮','Finlande'],'FR'=>['🇫🇷','France'],'GR'=>['🇬🇷','Grèce'],'IE'=>['🇮🇪','Irlande'],'IT'=>['🇮🇹','Italie'],'LU'=>['🇱🇺','Luxembourg'],'NO'=>['🇳🇴','Norvège'],'NL'=>['🇳🇱','Pays-Bas'],'PL'=>['🇵🇱','Pologne'],'PT'=>['🇵🇹','Portugal'],'GB'=>['🇬🇧','Royaume-Uni'],'RU'=>['🇷🇺','Russie'],'SE'=>['🇸🇪','Suède'],'CH'=>['🇨🇭','Suisse'],'UA'=>['🇺🇦','Ukraine']],
+                                    'Amériques' => ['AR'=>['🇦🇷','Argentine'],'BR'=>['🇧🇷','Brésil'],'CA'=>['🇨🇦','Canada'],'CL'=>['🇨🇱','Chili'],'CO'=>['🇨🇴','Colombie'],'US'=>['🇺🇸','États-Unis'],'MX'=>['🇲🇽','Mexique'],'PE'=>['🇵🇪','Pérou'],'VE'=>['🇻🇪','Venezuela']],
+                                    'Asie et Moyen-Orient' => ['SA'=>['🇸🇦','Arabie saoudite'],'AE'=>['🇦🇪','Émirats arabes unis'],'CN'=>['🇨🇳','Chine'],'IN'=>['🇮🇳','Inde'],'ID'=>['🇮🇩','Indonésie'],'JP'=>['🇯🇵','Japon'],'KW'=>['🇰🇼','Koweït'],'LB'=>['🇱🇧','Liban'],'MY'=>['🇲🇾','Malaisie'],'PK'=>['🇵🇰','Pakistan'],'QA'=>['🇶🇦','Qatar'],'SG'=>['🇸🇬','Singapour'],'KR'=>['🇰🇷','Corée du Sud'],'TH'=>['🇹🇭','Thaïlande'],'TR'=>['🇹🇷','Turquie'],'VN'=>['🇻🇳','Viêt Nam']],
+                                    'Océanie' => ['AU'=>['🇦🇺','Australie'],'NZ'=>['🇳🇿','Nouvelle-Zélande']],
+                                ];
+                                $flatCountries = [];
+                                foreach ($shopCountries as $grp) { $flatCountries += $grp; }
+                                $currentCountry = old('country', $shop->country ?? '');
+                                @endphp
+                                <div class="field-row">
+                                    <div class="field-group">
+                                        <label class="field-label" for="country">Pays de la boutique</label>
+                                        <select name="country" id="country" class="field-input" onchange="onShopCountryChange(this)">
+                                            <option value="">Sélectionner un pays…</option>
+                                            @foreach($shopCountries as $region => $pays)
+                                                <optgroup label="{{ $region }}">
+                                                    @foreach($pays as $code => [$flag, $cname])
+                                                    <option value="{{ $code }}" {{ $currentCountry === $code ? 'selected' : '' }}>{{ $flag }} {{ $cname }}</option>
+                                                    @endforeach
+                                                </optgroup>
+                                            @endforeach
+                                        </select>
+                                        <span id="shopCountryFlag" hidden></span>
+                                        <div class="field-hint">Les clients de ce pays voient votre boutique dans leur espace.</div>
+                                        @error('country')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
+                                    </div>
+                                    <div class="field-group">
+                                        <label class="field-label" for="currencyDisplay">Devise</label>
+                                        <div class="currency-wrap" id="currencyWrap">
+                                            <input type="text" class="currency-search-box field-input" id="currencyDisplay" placeholder="Sélectionner une devise…" readonly>
+                                            <input type="hidden" name="currency" id="currency_hidden" value="{{ old('currency', $shop->currency ?? 'GNF') }}">
+                                            <div class="currency-dropdown" id="currencyDropdown">
+                                                <label for="currencySearch" class="se-sr">Rechercher une devise</label>
+                                                <input type="text" class="currency-search-input" id="currencySearch" placeholder="Rechercher une devise ou un pays…" autocomplete="off">
+                                                <div class="currency-list" id="currencyList"></div>
+                                            </div>
+                                        </div>
+                                        <div class="field-hint">Quand un pays est choisi, c'est la devise de ce pays qui est enregistrée.</div>
+                                    </div>
+                                </div>
+
+                                <h3 class="se-sub-title">Paiements en ligne</h3>
+                                <div class="field-row">
+                                    <div class="field-group">
+                                        <label class="field-label" for="payout_wallet_type">Mobile Money</label>
+                                        <select name="payout_wallet_type" id="payout_wallet_type" class="field-input">
+                                            <option value="">Non renseigné</option>
+                                            @foreach(['orange_money' => 'Orange Money', 'mtn_momo' => 'MTN MoMo', 'paycard' => 'PayCard', 'kulu' => 'Kulu', 'soutra_money' => 'Soutra Money', 'akiba' => 'Akiba'] as $wv => $wl)
+                                            <option value="{{ $wv }}" {{ old('payout_wallet_type', $shop->payout_wallet_type ?? '') === $wv ? 'selected' : '' }}>{{ $wl }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('payout_wallet_type')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
+                                    </div>
+                                    <div class="field-group">
+                                        <label class="field-label" for="payout_wallet_number">Numéro Mobile Money</label>
+                                        <input type="text" name="payout_wallet_number" id="payout_wallet_number" class="field-input" inputmode="tel"
+                                               placeholder="Ex. 622 00 00 00" value="{{ old('payout_wallet_number', $shop->payout_wallet_number ?? '') }}">
+                                        @error('payout_wallet_number')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
+                                    </div>
+                                </div>
+                                <div class="field-hint" style="margin-top:-6px">C'est sur ce numéro que Shopio vous verse l'argent des ventes payées en ligne.</div>
+                            </div>
+
+                            {{-- ══ ÉTAPE 3 : Concevoir ══ --}}
+                            <div class="form-section" id="section-3">
+                                <h2 class="se-sec-title" tabindex="-1">Concevoir</h2>
+
+                                <fieldset class="field-group se-fieldset">
+                                    <legend class="field-label">Couleur d'accent</legend>
+                                    <div class="se-swatches">
+                                        @foreach($accentChoices as $hex => [$aLabel, $aInk])
+                                        <label class="se-swatch" style="--sw:{{ $hex }}">
+                                            <input type="radio" name="accent_color" value="{{ $hex }}" data-ink="{{ $aInk }}" {{ $currentAccent === $hex ? 'checked' : '' }}>
+                                            <span class="se-swatch-dot" aria-hidden="true"></span>
+                                            <span class="se-sr">{{ $aLabel }}</span>
+                                        </label>
+                                        @endforeach
+                                    </div>
+                                    <div class="field-hint">Utilisée pour le liseré du bandeau de votre boutique, visible par vos clients.</div>
+                                    @error('accent_color')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
+                                </fieldset>
+
+                                <div class="field-group">
+                                    <label class="field-label" for="description">Description courte</label>
+                                    <textarea name="description" id="description" class="field-input" rows="4" maxlength="500"
+                                              placeholder="Ex. Montres et parfums authentiques, livrés partout à Conakry.">{{ old('description', $shop->description) }}</textarea>
+                                    <div class="field-hint">500 caractères maximum. Dites ce que vous vendez et où vous livrez.</div>
+                                    @error('description')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
+                                </div>
+
+                                {{-- Pixel Meta (Facebook) : mesure des pubs du vendeur sur ses propres pages --}}
+                                <div class="field-group">
+                                    <label class="field-label" for="meta_pixel_id">Pixel Meta (Facebook) <span style="color:var(--muted);font-weight:500">· facultatif</span></label>
+                                    <input type="text" name="meta_pixel_id" id="meta_pixel_id" class="field-input {{ $errors->has('meta_pixel_id') ? 'error' : '' }}"
+                                           value="{{ old('meta_pixel_id', $shop->meta_pixel_id) }}" inputmode="numeric" autocomplete="off" maxlength="30"
+                                           placeholder="Ex. 123456789012345" aria-describedby="metaPixelHint">
+                                    <div class="field-hint" id="metaPixelHint">
+                                        L'identifiant à 15 ou 16 chiffres de votre pixel (Gestionnaire d'événements Meta → Sources de données).
+                                        Il mesure les visites de votre vitrine, les produits vus, les ajouts au panier et les commandes,
+                                        uniquement sur les pages de votre boutique. Laissez vide pour le désactiver.
+                                    </div>
+                                    @error('meta_pixel_id')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
+                                </div>
+
+                                {{-- Réglages avancés de la page publique (sections, affichage, bannière) --}}
+                                <div class="se-asset" style="flex-wrap:wrap">
+                                    <div style="flex:1 1 200px;min-width:0">
+                                        <strong>Vitrine de la boutique</strong>
+                                        <div class="field-hint" style="margin:2px 0 0">Ordre des sections, affichage des produits, bannière, avec un aperçu en direct. Enregistrez d'abord cette page si vous l'avez modifiée.</div>
+                                    </div>
+                                    <a href="{{ route('boutique.storefront.edit') }}" class="se-btn se-btn-blue">Personnaliser la vitrine en détail</a>
+                                </div>
+                            </div>
+
+                            {{-- ══ ÉTAPE 4 : Images et finalisation ══ --}}
+                            <div class="form-section" id="section-4">
+                                <h2 class="se-sec-title" tabindex="-1">Images et finalisation</h2>
+
+                                @if($shop->image)
+                                <div class="se-asset">
+                                    <img src="{{ \App\Services\ImageOptimizer::url($shop->image, 'thumb') ?? asset('storage/' . $shop->image) }}" alt="Image actuelle de {{ $shop->name }}" width="56" height="56">
+                                    <div style="flex:1;min-width:0"><strong>Image actuelle</strong><div class="field-hint" style="margin:0">Choisissez une nouvelle image ci-dessous pour la remplacer.</div></div>
+                                </div>
+                                @endif
+
+                                <div class="field-group">
+                                    <span class="field-label">{{ $shop->image ? 'Nouvelle image (facultatif)' : 'Logo ou image de la boutique' }}</span>
+                                    <div class="upload-zone" id="uploadZone">
+                                        <input type="file" name="image" id="imageInput" accept="image/*" aria-label="Choisir une image">
+                                        <div id="uploadPlaceholder">
+                                            <div class="upload-txt">Cliquez ou glissez votre image ici</div>
+                                            <div class="upload-hint">JPG, PNG ou WEBP · 2 Mo maximum · carré de 512 px conseillé</div>
+                                        </div>
+                                        <div class="upload-preview" id="uploadPreview">
+                                            <img id="previewImg" src="" alt="Aperçu de la nouvelle image">
+                                            <button type="button" class="upload-remove" id="removeImg" aria-label="Retirer l'image">&times;</button>
+                                        </div>
+                                    </div>
+                                    @error('image')<div class="field-error" style="display:block;margin-top:6px">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="se-recap">
+                                    <div class="se-recap-title">Récapitulatif</div>
+                                    <dl>
+                                        <div><dt>Nom</dt><dd id="recapName">{{ $shop->name }}</dd></div>
+                                        <div><dt>Type</dt><dd id="recapType">{{ $shop->type ?? '—' }}</dd></div>
+                                        <div><dt>E-mail</dt><dd id="recapEmail">{{ $shop->email }}</dd></div>
+                                        <div><dt>Téléphone</dt><dd id="recapPhone">{{ $shop->phone ?? '—' }}</dd></div>
+                                        <div><dt>Pays</dt><dd id="recapCountry">{{ $currentCountry && isset($flatCountries[$currentCountry]) ? $flatCountries[$currentCountry][0].' '.$flatCountries[$currentCountry][1] : '—' }}</dd></div>
+                                        <div><dt>Devise</dt><dd id="recapCurrency">{{ $shop->currency ?? 'GNF' }}</dd></div>
+                                        <div><dt>Couleur</dt><dd><span class="se-recap-dot" id="recapAccentDot" style="background:{{ $currentAccent }}"></span> <span id="recapAccent">{{ $accentChoices[$currentAccent][0] }}</span></dd></div>
+                                    </dl>
+                                </div>
+                            </div>
+
+                            <div class="form-nav se-nav">
+                                <button type="button" class="se-btn se-btn-line" id="stepPrev">Précédent</button>
+                                <button type="button" class="se-btn se-btn-blue" id="stepNext">Suivant</button>
+                                <button type="submit" class="se-btn se-btn-blue" id="submitBtn" hidden>Enregistrer les modifications</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
             </div>
-
-        </form>
+        </div>
     </main>
 </div>
 @endsection
@@ -1148,40 +1152,61 @@ const CURRENCIES = [
 ════════════════════════════════════════════════════════════════ */
 let currentStep = 1;
 const totalSteps = 4;
-const stepNames  = ['Informations générales', 'Contact & localisation', 'Devise', 'Image & finalisation'];
+const stepNames  = ['Informations générales', 'Contact et localisation', 'Concevoir', 'Images et finalisation'];
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function goToStep(step) {
-    document.getElementById(`section-${currentStep}`).classList.remove('active');
-
-    document.querySelectorAll('.step-tab').forEach(t => {
-        const n = parseInt(t.dataset.tab);
-        t.classList.remove('active', 'done');
-        if (n === step) t.classList.add('active');
-        else if (n < step) t.classList.add('done');
-    });
+function goToStep(step, opts = {}) {
+    document.getElementById(`section-${currentStep}`).classList.remove('active', 'is-in');
 
     document.querySelectorAll('.step-row').forEach(r => {
         const n = parseInt(r.dataset.step);
-        r.classList.remove('active', 'done');
-        if (n === step) r.classList.add('active');
-        else if (n < step) r.classList.add('done');
+        r.classList.toggle('active', n === step);
+        r.classList.toggle('done', n < step);
+        if (n === step) r.setAttribute('aria-current', 'step'); else r.removeAttribute('aria-current');
     });
 
     currentStep = step;
-    document.getElementById(`section-${step}`).classList.add('active');
-    document.getElementById('progressBar').style.width = (step / totalSteps * 100) + '%';
+    const section = document.getElementById(`section-${step}`);
+    section.classList.add('active');
+    if (!reduceMotion && !opts.silent) { void section.offsetWidth; section.classList.add('is-in'); }
+    document.getElementById('progressBar').style.setProperty('--p', step / totalSteps);
 
-    /* Mobile steps bar */
-    const mobileNum = document.getElementById('mobileStepNum');
-    const mobileTxt = document.getElementById('mobileStepTxt');
-    const mobileSub = document.getElementById('mobileStepSub');
-    if (mobileNum) mobileNum.textContent = step;
-    if (mobileTxt) mobileTxt.textContent = stepNames[step - 1];
-    if (mobileSub) mobileSub.textContent = `Étape ${step} sur ${totalSteps}`;
+    const counter = document.getElementById('mobileStepSub');
+    if (counter) counter.textContent = `Étape ${step} sur ${totalSteps} · ${stepNames[step - 1]}`;
+
+    /* Boutons : Précédent désactivé à l'étape 1, « Enregistrer » à la dernière */
+    document.getElementById('stepPrev').disabled = step === 1;
+    document.getElementById('stepNext').hidden = step === totalSteps;
+    document.getElementById('submitBtn').hidden = step !== totalSteps;
 
     if (step === 4) updateRecap();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (!opts.silent) {
+        const card = document.querySelector('.se-form-card');
+        if (card && card.getBoundingClientRect().top < 0) card.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+        section.querySelector('.se-sec-title')?.focus({ preventScroll: true });
+    }
 }
+
+document.querySelectorAll('.step-row').forEach(r => r.addEventListener('click', () => goToStep(parseInt(r.dataset.step))));
+document.getElementById('stepPrev').addEventListener('click', () => { if (currentStep > 1) goToStep(currentStep - 1); });
+document.getElementById('stepNext').addEventListener('click', () => { if (currentStep < totalSteps) goToStep(currentStep + 1); });
+goToStep(1, { silent: true });
+/* Lien direct vers une étape (ex. ?etape=2 depuis l'indicateur de qualité de la vitrine) */
+(function () {
+    const s = parseInt(new URLSearchParams(location.search).get('etape'), 10);
+    if (s >= 2 && s <= totalSteps) goToStep(s, { silent: true });
+})();
+
+/* ════════════════════════════════════════════════════════════════
+   COULEUR D'ACCENT — aperçu en direct (liseré, logo, badge, récap)
+════════════════════════════════════════════════════════════════ */
+document.querySelectorAll('input[name="accent_color"]').forEach(r => r.addEventListener('change', () => {
+    const c = r.value, ink = r.dataset.ink;
+    document.getElementById('previewStripe').style.background = c;
+    ['previewLogo', 'previewBadge'].forEach(id => { const el = document.getElementById(id); el.style.background = c; el.style.color = ink; });
+    document.getElementById('recapAccentDot').style.background = c;
+    document.getElementById('recapAccent').textContent = r.parentElement.querySelector('.se-sr').textContent;
+}));
 
 /* ════════════════════════════════════════════════════════════════
    DEVISE — identique à la création + pré-sélection boutique
@@ -1425,21 +1450,34 @@ function updateRecap() {
 /* ════════════════════════════════════════════════════════════════
    SUBMIT — loader sur le bouton
 ════════════════════════════════════════════════════════════════ */
-document.getElementById('shopForm').addEventListener('submit', () => {
+document.getElementById('shopForm').addEventListener('submit', e => {
+    /* Les champs obligatoires sont sur l'étape 1 : s'ils sont vides ou invalides alors que
+       l'étape est masquée, le navigateur bloquerait l'envoi sans rien montrer → on y retourne. */
+    const bad = ['name', 'email'].map(id => document.getElementById(id)).find(f => !f.checkValidity());
+    if (bad) {
+        e.preventDefault();
+        goToStep(1);
+        bad.reportValidity();
+        return;
+    }
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
-    btn.innerHTML = '⏳ Enregistrement…';
+    btn.textContent = 'Enregistrement…';
 });
 
 /* Si Laravel renvoie des erreurs → aller directement à l'étape concernée */
-@if($errors->has('name') || $errors->has('email') || $errors->has('description') || $errors->has('type'))
+@if($errors->has('name') || $errors->has('email') || $errors->has('type'))
     goToStep(1);
-@elseif($errors->has('phone') || $errors->has('address') || $errors->has('whatsapp'))
+@elseif($errors->has('phone') || $errors->has('address') || $errors->has('country') || $errors->has('currency') || $errors->has('payout_wallet_type') || $errors->has('payout_wallet_number'))
     goToStep(2);
-@elseif($errors->has('currency'))
+@elseif($errors->has('description') || $errors->has('accent_color') || $errors->has('meta_pixel_id'))
     goToStep(3);
 @elseif($errors->has('image'))
     goToStep(4);
 @endif
 </script>
+@endpush
+{{-- Thème bleu « espace vendeur » (maquette Main.dc.html), chargé après les styles de la page --}}
+@push('styles')
+@include('boutique._partials.sv-theme')
 @endpush

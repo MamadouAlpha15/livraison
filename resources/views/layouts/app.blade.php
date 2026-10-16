@@ -45,8 +45,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @auth<meta name="vapid-public-key" content="{{ config('app.vapid_public_key') }}">@endauth
     <meta name="theme-color" content="#6366f1">
-    <meta name="description" content="{{ $description ?? 'Shopio — la plateforme tout-en-un pour créer votre boutique en ligne, gérer vos livraisons et vos clients en Guinée.' }}">
-    <title>{{ $title ?? config('app.name', 'Shopio') }}</title>
+    {{-- Une page peut définir son titre et sa description avec @section('title') / @section('description') --}}
+    <meta name="description" content="@hasSection('description')@yield('description')@else{{ $description ?? 'Shopio — la plateforme tout-en-un pour créer votre boutique en ligne, gérer vos livraisons et vos clients en Guinée.' }}@endif">
+    <title>@hasSection('title')@yield('title')@else{{ $title ?? config('app.name', 'Shopio') }}@endif</title>
 
     {{-- ── Aperçu de lien (WhatsApp, Facebook, Messenger…) — une page peut définir
          ses propres balises via @push('meta') pour afficher sa photo + son titre
@@ -463,6 +464,11 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
     <script src="{{ \App\Support\Assets::v('vendor/bootstrap/bootstrap.bundle.min.js') }}" defer></script>
     <script src="{{ \App\Support\Assets::v('vendor/bootstrap/nprogress.min.js') }}" defer></script>
     @stack('scripts')
+
+{{-- ══ Pixel Meta des vendeurs : achat confirmé (préparé par App\Support\MetaPixel::queuePurchase) ══ --}}
+@foreach((array) session('meta_pixel_purchases', []) as $mpPurchase)
+    @include('partials.meta-pixel', ['pixelId' => $mpPurchase['pixel'], 'pageView' => false, 'events' => [['Purchase', $mpPurchase['params'], $mpPurchase['event_id']]]])
+@endforeach
 
 {{-- ══ Célébration : objectif journalier du livreur atteint (gamification) ══ --}}
 @auth

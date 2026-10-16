@@ -91,6 +91,8 @@ class OrderPaymentController extends Controller
         $routeArg  = auth()->check() ? [] : $order;
 
         if ($payment && $payment->status === 'payé') {
+            // Pixel Meta du vendeur : achat payé en ligne (une seule fois par commande et par session)
+            \App\Support\MetaPixel::queuePurchase($order);
             return redirect()->route($routeName, $routeArg)
                 ->with('success', 'Paiement reçu ! Votre commande est confirmée. 🎉');
         }

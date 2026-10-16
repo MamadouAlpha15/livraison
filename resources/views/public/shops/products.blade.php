@@ -635,13 +635,123 @@ a.amz-card-name { text-decoration: none; }
     .amz-card, .amz-card-img img { transition: none !important; }
     .amz-card.is-entering, .amz-filtered-empty.show, .shop-banner-open::before { animation: none !important; }
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   VITRINE PERSONNALISABLE (« Personnaliser ma vitrine » côté vendeur)
+   Variables posées sur .sf-flow : --sf-accent, --sf-ink, --sf-cols
+══════════════════════════════════════════════════════════════════ */
+.shop-banner { background: radial-gradient(120% 140% at 100% 0%, rgba(31,124,246,.35), transparent 55%), linear-gradient(135deg, #0B1E3D, #132B52) !important; border-bottom: 6px solid var(--sf-accent, #1F7CF6); }
+.sf-banner-compact { padding: 14px 22px !important; gap: 14px !important; }
+.sf-banner-compact .shop-banner-desc { display: none; }
+.sf-banner-compact .shop-banner-logo { width: 52px; height: 52px; }
+.sf-banner-compact .shop-banner-name { font-size: 19px; margin-bottom: 4px; }
+.sf-slim-head { max-width: 1500px; margin: 0 auto; padding: 18px 20px 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.sf-slim-name { font-size: 22px; font-weight: 800; letter-spacing: -.02em; color: var(--text); }
+.sf-slim-badge { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 10px; border-radius: 999px; background: #E7F6EC; color: #15803D; font-size: 12px; font-weight: 800; }
+.sf-slim-meta { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--muted); }
+.sf-slim-meta .ico { color: #F59E0B; }
+
+.sf-flow { display: flex; flex-direction: column; }
+/* Dans une colonne flex, les marges auto (centrage) empêchent l'étirement : sans largeur
+   explicite, la zone produits prenait la largeur de tout le carrousel et débordait. */
+.sf-flow > .amz-layout { width: 100%; }
+.sf-wrap { width: 100%; max-width: 1500px; margin: 0 auto; padding: 18px 20px 0; }
+.sf-h2 { margin: 0 0 12px; font-size: 20px; font-weight: 800; letter-spacing: -.02em; color: var(--text); display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.sf-h2 small { font-size: 14px; font-weight: 600; color: var(--muted); }
+.sf-hint { border: 1.5px dashed var(--border); border-radius: 16px; padding: 14px 16px; color: var(--muted); font-size: 14px; background: var(--surface); }
+
+.sf-announce { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 16px; background: #0B1E3D; color: #fff; font-weight: 700; font-size: 14.5px; }
+.sf-announce-ico { width: 30px; height: 30px; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--sf-accent); color: var(--sf-ink); }
+
+.sf-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.sf-chip { min-height: 40px; padding: 0 16px; border-radius: 999px; border: 0; background: var(--surface); box-shadow: inset 0 0 0 1px var(--border); color: var(--text); font: 700 13.5px var(--font); cursor: pointer; transition: background-color .18s, color .18s, box-shadow .18s; }
+.sf-chip:hover { box-shadow: inset 0 0 0 1.5px var(--sf-accent); }
+.sf-chip.is-on { background: var(--sf-accent); color: var(--sf-ink); box-shadow: none; }
+.sf-chip:focus-visible, .sf-btn:focus-visible { outline: 3px solid #1F7CF6; outline-offset: 2px; }
+
+/* 2 ou 3 produits à la une : cartes côte à côte, image au-dessus du texte */
+.sf-featured-row { display: grid; gap: 14px; }
+.sf-featured-row.is-multi { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.sf-featured-row.is-multi .sf-featured { grid-template-columns: minmax(0, 1fr); align-content: start; gap: 14px; }
+.sf-featured-row.is-multi .sf-featured-name { font-size: 20px; }
+.sf-featured-row.is-multi .sf-featured-desc { display: none; }
+.sf-featured { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 24px; align-items: center; padding: 18px; border-radius: 24px; background: var(--brand-mlt); }
+.sf-featured-img { display: block; aspect-ratio: 1 / 1; border-radius: 18px; overflow: hidden; background: var(--surface); }
+.sf-featured-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s cubic-bezier(.22,1,.36,1); }
+.sf-featured:hover .sf-featured-img img { transform: scale(1.04); }
+.sf-featured-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--brand); }
+.sf-kicker { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--brand-dk); }
+.sf-featured-name { margin: 6px 0 8px; font-size: 26px; font-weight: 800; letter-spacing: -.02em; color: var(--text); }
+.sf-featured-price { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.sf-featured-price strong { font-size: 22px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sf-featured-price s { color: var(--muted); white-space: nowrap; }
+.sf-featured-desc { margin: 10px 0 16px; color: var(--muted); font-size: 14.5px; max-width: 60ch; }
+.sf-btn { display: inline-flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 20px; border-radius: 999px; background: var(--sf-accent); color: var(--sf-ink); font-weight: 800; text-decoration: none; transition: transform .18s, box-shadow .18s; }
+.sf-btn:hover { color: var(--sf-ink); transform: translateY(-1px); box-shadow: 0 8px 20px rgba(11,30,61,.2); }
+
+.sf-reviews { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.sf-review { background: var(--surface); border-radius: 20px; box-shadow: 0 0 0 1px var(--border); padding: 16px 18px; }
+.sf-review p { margin: 8px 0 10px; color: var(--text); font-size: 14.5px; overflow-wrap: anywhere; }
+.sf-review-meta { font-size: 13px; color: var(--muted); }
+.sf-stars .star-ico.is-filled { color: #F59E0B; }
+.sf-stars .star-ico.is-empty { color: var(--border); }
+
+.sf-info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.sf-info { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 18px; background: var(--surface); box-shadow: 0 0 0 1px var(--border); }
+.sf-info strong { display: block; color: var(--text); font-size: 14.5px; }
+.sf-info span:not(.sf-info-ico) { font-size: 13.5px; color: var(--muted); }
+.sf-info-ico { width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--brand-mlt); color: var(--brand-dk); }
+
+.sf-contact { display: flex; justify-content: space-between; align-items: center; gap: 18px 32px; flex-wrap: wrap; padding: 22px 24px; border-radius: 24px; background: #0B1E3D; color: #C9D6EA; border-bottom: 6px solid var(--sf-accent); }
+.sf-contact p { margin: 0; max-width: 48ch; }
+.sf-contact-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.sf-contact-list li { display: flex; align-items: center; gap: 10px; color: #fff; font-weight: 600; flex-wrap: wrap; }
+.sf-contact-link { color: #7DB4FF; font-weight: 800; text-underline-offset: 3px; }
+
+/* Produits : colonnes, carrousel, forme des cartes */
+@media (min-width: 1101px) {
+    .sf-grid:not(.list-view):not(.sf-carousel) { grid-template-columns: repeat(var(--sf-cols, 4), minmax(0, 1fr)); }
+}
+.sf-grid.sf-carousel { display: flex !important; overflow-x: auto; scroll-snap-type: x mandatory; gap: 14px; padding: 4px 2px 12px; scrollbar-width: thin; }
+.sf-grid.sf-carousel .amz-card { flex: 0 0 260px; scroll-snap-align: start; }
+.sf-grid.sf-carousel .amz-filtered-empty { flex: 0 0 100%; }
+.sf-cards-square .amz-card, .sf-cards-square .sf-featured, .sf-cards-square .sf-featured-img,
+.sf-cards-square .sf-review, .sf-cards-square .sf-info { border-radius: 2px !important; }
+
+@media (max-width: 960px) {
+    .sf-wrap { padding: 14px 14px 0; }
+    .sf-slim-head { padding: 14px 14px 0; }
+}
+@media (max-width: 760px) {
+    .sf-featured { grid-template-columns: minmax(0, 1fr); }
+    .sf-featured-name { font-size: 22px; }
+    .sf-reviews { grid-template-columns: minmax(0, 1fr); }
+    .sf-grid.sf-carousel .amz-card { flex-basis: 72%; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .sf-featured:hover .sf-featured-img img, .sf-btn:hover { transform: none; }
+}
 </style>
 @endpush
 
 @section('content')
 @php
     $devise = $shop->currency ?? 'GNF';
+    // Réglages de la vitrine (voir App\Support\Storefront et PublicShopController@products)
+    $sfOrder = collect($sf['sections'])->pluck('key')->flip()->all();
+    $sfOn    = collect($sf['sections'])->pluck('on', 'key')->all();
+    $sfInk   = \App\Support\Storefront::ACCENT_INK[$sfAccent] ?? '#FFFFFF';
 @endphp
+@if(\App\Support\MetaPixel::activeFor($shop, $isPreview))
+@push('scripts')
+{{-- Pixel Meta (Facebook) du vendeur : visite de sa vitrine --}}
+@include('partials.meta-pixel', ['pixelId' => $shop->meta_pixel_id])
+@endpush
+@endif
+@if($isPreview)
+{{-- Aperçu dans l'éditeur de vitrine : on masque les fenêtres du site qui gêneraient la lecture --}}
+<style>#pwaModal, #pushNotifBanner { display: none !important; }</style>
+@endif
 
 {{-- ══ NAVBAR ══ --}}
 <nav class="amz-nav">
@@ -765,7 +875,15 @@ a.amz-card-name { text-decoration: none; }
 </div>
 
 {{-- ══ BANNIÈRE BOUTIQUE ══ --}}
-<div class="shop-banner">
+{{-- Taille réglable (grande, compacte, sans) ; liseré bas à la couleur d'accent du vendeur --}}
+@if($sf['banner'] === 'none')
+<div class="sf-slim-head" style="--sf-accent: {{ $sfAccent }}">
+    <span class="sf-slim-name">{{ $shop->name }}</span>
+    @if($shop->is_approved)<span class="sf-slim-badge">{!! \App\Support\IconLibrary::svg('check', '', 11) !!} Boutique vérifiée</span>@endif
+    @if($reviewAvg)<span class="sf-slim-meta">{!! \App\Support\IconLibrary::svg('star', '', 12) !!} {{ number_format($reviewAvg, 1, ',', ' ') }} ({{ $reviewCount }} avis)</span>@endif
+</div>
+@else
+<div class="shop-banner sf-banner-{{ $sf['banner'] }}" style="--sf-accent: {{ $sfAccent }}">
     <div class="shop-banner-logo">
         @if($shop->image)
             <img src="{{ \App\Services\ImageOptimizer::url($shop->image, 'thumb') ?? asset('storage/'.$shop->image) }}"
@@ -794,9 +912,15 @@ a.amz-card-name { text-decoration: none; }
         </div>
     </div>
 </div>
+@endif
 
-{{-- ══ LAYOUT ══ --}}
-<div class="amz-layout">
+{{-- ══ SECTIONS DE LA VITRINE (ordre et visibilité réglés par le vendeur) ══ --}}
+<div class="sf-flow sf-cards-{{ $sf['cards'] }}"
+     style="--sf-accent: {{ $sfAccent }}; --sf-ink: {{ $sfInk }}; --sf-cols: {{ $sf['columns'] }}">
+@include('public.shops._storefront-sections')
+
+{{-- ══ LAYOUT (section « Tous les produits ») ══ --}}
+<div class="amz-layout" id="sfProducts" style="order: {{ $sfOrder['products'] }};{{ $sfOn['products'] ? '' : ' display: none;' }}">
 
     {{-- Sidebar desktop --}}
     <aside class="amz-sidebar">
@@ -889,8 +1013,8 @@ a.amz-card-name { text-decoration: none; }
                     </select>
                 </div>
                 <div class="amz-view-btns">
-                    <button class="amz-view-btn active" id="btnGrid" onclick="setView('grid')" title="Grille">{!! \App\Support\IconLibrary::svg('grid', '', 14) !!}</button>
-                    <button class="amz-view-btn" id="btnList" onclick="setView('list')" title="Liste">{!! \App\Support\IconLibrary::svg('list', '', 14) !!}</button>
+                    <button class="amz-view-btn {{ $sf['layout'] !== 'list' ? 'active' : '' }}" id="btnGrid" onclick="setView('grid')" title="Grille">{!! \App\Support\IconLibrary::svg('grid', '', 14) !!}</button>
+                    <button class="amz-view-btn {{ $sf['layout'] === 'list' ? 'active' : '' }}" id="btnList" onclick="setView('list')" title="Liste">{!! \App\Support\IconLibrary::svg('list', '', 14) !!}</button>
                 </div>
             </div>
         </div>
@@ -902,7 +1026,7 @@ a.amz-card-name { text-decoration: none; }
         </div>
         @endif
 
-        <div class="amz-grid" id="prodGrid">
+        <div class="amz-grid sf-grid {{ $sf['layout'] === 'list' ? 'list-view' : '' }} {{ $sf['layout'] === 'carousel' ? 'sf-carousel' : '' }}" id="prodGrid">
             @forelse($products as $product)
             @php
                 $hasPromo = $product->original_price && $product->original_price > $product->price;
@@ -1010,6 +1134,7 @@ a.amz-card-name { text-decoration: none; }
         <div class="amz-pagination">{{ $products->links() }}</div>
     </div>
 </div>
+</div>{{-- /sf-flow --}}
 
 @endsection
 
@@ -1062,8 +1187,17 @@ function _syncRadios(fnName, activeVal) {
 
 /* ── Catégorie ── */
 function filterCat(cat) {
-    state.cat = cat;
-    _syncRadios('filterCat', cat);
+    /* Minuscules côté JS : strtolower() en PHP ne touche pas aux lettres accentuées
+       (« Électronique » restait « Électronique ») alors que les cartes sont comparées en
+       toLowerCase() → aucune carte ne correspondait aux catégories qui commencent par un accent. */
+    var raw = cat || '';
+    state.cat = raw.toLowerCase();
+    _syncRadios('filterCat', raw);
+    document.querySelectorAll('.sf-chip').forEach(function (c) {
+        var on = (c.dataset.sfCat || '').toLowerCase() === state.cat;
+        c.classList.toggle('is-on', on);
+        c.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
     updateBadge();
     applyFilters();
 }
@@ -1107,6 +1241,7 @@ function setSort(val, el, fromDrawer) {
 /* ── Vue grille / liste ── */
 function setView(type) {
     var grid = document.getElementById('prodGrid');
+    grid.classList.remove('sf-carousel'); // le visiteur reprend la main sur l'affichage choisi par le vendeur
     if (type === 'list') {
         grid.classList.add('list-view');
         document.getElementById('btnList').classList.add('active');
@@ -1254,6 +1389,15 @@ function onSearchInput(val) {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(function() { handleSearch(val); }, 220);
 }
+
+/* ── Pastilles « Catégories » de la vitrine : filtrent la liste puis y descendent ── */
+document.addEventListener('click', function (e) {
+    var chip = e.target.closest('.sf-chip');
+    if (!chip) return;
+    filterCat(chip.dataset.sfCat || '');
+    var target = document.getElementById('sfProducts');
+    if (target && target.style.display !== 'none') target.scrollIntoView({ behavior: REDUCE_MOTION ? 'auto' : 'smooth', block: 'start' });
+});
 
 document.addEventListener('DOMContentLoaded', function() {
     var d = document.getElementById('prodSearch');

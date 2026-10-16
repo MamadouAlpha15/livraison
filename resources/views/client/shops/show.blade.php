@@ -591,7 +591,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 </nav>
 
 {{-- BANNIÈRE --}}
-<div class="shop-banner">
+{{-- Liseré bas : couleur d'accent choisie par le vendeur (Ma boutique → Concevoir) --}}
+<div class="shop-banner" @if($shop->accent_color) style="border-bottom: 6px solid {{ $shop->accent_color }}" @endif>
     <div class="shop-banner-logo">
         @if($shop->image)
             <img src="{{ \App\Services\ImageOptimizer::url($shop->image, 'thumb') }}"

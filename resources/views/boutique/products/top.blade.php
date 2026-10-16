@@ -5,7 +5,7 @@
 @push('styles')
 <style>
 :root {
-    --brand:#6366f1; --brand-dk:#4f46e5; --brand-lt:#e0e7ff; --brand-mlt:#eef2ff;
+    --brand:#1668D8; --brand-dk:#1260C9; --brand-lt:#D6E6FF; --brand-mlt:#EAF2FF;
     --navy:#0f172a; --navy2:#1e3a5f;
     --orange:#f59e0b; --orange-lt:#fef3c7; --orange-dk:#92400e;
     --bg:#f1f5f9; --surface:#fff; --border:#e9edef; --muted:#64748b; --text:#0f172a;
@@ -14,8 +14,8 @@
 
 /* ══ MODE SOMBRE ══ */
 [data-theme="dark"] {
-    --brand-lt: rgba(99,102,241,.16);
-    --brand-mlt: rgba(99,102,241,.09);
+    --brand-lt: rgba(22,104,216,.16);
+    --brand-mlt: rgba(22,104,216,.09);
     --bg: #0b0f1a;
     --surface: #141925;
     --border: #262d3d;
@@ -38,7 +38,7 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
 }
 .tp-hero::before {
     content:''; position:absolute; inset:0;
-    background:radial-gradient(circle at 80% 50%, rgba(99,102,241,.12) 0%, transparent 60%);
+    background:radial-gradient(circle at 80% 50%, rgba(22,104,216,.12) 0%, transparent 60%);
 }
 .tp-hero-top { display:flex; align-items:center; justify-content:space-between; position:relative; gap:12px; flex-wrap:wrap; }
 .tp-back { display:inline-flex; align-items:center; gap:8px; padding:9px 18px; background:rgba(255,255,255,.12); color:#fff; border:1.5px solid rgba(255,255,255,.2); border-radius:10px; font-size:13px; font-weight:700; text-decoration:none; transition:all .15s; }
@@ -47,8 +47,8 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
 .tp-hero-sub   { font-size:13px; color:rgba(255,255,255,.55); margin-top:5px; position:relative; }
 .tp-period-badge {
     display:inline-flex; align-items:center; gap:6px;
-    background:rgba(99,102,241,.2); border:1px solid rgba(99,102,241,.35);
-    color:#a5b4fc; font-size:12px; font-weight:700; padding:5px 12px;
+    background:rgba(22,104,216,.2); border:1px solid rgba(22,104,216,.35);
+    color:#7DB4FF; font-size:12px; font-weight:700; padding:5px 12px;
     border-radius:20px; margin-top:10px; position:relative;
 }
 
@@ -200,7 +200,7 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
 <div class="tp-hero">
     <div class="tp-hero-top">
         <a href="{{ route('boutique.dashboard') }}" class="tp-back">← Tableau de bord</a>
-        <a href="{{ route('products.index') }}" class="tp-back" style="background:rgba(99,102,241,.2);border-color:rgba(99,102,241,.4);color:#a5b4fc;">
+        <a href="{{ route('products.index') }}" class="tp-back" style="background:rgba(22,104,216,.2);border-color:rgba(22,104,216,.4);color:#7DB4FF;">
             🏷️ Tous les produits
         </a>
     </div>
@@ -212,7 +212,7 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
 {{-- KPI FLOTTANTS --}}
 <div class="tp-kpi-row">
     <div class="tp-kpi">
-        <div class="tp-kpi-ico" style="background:#eef2ff;">🏆</div>
+        <div class="tp-kpi-ico" style="background:#EAF2FF;">🏆</div>
         <div>
             <div class="tp-kpi-lbl">Produits classés</div>
             <div class="tp-kpi-val">{{ $topProducts->count() }}</div>
@@ -360,4 +360,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
+@endpush
+
+{{-- Thème bleu « espace vendeur » (maquette Main.dc.html), chargé après les styles de la page --}}
+@push('styles')
+@include('boutique._partials.sv-theme')
 @endpush

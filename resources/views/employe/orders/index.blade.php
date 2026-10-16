@@ -77,8 +77,8 @@ $I = [
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 :root {
-    --brand:#6366f1;--brand-dk:#4f46e5;--brand-lt:#e0e7ff;--brand-mlt:#eef2ff;
-    --sb-bg:#0e0e16;--sb-border:rgba(255,255,255,.08);--sb-act:rgba(99,102,241,.52);
+    --brand:#1668D8;--brand-dk:#1260C9;--brand-lt:#D6E6FF;--brand-mlt:#EAF2FF;
+    --sb-bg:#0B1E3D;--sb-border:rgba(255,255,255,.08);--sb-act:rgba(22,104,216,.52);
     --sb-hov:rgba(255,255,255,.07);--sb-txt:rgba(255,255,255,.62);--sb-txt-act:#fff;
     --bg:#f8fafc;--surface:#ffffff;--border:#e2e8f0;--border-dk:#cbd5e1;
     --text:#0f172a;--text-2:#475569;--muted:#94a3b8;
@@ -89,8 +89,8 @@ $I = [
 
 /* ══ MODE SOMBRE ══ */
 [data-theme="dark"] {
-    --brand-lt: rgba(99,102,241,.16);
-    --brand-mlt: rgba(99,102,241,.09);
+    --brand-lt: rgba(22,104,216,.16);
+    --brand-mlt: rgba(22,104,216,.09);
     --bg: #0b0f1a;
     --surface: #141925;
     --border: #262d3d;
@@ -123,11 +123,11 @@ html{font-family:var(--font);}
 body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:antialiased;}
 .dash-wrap{display:flex;min-height:100vh;}
 .dash-wrap .main{margin-left:var(--sb-w);flex:1;min-width:0;}
-.sidebar{background:linear-gradient(180deg,#0f0f59 0%,#0e0e16 40%,#10103a 100%);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;width:var(--sb-w);overflow-y:scroll;scrollbar-width:thin;scrollbar-color:rgba(99,102,241,.35) transparent;z-index:40;border-right:1px solid rgba(99,102,241,.15);box-shadow:6px 0 30px rgba(0,0,0,.35);}
+.sidebar{background:linear-gradient(180deg,#0B1E3D 0%,#0B1E3D 40%,#0B1E3D 100%);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;width:var(--sb-w);overflow-y:scroll;scrollbar-width:thin;scrollbar-color:rgba(22,104,216,.35) transparent;z-index:40;border-right:1px solid rgba(22,104,216,.15);box-shadow:6px 0 30px rgba(0,0,0,.35);}
 .sidebar::-webkit-scrollbar{width:4px;}
 .sidebar::-webkit-scrollbar-track{background:rgba(255,255,255,.04);}
-.sidebar::-webkit-scrollbar-thumb{background:rgba(99,102,241,.4);border-radius:4px;}
-.sidebar::-webkit-scrollbar-thumb:hover{background:rgba(99,102,241,.7);}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(22,104,216,.4);border-radius:4px;}
+.sidebar::-webkit-scrollbar-thumb:hover{background:rgba(22,104,216,.7);}
 .sb-brand{padding:18px 16px 14px;border-bottom:1px solid var(--sb-border);flex-shrink:0;position:relative;}
 .sb-close{display:none;position:absolute;top:14px;right:12px;width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);color:rgba(255,255,255,.6);font-size:18px;line-height:1;cursor:pointer;align-items:center;justify-content:center;transition:background .15s,color .15s;flex-shrink:0;}
 .sb-close:hover{background:rgba(239,68,68,.18);border-color:rgba(239,68,68,.3);color:#fca5a5;}
@@ -142,8 +142,8 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .sb-section{font-size:9.5px;text-transform:uppercase;letter-spacing:1.8px;color:rgba(255,255,255,.48);padding:16px 10px 5px;font-weight:800;}
 .sb-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r-sm);font-size:13.5px;font-weight:600;color:rgba(255,255,255,.78);text-decoration:none;transition:background .15s,color .15s;position:relative;}
 .sb-item:hover{background:var(--sb-hov);color:rgba(255,255,255,.96);}
-.sb-item.active{background:var(--sb-act);color:#fff;box-shadow:0 2px 12px rgba(99,102,241,.25);}
-.sb-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:#a5b4fc;border-radius:0 3px 3px 0;box-shadow:2px 0 8px rgba(165,180,252,.5);}
+.sb-item.active{background:var(--sb-act);color:#fff;box-shadow:0 2px 12px rgba(22,104,216,.25);}
+.sb-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:#7DB4FF;border-radius:0 3px 3px 0;box-shadow:2px 0 8px rgba(165,180,252,.5);}
 .sb-item .ico{font-size:13px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);transition:background .15s;}
 .sb-item:hover .ico{background:rgba(255,255,255,.09);}
 .sb-item.active .ico{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.2);}
@@ -164,14 +164,14 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .sb-scroll-hint{position:sticky;top:auto;bottom:72px;width:100%;height:40px;background:linear-gradient(to bottom,transparent,rgba(17,17,24,.95));pointer-events:none;z-index:2;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;transition:opacity .3s;margin-top:-40px;align-self:flex-end;}
 .sb-scroll-hint.hidden{opacity:0;pointer-events:none;}
 .sb-scroll-hint-arrow{display:flex;flex-direction:column;align-items:center;gap:2px;animation:bounceDown 1.5s ease-in-out infinite;}
-.sb-scroll-hint-dot{width:4px;height:4px;border-radius:50%;background:rgba(99,102,241,.6);}
+.sb-scroll-hint-dot{width:4px;height:4px;border-radius:50%;background:rgba(22,104,216,.6);}
 .sb-scroll-hint-dot:nth-child(2){opacity:.5;margin-top:-2px;}
 .sb-scroll-hint-dot:nth-child(3){opacity:.25;margin-top:-2px;}
 @keyframes bounceDown{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
 .sb-footer{padding:12px 10px;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0;display:flex;flex-direction:column;gap:6px;position:sticky;bottom:0;background:linear-gradient(180deg,transparent 0%,#0b0b12 25%);z-index:1;}
 .sb-user{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r-sm);text-decoration:none;transition:background .15s,border-color .15s;border:1px solid transparent;}
 .sb-user:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.07);}
-.sb-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#4338ca);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 0 0 2px rgba(99,102,241,.45),0 2px 8px rgba(99,102,241,.3);letter-spacing:-.5px;}
+.sb-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#1668D8,#1260C9);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 0 0 2px rgba(22,104,216,.45),0 2px 8px rgba(22,104,216,.3);letter-spacing:-.5px;}
 .sb-uname{font-size:13px;font-weight:700;color:#fff;letter-spacing:-.2px;}
 .sb-urole{font-size:10.5px;color:rgba(255,255,255,.52);margin-top:1px;font-weight:500;}
 .sb-logout{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border-radius:var(--r-sm);background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.15);color:rgba(252,165,165,.92);font-size:12.5px;font-weight:600;font-family:var(--font);cursor:pointer;text-decoration:none;transition:background .15s,color .15s,border-color .15s;text-align:left;}
@@ -186,7 +186,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .tb-sub{font-size:11px;color:var(--muted);margin-top:1px;}
 .content{padding:20px 22px;flex:1;}
 .flash{padding:10px 14px;border-radius:var(--r-sm);border:1px solid;font-size:13.5px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
-.flash-success{background:#eef2ff;border-color:#a5b4fc;color:#3730a3;}
+.flash-success{background:#EAF2FF;border-color:#7DB4FF;color:#0B1E3D;}
 .flash-warning{background:#fffbeb;border-color:#fcd34d;color:#92400e;}
 .flash-danger{background:#fef2f2;border-color:#fca5a5;color:#991b1b;}
 .devise-badge{display:inline-flex;align-items:center;gap:5px;background:var(--brand-mlt);color:var(--brand-dk);border:1px solid var(--brand-lt);font-size:11px;font-weight:700;font-family:var(--mono);padding:4px 10px;border-radius:20px;}
@@ -202,7 +202,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .tbl tbody td{padding:11px 13px;border-bottom:1px solid #f3f6f4;vertical-align:middle;}
 .tbl tbody tr:last-child td{border-bottom:none;}
 .tbl tbody tr:hover td{background:#fafcfb;}
-.c-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--brand),#4f46e5);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
+.c-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--brand),#1260C9);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
 .c-name{font-size:13px;font-weight:600;color:var(--text);}
 .c-sub{font-size:11px;color:var(--muted);}
 .prod-img{width:58px;height:58px;border-radius:var(--r-sm);object-fit:cover;border:2px solid var(--border);flex-shrink:0;cursor:pointer;transition:transform .15s,box-shadow .15s;}
@@ -220,24 +220,24 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .amount{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--text);white-space:nowrap;}
 .amount small{font-size:10px;color:var(--muted);font-weight:500;}
 .pill{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;}
-.p-success{background:#e0e7ff;color:#3730a3;}
+.p-success{background:#D6E6FF;color:#0B1E3D;}
 .p-warning{background:#fef3c7;color:#92400e;}
 .p-info{background:#dbeafe;color:#1e40af;}
 .p-paid-online{background:#dcfce7;color:#166534;}
 .p-danger{background:#fee2e2;color:#991b1b;}
-.p-purple{background:#f5f3ff;color:#5b21b6;}
+.p-purple{background:#EAF2FF;color:#5b21b6;}
 .p-muted{background:#f3f6f4;color:#6b7280;}
 /* ── BULK SELECTION ── */
 .order-cb{width:15px;height:15px;cursor:pointer;accent-color:var(--brand);flex-shrink:0;}
 #selectAll{width:15px;height:15px;cursor:pointer;accent-color:var(--brand);}
-.tbl tbody tr.row-selected td{background:#eef2ff!important;}
-.bulk-bar{display:none;align-items:center;gap:10px;flex-wrap:wrap;background:linear-gradient(135deg,#4f46e5,#6366f1);border-radius:var(--r-sm);padding:10px 16px;margin-bottom:12px;box-shadow:0 4px 20px rgba(99,102,241,.28);animation:fadeIn .2s ease;}
+.tbl tbody tr.row-selected td{background:#EAF2FF!important;}
+.bulk-bar{display:none;align-items:center;gap:10px;flex-wrap:wrap;background:linear-gradient(135deg,#1260C9,#1668D8);border-radius:var(--r-sm);padding:10px 16px;margin-bottom:12px;box-shadow:0 4px 20px rgba(22,104,216,.28);animation:fadeIn .2s ease;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 .bulk-bar.visible{display:flex;}
 .bulk-count{font-size:13px;font-weight:800;color:#fff;flex-shrink:0;font-family:var(--mono);}
 .bulk-btn{padding:7px 14px;border-radius:7px;border:none;cursor:pointer;font-size:12.5px;font-weight:700;font-family:var(--font);display:inline-flex;align-items:center;gap:6px;transition:all .14s;white-space:nowrap;}
-.bulk-btn-driver{background:#fff;color:#4f46e5;}
-.bulk-btn-driver:hover{background:#e0e7ff;}
+.bulk-btn-driver{background:#fff;color:#1260C9;}
+.bulk-btn-driver:hover{background:#D6E6FF;}
 .bulk-btn-company{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.35);}
 .bulk-btn-company:hover{background:rgba(255,255,255,.28);}
 .bulk-btn-clear{margin-left:auto;background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.18);padding:5px 10px;border-radius:6px;font-size:11.5px;}
@@ -258,7 +258,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .blv-item{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;transition:border-color .14s,background .14s;user-select:none;}
 .blv-item:hover{border-color:var(--brand);background:var(--brand-mlt);}
 .blv-item input[type=radio]{width:15px;height:15px;accent-color:var(--brand);cursor:pointer;flex-shrink:0;}
-.blv-item.checked{border-color:var(--brand-dk);background:#eef2ff;}
+.blv-item.checked{border-color:var(--brand-dk);background:#EAF2FF;}
 .blv-footer{display:flex;gap:8px;}
 .assign-form{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;}
 .assign-select{padding:6px 10px;border-radius:var(--r-sm);border:1.5px solid var(--border-dk);font-size:12px;font-family:var(--font);color:var(--text);background:var(--surface);outline:none;min-width:110px;max-width:150px;transition:border-color .15s;}
@@ -316,7 +316,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .chat-hd{
     padding:14px 18px;border-bottom:1px solid var(--border);flex-shrink:0;
     display:flex;align-items:center;justify-content:space-between;gap:10px;
-    background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;
+    background:linear-gradient(135deg,#1260C9,#1668D8);color:#fff;
 }
 .chat-hd-info{display:flex;align-items:center;gap:10px;}
 .chat-hd-av{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
@@ -345,14 +345,14 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 }
 
 /* Messages */
-.chat-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:8px;background:#f8fafc;scrollbar-width:thin;scrollbar-color:#c7d2fe transparent;}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:8px;background:#f8fafc;scrollbar-width:thin;scrollbar-color:#D6E6FF transparent;}
 .chat-msgs::-webkit-scrollbar{width:3px;}
-.chat-msgs::-webkit-scrollbar-thumb{background:#c7d2fe;border-radius:3px;}
+.chat-msgs::-webkit-scrollbar-thumb{background:#D6E6FF;border-radius:3px;}
 .msg-row{display:flex;flex-direction:column;max-width:80%;}
 .msg-row.mine{align-self:flex-end;align-items:flex-end;}
 .msg-row.theirs{align-self:flex-start;align-items:flex-start;}
 .msg-bubble{padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.5;word-break:break-word;white-space:pre-wrap;}
-.msg-row.mine .msg-bubble{background:#4f46e5;color:#fff;border-bottom-right-radius:4px;}
+.msg-row.mine .msg-bubble{background:#1260C9;color:#fff;border-bottom-right-radius:4px;}
 .msg-row.theirs .msg-bubble{background:#fff;color:#1e293b;border-bottom-left-radius:4px;border:1px solid #e2e8f0;}
 .msg-bubble.system{background:#fef9c3;color:#92400e;border:1px solid #fde68a;font-size:12px;font-style:italic;border-radius:10px;}
 .msg-meta{font-size:10px;color:#94a3b8;margin-top:2px;padding:0 2px;}
@@ -447,12 +447,12 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 
 /* Bouton message sur chaque entreprise */
 .btn-msg-company{
-    width:32px;height:32px;border-radius:8px;border:1.5px solid #c7d2fe;
-    background:#eef2ff;color:#4f46e5;cursor:pointer;font-size:15px;
+    width:32px;height:32px;border-radius:8px;border:1.5px solid #D6E6FF;
+    background:#EAF2FF;color:#1260C9;cursor:pointer;font-size:15px;
     display:flex;align-items:center;justify-content:center;flex-shrink:0;
     transition:all .14s;
 }
-.btn-msg-company:hover{background:#4f46e5;color:#fff;border-color:#4f46e5;}
+.btn-msg-company:hover{background:#1260C9;color:#fff;border-color:#1260C9;}
 .btn-restore-confirm{background:#2563eb;border-color:#1d4ed8;color:#fff;font-weight:700;}
 .btn-restore-confirm:hover{background:#1d4ed8;color:#fff;}
 /* ── Desktop medium (sidebar visible, écrans 900–1200px) ── */
@@ -526,7 +526,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
     .stat-chip .val{font-size:14px;}
     #autoRefreshBadge{display:none !important;}
 }
-*{scrollbar-width:thin;scrollbar-color:rgba(99,102,241,.2) transparent;}
+*{scrollbar-width:thin;scrollbar-color:rgba(22,104,216,.2) transparent;}
 /* ── PLAN LIMIT MODAL ── */
 .plm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:3000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px);}
 .plm-overlay.open{display:flex;}
@@ -539,8 +539,8 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .plm-feat-title{font-size:10px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
 .plm-feat-item{display:flex;align-items:center;gap:9px;font-size:13px;color:#1e293b;font-weight:600;padding:4px 0;}
 .plm-feat-ico{width:18px;height:18px;border-radius:50%;background:#d1fae5;color:#059669;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0;}
-.plm-btn-upgrade{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:12px;border:none;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:15px;font-weight:800;font-family:var(--font);cursor:pointer;transition:all .16s;box-shadow:0 6px 22px rgba(99,102,241,.42);text-decoration:none;margin-bottom:10px;}
-.plm-btn-upgrade:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(99,102,241,.55);color:#fff;}
+.plm-btn-upgrade{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:12px;border:none;background:linear-gradient(135deg,#1668D8,#1F7CF6);color:#fff;font-size:15px;font-weight:800;font-family:var(--font);cursor:pointer;transition:all .16s;box-shadow:0 6px 22px rgba(22,104,216,.42);text-decoration:none;margin-bottom:10px;}
+.plm-btn-upgrade:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(22,104,216,.55);color:#fff;}
 .plm-btn-close{width:100%;padding:10px;border-radius:10px;border:none;background:transparent;color:#94a3b8;font-size:13px;font-family:var(--font);cursor:pointer;transition:color .15s;}
 .plm-btn-close:hover{color:#475569;}
 /* ── Barre de filtres ── */
@@ -549,7 +549,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .filter-search-wrap{position:relative;flex:1;min-width:180px;}
 .filter-search-wrap .ico-search{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none;color:var(--muted);}
 .filter-input{width:100%;padding:8px 10px 8px 32px;border:1.5px solid var(--border-dk);border-radius:var(--r-sm);font-size:13px;font-family:var(--font);color:var(--text);background:var(--surface);outline:none;transition:border-color .15s;}
-.filter-input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(99,102,241,.1);}
+.filter-input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(22,104,216,.1);}
 .filter-select{padding:8px 10px;border:1.5px solid var(--border-dk);border-radius:var(--r-sm);font-size:13px;font-family:var(--font);color:var(--text);background:var(--surface);outline:none;cursor:pointer;transition:border-color .15s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;background-size:14px;padding-right:28px;}
 .filter-select:focus{border-color:var(--brand);}
 .date-chips{display:flex;gap:5px;flex-wrap:wrap;}
@@ -567,8 +567,8 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 .filter-active-badge{display:inline-flex;align-items:center;gap:4px;background:#fef3c7;border:1px solid #fcd34d;color:#92400e;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
 .mobile-list{display:none;flex-direction:column;gap:12px;}
 .m-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);transition:border-color .15s,background .15s;}
-.m-card.row-selected{border-color:var(--brand) !important;background:#eef2ff;}
-.m-card.row-selected .m-card-hd{background:#e0e7ff;}
+.m-card.row-selected{border-color:var(--brand) !important;background:#EAF2FF;}
+.m-card.row-selected .m-card-hd{background:#D6E6FF;}
 .m-card-hd{padding:11px 14px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .m-card-body{padding:12px 14px;display:flex;flex-direction:column;gap:9px;}
 .m-row{display:flex;align-items:center;justify-content:space-between;gap:8px;}
@@ -593,19 +593,19 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
 /* ── Vendor position modal ── */
 .vpos-overlay{position:fixed;inset:0;background:rgba(10,8,30,.72);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;}
 .vpos-overlay.open{opacity:1;pointer-events:all;}
-.vpos-modal{background:#fff;border-radius:20px;padding:32px 28px 28px;max-width:400px;width:100%;box-shadow:0 24px 60px rgba(99,102,241,.22);text-align:center;transform:translateY(16px) scale(.97);transition:transform .25s;}
+.vpos-modal{background:#fff;border-radius:20px;padding:32px 28px 28px;max-width:400px;width:100%;box-shadow:0 24px 60px rgba(22,104,216,.22);text-align:center;transform:translateY(16px) scale(.97);transition:transform .25s;}
 .vpos-overlay.open .vpos-modal{transform:none;}
-.vpos-icon-wrap{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;box-shadow:0 8px 24px rgba(99,102,241,.35);}
+.vpos-icon-wrap{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#1668D8,#1F7CF6);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;box-shadow:0 8px 24px rgba(22,104,216,.35);}
 .vpos-icon-wrap svg{width:34px;height:34px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .vpos-pulse{position:relative;}
-.vpos-pulse::before,.vpos-pulse::after{content:'';position:absolute;inset:-12px;border-radius:50%;border:2px solid rgba(99,102,241,.25);animation:vpulse 2s ease-out infinite;}
+.vpos-pulse::before,.vpos-pulse::after{content:'';position:absolute;inset:-12px;border-radius:50%;border:2px solid rgba(22,104,216,.25);animation:vpulse 2s ease-out infinite;}
 .vpos-pulse::after{animation-delay:.7s;}
 @keyframes vpulse{0%{transform:scale(.85);opacity:.8;}100%{transform:scale(1.5);opacity:0;}}
 .vpos-title{font-size:18px;font-weight:800;color:#1e1b4b;margin-bottom:8px;font-family:var(--font);}
 .vpos-desc{font-size:13.5px;color:#64748b;line-height:1.55;margin-bottom:24px;font-family:var(--font);}
-.vpos-order-badge{display:inline-block;background:#eef0ff;border:1px solid rgba(99,102,241,.2);color:#4338ca;font-size:12px;font-weight:700;border-radius:20px;padding:3px 12px;margin-bottom:14px;font-family:var(--font);}
-.btn-vpos-share{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:14.5px;font-weight:800;font-family:var(--font);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;box-shadow:0 6px 20px rgba(99,102,241,.35);}
-.btn-vpos-share:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 10px 28px rgba(99,102,241,.45);}
+.vpos-order-badge{display:inline-block;background:#eef0ff;border:1px solid rgba(22,104,216,.2);color:#1260C9;font-size:12px;font-weight:700;border-radius:20px;padding:3px 12px;margin-bottom:14px;font-family:var(--font);}
+.btn-vpos-share{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#1668D8,#1F7CF6);color:#fff;font-size:14.5px;font-weight:800;font-family:var(--font);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;box-shadow:0 6px 20px rgba(22,104,216,.35);}
+.btn-vpos-share:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 10px 28px rgba(22,104,216,.45);}
 .btn-vpos-share:disabled{opacity:.6;cursor:not-allowed;}
 .btn-vpos-later{margin-top:10px;width:100%;padding:10px;border-radius:10px;border:none;background:transparent;color:#94a3b8;font-size:13px;font-family:var(--font);cursor:pointer;transition:color .15s;}
 .btn-vpos-later:hover{color:#475569;}
@@ -725,7 +725,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
         <div class="plm-title">Limite atteinte !</div>
         <div class="plm-sub">
             Vous avez traité les <strong>10 commandes</strong> incluses dans votre Plan Gratuit ce mois-ci.
-            Passez au <strong style="color:#6366f1;">Plan Pro</strong> pour continuer sans limite.
+            Passez au <strong style="color:#1668D8;">Plan Pro</strong> pour continuer sans limite.
         </div>
         <div class="plm-features">
             <div class="plm-feat-title">Ce que le Plan Pro débloque</div>
@@ -767,7 +767,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
             @forelse($deliveryCompanies as $dc)
             <div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);">
                 {{-- Logo --}}
-                <div style="width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;">
+                <div style="width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,#1260C9,#1260C9);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;">
                     @if($dc->image)
                         <img src="{{ asset('storage/'.$dc->image) }}" style="width:100%;height:100%;object-fit:cover;" alt="" id="dc-img-{{ $dc->id }}">
                     @else
@@ -793,7 +793,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         {!! $I['msg_btn'] !!}
                     </button>
                     <button class="btn btn-sm bulk-assign-company bulk-show"
-                            style="display:none;background:#eef2ff;border-color:#c7d2fe;color:#4f46e5;font-weight:700;"
+                            style="display:none;background:#EAF2FF;border-color:#D6E6FF;color:#1260C9;font-weight:700;"
                             data-company-id="{{ $dc->id }}"
                             data-company-name="{{ addslashes($dc->name) }}"
                             onclick="submitBulkCompany(this)"
@@ -1048,12 +1048,12 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                 $_sbCmdMax  = 10; $_sbProdMax = 5;
                 $_sbCmdPct  = $isPro ? 0 : min(100, round(($processedCount / $_sbCmdMax) * 100));
                 $_sbCmdCls  = $isPro ? 'ok' : ($_sbCmdPct >= 100 ? 'danger' : ($_sbCmdPct >= 80 ? 'warn' : 'ok'));
-                $_sbCmdClr  = $_sbCmdCls === 'danger' ? '#dc2626' : ($_sbCmdCls === 'warn' ? '#d97706' : '#6366f1');
+                $_sbCmdClr  = $_sbCmdCls === 'danger' ? '#dc2626' : ($_sbCmdCls === 'warn' ? '#d97706' : '#1668D8');
                 $_prodCount = $shop ? $shop->products()->count() : 0;
                 if ($isPro)                        { $_sbProdClr = '#10b981'; }
                 elseif ($_prodCount >= $_sbProdMax){ $_sbProdClr = '#ef4444'; }
                 elseif ($_prodCount >= 4)          { $_sbProdClr = '#f59e0b'; }
-                else                               { $_sbProdClr = '#8b5cf6'; }
+                else                               { $_sbProdClr = '#1F7CF6'; }
             @endphp
             <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">{!! $I['msg_nav'] !!}</span> Messages</a>
             <a href="{{ route('boutique.orders.index') }}" class="sb-item active">
@@ -1160,7 +1160,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                 <div class="tb-sub">{{ $shop->name ?? 'Boutique' }} &nbsp;·&nbsp; <span class="devise-badge" style="font-size:10px;padding:2px 8px">{!! $I['currency_tb'] !!} {{ $devise }}</span></div>
             </div>
             @if($isPro)
-            <a href="{{ route('employe.orders.carte') }}" style="display:flex;align-items:center;gap:5px;height:30px;padding:0 12px;border-radius:8px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);color:#4f46e5;font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;text-decoration:none;transition:background .14s" onmouseover="this.style.background='rgba(99,102,241,.18)'" onmouseout="this.style.background='rgba(99,102,241,.1)'">
+            <a href="{{ route('employe.orders.carte') }}" style="display:flex;align-items:center;gap:5px;height:30px;padding:0 12px;border-radius:8px;background:rgba(22,104,216,.1);border:1px solid rgba(22,104,216,.25);color:#1260C9;font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;text-decoration:none;transition:background .14s" onmouseover="this.style.background='rgba(22,104,216,.18)'" onmouseout="this.style.background='rgba(22,104,216,.1)'">
                 {!! $I['map_tb'] !!} <span class="desk-only">Carte GPS</span>
             </a>
             @elseif(auth()->user()->role === 'admin')
@@ -1300,7 +1300,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                     </td>
 
                         <td>
-                            @if($product)@php $photoUrl = $variantPhoto ?: ($product->image ? asset('storage/'.$product->image) : null); @endphp<div style="display:flex;align-items:center;gap:8px">@if($photoUrl)<img src="{{ $photoUrl }}" class="prod-img" alt="{{ $product->name }}" onclick="openLightbox('{{ $photoUrl }}','{{ addslashes($product->name) }}')">@else<div class="prod-ph">{!! $I['tag_product'] !!}</div>@endif<div><div style="font-size:12.5px;font-weight:600;color:var(--text)">{{ Str::limit($product->name,22) }}</div>@if($order->items->first()?->variant_name)<div style="font-size:11px;font-weight:700;color:var(--brand,#6366f1)">🎨 {{ $order->items->first()->variant_name }}</div>@endif<div style="font-size:11px;color:var(--muted)">Qté : {{ $order->items->first()->quantity ?? 1 }}</div></div></div>
+                            @if($product)@php $photoUrl = $variantPhoto ?: ($product->image ? asset('storage/'.$product->image) : null); @endphp<div style="display:flex;align-items:center;gap:8px">@if($photoUrl)<img src="{{ $photoUrl }}" class="prod-img" alt="{{ $product->name }}" onclick="openLightbox('{{ $photoUrl }}','{{ addslashes($product->name) }}')">@else<div class="prod-ph">{!! $I['tag_product'] !!}</div>@endif<div><div style="font-size:12.5px;font-weight:600;color:var(--text)">{{ Str::limit($product->name,22) }}</div>@if($order->items->first()?->variant_name)<div style="font-size:11px;font-weight:700;color:var(--brand,#1668D8)">🎨 {{ $order->items->first()->variant_name }}</div>@endif<div style="font-size:11px;color:var(--muted)">Qté : {{ $order->items->first()->quantity ?? 1 }}</div></div></div>
                             @else<span style="color:var(--muted);font-size:12px">—</span>@endif
                         </td>
                         <td>
@@ -1321,8 +1321,8 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                             @if($order->livreur)
                                 <div class="lv-chip"><div class="lv-chip-av">{{ initiales($order->livreur->name) }}</div>{{ Str::limit($order->livreur->name,14) }}</div>
                             @elseif($order->deliveryCompany)
-                                <div class="lv-chip" style="background:#eef2ff;border-color:#c7d2fe;color:#4f46e5;">
-                                    <div class="lv-chip-av" style="background:#6366f1;">{!! $I['bldg_chip'] !!}</div>
+                                <div class="lv-chip" style="background:#EAF2FF;border-color:#D6E6FF;color:#1260C9;">
+                                    <div class="lv-chip-av" style="background:#1668D8;">{!! $I['bldg_chip'] !!}</div>
                                     {{ Str::limit($order->deliveryCompany->name,14) }}
                                 </div>
                             @else
@@ -1346,7 +1346,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                                 {{-- Entreprise externe --}}
                                 <button type="button"
                                         class="btn btn-sm"
-                                        style="background:#eef2ff;border-color:#c7d2fe;color:#4f46e5;white-space:nowrap;"
+                                        style="background:#EAF2FF;border-color:#D6E6FF;color:#1260C9;white-space:nowrap;"
                                         data-order-id="{{ $order->id }}"
                                         data-order-num="#{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
                                         data-client="{{ addslashes($order->display_name) }}"
@@ -1435,7 +1435,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span class="pill {{ $st['cls'] }}">{{ $st['label'] }}</span><span style="font-family:var(--mono);font-size:10px;color:var(--muted)">#{{ $order->id }}</span></div>
                     </div>
                     <div class="m-card-body">
-                        @if($product)@php $photoUrl = $variantPhoto ?: ($product->image ? asset('storage/'.$product->image) : null); @endphp<div style="display:flex;align-items:center;gap:9px">@if($photoUrl)<img src="{{ $photoUrl }}" class="prod-img" alt="{{ $product->name }}" onclick="openLightbox('{{ $photoUrl }}','{{ addslashes($product->name) }}')">@else<div class="prod-ph">{!! $I['tag_product'] !!}</div>@endif<div><div style="font-size:13px;font-weight:600">{{ $product->name }}</div>@if($order->items->first()?->variant_name)<div style="font-size:11px;font-weight:700;color:var(--brand,#6366f1)">🎨 {{ $order->items->first()->variant_name }}</div>@endif<div style="font-size:11px;color:var(--muted)">Qté : {{ $order->items->first()->quantity ?? 1 }}</div></div></div>@endif
+                        @if($product)@php $photoUrl = $variantPhoto ?: ($product->image ? asset('storage/'.$product->image) : null); @endphp<div style="display:flex;align-items:center;gap:9px">@if($photoUrl)<img src="{{ $photoUrl }}" class="prod-img" alt="{{ $product->name }}" onclick="openLightbox('{{ $photoUrl }}','{{ addslashes($product->name) }}')">@else<div class="prod-ph">{!! $I['tag_product'] !!}</div>@endif<div><div style="font-size:13px;font-weight:600">{{ $product->name }}</div>@if($order->items->first()?->variant_name)<div style="font-size:11px;font-weight:700;color:var(--brand,#1668D8)">🎨 {{ $order->items->first()->variant_name }}</div>@endif<div style="font-size:11px;color:var(--muted)">Qté : {{ $order->items->first()->quantity ?? 1 }}</div></div></div>@endif
                         @php $mAddr = $order->delivery_destination ?: ($client?->address ?? ''); @endphp
                         @if($mAddr)<div class="m-row"><span class="m-lbl">Adresse</span><span style="font-size:12px;color:var(--text-2);text-align:right;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{{ $mAddr }}">{!! $I['pin_addr'] !!} {{ $mAddr }}</span></div>@endif
                         <div class="m-row"><span class="m-lbl">Montant</span><span class="amount">{{ number_format($order->total,0,',',' ') }} <small>{{ $devise }}</small></span></div>
@@ -1449,7 +1449,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         @if(!$order->livreur && !$order->deliveryCompany)
                         <div style="display:flex;flex-direction:column;gap:6px;">
                             @if($livreurs->isNotEmpty())<form action="{{ route('employe.orders.assign',$order) }}" method="POST" style="display:flex;gap:8px;align-items:center">@csrf @method('PUT')<select name="livreur_id" class="assign-select" style="flex:1" required><option value="">— Choisir —</option>@foreach($livreurs as $lv)<option value="{{ $lv->id }}">{{ $lv->name }} {{ $lv->is_available ? '🟢' : '🟡' }}</option>@endforeach</select><button type="submit" class="btn btn-primary btn-sm">{!! $I['check_assign'] !!}</button></form>@endif
-                            <button type="button" class="btn btn-sm" style="background:#eef2ff;border-color:#c7d2fe;color:#4f46e5;width:100%;justify-content:center;"
+                            <button type="button" class="btn btn-sm" style="background:#EAF2FF;border-color:#D6E6FF;color:#1260C9;width:100%;justify-content:center;"
                                     data-order-id="{{ $order->id }}"
                                     data-order-num="#{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}"
                                     data-client="{{ addslashes($order->display_name) }}"
@@ -2513,7 +2513,7 @@ function submitBulkCompany(btn) {
         /* ── Entreprise sans aucune zone configurée ── */
         if (!zones.length) {
             const numsList = orders.map(o =>
-                `<span style="display:inline-flex;align-items:center;background:#eef2ff;border:1.5px solid #c7d2fe;color:#4f46e5;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;">#${o.num}</span>`
+                `<span style="display:inline-flex;align-items:center;background:#EAF2FF;border:1.5px solid #D6E6FF;color:#1260C9;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;">#${o.num}</span>`
             ).join(' ');
             listEl.innerHTML = `
                 <div style="padding:12px 14px;border-radius:9px;border:1.5px solid #fde68a;background:#fffbeb;margin-bottom:10px;">
@@ -2585,7 +2585,7 @@ function _renderBulkLotsWithSkipped(validLots, skippedOrders, listEl) {
         const price   = g.zonePrice;
         let badge;
         if (hasZone) {
-            badge = `<span style="background:#eef2ff;border:1.5px solid #c7d2fe;color:#4f46e5;border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:3px;">${_SVG.pin} ${label}${price?' — '+fmt(price)+' '+DEVISE:''}</span>`;
+            badge = `<span style="background:#EAF2FF;border:1.5px solid #D6E6FF;color:#1260C9;border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:3px;">${_SVG.pin} ${label}${price?' — '+fmt(price)+' '+DEVISE:''}</span>`;
         } else if (label) {
             badge = `<span style="background:#f0fdf4;border:1.5px solid #bbf7d0;color:#065f46;border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:3px;">${_SVG.pin} ${label}</span>`;
         } else {
@@ -2853,3 +2853,7 @@ document.addEventListener('keydown', function(e) {
 @endpush
 
 @endsection
+{{-- Thème bleu « espace vendeur » (maquette Main.dc.html), chargé après les styles de la page --}}
+@push('styles')
+@include('boutique._partials.sv-theme')
+@endpush

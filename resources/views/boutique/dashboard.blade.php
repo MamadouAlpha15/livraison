@@ -31,15 +31,15 @@
 
 :root {
     /* ── Accent indigo premium ── */
-    --brand:      #6366f1;
-    --brand-dk:   #4f46e5;
-    --brand-lt:   #e0e7ff;
-    --brand-mlt:  #eef2ff;
+    --brand:      #1668D8;
+    --brand-dk:   #1260C9;
+    --brand-lt:   #D6E6FF;
+    --brand-mlt:  #EAF2FF;
 
     /* ── Sidebar noir profond ── */
-    --sb-bg:      #0e0e16;
+    --sb-bg:      #0B1E3D;
     --sb-border:  rgba(255,255,255,.08);
-    --sb-act:     rgba(99,102,241,.52);
+    --sb-act:     rgba(22,104,216,.52);
     --sb-hov:     rgba(255,255,255,.07);
     --sb-txt:     rgba(255,255,255,.62);
     --sb-txt-act: #fff;
@@ -70,8 +70,8 @@
 
 /* ══ MODE SOMBRE — activé via data-theme="dark" sur <html> (bouton en haut à droite) ══ */
 [data-theme="dark"] {
-    --brand-lt:   rgba(99,102,241,.16);
-    --brand-mlt:  rgba(99,102,241,.09);
+    --brand-lt:   rgba(22,104,216,.16);
+    --brand-mlt:  rgba(22,104,216,.09);
 
     --bg:         #0b0f1a;
     --surface:    #141925;
@@ -139,11 +139,11 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .dash-wrap .main { margin-left: var(--sb-w); flex: 1; min-width: 0; }
 
 /* SIDEBAR */
-.sidebar { background: linear-gradient(180deg, #0f0f59 0%, #0e0e16 40%, #10103a 100%); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; width: var(--sb-w); overflow-y: scroll; scrollbar-width: thin; scrollbar-color: rgba(99,102,241,.35) transparent; z-index: 40; border-right: 1px solid rgba(99,102,241,.15); box-shadow: 6px 0 30px rgba(0,0,0,.35); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+.sidebar { background: linear-gradient(180deg, #0B1E3D 0%, #0B1E3D 40%, #0B1E3D 100%); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; width: var(--sb-w); overflow-y: scroll; scrollbar-width: thin; scrollbar-color: rgba(22,104,216,.35) transparent; z-index: 40; border-right: 1px solid rgba(22,104,216,.15); box-shadow: 6px 0 30px rgba(0,0,0,.35); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
 .sidebar::-webkit-scrollbar { width: 4px; }
 .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,.04); }
-.sidebar::-webkit-scrollbar-thumb { background: rgba(99,102,241,.4); border-radius: 4px; }
-.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,.7); }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(22,104,216,.4); border-radius: 4px; }
+.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(22,104,216,.7); }
 .sb-brand { padding: 18px 16px 14px; border-bottom: 1px solid var(--sb-border); flex-shrink: 0; position: relative; }
 .sb-close { display: none; position: absolute; top: 14px; right: 12px; width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.10); color: rgba(255,255,255,.6); cursor: pointer; align-items: center; justify-content: center; transition: background .15s, color .15s; flex-shrink: 0; }
 .sb-ft-ico { width:16px;height:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:.7; }
@@ -159,8 +159,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .sb-section { font-size: 9.5px; text-transform: uppercase; letter-spacing: 1.8px; color: rgba(255,255,255,.48); padding: 16px 10px 5px; font-weight: 800; }
 .sb-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--r-sm); font-size: 13.5px; font-weight: 600; color: rgba(255,255,255,.78); text-decoration: none; transition: background .15s, color .15s; position: relative; letter-spacing: -.1px; }
 .sb-item:hover { background: var(--sb-hov); color: rgba(255,255,255,.96); }
-.sb-item.active { background: var(--sb-act); color: #fff; box-shadow: 0 2px 12px rgba(99,102,241,.25); }
-.sb-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #a5b4fc; border-radius: 0 3px 3px 0; box-shadow: 2px 0 8px rgba(165,180,252,.5); }
+.sb-item.active { background: var(--sb-act); color: #fff; box-shadow: 0 2px 12px rgba(22,104,216,.25); }
+.sb-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #7DB4FF; border-radius: 0 3px 3px 0; box-shadow: 2px 0 8px rgba(165,180,252,.5); }
 .sb-item .ico { font-size: 13px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border-radius: 7px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); transition: background .15s; }
 .sb-item:hover .ico { background: rgba(255,255,255,.11); border-color: rgba(255,255,255,.14); }
 .sb-item.active .ico { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.25); }
@@ -182,13 +182,13 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .sb-scroll-hint { position: sticky; top: auto; bottom: 72px; width: 100%; height: 40px; background: linear-gradient(to bottom, transparent, rgba(17,17,24,.95)); pointer-events: none; z-index: 2; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; transition: opacity .3s; margin-top: -40px; align-self: flex-end; }
 .sb-scroll-hint.hidden { opacity: 0; pointer-events: none; }
 .sb-scroll-hint-arrow { display: flex; flex-direction: column; align-items: center; gap: 2px; animation: bounceDown 1.5s ease-in-out infinite; }
-.sb-scroll-hint-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(99,102,241,.6); }
+.sb-scroll-hint-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(22,104,216,.6); }
 .sb-scroll-hint-dot:nth-child(2) { opacity: .5; margin-top: -2px; }
 .sb-scroll-hint-dot:nth-child(3) { opacity: .25; margin-top: -2px; }
 @keyframes bounceDown { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
 .sb-user { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--r-sm); text-decoration: none; transition: background .15s, border-color .15s; border: 1px solid transparent; }
 .sb-user:hover { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.08); }
-.sb-av { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #4338ca); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(99,102,241,.45), 0 2px 8px rgba(99,102,241,.3); letter-spacing: -.5px; }
+.sb-av { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #1668D8, #1260C9); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(22,104,216,.45), 0 2px 8px rgba(22,104,216,.3); letter-spacing: -.5px; }
 .sb-uname { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: -.2px; }
 .sb-urole { font-size: 10.5px; color: rgba(255,255,255,.52); margin-top: 1px; font-weight: 500; }
 .sb-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; border-radius: var(--r-sm); background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.15); color: rgba(252,165,165,.9); font-size: 12.5px; font-weight: 600; font-family: var(--font); cursor: pointer; text-decoration: none; transition: background .15s, color .15s, border-color .15s; text-align: left; letter-spacing: -.1px; }
@@ -254,11 +254,11 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 /* PAGE */
 .content { padding: 22px 24px; flex: 1; }
 .flash { margin: 12px 24px 0; padding: 10px 14px; font-size: 12.5px; font-weight: 500; border-radius: var(--r-sm); border: 1px solid; display: flex; align-items: center; gap: 8px; }
-.flash-success { background: #eef2ff; border-color: #a5b4fc; color: #3730a3; }
+.flash-success { background: #EAF2FF; border-color: #7DB4FF; color: #0B1E3D; }
 .flash-info    { background: #eff6ff; border-color: #93c5fd; color: #1e40af; }
 .flash-warning { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
 .flash-danger  { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
-.comm-banner { background: var(--brand-mlt); border: 1px solid var(--brand-lt); border-radius: var(--r-sm); padding: 10px 14px; display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: #3730a3; margin-bottom: 20px; font-weight: 500; }
+.comm-banner { background: var(--brand-mlt); border: 1px solid var(--brand-lt); border-radius: var(--r-sm); padding: 10px 14px; display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: #0B1E3D; margin-bottom: 20px; font-weight: 500; }
 
 /* KPI GRID */
 .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 14px; }
@@ -284,19 +284,19 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 /* CHART */
 .chart-wrap { margin-bottom: 22px; }
-.rc-header { padding: 18px 22px 14px; border-bottom: 1px solid rgba(99,102,241,.1); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: linear-gradient(135deg,rgba(99,102,241,.045) 0%,rgba(139,92,246,.02) 100%); }
-.rc-header-left .rc-title { font-size: 10.5px; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 6px; }
+.rc-header { padding: 18px 22px 14px; border-bottom: 1px solid rgba(22,104,216,.1); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: linear-gradient(135deg,rgba(22,104,216,.045) 0%,rgba(31,124,246,.02) 100%); }
+.rc-header-left .rc-title { font-size: 10.5px; font-weight: 700; color: #1668D8; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 6px; }
 .rc-total { font-size: 28px; font-weight: 800; color: var(--text); font-family: var(--mono); line-height: 1; letter-spacing: -1px; }
 .rc-total sup { font-size: 12px; font-weight: 600; vertical-align: super; color: var(--muted); margin-right: 2px; }
 .rc-delta { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-top: 8px; }
 .rc-delta.up   { background: #dcfce7; color: #15803d; }
 .rc-delta.down { background: #fee2e2; color: #991b1b; }
 .rc-delta.flat { background: #f3f4f6; color: #475569; }
-.rc-header-right { text-align: right; font-size: 11px; color: var(--muted); background: rgba(99,102,241,.04); border: 1px solid rgba(99,102,241,.1); border-radius: 10px; padding: 10px 14px; }
+.rc-header-right { text-align: right; font-size: 11px; color: var(--muted); background: rgba(22,104,216,.04); border: 1px solid rgba(22,104,216,.1); border-radius: 10px; padding: 10px 14px; }
 .rc-header-right .rc-best { font-size: 12px; font-weight: 700; color: var(--brand); margin-top: 2px; }
 .rc-svg-wrap { padding: 14px 22px 4px; position: relative; }
-.rc-tooltip { position: absolute; background: linear-gradient(135deg,#1e1b4b,#2d2b6e); color: #f8fafc; border-radius: 10px; padding: 10px 14px; font-size: 11.5px; pointer-events: none; opacity: 0; transition: opacity .15s; white-space: nowrap; box-shadow: 0 8px 28px rgba(99,102,241,.4),0 2px 8px rgba(0,0,0,.2); z-index: 10; border: 1px solid rgba(165,180,252,.2); }
-.rc-tooltip strong { display: block; font-size: 14px; font-family: var(--mono); color: #a5b4fc; }
+.rc-tooltip { position: absolute; background: linear-gradient(135deg,#1e1b4b,#2d2b6e); color: #f8fafc; border-radius: 10px; padding: 10px 14px; font-size: 11.5px; pointer-events: none; opacity: 0; transition: opacity .15s; white-space: nowrap; box-shadow: 0 8px 28px rgba(22,104,216,.4),0 2px 8px rgba(0,0,0,.2); z-index: 10; border: 1px solid rgba(165,180,252,.2); }
+.rc-tooltip strong { display: block; font-size: 14px; font-family: var(--mono); color: #7DB4FF; }
 .rc-tooltip span   { color: #94a3b8; font-size: 10px; }
 .rc-day-dots { display: flex; justify-content: space-around; padding: 2px 0 4px; }
 .rc-day-dot { flex: 1; text-align: center; font-size: 9.5px; color: var(--muted); font-family: var(--mono); }
@@ -390,10 +390,10 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .sp-val { font-family: var(--mono); font-size: 11.5px; font-weight: 600; color: var(--text); width: 30px; text-align: right; flex-shrink: 0; }
 
 /* AVATAR COLORS */
-.av-green  { background: #6366f1; }
+.av-green  { background: #1668D8; }
 .av-blue   { background: #2563eb; }
 .av-amber  { background: #d97706; }
-.av-purple { background: #7c3aed; }
+.av-purple { background: #1260C9; }
 .av-teal   { background: #0891b2; }
 .av-rose   { background: #e11d48; }
 
@@ -443,7 +443,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 /* ÉTAPE 1 CSS */
 .today-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
-.today-card { background: linear-gradient(90deg, #291d95, #291d95, #aa28d9 ); border: 1px solid rgba(99,102,241,.35); border-radius: var(--r); padding: 20px 22px; display: flex; align-items: center; gap: 16px; box-shadow: 0 8px 32px rgba(79,70,229,.35), 0 2px 8px rgba(0,0,0,.2); position: relative; overflow: hidden; }
+.today-card { background: linear-gradient(90deg, #291d95, #291d95, #aa28d9 ); border: 1px solid rgba(22,104,216,.35); border-radius: var(--r); padding: 20px 22px; display: flex; align-items: center; gap: 16px; box-shadow: 0 8px 32px rgba(79,70,229,.35), 0 2px 8px rgba(0,0,0,.2); position: relative; overflow: hidden; }
 .today-card::before { content: ''; position: absolute; right: -30px; top: -30px; width: 140px; height: 140px; background: rgba(255,255,255,.06); border-radius: 50%; pointer-events: none; }
 .today-card::after  { content: ''; position: absolute; left: -20px; bottom: -30px; width: 110px; height: 110px; background: rgba(255,255,255,.04); border-radius: 50%; pointer-events: none; }
 .today-icon { width: 48px; height: 48px; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; backdrop-filter: blur(4px); }
@@ -451,7 +451,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .today-val  { font-size: 26px; font-weight: 800; color: #fff; font-family: var(--mono); letter-spacing: -1px; line-height: 1; text-shadow: 0 2px 8px rgba(0,0,0,.2); }
 .today-unit { font-size: 10px; color: rgba(255,255,255,.45); margin-top: 3px; }
 .today-delta { font-size: 11px; font-weight: 700; margin-top: 6px; display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px; border-radius: 20px; }
-.today-delta.up   { background: rgba(255,255,255,.15); color: #c7d2fe; border: 1px solid rgba(255,255,255,.2); }
+.today-delta.up   { background: rgba(255,255,255,.15); color: #D6E6FF; border: 1px solid rgba(255,255,255,.2); }
 .today-delta.down { background: rgba(239,68,68,.25);  color: #fca5a5; border: 1px solid rgba(239,68,68,.3); }
 .today-delta.flat { background: rgba(255,255,255,.08); color: rgba(255,255,255,.5); }
 .alerts-zone { margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
@@ -459,7 +459,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 @keyframes slideIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
 .alert-item.danger  { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
 .alert-item.warning { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
-.alert-item.success { background: #eef2ff; border-color: #a5b4fc; color: #3730a3; }
+.alert-item.success { background: #EAF2FF; border-color: #7DB4FF; color: #0B1E3D; }
 .alert-item.info    { background: #eff6ff; border-color: #93c5fd; color: #1e40af; }
 .alert-ico  { display:flex;align-items:center;justify-content:center;flex-shrink: 0; }
 .alert-msg  { flex: 1; line-height: 1.4; }
@@ -534,7 +534,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .period-btns { display: flex; flex-wrap: wrap; gap: 6px; padding: 14px 18px; border-bottom: 1px solid var(--border); }
 .period-btn { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; font-family: var(--font); border: 1px solid var(--border-dk); background: var(--bg); color: var(--text-2); cursor: pointer; transition: all .15s; white-space: nowrap; }
 .period-btn:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-mlt); }
-.period-btn.active { background: var(--brand); color: #fff; border-color: var(--brand-dk); box-shadow: 0 2px 8px rgba(99,102,241,.25); }
+.period-btn.active { background: var(--brand); color: #fff; border-color: var(--brand-dk); box-shadow: 0 2px 8px rgba(22,104,216,.25); }
 .period-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
 .period-stat { padding: 16px 18px; border-right: 1px solid var(--border); text-align: center; }
 .period-stat:last-child { border-right: none; }
@@ -564,7 +564,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 }
 .period-bar-wrap:hover .period-bar-tooltip { opacity: 1; }
 .tt-date   { font-size: 9px; color: rgba(255,255,255,.45); display: block; margin-bottom: 3px; }
-.tt-ca     { color: #a5b4fc; font-size: 12px; display: block; }
+.tt-ca     { color: #7DB4FF; font-size: 12px; display: block; }
 .tt-detail { color: rgba(255,255,255,.55); font-size: 9.5px; display: block; margin-top: 2px; }
 
 .period-bar { width: 100%; border-radius: 3px 3px 0 0; background: var(--brand); opacity: .8; transform-origin: bottom; transition: transform .4s cubic-bezier(.23,1,.32,1), opacity .15s; cursor: pointer; position: relative; min-height: 2px; }
@@ -591,14 +591,14 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 /* Sidebar active item — glow premium (override) */
 .sb-item.active {
-    background: linear-gradient(90deg, rgba(99,102,241,.58) 0%, rgba(99,102,241,.32) 100%);
-    box-shadow: 0 2px 14px rgba(99,102,241,.22), inset 0 1px 0 rgba(255,255,255,.08);
+    background: linear-gradient(90deg, rgba(22,104,216,.58) 0%, rgba(22,104,216,.32) 100%);
+    box-shadow: 0 2px 14px rgba(22,104,216,.22), inset 0 1px 0 rgba(255,255,255,.08);
 }
-.sb-item.active::before { box-shadow: 2px 0 10px rgba(165,180,252,.6), 0 0 8px rgba(99,102,241,.35); }
+.sb-item.active::before { box-shadow: 2px 0 10px rgba(165,180,252,.6), 0 0 8px rgba(22,104,216,.35); }
 
 /* Topbar search */
 .tb-search { display:flex; align-items:center; gap:8px; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:6px 14px; font-size:12px; color:var(--muted); cursor:pointer; white-space:nowrap; transition:border-color .15s, box-shadow .15s; flex-shrink:0; min-width:160px; }
-.tb-search:hover { border-color:var(--brand-lt); box-shadow:0 0 0 3px rgba(99,102,241,.08); }
+.tb-search:hover { border-color:var(--brand-lt); box-shadow:0 0 0 3px rgba(22,104,216,.08); }
 .tb-search kbd { background:#f1f5f9; border:1px solid var(--border-dk); border-radius:4px; padding:1px 5px; font-size:10px; color:var(--muted); font-family:var(--mono); margin-left:auto; }
 @media(max-width:680px){ .tb-search{ display:none; } }
 
@@ -632,28 +632,28 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 
 /* KPI card hover lift */
 .kpi { transition:box-shadow .2s, transform .2s; }
-.kpi:hover { box-shadow:0 8px 32px rgba(99,102,241,.12), 0 2px 8px rgba(0,0,0,.05); transform:translateY(-2px); }
+.kpi:hover { box-shadow:0 8px 32px rgba(22,104,216,.12), 0 2px 8px rgba(0,0,0,.05); transform:translateY(-2px); }
 
 /* Charts side-by-side */
 .charts-duo { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:24px; }
 @media(max-width:860px){ .charts-duo{ grid-template-columns:1fr; } }
-.charts-duo .card { border:1px solid rgba(99,102,241,.12); box-shadow:0 4px 28px rgba(99,102,241,.08),0 1px 6px rgba(0,0,0,.04); overflow:hidden; }
-.card.chart-wrap { border-top:3px solid #6366f1; }
-.charts-duo>.card:not(.chart-wrap) { border-top:3px solid #8b5cf6; }
+.charts-duo .card { border:1px solid rgba(22,104,216,.12); box-shadow:0 4px 28px rgba(22,104,216,.08),0 1px 6px rgba(0,0,0,.04); overflow:hidden; }
+.card.chart-wrap { border-top:3px solid #1668D8; }
+.charts-duo>.card:not(.chart-wrap) { border-top:3px solid #1F7CF6; }
 
 /* Mini bar chart (commandes) */
-.mini-chart-hd { padding:18px 22px 12px; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; background:linear-gradient(135deg,rgba(139,92,246,.045) 0%,rgba(99,102,241,.02) 100%); border-bottom:1px solid rgba(139,92,246,.1); }
-.mini-chart-lbl { font-size:10.5px; font-weight:700; color:#8b5cf6; text-transform:uppercase; letter-spacing:.6px; margin-bottom:6px; }
+.mini-chart-hd { padding:18px 22px 12px; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; background:linear-gradient(135deg,rgba(31,124,246,.045) 0%,rgba(22,104,216,.02) 100%); border-bottom:1px solid rgba(31,124,246,.1); }
+.mini-chart-lbl { font-size:10.5px; font-weight:700; color:#1F7CF6; text-transform:uppercase; letter-spacing:.6px; margin-bottom:6px; }
 .mini-chart-val { font-size:26px; font-weight:800; font-family:var(--mono); color:var(--text); letter-spacing:-.8px; line-height:1; }
 .mini-chart-sub { font-size:10px; color:var(--muted); margin-top:3px; }
-.mini-period-badge { font-size:10.5px; color:#8b5cf6; background:rgba(139,92,246,.09); border:1px solid rgba(139,92,246,.2); border-radius:20px; padding:4px 12px; font-weight:700; white-space:nowrap; cursor:pointer; align-self:flex-start; margin-top:4px; }
+.mini-period-badge { font-size:10.5px; color:#1F7CF6; background:rgba(31,124,246,.09); border:1px solid rgba(31,124,246,.2); border-radius:20px; padding:4px 12px; font-weight:700; white-space:nowrap; cursor:pointer; align-self:flex-start; margin-top:4px; }
 .mini-delta { font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:3px; padding:3px 10px; border-radius:20px; margin-top:7px; }
 .mini-delta.up { background:#dcfce7; color:#15803d; } .mini-delta.down { background:#fee2e2; color:#991b1b; }
 .mini-bars-wrap { display:flex; align-items:flex-end; gap:5px; padding:18px 22px 6px; height:120px; }
 .mini-bar-col { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; }
-.mini-bar { width:80%; border-radius:6px 6px 0 0; background:linear-gradient(180deg,#a78bfa 0%,#7c3aed 100%); opacity:.45; min-height:3px; transform-origin:bottom; transition:transform .65s cubic-bezier(.23,1,.32,1), opacity .2s, box-shadow .2s; cursor:pointer; }
-.mini-bar:hover { opacity:.85; box-shadow:0 -4px 14px rgba(139,92,246,.4); }
-.mini-bar.actuel { background:linear-gradient(180deg,#c4b5fd 0%,#7c3aed 100%); opacity:1; box-shadow:0 -6px 20px rgba(139,92,246,.55); }
+.mini-bar { width:80%; border-radius:6px 6px 0 0; background:linear-gradient(180deg,#a78bfa 0%,#1260C9 100%); opacity:.45; min-height:3px; transform-origin:bottom; transition:transform .65s cubic-bezier(.23,1,.32,1), opacity .2s, box-shadow .2s; cursor:pointer; }
+.mini-bar:hover { opacity:.85; box-shadow:0 -4px 14px rgba(31,124,246,.4); }
+.mini-bar.actuel { background:linear-gradient(180deg,#7DB4FF 0%,#1260C9 100%); opacity:1; box-shadow:0 -6px 20px rgba(31,124,246,.55); }
 .mini-bar-lbl { font-size:9px; color:var(--muted); font-family:var(--mono); }
 .mini-bar-labs { display:flex; gap:5px; padding:0 22px 14px; }
 
@@ -677,7 +677,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .bq-chat-overlay.open{visibility:visible;opacity:1;pointer-events:all;}
 .bq-chat-panel{background:#fff;border-radius:16px;width:100%;max-width:520px;display:flex;flex-direction:column;height:88vh;max-height:660px;box-shadow:0 28px 80px rgba(0,0,0,.22);overflow:hidden;animation:bqModalIn .2s ease;}
 @keyframes bqModalIn{from{opacity:0;transform:scale(.95) translateY(-8px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.bq-chat-hd{padding:14px 18px;border-bottom:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;}
+.bq-chat-hd{padding:14px 18px;border-bottom:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(135deg,#1260C9,#1668D8);color:#fff;}
 .bq-chat-hd-info{display:flex;align-items:center;gap:10px;}
 .bq-chat-hd-av{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;}
 .bq-chat-hd-av img{width:100%;height:100%;object-fit:cover;}
@@ -688,25 +688,25 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .bq-msg-system-time{font-size:10px;color:#9ca3af;text-align:center;margin-top:2px;}
 .bq-chat-close{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;font-size:16px;flex-shrink:0;transition:background .14s;}
 .bq-chat-close:hover{background:rgba(255,255,255,.3);}
-.bq-chat-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:8px;background:#f8fafc;scrollbar-width:thin;scrollbar-color:#818cf8 #e0e7ff;}
+.bq-chat-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:8px;background:#f8fafc;scrollbar-width:thin;scrollbar-color:#7DB4FF #D6E6FF;}
 .bq-chat-msgs::-webkit-scrollbar{width:6px;}
-.bq-chat-msgs::-webkit-scrollbar-track{background:#e0e7ff;border-radius:6px;}
-.bq-chat-msgs::-webkit-scrollbar-thumb{background:#818cf8;border-radius:6px;}
-.bq-chat-msgs::-webkit-scrollbar-thumb:hover{background:#6366f1;}
+.bq-chat-msgs::-webkit-scrollbar-track{background:#D6E6FF;border-radius:6px;}
+.bq-chat-msgs::-webkit-scrollbar-thumb{background:#7DB4FF;border-radius:6px;}
+.bq-chat-msgs::-webkit-scrollbar-thumb:hover{background:#1668D8;}
 .bq-msg-row{display:flex;flex-direction:column;max-width:80%;}
 .bq-msg-row.mine{align-self:flex-end;align-items:flex-end;}
 .bq-msg-row.theirs{align-self:flex-start;align-items:flex-start;}
 .bq-msg-bubble{padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.5;word-break:break-word;white-space:pre-wrap;}
-.bq-msg-row.mine .bq-msg-bubble{background:#4f46e5;color:#fff;border-bottom-right-radius:4px;}
+.bq-msg-row.mine .bq-msg-bubble{background:#1260C9;color:#fff;border-bottom-right-radius:4px;}
 .bq-msg-row.theirs .bq-msg-bubble{background:#fff;color:#1e293b;border-bottom-left-radius:4px;border:1px solid #e2e8f0;}
 .bq-msg-bubble.system{background:#fef9c3;color:#92400e;border:1px solid #fde68a;font-size:12px;font-style:italic;border-radius:10px;}
 .bq-msg-meta{font-size:10px;color:#94a3b8;margin-top:2px;padding:0 2px;}
 .bq-chat-empty{text-align:center;padding:32px 16px;color:#94a3b8;font-size:13px;}
 .bq-chat-input-zone{padding:10px 14px;flex-shrink:0;border-top:1px solid #e2e8f0;background:#fff;display:flex;gap:8px;align-items:flex-end;}
 .bq-chat-textarea{flex:1;resize:none;border:1.5px solid #e2e8f0;border-radius:10px;padding:9px 12px;font-size:13px;font-family:var(--font);color:var(--text);outline:none;line-height:1.4;max-height:120px;min-height:40px;transition:border-color .14s;scrollbar-width:thin;}
-.bq-chat-textarea:focus{border-color:#6366f1;}
-.bq-chat-send-btn{width:38px;height:38px;border-radius:10px;border:none;cursor:pointer;background:#6366f1;color:#fff;font-size:17px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .14s;}
-.bq-chat-send-btn:hover{background:#4f46e5;}
+.bq-chat-textarea:focus{border-color:#1668D8;}
+.bq-chat-send-btn{width:38px;height:38px;border-radius:10px;border:none;cursor:pointer;background:#1668D8;color:#fff;font-size:17px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .14s;}
+.bq-chat-send-btn:hover{background:#1260C9;}
 .bq-chat-send-btn:disabled{opacity:.5;cursor:not-allowed;}
 /* Toggle livraison boutique (mobile only) */
 .bq-confier-toggle{display:none;}
@@ -722,7 +722,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .bq-order-card{padding:9px 12px;border-radius:9px;border:1.5px solid #e2e8f0;background:#fff;cursor:pointer;transition:all .14s;display:flex;align-items:center;gap:10px;}
 .bq-order-card:hover{border-color:#86efac;background:#f0fdf4;}
 .bq-order-card.selected{border-color:#059669;background:#f0fdf4;box-shadow:0 0 0 3px rgba(16,185,129,.12);}
-.bq-order-card-num{font-size:11px;font-weight:700;color:#6366f1;font-family:var(--mono);flex-shrink:0;}
+.bq-order-card-num{font-size:11px;font-weight:700;color:#1668D8;font-family:var(--mono);flex-shrink:0;}
 .bq-order-card-info{flex:1;min-width:0;}
 .bq-order-card-client{font-size:12.5px;font-weight:700;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .bq-order-card-amount{font-size:11px;color:#6b7280;margin-top:1px;}
@@ -816,7 +816,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     border-bottom:1px solid rgba(0,0,0,.04);
     transition:background .14s; text-decoration:none; color:inherit;
 }
-.bq-np-item:hover { background:rgba(99,102,241,.04); }
+.bq-np-item:hover { background:rgba(22,104,216,.04); }
 .bq-np-item:last-child { border-bottom:none; }
 
 .bq-np-av {
@@ -831,8 +831,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .bq-np-time { font-size:10px; color:#94a3b8; }
 .bq-np-badge { font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:20px; }
 .bq-np-badge.order   { background:#fef3c7; color:#92400e; }
-.bq-np-badge.msg     { background:#ede9fe; color:#5b21b6; }
-.bq-np-badge.company { background:#eef2ff; color:#3730a3; }
+.bq-np-badge.msg     { background:#D6E6FF; color:#5b21b6; }
+.bq-np-badge.company { background:#EAF2FF; color:#0B1E3D; }
 .bq-np-badge.support { background:#f0fdf4; color:#166534; }
 
 .bq-np-close-btn {
@@ -1011,8 +1011,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 /* Scrollbar globale fine (fallback pour éléments sans règle spécifique) */
 *{scrollbar-width:thin;}
 ::-webkit-scrollbar{width:5px;height:5px;}
-::-webkit-scrollbar-thumb{background:rgba(99,102,241,.25);border-radius:5px;}
-::-webkit-scrollbar-thumb:hover{background:rgba(99,102,241,.5);}
+::-webkit-scrollbar-thumb{background:rgba(22,104,216,.25);border-radius:5px;}
+::-webkit-scrollbar-thumb:hover{background:rgba(22,104,216,.5);}
 
 /* ══════════════════════════════════════════
    PLAN INDICATORS — usage bars & lock overlays
@@ -1026,8 +1026,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     display:flex;align-items:center;gap:16px;flex-wrap:wrap;
 }
 .plan-banner.pro{
-    background:linear-gradient(135deg,#eef2ff 0%,#f5f3ff 100%);
-    border-color:rgba(99,102,241,.35);
+    background:linear-gradient(135deg,#EAF2FF 0%,#EAF2FF 100%);
+    border-color:rgba(22,104,216,.35);
 }
 .plan-banner-badge{
     display:inline-flex;align-items:center;gap:6px;
@@ -1035,7 +1035,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;flex-shrink:0;
 }
 .plan-banner-badge.free{background:#fef3c7;color:#92400e;border:1px solid #fcd34d;}
-.plan-banner-badge.pro{background:#eef2ff;color:#3730a3;border:1px solid #a5b4fc;}
+.plan-banner-badge.pro{background:#EAF2FF;color:#0B1E3D;border:1px solid #7DB4FF;}
 .plan-usages{display:flex;align-items:center;gap:20px;flex-wrap:wrap;flex:1;}
 .plan-usage-item{display:flex;flex-direction:column;gap:4px;min-width:140px;}
 .plan-usage-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
@@ -1057,8 +1057,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 }
 .plan-banner-cta:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(245,158,11,.5);color:#fff;}
 .plan-banner-cta.pro-active{
-    background:linear-gradient(135deg,#6366f1,#4f46e5);
-    box-shadow:0 3px 12px rgba(99,102,241,.35);
+    background:linear-gradient(135deg,#1668D8,#1260C9);
+    box-shadow:0 3px 12px rgba(22,104,216,.35);
 }
 @media (max-width: 640px) {
     .plan-banner-badge{
@@ -1107,6 +1107,262 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     font-size:9.5px;font-weight:800;color:#d97706;
     background:#fef3c7;border:1px solid #fcd34d;
     padding:1px 6px;border-radius:8px;margin-top:2px;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   REFONTE « ESPACE VENDEUR » — bleu Shopio (maquette Main.dc.html)
+   Placée en dernier : elle prend le pas sur les anciens styles sans
+   toucher aux identifiants utilisés par les scripts de la page.
+══════════════════════════════════════════════════════════════════ */
+:root {
+    --brand: #1668D8; --brand-dk: #1260C9; --brand-lt: #D6E6FF; --brand-mlt: #EAF2FF;
+    --sv-blue: #1F7CF6; --sv-btn: #1668D8; --sv-btn-h: #1260C9; --sv-b50: #EAF2FF; --sv-b100: #D6E6FF;
+    --sv-night: #0B1E3D; --sv-night2: #132B52; --sv-sky: #7DB4FF;
+    --sv-amber: #F59E0B; --sv-amb50: #FEF3E0; --sv-amb-ink: #92400E;
+    --sv-ok: #15803D; --sv-ok50: #E7F6EC; --sv-warn: #B45309; --sv-err: #B91C1C; --sv-err50: #FDECEC;
+    --sv-e-out: cubic-bezier(.22,1,.36,1); --sv-e-io: cubic-bezier(.65,0,.35,1); --sv-e-pop: cubic-bezier(.34,1.56,.64,1);
+    --bg: #F6F9FF; --surface: #FFFFFF; --border: #E3E8F2; --text: #16162A; --text-2: #45455E; --muted: #62627C;
+    --mono: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --sb-w: 264px; --top-h: 72px;
+}
+[data-theme="dark"] {
+    --brand-lt: #1B3563; --brand-mlt: #13284B;
+    --sv-b50: #13284B; --sv-b100: #1B3563; --sv-amb50: #2E2208; --sv-amb-ink: #FBBF24;
+    --sv-ok: #4ADE80; --sv-ok50: #0F2A1C; --sv-warn: #FBBF24; --sv-err: #F87171; --sv-err50: #2A1214;
+    --bg: #0A1426; --surface: #10203B; --border: #22355A; --border-dk: #2B4370;
+    --text: #EAF0FA; --text-2: #C3CEE0; --muted: #9DAAC2;
+}
+body { font-variant-numeric: tabular-nums; }
+.sv-num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Barre latérale bleu nuit, élément actif en pilule bleue */
+.sidebar { background: var(--sv-night) !important; border-right: 0 !important; box-shadow: none !important; }
+.sb-brand { border-bottom-color: #1C3560 !important; }
+.sb-section { color: #8EA3C4 !important; font-size: 11px !important; letter-spacing: .09em !important; padding: 16px 12px 6px !important; }
+.sb-nav .sb-item { min-height: 44px; padding: 0 12px; border-radius: 14px; color: #C9D6EA; font-size: 15px; gap: 12px; transition: background-color 180ms var(--sv-e-out), color 180ms, transform 180ms var(--sv-e-out); }
+.sb-nav .sb-item:hover { background: var(--sv-night2); color: #fff; transform: translateX(2px); }
+.sb-nav .sb-item.active { background: #1668D8 !important; color: #fff !important; box-shadow: 0 8px 18px rgba(22,104,216,.35) !important; }
+.sb-nav .sb-item.active::before { display: none !important; }
+.sb-nav .sb-item .ico { background: transparent !important; border: 0 !important; width: 22px; }
+.sb-badge { border-radius: 999px; font-family: var(--font); font-weight: 800; font-size: 12px; min-width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; padding: 0 7px; }
+.sb-group-toggle { min-height: 44px; border-radius: 14px; font-size: 15px !important; color: #C9D6EA !important; }
+.sb-user { background: var(--sv-night2); border-radius: 16px; padding: 12px; }
+.sb-av { background: var(--sv-blue) !important; box-shadow: none !important; width: 38px; height: 38px; font-size: 13px; }
+.sb-logout { border-radius: 999px; min-height: 40px; }
+
+/* Barre du haut */
+/* Fond plein, sans backdrop-filter : un filtre ferait de la barre le repère des éléments
+   position:fixed qu'elle contient (toast de négociation, menus) et les ferait apparaître dedans. */
+.topbar { height: auto; min-height: var(--top-h); padding: 14px 28px; background: var(--bg); box-shadow: none; border-bottom: 1px solid var(--border); }
+/* Cartes « aujourd'hui » : bleu Shopio et bleu nuit au lieu du dégradé violet */
+.today-grid { gap: 16px; }
+.today-card { background: linear-gradient(135deg, #1F7CF6, #1260C9) !important; border: 0 !important; box-shadow: 0 14px 30px -12px rgba(22,104,216,.55) !important; }
+.today-grid .today-card + .today-card { background: var(--sv-night) !important; box-shadow: 0 14px 30px -12px rgba(11,30,61,.55) !important; }
+.today-icon { border-radius: 14px; box-shadow: inset -5px -6px 10px rgba(0,0,0,.15), inset 4px 4px 8px rgba(255,255,255,.2); }
+.today-val { font-family: var(--font) !important; font-weight: 800; }
+.sv-title { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.02em; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sv-title-ico { color: var(--sv-blue); display: flex; }
+.sv-title-ico svg { width: 22px; height: 22px; }
+.topbar .tb-greeting-sub { font-size: 13px; color: var(--muted); }
+.topbar .btn, .topbar .tb-icon-btn, .topbar .export-dropdown-btn { min-height: 44px; min-width: 44px; justify-content: center; border-radius: 999px; padding: 0 16px; font-size: 14px; font-weight: 700; border: 0; background: var(--surface); color: var(--text); box-shadow: inset 0 0 0 1.5px var(--border); transition: box-shadow 180ms var(--sv-e-out), color 180ms, transform 180ms var(--sv-e-out); }
+.topbar .tb-icon-btn, .topbar #notifBellBtn { padding: 0 !important; width: 44px; }
+.topbar .btn:hover, .topbar .tb-icon-btn:hover, .topbar .export-dropdown-btn:hover { background: var(--surface); box-shadow: inset 0 0 0 1.5px var(--sv-blue); color: var(--sv-btn); }
+.topbar .btn-primary { background: var(--sv-btn); color: #fff; box-shadow: none; }
+.topbar .btn-primary:hover { background: var(--sv-btn-h); color: #fff; box-shadow: 0 8px 20px rgba(22,104,216,.28); transform: translateY(-1px); }
+.topbar .btn:active { transform: scale(.97); }
+.content { padding: 24px 28px 48px; }
+
+/* Bannière du plan : alerte ambre douce */
+.plan-banner { border-radius: 20px !important; }
+.plan-banner:not(.pro) { background: var(--sv-amb50) !important; border: 0 !important; box-shadow: inset 0 0 0 1px #F7D59B; }
+.plan-banner.pro { background: var(--sv-b50) !important; border: 0 !important; box-shadow: inset 0 0 0 1px var(--sv-b100); }
+.plan-banner-cta { border-radius: 999px !important; background: var(--sv-amber) !important; color: #16162A !important; min-height: 44px; display: inline-flex !important; align-items: center; }
+
+/* Cartes génériques */
+.card, .kpi, .quick-card, .today-card { border-radius: 24px !important; }
+.card { border: 0 !important; box-shadow: 0 0 0 1px var(--border) !important; }
+.card.chart-wrap { border-top: 0 !important; }
+.alert-item { border-radius: 18px; }
+.flash { border-radius: 16px; }
+
+/* Indicateurs : icône en relief, légère bascule 3D au survol */
+.kpi-grid { gap: 16px !important; margin-bottom: 20px !important; }
+.kpi { border: 0 !important; box-shadow: 0 0 0 1px var(--border) !important; padding: 20px !important; transition: transform 260ms var(--sv-e-out), box-shadow 260ms var(--sv-e-out) !important; }
+.kpi::before { display: none !important; }
+.kpi:hover { transform: perspective(800px) rotateX(7deg) rotateY(-7deg) translateY(-4px) !important; box-shadow: 0 0 0 1px var(--border), 10px 18px 32px rgba(11,30,61,.10) !important; }
+.kpi-icon { width: 46px !important; height: 46px !important; border-radius: 14px !important; border: 0 !important; color: #fff; box-shadow: inset -5px -6px 10px rgba(0,0,0,.18), inset 4px 4px 8px rgba(255,255,255,.3), 0 8px 16px rgba(11,30,61,.12) !important; }
+.kpi-icon svg { stroke: currentColor; }
+.kpi-grid .kpi:nth-child(1) .kpi-icon { background: var(--sv-blue) !important; }
+.kpi-grid .kpi:nth-child(2):not([style*="border:2px"]) .kpi-icon { background: var(--sv-night) !important; color: var(--sv-sky); }
+.kpi-grid .kpi:nth-child(3) .kpi-icon { background: var(--sv-amber) !important; color: #16162A; }
+.kpi-grid .kpi:nth-child(4) .kpi-icon { background: #15803D !important; }
+.kpi-lbl { font-size: 12px !important; font-weight: 800 !important; letter-spacing: .07em !important; color: var(--muted) !important; margin-top: 8px; }
+.kpi-val { font-family: var(--font) !important; font-size: 28px !important; font-weight: 800 !important; letter-spacing: -.02em !important; line-height: 1.1 !important; }
+.kpi-unit { font-size: 13px; color: var(--muted); }
+[data-theme="dark"] .kpi:hover { box-shadow: 0 0 0 1px var(--border), 10px 18px 32px rgba(0,0,0,.4) !important; }
+
+/* Boutons de la refonte */
+.sv-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 999px; font: 700 14px/1 var(--font); text-decoration: none; border: 0; cursor: pointer; white-space: nowrap; transition: transform 180ms var(--sv-e-out), background-color 180ms var(--sv-e-out), box-shadow 180ms var(--sv-e-out), color 180ms var(--sv-e-out); }
+.sv-btn:active { transform: scale(.97); }
+.sv-btn:focus-visible, .sv-pcol:focus-visible, .quick-btn:focus-visible { outline: 3px solid var(--sv-blue); outline-offset: 2px; }
+.sv-btn-sm { min-height: 38px; padding: 0 14px; }
+.sv-btn-amber { min-height: 48px; background: var(--sv-amber); color: #16162A; }
+.sv-btn-amber:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(245,158,11,.35); color: #16162A; }
+.sv-btn-line { min-height: 48px; background: transparent; color: #fff; box-shadow: inset 0 0 0 1.5px #2B4A7E; }
+.sv-btn-line:hover { box-shadow: inset 0 0 0 1.5px var(--sv-sky); color: #fff; }
+.sv-btn-line-dk { background: var(--surface); color: var(--text); box-shadow: inset 0 0 0 1.5px var(--border); }
+.sv-btn-line-dk:hover { box-shadow: inset 0 0 0 1.5px var(--sv-blue); color: var(--sv-btn); }
+.sv-btn-blue { background: var(--sv-btn); color: #fff; }
+.sv-btn-blue:hover { background: var(--sv-btn-h); color: #fff; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(22,104,216,.28); }
+
+/* Cartes de la refonte */
+.sv-card { background: var(--surface); border-radius: 24px; box-shadow: 0 0 0 1px var(--border); padding: 22px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.sv-card-hd { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.sv-card-hd h2, .sv-row-3 .quick-card-title { margin: 0; font-size: 17px; font-weight: 800; letter-spacing: -.02em; color: var(--text); }
+.sv-muted { margin: 0; color: var(--muted); font-size: 14px; }
+.sv-ok { margin: 0; color: var(--sv-ok); font-weight: 700; }
+.sv-badge { display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 800; white-space: nowrap; }
+.sv-badge-err { background: var(--sv-err50); color: var(--sv-err); }
+.sv-tile { display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: inset -5px -6px 10px rgba(0,0,0,.10), inset 4px 4px 8px rgba(255,255,255,.3), 0 8px 16px rgba(11,30,61,.10); }
+.sv-tile-sm { width: 40px; height: 40px; border-radius: 12px; }
+.sv-tile-soft { background: var(--sv-b50); color: var(--sv-btn); }
+[data-theme="dark"] .sv-tile-soft { color: var(--sv-sky); }
+
+/* Bonjour + scène 3D */
+.sv-hero { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 20px; margin-bottom: 20px; }
+.sv-hello { position: relative; overflow: hidden; background: var(--sv-night); color: #fff; border-radius: 24px; padding: 30px; display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 16px; align-items: center; }
+.sv-hello-txt { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; }
+.sv-chip { align-self: flex-start; display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; background: var(--sv-night2); color: var(--sv-sky); font-size: 12px; font-weight: 800; }
+.sv-hello-title { margin: 0; font-size: 32px; line-height: 1.1; font-weight: 800; letter-spacing: -.02em; color: #fff; text-wrap: balance; }
+.sv-hello-title span { color: var(--sv-sky); }
+.sv-hello-sub { margin: 0; max-width: 460px; color: #C9D6EA; font-size: 15px; }
+.sv-hello-cta { display: flex; flex-wrap: wrap; gap: 10px; }
+.sv-scene { position: relative; height: 200px; perspective: 1200px; }
+.sv-stage { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateX(var(--rx, 6deg)) rotateY(var(--ry, -16deg)); transition: transform 450ms var(--sv-e-out); }
+.sv-layer { position: absolute; transform-style: preserve-3d; }
+.sv-sphere { left: 20px; top: 0; width: 180px; height: 180px; border-radius: 50%; background: var(--sv-blue); box-shadow: inset -24px -30px 50px rgba(5,15,35,.5), inset 18px 18px 36px rgba(255,255,255,.18); transform: translateZ(-80px); }
+.sv-float-card { left: 0; top: 112px; transform: translateZ(90px); }
+.sv-float { padding: 10px 12px; border-radius: 16px; background: #fff; color: #16162A; box-shadow: 0 14px 28px rgba(0,0,0,.35); animation: svFloat 4s var(--sv-e-io) infinite; }
+.sv-float-lbl { font-size: 11px; font-weight: 800; color: #62627C; text-transform: uppercase; letter-spacing: .06em; }
+.sv-float-val { font-size: 22px; font-weight: 800; }
+.sv-coin-wrap { right: 0; top: 18px; transform: translateZ(140px); }
+.sv-coin { width: 58px; height: 58px; border-radius: 999px; background: var(--sv-amber); color: #16162A; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; box-shadow: inset -6px -8px 12px rgba(120,60,0,.45), inset 4px 4px 8px rgba(255,255,255,.4), 0 14px 26px rgba(0,0,0,.35); animation: svFloat 4s var(--sv-e-io) .8s infinite; }
+.sv-visits-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.sv-visit { padding: 14px; border-radius: 18px; }
+.sv-visit-val { font-size: 26px; font-weight: 800; color: var(--text); }
+.sv-visit-lbl { font-size: 13px; font-weight: 600; color: var(--text-2); }
+.sv-tone-b { background: var(--sv-b50); } .sv-tone-b .sv-visit-val { color: var(--sv-btn-h); }
+.sv-tone-a { background: var(--sv-amb50); } .sv-tone-a .sv-visit-val { color: var(--sv-amb-ink); }
+.sv-tone-g { background: var(--sv-ok50); } .sv-tone-g .sv-visit-val { color: var(--sv-ok); }
+.sv-tone-n { background: var(--bg); }
+[data-theme="dark"] .sv-tone-b .sv-visit-val { color: var(--sv-sky); }
+
+/* Rangées */
+.sv-row { display: grid; gap: 20px; margin-bottom: 20px; }
+.sv-row-pipe { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+.sv-row-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: stretch; }
+
+/* Pipeline en colonnes 3D (prismes) */
+.sv-pipe { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; padding-top: 22px; }
+.sv-pcol { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 10px; min-height: 250px; padding: 14px 8px; border-radius: 18px; text-decoration: none; color: inherit; transition: background-color 180ms var(--sv-e-out), transform 220ms var(--sv-e-out); }
+.sv-pcol:hover { background: var(--sv-b50); transform: translateY(-3px); }
+.sv-prism { position: relative; display: block; width: 46px; height: var(--h); margin-right: 16px; background: var(--front); transform-origin: 50% 100%; animation: svGrow 900ms var(--sv-e-out) backwards; }
+.sv-prism-s { position: absolute; left: 46px; top: 0; width: 16px; height: 100%; background: var(--side); transform-origin: 0 0; transform: skewY(-45deg); }
+.sv-prism-t { position: absolute; left: 0; top: -16px; width: 46px; height: 16px; background: var(--top); transform-origin: 0 100%; transform: skewX(-45deg); }
+.sv-pcol-n { font-size: 26px; font-weight: 800; color: var(--text); }
+.sv-pcol-lbl { min-height: 3em; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--text-2); text-align: center; }
+.sv-pcol-lbl small { font-size: 11px; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--muted); }
+
+/* À traiter maintenant */
+.sv-urgent-row { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 16px; background: var(--bg); }
+.sv-urgent-txt { flex: 1; min-width: 0; }
+.sv-urgent-prod { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
+.sv-urgent-meta { font-size: 13px; color: var(--muted); }
+
+/* Meilleurs clients */
+.sv-client { display: flex; flex-direction: column; gap: 6px; }
+.sv-client-top { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; color: var(--text); }
+.sv-client-top strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sv-client-top span { font-weight: 700; white-space: nowrap; }
+.sv-bar { height: 10px; border-radius: 10px; background: var(--sv-b50); overflow: hidden; }
+.sv-bar span { display: block; height: 100%; border-radius: 10px; background: var(--sv-blue); transform-origin: left center; transform: scaleX(var(--r)); animation: svBar 900ms var(--sv-e-out) backwards; }
+
+/* Actions rapides dans la rangée de 3 cartes */
+.sv-row-3 .quick-section { margin: 0; }
+.sv-row-3 .quick-card { height: 100%; border: 0 !important; box-shadow: 0 0 0 1px var(--border); padding: 22px; display: flex; flex-direction: column; gap: 12px; overflow: visible; }
+.sv-row-3 .quick-card-hd { padding: 0; border: 0; }
+.sv-row-3 .quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px; }
+.sv-row-3 .quick-btn { align-items: flex-start; text-align: left; gap: 8px; padding: 14px; border: 0 !important; border-radius: 18px; background: var(--bg) !important; transition: transform 260ms var(--sv-e-out), box-shadow 260ms var(--sv-e-out); }
+.sv-row-3 .quick-btn::before { display: none !important; }
+.sv-row-3 .quick-btn:hover { transform: perspective(800px) rotateX(7deg) rotateY(-7deg) translateY(-4px); box-shadow: 0 0 0 1px var(--border), 10px 18px 32px rgba(11,30,61,.10); }
+.sv-row-3 .quick-btn-ico { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: var(--surface); box-shadow: inset -4px -5px 8px rgba(0,0,0,.08), 0 6px 12px rgba(11,30,61,.08); }
+.sv-row-3 .quick-btn-ico svg { width: 18px; height: 18px; }
+.sv-row-3 .quick-btn-lbl { font-size: 14px; font-weight: 800; color: var(--text); line-height: 1.25; }
+.sv-row-3 .quick-btn-sub { font-size: 12.5px; color: var(--muted); }
+
+/* Livraison */
+.sv-rider { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 18px; background: var(--sv-ok50); color: var(--text); }
+.sv-rider-off { background: var(--bg); }
+.sv-rider-av { position: relative; width: 44px; height: 44px; border-radius: 999px; background: #15803D; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0; }
+.sv-rider-av i { position: absolute; right: 0; bottom: 0; width: 12px; height: 12px; border-radius: 999px; background: #4ADE80; box-shadow: 0 0 0 2px var(--sv-ok50); }
+.sv-rider-off .sv-rider-av { background: var(--sv-b50); color: var(--sv-btn); }
+.sv-rider-st { font-size: 13px; font-weight: 700; color: var(--sv-ok); }
+.sv-kv { margin: 0; display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+.sv-kv div { display: flex; justify-content: space-between; gap: 8px; }
+.sv-kv dt { color: var(--text-2); }
+.sv-kv dd { margin: 0; font-weight: 800; color: var(--text); }
+.sv-kv dd.is-warn { color: var(--sv-warn); }
+
+/* Message bref (partage de la boutique) */
+.sv-toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 9500; display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-radius: 999px; background: var(--sv-night); color: #fff; font-weight: 700; box-shadow: 0 16px 32px rgba(11,30,61,.35); transform: translateX(-50%); animation: svToast 300ms var(--sv-e-out) both; }
+
+/* Mouvements */
+@keyframes svFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@keyframes svGrow { from { transform: scaleY(0); } }
+@keyframes svBar { from { transform: scaleX(0); } }
+@keyframes svRise { from { opacity: 0; transform: translateY(16px); } }
+@keyframes svToast { from { opacity: 0; transform: translate(-50%, 16px); } }
+.sv-in { animation: svRise 600ms var(--sv-e-out) backwards; }
+.sv-row .sv-in:nth-child(2) { animation-delay: 80ms; }
+.sv-row .sv-in:nth-child(3) { animation-delay: 160ms; }
+
+/* Responsive */
+@media (max-width: 1180px) {
+    .sv-row-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .sv-row-3 > .quick-section { grid-column: 1 / -1; grid-row: 1; }
+}
+@media (max-width: 900px) {
+    .sv-hero, .sv-row-pipe, .sv-row-3 { grid-template-columns: minmax(0, 1fr); }
+    .sv-row-3 > .quick-section { grid-column: auto; grid-row: auto; }
+    .sv-hello { grid-template-columns: minmax(0, 1fr); }
+    .sv-scene { display: none; }
+    .topbar { padding: 10px 14px; }
+    .content { padding: 16px; }
+}
+@media (max-width: 640px) {
+    /* Titre sur la 1re ligne, boutons sur la 2e : le titre n'est plus tronqué */
+    .topbar { flex-wrap: wrap; row-gap: 10px; }
+    .topbar .tb-info { flex: 1 1 calc(100% - 60px); }
+    .topbar .tb-actions { width: 100%; justify-content: flex-end; flex-wrap: wrap; }
+    .sv-title { font-size: 19px; }
+    .sv-hello { padding: 22px; }
+    .sv-hello-title { font-size: 26px; }
+    .sv-hello-cta .sv-btn { flex: 1 1 auto; }
+    .sv-card { padding: 18px; }
+    .sv-pipe { gap: 2px; padding-top: 14px; }
+    .sv-pcol { min-height: 210px; padding: 10px 2px; gap: 8px; }
+    .sv-prism { width: 30px; margin-right: 10px; }
+    .sv-prism-s { left: 30px; width: 10px; }
+    .sv-prism-t { top: -10px; width: 30px; height: 10px; }
+    .sv-pcol-n { font-size: 20px; }
+    .sv-pcol-lbl { font-size: 10px; letter-spacing: .02em; }
+    .sv-urgent-row { flex-wrap: wrap; }
+    .sv-urgent-row .sv-btn { margin-left: 52px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .sv-in, .sv-float, .sv-coin, .sv-prism, .sv-bar span, .sv-toast { animation: none !important; }
+    .kpi:hover, .sv-row-3 .quick-btn:hover, .sv-pcol:hover, .sb-nav .sb-item:hover { transform: none !important; }
+    .sv-stage { transition: none; }
 }
 </style>
 @endpush
@@ -1325,7 +1581,7 @@ $I = [
         'annulée'=>['label'=>'Annulé','cls'=>'p-danger'],
     ];
     $pendingCount = $shop->orders()->whereIn('status',['en attente','en_attente','pending'])->count();
-    $avColors = ['#10b981','#6366f1','#f59e0b','#8b5cf6','#14b8a6','#f43f5e'];
+    $avColors = ['#10b981','#1668D8','#f59e0b','#1F7CF6','#14b8a6','#f43f5e'];
     $devise = $shop->currency ?? 'GNF';
     $proGnf = number_format(150000, 0, ',', ' ');
     $proPriceLabel = "{$proGnf} GNF/mois";
@@ -1346,7 +1602,7 @@ $I = [
     $kanban = [
         ['key'=>'en_attente',  'label'=>'En attente','count'=>$shop->orders()->whereIn('status',['pending','en attente','en_attente'])->count(),'color'=>'#f59e0b','bg'=>'#fffbeb','ico'=>$I['clock_k']],
         ['key'=>'confirmees',  'label'=>'Confirmées','count'=>$shop->orders()->whereIn('status',['confirmed','confirmée','processing'])->count(),'color'=>'#10b981','bg'=>'#ecfdf5','ico'=>$I['check_k']],
-        ['key'=>'en_livraison','label'=>'En livraison','count'=>$shop->orders()->whereIn('status',['en_livraison','delivering','shipped'])->count(),'color'=>'#6366f1','bg'=>'#eef2ff','ico'=>$I['truck_k']],
+        ['key'=>'en_livraison','label'=>'En livraison','count'=>$shop->orders()->whereIn('status',['en_livraison','delivering','shipped'])->count(),'color'=>'#1668D8','bg'=>'#EAF2FF','ico'=>$I['truck_k']],
         ['key'=>'terminees',   'label'=>'Terminées','count'=>$cmdLivreesMonth,'color'=>'#22c55e','bg'=>'#dcfce7','ico'=>$I['trophy_k']], // même valeur que $cmdLivreesMonth, calculée plus haut — requête en moins
         ['key'=>'annulees',    'label'=>'Annulées','count'=>$shop->orders()->whereMonth('created_at',$now->month)->whereYear('created_at',$now->year)->whereIn('status',['annulée','cancelled'])->count(),'color'=>'#ef4444','bg'=>'#fef2f2','ico'=>$I['x_k']],
     ];
@@ -1381,6 +1637,31 @@ $I = [
     $usageCmdPct     = $isPro ? 100 : min(100, round(($cmdMonth / $maxCmdMois) * 100));
     $prodClass       = $isPro ? 'ok' : ($usageProdPct >= 100 ? 'danger' : ($usageProdPct >= 80 ? 'warn' : 'ok'));
     $cmdClass        = $isPro ? 'ok' : ($usageCmdPct >= 100 ? 'danger' : ($usageCmdPct >= 80 ? 'warn' : 'ok'));
+
+    /* ── Refonte « espace vendeur » : blocs Bonjour / À traiter / Meilleurs clients / Livraison ── */
+    $pendingStatuses   = ['pending', 'en attente', 'en_attente'];
+    $unassignedQuery   = fn () => $shop->orders()->whereIn('status', $pendingStatuses)
+        ->whereNull('driver_id')->whereNull('delivery_company_id')->whereNull('livreur_id');
+    $unassignedCount   = $unassignedQuery()->count();
+    // Les plus anciennes d'abord : ce sont elles qui attendent depuis le plus longtemps
+    $urgentOrders      = $unassignedQuery()->with(['user:id,name', 'items.product:id,name'])->oldest()->take(4)->get();
+    // Meilleurs clients : montant des commandes livrées (vraies données, aucune estimation)
+    $topClients = $shop->orders()->where('status', 'livrée')
+        ->selectRaw('user_id, client_name, SUM(total) as spent, COUNT(*) as n')
+        ->groupBy('user_id', 'client_name')->orderByDesc('spent')->take(3)->get();
+    $topClientNames = \App\Models\User::whereIn('id', $topClients->pluck('user_id')->filter())->pluck('name', 'id');
+    $topClientMax   = (float) ($topClients->max('spent') ?: 1);
+    $firstName      = $parts[0] ?? auth()->user()->name;
+    $shopPublicUrl  = route('public.shops.products', $shop);
+    // Pipeline en 3D : hauteur des colonnes proportionnelle au nombre de commandes
+    $pipeMax   = max(1, collect($kanban)->max('count'));
+    $pipeStyle = [
+        'en_attente'   => ['#F59E0B', '#C27C08', '#FBBF4A', 'en_attente'],
+        'confirmees'   => ['#1F7CF6', '#1260C9', '#5BA0FA', 'confirmée'],
+        'en_livraison' => ['#7DB4FF', '#5B95E6', '#A9CDFF', 'en_livraison'],
+        'terminees'    => ['#15803D', '#0F5F2D', '#3FA663', 'livrée'],
+        'annulees'     => ['#DC2626', '#A61B1B', '#EF6262', 'annulée'],
+    ];
 @endphp
 
 {{-- ══ MODAL CHAT BOUTIQUE ↔ ENTREPRISE (depuis la cloche) ══ --}}
@@ -1481,13 +1762,13 @@ $I = [
             <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">{!! $I['msg'] !!}</span> Messages <span class="sb-badge" id="sbMsgBadge" style="display:none"></span></a>
             <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">{!! $I['box'] !!}</span> Commandes
                 @if(!$isPro)
-                    <span class="sb-badge" style="background:{{ $cmdClass === 'danger' ? '#dc2626' : ($cmdClass === 'warn' ? '#d97706' : '#6366f1') }};margin-left:auto;">{{ $cmdMonth }}/{{ $maxCmdMois }}</span>
+                    <span class="sb-badge" style="background:{{ $cmdClass === 'danger' ? '#dc2626' : ($cmdClass === 'warn' ? '#d97706' : '#1668D8') }};margin-left:auto;">{{ $cmdMonth }}/{{ $maxCmdMois }}</span>
                 @else
                     <span class="sb-badge" id="sbOrdersBadge" style="{{ $pendingCount > 0 ? '' : 'display:none' }}">{{ $pendingCount }}</span>
                 @endif
             </a>
             <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">{!! $I['tag'] !!}</span> Produits
-                @if(!$isPro)<span class="sb-badge" style="background:{{ $prodClass === 'danger' ? '#ef4444' : ($prodClass === 'warn' ? '#f59e0b' : '#8b5cf6') }};color:#fff;font-size:10px;padding:1px 5px;border-radius:8px;margin-left:auto">{{ $totalProduits }}/{{ $maxProduits }}</span>@endif
+                @if(!$isPro)<span class="sb-badge" style="background:{{ $prodClass === 'danger' ? '#ef4444' : ($prodClass === 'warn' ? '#f59e0b' : '#1F7CF6') }};color:#fff;font-size:10px;padding:1px 5px;border-radius:8px;margin-left:auto">{{ $totalProduits }}/{{ $maxProduits }}</span>@endif
             </a>
             @if($isPro)
             <a href="{{ route('boutique.promo-codes.index') }}" class="sb-item"><span class="ico">{!! $I['promo'] !!}</span> Codes promo</a>
@@ -1495,6 +1776,7 @@ $I = [
             <a href="{{ route('boutique.subscription.upgrade') }}" class="sb-item" style="opacity:.6;" title="Plan Pro requis"><span class="ico">{!! $I['promo'] !!}</span> Codes promo <span class="sb-badge" style="background:#f59e0b;">🔒</span></a>
             @endif
             <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">{!! $I['users'] !!}</span> Clients</a>
+            <a href="{{ route('boutique.marketing') }}" class="sb-item"><span class="ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h3l6 4V6l-6 4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></span> Marketing</a>
             @if($isPro)
             <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">{!! $I['briefcase'] !!}</span> Équipe</a>
             @else
@@ -1592,10 +1874,10 @@ $I = [
         <div class="topbar">
             <button class="btn-hamburger" id="btnMenu" aria-label="Menu">{!! $I['menu'] !!}</button>
             <div class="tb-info">
-                <div class="tb-greeting">Bonjour, {{ auth()->user()->name }} 👋</div>
+                <h1 class="tb-greeting sv-title"><span class="sv-title-ico" aria-hidden="true">{!! $I['grid'] !!}</span> Tableau de bord</h1>
                 <div class="tb-greeting-sub">
-                    Voici ce qui se passe avec votre boutique aujourd'hui.
-                    <span id="dashLastUpdate" style="margin-left:6px;font-size:10px;color:var(--muted);font-weight:500"></span>
+                    {{ $shop->name }}
+                    <span id="dashLastUpdate" style="margin-left:6px;font-size:inherit;color:var(--muted);font-weight:500"></span>
                 </div>
             </div>
 
@@ -1719,16 +2001,76 @@ $I = [
                 </a>
                 @else
                 {{-- Pro actif : pas de bouton renouveler --}}
-                <div style="font-size:12px;color:#4338ca;font-weight:600;flex:1">
+                <div style="font-size:12px;color:#1260C9;font-weight:600;flex:1">
                     Toutes les fonctionnalités débloquées.
                 </div>
                 @endif
             </div>
 
+            {{-- ══ BONJOUR + VISITES (maquette « Espace vendeur ») ══ --}}
+            <section class="sv-hero sv-in">
+                <div class="sv-hello" id="svHello">
+                    <div class="sv-hello-txt">
+                        <span class="sv-chip">{{ ucfirst($_dayLabel($now)) }} {{ $now->day }} {{ mb_strtolower(__('app.months')[$now->month]) }}</span>
+                        <h2 class="sv-hello-title">Bonjour, {{ $firstName }}.
+                            @if($pendingCount > 0)
+                                <span>{{ $pendingCount }} commande{{ $pendingCount > 1 ? 's vous attendent' : ' vous attend' }}.</span>
+                            @else
+                                <span>Tout est à jour.</span>
+                            @endif
+                        </h2>
+                        <p class="sv-hello-sub">
+                            @if($cmdLivreesMonth === 0)
+                                Aucune vente livrée ce mois-ci pour l'instant.
+                            @else
+                                {{ $cmdLivreesMonth }} vente{{ $cmdLivreesMonth > 1 ? 's livrées' : ' livrée' }} ce mois-ci, pour {{ number_format($caMonth, 0, ',', ' ') }} {{ $devise }} net.
+                            @endif
+                            @if($unassignedCount > 0)
+                                Assignez un livreur aux commandes en attente pour les débloquer.
+                            @endif
+                        </p>
+                        <div class="sv-hello-cta">
+                            <a href="{{ route('boutique.orders.index', ['status' => 'en_attente']) }}" class="sv-btn sv-btn-amber">Traiter les commandes</a>
+                            <button type="button" class="sv-btn sv-btn-line" data-share-shop="{{ $shopPublicUrl }}" data-share-name="{{ $shop->name }}">Partager ma boutique</button>
+                        </div>
+                    </div>
+                    {{-- Scène 3D décorative : sphère bleue, carte « Visites ce mois », pièce GNF --}}
+                    <div class="sv-scene" aria-hidden="true">
+                        <div class="sv-stage" id="svStage">
+                            <div class="sv-layer sv-sphere"></div>
+                            <div class="sv-layer sv-float-card"><div class="sv-float">
+                                <div class="sv-float-lbl">Visites ce mois</div>
+                                <div class="sv-float-val sv-num" data-count="{{ $visitesMonth }}">{{ number_format($visitesMonth, 0, ',', ' ') }}</div>
+                            </div></div>
+                            <div class="sv-layer sv-coin-wrap"><div class="sv-coin">{{ $devise }}</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sv-card sv-visits">
+                    <div class="sv-card-hd">
+                        <h2>Visites de la boutique</h2>
+                    </div>
+                    <div class="sv-visits-grid">
+                        @foreach([
+                            ["Aujourd'hui", $visitesToday, 'b'],
+                            ['Cette semaine', $visitesWeek, 'a'],
+                            ['Ce mois', $visitesMonth, 'g'],
+                            ['Au total', $visitesTotal, 'n'],
+                        ] as [$vLbl, $vVal, $vTone])
+                        <div class="sv-visit sv-tone-{{ $vTone }}">
+                            <div class="sv-visit-val sv-num" data-count="{{ $vVal }}">{{ number_format($vVal, 0, ',', ' ') }}</div>
+                            <div class="sv-visit-lbl">{{ $vLbl }}</div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </section>
+
             {{-- KPI Grid --}}
             <div class="kpi-grid" style="margin-bottom:22px">
-                <div class="kpi"  style="--kpi-color:#8b5cf6;--kpi-bg:#f5f3ff">
-                    <div class="kpi-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);border-color:rgba(139,92,246,.3);box-shadow:0 0 0 3px rgba(139,92,246,.12),0 4px 14px rgba(139,92,246,.4)">{!! $I['dollar_kpi'] !!}</div>
+                <div class="kpi"  style="--kpi-color:#1F7CF6;--kpi-bg:#EAF2FF">
+                    <div class="kpi-icon" style="background:linear-gradient(135deg,#1F7CF6,#1260C9);border-color:rgba(31,124,246,.3);box-shadow:0 0 0 3px rgba(31,124,246,.12),0 4px 14px rgba(31,124,246,.4)">{!! $I['dollar_kpi'] !!}</div>
                     <div class="kpi-lbl">{{ __('app.net_revenue') }}</div>
                     <div class="kpi-val" id="kpiCaVal">{{ number_format($caMonth,0,',',' ') }}</div>
                     <div class="kpi-unit">{{ $devise }} · {{ $_monthYear($now) }}</div>
@@ -1742,14 +2084,14 @@ $I = [
                     @endif
                 </div>
                 @php
-                    $_cmdColor  = !$isPro && $cmdClass === 'danger' ? '#dc2626' : (!$isPro && $cmdClass === 'warn' ? '#d97706' : '#8b5cf6');
-                    $_cmdBg     = !$isPro && $cmdClass === 'danger' ? '#fef2f2' : (!$isPro && $cmdClass === 'warn' ? '#fffbeb' : '#f5f3ff');
-                    $_cmdGrad   = !$isPro && $cmdClass === 'danger' ? '#ef4444,#b91c1c' : (!$isPro && $cmdClass === 'warn' ? '#f59e0b,#b45309' : '#8b5cf6,#6d28d9');
-                    $_cmdShadow = !$isPro && $cmdClass === 'danger' ? '0 0 0 3px rgba(220,38,38,.12),0 4px 14px rgba(220,38,38,.35)' : (!$isPro && $cmdClass === 'warn' ? '0 0 0 3px rgba(217,119,6,.12),0 4px 14px rgba(217,119,6,.35)' : '0 0 0 3px rgba(139,92,246,.12),0 4px 14px rgba(139,92,246,.4)');
+                    $_cmdColor  = !$isPro && $cmdClass === 'danger' ? '#dc2626' : (!$isPro && $cmdClass === 'warn' ? '#d97706' : '#1F7CF6');
+                    $_cmdBg     = !$isPro && $cmdClass === 'danger' ? '#fef2f2' : (!$isPro && $cmdClass === 'warn' ? '#fffbeb' : '#EAF2FF');
+                    $_cmdGrad   = !$isPro && $cmdClass === 'danger' ? '#ef4444,#b91c1c' : (!$isPro && $cmdClass === 'warn' ? '#f59e0b,#b45309' : '#1F7CF6,#1260C9');
+                    $_cmdShadow = !$isPro && $cmdClass === 'danger' ? '0 0 0 3px rgba(220,38,38,.12),0 4px 14px rgba(220,38,38,.35)' : (!$isPro && $cmdClass === 'warn' ? '0 0 0 3px rgba(217,119,6,.12),0 4px 14px rgba(217,119,6,.35)' : '0 0 0 3px rgba(31,124,246,.12),0 4px 14px rgba(31,124,246,.4)');
                     $_cmdBorder = !$isPro && $cmdClass === 'danger' ? 'border:2px solid #fca5a5;' : (!$isPro && $cmdClass === 'warn' ? 'border:2px solid #fde68a;' : '');
                 @endphp
                 <div class="kpi" style="--kpi-color:{{ $_cmdColor }};--kpi-bg:{{ $_cmdBg }};{{ $_cmdBorder }}">
-                    <div class="kpi-icon" style="background:linear-gradient(135deg,{{ $_cmdGrad }});border-color:rgba(139,92,246,.3);box-shadow:{{ $_cmdShadow }}">{!! $I['box_kpi'] !!}</div>
+                    <div class="kpi-icon" style="background:linear-gradient(135deg,{{ $_cmdGrad }});border-color:rgba(31,124,246,.3);box-shadow:{{ $_cmdShadow }}">{!! $I['box_kpi'] !!}</div>
                     <div class="kpi-lbl">{{ __('app.orders_this_month') }}</div>
                     <div class="kpi-val" id="kpiCmdVal">
                         @if(!$isPro)
@@ -1768,13 +2110,13 @@ $I = [
                             <span style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Utilisation</span>
                             <span style="font-size:10.5px;font-weight:800;font-family:var(--mono);color:{{ $_cmdColor }}">{{ $usageCmdPct }}%</span>
                         </div>
-                        <div style="height:5px;border-radius:20px;background:{{ !$isPro && $cmdClass === 'danger' ? '#fee2e2' : (!$isPro && $cmdClass === 'warn' ? '#fef3c7' : '#ede9fe') }};overflow:hidden;">
+                        <div style="height:5px;border-radius:20px;background:{{ !$isPro && $cmdClass === 'danger' ? '#fee2e2' : (!$isPro && $cmdClass === 'warn' ? '#fef3c7' : '#D6E6FF') }};overflow:hidden;">
                             <div style="height:100%;border-radius:20px;width:{{ $usageCmdPct }}%;background:linear-gradient(90deg,{{ $_cmdGrad }});transition:width .4s ease;"></div>
                         </div>
                         @if($cmdClass === 'danger')
                         <div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between;gap:6px;">
                             <span style="font-size:10.5px;font-weight:800;color:#dc2626;">🔒 Limite atteinte</span>
-                            <a href="{{ route('boutique.subscription.upgrade') }}" style="font-size:10px;font-weight:800;color:#6366f1;background:#eef2ff;border:1px solid #c7d2fe;padding:2px 8px;border-radius:20px;text-decoration:none;white-space:nowrap;">⚡ Plan Pro</a>
+                            <a href="{{ route('boutique.subscription.upgrade') }}" style="font-size:10px;font-weight:800;color:#1668D8;background:#EAF2FF;border:1px solid #D6E6FF;padding:2px 8px;border-radius:20px;text-decoration:none;white-space:nowrap;">⚡ Plan Pro</a>
                         </div>
                         @elseif($cmdClass === 'warn')
                         <div style="margin-top:7px;font-size:10.5px;font-weight:700;color:#d97706;">⚠ Bientôt la limite — {{ $maxCmdMois - $cmdMonth }} restante{{ $maxCmdMois - $cmdMonth > 1 ? 's' : '' }}</div>
@@ -1801,18 +2143,6 @@ $I = [
 
             </div>
 
-            {{-- Barre visites --}}
-            <div class="visits-banner" style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:12px 18px;margin-bottom:22px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                <span class="visits-label" style="font-size:12px;font-weight:700;color:#0284c7;text-transform:uppercase;letter-spacing:.4px;margin-right:6px">Visites boutique</span>
-                <span class="visits-pill" style="font-size:12px;color:#0369a1;background:#e0f2fe;padding:3px 10px;border-radius:20px;font-weight:700">{{ number_format($visitesToday,0,',',' ') }} aujourd'hui</span>
-                <span style="color:#bae6fd">·</span>
-                <span class="visits-pill" style="font-size:12px;color:#0369a1;background:#e0f2fe;padding:3px 10px;border-radius:20px;font-weight:700">{{ number_format($visitesWeek,0,',',' ') }} cette semaine</span>
-                <span style="color:#bae6fd">·</span>
-                <span class="visits-pill" style="font-size:12px;color:#0369a1;background:#e0f2fe;padding:3px 10px;border-radius:20px;font-weight:700">{{ number_format($visitesMonth,0,',',' ') }} ce mois</span>
-                <span style="color:#bae6fd">·</span>
-                <span style="font-size:12px;color:#64748b;margin-left:2px">{{ number_format($visitesTotal,0,',',' ') }} au total</span>
-            </div>
 
 
             {{-- BLOC A --}}
@@ -1832,7 +2162,7 @@ $I = [
                         <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.12);display:flex;flex-direction:column;gap:3px">
                             <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.4)"><span>CA brut</span><span style="font-family:var(--mono);color:rgba(255,255,255,.6)">{{ number_format($caGrossToday,0,',',' ') }}</span></div>
                             <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.4)"><span>Commissions</span><span style="font-family:var(--mono);color:#fca5a5">− {{ number_format($commToday,0,',',' ') }}</span></div>
-                            <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;padding-top:3px;border-top:1px dashed rgba(255,255,255,.1)"><span style="color:#a5b4fc">Net</span><span style="font-family:var(--mono);color:#a5b4fc">{{ number_format($caToday,0,',',' ') }}</span></div>
+                            <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;padding-top:3px;border-top:1px dashed rgba(255,255,255,.1)"><span style="color:#7DB4FF">Net</span><span style="font-family:var(--mono);color:#7DB4FF">{{ number_format($caToday,0,',',' ') }}</span></div>
                         </div>
                         @endif
                     </div>
@@ -1860,9 +2190,9 @@ $I = [
                     {{-- Wave sparkline décoration --}}
                     <div class="today-wave">
                         <svg viewBox="0 0 200 100" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0,60 C15,60 25,80 50,65 C75,50 85,25 110,35 C135,45 140,70 165,55 C182,44 195,20 210,25 L210,100 L0,100 Z" fill="rgba(99,102,241,.18)"/>
-                            <path d="M0,75 C20,75 30,90 55,78 C80,66 90,42 115,50 C140,58 150,78 175,68 C192,61 200,42 210,38 L210,100 L0,100 Z" fill="rgba(99,102,241,.10)"/>
-                            <path d="M0,60 C15,60 25,80 50,65 C75,50 85,25 110,35 C135,45 140,70 165,55 C182,44 195,20 210,25" stroke="rgba(99,102,241,.55)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+                            <path d="M0,60 C15,60 25,80 50,65 C75,50 85,25 110,35 C135,45 140,70 165,55 C182,44 195,20 210,25 L210,100 L0,100 Z" fill="rgba(22,104,216,.18)"/>
+                            <path d="M0,75 C20,75 30,90 55,78 C80,66 90,42 115,50 C140,58 150,78 175,68 C192,61 200,42 210,38 L210,100 L0,100 Z" fill="rgba(22,104,216,.10)"/>
+                            <path d="M0,60 C15,60 25,80 50,65 C75,50 85,25 110,35 C135,45 140,70 165,55 C182,44 195,20 210,25" stroke="rgba(22,104,216,.55)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
                         </svg>
                     </div>
                 </div>
@@ -1882,29 +2212,78 @@ $I = [
             @endif
 
             {{-- BLOC C KANBAN --}}
-            <div class="kanban-section">
-                <div class="card-hd" style="padding:0 0 12px;border:none;background:transparent">
-                    <span class="card-title" style="font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px">Pipeline commandes</span>
-                    <a href="{{ route('boutique.orders.index') }}" class="btn btn-ghost btn-sm">Gérer les commandes →</a>
-                </div>
-                <div class="kanban-grid">
-                    @foreach($kanban as $col)
-                    <div class="kanban-col {{ $col['count'] > 0 ? 'has-items' : '' }}" style="--k-color:{{ $col['color'] }};--k-bg:{{ $col['bg'] }}">
-                        <div class="kanban-ico-wrap" style="color:{{ $col['color'] }}">{!! $col['ico'] !!}</div>
-                        <div class="kanban-count" id="kb-{{ $col['key'] }}">{{ $col['count'] }}</div>
-                        <div class="kanban-lbl">{{ $col['label'] }}</div>
-                        @if($col['label'] === 'Terminées')<div style="font-size:9px;color:var(--muted);margin-top:3px;font-weight:600">ce mois</div>@endif
+            <section class="sv-row sv-row-pipe">
+                <div class="sv-card sv-pipe-card sv-in">
+                    <div class="sv-card-hd">
+                        <h2>Pipeline des commandes</h2>
+                        <a href="{{ route('boutique.orders.index') }}" class="sv-btn sv-btn-line-dk sv-btn-sm">Gérer les commandes</a>
                     </div>
-                    @endforeach
+                    <div class="sv-pipe">
+                        @foreach($kanban as $i => $col)
+                        @php [$pFront, $pSide, $pTop, $pStatus] = $pipeStyle[$col['key']]; @endphp
+                        <a href="{{ route('boutique.orders.index', ['status' => $pStatus]) }}" class="sv-pcol"
+                           aria-label="{{ $col['label'] }} : {{ $col['count'] }} commande{{ $col['count'] > 1 ? 's' : '' }}{{ $col['key'] === 'terminees' || $col['key'] === 'annulees' ? ' ce mois' : '' }}">
+                            <span class="sv-prism" style="--h:{{ max(8, (int) round($col['count'] / $pipeMax * 150)) }}px;--front:{{ $pFront }};--side:{{ $pSide }};--top:{{ $pTop }};animation-delay:{{ $i * 90 }}ms" aria-hidden="true"><span class="sv-prism-s"></span><span class="sv-prism-t"></span></span>
+                            <span class="sv-pcol-n sv-num" id="kb-{{ $col['key'] }}">{{ $col['count'] }}</span>
+                            <span class="sv-pcol-lbl">{{ $col['label'] }}@if(in_array($col['key'], ['terminees', 'annulees']))<small>ce mois</small>@endif</span>
+                        </a>
+                        @endforeach
+                    </div>
                 </div>
-            </div>
 
-            {{-- BLOC D ACTIONS RAPIDES --}}
-            <div class="quick-section">
+                <div class="sv-card sv-urgent sv-in">
+                    <div class="sv-card-hd">
+                        <h2>À traiter maintenant</h2>
+                        @if($cmdEnRetard > 0)<span class="sv-badge sv-badge-err">{{ $cmdEnRetard }} depuis + de 2 h</span>@endif
+                    </div>
+                    @forelse($urgentOrders as $uo)
+                    @php
+                        $uoProd   = $uo->items->first()?->product?->name ?? 'Commande';
+                        $uoMore   = $uo->items->count() > 1 ? ' + ' . ($uo->items->count() - 1) : '';
+                        $uoClient = $uo->user->name ?? $uo->client_name ?? 'Client';
+                    @endphp
+                    <div class="sv-urgent-row">
+                        <span class="sv-tile sv-tile-sm sv-tile-soft" aria-hidden="true">{!! $I['box'] !!}</span>
+                        <div class="sv-urgent-txt">
+                            <div class="sv-urgent-prod">{{ $uoProd }}{{ $uoMore }}</div>
+                            <div class="sv-urgent-meta">#{{ $uo->id }} · {{ $uoClient }} · <span class="sv-num">{{ number_format($uo->total, 0, ',', ' ') }} {{ $devise }}</span> · {{ $uo->created_at->diffForHumans() }}</div>
+                        </div>
+                        <a href="{{ route('boutique.orders.index', ['search' => $uo->id]) }}" class="sv-btn sv-btn-blue sv-btn-sm">Assigner</a>
+                    </div>
+                    @empty
+                    <p class="sv-ok">Aucune commande en attente de livreur. Tout est assigné.</p>
+                    @endforelse
+                    <a href="{{ route('boutique.orders.index', ['status' => 'en_attente']) }}" class="sv-btn sv-btn-line-dk sv-btn-sm" style="align-self:flex-start">Voir toutes les commandes en attente</a>
+                </div>
+            </section>
+
+            {{-- BLOC D : Meilleurs clients · Actions rapides · Livraison --}}
+            <section class="sv-row sv-row-3">
+                <div class="sv-card sv-clients sv-in">
+                    <div class="sv-card-hd">
+                        <h2>Meilleurs clients</h2>
+                        <a href="{{ route('boutique.clients.index') }}" class="sv-btn sv-btn-line-dk sv-btn-sm">Tous</a>
+                    </div>
+                    @forelse($topClients as $tc)
+                    @php $tcName = $topClientNames[$tc->user_id] ?? $tc->client_name ?? 'Client'; @endphp
+                    <div class="sv-client">
+                        <div class="sv-client-top">
+                            <strong>{{ $tcName }}</strong>
+                            <span class="sv-num">{{ number_format($tc->spent, 0, ',', ' ') }} {{ $devise }}</span>
+                        </div>
+                        <div class="sv-bar" role="img" aria-label="{{ $tc->n }} commande{{ $tc->n > 1 ? 's' : '' }} livrée{{ $tc->n > 1 ? 's' : '' }}">
+                            <span style="--r:{{ round($tc->spent / $topClientMax, 3) }}"></span>
+                        </div>
+                    </div>
+                    @empty
+                    <p class="sv-muted">Vos meilleurs clients apparaîtront ici après les premières commandes livrées.</p>
+                    @endforelse
+                </div>
+
+            <div class="quick-section sv-in">
                 <div class="quick-card">
                     <div class="quick-card-hd">
-                        <div class="quick-card-title"><span class="title-ico">{!! $I['flash_t'] !!}</span> Actions rapides</div>
-                        <span style="font-size:11px;color:var(--muted)">Accès direct aux tâches courantes</span>
+                        <h2 class="quick-card-title">Actions rapides</h2>
                     </div>
                     <div class="quick-grid">
                         {{-- Commandes — toujours accessible, mais avec usage pour plan gratuit --}}
@@ -1919,8 +2298,8 @@ $I = [
                         </a>
 
                         {{-- Nouveau produit — accessible mais avec usage --}}
-                        <a href="{{ $isPro || $totalProduits < $maxProduits ? route('products.create') : route('boutique.subscription.upgrade') }}" class="quick-btn" style="--q-bg:#eef2ff;--q-border:#a5b4fc;--q-color:#6366f1">
-                            <div class="quick-btn-ico" style="color:#6366f1">{!! $I['plus_q'] !!}</div>
+                        <a href="{{ $isPro || $totalProduits < $maxProduits ? route('products.create') : route('boutique.subscription.upgrade') }}" class="quick-btn" style="--q-bg:#EAF2FF;--q-border:#7DB4FF;--q-color:#1668D8">
+                            <div class="quick-btn-ico" style="color:#1668D8">{!! $I['plus_q'] !!}</div>
                             <div class="quick-btn-lbl">Nouveau produit</div>
                             @if(!$isPro)
                                 <div class="quick-btn-sub" style="color:{{ $prodClass === 'danger' ? '#dc2626' : ($prodClass === 'warn' ? '#d97706' : '') }}">{{ $totalProduits }}/{{ $maxProduits }} produits</div>
@@ -1934,8 +2313,8 @@ $I = [
 
                         {{-- Livreurs — bloqué plan gratuit --}}
                         @if($isPro)
-                            <a href="{{ route('boutique.livreurs.index') }}" class="quick-btn" style="--q-bg:#f5f3ff;--q-border:#c4b5fd;--q-color:#8b5cf6">
-                                <div class="quick-btn-ico" style="color:#8b5cf6">{!! $I['bike_q'] !!}</div>
+                            <a href="{{ route('boutique.livreurs.index') }}" class="quick-btn" style="--q-bg:#EAF2FF;--q-border:#7DB4FF;--q-color:#1F7CF6">
+                                <div class="quick-btn-ico" style="color:#1F7CF6">{!! $I['bike_q'] !!}</div>
                                 <div class="quick-btn-lbl">Livreurs</div>
                                 <div class="quick-btn-sub">Voir en ligne</div>
                             </a>
@@ -1956,6 +2335,30 @@ $I = [
                     </div>
                 </div>
             </div>
+
+                <div class="sv-card sv-delivery sv-in">
+                    <div class="sv-card-hd">
+                        <h2>Livraison</h2>
+                        <a href="{{ $isPro ? route('boutique.livreurs.index') : route('boutique.subscription.upgrade') }}" class="sv-btn sv-btn-line-dk sv-btn-sm">Gérer</a>
+                    </div>
+                    @forelse($livreursDisponibles->take(2) as $lv)
+                    @php $lvParts = preg_split('/\s+/', trim($lv->name)); $lvIni = mb_strtoupper(mb_substr($lvParts[0], 0, 1) . mb_substr($lvParts[1] ?? $lvParts[0], isset($lvParts[1]) ? 0 : 1, 1)); @endphp
+                    <div class="sv-rider">
+                        <span class="sv-rider-av" aria-hidden="true">{{ $lvIni }}<i></i></span>
+                        <div><strong>{{ $lv->name }}</strong><div class="sv-rider-st">Disponible</div></div>
+                    </div>
+                    @empty
+                    <div class="sv-rider sv-rider-off">
+                        <span class="sv-rider-av" aria-hidden="true">{!! $I['bike'] !!}</span>
+                        <div><strong>Aucun livreur disponible</strong><div class="sv-muted">Ajoutez un livreur ou confiez la course à une entreprise partenaire.</div></div>
+                    </div>
+                    @endforelse
+                    <dl class="sv-kv">
+                        <div><dt>Entreprises de livraison</dt><dd class="sv-num">{{ $partenairesCount }}</dd></div>
+                        <div><dt>Commandes non assignées</dt><dd class="sv-num {{ $unassignedCount > 0 ? 'is-warn' : '' }}">{{ $unassignedCount }}</dd></div>
+                    </dl>
+                </div>
+            </section>
 
             {{-- CHARTS DUO : Revenus + Commandes 7j --}}
             {{-- ===================== REVENUE CHART 7J ===================== --}}
@@ -2037,13 +2440,13 @@ $I = [
                     <svg viewBox="0 0 {{ $W }} {{ $H }}" width="100%" height="160" preserveAspectRatio="none" overflow="visible" style="display:block">
                         <defs>
                             <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%"   stop-color="#8b5cf6" stop-opacity=".38"/>
-                                <stop offset="45%"  stop-color="#6366f1" stop-opacity=".14"/>
-                                <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+                                <stop offset="0%"   stop-color="#1F7CF6" stop-opacity=".38"/>
+                                <stop offset="45%"  stop-color="#1668D8" stop-opacity=".14"/>
+                                <stop offset="100%" stop-color="#1668D8" stop-opacity="0"/>
                             </linearGradient>
                             <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
-                                <stop offset="0%"   stop-color="#8b5cf6"/>
-                                <stop offset="100%" stop-color="#6366f1"/>
+                                <stop offset="0%"   stop-color="#1F7CF6"/>
+                                <stop offset="100%" stop-color="#1668D8"/>
                             </linearGradient>
                             <filter id="glowLine" x="-10%" y="-80%" width="120%" height="260%">
                                 <feGaussianBlur stdDeviation="3.5" result="blur"/>
@@ -2058,7 +2461,7 @@ $I = [
                         {{-- Y gridlines premium --}}
                         @foreach($yGrid as $g)
                         <line x1="{{ $pL }}" y1="{{ $g['y'] }}" x2="{{ $W - $pR }}" y2="{{ $g['y'] }}"
-                              stroke="rgba(99,102,241,.12)" stroke-width="1" stroke-dasharray="{{ $g['val'] > 0 ? '5 6' : 'none' }}"/>
+                              stroke="rgba(22,104,216,.12)" stroke-width="1" stroke-dasharray="{{ $g['val'] > 0 ? '5 6' : 'none' }}"/>
                         <text x="{{ $pL - 8 }}" y="{{ $g['y'] + 4 }}" text-anchor="end"
                               font-size="9" fill="#94a3b8" font-family="monospace">{{ rcFmt($g['val']) }}</text>
                         @endforeach
@@ -2067,18 +2470,18 @@ $I = [
                         <polygon points="{{ $areaPoints }}" fill="url(#areaGrad)"/>
 
                         {{-- Glow line shadow --}}
-                        <polyline points="{{ $polyline }}" fill="none" stroke="rgba(139,92,246,.35)" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+                        <polyline points="{{ $polyline }}" fill="none" stroke="rgba(31,124,246,.35)" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
                         {{-- Line --}}
                         <polyline points="{{ $polyline }}" fill="none" stroke="url(#lineGrad)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
 
                         {{-- Points + hit areas --}}
                         @foreach($pts as $i => $p)
                         @if($p['today'])
-                        <circle cx="{{ $p['x'] }}" cy="{{ $p['y'] }}" r="9" fill="rgba(139,92,246,.18)" stroke="none"/>
+                        <circle cx="{{ $p['x'] }}" cy="{{ $p['y'] }}" r="9" fill="rgba(31,124,246,.18)" stroke="none"/>
                         @endif
                         <circle cx="{{ $p['x'] }}" cy="{{ $p['y'] }}" r="{{ $p['today'] ? 5 : 3.5 }}"
-                                fill="{{ $p['today'] ? '#8b5cf6' : '#fff' }}"
-                                stroke="{{ $p['today'] ? '#c4b5fd' : '#6366f1' }}" stroke-width="{{ $p['today'] ? 2.5 : 1.8 }}"
+                                fill="{{ $p['today'] ? '#1F7CF6' : '#fff' }}"
+                                stroke="{{ $p['today'] ? '#7DB4FF' : '#1668D8' }}" stroke-width="{{ $p['today'] ? 2.5 : 1.8 }}"
                                 class="rc-pt"
                                 data-val="{{ $p['v'] }}"
                                 data-lbl="{{ $p['lbl'] }}"
@@ -2527,7 +2930,7 @@ $I = [
     background: linear-gradient(135deg, var(--brand), var(--brand-dk));
     color: #fff; border: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 6px 20px rgba(99,102,241,.45);
+    box-shadow: 0 6px 20px rgba(22,104,216,.45);
     font-size: 24px; transition: transform .2s;
 }
 .va-chat-fab:hover { transform: scale(1.06); }
@@ -2710,4 +3113,64 @@ window.BQ_CFG = {
 };
 </script>
 @vite(['resources/js/boutique-dashboard.js'])
+@endpush
+
+@push('scripts')
+<script>
+/* ══ Refonte « espace vendeur » : scène 3D du bandeau, partage, compteurs ══ */
+(function () {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Scène 3D : bascule selon la souris (±6° vertical, ±13° horizontal autour de la pose de repos)
+    const hello = document.getElementById('svHello'), stage = document.getElementById('svStage');
+    if (hello && stage && !reduce && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        hello.addEventListener('pointermove', e => {
+            const r = hello.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+            stage.style.setProperty('--rx', (6 - (y - .5) * 12).toFixed(2) + 'deg');
+            stage.style.setProperty('--ry', (-16 + (x - .5) * 26).toFixed(2) + 'deg');
+        });
+        hello.addEventListener('pointerleave', () => { stage.style.removeProperty('--rx'); stage.style.removeProperty('--ry'); });
+    }
+
+    // Petit message en bas de l'écran
+    function toast(msg) {
+        document.querySelector('.sv-toast')?.remove();
+        const t = document.createElement('div');
+        t.className = 'sv-toast'; t.setAttribute('role', 'status'); t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 2600);
+    }
+
+    // Partager ma boutique : feuille de partage du téléphone, sinon copie du lien
+    document.querySelectorAll('[data-share-shop]').forEach(btn => btn.addEventListener('click', async () => {
+        const url = btn.dataset.shareShop, title = btn.dataset.shareName;
+        try {
+            if (navigator.share) { await navigator.share({ title, url }); return; }
+            await navigator.clipboard.writeText(url);
+            toast('Lien de la boutique copié');
+        } catch (e) {
+            if (e && e.name === 'AbortError') return;
+            window.prompt('Copiez le lien de votre boutique :', url);
+        }
+    }));
+
+    // Compteurs : montent jusqu'à leur valeur réelle (le chiffre exact est déjà dans la page)
+    if (!reduce && 'IntersectionObserver' in window) {
+        const fmt = n => Math.round(n).toLocaleString('fr-FR');
+        const io = new IntersectionObserver(entries => entries.forEach(en => {
+            if (!en.isIntersecting) return;
+            io.unobserve(en.target);
+            const el = en.target, end = parseInt(el.dataset.count, 10) || 0;
+            if (end < 2) return;
+            const t0 = performance.now(), dur = 900;
+            (function step(t) {
+                const p = Math.min(1, (t - t0) / dur), eased = 1 - Math.pow(1 - p, 3);
+                el.textContent = fmt(end * eased);
+                if (p < 1) requestAnimationFrame(step);
+            })(t0);
+        }), { threshold: .4 });
+        document.querySelectorAll('[data-count]').forEach(el => io.observe(el));
+    }
+})();
+</script>
 @endpush

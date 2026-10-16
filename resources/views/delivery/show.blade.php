@@ -7,11 +7,11 @@
 *,*::before,*::after{box-sizing:border-box}
 
 :root{
-    --brand:     #6366f1;
-    --brand-dk:  #4f46e5;
-    --brand-dkk: #4338ca;
-    --brand-lt:  #e0e7ff;
-    --brand-mlt: #eef2ff;
+    --brand:     #1668D8;
+    --brand-dk:  #1260C9;
+    --brand-dkk: #1260C9;
+    --brand-lt:  #D6E6FF;
+    --brand-mlt: #EAF2FF;
     --bg:        #f8fafc;
     --surface:   #ffffff;
     --surface2:  #f1f5f9;
@@ -40,7 +40,7 @@ a{text-decoration:none;color:inherit;}
 ════════════════════════════════════ */
 .page-banner{
     width:100%;
-    background:linear-gradient(135deg,#3730a3 0%,#4f46e5 40%,#6366f1 75%,#818cf8 100%);
+    background:linear-gradient(135deg,#0B1E3D 0%,#1260C9 40%,#1668D8 75%,#7DB4FF 100%);
     padding:0;position:relative;overflow:hidden;
 }
 .page-banner::before{
@@ -234,7 +234,7 @@ a{text-decoration:none;color:inherit;}
     background:var(--surface2);border:1px solid var(--border);
     transition:border-color .15s,box-shadow .15s;
 }
-.driver-card:hover{border-color:#c7d2fe;box-shadow:0 2px 12px rgba(99,102,241,.1);}
+.driver-card:hover{border-color:#D6E6FF;box-shadow:0 2px 12px rgba(22,104,216,.1);}
 .driver-av{
     width:44px;height:44px;border-radius:var(--r-xs);flex-shrink:0;overflow:hidden;
     background:linear-gradient(135deg,var(--brand),var(--brand-dkk));
@@ -271,7 +271,7 @@ a{text-decoration:none;color:inherit;}
 /* Contact card */
 .contact-card{
     background:linear-gradient(135deg,var(--brand-dk) 0%,var(--brand) 100%);
-    border-radius:var(--r);box-shadow:0 8px 32px rgba(99,102,241,.3);
+    border-radius:var(--r);box-shadow:0 8px 32px rgba(22,104,216,.3);
     overflow:hidden;position:relative;
 }
 .contact-card::before{
@@ -523,7 +523,7 @@ a{text-decoration:none;color:inherit;}
             <div class="card">
                 <div class="card-body" style="padding:18px 22px">
                     <div class="stats-grid">
-                        <div class="stat-box" style="--s-color:#6366f1">
+                        <div class="stat-box" style="--s-color:#1668D8">
                             <div class="stat-box-ico">🚴</div>
                             <div class="stat-box-val">{{ $company->drivers()->count() }}</div>
                             <div class="stat-box-lbl">Livreurs</div>
@@ -658,7 +658,7 @@ a{text-decoration:none;color:inherit;}
                                     style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:13px;font-family:inherit;resize:vertical;background:var(--surface);color:var(--text);outline:none;transition:border-color .15s;"
                                     onfocus="this.style.borderColor='var(--brand)'" onblur="this.style.borderColor='var(--border)'">{{ $userReview?->comment }}</textarea>
                                 <button type="submit"
-                                    style="margin-top:10px;padding:10px 22px;background:linear-gradient(135deg,var(--brand-dk),var(--brand));color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 4px 14px rgba(99,102,241,.35);">
+                                    style="margin-top:10px;padding:10px 22px;background:linear-gradient(135deg,var(--brand-dk),var(--brand));color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 4px 14px rgba(22,104,216,.35);">
                                     {{ $userReview ? 'Mettre à jour' : 'Publier mon avis' }}
                                 </button>
                             </form>
@@ -863,4 +863,9 @@ a{text-decoration:none;color:inherit;}
     });
 })();
 </script>
+@endpush
+
+{{-- Thème bleu « espace vendeur » (maquette Main.dc.html), chargé après les styles de la page --}}
+@push('styles')
+@include('boutique._partials.sv-theme')
 @endpush

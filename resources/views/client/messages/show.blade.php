@@ -789,6 +789,10 @@ let _selectedFiles = [];   // photos en attente d'envoi
    ════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
     scrollBottom();
+    /* Arrivée depuis « Faire une offre » sur la fiche produit : on ouvre directement le panneau de proposition */
+    if (new URLSearchParams(location.search).has('offre') && document.getElementById('btnPropose')) {
+        toggleProposePanel();
+    }
     /* Lancer le polling image-status pour les messages "processing" déjà en page */
     document.querySelectorAll('.msg-img-grid[data-status="processing"]').forEach(grid => {
         const row = grid.closest('[data-msg-id]');
