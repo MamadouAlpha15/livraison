@@ -40,6 +40,9 @@ body { font-family: var(--font); font-variant-numeric: tabular-nums; }
 .sidebar .sb-user { background: var(--sv-night2); border-radius: 16px; padding: 12px; }
 .sidebar .sb-av { background: var(--sv-blue) !important; box-shadow: none !important; }
 .sidebar .sb-logout { border-radius: 999px; min-height: 40px; }
+/* Indicateur « faites défiler » : placé juste sous l'en-tête avec une marge négative, il
+   recouvrait la ligne « Boutique active · Admin ». La barre de défilement suffit. */
+.sidebar .sb-scroll-hint { display: none !important; }
 
 /* ── Barre du haut (fond plein : un backdrop-filter casserait les éléments position:fixed qu'elle contient) ── */
 .main .topbar { min-height: 72px; height: auto; padding-top: 12px; padding-bottom: 12px; background: var(--bg) !important; box-shadow: none !important; border-bottom: 1px solid var(--border) !important; }

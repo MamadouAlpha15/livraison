@@ -44,7 +44,7 @@
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @auth<meta name="vapid-public-key" content="{{ config('app.vapid_public_key') }}">@endauth
-    <meta name="theme-color" content="#6366f1">
+    <meta name="theme-color" content="#1F7CF6">
     {{-- Une page peut définir son titre et sa description avec @section('title') / @section('description') --}}
     <meta name="description" content="@hasSection('description')@yield('description')@else{{ $description ?? 'Shopio — la plateforme tout-en-un pour créer votre boutique en ligne, gérer vos livraisons et vos clients en Guinée.' }}@endif">
     <title>@hasSection('title')@yield('title')@else{{ $title ?? config('app.name', 'Shopio') }}@endif</title>

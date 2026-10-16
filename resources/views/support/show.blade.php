@@ -253,6 +253,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
             <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">{!! $I['box_nav'] !!}</span> Commandes</a>
             <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">{!! $I['tag_nav'] !!}</span> Produits</a>
             <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">{!! $I['users_nav'] !!}</span> Clients</a>
+            @if(auth()->user()->role === 'admin')<a href="{{ route('boutique.marketing') }}" class="sb-item"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h3l6 4V6l-6 4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></span> Marketing</a>@endif
             <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">{!! $I['team_nav'] !!}</span> Équipe</a>
             <div class="sb-section">Livraison</div>
             <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">{!! $I['bike_nav'] !!}</span> Livreurs</a>

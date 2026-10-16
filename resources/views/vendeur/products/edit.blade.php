@@ -405,7 +405,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                                      style="{{ ($isEdit && $product->image) ? 'display:none' : '' }}">
                                     <span class="upload-placeholder-ico">📷</span>
                                     <div class="upload-placeholder-txt">Photo principale</div>
-                                    <div class="upload-placeholder-hint">JPG · PNG · WEBP — Max 20 Mo</div>
+                                    <div class="upload-placeholder-hint">Carré conseillé · JPG · PNG · WEBP — Max 20 Mo</div>
                                 </div>
                                 <button type="button" class="img-remove {{ ($isEdit && $product->image) ? 'visible' : '' }}"
                                         id="mainRemoveBtn"
@@ -442,6 +442,9 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                         </div>
                     </div>
 
+
+                    {{-- Format conseillé + aperçu accueil / vitrine / fiche, et ajustement automatique --}}
+                    @include('vendeur.products._image-guide')
                 </div>
             </div>
 
@@ -917,6 +920,7 @@ async function uploadMainImage(file) {
 /* Afficher la prévisualisation */
 function showMainPreview(url) {
     mainPreview.src = url;
+    window.pigCheck?.(url); // guide du format de la photo
     mainPreview.classList.add('visible');
     mainPlaceholder.style.display = 'none';
     mainRemoveBtn.classList.add('visible');
@@ -929,6 +933,7 @@ function showMainPreview(url) {
 
 /* Supprimer l'image */
 function removeMainImage() {
+    window.pigReset?.();
     mainInput.value = '';
     mainImageUploaded.value = '';
     mainPreview.src = '';
@@ -960,6 +965,8 @@ zone.addEventListener('drop', e => {
 
 const CSRF        = document.querySelector('meta[name="csrf-token"]').content;
 const UPLOAD_URL  = '{{ route("products.upload.image") }}';
+// Photo déjà enregistrée : le guide de format l'analyse dès l'ouverture
+if (mainImageUploaded.value && mainPreview.getAttribute('src')) window.pigCheck?.(mainPreview.src);
 const AI_DESC_URL = '{{ route("products.ai.description") }}';
 
 async function generateAiDescription() {

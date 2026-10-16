@@ -3469,7 +3469,7 @@ $rGrads = [
                 $medal    = $i === 0 ? '🥇' : ($i === 1 ? '🥈' : ($i === 2 ? '🥉' : null));
                 $posClass = $i === 0 ? 'gold' : ($i === 1 ? 'silver' : ($i === 2 ? 'bronze' : ''));
             @endphp
-            <a href="{{ route('client.shops.show', $ts) }}" class="rank-row" data-rank-idx="{{ $i }}">
+            <a href="{{ route('public.shops.products', $ts) }}" class="rank-row" data-rank-idx="{{ $i }}">
                 <div class="rank-pos {{ $posClass }}">{{ $medal ?? ($i + 1) }}</div>
                 <div class="rank-av" style="background:{{ $rGrad }}">
                     @if($ts->image)

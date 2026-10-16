@@ -355,6 +355,7 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
         <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">🏷️</span> Produits</a>
         <a href="{{ route('boutique.promo-codes.index') }}" class="sb-item"><span class="ico">🎟️</span> Codes promo</a>
         <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">👥</span> Clients</a>
+        @if(auth()->user()->role === 'admin')<a href="{{ route('boutique.marketing') }}" class="sb-item"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h3l6 4V6l-6 4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></span> Marketing</a>@endif
         <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">🧑‍💼</span> Équipe</a>
         <div class="sb-section">Livraison</div>
         <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">🚴</span> Livreurs</a>

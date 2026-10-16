@@ -759,7 +759,12 @@ a.amz-card-name { text-decoration: none; }
         <img src="/images/shopio-logo-192.png" alt="Shopio" class="nav-logo-img" width="36" height="36">
         <span class="nav-brand-name">Shopio</span>
     </a>
+    {{-- Client connecté : retour vers son espace (comme l'ancienne page boutique client) --}}
+    @if(auth()->check() && auth()->user()->role === 'client')
+    <a href="{{ route('client.dashboard') }}" class="amz-back-home">{!! \App\Support\IconLibrary::svg('home', '', 14) !!} <span class="txt">Mon espace</span></a>
+    @else
     <a href="{{ url('/') }}" class="amz-back-home">{!! \App\Support\IconLibrary::svg('home', '', 14) !!} <span class="txt">Accueil</span></a>
+    @endif
     <a href="{{ route('shops.index') }}" class="amz-back">{!! \App\Support\IconLibrary::svg('arrow-left', '', 13) !!} Boutiques</a>
     <div class="amz-nav-search">
         <input type="text" id="prodSearch" placeholder="Rechercher dans {{ $shop->name }}…" autocomplete="off">

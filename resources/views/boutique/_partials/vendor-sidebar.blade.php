@@ -1,7 +1,7 @@
 {{--
     Menu latéral de l'espace vendeur (maquette Main.dc.html), réutilisable.
     @include('boutique._partials.vendor-sidebar', ['shop' => $shop, 'active' => 'settings'])
-    Clés de $active : dash, messages, orders, products, promos, clients, marketing, team, riders, partners, finances, settings, support.
+    Clés de $active : dash, messages, orders, products, promos, clients, marketing, team, riders, partners, finances, commissions, reports, settings, support.
     À utiliser dans une page qui inclut aussi boutique._partials.sv-theme (couleurs).
     Structure attendue : <div class="vs-wrap"> [ce menu] <main class="main vs-main"> … </main> </div>
 --}}
@@ -24,6 +24,8 @@
         'riders'   => 'M6 19.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM18 19.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM8.5 17h7M15 7h2.5l2.5 6.5M6 14.5 9 9h5l1 5',
         'partners' => 'M4 10.5 12 4l8 6.5V20H4zM10 20v-5h4v5',
         'finances' => 'M4 6.5h16v11H4zM4 10h16M8 14.5h3',
+        'commissions' => 'M4 19h16M7 16V9M12 16V5M17 16v-4',
+        'reports'  => 'M8 4h8v3H8zM6 5.5H5v15h14v-15h-1M9 12h6M9 16h4',
         'settings' => 'M4 9l1.5-5h13L20 9M4 9v11h16V9M4 9c0 1.7 1.3 3 3 3s3-1.3 3-3c0 1.7 1.3 3 3 3s3-1.3 3-3c0 1.7 1.3 3 3 3M10 20v-5h4v5',
         'support'  => 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7M12 17h.01',
         'logout'   => 'M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10',
@@ -46,7 +48,9 @@
             ['partners', 'Partenaires', route('delivery.companies.index'), true],
         ],
         'Finances' => [
-            ['finances', 'Paiements et commissions', route('boutique.payments.index'), false],
+            ['finances', 'Paiements', route('boutique.payments.index'), false],
+            ['commissions', 'Commissions', route('boutique.commissions.index'), false],
+            ['reports', 'Rapports', route('boutique.reports.index'), true],
         ],
         'Réglages' => [
             ['settings', 'Ma boutique', route('shop.edit', $shop), false],

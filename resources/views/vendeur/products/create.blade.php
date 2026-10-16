@@ -487,7 +487,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                                 <div class="upload-placeholder" id="mainPlaceholder">
                                     <span class="upload-placeholder-ico">📷</span>
                                     <div class="upload-placeholder-txt">Photo principale</div>
-                                    <div class="upload-placeholder-hint">JPG · PNG · WEBP — Max 2 Mo</div>
+                                    <div class="upload-placeholder-hint">Carré conseillé · JPG · PNG · WEBP — Max 20 Mo</div>
                                 </div>
                                 <button type="button" class="img-remove"
                                         id="mainRemoveBtn"
@@ -513,6 +513,9 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                         </div>
                     </div>
 
+
+                    {{-- Format conseillé + aperçu accueil / vitrine / fiche, et ajustement automatique --}}
+                    @include('vendeur.products._image-guide')
                 </div>
             </div>
 
@@ -980,6 +983,7 @@ async function uploadMainImage(file) {
 
 function showMainPreview(url) {
     mainPreview.src = url;
+    window.pigCheck?.(url); // guide du format de la photo
     mainPreview.classList.add('visible');
     mainPlaceholder.style.display = 'none';
     mainRemoveBtn.classList.add('visible');
@@ -996,6 +1000,7 @@ function showMainPreview(url) {
 }
 
 function removeMainImage() {
+    window.pigReset?.();
     mainInput.value = '';
     mainImageUploaded.value = '';
     mainPreview.src = '';

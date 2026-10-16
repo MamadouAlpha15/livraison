@@ -41,7 +41,7 @@
     $chatUrl   = route('client.messages.index', $product);
     $offerUrl  = auth()->check() ? $chatUrl . '?offre=1' : route('register', ['redirect' => $chatUrl . '?offre=1', 'role' => 'client']);
     $writeUrl  = auth()->check() ? $chatUrl : route('register', ['redirect' => $chatUrl, 'role' => 'client']);
-    $shopUrl   = auth()->check() ? route('client.shops.show', $shop) : route('public.shops.products', $shop);
+    $shopUrl   = route('public.shops.products', $shop);
     $catUrl    = $product->category ? url('/') . '?category=' . urlencode($product->category) : null;
     $initials  = collect(preg_split('/\s+/', trim($shop->name)))->filter()->take(2)->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))->implode('');
 

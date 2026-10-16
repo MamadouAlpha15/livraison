@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Review;
 use App\Models\Shop;
-use App\Models\ShopVisit;
 use App\Support\Storefront;
 use App\Support\TrafficSource;
 use Illuminate\Http\Request;
@@ -70,8 +69,8 @@ class PublicShopController extends Controller
             if (isset(Storefront::ACCENT_INK[$request->query('accent')])) $sfAccent = $request->query('accent');
         }
 
-        if (!$isPreview) ShopVisit::record($shop->id);
-        // Provenance de la visite (Facebook, Instagram, WhatsApp…) pour la page Marketing
+        // Visite (une par visiteur et par jour, hors vendeur et robots) et sa provenance
+        // (Facebook, Instagram, WhatsApp…) : tableau de bord + page Marketing
         TrafficSource::recordLanding($shop, $request, $isPreview);
 
         $query = $shop->products()->where('is_active', true);

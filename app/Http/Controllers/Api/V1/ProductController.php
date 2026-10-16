@@ -13,7 +13,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\ProductDetailResource;
 use App\Http\Resources\Api\V1\ProductResource;
 use App\Models\Product;
-use App\Models\ShopVisit;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -67,7 +66,7 @@ class ProductController extends Controller
      */
     public function show(Request $request, Product $product): JsonResponse
     {
-        ShopVisit::record($product->shop_id);
+        if ($product->shop) \App\Support\TrafficSource::recordAppVisit($product->shop, $request);
 
         $product->load(['shop', 'activeVariants']);
         // Le nom de la relation chargée par activeVariants() diffère de "variants" —
