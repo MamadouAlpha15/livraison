@@ -28,8 +28,8 @@ $I['hdp_tb']    = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" s
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 :root {
-    --brand:#6366f1;--brand-dk:#4f46e5;--brand-lt:#e0e7ff;
-    --sb-border:rgba(255,255,255,.08);--sb-act:rgba(99,102,241,.52);
+    --brand:#1F7CF6;--brand-dk:#1260C9;--brand-lt:#D6E6FF;
+    --sb-border:rgba(255,255,255,.08);--sb-act:rgba(31,124,246,.52);
     --sb-hov:rgba(255,255,255,.07);--sb-txt:rgba(255,255,255,.62);--sb-txt-act:#fff;
     --bg:#f8fafc;--surface:#ffffff;--border:#e2e8f0;
     --text:#0f172a;--text-2:#475569;--muted:#94a3b8;
@@ -41,48 +41,6 @@ html { font-family:var(--font); }
 body { background:var(--bg); margin:0; color:var(--text); -webkit-font-smoothing:antialiased; }
 .dash-wrap { display:flex; min-height:100vh; }
 .dash-wrap .main { margin-left:var(--sb-w); flex:1; min-width:0; }
-
-/* ── SIDEBAR ── */
-.sidebar{background:linear-gradient(180deg,#0f0f59 0%,#0e0e16 40%,#10103a 100%);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;width:var(--sb-w);overflow-y:scroll;scrollbar-width:thin;scrollbar-color:rgba(99,102,241,.35) transparent;z-index:40;border-right:1px solid rgba(99,102,241,.15);box-shadow:6px 0 30px rgba(0,0,0,.35);}
-.sidebar::-webkit-scrollbar{width:4px;}
-.sidebar::-webkit-scrollbar-thumb{background:rgba(99,102,241,.4);border-radius:4px;}
-.sb-brand{padding:18px 16px 14px;border-bottom:1px solid var(--sb-border);flex-shrink:0;position:relative;}
-.sb-close{display:none;position:absolute;top:14px;right:12px;width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);color:rgba(255,255,255,.6);font-size:18px;line-height:1;cursor:pointer;align-items:center;justify-content:center;transition:background .15s,color .15s;flex-shrink:0;}
-.sb-close:hover{background:rgba(239,68,68,.18);color:#fca5a5;}
-@media(max-width:900px){.sb-close{display:flex;}}
-.sb-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;}
-.sb-logo-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
-.sb-shop-name{font-size:14.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:148px;color:#fff;}
-.sb-status{display:flex;align-items:center;gap:6px;margin-top:9px;font-size:10.5px;color:var(--sb-txt);font-weight:500;}
-.pulse{width:6px;height:6px;border-radius:50%;background:var(--brand);flex-shrink:0;animation:blink 2.2s ease-in-out infinite;box-shadow:0 0 5px var(--brand);}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
-.sb-nav{padding:10px 10px 32px;flex:1;display:flex;flex-direction:column;gap:1px;}
-.sb-section{font-size:9.5px;text-transform:uppercase;letter-spacing:1.8px;color:rgba(255,255,255,.48);padding:16px 10px 5px;font-weight:800;}
-.sb-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r-sm);font-size:13.5px;font-weight:600;color:rgba(255,255,255,.78);text-decoration:none;transition:background .15s,color .15s;position:relative;}
-.sb-item:hover{background:var(--sb-hov);color:rgba(255,255,255,.96);}
-.sb-item.active{background:var(--sb-act);color:#fff;box-shadow:0 2px 12px rgba(99,102,241,.25);}
-.sb-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:#a5b4fc;border-radius:0 3px 3px 0;}
-.sb-item .ico{font-size:13px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);}
-.sb-item.active .ico{background:rgba(255,255,255,.18);}
-.sb-badge{margin-left:auto;background:var(--brand);color:#fff;font-size:10px;font-weight:700;border-radius:20px;padding:1px 7px;min-width:20px;text-align:center;}
-.sb-group{display:flex;flex-direction:column;}
-.sb-group-toggle{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r-sm);font-size:13.5px;font-weight:600;color:rgba(255,255,255,.78);cursor:pointer;transition:background .15s;border:none;background:none;width:100%;text-align:left;font-family:var(--font);}
-.sb-group-toggle:hover{background:var(--sb-hov);}
-.sb-group-toggle .ico{font-size:13px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:7px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);}
-.sb-group-toggle .sb-arrow{margin-left:auto;font-size:10px;color:rgba(255,255,255,.32);transition:transform .2s;}
-.sb-group-toggle.open .sb-arrow{transform:rotate(90deg);}
-.sb-sub{display:none;flex-direction:column;gap:1px;margin-left:12px;padding-left:14px;border-left:1px solid rgba(255,255,255,.1);margin-top:2px;}
-.sb-sub.open{display:flex;}
-.sb-sub .sb-item{font-size:13px;font-weight:500;padding:6px 10px;}
-.sb-footer{padding:12px 10px;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0;display:flex;flex-direction:column;gap:6px;position:sticky;bottom:0;background:linear-gradient(180deg,transparent 0%,#0b0b12 25%);z-index:1;}
-.sb-user{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r-sm);text-decoration:none;transition:background .15s;border:1px solid transparent;}
-.sb-user:hover{background:rgba(255,255,255,.06);}
-.sb-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#4338ca);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;}
-.sb-uname{font-size:13px;font-weight:700;color:#fff;}
-.sb-urole{font-size:10.5px;color:rgba(255,255,255,.52);margin-top:1px;}
-.sb-logout{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border-radius:var(--r-sm);background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.15);color:rgba(252,165,165,.92);font-size:12.5px;font-weight:600;font-family:var(--font);cursor:pointer;text-decoration:none;transition:background .15s;}
-.sb-logout:hover{background:rgba(220,38,38,.18);}
-.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:39;}
 
 /* ── MAIN ── */
 .main { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
@@ -112,14 +70,14 @@ body { background:var(--bg); margin:0; color:var(--text); -webkit-font-smoothing
 /* Avatar SuperAdmin */
 .chat-av {
     width:32px; height:32px; border-radius:50%; flex-shrink:0;
-    background:linear-gradient(135deg,#6366f1,#4338ca);
+    background:linear-gradient(135deg,#1F7CF6,#1260C9);
     color:#fff; font-size:11px; font-weight:800;
     display:flex; align-items:center; justify-content:center;
 }
 
 /* Bubble */
 .chat-wrap { display:flex; flex-direction:column; max-width:100%; }
-.chat-name { font-size:11px; font-weight:700; color:#6366f1; margin-bottom:2px; padding-left:2px; }
+.chat-name { font-size:11px; font-weight:700; color:#1F7CF6; margin-bottom:2px; padding-left:2px; }
 .chat-bubble {
     padding: 9px 13px; border-radius: 8px; font-size: 13.5px;
     line-height: 1.55; word-break: break-word;
@@ -159,7 +117,7 @@ body { background:var(--bg); margin:0; color:var(--text); -webkit-font-smoothing
     display:flex; align-items:center; justify-content:center;
     flex-shrink:0; transition:background .15s, transform .1s;
 }
-.chat-send-btn:hover { background:var(--brand-dk,#4f46e5); transform:scale(1.06); }
+.chat-send-btn:hover { background:var(--brand-dk,#1260C9); transform:scale(1.06); }
 .chat-send-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
 
 /* Typing indicator */
@@ -197,7 +155,37 @@ body { background:var(--bg); margin:0; color:var(--text); -webkit-font-smoothing
     .chat-row { max-width:94%; }
     .chat-bubble { font-size:12.5px; }
 }
-* { scrollbar-width:thin; scrollbar-color:rgba(99,102,241,.2) transparent; }
+* { scrollbar-width:thin; scrollbar-color:rgba(31,124,246,.2) transparent; }
+/* ══ Support — design espace vendeur (bleu Shopio) ══ */
+.sp-main { height: 100vh; }
+.sp-top { display: flex; align-items: center; gap: 12px; height: auto; padding: 12px 24px !important; }
+.sp-top .tb-info { flex: 1 1 auto; min-width: 0; }
+.sp-title { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.02em; color: var(--text); }
+.sa-online { padding: 8px 14px; border-radius: 999px; background: var(--sv-ok50); color: var(--sv-ok); font-weight: 700; font-size: 13px; }
+.sa-dot { background: currentColor; }
+.chat-thread { background: var(--bg) radial-gradient(rgba(31,124,246,.07) 1px, transparent 1px) 0 0 / 22px 22px; padding: 20px 24px; }
+.chat-av { background: linear-gradient(135deg, #1F7CF6, #1260C9); }
+.chat-name { color: var(--sv-btn); }
+.chat-bubble { border-radius: 18px; box-shadow: 0 1px 1px rgba(11,30,61,.06); padding: 10px 14px; color: var(--text); }
+.chat-row.mine .chat-bubble { background: var(--sv-b100); border-bottom-right-radius: 6px; }
+.chat-row.theirs .chat-bubble { background: var(--surface); border-bottom-left-radius: 6px; }
+.chat-meta { color: var(--muted); }
+.chat-date-sep span { background: var(--surface); color: var(--muted); box-shadow: 0 0 0 1px var(--border); }
+.chat-welcome { gap: 8px; }
+.chat-welcome .w-ico { width: 72px; height: 72px; border-radius: 22px; background: var(--sv-b50); color: var(--sv-btn); display: flex; align-items: center; justify-content: center; opacity: 1; margin-bottom: 8px; }
+.chat-welcome .w-title { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -.01em; }
+.chat-welcome p { color: var(--muted); max-width: 46ch; line-height: 1.55; }
+.chat-input-zone { background: var(--surface); padding: 12px 16px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+.chat-textarea { background: var(--bg); box-shadow: inset 0 0 0 1.5px var(--border); color: var(--text); padding: 11px 18px; }
+.chat-textarea:focus { box-shadow: inset 0 0 0 1.5px var(--sv-blue), 0 0 0 3px var(--sv-b50); }
+.chat-send-btn { background: var(--sv-btn); box-shadow: 0 6px 16px rgba(22,104,216,.28); }
+.chat-send-btn:hover { background: var(--sv-btn-h); }
+.chat-typing { background: var(--surface); }
+.chat-send-btn:focus-visible, .chat-textarea:focus-visible { outline: 3px solid var(--sv-blue); outline-offset: 2px; }
+@media (max-width: 900px) { .sp-top { padding: 10px 14px !important; } .sp-title { font-size: 19px; } }
+@media (max-width: 640px) { .sa-online { padding: 6px; background: transparent; } .sa-online .sa-dot { display: inline-block !important; width: 10px; height: 10px; } }
+.chat-av { overflow: hidden; background: var(--surface); box-shadow: 0 0 0 1px var(--border); }
+.chat-av img { width: 100%; height: 100%; object-fit: cover; display: block; }
 </style>
 @endpush
 
@@ -210,80 +198,25 @@ body { background:var(--bg); margin:0; color:var(--text); -webkit-font-smoothing
     $pendingCount = $shop ? $shop->orders()->whereIn('status',['pending','en attente','en_attente'])->count() : 0;
 @endphp
 
-<div class="dash-wrap">
+<div class="vs-wrap">
 
-{{-- SIDEBAR --}}
+{{-- Menu vendeur partagé --}}
 @if($shop)
-<aside class="sidebar" id="sidebar">
-    <div class="sb-brand">
-        <a href="{{ route('boutique.dashboard') }}" class="sb-logo">
-            <div class="sb-logo-icon"><img src="/images/shopio3.jpeg" alt="Shopio" style="width:100%;height:100%;object-fit:cover;border-radius:9px"></div>
-            <span class="sb-shop-name">{{ $shop->name ?? 'Boutique' }}</span>
-        </a>
-        <button class="sb-close" id="btnCloseSidebar">✕</button>
-        <div class="sb-status">
-            <span class="pulse"></span>
-            {{ ($shop->is_approved ?? true) ? 'Boutique active' : 'En attente' }}
-        </div>
-    </div>
-    <nav class="sb-nav">
-        <a href="{{ route('boutique.dashboard') }}" class="sb-item"><span class="ico">{!! $I['dash_nav'] !!}</span> Tableau de bord</a>
-        <div class="sb-section">Boutique</div>
-        <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">{!! $I['msg_nav'] !!}</span> Messages</a>
-        <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">{!! $I['box_nav'] !!}</span> Commandes @if($pendingCount > 0)<span class="sb-badge">{{ $pendingCount }}</span>@endif</a>
-        <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">{!! $I['tag_nav'] !!}</span> Produits</a>
-        <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">{!! $I['users_nav'] !!}</span> Clients</a>
-        @if(auth()->user()->role === 'admin')<a href="{{ route('boutique.marketing') }}" class="sb-item"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h3l6 4V6l-6 4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></span> Marketing</a>@endif
-        <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">{!! $I['team_nav'] !!}</span> Équipe</a>
-        <div class="sb-section">Livraison</div>
-        <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">{!! $I['bike_nav'] !!}</span> Livreurs</a>
-        <a href="{{ route('delivery.companies.index') }}" class="sb-item"><span class="ico">{!! $I['bldg_nav'] !!}</span> Partenaires</a>
-        <div class="sb-section">Finances</div>
-        <div class="sb-group">
-            <button class="sb-group-toggle" onclick="toggleGroup(this)" type="button">
-                <span class="ico">{!! $I['coin_nav'] !!}</span> Finances &amp; Rapports <span class="sb-arrow">▶</span>
-            </button>
-            <div class="sb-sub">
-                <a href="{{ route('boutique.payments.index') }}" class="sb-item"><span class="ico">{!! $I['card_nav'] !!}</span> Paiements</a>
-                <a href="{{ route('boutique.commissions.index') }}" class="sb-item"><span class="ico">{!! $I['chart_nav'] !!}</span> Commissions</a>
-                <a href="{{ route('boutique.reports.index') }}" class="sb-item"><span class="ico">{!! $I['list_nav'] !!}</span> Rapports</a>
-                @if($u->role === 'admin')
-                <a href="{{ route('shop.edit', $shop) }}" class="sb-item"><span class="ico">{!! $I['gear_nav'] !!}</span> Paramètres</a>
-                @endif
-            </div>
-        </div>
-        <div class="sb-section">Aide</div>
-        <a href="{{ route('support.index') }}" class="sb-item active"><span class="ico">{!! $I['hdp_nav'] !!}</span> Support</a>
-    </nav>
-    <div class="sb-footer">
-        <a href="{{ route('profile.edit') }}" class="sb-user">
-            <div class="sb-av">{{ $initials }}</div>
-            <div style="flex:1;min-width:0">
-                <div class="sb-uname">{{ Str::limit($u->name, 20) }}</div>
-                <div class="sb-urole">{{ $u->role === 'admin' ? 'Administrateur' : ucfirst($u->role) }}</div>
-            </div>
-        </a>
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit" class="sb-logout">⎋ Se déconnecter</button>
-        </form>
-    </div>
-</aside>
-<div class="sb-overlay" id="sbOverlay"></div>
+    @include('boutique._partials.vendor-sidebar', ['shop' => $shop, 'active' => 'support'])
 @endif
 
 {{-- MAIN --}}
-<main class="main">
+<main class="main {{ $shop ? 'vs-main' : '' }} sp-main">
     {{-- Topbar --}}
-    <div class="topbar">
-        @if($shop)<button class="btn-hamburger" id="btnMenu">☰</button>@endif
-        <div>
-            <div class="tb-title">{!! $I['hdp_tb'] !!} Support</div>
-            <div class="tb-sub">{{ $shop->name ?? '' }} · Chat avec le SuperAdmin</div>
+    <div class="topbar sp-top">
+        @if($shop)<button type="button" class="vs-burger" data-vs-open aria-label="Ouvrir le menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>@endif
+        <div class="tb-info">
+            <h1 class="sp-title">Support</h1>
+            <div class="tb-sub">{{ $shop->name ?? '' }} · discussion avec l'équipe Shopio</div>
         </div>
         <div class="sa-online">
             <span class="sa-dot"></span>
-            <span>SuperAdmin disponible</span>
+            <span>Équipe Shopio disponible</span>
         </div>
     </div>
 
@@ -292,9 +225,9 @@ body { background:var(--bg); margin:0; color:var(--text); -webkit-font-smoothing
 
         @if($messages->isEmpty())
         <div class="chat-welcome">
-            <div class="w-ico">🎧</div>
-            <p style="font-size:16px;font-weight:700;color:#374151">Bienvenue dans le chat support</p>
-            <p>Écrivez votre message ci-dessous.<br>Le SuperAdmin vous répondra dès que possible.</p>
+            <div class="w-ico"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></div>
+            <p class="w-title">Une question ? Écrivez-nous</p>
+            <p>Un problème de commande, de paiement ou de réglage de votre boutique : décrivez-le ci-dessous. L'équipe Shopio vous répond ici même.</p>
         </div>
         @else
 
@@ -311,11 +244,11 @@ body { background:var(--bg); margin:0; color:var(--text); -webkit-font-smoothing
 
             <div class="chat-row {{ $mine ? 'mine' : 'theirs' }}" data-id="{{ $msg->id }}">
                 @if(!$mine)
-                <div class="chat-av">SA</div>
+                <div class="chat-av"><img src="{{ asset('images/shopio-logo-192.png') }}" alt=""></div>
                 @endif
                 <div class="chat-wrap">
                     @if(!$mine)
-                    <div class="chat-name">SuperAdmin</div>
+                    <div class="chat-name">Équipe Shopio</div>
                     @endif
                     <div class="chat-bubble">{{ $msg->body }}</div>
                     <div class="chat-meta">{{ \Carbon\Carbon::parse($msg->created_at)->format('H:i') }}</div>
@@ -334,7 +267,7 @@ body { background:var(--bg); margin:0; color:var(--text); -webkit-font-smoothing
         <textarea id="chatInput" class="chat-textarea" placeholder="Écrire au support…" rows="1"
             onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"
             oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
-        <button class="chat-send-btn" id="sendBtn" onclick="sendMsg()">
+        <button class="chat-send-btn" id="sendBtn" onclick="sendMsg()" aria-label="Envoyer">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         </button>
     </div>
@@ -369,9 +302,9 @@ function appendMsg(m) {
     row.className = 'chat-row ' + (mine ? 'mine' : 'theirs');
     row.dataset.id = m.id;
     row.innerHTML = `
-        ${!mine ? '<div class="chat-av">SA</div>' : ''}
+        ${!mine ? '<div class="chat-av"><img src="{{ asset("images/shopio-logo-192.png") }}" alt=""></div>' : ''}
         <div class="chat-wrap">
-            ${!mine ? '<div class="chat-name">SuperAdmin</div>' : ''}
+            ${!mine ? '<div class="chat-name">Équipe Shopio</div>' : ''}
             <div class="chat-bubble">${escHtml(m.body)}</div>
             <div class="chat-meta">${fmtTime(m.created_at)}</div>
         </div>`;
@@ -486,4 +419,8 @@ function toggleGroup(btn) {
     if (!isOpen) { sub.classList.add('open'); btn.classList.add('open'); }
 }
 </script>
+@endpush
+
+@push('styles')
+@include('boutique._partials.sv-theme')
 @endpush

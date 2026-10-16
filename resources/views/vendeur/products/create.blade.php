@@ -14,23 +14,23 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 :root {
-    --brand:     #6366f1; --brand-dk: #4f46e5;
-    --brand-lt:  #e0e7ff; --brand-mlt: #eef2ff;
+    --brand:     #1F7CF6; --brand-dk: #1260C9;
+    --brand-lt:  #D6E6FF; --brand-mlt: #EAF2FF;
     --bg:        #f8fafc; --surface:  #ffffff;
     --border:    #e2e8f0; --border-dk: #cbd5e1;
     --text:      #0f172a; --text-2:   #475569; --muted: #94a3b8;
     --danger:    #ef4444; --danger-lt: #fef2f2;
     --font:      'Plus Jakarta Sans', sans-serif;
     --mono:      'JetBrains Mono', monospace;
-    --r:         14px; --r-sm: 9px;
+    --r:         20px; --r-sm: 14px;
     --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
     --shadow:    0 8px 32px rgba(0,0,0,.08);
 }
 
 /* ══ MODE SOMBRE ══ */
 [data-theme="dark"] {
-    --brand-lt: rgba(99,102,241,.16);
-    --brand-mlt: rgba(99,102,241,.09);
+    --brand-lt: rgba(31,124,246,.16);
+    --brand-mlt: rgba(31,124,246,.09);
     --bg: #0b0f1a;
     --surface: #141925;
     --border: #262d3d;
@@ -105,7 +105,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 }
 .field-input:focus, .field-select:focus, .field-textarea:focus {
     border-color: var(--brand);
-    box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+    box-shadow: 0 0 0 3px rgba(31,124,246,.12);
 }
 .field-input.error  { border-color: var(--danger); }
 .field-error { font-size: 11.5px; color: var(--danger); margin-top: 4px; }
@@ -234,7 +234,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 
 /* ── Allergens & tags ── */
 .tag-input-wrap { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: var(--r-sm); min-height: 42px; cursor: text; transition: border-color .15s; }
-.tag-input-wrap:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(99,102,241,.12); }
+.tag-input-wrap:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(31,124,246,.12); }
 .tag-chip { display: inline-flex; align-items: center; gap: 4px; background: var(--brand-lt); color: var(--brand-dk); font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
 .tag-chip-remove { background: none; border: none; cursor: pointer; color: var(--brand-dk); font-size: 13px; padding: 0; line-height: 1; }
 .tag-real-input { border: none; outline: none; font-size: 13px; font-family: var(--font); flex: 1; min-width: 80px; background: transparent; }
@@ -251,7 +251,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
     border: 1.5px solid var(--brand-dk);
     cursor: pointer; transition: all .15s;
     display: inline-flex; align-items: center; gap: 7px;
-    box-shadow: 0 4px 14px rgba(99,102,241,.3);
+    box-shadow: 0 4px 14px rgba(31,124,246,.3);
 }
 .btn-submit:hover { background: var(--brand-dk); transform: translateY(-1px); }
 .btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
@@ -335,7 +335,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 .mobile-product-preview::before {
     content: '';
     position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    background: linear-gradient(90deg, var(--brand), #a855f7);
+    background: linear-gradient(90deg, var(--brand), #7DB4FF);
 }
 .mpv-img {
     width: 60px; height: 60px; border-radius: 10px; flex-shrink: 0;
@@ -406,28 +406,83 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
     .upload-gallery-grid { grid-template-columns: repeat(2, 1fr); }
     .btn-submit { padding: 12px 16px; font-size: 13.5px; }
 }
+/* ══ Design espace vendeur (bleu Shopio, pilules, menu latéral) ══ */
+.pf-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; position: sticky; top: 0; z-index: 30; padding: 14px 28px !important; }
+.pf-top .tb-info { flex: 1 1 240px; min-width: 0; }
+.pf-crumb { display: flex; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); min-width: 0; }
+.pf-crumb a { color: var(--sv-btn, #1668D8); font-weight: 700; text-decoration: none; }
+.pf-crumb a:hover { text-decoration: underline; }
+.pf-crumb span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pf-title { margin: 2px 0 0; font-size: 22px; font-weight: 800; letter-spacing: -.02em; color: var(--text); }
+.pf-back { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; background: var(--surface); color: var(--text); box-shadow: inset 0 0 0 1.5px var(--border); font-weight: 700; font-size: 14px; text-decoration: none; }
+.pf-back:hover { box-shadow: inset 0 0 0 1.5px var(--sv-blue, #1F7CF6); color: var(--sv-btn, #1668D8); }
+.product-form-wrap { max-width: 1180px; margin: 0; padding: 24px 28px 60px; grid-template-columns: minmax(0, 1fr) 320px; overflow: visible; }
+.form-card { border: 0; box-shadow: 0 0 0 1px var(--border); border-radius: 24px; }
+.form-card-hd { background: transparent; padding: 16px 22px; gap: 12px; }
+.form-card-hd-ico { width: 38px; height: 38px; border-radius: 12px; background: var(--sv-b50, #EAF2FF); border: 0; color: var(--sv-btn, #1668D8); }
+.form-card-title { font-size: 16px; font-weight: 800; letter-spacing: -.01em; }
+.form-card-body { padding: 20px 22px 22px; }
+.field-lbl { font-size: 12px; letter-spacing: .06em; }
+.field-input, .field-select, .field-textarea { border-radius: 14px; min-height: 46px; font-size: 14px; }
+.field-textarea { min-height: 110px; }
+.field-input:focus, .field-select:focus, .field-textarea:focus { border-color: var(--sv-blue, #1F7CF6); box-shadow: 0 0 0 3px var(--sv-b50, #EAF2FF); }
+/* Photo principale : cadre carré, comme le format conseillé */
+.upload-main { aspect-ratio: 1 / 1; border: 2px dashed var(--sv-b100, #D6E6FF); background: var(--sv-b50, #EAF2FF); border-radius: 20px; }
+.upload-main:hover, .upload-main.over { border-color: var(--sv-blue, #1F7CF6); background: var(--sv-b50, #EAF2FF); }
+.upload-placeholder-ico { opacity: 1; color: var(--sv-btn, #1668D8); display: flex; justify-content: center; }
+.upload-placeholder-txt { color: var(--text); font-weight: 700; }
+/* « Changer la photo » seulement quand une photo est en place */
+.upload-main:hover .upload-main-overlay { display: none; }
+.upload-main:hover .upload-main-preview.visible ~ .upload-main-overlay { display: flex; background: rgba(11,30,61,.55); }
+.gallery-slot { opacity: 1; border-radius: 14px; border-color: var(--sv-b100, #D6E6FF); background: var(--sv-b50, #EAF2FF); color: var(--sv-btn, #1668D8); }
+/* Boutons en pilule */
+.btn-submit { border-radius: 999px; border: 0; background: var(--sv-btn, #1668D8); box-shadow: none; min-height: 48px; padding: 0 28px; }
+.btn-submit:hover { background: var(--sv-btn-h, #1260C9); box-shadow: 0 8px 20px rgba(22,104,216,.28); }
+.btn-cancel { border-radius: 999px; border: 0; box-shadow: inset 0 0 0 1.5px var(--border); min-height: 48px; padding: 0 22px; color: var(--text); }
+.btn-cancel:hover { background: var(--surface); box-shadow: inset 0 0 0 1.5px var(--sv-blue, #1F7CF6); color: var(--sv-btn, #1668D8); }
+.variant-add-btn { border-radius: 999px; }
+.btn-submit:focus-visible, .btn-cancel:focus-visible, .variant-add-btn:focus-visible, .pf-back:focus-visible { outline: 3px solid var(--sv-blue, #1F7CF6); outline-offset: 2px; }
+/* Aperçu et conseils */
+.preview-card-product { border: 0; box-shadow: none; border-radius: 0; }
+.preview-card-img { background: var(--sv-b50, #EAF2FF); opacity: 1; color: var(--sv-blue, #1F7CF6); aspect-ratio: 3 / 2; height: auto; }
+.preview-price { color: var(--sv-btn, #1668D8); }
+.pf-tip-ico { width: 34px; height: 34px; border-radius: 10px; background: var(--sv-b50, #EAF2FF); color: var(--sv-btn, #1668D8); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.mobile-product-preview { border: 0; box-shadow: 0 0 0 1px var(--border); border-radius: 20px; }
+.mobile-product-preview::before { display: none; }
+.mpv-img { background: var(--sv-b50, #EAF2FF); color: var(--sv-blue, #1F7CF6); border: 0; }
+@media (max-width: 900px) {
+    .pf-top { padding: 12px 16px !important; }
+    .product-form-wrap { padding: 18px 16px 48px; grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) { .pf-back { display: none; } }
+@media (prefers-reduced-motion: reduce) { .btn-submit:hover { transform: none; } }
 </style>
 @endpush
 
 @section('content')
+@php
+    $pfIco = collect(['camera' => 'M4 8h3.5L9 5.5h6L16.5 8H20v11H4zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z', 'pencil' => 'M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4', 'price' => 'M12 3v18M16.5 7.5c0-1.7-2-3-4.5-3s-4.5 1.3-4.5 3 2 2.6 4.5 3 4.5 1.3 4.5 3-2 3-4.5 3-4.5-1.3-4.5-3', 'star' => 'M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z'])
+        ->map(fn ($d) => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' . $d . '"/></svg>')->all();
+@endphp
+<div class="vs-wrap">
+    @include('boutique._partials.vendor-sidebar', ['shop' => $shop, 'active' => 'products'])
+
+    <main class="main vs-main">
+        <div class="topbar pf-top">
+            <button type="button" class="vs-burger" data-vs-open aria-label="Ouvrir le menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+            </button>
+            <div class="tb-info">
+                <nav class="pf-crumb" aria-label="Fil d'Ariane"><a href="{{ route('products.index') }}">Produits</a><span aria-hidden="true">/</span><span>{{ $isEdit ? Str::limit($product->name, 40) : 'Nouveau produit' }}</span></nav>
+                <h1 class="pf-title">{{ $isEdit ? 'Modifier le produit' : 'Ajouter un produit' }}</h1>
+            </div>
+            <a href="{{ route('products.index') }}" class="pf-back">Retour aux produits</a>
+        </div>
+
 <div class="product-form-wrap">
 
     {{-- ═══ COLONNE PRINCIPALE ═══ --}}
     <div class="main-col">
-
-        {{-- Breadcrumb + titre page --}}
-        <div style="margin-bottom:20px">
-            <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:6px">
-                <a href="{{ route('products.index') }}" style="color:var(--muted);text-decoration:none;font-weight:600">← Catalogue</a>
-                <span>/</span>
-                <span style="color:var(--text);font-weight:600">
-                    {{ $isEdit ? Str::limit($product->name, 28) : 'Ajouter un produit' }}
-                </span>
-            </div>
-            <h1 style="font-size:20px;font-weight:800;color:var(--text);margin:0;letter-spacing:-.4px;line-height:1.2">
-                {{ $isEdit ? '✏️ Modifier le produit' : '🚀 Ajouter un produit' }}
-            </h1>
-        </div>
 
         {{-- Flash --}}
         @if($errors->any())
@@ -443,7 +498,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
         {{-- Aperçu produit mobile (caché sur desktop) --}}
         <div class="mobile-product-preview">
             <div class="mpv-img" id="mpvImgWrap">
-                <span id="mpvEmoji">🏷️</span>
+                <span id="mpvEmoji"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v14H4zM4 15l4.5-4.5 4 4 2.5-2.5L20 17M15.5 9.5h.01"/></svg></span>
                 <img id="mpvImg" src="" alt="">
             </div>
             <div class="mpv-info">
@@ -467,7 +522,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
             {{-- ── CARD 1 : Photos du produit ── --}}
             <div class="form-card">
                 <div class="form-card-hd">
-                    <div class="form-card-hd-ico">🖼️</div>
+                    <div class="form-card-hd-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v14H4zM4 15l4.5-4.5 4 4 2.5-2.5L20 17M15.5 9.5h.01"/></svg></div>
                     <span class="form-card-title">Photos du produit</span>
                     <span class="form-card-sub">Max 20 Mo par image</span>
                 </div>
@@ -483,10 +538,10 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                             <div class="upload-main" id="mainUploadZone"
                                  onclick="document.getElementById('mainImageInput').click()">
                                 <img id="mainPreview" class="upload-main-preview" src="" alt="Aperçu" data-no-skeleton>
-                                <div class="upload-main-overlay">📷 Changer l'image</div>
+                                <div class="upload-main-overlay"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3.5L9 5.5h6L16.5 8H20v11H4zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg> Changer la photo</div>
                                 <div class="upload-placeholder" id="mainPlaceholder">
-                                    <span class="upload-placeholder-ico">📷</span>
-                                    <div class="upload-placeholder-txt">Photo principale</div>
+                                    <span class="upload-placeholder-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3.5L9 5.5h6L16.5 8H20v11H4zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg></span>
+                                    <div class="upload-placeholder-txt">Ajouter la photo principale</div>
                                     <div class="upload-placeholder-hint">Carré conseillé · JPG · PNG · WEBP — Max 20 Mo</div>
                                 </div>
                                 <button type="button" class="img-remove"
@@ -503,12 +558,12 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                                 <div class="gallery-slot" id="galleryAddBtn"
                                      onclick="document.getElementById('galleryInput').click()"
                                      title="Ajouter une photo">
-                                    ➕
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
                                 </div>
                             </div>
                             <input type="file" id="galleryInput" accept="image/*" multiple style="display:none">
                             <div class="field-hint" style="margin-top:8px">
-                                ✕ pour supprimer · ➕ pour ajouter · max 20 photos.
+                                + pour ajouter, croix pour retirer · 20 photos maximum.
                             </div>
                         </div>
                     </div>
@@ -522,7 +577,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
             {{-- ── CARD 2 : Informations principales ── --}}
             <div class="form-card">
                 <div class="form-card-hd">
-                    <div class="form-card-hd-ico">🏷️</div>
+                    <div class="form-card-hd-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12 12 3h8v8l-9 9zM15.5 8.5h.01"/></svg></div>
                     <span class="form-card-title">Informations principales</span>
                 </div>
                 <div class="form-card-body">
@@ -542,7 +597,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                             <label class="field-lbl" for="description" style="margin-bottom:0">Description</label>
                             @if($isPro)
                             <button type="button" id="btnShopioIA" onclick="generateAiDescription()"
-                                style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;border:1.5px solid #6366f1;background:linear-gradient(135deg,#eef2ff,#e0e7ff);color:#4f46e5;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;font-family:var(--font);white-space:nowrap">
+                                style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;border:1.5px solid #1F7CF6;background:linear-gradient(135deg,#EAF2FF,#D6E6FF);color:#1260C9;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;font-family:var(--font);white-space:nowrap">
                                 ✨ Shopio IA
                             </button>
                             @else
@@ -553,15 +608,15 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                             </a>
                             @endif
                         </div>
-                        <div id="shopioIaStatus" style="display:none;align-items:center;gap:8px;padding:10px 14px;background:#eef2ff;border:1px solid #c7d2fe;border-radius:9px;margin-bottom:8px;font-size:12.5px;color:#4f46e5;font-weight:600">
-                            <span style="display:inline-block;width:14px;height:14px;border:2px solid #c7d2fe;border-top-color:#6366f1;border-radius:50%;animation:iaSpin .7s linear infinite;flex-shrink:0"></span>
+                        <div id="shopioIaStatus" style="display:none;align-items:center;gap:8px;padding:10px 14px;background:#EAF2FF;border:1px solid #D6E6FF;border-radius:9px;margin-bottom:8px;font-size:12.5px;color:#1260C9;font-weight:600">
+                            <span style="display:inline-block;width:14px;height:14px;border:2px solid #D6E6FF;border-top-color:#1F7CF6;border-radius:50%;animation:iaSpin .7s linear infinite;flex-shrink:0"></span>
                             Shopio IA génère la description…
                         </div>
                         <textarea name="description" id="description"
                                   class="field-textarea"
                                   rows="3"
                                   placeholder="Décrivez votre produit ou cliquez ✨ Shopio IA pour générer automatiquement…">{{ old('description', $isEdit ? $product->description : '') }}</textarea>
-                        <div class="field-hint">Max 2000 caractères · <span style="color:#6366f1;font-weight:600">✨ Shopio IA</span> génère la description depuis la photo, le nom et le prix.</div>
+                        <div class="field-hint">Max 2000 caractères · <span style="color:#1F7CF6;font-weight:600">✨ Shopio IA</span> génère la description depuis la photo, le nom et le prix.</div>
                     </div>
 
                     <div class="field-row">
@@ -623,7 +678,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
             {{-- ── CARD 3 : Prix & Stock ── --}}
             <div class="form-card">
                 <div class="form-card-hd">
-                    <div class="form-card-hd-ico">💰</div>
+                    <div class="form-card-hd-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M16.5 7.5c0-1.7-2-3-4.5-3s-4.5 1.3-4.5 3 2 2.6 4.5 3 4.5 1.3 4.5 3-2 3-4.5 3-4.5-1.3-4.5-3"/></svg></div>
                     <span class="form-card-title">Prix & Stock</span>
                 </div>
                 <div class="form-card-body">
@@ -691,7 +746,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
             {{-- ── CARD : Vente flash ── --}}
             <div class="form-card">
                 <div class="form-card-hd">
-                    <div class="form-card-hd-ico">⚡</div>
+                    <div class="form-card-hd-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 3 5 13.5h6L10 21l9-11h-6z"/></svg></div>
                     <span class="form-card-title">Vente flash</span>
                     <span class="form-card-sub">Optionnel</span>
                 </div>
@@ -741,7 +796,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
             {{-- ── CARD : Variantes (taille/couleur/quantité) ── --}}
             <div class="form-card">
                 <div class="form-card-hd">
-                    <div class="form-card-hd-ico">🎨</div>
+                    <div class="form-card-hd-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 7.5l9 4.5 9-4.5zM3 12l9 4.5 9-4.5M3 16.5 12 21l9-4.5"/></svg></div>
                     <span class="form-card-title">Variantes</span>
                     <span class="form-card-sub">Optionnel</span>
                 </div>
@@ -764,7 +819,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
             {{-- ── CARD 4 : Options avancées ── --}}
             <div class="form-card">
                 <div class="form-card-hd">
-                    <div class="form-card-hd-ico">⚙️</div>
+                    <div class="form-card-hd-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8M16 5v4M10 15v4"/></svg></div>
                     <span class="form-card-title">Options & disponibilité</span>
                 </div>
                 <div class="form-card-body" style="padding:8px 20px">
@@ -811,7 +866,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
             {{-- ── CARD 5 : Allergènes ── --}}
             <div class="form-card">
                 <div class="form-card-hd">
-                    <div class="form-card-hd-ico">⚠️</div>
+                    <div class="form-card-hd-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 2.5 20h19zM12 10v4.5M12 17.5h.01"/></svg></div>
                     <span class="form-card-title">Allergènes & infos santé</span>
                     <span class="form-card-sub">Recommandé pour les restaurants</span>
                 </div>
@@ -829,9 +884,9 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 
             {{-- ── Boutons ── --}}
             <div class="form-actions">
-                <a href="{{ route('products.index') }}" class="btn-cancel">← Retour</a>
+                <a href="{{ route('products.index') }}" class="btn-cancel">Annuler</a>
                 <button type="submit" class="btn-submit" id="submitBtn">
-                    {{ $isEdit ? '💾 Enregistrer les modifications' : '🚀 Ajouter le produit' }}
+                    {{ $isEdit ? 'Enregistrer les modifications' : 'Ajouter le produit' }}
                 </button>
             </div>
 
@@ -845,13 +900,13 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
             {{-- Preview card --}}
             <div class="form-card" style="margin-bottom:16px">
                 <div class="form-card-hd">
-                    <div class="form-card-hd-ico">👁️</div>
+                    <div class="form-card-hd-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg></div>
                     <span class="form-card-title">Aperçu client</span>
                 </div>
                 <div class="preview-card-product">
                     <div class="preview-card-img" id="previewImgWrap">
                         <img id="previewImgEl" src="" alt="">
-                        <span id="previewImgPlaceholder">🏷️</span>
+                        <span id="previewImgPlaceholder"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v14H4zM4 15l4.5-4.5 4 4 2.5-2.5L20 17M15.5 9.5h.01"/></svg></span>
                     </div>
                     <div class="preview-card-body">
                         <div class="preview-cat" id="previewCat">{{ $isEdit ? ($product->category ?? '') : '' }}</div>
@@ -880,18 +935,18 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
             {{-- Conseils --}}
             <div class="form-card">
                 <div class="form-card-hd">
-                    <div class="form-card-hd-ico">💡</div>
+                    <div class="form-card-hd-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.9V16h5v-.2c0-.8.4-1.5 1-1.9A6 6 0 0 0 12 3z"/></svg></div>
                     <span class="form-card-title">Conseils de vente</span>
                 </div>
                 <div class="form-card-body" style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">
                     @foreach([
-                        ['📸', 'Bonne photo', 'Une photo nette augmente les ventes de 3×.'],
-                        ['✍️', 'Description claire', 'Mentionnez les ingrédients, taille, matière.'],
-                        ['💰', 'Prix juste', 'Comparez avec le marché local.'],
-                        ['⭐', 'Mettez en vedette', 'Les produits vedettes sont vus en premier.'],
+                        ['camera', 'Bonne photo', 'Une photo nette augmente les ventes de 3×.'],
+                        ['pencil', 'Description claire', 'Mentionnez les ingrédients, taille, matière.'],
+                        ['price', 'Prix juste', 'Comparez avec le marché local.'],
+                        ['star', 'Mettez en vedette', 'Les produits vedettes sont vus en premier.'],
                     ] as [$ico, $t, $d])
                     <div style="display:flex;gap:10px;align-items:flex-start">
-                        <span style="font-size:18px;flex-shrink:0">{{ $ico }}</span>
+                        <span class="pf-tip-ico">{!! $pfIco[$ico] !!}</span>
                         <div>
                             <div style="font-size:12px;font-weight:700;color:var(--text)">{{ $t }}</div>
                             <div style="font-size:11.5px;color:var(--muted);line-height:1.5">{{ $d }}</div>
@@ -904,6 +959,8 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
         </div>
     </div>
 
+</div>
+    </main>
 </div>
 @endsection
 
@@ -1243,8 +1300,8 @@ async function generateAiDescription() {
         if (data.description) {
             textarea.value = data.description;
             textarea.dispatchEvent(new Event('input'));
-            textarea.style.borderColor = '#6366f1';
-            textarea.style.boxShadow = '0 0 0 3px rgba(99,102,241,.15)';
+            textarea.style.borderColor = '#1F7CF6';
+            textarea.style.boxShadow = '0 0 0 3px rgba(31,124,246,.15)';
             setTimeout(() => { textarea.style.borderColor = ''; textarea.style.boxShadow = ''; }, 2000);
         } else {
             alert(data.error || 'Erreur Shopio IA. Réessayez.');
@@ -1424,4 +1481,8 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 @endif
 </script>
+@endpush
+
+@push('styles')
+@include('boutique._partials.sv-theme')
 @endpush

@@ -838,9 +838,12 @@ document.addEventListener('click', function (e) {
 /* ══ Skeleton Shimmer — toutes les images du site ══ */
 (function () {
     function applyToImg(img) {
-        if (!img.src || img.src.startsWith('data:')) return;
+        // src="" : img.src renvoie l'adresse de la page, il faut lire l'attribut
+        if (!img.getAttribute('src') || img.src.startsWith('data:')) return;
         if (img.src.endsWith('.svg')) return;
-        if (img.complete && img.naturalHeight > 0) return; // déjà en cache
+        // Déjà terminée (en cache, ou en erreur) : aucun événement load/error ne viendra
+        // retirer l'animation, qui tournerait sans fin (ex. aperçu vide du formulaire produit)
+        if (img.complete) return;
         if (img.dataset.noSkeleton !== undefined) return;  // exclusion manuelle
 
         const parent = img.parentElement;
