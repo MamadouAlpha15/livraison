@@ -570,6 +570,8 @@ textarea.field-input { resize: vertical; min-height: 90px; }
 .se-btn:disabled { opacity: .5; cursor: default; }
 .se-btn-sm { min-height: 40px; padding: 0 14px; }
 .se-btn-blue { background: #1668D8; color: #fff; }
+.se-btn-amber { background: #F59E0B; color: #16162A; }
+.se-btn-amber:hover { color: #16162A; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(245,158,11,.35); }
 .se-btn-blue:hover:not(:disabled) { background: #1260C9; color: #fff; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(22,104,216,.28); }
 .se-btn-line { background: var(--surface); color: var(--text); box-shadow: inset 0 0 0 1.5px var(--border); }
 .se-btn-line:hover:not(:disabled) { box-shadow: inset 0 0 0 1.5px var(--sv-blue, #1F7CF6); color: #1668D8; }
@@ -763,7 +765,9 @@ select.field-input { appearance: auto; }
                 <div class="tb-sub">{{ $shop->name }} · informations et apparence</div>
             </div>
             <div class="se-top-actions">
-                <a href="{{ route('public.shops.products', $shop) }}" class="se-btn se-btn-line" target="_blank" rel="noopener">Voir ma boutique</a>
+                <a href="{{ \App\Support\Storefront::publicUrl($shop) }}" class="se-btn se-btn-line" target="_blank" rel="noopener">Voir ma boutique</a>
+                <a href="{{ route('boutique.storefront.edit') }}" class="se-btn se-btn-amber">Éditeur avancé</a>
+                <a href="{{ route('boutique.grow', ['onglet' => 'partage']) }}" class="se-btn se-btn-blue">Partage, stats et qualité</a>
                 <a href="{{ route('boutique.dashboard') }}" class="se-btn se-btn-line se-hide-m">Tableau de bord</a>
             </div>
         </div>
@@ -1039,7 +1043,10 @@ select.field-input { appearance: auto; }
                                         <strong>Vitrine de la boutique</strong>
                                         <div class="field-hint" style="margin:2px 0 0">Ordre des sections, affichage des produits, bannière, avec un aperçu en direct. Enregistrez d'abord cette page si vous l'avez modifiée.</div>
                                     </div>
-                                    <a href="{{ route('boutique.storefront.edit') }}" class="se-btn se-btn-blue">Personnaliser la vitrine en détail</a>
+                                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                                        <a href="{{ route('boutique.grow', ['onglet' => 'couverture']) }}" class="se-btn se-btn-blue">Changer la couverture et le logo</a>
+                                        <a href="{{ route('boutique.storefront.edit') }}" class="se-btn se-btn-line">Personnaliser la vitrine en détail</a>
+                                    </div>
                                 </div>
                             </div>
 
