@@ -39,6 +39,11 @@ class CartController extends Controller
             'quantity'   => 'nullable|integer|min:1|max:99',
         ]);
 
+        // Mode vacances : commandes en pause dans cette boutique
+        if (\App\Support\Storefront::onVacation($product->shop)) {
+            return response()->json(['message' => \App\Support\Storefront::vacationMessage($product->shop)], 422);
+        }
+
         $qty = (int) ($request->input('quantity', 1) ?: 1);
 
         $variant = null;
@@ -172,6 +177,13 @@ class CartController extends Controller
 
         if ($items->isEmpty()) {
             return back()->withErrors(['cart' => 'Votre panier est vide.']);
+        }
+
+        // Boutique en mode vacances : on ne commande rien (le client retire l'article ou attend son retour)
+        foreach ($items->pluck('product.shop')->unique('id') as $cartShop) {
+            if (\App\Support\Storefront::onVacation($cartShop)) {
+                return back()->withErrors(['cart' => \App\Support\Storefront::vacationMessage($cartShop)]);
+            }
         }
 
         // Vérification du stock AVANT de créer quoi que ce soit (pour ne rien commander à moitié).

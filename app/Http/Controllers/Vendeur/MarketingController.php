@@ -12,6 +12,7 @@ use App\Models\Shop;
 use App\Models\ShopTraffic;
 use App\Services\ImageOptimizer;
 use App\Support\MetaPixel;
+use App\Support\Storefront;
 use App\Support\TrafficSource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -80,7 +81,7 @@ class MarketingController extends Controller
             return ['date' => $d->toDateString(), 'label' => $d->translatedFormat('j M'), 'visits' => (int) ($visitsByDay[$d->toDateString()] ?? 0)];
         });
 
-        $publicUrl = route('public.shops.products', $shop);
+        $publicUrl = Storefront::publicUrl($shop);
         $links = collect(TrafficSource::LINK_CHANNELS)->mapWithKeys(fn ($c) => [$c => TrafficSource::tag($publicUrl, $c, $c === 'qr' ? 'print' : 'social')]);
 
         $products = $shop->products()->where('is_active', true)->latest()->get(['id', 'name'])
@@ -102,6 +103,7 @@ class MarketingController extends Controller
             'publicUrl'     => $publicUrl,
             'links'         => $links,
             'products'      => $products,
+            'categoryLinks' => Storefront::categoryLinks($shop),
             'catalogUrl'    => route('public.shops.catalog', $shop),
             'catalogCount'  => $catalogCount,
             'withoutPhoto'  => max(0, $products->count() - $catalogCount),
@@ -122,7 +124,7 @@ class MarketingController extends Controller
         $visits = ShopTraffic::where('shop_id', $shop->id)->whereIn('campaign_id', $campaigns->pluck('id'))
             ->selectRaw('campaign_id, SUM(visits) as v')->groupBy('campaign_id')->pluck('v', 'campaign_id');
 
-        $publicUrl = route('public.shops.products', $shop);
+        $publicUrl = Storefront::publicUrl($shop);
 
         return $campaigns->map(function (MarketingCampaign $c) use ($shop, $visits, $publicUrl) {
             // Commandes arrivées par le lien, ou passées avec le code promo de la campagne

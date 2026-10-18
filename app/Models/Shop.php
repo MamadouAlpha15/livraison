@@ -16,6 +16,8 @@ class Shop extends Model
         'accent_color',        // Couleur d'accent de la vitrine (Ma boutique → Concevoir)
         'storefront',          // Réglages de la vitrine (JSON, voir App\Support\Storefront)
         'meta_pixel_id',       // Pixel Meta (Facebook) du vendeur, chargé sur ses pages (App\Support\MetaPixel)
+        'storefront_history',  // Dernières publications de la vitrine (restaurables dans l'éditeur)
+        'slug',                // Adresse courte de la boutique : /s/{slug}
     ];
 
     public function owner() {
@@ -40,6 +42,7 @@ protected $casts = [
     'is_approved'      => 'boolean',
     'plan_expires_at'  => 'datetime',  // Cast auto en Carbon pour isFuture() / isPast()
     'storefront'       => 'array',     // Réglages de la vitrine (App\Support\Storefront)
+    'storefront_history' => 'array',
 ];
 
 // 🟢 0.15 → 15 (pour l'affichage)

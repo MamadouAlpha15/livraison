@@ -201,6 +201,19 @@ Route::get('/shops', [PublicShopController::class, 'index'])
 Route::get('/shops/{shop}/products', [PublicShopController::class, 'products'])
     ->name('public.shops.products');
 
+/* Une catégorie de la boutique, avec son propre lien (à partager) */
+Route::get('/shops/{shop}/products/c/{categorie}', [PublicShopController::class, 'category'])
+    ->where('categorie', '[a-z0-9]+(?:-[a-z0-9]+)*')
+    ->name('public.shops.category');
+
+/* Adresse courte d'une boutique (choisie dans l'éditeur de boutique → Réglages), et de ses catégories */
+Route::get('/s/{slug}', [PublicShopController::class, 'bySlug'])
+    ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
+    ->name('public.shops.slug');
+Route::get('/s/{slug}/{categorie}', [PublicShopController::class, 'bySlugCategory'])
+    ->where(['slug' => '[a-z0-9]+(?:-[a-z0-9]+)*', 'categorie' => '[a-z0-9]+(?:-[a-z0-9]+)*'])
+    ->name('public.shops.slug.category');
+
 /* Catalogue produits d'une boutique pour Facebook / Instagram (lu par Meta Commerce Manager) */
 Route::get('/shops/{shop}/catalogue-meta.csv', [\App\Http\Controllers\CatalogFeedController::class, 'meta'])
     ->name('public.shops.catalog');
@@ -601,6 +614,9 @@ Route::middleware(['auth', 'role:admin'])
         Route::put('vitrine',               [\App\Http\Controllers\Vendeur\StorefrontController::class, 'update'])->name('storefront.update');
         Route::post('vitrine/reinitialiser', [\App\Http\Controllers\Vendeur\StorefrontController::class, 'reset']) ->name('storefront.reset');
         Route::get('vitrine/qr-code',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'qr'])    ->name('storefront.qr');
+        Route::post('vitrine/apercu',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'draft'])       ->name('storefront.draft');
+        Route::post('vitrine/image',        [\App\Http\Controllers\Vendeur\StorefrontController::class, 'uploadImage']) ->name('storefront.image');
+        Route::get('vitrine/adresse',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'slugCheck'])   ->name('storefront.slug');
 
         /* Marketing : provenance des visites et commandes, liens de suivi, catalogue Facebook, test du pixel */
         Route::get('marketing',                     [\App\Http\Controllers\Vendeur\MarketingController::class, 'index'])         ->name('marketing');

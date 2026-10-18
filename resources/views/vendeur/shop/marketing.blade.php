@@ -412,6 +412,13 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                     <select class="mk-select" id="mkTarget">
                         <option value="{{ $publicUrl }}">Ma vitrine (tous les produits)</option>
                         @if($products->isNotEmpty())
+                        @if(count($categoryLinks))
+                        <optgroup label="Une catégorie">
+                            @foreach($categoryLinks as $c)<option value="{{ $c['url'] }}">{{ $c['name'] }} ({{ $c['count'] }})</option>@endforeach
+                        </optgroup>
+                        @endif
+                        @endif
+                        @if($products->isNotEmpty())
                         <optgroup label="Un produit">
                             @foreach($products as $p)<option value="{{ $p['url'] }}">{{ $p['name'] }}</option>@endforeach
                         </optgroup>

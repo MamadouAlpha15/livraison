@@ -739,8 +739,12 @@ select.field-input { appearance: auto; }
         '#F59E0B' => ['Ambre', '#16162A'],
         '#15803D' => ['Vert', '#FFFFFF'],
     ];
-    $currentAccent = old('accent_color', $shop->accent_color ?: '#1F7CF6');
-    if (!isset($accentChoices[$currentAccent])) $currentAccent = '#1F7CF6';
+    $currentAccent = strtoupper(old('accent_color', $shop->accent_color ?: '#1F7CF6'));
+    // Couleur libre choisie dans l'éditeur de boutique : proposée telle quelle (sinon elle serait perdue à l'enregistrement)
+    if (!isset($accentChoices[$currentAccent])) {
+        $currentAccent = \App\Support\Storefront::isHex($currentAccent) ? $currentAccent : '#1F7CF6';
+        if (!isset($accentChoices[$currentAccent])) $accentChoices[$currentAccent] = ['Votre couleur', \App\Support\Storefront::inkFor($currentAccent)];
+    }
     $shopIni = collect(preg_split('/\s+/', trim($shop->name)))->filter()->take(2)->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))->implode('');
     $stepLabels = ['Informations générales', 'Contact et localisation', 'Concevoir', 'Images et finalisation'];
     $svgStore = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9l1.5-5h13L20 9M4 9v11h16V9M4 9c0 1.7 1.3 3 3 3s3-1.3 3-3c0 1.7 1.3 3 3 3s3-1.3 3-3c0 1.7 1.3 3 3 3M10 20v-5h4v5"/></svg>';

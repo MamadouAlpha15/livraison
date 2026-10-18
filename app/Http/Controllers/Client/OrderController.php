@@ -400,6 +400,11 @@ class OrderController extends Controller
         // Vérification de sécurité : la boutique doit exister et être approuvée
         abort_unless($product->shop && $product->shop->is_approved, 403);
 
+        // Mode vacances (éditeur de boutique) : la boutique reste visible, les commandes sont en pause
+        if (\App\Support\Storefront::onVacation($product->shop)) {
+            return back()->withErrors(['quantity' => \App\Support\Storefront::vacationMessage($product->shop)]);
+        }
+
         // Variante (taille/couleur) : optionnelle — le client peut commander "sans préférence"
         $variant = null;
         if ($product->has_variants && $request->filled('variant_id')) {
