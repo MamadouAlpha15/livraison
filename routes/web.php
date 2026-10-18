@@ -214,6 +214,33 @@ Route::get('/s/{slug}/{categorie}', [PublicShopController::class, 'bySlugCategor
     ->where(['slug' => '[a-z0-9]+(?:-[a-z0-9]+)*', 'categorie' => '[a-z0-9]+(?:-[a-z0-9]+)*'])
     ->name('public.shops.slug.category');
 
+/* Collections d'une boutique (Faire grandir ma vitrine → Personnalisation) */
+Route::get('/shops/{shop}/products/collection/{collection}', [PublicShopController::class, 'collection'])
+    ->where('collection', 'c[a-z0-9]{3,16}')
+    ->name('public.shops.collection');
+Route::get('/s/{slug}/collection/{collection}', [PublicShopController::class, 'bySlugCollection'])
+    ->where(['slug' => '[a-z0-9]+(?:-[a-z0-9]+)*', 'collection' => 'c[a-z0-9]{3,16}'])
+    ->name('public.shops.slug.collection');
+
+/* Lien d'aperçu de la vitrine, valable 48 h, et avis laissés dessus (Faire grandir ma vitrine → Qualité) */
+Route::get('/apercu/{token}', [PublicShopController::class, 'previewLink'])
+    ->where('token', '[a-z0-9]{24}')
+    ->name('storefront.preview-link');
+Route::post('/apercu/{token}/avis', [PublicShopController::class, 'previewFeedback'])
+    ->where('token', '[a-z0-9]{24}')
+    ->middleware('throttle:6,10')
+    ->name('storefront.preview-feedback');
+
+/* Commande passée depuis un modèle de page boutique (panier → une commande, payée à la livraison) */
+Route::post('/shops/{shop}/commande', [\App\Http\Controllers\StorefrontOrderController::class, 'store'])
+    ->middleware('throttle:10,1')
+    ->name('public.shops.order');
+
+/* Clic dans une section de la vitrine (statistiques « clics par section ») */
+Route::post('/shops/{shop}/clic', [PublicShopController::class, 'click'])
+    ->middleware('throttle:120,1')
+    ->name('public.shops.click');
+
 /* Catalogue produits d'une boutique pour Facebook / Instagram (lu par Meta Commerce Manager) */
 Route::get('/shops/{shop}/catalogue-meta.csv', [\App\Http\Controllers\CatalogFeedController::class, 'meta'])
     ->name('public.shops.catalog');
@@ -617,6 +644,24 @@ Route::middleware(['auth', 'role:admin'])
         Route::post('vitrine/apercu',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'draft'])       ->name('storefront.draft');
         Route::post('vitrine/image',        [\App\Http\Controllers\Vendeur\StorefrontController::class, 'uploadImage']) ->name('storefront.image');
         Route::get('vitrine/adresse',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'slugCheck'])   ->name('storefront.slug');
+
+        /* Faire grandir ma vitrine : couverture et logo, partage, personnalisation, conversion, qualité */
+        Route::prefix('vitrine/grandir')->name('grow')->controller(\App\Http\Controllers\Vendeur\GrowController::class)->group(function () {
+            Route::get('/', 'index');
+            Route::post('couverture/photo', 'uploadCover')->name('.cover-upload');
+            Route::post('logo', 'uploadLogo')->name('.logo-upload');
+            Route::put('identite', 'saveIdentity')->name('.identity');
+            Route::post('campagne', 'createCampaign')->name('.campaign');
+            Route::post('campagne/{campaign}/arreter', 'stopCampaign')->name('.campaign.stop');
+            Route::get('qr-code', 'qr')->name('.qr');
+            Route::get('affiche', 'poster')->name('.poster');
+            Route::put('personnalisation', 'savePersonalize')->name('.personalize');
+            Route::delete('brouillon', 'discardDraft')->name('.draft.discard');
+            Route::put('conversion', 'saveConversion')->name('.conversion');
+            Route::post('modele', 'useModel')->name('.model');
+            Route::post('apercu', 'createPreview')->name('.preview');
+            Route::delete('apercu', 'disablePreview')->name('.preview.disable');
+        });
 
         /* Marketing : provenance des visites et commandes, liens de suivi, catalogue Facebook, test du pixel */
         Route::get('marketing',                     [\App\Http\Controllers\Vendeur\MarketingController::class, 'index'])         ->name('marketing');

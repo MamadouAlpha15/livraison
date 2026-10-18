@@ -14,16 +14,19 @@
 
 @php
     $shopDesc = trim(strip_tags($shop->description ?? '')) ?: ($shop->name . ' — découvrez tous nos produits et commandez directement en ligne sur Shopio.');
-    $shopImg  = $shop->image ? (\App\Services\ImageOptimizer::url($shop->image, 'medium') ?? asset('storage/'.$shop->image)) : asset('images/shopio-logo-192.png');
+    $shopImg  = ($shareImage ?? null) ?: ($shop->image ? (\App\Services\ImageOptimizer::url($shop->image, 'medium') ?? asset('storage/'.$shop->image)) : asset('images/shopio-logo-192.png'));
+    $activeCollection = $activeCollection ?? null;
+    $previewLink = $previewLink ?? null;
+    $proofs = $proofs ?? ['rating' => (bool) $reviewAvg, 'delivered' => $deliveredCount > 0, 'response' => false];
     // Page d'une catégorie (lien partagé) : titre et aperçu de partage à son nom
     $activeCategory = $activeCategory ?? null;
-    $pageTitle = $activeCategory ? $activeCategory['name'] . ' · ' . $shop->name : $shop->name . ' — Boutique en ligne';
+    $pageTitle = $activeCategory ? $activeCategory['name'] . ' · ' . $shop->name : ($activeCollection ? $activeCollection['name'] . ' · ' . $shop->name : $shop->name . ' — Boutique en ligne');
     if ($activeCategory) {
         $shopDesc = $activeCategory['count'] . ' produit' . ($activeCategory['count'] > 1 ? 's' : '') . ' « ' . $activeCategory['name'] . ' » chez ' . $shop->name . '. Commandez en ligne, paiement à la livraison.';
     }
 @endphp
 
-@section('title', $activeCategory ? $pageTitle : $shop->name . ' — Produits')
+@section('title', ($activeCategory || $activeCollection) ? $pageTitle : $shop->name . ' — Produits')
 @section('description', \Illuminate\Support\Str::limit($shopDesc, 160))
 @php $bodyClass = 'is-dashboard'; @endphp
 
@@ -31,6 +34,7 @@
 {{-- Aperçu riche quand ce lien est collé sur WhatsApp / Facebook / Messenger : c'est
      précisément ce que le vendeur partage pour attirer des clients, donc la carte de
      prévisualisation doit montrer la boutique (photo + nom + description), pas le site. --}}
+@if($previewLink)<meta name="robots" content="noindex, nofollow">@endif
 <meta property="og:type" content="website">
 <meta property="og:title" content="{{ $pageTitle }}">
 <meta property="og:description" content="{{ \Illuminate\Support\Str::limit($shopDesc, 200) }}">
@@ -654,6 +658,14 @@ a.amz-card-name { text-decoration: none; }
 .sf-slim-head { max-width: 1500px; margin: 0 auto; padding: 18px 20px 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .sf-slim-name { font-size: 22px; font-weight: 800; letter-spacing: -.02em; color: var(--text); }
 .sf-slim-badge { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 10px; border-radius: 999px; background: #E7F6EC; color: #15803D; font-size: 12px; font-weight: 800; }
+/* Statut Ouvert / Fermé / En pause (horaires du bloc « Adresse et horaires », heure de Conakry) */
+.sf-status { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 11px; border-radius: 999px; font-size: 12.5px; font-weight: 800; white-space: nowrap; }
+.sf-status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.shop-banner .sf-status.is-open { background: rgba(34,197,94,.18); color: #86EFAC; }
+.shop-banner .sf-status.is-closed { background: rgba(255,255,255,.12); color: #E3E8F2; }
+.sf-status.is-pause { background: #F59E0B; color: #16162A; }
+.sf-slim-head .sf-status.is-open { background: #E7F6EC; color: #15803D; }
+.sf-slim-head .sf-status.is-closed { background: var(--grey-2); color: var(--text-2); }
 .sf-slim-meta { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--muted); }
 .sf-slim-meta .ico { color: #F59E0B; }
 
@@ -863,10 +875,49 @@ iframe.sf-video { cursor: auto; }
 .sf-welcome-box .sf-btn { width: 100%; justify-content: center; margin-top: 12px; }
 .sf-welcome-x { position: absolute; top: 12px; right: 12px; width: 38px; height: 38px; border-radius: 999px; border: 0; background: #F1F5FB; color: #16162A; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
+/* En-tête « couverture » (Faire grandir ma vitrine → Couverture et logo) */
+@include('public.shops._cover-css')
+/* Mode WhatsApp (Faire grandir ma vitrine → Conversion) : la commande part aussi sur WhatsApp */
+.sf-btn.is-wa, .amz-btn-order.is-wa:not(.out) { background: #15803D !important; color: #fff !important; box-shadow: none !important; }
+/* Lien d'aperçu (48 h) : bandeau en haut, avis en bas */
+.sf-plink { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; padding: 10px max(16px, env(safe-area-inset-left, 0px)); background: #0B1E3D; color: #fff; font-size: 14px; font-weight: 600; text-align: center; }
+.sf-plink b { color: #FCD34D; }
+.sf-fb { max-width: 640px; margin: 28px auto 8px; padding: 22px; border-radius: 24px; background: var(--surface); box-shadow: 0 0 0 1px var(--border); display: flex; flex-direction: column; gap: 10px; }
+.sf-fb h2 { margin: 0; font-size: 19px; font-weight: 800; color: var(--text); }
+.sf-fb p { margin: 0; color: var(--text-2); font-size: 14px; }
+.sf-fb input, .sf-fb textarea { width: 100%; border: 0; border-radius: 14px; padding: 12px 14px; background: var(--grey-2, #EEF2F8); color: var(--text); font: 500 15px var(--font); box-shadow: inset 0 0 0 1.5px var(--border); }
+.sf-fb textarea { min-height: 96px; resize: vertical; }
+.sf-fb input:focus, .sf-fb textarea:focus { outline: 0; box-shadow: inset 0 0 0 2px #1F7CF6; }
+.sf-fb-err { color: #B91C1C; font-size: 13px; font-weight: 700; }
+.sf-fb-ok { padding: 12px 14px; border-radius: 14px; background: #E7F6EC; color: #15803D; font-weight: 700; }
+.sf-fb .sf-btn { align-self: flex-start; border: 0; cursor: pointer; font-family: var(--font); }
+.sf-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+/* Collections (une rangée de produits par collection) */
+.sf-col + .sf-col { margin-top: 22px; }
+.sf-col-hd { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.sf-col-hd .sf-sel-more { margin: 0; }
+.sf-stock-note { font-size: 12.5px; font-weight: 800; color: #92400E; }
 /* Aperçu de l'éditeur : bloc survolé / sélectionné */
 .sf-preview [data-sf-block] { cursor: pointer; outline: 2px solid transparent; outline-offset: 2px; transition: outline-color .16s; border-radius: 8px; }
 .sf-preview [data-sf-block]:hover { outline-color: rgba(31,124,246,.45); }
 .sf-preview [data-sf-block].sf-is-selected { outline: 3px solid #1F7CF6; }
+.sf-preview [data-sf-block]:focus-visible { outline: 3px solid #1F7CF6; outline-offset: 2px; }
+.sf-preview [data-sf-block].sf-is-dragging { opacity: .4; }
+/* Étiquette du bloc (en haut à gauche) et barre d'outils (en haut à droite) ; --ed-ui compense le zoom de l'aperçu */
+.sf-ed-tag, .sf-ed-bar { position: absolute; z-index: 8000; transform-origin: 0 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+.sf-ed-tag { display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 11px; border-radius: 999px; background: #1F7CF6; color: #fff; font-size: 12px; font-weight: 800; white-space: nowrap; pointer-events: none; box-shadow: 0 6px 14px rgba(11,30,61,.25); transform: scale(var(--ed-ui, 1)); }
+.sf-ed-bar { display: flex; gap: 2px; padding: 4px; border-radius: 999px; background: #0B1E3D; box-shadow: 0 10px 24px rgba(11,30,61,.35); transform: scale(var(--ed-ui, 1)) translateX(-100%); }
+.sf-ed-tag[hidden], .sf-ed-bar[hidden], .sf-ed-line[hidden] { display: none; }
+.sf-ed-bar button, .sf-ed-grip { width: 34px; height: 34px; border: 0; border-radius: 999px; background: transparent; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background-color .18s; }
+.sf-ed-grip { cursor: grab; }
+.sf-ed-bar button:hover, .sf-ed-grip:hover { background: #132B52; }
+.sf-ed-bar button[data-ed-act="del"]:hover { background: #B91C1C; }
+.sf-ed-bar button:disabled { opacity: .35; cursor: default; background: transparent; }
+.sf-ed-bar button:focus-visible { outline: 3px solid #7DB4FF; outline-offset: 1px; }
+/* Point d'insertion pendant un glisser-déposer */
+.sf-ed-line { position: absolute; z-index: 8001; height: 4px; border-radius: 4px; background: #F59E0B; box-shadow: 0 0 0 3px rgba(245,158,11,.25); pointer-events: none; }
+.sf-ed-end { order: 9999; margin-top: 18px; padding: 22px 16px; border: 2px dashed var(--border, #C3CBDA); border-radius: 18px; text-align: center; color: var(--muted, #62627C); font: 700 14px var(--font, sans-serif); transition: background-color .18s, border-color .18s, color .18s; }
+.sf-ed-end.is-over { background: #FEF3E0; border-color: #F59E0B; color: #92400E; }
 
 @media (max-width: 760px) {
     .sf-imgtext, .sf-hours { grid-template-columns: minmax(0, 1fr); }
@@ -897,6 +948,7 @@ iframe.sf-video { cursor: auto; }
     $sfSet   = $sf['settings'];
     $sfCats  = \App\Support\Storefront::categoryLinks($shop);
     $sfHome  = \App\Support\Storefront::publicUrl($shop);
+    $sfStatus = \App\Support\Storefront::openStatus($sf); // « Ouvert maintenant » / « Fermé · ouvre à … » / « En pause »
     $sfStyle = $sf['style'];
     $sfBg    = \App\Support\Storefront::background($sfStyle['bg']);
     $sfFont  = \App\Support\Storefront::FONTS[$sfStyle['font']];
@@ -935,6 +987,11 @@ body { background: var(--grey){{ $sfStyle['bg'] === 'texture' ? ' radial-gradien
 {{-- Aperçu dans l'éditeur de vitrine : on masque les fenêtres du site qui gêneraient la lecture --}}
 <style>#pwaModal, #pushNotifBanner { display: none !important; }</style>
 <script>document.documentElement.classList.add('sf-preview');</script>
+@endif
+
+{{-- ══ Modèles de boutique Shopio : barre visible du seul vendeur ══ --}}
+@if($isOwnerBar ?? false)
+@include('public.shops.models._owner-bar', ['current' => 'standard'])
 @endif
 
 {{-- ══ NAVBAR ══ --}}
@@ -1071,13 +1128,21 @@ body { background: var(--grey){{ $sfStyle['bg'] === 'texture' ? ' radial-gradien
 </div>
 @endif
 
+{{-- ══ LIEN D'APERÇU (48 h) ══ --}}
+@if($previewLink)
+<div class="sf-plink" role="note"><span><b>Aperçu</b> de la vitrine de {{ $shop->name }} · pas encore visible des clients · lien valable jusqu’au {{ $previewLink['expires']->timezone('Africa/Conakry')->translatedFormat('j F à H:i') }}</span></div>
+@endif
+
 {{-- ══ BANNIÈRE BOUTIQUE ══ --}}
-{{-- Taille réglable (grande, compacte, sans) ; liseré bas à la couleur d'accent du vendeur --}}
-@if($sf['banner'] === 'none')
+{{-- Couverture réglée dans « Faire grandir ma vitrine », sinon l'en-tête d'origine (grande, compacte, sans) --}}
+@if($sf['cover']['on'] && $coverSlides)
+@include('public.shops._storefront-cover')
+@elseif($sf['banner'] === 'none')
 <div class="sf-slim-head" data-sf-block="__banner">
     <span class="sf-slim-name">{{ $shop->name }}</span>
     @if($shop->is_approved)<span class="sf-slim-badge">{!! \App\Support\IconLibrary::svg('check', '', 11) !!} Boutique vérifiée</span>@endif
-    @if($reviewAvg)<span class="sf-slim-meta">{!! \App\Support\IconLibrary::svg('star', '', 12) !!} {{ number_format($reviewAvg, 1, ',', ' ') }} ({{ $reviewCount }} avis)</span>@endif
+    @if($sfStatus)<span class="sf-status is-{{ $sfStatus[1] }}">{{ $sfStatus[0] }}</span>@endif
+    @if($proofs['rating'] && $reviewAvg)<span class="sf-slim-meta">{!! \App\Support\IconLibrary::svg('star', '', 12) !!} {{ number_format($reviewAvg, 1, ',', ' ') }} ({{ $reviewCount }} avis)</span>@endif
 </div>
 @else
 <div class="shop-banner sf-banner-{{ $sf['banner'] }}" data-sf-block="__banner">
@@ -1100,8 +1165,10 @@ body { background: var(--grey){{ $sfStyle['bg'] === 'texture' ? ' radial-gradien
         <div class="shop-banner-desc">{{ Str::limit(strip_tags($shop->description), 140) }}</div>
         @endif
         <div class="shop-banner-meta">
-            @if($reviewAvg)<span class="shop-banner-rating">{!! \App\Support\IconLibrary::svg('star', '', 12) !!} {{ number_format($reviewAvg, 1) }} <span style="opacity:.8">({{ $reviewCount }} avis)</span></span>@endif
-            @if($deliveredCount > 0)<span class="shop-banner-chip">{!! \App\Support\IconLibrary::svg('check', '', 12) !!} {{ $deliveredCount }} commande{{ $deliveredCount > 1 ? 's' : '' }} livrée{{ $deliveredCount > 1 ? 's' : '' }}</span>@endif
+            @if($sfStatus)<span class="sf-status is-{{ $sfStatus[1] }}">{{ $sfStatus[0] }}</span>@endif
+            @if($proofs['rating'] && $reviewAvg)<span class="shop-banner-rating">{!! \App\Support\IconLibrary::svg('star', '', 12) !!} {{ number_format($reviewAvg, 1) }} <span style="opacity:.8">({{ $reviewCount }} avis)</span></span>@endif
+            @if($proofs['response'])<span class="shop-banner-chip">{!! \App\Support\IconLibrary::svg('message', '', 12) !!} Répond en moins d’1 h</span>@endif
+            @if($proofs['delivered'])<span class="shop-banner-chip">{!! \App\Support\IconLibrary::svg('check', '', 12) !!} {{ $deliveredCount }} commande{{ $deliveredCount > 1 ? 's' : '' }} livrée{{ $deliveredCount > 1 ? 's' : '' }}</span>@endif
             @if($shop->type)<span class="shop-banner-chip">{!! \App\Support\IconLibrary::svg('tag', '', 12) !!} {{ $shop->type }}</span>@endif
             @if($shop->address)<span class="shop-banner-chip">{!! \App\Support\IconLibrary::svg('map-pin', '', 12) !!} {{ Str::limit($shop->address, 28) }}</span>@endif
             <span class="shop-banner-chip">{!! \App\Support\IconLibrary::svg('package', '', 12) !!} {{ $products->total() }} produit{{ $products->total() > 1 ? 's' : '' }}</span>
@@ -1127,6 +1194,25 @@ body { background: var(--grey){{ $sfStyle['bg'] === 'texture' ? ' radial-gradien
         <div class="sf-cat-actions">
             <button type="button" class="sf-cat-btn" data-copy-link="{{ $activeCategory['url'] }}">{!! \App\Support\IconLibrary::svg('globe', '', 15) !!} <span>Copier le lien</span></button>
             <a class="sf-cat-btn is-wa" href="https://wa.me/?text={{ rawurlencode($catWa) }}" target="_blank" rel="noopener">{!! \App\Support\IconLibrary::svg('message', '', 15) !!} WhatsApp</a>
+            <a class="sf-cat-btn" href="{{ $sfHome }}">Toute la boutique</a>
+        </div>
+    </div>
+</div>
+@endif
+
+{{-- ══ PAGE D'UNE COLLECTION (Faire grandir ma vitrine → Personnalisation) ══ --}}
+@if($activeCollection)
+@php $colWa = 'Découvrez « ' . $activeCollection['name'] . ' » chez ' . $shop->name . ' sur Shopio : ' . \App\Support\TrafficSource::tag($activeCollection['url'], 'whatsapp'); @endphp
+<div class="sf-wrap">
+    <div class="sf-cathead">
+        <div style="min-width:0">
+            <nav class="sf-crumb" aria-label="Fil d'Ariane"><a href="{{ $sfHome }}">{{ $shop->name }}</a><span aria-hidden="true">/</span><span>Collection</span></nav>
+            <h1 class="sf-cat-title">{{ $activeCollection['name'] }}</h1>
+            <span class="sf-cat-count">{{ $activeCollection['count'] }} produit{{ $activeCollection['count'] > 1 ? 's' : '' }}</span>
+        </div>
+        <div class="sf-cat-actions">
+            <button type="button" class="sf-cat-btn" data-copy-link="{{ $activeCollection['url'] }}">{!! \App\Support\IconLibrary::svg('globe', '', 15) !!} <span>Copier le lien</span></button>
+            <a class="sf-cat-btn is-wa" href="https://wa.me/?text={{ rawurlencode($colWa) }}" target="_blank" rel="noopener">{!! \App\Support\IconLibrary::svg('message', '', 15) !!} WhatsApp</a>
             <a class="sf-cat-btn" href="{{ $sfHome }}">Toute la boutique</a>
         </div>
     </div>
@@ -1316,7 +1402,7 @@ body { background: var(--grey){{ $sfStyle['bg'] === 'texture' ? ' radial-gradien
                     @auth
                         @if(Auth::user()->role === 'client')
                             @if(!$stockOut && !$sfSet['vacation'])
-                            <a href="{{ route('client.orders.createFromProduct', $product) }}" class="amz-btn-order">{!! \App\Support\IconLibrary::svg('cart', '', 14) !!} {{ $sfSet['btn_text'] }}</a>
+                            <a href="{{ route('client.orders.createFromProduct', $product) }}" class="amz-btn-order{{ $sfSet['wa_mode'] ? ' is-wa' : '' }}">{!! \App\Support\IconLibrary::svg($sfSet['wa_mode'] ? 'message' : 'cart', '', 14) !!} {{ $sfSet['wa_mode'] ? 'Commander sur WhatsApp' : $sfSet['btn_text'] }}</a>
                             @else
                             <div class="amz-btn-order out">Indisponible</div>
                             @endif
@@ -1324,7 +1410,7 @@ body { background: var(--grey){{ $sfStyle['bg'] === 'texture' ? ' radial-gradien
                         @endif
                     @else
                         @if(!$stockOut && !$sfSet['vacation'])
-                        <a href="{{ route('client.orders.createFromProduct', $product) }}" class="amz-btn-order">{!! \App\Support\IconLibrary::svg('cart', '', 14) !!} {{ $sfSet['btn_text'] }}</a>
+                        <a href="{{ route('client.orders.createFromProduct', $product) }}" class="amz-btn-order{{ $sfSet['wa_mode'] ? ' is-wa' : '' }}">{!! \App\Support\IconLibrary::svg($sfSet['wa_mode'] ? 'message' : 'cart', '', 14) !!} {{ $sfSet['wa_mode'] ? 'Commander sur WhatsApp' : $sfSet['btn_text'] }}</a>
                         @else
                         <div class="amz-btn-order out">Indisponible</div>
                         @endif
@@ -1360,6 +1446,23 @@ body { background: var(--grey){{ $sfStyle['bg'] === 'texture' ? ' radial-gradien
 </div>
 </div>{{-- /sf-flow --}}
 
+@if($previewLink)
+<section class="sf-wrap" aria-labelledby="sfFbTitle">
+    <form class="sf-fb" method="POST" action="{{ route('storefront.preview-feedback', $previewLink['token']) }}">
+        @csrf
+        <h2 id="sfFbTitle">Votre avis sur cette vitrine</h2>
+        <p>{{ $shop->name }} prépare sa boutique et aimerait savoir ce que vous en pensez avant de la publier.</p>
+        @if(session('feedback_sent'))<div class="sf-fb-ok" role="status">Merci, votre avis a été envoyé à la boutique.</div>@endif
+        <label class="sf-sr" for="sfFbName">Votre prénom (facultatif)</label>
+        <input id="sfFbName" name="name" maxlength="40" placeholder="Votre prénom (facultatif)" value="{{ old('name') }}" autocomplete="given-name">
+        <label class="sf-sr" for="sfFbMsg">Votre avis</label>
+        <textarea id="sfFbMsg" name="message" maxlength="500" required placeholder="Ce qui vous plaît, ce qui manque, ce qui n’est pas clair…" aria-describedby="sfFbErr">{{ old('message') }}</textarea>
+        @error('message')<span class="sf-fb-err" id="sfFbErr" role="alert">{{ $message }}</span>@enderror
+        <button type="submit" class="sf-btn">Envoyer mon avis</button>
+    </form>
+</section>
+@endif
+
 {{-- ══ Message de bienvenue : une seule fois par visiteur, avec un vrai code promo de la boutique ══ --}}
 @if($welcomePromo)
 <div class="sf-welcome" id="sfWelcome" hidden>
@@ -1387,6 +1490,36 @@ body { background: var(--grey){{ $sfStyle['bg'] === 'texture' ? ' radial-gradien
             else { window.prompt('Copiez ce lien :', btn.dataset.copyLink); }
         });
     });
+
+    /* Couverture en diapos : une toutes les 3,8 s, pause au survol, points de navigation */
+    document.querySelectorAll('[data-cover-carousel]').forEach(function (media) {
+        var slides = media.querySelectorAll('.sf-cover-slide'), dots = media.querySelectorAll('[data-cover-dot]'), at = 0, paused = false;
+        var show = function (i) {
+            at = (i + slides.length) % slides.length;
+            slides.forEach(function (s, k) { s.classList.toggle('is-on', k === at); });
+            dots.forEach(function (d, k) { if (k === at) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current'); });
+        };
+        dots.forEach(function (d) { d.addEventListener('click', function (e) { e.stopPropagation(); show(+d.dataset.coverDot); }); });
+        media.addEventListener('mouseenter', function () { paused = true; });
+        media.addEventListener('mouseleave', function () { paused = false; });
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(function () { if (!paused && !document.hidden) show(at + 1); }, 3800);
+    });
+
+    /* Clics par section (statistiques du vendeur) : pas dans l'aperçu ni sur le lien d'aperçu */
+    @if(!$isPreview && !$previewLink)
+    (function () {
+        var url = @json(route('public.shops.click', $shop)), token = document.querySelector('meta[name="csrf-token"]');
+        document.addEventListener('click', function (e) {
+            var hit = e.target.closest('a, button');
+            var blk = hit && hit.closest('[data-sf-block]');
+            if (!blk || !navigator.sendBeacon) return;
+            var fd = new FormData();
+            fd.append('block', blk.dataset.sfBlock);
+            if (token) fd.append('_token', token.content);
+            navigator.sendBeacon(url, fd);
+        });
+    })();
+    @endif
 
     /* Compte à rebours : jours, heures, minutes ; le bloc disparaît à la fin */
     document.querySelectorAll('.sf-countdown[data-end]').forEach(function (box) {
@@ -1429,28 +1562,142 @@ body { background: var(--grey){{ $sfStyle['bg'] === 'texture' ? ' radial-gradien
         }
     }
 
-    /* Aperçu dans l'éditeur : clic sur un bloc → sélection côté éditeur ; liens neutralisés */
+    /* Aperçu dans l'éditeur : la page se modifie directement.
+       Survol → contour léger ; clic (ou Entrée) → bloc sélectionné, avec son étiquette et une barre d'outils
+       (glisser, monter, descendre, dupliquer, supprimer) ; glisser un bloc sur un autre → trait ambre au point
+       d'insertion ; zone de dépôt en bas de page ; raccourcis clavier transmis à l'éditeur. Les liens sont neutralisés. */
     if (IS_PREVIEW && window.parent !== window) {
-        var selected = null;
+        var ORIGIN = location.origin;
+        var send = function (msg) { window.parent.postMessage(msg, ORIGIN); };
+        var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var meta = {}, selected = null, selectedId = null, dragId = null, outer = null, drop = null;
+        var ICO = {
+            up: 'm6 15 6-6 6 6', down: 'm6 9 6 6 6-6', dup: 'M8 8h12v12H8zM4 16V4h12',
+            del: 'M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3', lock: 'M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4',
+            hide: 'M3 3l18 18M10.6 6.1A9.7 9.7 0 0 1 12 6c6 0 9.5 6 9.5 6a17 17 0 0 1-3 3.6M6.6 6.6A17 17 0 0 0 2.5 12S6 18.5 12 18.5a9 9 0 0 0 4.4-1.1',
+            drag: 'M9 5h.01M9 12h.01M9 19h.01M15 5h.01M15 12h.01M15 19h.01',
+        };
+        var ico = function (d, s) { return '<svg width="' + (s || 16) + '" height="' + (s || 16) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + d + '"/></svg>'; };
+        var btn = function (act, label, d, off) { return '<button type="button" data-ed-act="' + act + '" aria-label="' + label + '" title="' + label + '"' + (off ? ' disabled' : '') + '>' + ico(d) + '</button>'; };
+        var escH = function (v) { return String(v).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+        var byId = function (id) { return id ? document.querySelector('[data-sf-block="' + (window.CSS && CSS.escape ? CSS.escape(id) : id) + '"]') : null; };
+        var make = function (cls) { var el = document.createElement('div'); el.className = cls; el.hidden = true; document.body.appendChild(el); return el; };
+        var tag = make('sf-ed-tag'), bar = make('sf-ed-bar'), line = make('sf-ed-line');
+        bar.setAttribute('role', 'toolbar'); bar.setAttribute('aria-label', 'Actions du bloc');
+        var flow = document.querySelector('.sf-flow'), end = null;
+        if (flow) {
+            end = document.createElement('div'); end.className = 'sf-ed-end';
+            end.textContent = 'Déposez un bloc ici pour l’ajouter en bas de la page';
+            flow.appendChild(end);
+        }
+
+        /* Étiquette et barre d'outils suivent le bloc sélectionné (positions dans la page) */
+        var place = function () {
+            if (!selected || !selected.isConnected) { tag.hidden = true; bar.hidden = true; return; }
+            var r = selected.getBoundingClientRect(), y = r.top + window.scrollY + 8, x = r.left + window.scrollX;
+            tag.style.top = y + 'px'; tag.style.left = (x + 8) + 'px';
+            bar.style.top = y + 'px'; bar.style.left = (x + r.width - 8) + 'px';
+        };
         var mark = function (id, scroll) {
             if (selected) selected.classList.remove('sf-is-selected');
-            selected = id ? document.querySelector('[data-sf-block="' + id + '"]') : null;
-            if (selected) {
-                selected.classList.add('sf-is-selected');
-                if (scroll) selected.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            selectedId = id; selected = byId(id);
+            if (!selected) { place(); return; }
+            selected.classList.add('sf-is-selected');
+            var m = meta[id] || {};
+            tag.innerHTML = (m.trust ? ico(ICO.lock, 13) : '') + escH(m.label || 'Bloc');
+            tag.hidden = false;
+            if (id === '__banner') { bar.innerHTML = ''; bar.hidden = true; }
+            else {
+                bar.innerHTML = '<span class="sf-ed-grip" draggable="true" title="Glisser pour déplacer" aria-hidden="true">' + ico(ICO.drag) + '</span>' +
+                    btn('up', 'Monter', ICO.up, m.i === 0) + btn('down', 'Descendre', ICO.down, m.i === m.n - 1) +
+                    (m.single ? (m.trust ? '' : btn('hide', 'Masquer ce bloc', ICO.hide)) : btn('dup', 'Dupliquer', ICO.dup) + btn('del', 'Supprimer', ICO.del));
+                bar.hidden = false;
             }
+            place();
+            if (scroll) selected.scrollIntoView({ block: 'center', behavior: reduceMotion ? 'auto' : 'smooth' });
         };
+        var pick = function (blk) { mark(blk.dataset.sfBlock, false); send({ type: 'sf-select', id: blk.dataset.sfBlock }); };
+        var labelBlocks = function () {
+            Array.prototype.forEach.call(document.querySelectorAll('[data-sf-block]'), function (b) {
+                var m = meta[b.dataset.sfBlock];
+                b.tabIndex = 0;
+                if (m) b.setAttribute('aria-label', 'Bloc ' + m.label + ' · Entrée pour le modifier');
+            });
+        };
+
         document.addEventListener('click', function (e) {
+            var act = e.target.closest('[data-ed-act]');
+            if (act) { e.preventDefault(); e.stopPropagation(); if (!act.disabled) send({ type: 'sf-act', id: selectedId, act: act.dataset.edAct }); return; }
+            if (e.target.closest('.sf-ed-bar')) { e.preventDefault(); return; }
             var blk = e.target.closest('[data-sf-block]');
             if (e.target.closest('a, form, .sf-video')) e.preventDefault();
-            if (blk) { e.preventDefault(); mark(blk.dataset.sfBlock, false); window.parent.postMessage({ type: 'sf-select', id: blk.dataset.sfBlock }, location.origin); }
+            if (blk) { e.preventDefault(); pick(blk); }
         }, true);
-        window.addEventListener('message', function (e) {
-            if (e.origin !== location.origin || !e.data) return;
-            if (e.data.type === 'sf-highlight') mark(e.data.id, e.data.scroll !== false);
-            if (e.data.type === 'sf-welcome') openWelcome();
+
+        /* Glisser-déposer : un bloc de la page (poignée), ou un bloc venu de l'éditeur (bibliothèque, structure) */
+        var clearDrop = function () { line.hidden = true; if (end) end.classList.remove('is-over'); drop = null; };
+        var stopDrag = function () { if (selected) selected.classList.remove('sf-is-dragging'); dragId = null; clearDrop(); };
+        document.addEventListener('dragstart', function (e) {
+            var el = e.target.nodeType === 1 ? e.target : e.target.parentElement;
+            if (!el || !el.closest('.sf-ed-grip') || !selected) return;
+            dragId = selectedId;
+            selected.classList.add('sf-is-dragging');
+            try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragId); e.dataTransfer.setDragImage(selected, 24, 24); } catch (x) {}
         });
-        window.parent.postMessage({ type: 'sf-ready' }, location.origin);
+        document.addEventListener('dragover', function (e) {
+            if (!dragId && !outer) return;
+            var el = e.target.nodeType === 1 ? e.target : e.target.parentElement;
+            var t = el ? el.closest('[data-sf-block], .sf-ed-end') : null;
+            if (!t) { clearDrop(); return; }
+            e.preventDefault();
+            try { e.dataTransfer.dropEffect = dragId ? 'move' : 'copy'; } catch (x) {}
+            if (t === end) { line.hidden = true; end.classList.add('is-over'); drop = { end: true }; return; }
+            if (end) end.classList.remove('is-over');
+            var id = t.dataset.sfBlock;
+            if (id === dragId) { line.hidden = true; drop = null; return; }
+            var r = t.getBoundingClientRect();
+            var after = id === '__banner' || e.clientY > r.top + r.height / 2; // l'en-tête reste en haut : on dépose dessous
+            line.style.top = ((after ? r.bottom : r.top) + window.scrollY - 2) + 'px';
+            line.style.left = (r.left + window.scrollX) + 'px';
+            line.style.width = r.width + 'px';
+            line.hidden = false;
+            drop = { targetId: id, after: after };
+        });
+        document.addEventListener('dragleave', function (e) { if (!e.relatedTarget) clearDrop(); });
+        document.addEventListener('drop', function (e) {
+            if (!dragId && !outer) return;
+            e.preventDefault();
+            if (drop) send({ type: 'sf-drop', id: dragId, outer: outer, targetId: drop.targetId || null, after: !!drop.after, end: !!drop.end });
+            stopDrag();
+        });
+        document.addEventListener('dragend', stopDrag);
+
+        /* Clavier : Entrée sélectionne le bloc ; annuler, rétablir, déplacer, supprimer → éditeur */
+        document.addEventListener('keydown', function (e) {
+            var el = e.target, tn = el.tagName;
+            if (tn === 'INPUT' || tn === 'TEXTAREA' || tn === 'SELECT') return;
+            if (e.key === 'Enter' && el.hasAttribute && el.hasAttribute('data-sf-block')) { e.preventDefault(); pick(el); return; }
+            var k = e.key.toLowerCase(), ctrl = e.ctrlKey || e.metaKey;
+            if ((ctrl && (k === 'z' || k === 'y')) || (e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) || e.key === 'Delete') {
+                e.preventDefault();
+                send({ type: 'sf-key', key: e.key, ctrl: ctrl, alt: e.altKey, shift: e.shiftKey });
+            }
+        });
+
+        window.addEventListener('message', function (e) {
+            if (e.origin !== ORIGIN || !e.data) return;
+            var d = e.data;
+            if (d.type === 'sf-highlight') {
+                if (d.meta) { meta = d.meta; labelBlocks(); }
+                if (d.ui) document.documentElement.style.setProperty('--ed-ui', Math.min(2.6, Math.max(1, d.ui)).toFixed(3));
+                mark(d.id, d.scroll !== false);
+            }
+            if (d.type === 'sf-drag') { outer = d.drag || null; if (!outer) clearDrop(); }
+            if (d.type === 'sf-welcome') openWelcome();
+        });
+        window.addEventListener('resize', place);
+        if (window.ResizeObserver) new ResizeObserver(place).observe(document.body);
+        send({ type: 'sf-ready' });
     }
 })();
 </script>

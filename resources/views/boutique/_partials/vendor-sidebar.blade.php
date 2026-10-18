@@ -1,7 +1,7 @@
 {{--
     Menu latéral de l'espace vendeur (maquette Main.dc.html), réutilisable.
     @include('boutique._partials.vendor-sidebar', ['shop' => $shop, 'active' => 'settings'])
-    Clés de $active : dash, messages, orders, products, promos, clients, marketing, team, riders, partners, finances, commissions, reports, settings, support.
+    Clés de $active : dash, messages, orders, products, promos, clients, marketing, grow, team, riders, partners, finances, commissions, reports, settings, support.
     À utiliser dans une page qui inclut aussi boutique._partials.sv-theme (couleurs).
     Structure attendue : <div class="vs-wrap"> [ce menu] <main class="main vs-main"> … </main> </div>
 --}}
@@ -20,6 +20,7 @@
         'promos'   => 'M19 5 5 19M7.5 7.5h.01M16.5 16.5h.01',
         'clients'  => 'M9 11.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM3 20c.8-3.4 3.2-5.5 6-5.5s5.2 2.1 6 5.5M16 4.5a3.5 3.5 0 0 1 0 7M21 20c-.5-2.4-1.8-4.1-3.6-4.9',
         'marketing'=> 'M4 10v4h3l6 4V6l-6 4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11',
+        'grow'     => 'M4 19h16M6 15l4-4 3 3 6-7M15 7h4v4',
         'team'     => 'M4 7h16v12H4zM9 7V5h6v2M12 11v4M10 13h4',
         'riders'   => 'M6 19.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM18 19.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM8.5 17h7M15 7h2.5l2.5 6.5M6 14.5 9 9h5l1 5',
         'partners' => 'M4 10.5 12 4l8 6.5V20H4zM10 20v-5h4v5',
@@ -41,6 +42,7 @@
             ['promos', 'Codes promo', route('boutique.promo-codes.index'), true],
             ['clients', 'Clients', route('boutique.clients.index'), false],
             ['marketing', 'Marketing', route('boutique.marketing'), false],
+            ['grow', 'Faire grandir ma vitrine', route('boutique.grow'), false],
             ['team', 'Équipe', route('boutique.employees.index'), true],
         ],
         'Livraison' => [

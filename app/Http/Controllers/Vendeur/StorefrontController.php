@@ -221,7 +221,7 @@ class StorefrontController extends Controller
     }
 
     /** Génère le QR code en SVG ; null si la bibliothèque bacon/bacon-qr-code n'est pas installée. */
-    public static function qrSvg(string $url, int $size): ?string
+    public static function qrSvg(string $url, int $size, bool $withLogo = false): ?string
     {
         if (!class_exists(\BaconQrCode\Writer::class)) return null;
 
@@ -229,7 +229,9 @@ class StorefrontController extends Controller
             new \BaconQrCode\Renderer\RendererStyle\RendererStyle($size, 1),
             new \BaconQrCode\Renderer\Image\SvgImageBackEnd()
         );
-        $svg = (new \BaconQrCode\Writer($renderer))->writeString($url);
+        // $withLogo : correction d'erreur renforcée (Q, 25 %) pour poser un logo au centre sans gêner la lecture
+        $svg = (new \BaconQrCode\Writer($renderer))->writeString($url, 'UTF-8',
+            $withLogo ? \BaconQrCode\Common\ErrorCorrectionLevel::Q() : \BaconQrCode\Common\ErrorCorrectionLevel::L());
 
         // Retire la déclaration XML pour pouvoir l'insérer directement dans la page
         return trim(preg_replace('/^<\?xml[^>]*\?>/', '', $svg));

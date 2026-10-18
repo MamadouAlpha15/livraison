@@ -573,6 +573,17 @@ class OrderController extends Controller
 
         $successMsg = "Commande passée avec succès ! Vous recevrez une confirmation. 🎉";
 
+        // Mode WhatsApp de la boutique : la commande est enregistrée, le client peut aussi l'envoyer sur WhatsApp
+        $waShop = $product->shop;
+        if ($waShop && $waShop->phone && \App\Support\Storefront::settings($waShop)['wa_mode']) {
+            $waPhone = preg_replace('/\D/', '', $waShop->phone);
+            if (strlen($waPhone) === 9) $waPhone = '224' . $waPhone; // numéro guinéen sans indicatif
+            $waText = 'Bonjour ' . $waShop->name . ', je viens de commander sur Shopio : ' . $product->name
+                . ' (' . number_format($order->total, 0, ',', ' ') . ' ' . ($waShop->currency ?? 'GNF') . '). Commande n° ' . $order->id
+                . '. ' . route('client.orders.createFromProduct', $product);
+            session()->flash('wa_order', ['shop' => $waShop->name, 'url' => 'https://wa.me/' . $waPhone . '?text=' . rawurlencode($waText)]);
+        }
+
         // Pixel Meta du vendeur : achat confirmé (paiement à la livraison). Pour le paiement en
         // ligne réussi, l'événement part au retour de paiement (OrderPaymentController@success).
         \App\Support\MetaPixel::queuePurchase($order);

@@ -470,6 +470,16 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
     @include('partials.meta-pixel', ['pixelId' => $mpPurchase['pixel'], 'pageView' => false, 'events' => [['Purchase', $mpPurchase['params'], $mpPurchase['event_id']]]])
 @endforeach
 
+{{-- ══ Mode WhatsApp de la boutique : envoyer la commande qui vient d'être enregistrée ══ --}}
+@if(session('wa_order'))
+<div id="waOrder" role="dialog" aria-labelledby="waOrderTitle" style="position:fixed;left:50%;bottom:max(16px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:99990;width:min(420px,calc(100% - 32px));background:#fff;color:#16162A;border-radius:22px;padding:18px;box-shadow:0 24px 60px rgba(11,30,61,.35);font-family:'Plus Jakarta Sans',system-ui,sans-serif;">
+    <button type="button" onclick="document.getElementById('waOrder').remove()" aria-label="Fermer" style="position:absolute;top:10px;right:10px;width:36px;height:36px;border:0;border-radius:999px;background:#F1F5FB;color:#16162A;font-size:20px;cursor:pointer">&times;</button>
+    <strong id="waOrderTitle" style="display:block;font-size:16px;padding-right:40px">Commande enregistrée</strong>
+    <p style="margin:6px 0 12px;font-size:14px;color:#45455E">Envoyez-la aussi à {{ session('wa_order')['shop'] }} sur WhatsApp : le message est déjà prêt.</p>
+    <a href="{{ session('wa_order')['url'] }}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;min-height:48px;border-radius:999px;background:#15803D;color:#fff;font-weight:800;text-decoration:none">Envoyer sur WhatsApp</a>
+</div>
+@endif
+
 {{-- ══ Célébration : objectif journalier du livreur atteint (gamification) ══ --}}
 @auth
 @if(session('daily_bonus_unlocked'))

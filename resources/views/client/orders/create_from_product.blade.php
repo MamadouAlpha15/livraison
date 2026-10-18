@@ -36,6 +36,8 @@
     $stockOut = $variants->isEmpty() && $stockVal !== null && $stockVal <= 0;
     // Mode vacances (éditeur de boutique) : produit visible, commande et panier en pause
     $onVacation = \App\Support\Storefront::onVacation($shop);
+    // Mode WhatsApp (Faire grandir ma vitrine → Conversion) : commande enregistrée ici, puis envoyée à la boutique sur WhatsApp
+    $waMode = $shop->phone && \App\Support\Storefront::settings($shop)['wa_mode'];
     $stockLow = $variants->isEmpty() && $stockVal !== null && $stockVal > 0 && $stockVal <= 5;
 
     $here      = url()->current();
@@ -600,8 +602,8 @@ select.ck-input { appearance: auto; }
                         </div>
                     </div>
                     <div class="pp-buy-main">
-                        <button type="button" class="pp-btn pp-btn-primary pp-btn-lg" id="ppBuyNow">
-                            Commander · <span class="pp-num"><span id="ppBuyTotal">{{ $fmt($nowPrice) }}</span> {{ $devise }}</span>
+                        <button type="button" class="pp-btn pp-btn-primary pp-btn-lg" id="ppBuyNow"@if($waMode) style="background:#15803D;box-shadow:none"@endif>
+                            {{ $waMode ? 'Commander sur WhatsApp' : 'Commander' }} · <span class="pp-num"><span id="ppBuyTotal">{{ $fmt($nowPrice) }}</span> {{ $devise }}</span>
                         </button>
                         @include('client.orders.partials.fav-button')
                     </div>
@@ -857,6 +859,7 @@ select.ck-input { appearance: auto; }
                 <div class="ck-actions">
                     <button type="button" class="pp-btn pp-btn-ghost" data-ck-prev="2">Retour</button>
                     <button type="submit" class="pp-btn pp-btn-primary" id="submitBtn">{!! Ico::svg('check', '', 17) !!} Valider ma commande</button>
+                    @if($waMode)<p style="flex-basis:100%;margin:6px 0 0;font-size:13px;color:#45455E">Votre commande est enregistrée sur Shopio, puis vous pourrez l’envoyer à la boutique sur WhatsApp en un clic.</p>@endif
                 </div>
             </div>
         </form>

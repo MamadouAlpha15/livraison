@@ -13,7 +13,8 @@ class MarketingCampaign extends Model
 {
     public const MAX_ACTIVE = 20;
 
-    protected $fillable = ['shop_id', 'name', 'slug', 'channel', 'promo_code_id', 'archived_at'];
+    // landing : fin de lien de la catégorie visée (null = toute la boutique), voir Faire grandir ma vitrine → Partage
+    protected $fillable = ['shop_id', 'name', 'slug', 'channel', 'landing', 'promo_code_id', 'archived_at'];
 
     protected $casts = ['archived_at' => 'datetime'];
 

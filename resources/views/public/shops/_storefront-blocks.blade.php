@@ -18,14 +18,25 @@
     $sfBuy = function ($p) use ($sfSet) {
         $out = $p->stock !== null && $p->stock <= 0;
         if ($sfSet['vacation'] || $out) return '<span class="sf-btn is-off">' . e($sfSet['vacation'] ? 'Indisponible' : 'Rupture') . '</span>';
+        // Mode WhatsApp : la commande est enregistrée dans Shopio, puis envoyée à la boutique sur WhatsApp
+        if ($sfSet['wa_mode']) return '<a href="' . e(route('client.orders.createFromProduct', $p)) . '" class="sf-btn is-wa">Commander sur WhatsApp</a>';
         return '<a href="' . e(route('client.orders.createFromProduct', $p)) . '" class="sf-btn">' . e($sfSet['btn_text']) . '</a>';
+    };
+    $sfCard = function ($p, bool $stockNote = false) use ($sfSet, $sfMoney, $sfBuy) {
+        $url = e(route('client.orders.createFromProduct', $p));
+        $img = $p->image ? '<img src="' . e(\App\Services\ImageOptimizer::url($p->image, 'thumb') ?? asset('storage/' . $p->image)) . '" alt="" loading="lazy">' : \App\Support\IconLibrary::categorySvg($p->category, '', 40);
+        $old = $sfSet['show_strike'] && $p->original_price && $p->original_price > $p->current_price ? '<s>' . number_format($p->original_price, 0, ',', ' ') . '</s>' : '';
+        $note = $stockNote && $p->stock !== null && $p->stock > 0 ? '<span class="sf-stock-note">Plus que ' . (int) $p->stock . ' en stock</span>' : '';
+        return '<article class="sf-sel-card"><a href="' . $url . '" class="sf-sel-img" tabindex="-1" aria-hidden="true">' . $img . '</a>'
+            . '<a href="' . $url . '" class="sf-sel-name">' . e($p->name) . '</a>'
+            . '<div class="sf-sel-price"><strong>' . e($sfMoney($p->current_price)) . '</strong>' . $old . '</div>' . $note . $sfBuy($p) . '</article>';
     };
 @endphp
 
 @foreach($sf['blocks'] as $i => $blk)
 @continue(!$blk['on'] || $blk['type'] === 'products')
-{{-- Page d'une catégorie : seulement le bandeau d'annonce et les catégories au-dessus des produits --}}
-@continue(!empty($activeCategory) && !in_array($blk['type'], ['announcement', 'categories'], true))
+{{-- Page d'une catégorie ou d'une collection : seulement le bandeau d'annonce et les catégories au-dessus des produits --}}
+@continue((!empty($activeCategory) || !empty($activeCollection)) && !in_array($blk['type'], ['announcement', 'categories'], true))
 @php $d = $blk['d']; $attrs = 'data-sf-block="' . e($blk['id']) . '" style="order: ' . $i . '"'; @endphp
 
 @switch($blk['type'])
@@ -355,6 +366,43 @@
     </section>
     @elseif($isPreview)
     <div class="sf-wrap" {!! $attrs !!}>{!! $sfHint('Sélection de produits : aucun produit en ligne dans cette catégorie.') !!}</div>
+    @endif
+    @break
+
+@case('collections')
+    @if(($collectionRows ?? collect())->isNotEmpty())
+    <section class="sf-wrap" {!! $attrs !!}>
+        @foreach($collectionRows as $row)
+        <div class="sf-col">
+            <div class="sf-col-hd"><h2 class="sf-h2b">{{ $row['c']['name'] }}</h2><a class="sf-sel-more" href="{{ $row['url'] }}">Tout voir →</a></div>
+            <div class="sf-sel">@foreach($row['items'] as $p) {!! $sfCard($p) !!} @endforeach</div>
+        </div>
+        @endforeach
+    </section>
+    @elseif($isPreview)
+    <div class="sf-wrap" {!! $attrs !!}>{!! $sfHint('Collections : aucune collection affichée avec des produits en ligne. Créez-les dans « Faire grandir ma vitrine ».') !!}</div>
+    @endif
+    @break
+
+@case('trending')
+    @if(($trending ?? collect())->isNotEmpty())
+    <section class="sf-wrap" {!! $attrs !!}>
+        <h2 class="sf-h2b">{{ $d['title'] }}</h2>
+        <div class="sf-sel">@foreach($trending as $p) {!! $sfCard($p) !!} @endforeach</div>
+    </section>
+    @elseif($isPreview)
+    <div class="sf-wrap" {!! $attrs !!}>{!! $sfHint('Les plus vus : aucune fiche produit vue cette semaine pour l’instant. La section apparaîtra toute seule.') !!}</div>
+    @endif
+    @break
+
+@case('lowstock')
+    @if(($lowStock ?? collect())->isNotEmpty())
+    <section class="sf-wrap" {!! $attrs !!}>
+        <h2 class="sf-h2b">{{ $d['title'] }}</h2>
+        <div class="sf-sel">@foreach($lowStock as $p) {!! $sfCard($p, true) !!} @endforeach</div>
+    </section>
+    @elseif($isPreview)
+    <div class="sf-wrap" {!! $attrs !!}>{!! $sfHint('Bientôt en rupture : aucun produit à 2 unités ou moins. La section apparaîtra toute seule.') !!}</div>
     @endif
     @break
 

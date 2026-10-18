@@ -18,6 +18,9 @@ class Shop extends Model
         'meta_pixel_id',       // Pixel Meta (Facebook) du vendeur, chargé sur ses pages (App\Support\MetaPixel)
         'storefront_history',  // Dernières publications de la vitrine (restaurables dans l'éditeur)
         'slug',                // Adresse courte de la boutique : /s/{slug}
+        'storefront_draft',    // Brouillon de la vitrine (Faire grandir ma vitrine → Personnalisation)
+        'storefront_publish_at', // Publication programmée du brouillon
+        'preview_token', 'preview_expires_at', 'preview_feedback', // Lien d'aperçu 48 h et avis reçus
     ];
 
     public function owner() {
@@ -43,6 +46,10 @@ protected $casts = [
     'plan_expires_at'  => 'datetime',  // Cast auto en Carbon pour isFuture() / isPast()
     'storefront'       => 'array',     // Réglages de la vitrine (App\Support\Storefront)
     'storefront_history' => 'array',
+    'storefront_draft'   => 'array',
+    'storefront_publish_at' => 'datetime',
+    'preview_expires_at' => 'datetime',
+    'preview_feedback'   => 'array',
 ];
 
 // 🟢 0.15 → 15 (pour l'affichage)

@@ -45,7 +45,34 @@ class Storefront
         'hours'        => ['Adresse et horaires', 'Où vous trouver, quand vous êtes ouvert', false, false],
         'social'       => ['Réseaux sociaux', 'Liens WhatsApp, Facebook, TikTok, Instagram', false, false],
         'selection'    => ['Sélection de produits', 'Une catégorie mise en avant', false, false],
+        // Gérés depuis « Faire grandir ma vitrine » (collections, sections automatiques)
+        'collections'  => ['Collections', 'Vos collections de produits', true, false],
+        'trending'     => ['Les plus vus', 'Les plus vus de la semaine · automatique', true, false],
+        'lowstock'     => ['Bientôt en rupture', '2 unités ou moins en stock · automatique', true, false],
     ];
+
+    /** Blocs ajoutés et retirés depuis « Faire grandir ma vitrine » (pas dans la bibliothèque de l'éditeur). */
+    public const MANAGED = ['collections', 'trending', 'lowstock'];
+
+    // ─────────────────── Couverture et logo (Faire grandir ma vitrine → Couverture et logo)
+    public const COVER_SOURCES = ['default' => 'Bannière actuelle', 'product' => 'Photo produit', 'night' => 'Dégradé nuit', 'gold' => 'Dégradé or', 'blue' => 'Dégradé bleu', 'photo' => 'Ma photo'];
+    public const COVER_GRADIENTS = [
+        'default' => 'radial-gradient(120% 140% at 100% 0%, rgba(31,124,246,.35), transparent 55%), linear-gradient(135deg, #0B1E3D, #132B52)',
+        'night'   => 'linear-gradient(135deg, #061226 0%, #0B1E3D 50%, #1F3F75 100%)',
+        'gold'    => 'linear-gradient(135deg, #2E2205 0%, #7A5A0E 45%, #D4A017 100%)',
+        'blue'    => 'linear-gradient(135deg, #1260C9 0%, #1F7CF6 55%, #7DB4FF 100%)',
+    ];
+    public const COVER_HEIGHTS = ['l' => 'Grande', 'm' => 'Moyenne', 's' => 'Fine'];
+    public const SLIDES_MAX = 4;
+    public const LOGO_SHAPES = ['round' => 'Rond', 'rounded' => 'Arrondi', 'square' => 'Carré'];
+    public const LOGO_POSITIONS = ['left' => 'À gauche', 'center' => 'Centré', 'over' => 'Sur la photo'];
+    /** Couleurs proposées à côté du nom (onglet Couverture et logo). */
+    public const IDENTITY_COLORS = ['#1F7CF6' => 'Bleu Shopio', '#0B1E3D' => 'Bleu nuit', '#F59E0B' => 'Ambre', '#15803D' => 'Vert'];
+
+    // ─────────────────── Collections (onglet Personnalisation)
+    public const COLLECTION_KINDS = ['manual' => 'Choisie à la main', 'under' => 'Prix maximum (automatique)', 'new' => 'Nouveautés de la semaine (automatique)'];
+    public const COLLECTIONS_MAX = 6;
+    public const COLLECTION_ITEMS_MAX = 12;
 
     /** Blocs de base, dans l'ordre par défaut. */
     public const CORE = ['announcement', 'categories', 'featured', 'products', 'reviews', 'delivery', 'contact'];
@@ -89,6 +116,11 @@ class Storefront
 
     /** Mises en page de départ selon le type de boutique (ordre des blocs de base + affichage). */
     public const TEMPLATES = [
+        'luxe' => [
+            'label' => 'Luxe', 'hint' => 'Grandes photos, peu de texte, prix élevés d’abord',
+            'order' => ['featured', 'categories', 'products', 'reviews', 'delivery', 'contact', 'announcement'],
+            'off' => ['announcement'], 'layout' => 'grid', 'columns' => 3, 'sort' => 'price_desc', 'cards' => 'square', 'banner' => 'large', 'accent' => '#0B1E3D',
+        ],
         'mode' => [
             'label' => 'Mode', 'hint' => 'Photos en grand, nouveautés d’abord',
             'order' => ['announcement', 'featured', 'categories', 'products', 'reviews', 'delivery', 'contact'],
@@ -117,6 +149,8 @@ class Storefront
     public const RESERVED_SLUGS = ['admin', 'shopio', 'boutique', 'boutiques', 'shop', 'shops', 'support', 'api', 'login', 'register', 'client', 'vendeur', 'livreur', 'produit', 'produits', 'products', 'aide', 'help', 'contact', 'compte', 'panier', 'cart', 'suivi', 'marketing', 'www', 'app'];
 
     private const IMG_PATH = '#^storefront/medium/[A-Za-z0-9]{20}\.webp$#';
+    /** Couvertures importées (avec une variante « large » de 1600 px). */
+    public const COVER_PATH = '#^covers/medium/[A-Za-z0-9]{20}\.webp$#';
     private const TIME = '/^([01]\d|2[0-3]):[0-5]\d$/';
 
     // ─────────────────────────────────────────────────────────────── Valeurs par défaut
@@ -134,7 +168,26 @@ class Storefront
             'style'        => self::styleDefaults(),
             'settings'     => self::settingsDefaults(),
             'themes'       => [],
+            'cover'        => self::coverDefaults(),
+            'logo'         => self::logoDefaults(),
+            'collections'  => [],
+            'template'     => '',
+            'page_model'   => 'standard',
         ];
+    }
+
+    /**
+     * Couverture : « on » = réglée dans Faire grandir ma vitrine (sinon l'en-tête d'origine est gardé).
+     * slides : 1 à 4 diapos [src, img (photo importée), pid (produit dont on montre la photo)].
+     */
+    public static function coverDefaults(): array
+    {
+        return ['on' => false, 'slides' => [['src' => 'default', 'img' => null, 'pid' => null]], 'y' => 50, 'veil' => 30, 'height' => 'l', 'name_on' => true, 'slogan' => ''];
+    }
+
+    public static function logoDefaults(): array
+    {
+        return ['src' => 'current', 'shape' => 'round', 'pos' => 'left', 'size' => 104];
     }
 
     public static function styleDefaults(): array
@@ -148,6 +201,8 @@ class Storefront
             'btn_text' => 'Commander', 'show_stock' => true, 'show_strike' => true, 'show_nego' => false,
             'vacation' => false, 'vacation_msg' => 'De retour très bientôt',
             'welcome' => false, 'welcome_promo_id' => null,
+            // Onglet Conversion : commande envoyée aussi sur WhatsApp, preuves de confiance affichables
+            'wa_mode' => false, 'proof_delivered' => true, 'proof_response' => true,
         ];
     }
 
@@ -169,6 +224,9 @@ class Storefront
             'hours'     => ['addr' => '', 'days' => 'Lundi – samedi', 'open' => '09:00', 'close' => '20:00'],
             'social'    => ['wa' => '', 'fb' => '', 'tt' => '', 'ig' => ''],
             'selection' => ['title' => 'Notre sélection', 'category' => '', 'limit' => 4],
+            'collections' => ['title' => 'Nos collections'],
+            'trending'  => ['title' => 'Les plus vus cette semaine'],
+            'lowstock'  => ['title' => 'Bientôt en rupture'],
             default     => [],
         };
     }
@@ -207,7 +265,75 @@ class Storefront
             'style'        => self::normalizeStyle($input['style'] ?? null),
             'settings'     => self::normalizeSettings($input['settings'] ?? null),
             'themes'       => self::normalizeThemes($input['themes'] ?? null),
+            'cover'        => self::normalizeCover($input['cover'] ?? null),
+            'logo'         => self::normalizeLogo($input['logo'] ?? null),
+            'collections'  => self::normalizeCollections($input['collections'] ?? null),
+            'template'     => $pick($input['template'] ?? null, array_keys(self::TEMPLATES), ''),
+            // Modèle de page côté client (voir App\Support\PageModels) : « standard » = la vitrine à blocs
+            'page_model'   => $pick($input['page_model'] ?? null, array_keys(PageModels::MODELS), 'standard'),
         ];
+    }
+
+    public static function normalizeCover($c): array
+    {
+        $d = self::coverDefaults();
+        $c = is_array($c) ? $c : [];
+        $slides = [];
+        foreach (is_array($c['slides'] ?? null) ? $c['slides'] : [] as $s) {
+            if (!is_array($s) || count($slides) >= self::SLIDES_MAX) continue;
+            $src = in_array($s['src'] ?? null, array_keys(self::COVER_SOURCES), true) ? $s['src'] : null;
+            $img = is_string($s['img'] ?? null) && preg_match(self::COVER_PATH, $s['img']) ? $s['img'] : null;
+            if (!$src || ($src === 'photo' && !$img)) continue;
+            $pid = (int) ($s['pid'] ?? 0);
+            $slides[] = ['src' => $src, 'img' => $src === 'photo' ? $img : null, 'pid' => $src === 'product' && $pid > 0 ? $pid : null];
+        }
+        $int = fn ($k, $min, $max) => max($min, min($max, (int) ($c[$k] ?? $d[$k])));
+        return [
+            'on'      => filter_var($c['on'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            'slides'  => $slides ?: $d['slides'],
+            'y'       => $int('y', 0, 100),
+            'veil'    => $int('veil', 0, 70),
+            'height'  => in_array($c['height'] ?? null, array_keys(self::COVER_HEIGHTS), true) ? $c['height'] : $d['height'],
+            'name_on' => array_key_exists('name_on', $c) ? filter_var($c['name_on'], FILTER_VALIDATE_BOOLEAN) : $d['name_on'],
+            'slogan'  => self::line($c['slogan'] ?? '', 60),
+        ];
+    }
+
+    public static function normalizeLogo($l): array
+    {
+        $d = self::logoDefaults();
+        $l = is_array($l) ? $l : [];
+        return [
+            'src'   => in_array($l['src'] ?? null, ['current', 'initials'], true) ? $l['src'] : $d['src'],
+            'shape' => in_array($l['shape'] ?? null, array_keys(self::LOGO_SHAPES), true) ? $l['shape'] : $d['shape'],
+            'pos'   => in_array($l['pos'] ?? null, array_keys(self::LOGO_POSITIONS), true) ? $l['pos'] : $d['pos'],
+            'size'  => max(64, min(140, (int) ($l['size'] ?? $d['size']))),
+        ];
+    }
+
+    /** Collections : [id, nom, type (à la main, prix maximum, nouveautés), produits choisis, prix maximum, affichée]. */
+    public static function normalizeCollections($cols): array
+    {
+        $out = [];
+        $seen = [];
+        foreach (is_array($cols) ? $cols : [] as $c) {
+            if (!is_array($c) || count($out) >= self::COLLECTIONS_MAX) continue;
+            $name = self::line($c['name'] ?? '', 40);
+            $kind = in_array($c['kind'] ?? null, array_keys(self::COLLECTION_KINDS), true) ? $c['kind'] : null;
+            if ($name === '' || !$kind) continue;
+            $id = is_string($c['id'] ?? null) && preg_match('/^c[a-z0-9]{3,16}$/', $c['id']) ? $c['id'] : 'c' . substr(self::newId(), 1);
+            while (isset($seen[$id])) $id = 'c' . substr(self::newId(), 1);
+            $seen[$id] = true;
+            $out[] = [
+                'id'   => $id,
+                'name' => $name,
+                'kind' => $kind,
+                'ids'  => $kind === 'manual' ? array_slice(array_values(array_unique(array_filter(array_map('intval', (array) ($c['ids'] ?? [])), fn ($v) => $v > 0))), 0, self::COLLECTION_ITEMS_MAX) : [],
+                'max'  => $kind === 'under' ? max(1, min(1_000_000_000, (int) ($c['max'] ?? 0))) : null,
+                'on'   => filter_var($c['on'] ?? true, FILTER_VALIDATE_BOOLEAN),
+            ];
+        }
+        return $out;
     }
 
     private static function normalizeBlocks($blocks): array
@@ -220,12 +346,13 @@ class Storefront
             $type = $b['type'] ?? null;
             if (!is_string($type) || !isset(self::BLOCKS[$type])) continue;
             $core = in_array($type, self::CORE, true);
-            if ($core && isset($seenCore[$type])) continue;
+            $single = self::BLOCKS[$type][2]; // un seul exemplaire : identifiant = son type
+            if ($single && isset($seenCore[$type])) continue;
 
-            $id = $core ? $type : (is_string($b['id'] ?? null) && preg_match('/^b[a-z0-9]{3,16}$/', $b['id']) ? $b['id'] : self::newId());
+            $id = $single ? $type : (is_string($b['id'] ?? null) && preg_match('/^b[a-z0-9]{3,16}$/', $b['id']) ? $b['id'] : self::newId());
             while (isset($seenIds[$id])) $id = self::newId();
             $seenIds[$id] = true;
-            if ($core) $seenCore[$type] = true;
+            if ($single) $seenCore[$type] = true;
 
             $trust = self::BLOCKS[$type][3];
             $out[] = [
@@ -307,6 +434,7 @@ class Storefront
                 'category' => self::line($d['category'] ?? '', 80),
                 'limit'    => in_array((int) ($d['limit'] ?? 4), [4, 8], true) ? (int) $d['limit'] : 4,
             ],
+            'collections', 'trending', 'lowstock' => ['title' => self::line($d['title'] ?? '', 80) ?: self::blockDefaults($type)['title']],
             default => [],
         };
     }
@@ -365,6 +493,9 @@ class Storefront
             'vacation_msg'     => self::line($s['vacation_msg'] ?? $d['vacation_msg'], 120),
             'welcome'          => $bool('welcome'),
             'welcome_promo_id' => $promo > 0 ? $promo : null,
+            'wa_mode'          => $bool('wa_mode'),
+            'proof_delivered'  => $bool('proof_delivered'),
+            'proof_response'   => $bool('proof_response'),
         ];
     }
 
@@ -555,8 +686,23 @@ class Storefront
     /** La boutique est-elle ouverte maintenant (heure du site) ? */
     public static function isOpenNow(array $d): bool
     {
-        $now = now()->format('H:i');
+        $now = now('Africa/Conakry')->format('H:i');
         return $d['open'] < $d['close'] ? ($now >= $d['open'] && $now < $d['close']) : ($now >= $d['open'] || $now < $d['close']);
+    }
+
+    /**
+     * Statut affiché en pastille dans l'en-tête de la vitrine : [texte, état open|closed|pause],
+     * calculé à partir des horaires du premier bloc « Adresse et horaires » affiché (heure de Conakry).
+     * null si la boutique n'a pas indiqué ses horaires.
+     */
+    public static function openStatus(array $config): ?array
+    {
+        if ($config['settings']['vacation'] ?? false) return ['En pause', 'pause'];
+        $hours = collect($config['blocks'] ?? [])->first(fn ($b) => $b['type'] === 'hours' && $b['on']);
+        if (!$hours) return null;
+        return self::isOpenNow($hours['d'])
+            ? ['Ouvert maintenant', 'open']
+            : ['Fermé · ouvre à ' . $hours['d']['open'], 'closed'];
     }
 
     /**

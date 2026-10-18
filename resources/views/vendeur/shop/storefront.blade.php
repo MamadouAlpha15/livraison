@@ -88,6 +88,7 @@ html, body { margin: 0; background: var(--vf-bg); color: var(--vf-ink); font-fam
 .vf-rail button:hover { color: #fff; }
 .vf-rail button[aria-pressed="true"] { background: #fff; color: var(--vf-night); }
 .vf-col { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.vf-inspect { position: sticky; top: 78px; max-height: calc(100vh - 92px); overflow-y: auto; overscroll-behavior: contain; border-radius: 24px; }
 .vf-panel { background: var(--vf-surf); border-radius: 22px; box-shadow: 0 0 0 1px var(--vf-line); padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .vf-panel-in { animation: vfIn 320ms var(--vf-out) backwards; }
 @keyframes vfIn { from { opacity: 0; transform: translateY(6px); } }
@@ -155,6 +156,12 @@ html, body { margin: 0; background: var(--vf-bg); color: var(--vf-ink); font-fam
 .vf-swatch[aria-pressed="true"] { outline: 3px solid var(--vf-ink); outline-offset: 3px; }
 .vf-color { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 14px; background: var(--vf-bg); cursor: pointer; }
 .vf-color input { width: 44px; height: 34px; border: 0; padding: 0; background: none; cursor: pointer; }
+.vf-hist { display: flex; flex-direction: column; gap: 4px; }
+.vf-hist-row { padding: 8px 10px; }
+.vf-hist-row b { font-size: 13px; }
+.vf-hist-row .vf-dot { background: #C3CBDA; }
+.vf-hist-row.is-current { background: var(--vf-b50); }
+.vf-hist-row.is-current .vf-dot { background: var(--vf-blue); }
 .vf-ct { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; }
 .vf-ct-aa { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0; }
 .vf-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -281,7 +288,7 @@ html, body { margin: 0; background: var(--vf-bg); color: var(--vf-ink); font-fam
     /* Le bloc sélectionné passe en haut de la colonne d'outils, l'aperçu prend toute la hauteur */
     .vf-body { grid-template-columns: 84px 320px minmax(0, 1fr); }
     .vf-rail { grid-column: 1; grid-row: 1 / span 2; }
-    .vf-inspect { grid-column: 2; grid-row: 1; }
+    .vf-inspect { grid-column: 2; grid-row: 1; position: static; max-height: none; overflow: visible; }
     #vfTools { grid-column: 2; grid-row: 2; }
     .vf-stage { grid-column: 3; grid-row: 1 / span 2; }
 }
@@ -327,6 +334,7 @@ html, body { margin: 0; background: var(--vf-bg); color: var(--vf-ink); font-fam
         </div>
         <a class="vf-btn vf-btn-night" href="{{ $publicUrl }}" target="_blank" rel="noopener">Vitrine</a>
         <a class="vf-btn vf-btn-night" href="{{ route('boutique.dashboard') }}">Tableau de bord</a>
+        <a class="vf-btn vf-btn-night" href="{{ route('boutique.grow') }}">Faire grandir</a>
         <button type="button" class="vf-btn vf-btn-night" data-share-open="">Partager</button>
         <form method="POST" action="{{ route('boutique.storefront.update') }}" id="vfPublishForm">
             @csrf @method('PUT')
@@ -336,6 +344,9 @@ html, body { margin: 0; background: var(--vf-bg); color: var(--vf-ink); font-fam
     </header>
 
     @if(session('success'))<div class="vf-flash vf-flash-ok" role="status">{{ session('success') }}</div>@endif
+    @if(\App\Support\PageModels::isModel($config['page_model'] ?? null))
+    <div class="vf-flash" style="background:var(--vf-amb50);color:var(--vf-ambi)" role="note">Votre vitrine utilise le modèle « {{ \App\Support\PageModels::MODELS[$config['page_model']][0] }} » : les blocs réglés ici servent au modèle Standard. <a href="{{ $publicUrl }}?modele=standard" target="_blank" rel="noopener" style="color:inherit">Voir le modèle Standard</a> · <a href="{{ route('boutique.grow', ['onglet' => 'personnalisation']) }}" style="color:inherit">Changer de modèle</a></div>
+    @endif
     @if($errors->any())<div class="vf-flash vf-flash-err" role="alert">{{ $errors->first() }}</div>@endif
 
     <div class="vf-body">
@@ -454,6 +465,8 @@ html, body { margin: 0; background: var(--vf-bg); color: var(--vf-ink); font-fam
         story: 'M4 19V5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2zM8 7h6', hours: 'M12 22s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12zM12 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4',
         social: 'M18 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6M6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6M18 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6M8.6 13.5l6.8 4M15.4 6.5l-6.8 4',
         selection: 'M3 12 12 3h8v8l-9 9zM15.5 8.5h.01',
+        collections: 'M4 6h7v7H4zM13 6h7v4h-7zM13 12h7v7h-7zM4 15h7v4H4z', trending: 'M4 19h16M6 15l4-4 3 3 6-7M15 7h4v4',
+        lowstock: 'M12 3 2 20h20zM12 10v4M12 17h.01',
     };
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -473,7 +486,7 @@ html, body { margin: 0; background: var(--vf-bg); color: var(--vf-ink); font-fam
     /* ───────────────────────── Historique : annuler / rétablir ───────────────────────── */
     function snapshot() { return JSON.stringify(S); }
     function commit(label, mutate) {
-        past.push({ s: snapshot(), label: label });
+        past.push({ s: snapshot(), label: label, at: Date.now() });
         if (past.length > 60) past.shift();
         future = [];
         mutate();
@@ -484,13 +497,13 @@ html, body { margin: 0; background: var(--vf-bg); color: var(--vf-ink); font-fam
     function beginTyping(key, label) {
         if (typingField === key) return;
         typingField = key;
-        past.push({ s: snapshot(), label: label });
+        past.push({ s: snapshot(), label: label, at: Date.now() });
         future = [];
     }
     function undo() {
         if (!past.length) return;
         const last = past.pop();
-        future.unshift({ s: snapshot(), label: last.label });
+        future.unshift({ s: snapshot(), label: last.label, at: last.at });
         S = JSON.parse(last.s); typingField = null;
         if (!blk(sel) && sel !== '__banner') sel = 'products';
         renderAll(); changed(); toast('Annulé : ' + last.label);
@@ -498,25 +511,30 @@ html, body { margin: 0; background: var(--vf-bg); color: var(--vf-ink); font-fam
     function redo() {
         if (!future.length) return;
         const next = future.shift();
-        past.push({ s: snapshot(), label: next.label });
+        past.push({ s: snapshot(), label: next.label, at: next.at || Date.now() });
         S = JSON.parse(next.s); typingField = null;
         renderAll(); changed(); toast('Rétabli : ' + next.label);
     }
     $('vfUndo').addEventListener('click', undo);
     $('vfRedo').addEventListener('click', redo);
+    /* Raccourcis : touches pressées dans l'éditeur, ou dans l'aperçu (transmises par la page) */
+    function shortcut(k) {
+        const key = k.key.toLowerCase();
+        if (k.ctrl && key === 'z') { k.shift ? redo() : undo(); return true; }
+        if (k.ctrl && key === 'y') { redo(); return true; }
+        if (k.alt && (k.key === 'ArrowUp' || k.key === 'ArrowDown') && blk(sel)) { scrollNext = true; move(sel, k.key === 'ArrowUp' ? -1 : 1); return true; }
+        if (k.key === 'Delete' && blk(sel) && !BLOCKS[blk(sel).type].single) { removeBlock(sel); return true; }
+        return false;
+    }
     document.addEventListener('keydown', e => {
         const tag = e.target.tagName;
-        const typing = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
-        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !typing) { e.preventDefault(); e.shiftKey ? redo() : undo(); }
-        else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y' && !typing) { e.preventDefault(); redo(); }
-        else if (!typing && e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown') && blk(sel)) { e.preventDefault(); move(sel, e.key === 'ArrowUp' ? -1 : 1); }
-        else if (!typing && e.key === 'Delete' && blk(sel) && !BLOCKS[blk(sel).type].single) { e.preventDefault(); removeBlock(sel); }
-        else if (e.key === 'Escape' && !$('vfShare').hidden) closeShare();
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+        if (shortcut({ key: e.key, ctrl: e.ctrlKey || e.metaKey, alt: e.altKey, shift: e.shiftKey })) e.preventDefault();
     });
 
     /* ───────────────────────── Aperçu ───────────────────────── */
     const frame = $('vfFrame'), viewport = $('vfViewport'), stage = $('vfStage'), devEl = $('vfDevice');
-    let timer = null, savedScroll = 0, frameReady = false, sending = null;
+    let timer = null, savedScroll = 0, frameReady = false, sending = null, curScale = 1, scrollNext = false;
     function changed() {
         if (!dirty) { dirty = true; $('vf').classList.add('is-dirty'); }
         $('vfUndo').disabled = !past.length; $('vfRedo').disabled = !future.length;
@@ -537,14 +555,46 @@ html, body { margin: 0; background: var(--vf-bg); color: var(--vf-ink); font-fam
         viewport.classList.remove('is-loading');
         try { frame.contentWindow.scrollTo(0, savedScroll); } catch (e) {}
     });
+    /* Messages de l'aperçu : sélection, barre d'outils du bloc, glisser-déposer, raccourcis */
     window.addEventListener('message', e => {
         if (e.origin !== location.origin || !e.data) return;
-        if (e.data.type === 'sf-ready') { frameReady = true; highlight(false); }
-        if (e.data.type === 'sf-select') { select(e.data.id, false); }
+        const d = e.data;
+        if (d.type === 'sf-ready') { frameReady = true; highlight(scrollNext); scrollNext = false; }
+        else if (d.type === 'sf-select') select(d.id, false);
+        else if (d.type === 'sf-act') pageAction(d.id, d.act);
+        else if (d.type === 'sf-drop') pageDrop(d);
+        else if (d.type === 'sf-key') shortcut(d);
     });
-    function highlight(scroll) { if (frameReady) frame.contentWindow.postMessage({ type: 'sf-highlight', id: sel, scroll: scroll }, location.origin); }
+    /* La page reçoit le bloc à mettre en avant, le nom et la place de chaque bloc, et le zoom de l'aperçu */
+    function highlight(scroll) { framePost({ type: 'sf-highlight', id: sel, scroll: scroll, meta: pageMeta(), ui: 1 / curScale }); }
+    function framePost(msg) { if (frameReady) { try { frame.contentWindow.postMessage(msg, location.origin); } catch (e) {} } }
+    function pageMeta() {
+        const n = S.config.blocks.length, m = { __banner: { label: 'En-tête · toujours en haut' } };
+        S.config.blocks.forEach((b, i) => { m[b.id] = { label: BLOCKS[b.type].label, trust: !!BLOCKS[b.type].trust, single: !!BLOCKS[b.type].single, i: i, n: n }; });
+        return m;
+    }
+    function pageAction(id, act) {
+        if (!blk(id)) return;
+        if (sel !== id) { sel = id; renderStructure(); }
+        scrollNext = true;
+        if (act === 'up' || act === 'down') move(id, act === 'up' ? -1 : 1);
+        else if (act === 'dup') duplicate(id);
+        else if (act === 'del') removeBlock(id);
+        else if (act === 'hide') toggleBlock(id);
+    }
+    function pageDrop(d) {
+        let at;
+        if (d.end) at = S.config.blocks.length;
+        else if (d.targetId === '__banner') at = 0;
+        else { const i = S.config.blocks.findIndex(b => b.id === d.targetId); if (i < 0) return; at = i + (d.after ? 1 : 0); }
+        const src = d.id ? { id: d.id } : (d.outer || {});
+        scrollNext = true;
+        if (src.newType) insert(src.newType, at); else if (src.id) moveTo(src.id, at);
+        dragEnd();
+    }
 
     function fit() {
+        if (stage.clientWidth < 80) return; // aperçu pas encore mis en page (onglet caché…) : le ResizeObserver relancera
         const W = device === 'phone' ? 390 : 1280, H = device === 'phone' ? 800 : 900;
         const pad = device === 'phone' ? 20 : 0, chrome = device === 'phone' ? 20 : 36;
         const availW = stage.clientWidth - 36, availH = stage.clientHeight - 36 - chrome;
@@ -553,6 +603,7 @@ html, body { margin: 0; background: var(--vf-bg); color: var(--vf-ink); font-fam
         frame.style.width = W + 'px'; frame.style.height = viewH + 'px'; frame.style.transform = 'scale(' + scale + ')';
         viewport.style.width = (W * scale) + 'px'; viewport.style.height = (viewH * scale) + 'px';
         devEl.style.width = (W * scale + pad) + 'px';
+        if (Math.abs(scale - curScale) > .005) { curScale = scale; highlight(false); }
     }
     document.querySelectorAll('[data-device]').forEach(b => b.addEventListener('click', () => {
         device = b.dataset.device;
@@ -578,7 +629,7 @@ html, body { margin: 0; background: var(--vf-bg); color: var(--vf-ink); font-fam
         const nb = { id: uid(), type: type, on: true, d: clone(DEFAULTS[type] || {}) };
         if (type === 'hours' && !nb.d.addr) nb.d.addr = SHOP.address;
         commit('Bloc ajouté : ' + BLOCKS[type].label, () => { S.config.blocks.splice(at, 0, nb); sel = nb.id; });
-        renderAll(); highlightSoon();
+        scrollNext = true; renderAll();
     }
     function insertAfterSel(type) {
         const i = S.config.blocks.findIndex(b => b.id === sel);
@@ -604,7 +655,7 @@ html, body { margin: 0; background: var(--vf-bg); color: var(--vf-ink); font-fam
         if (!b || BLOCKS[b.type].single) return;
         const nb = { id: uid(), type: b.type, on: true, d: clone(b.d) };
         commit('Bloc dupliqué : ' + blockName(b), () => { S.config.blocks.splice(i + 1, 0, nb); sel = nb.id; });
-        renderAll(); highlightSoon();
+        scrollNext = true; renderAll();
     }
     function removeBlock(id) {
         const b = blk(id);
@@ -625,21 +676,20 @@ html, body { margin: 0; background: var(--vf-bg); color: var(--vf-ink); font-fam
         highlight(scroll !== false);
         if (window.innerWidth < 1381) $('vfInspect').scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
     }
-    const highlightSoon = () => setTimeout(() => highlight(true), 900);
 
     /* ───────────────────────── Panneau : Blocs ───────────────────────── */
     let dragId = null, dragNew = null;
     function renderBlocksPanel() {
         const lib = Object.keys(BLOCKS).filter(t => !BLOCKS[t].single);
         return '<section class="vf-panel vf-panel-in"><h2>Structure de la page</h2>' +
-            '<p class="vf-hint">Glissez pour réordonner. L’œil masque un bloc sans le perdre.</p>' +
+            '<p class="vf-hint">Glissez pour réordonner, ici ou directement sur la page. L’œil masque un bloc sans le perdre.</p>' +
             '<ol class="vf-tree" id="vfTree"></ol>' +
             '<div class="vf-drop-end" id="vfDropEnd">Déposez un bloc ici pour l’ajouter en bas de la page</div></section>' +
-            '<section class="vf-panel"><h2>Ajouter un bloc</h2><p class="vf-hint">Glissez un bloc dans la structure, ou cliquez pour l’ajouter sous le bloc sélectionné.</p><div class="vf-lib">' +
+            '<section class="vf-panel"><h2>Ajouter un bloc</h2><p class="vf-hint">Glissez un bloc sur la page ou dans la structure, ou cliquez pour l’ajouter sous le bloc sélectionné.</p><div class="vf-lib">' +
             lib.map(t => '<button type="button" class="vf-libb" draggable="true" data-add="' + t + '"><span class="vf-node-ico">' + svg(ICON[t]) + '</span><span style="flex:1;min-width:0">' + esc(BLOCKS[t].label) + '<small>' + esc(BLOCKS[t].desc) + '</small></span><span class="vf-plus" aria-hidden="true">+</span></button>').join('') +
             '</div></section>' +
-            '<section class="vf-panel"><h3>Toujours affichés</h3><p class="vf-hint">« Avis clients » et « Paiement et livraison » rassurent les clients sur toutes les boutiques Shopio : vous pouvez les déplacer, pas les masquer. Les avis n’apparaissent que s’ils viennent de vrais clients livrés.</p></section>' +
-            '<section class="vf-panel vf-kbd-card"><h3>Raccourcis</h3><div class="vf-kbd"><span><kbd>Ctrl</kbd> + <kbd>Z</kbd> annuler · <kbd>Ctrl</kbd> + <kbd>Y</kbd> rétablir</span><span><kbd>Suppr</kbd> retirer le bloc sélectionné</span><span><kbd>Alt</kbd> + <kbd>↑</kbd> <kbd>↓</kbd> déplacer le bloc</span></div></section>';
+            '<section class="vf-panel"><h3>Toujours affichés</h3><p class="vf-hint">« Boutique vérifiée », « Paiement à la livraison » et « Avis clients » rassurent les clients sur toutes les boutiques Shopio : les blocs à cadenas se déplacent mais ne se modifient pas et ne se masquent pas. Les avis n’apparaissent que s’ils viennent de vrais clients livrés.</p></section>' +
+            '<section class="vf-panel vf-kbd-card"><h3>Raccourcis</h3><div class="vf-kbd"><span><kbd>Ctrl</kbd> + <kbd>Z</kbd> annuler · <kbd>Ctrl</kbd> + <kbd>Y</kbd> rétablir</span><span><kbd>Entrée</kbd> sélectionner un bloc de la page</span><span><kbd>Suppr</kbd> retirer le bloc sélectionné</span><span><kbd>Alt</kbd> + <kbd>↑</kbd> <kbd>↓</kbd> déplacer le bloc</span></div></section>';
     }
     function renderStructure(movedId) {
         const tree = $('vfTree');
@@ -673,6 +723,7 @@ html, body { margin: 0; background: var(--vf-bg); color: var(--vf-ink); font-fam
             const li = e.target.closest('[data-id]');
             if (!li) return;
             dragId = li.dataset.id; dragNew = null;
+            framePost({ type: 'sf-drag', drag: { id: dragId } });
             try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragId); } catch (x) {}
             li.classList.add('is-dragging');
         });
@@ -696,13 +747,14 @@ html, body { margin: 0; background: var(--vf-bg); color: var(--vf-ink); font-fam
         end.addEventListener('drop', e => { e.preventDefault(); if (dragNew) insert(dragNew, S.config.blocks.length); else if (dragId) moveTo(dragId, S.config.blocks.length); dragEnd(); });
         document.querySelectorAll('[data-add]').forEach(b => {
             b.addEventListener('click', () => insertAfterSel(b.dataset.add));
-            b.addEventListener('dragstart', e => { dragNew = b.dataset.add; dragId = null; try { e.dataTransfer.effectAllowed = 'copy'; e.dataTransfer.setData('text/plain', dragNew); } catch (x) {} });
+            b.addEventListener('dragstart', e => { dragNew = b.dataset.add; dragId = null; framePost({ type: 'sf-drag', drag: { newType: dragNew } }); try { e.dataTransfer.effectAllowed = 'copy'; e.dataTransfer.setData('text/plain', dragNew); } catch (x) {} });
             b.addEventListener('dragend', dragEnd);
         });
         tree.addEventListener('dragend', dragEnd);
     }
     function dragEnd() {
         dragId = null; dragNew = null;
+        framePost({ type: 'sf-drag', drag: null });
         document.querySelectorAll('.is-over,.is-dragging').forEach(x => x.classList.remove('is-over', 'is-dragging'));
     }
 
@@ -760,9 +812,20 @@ html, body { margin: 0; background: var(--vf-bg); color: var(--vf-ink); font-fam
             '<p class="vf-hint" style="font-size:12px">Enregistre la couleur, la police, les boutons et le fond actuels (' + S.config.themes.length + ' / ' + LIMITS.themes + ').</p></section>' +
             '<section class="vf-panel"><h2>Mise en page de départ</h2><p class="vf-hint">Réordonne les blocs de base et règle l’affichage des produits selon votre activité.</p><div class="vf-templates">' +
             Object.entries(TEMPLATES).map(([k, t]) => '<button type="button" class="vf-tpl" data-template="' + k + '" style="--tc:' + t.accent + '"><span class="vf-tpl-dot" aria-hidden="true"></span><b>' + esc(t.label) + '</b><small>' + esc(t.hint) + '</small></button>').join('') + '</div></section>' +
-            '<section class="vf-panel"><h2>Historique des publications</h2>' +
-            (HISTORY.length ? '<div style="display:flex;flex-direction:column;gap:4px">' + HISTORY.map((h, i) => '<div class="vf-row" style="padding:8px 10px' + (i === 0 ? ';background:var(--vf-b50)' : '') + '"><span class="vf-dot" style="background:' + (i === 0 ? 'var(--vf-blue)' : '#C3CBDA') + '"></span><div class="vf-row-txt"><b style="font-size:13px">' + (i === 0 ? 'Version en ligne' : 'Publication') + '</b><span class="vf-num">' + esc(h.at) + '</span></div>' + (i === 0 ? '' : '<button type="button" class="vf-btn vf-btn-line vf-btn-sm" data-restore="' + i + '">Restaurer</button>') + '</div>').join('') + '</div>'
-                : '<p class="vf-hint">Vos publications apparaîtront ici : vous pourrez revenir à une version précédente.</p>') + '</section>';
+            '<section class="vf-panel"><h2>Historique</h2><p class="vf-hint">Revenez à n’importe quelle étape : rien n’est visible des clients avant « Publier ».</p>' +
+            '<div class="vf-hist">' + historyRows() + '</div></section>';
+    }
+    /* Une ligne par modification (la plus récente d'abord), puis la version publiée et les publications précédentes */
+    function historyRows() {
+        const hm = t => { const d = new Date(t); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+        const row = (title, when, attrs, current) => '<div class="vf-row vf-hist-row' + (current ? ' is-current' : '') + '"><span class="vf-dot" aria-hidden="true"></span><div class="vf-row-txt"><b>' + esc(title) + '</b><span class="vf-num">' + esc(when) + '</span></div>' +
+            (attrs ? '<button type="button" class="vf-btn vf-btn-line vf-btn-sm" ' + attrs + '>Restaurer</button>' : (current ? '<span class="vf-chip" style="background:var(--vf-b50);color:var(--vf-btn)">Maintenant</span>' : '')) + '</div>';
+        const edits = past.map((p, k) => ({ p: p, k: k })).reverse().slice(0, 15)
+            .map(({ p, k }) => row(p.label, 'aujourd’hui, ' + hm(p.at || Date.now()), k === past.length - 1 ? '' : 'data-restore-edit="' + k + '"', k === past.length - 1)).join('');
+        const more = past.length > 15 ? '<p class="vf-hint" style="font-size:12px;padding-left:10px">… et ' + (past.length - 15) + ' modification' + (past.length - 15 > 1 ? 's' : '') + ' plus ancienne' + (past.length - 15 > 1 ? 's' : '') + '</p>' : '';
+        const pubs = HISTORY.map((h, i) => row(i === 0 ? 'Version publiée' : 'Publication', h.at, past.length || i > 0 ? 'data-restore="' + i + '"' : '', false)).join('');
+        if (!past.length && !HISTORY.length) return '<p class="vf-hint">Vos modifications et vos publications apparaîtront ici, avec l’heure : vous pourrez revenir à n’importe laquelle.</p>';
+        return edits + more + (pubs || '<p class="vf-hint" style="padding-left:10px">Pas encore de version publiée.</p>');
     }
     function bindThemesPanel() {
         document.querySelectorAll('[data-theme-apply]').forEach(b => b.addEventListener('click', () => {
@@ -794,6 +857,13 @@ html, body { margin: 0; background: var(--vf-bg); color: var(--vf-ink); font-fam
                 S.accent = t.accent;
             });
             renderAll(); toast('Mise en page « ' + t.label + ' » appliquée (non publiée)');
+        }));
+        document.querySelectorAll('[data-restore-edit]').forEach(b => b.addEventListener('click', () => {
+            const k = +b.dataset.restoreEdit, step = past[k], after = past[k + 1];
+            if (!step || !after) return;
+            commit('Retour à : ' + step.label, () => { S = JSON.parse(after.s); });
+            if (!blk(sel) && sel !== '__banner') sel = 'products';
+            renderAll(); toast('Retour à « ' + step.label + ' » (Ctrl+Z pour annuler)');
         }));
         document.querySelectorAll('[data-restore]').forEach(b => b.addEventListener('click', () => {
             const h = HISTORY[+b.dataset.restore];
@@ -966,6 +1036,9 @@ html, body { margin: 0; background: var(--vf-bg); color: var(--vf-ink); font-fam
                         ? '<div><span class="vf-lbl">Lien de chaque catégorie</span><p class="vf-hint" style="margin-bottom:8px">Prêt à partager, rien à régler : le client arrive directement sur les produits de la catégorie.</p><div class="vf-catlinks">' +
                           CAT_LINKS.map((c, i) => '<div class="vf-catlink"><div><b>' + esc(c.name) + '</b><span>' + c.count + ' produit' + (c.count > 1 ? 's' : '') + '</span></div><button type="button" class="vf-btn vf-btn-line vf-btn-sm" data-share-open="' + i + '">Partager</button></div>').join('') + '</div></div>'
                         : '<p class="vf-hint">Indiquez une catégorie sur vos produits (ex. « Montres ») : chacune aura son lien à partager.</p>');
+                break;
+            case 'collections': case 'trending': case 'lowstock':
+                body += '<div class="vf-note">Bloc rempli automatiquement avec vos vrais produits. Réglez-le dans <a href="' + esc(@json(route('boutique.grow', ['onglet' => 'personnalisation']))) + '">Faire grandir ma vitrine</a> (collections) ou l’onglet Conversion (sections automatiques).</div>';
                 break;
             case 'contact': body += '<div class="vf-note">Téléphone, adresse et e-mail viennent de <a href="' + esc(URLS.shopEdit) + '?etape=2">Ma boutique</a>.</div>'; break;
             case 'reviews': body += '<div class="vf-note">Ce bloc est géré par Shopio pour la confiance des clients : vous pouvez le déplacer, pas le modifier ni le masquer. Seuls les avis de vrais clients livrés sont affichés.</div>'; break;
