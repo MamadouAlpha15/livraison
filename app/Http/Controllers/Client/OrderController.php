@@ -400,6 +400,11 @@ class OrderController extends Controller
         // Vérification de sécurité : la boutique doit exister et être approuvée
         abort_unless($product->shop && $product->shop->is_approved, 403);
 
+        // Mode vacances (éditeur de boutique) : la boutique reste visible, les commandes sont en pause
+        if (\App\Support\Storefront::onVacation($product->shop)) {
+            return back()->withErrors(['quantity' => \App\Support\Storefront::vacationMessage($product->shop)]);
+        }
+
         // Variante (taille/couleur) : optionnelle — le client peut commander "sans préférence"
         $variant = null;
         if ($product->has_variants && $request->filled('variant_id')) {
@@ -567,6 +572,17 @@ class OrderController extends Controller
         }
 
         $successMsg = "Commande passée avec succès ! Vous recevrez une confirmation. 🎉";
+
+        // Mode WhatsApp de la boutique : la commande est enregistrée, le client peut aussi l'envoyer sur WhatsApp
+        $waShop = $product->shop;
+        if ($waShop && $waShop->phone && \App\Support\Storefront::settings($waShop)['wa_mode']) {
+            $waPhone = preg_replace('/\D/', '', $waShop->phone);
+            if (strlen($waPhone) === 9) $waPhone = '224' . $waPhone; // numéro guinéen sans indicatif
+            $waText = 'Bonjour ' . $waShop->name . ', je viens de commander sur Shopio : ' . $product->name
+                . ' (' . number_format($order->total, 0, ',', ' ') . ' ' . ($waShop->currency ?? 'GNF') . '). Commande n° ' . $order->id
+                . '. ' . route('client.orders.createFromProduct', $product);
+            session()->flash('wa_order', ['shop' => $waShop->name, 'url' => 'https://wa.me/' . $waPhone . '?text=' . rawurlencode($waText)]);
+        }
 
         // Pixel Meta du vendeur : achat confirmé (paiement à la livraison). Pour le paiement en
         // ligne réussi, l'événement part au retour de paiement (OrderPaymentController@success).

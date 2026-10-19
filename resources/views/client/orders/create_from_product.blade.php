@@ -34,6 +34,10 @@
     // Stock : avec des variantes, c'est le stock de chaque option qui compte
     $stockVal = $product->stock;
     $stockOut = $variants->isEmpty() && $stockVal !== null && $stockVal <= 0;
+    // Mode vacances (éditeur de boutique) : produit visible, commande et panier en pause
+    $onVacation = \App\Support\Storefront::onVacation($shop);
+    // Mode WhatsApp (Faire grandir ma vitrine → Conversion) : commande enregistrée ici, puis envoyée à la boutique sur WhatsApp
+    $waMode = $shop->phone && \App\Support\Storefront::settings($shop)['wa_mode'];
     $stockLow = $variants->isEmpty() && $stockVal !== null && $stockVal > 0 && $stockVal <= 5;
 
     $here      = url()->current();
@@ -41,7 +45,7 @@
     $chatUrl   = route('client.messages.index', $product);
     $offerUrl  = auth()->check() ? $chatUrl . '?offre=1' : route('register', ['redirect' => $chatUrl . '?offre=1', 'role' => 'client']);
     $writeUrl  = auth()->check() ? $chatUrl : route('register', ['redirect' => $chatUrl, 'role' => 'client']);
-    $shopUrl   = auth()->check() ? route('client.shops.show', $shop) : route('public.shops.products', $shop);
+    $shopUrl   = route('public.shops.products', $shop);
     $catUrl    = $product->category ? url('/') . '?category=' . urlencode($product->category) : null;
     $initials  = collect(preg_split('/\s+/', trim($shop->name)))->filter()->take(2)->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))->implode('');
 
@@ -141,6 +145,7 @@ body { background: var(--pp-bg); color: var(--pp-ink); margin: 0; }
 /* ── Produit : galerie + achat ── */
 .pp-top { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); gap: 48px; align-items: start; }
 .pp-gallery { position: sticky; top: 92px; }
+.pp-vacation { margin: 0; padding: 12px 14px; border-radius: var(--pp-r-sm); background: #FEF3E0; color: #92400E; font-weight: 700; font-size: 14.5px; }
 .pp-stage { position: relative; aspect-ratio: 1 / 1; border-radius: var(--pp-r-lg); background: radial-gradient(120% 90% at 30% 20%, var(--pp-surface) 0%, var(--pp-blue-50) 70%); overflow: hidden; cursor: zoom-in; border: 1px solid var(--pp-line); }
 .pp-stage img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity .2s ease, transform .5s var(--pp-ease-in); }
 .pp-stage:hover img { transform: scale(1.03); }
@@ -574,7 +579,13 @@ select.ck-input { appearance: auto; }
                 </div>
                 @endif
 
-                @if($stockOut)
+                @if($onVacation)
+                    <p class="pp-vacation" role="status">{{ \App\Support\Storefront::vacationMessage($shop) }}</p>
+                    <div class="pp-buy-main">
+                        <a href="{{ $writeUrl }}" class="pp-btn pp-btn-primary pp-btn-lg">{!! Ico::svg('message', '', 18) !!} Écrire au vendeur</a>
+                        @include('client.orders.partials.fav-button')
+                    </div>
+                @elseif($stockOut)
                     <p class="pp-note" style="font-size:15px;color:var(--pp-ink-2)">Ce produit n'est plus disponible pour le moment. Ajoutez-le à vos favoris ou écrivez au vendeur pour savoir quand il revient.</p>
                     <div class="pp-buy-main">
                         <a href="{{ $writeUrl }}" class="pp-btn pp-btn-primary pp-btn-lg">{!! Ico::svg('message', '', 18) !!} Écrire au vendeur</a>
@@ -591,8 +602,8 @@ select.ck-input { appearance: auto; }
                         </div>
                     </div>
                     <div class="pp-buy-main">
-                        <button type="button" class="pp-btn pp-btn-primary pp-btn-lg" id="ppBuyNow">
-                            Commander · <span class="pp-num"><span id="ppBuyTotal">{{ $fmt($nowPrice) }}</span> {{ $devise }}</span>
+                        <button type="button" class="pp-btn pp-btn-primary pp-btn-lg" id="ppBuyNow"@if($waMode) style="background:#15803D;box-shadow:none"@endif>
+                            {{ $waMode ? 'Commander sur WhatsApp' : 'Commander' }} · <span class="pp-num"><span id="ppBuyTotal">{{ $fmt($nowPrice) }}</span> {{ $devise }}</span>
                         </button>
                         @include('client.orders.partials.fav-button')
                     </div>
@@ -717,7 +728,7 @@ select.ck-input { appearance: auto; }
 </main>
 
 {{-- ═══ TUNNEL DE COMMANDE (3 étapes) ═══ --}}
-@unless($stockOut)
+@unless($stockOut || $onVacation)
 <section class="ck" id="checkout" hidden aria-label="Commande">
 <div class="pp-wrap">
     <div class="ck-top">
@@ -848,6 +859,7 @@ select.ck-input { appearance: auto; }
                 <div class="ck-actions">
                     <button type="button" class="pp-btn pp-btn-ghost" data-ck-prev="2">Retour</button>
                     <button type="submit" class="pp-btn pp-btn-primary" id="submitBtn">{!! Ico::svg('check', '', 17) !!} Valider ma commande</button>
+                    @if($waMode)<p style="flex-basis:100%;margin:6px 0 0;font-size:13px;color:#45455E">Votre commande est enregistrée sur Shopio, puis vous pourrez l’envoyer à la boutique sur WhatsApp en un clic.</p>@endif
                 </div>
             </div>
         </form>

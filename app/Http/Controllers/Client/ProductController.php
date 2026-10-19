@@ -5,15 +5,18 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
-use App\Models\ShopVisit;
 
 class ProductController extends Controller
 {
-    public function show(Product $product)
+    public function show(Product $product, Request $request)
     {
-        ShopVisit::record($product->shop_id);
-
         $shop = $product->shop;
+
+        // Visite et vue du produit, une fois par jour, hors vendeur et robots
+        if ($shop) {
+            \App\Support\TrafficSource::recordLanding($shop, $request);
+            \App\Support\TrafficSource::recordProductView($product, $request);
+        }
 
         $isFavorited = auth()->check()
             ? auth()->user()->favoriteProducts()->where('product_id', $product->id)->exists()

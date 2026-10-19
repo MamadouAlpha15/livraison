@@ -173,7 +173,7 @@ class ProductController extends Controller
         $devise     = $shop->currency ?? 'GNF';
         $isPro      = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
 
-        return view('vendeur.products.create', compact('categories', 'customCats', 'devise', 'isPro'));
+        return view('vendeur.products.create', compact('shop', 'categories', 'customCats', 'devise', 'isPro'));
     }
 
     /* ─────────────────────────────────────────────
@@ -342,7 +342,7 @@ class ProductController extends Controller
         $devise     = $shop->currency ?? 'GNF';
         $isPro      = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
 
-        return view('vendeur.products.edit', compact('product', 'categories', 'customCats', 'devise', 'isPro'));
+        return view('vendeur.products.edit', compact('shop', 'product', 'categories', 'customCats', 'devise', 'isPro'));
     }
 
     /* ─────────────────────────────────────────────

@@ -36,8 +36,9 @@ class ImageOptimizer
      *
      * @return string Le chemin de l'image principale (medium)
      */
-    public static function store(UploadedFile $file, string $folder = 'products'): string
+    public static function store(UploadedFile $file, string $folder = 'products', bool $large = false): string
     {
+        // $large : ajoute une variante 1600 px (couvertures de vitrine, affichées en pleine largeur)
         // Augmente la mémoire pour traiter les grandes images (photos de téléphone = ~15-20 Mo)
         $prevMemory = ini_set('memory_limit', '512M');
         // Augmente le temps d'exécution par image (pour les traitements en lot)
@@ -53,7 +54,7 @@ class ImageOptimizer
             $sizes = [
                 'thumb'  => 300,
                 'medium' => 800,
-            ];
+            ] + ($large ? ['large' => 1600] : []);
 
             $paths = [];
 
