@@ -17,7 +17,7 @@
 })();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -56,7 +56,7 @@
 html, body { height: 100%; font-family: var(--font); background: var(--bg); color: var(--text); overflow: hidden; }
 
 /* ═══════════ TOPBAR ═══════════ */
-.topbar {
+.hub-legacy-top {
     height: var(--nav-h); background: var(--navy-2); display: flex; align-items: center;
     padding: 0 20px; gap: 14px; position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     box-shadow: 0 2px 8px rgba(0,0,0,.3);
@@ -529,7 +529,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
     .hub-back-btn { display: flex !important; }
 
     /* Topbar compacte */
-    .topbar { padding: 0 12px; gap: 8px; }
+    .hub-legacy-top { padding: 0 12px; gap: 8px; }
     .topbar-logo img { height: 24px; }
     .topbar-logo-name { display: none; }
     .topbar-sep { display: none; }
@@ -662,6 +662,85 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 </style>
 {{-- Thème bleu « espace vendeur » --}}
 @include('boutique._partials.sv-theme')
+
+<style id="hub-shopio">
+/* ══ Messages — design espace vendeur (bleu Shopio) ══ */
+html, body { font-family: var(--font); }
+.vs-wrap { height: 100vh; min-height: 0; }
+.hub-page { height: 100vh; overflow: hidden; }
+.hub-top { display: flex; align-items: center; gap: 12px; padding: 12px 24px !important; flex-shrink: 0; position: relative; }
+.hub-top .tb-info { flex: 1 1 auto; min-width: 0; }
+.hub-top-title { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.02em; color: var(--text); }
+.hub-dark-btn { width: 44px; height: 44px; border-radius: 999px; border: 0; background: var(--surface); color: var(--text); box-shadow: inset 0 0 0 1.5px var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+.hub-dark-btn:hover { box-shadow: inset 0 0 0 1.5px var(--sv-blue); color: var(--sv-btn); }
+.hub-page .hub { flex: 1; min-height: 0; height: auto; margin-top: 0; }
+
+/* Liste des conversations */
+.hub-sidebar { background: var(--surface); border-right: 1px solid var(--border); }
+.hub-sidebar-head { background: transparent; border-bottom: 0; padding: 18px 18px 6px; }
+.hub-sidebar-title { font-size: 18px; font-weight: 800; letter-spacing: -.01em; }
+.hub-search-wrap { border-bottom: 0; padding: 8px 14px 12px; }
+.hub-search { border-radius: 999px; background: var(--bg); box-shadow: inset 0 0 0 1.5px var(--border); padding: 11px 18px; font-size: 14px; }
+.hub-search:focus { box-shadow: inset 0 0 0 1.5px var(--sv-blue), 0 0 0 3px var(--sv-b50); }
+.hub-conv-list { padding: 0 8px 12px; }
+.hub-conv-item { border-bottom: 0; border-radius: 16px; padding: 10px 12px; margin-bottom: 2px; }
+.hub-conv-item:hover { background: var(--sv-b50); }
+.hub-conv-item.active { background: var(--sv-b100); }
+.hub-conv-av { width: 46px; height: 46px; box-shadow: none; font-weight: 800; }
+.hub-conv-name { font-weight: 700; }
+.hub-conv-badge { background: var(--sv-amber); color: #16162A; font-weight: 800; border-radius: 999px; }
+.hub-conv-empty-ico { display: flex; justify-content: center; opacity: 1; color: var(--sv-blue); }
+
+/* Accueil (aucune conversation ouverte) */
+.hub-main { background: var(--bg); }
+.hub-welcome { gap: 10px; text-align: center; padding: 24px; }
+.hub-welcome-ico { width: 72px; height: 72px; border-radius: 22px; background: var(--sv-b50); color: var(--sv-btn); display: flex; align-items: center; justify-content: center; opacity: 1; margin-bottom: 6px; }
+.hub-welcome-title { font-size: 20px; font-weight: 800; opacity: 1; letter-spacing: -.01em; }
+.hub-welcome-sub { max-width: 34ch; line-height: 1.5; }
+
+/* Conversation ouverte */
+.hub-chat-head { background: var(--surface); padding: 12px 18px; }
+.hub-chat-av { background: linear-gradient(135deg, #1F7CF6, #1260C9); font-weight: 800; }
+.hub-back-btn:hover { background: var(--sv-b50); }
+.hub-prod-strip { background: var(--surface); border-bottom: 1px solid var(--border); }
+.hub-prod-img, .hub-prod-img-ph { border-radius: 12px; box-shadow: none; border: 1px solid var(--border); }
+.hub-prod-img-ph { background: var(--sv-b50); color: var(--sv-btn); }
+.hub-prod-label { color: var(--sv-btn); letter-spacing: .06em; }
+.hub-prod-price, .prod-modal-price { color: var(--text); font-family: var(--font); }
+.hub-prod-view-btn { border-radius: 999px; border: 0; background: var(--sv-b50); color: var(--sv-btn); padding: 8px 14px; }
+.hub-prod-view-btn:hover { background: var(--sv-b100); }
+.hub-thread { background: var(--bg) radial-gradient(rgba(31,124,246,.07) 1px, transparent 1px) 0 0 / 22px 22px; padding: 18px 16px; }
+.hub-date-sep span { background: var(--surface); box-shadow: 0 0 0 1px var(--border); }
+.hub-msg-bubble { border-radius: 18px; box-shadow: 0 1px 1px rgba(11,30,61,.06); padding: 10px 14px; }
+.hub-msg-row.mine .hub-msg-bubble, .hub-msg-row.mine .msg-img-bubble { background: var(--sv-b100); color: var(--text); border-bottom-right-radius: 6px; }
+.hub-msg-row.theirs .hub-msg-bubble, .hub-msg-row.theirs .msg-img-bubble { background: var(--surface); color: var(--text); border-bottom-left-radius: 6px; }
+.msg-img-bubble { border-radius: 18px; }
+.hub-msg-row.mine .msg-img-meta { color: var(--muted); }
+.hub-msg-tick { color: var(--sv-blue); }
+.hub-input-zone { background: var(--surface); padding: 12px 16px; }
+.hub-textarea { background: var(--bg); box-shadow: inset 0 0 0 1.5px var(--border); padding: 11px 18px; font-size: 14px; color: var(--text); }
+.hub-textarea:focus { box-shadow: inset 0 0 0 1.5px var(--sv-blue), 0 0 0 3px var(--sv-b50); }
+.hub-attach-btn { background: var(--surface); border: 0; box-shadow: inset 0 0 0 1.5px var(--border); color: var(--muted); }
+.hub-attach-btn:hover { background: var(--sv-b50); color: var(--sv-btn); }
+.hub-send-btn { background: var(--sv-btn); box-shadow: 0 6px 16px rgba(22,104,216,.28); }
+.hub-send-btn:hover { background: var(--sv-btn-h); }
+.hub-img-thumb-wrap { border-color: var(--sv-blue); border-radius: 12px; }
+.img-sending-spinner { border-top-color: var(--sv-blue); }
+.hub-offer-panel { background: var(--sv-b50); border-top: 1px solid var(--border); }
+.hub-offer-panel-title { color: var(--text); letter-spacing: .06em; }
+.hub-offer-input { border-radius: 14px; }
+.hub-offer-submit, .hub-offer-cancel { border-radius: 999px; }
+.lb-thumb.active { border-color: var(--sv-blue); }
+.hub-toast.ok { background: var(--sv-night); }
+.prod-modal { background: var(--surface); border-radius: 24px; }
+.prod-modal-img-wrap { border-radius: 24px 24px 0 0; background: var(--sv-b50); }
+.prod-modal-img-ph { color: var(--sv-btn); opacity: 1; }
+.prod-modal-name { color: var(--text); }
+.prod-modal-desc { color: var(--text-2); }
+.hub-search:focus-visible, .hub-textarea:focus-visible, .hub-send-btn:focus-visible, .hub-attach-btn:focus-visible, .hub-dark-btn:focus-visible { outline: 3px solid var(--sv-blue); outline-offset: 2px; }
+@media (max-width: 900px) { .hub-top { padding: 10px 14px !important; } .hub-top-title { font-size: 19px; } }
+@media (max-width: 640px) { .hub-page .hub { height: auto; } .hub-top .tb-sub { display: none; } }
+</style>
 </head>
 <body>
 
@@ -672,19 +751,21 @@ $hubIcons = [
     'sun'  => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" '.$hubIconStroke.'><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>',
 ];
 @endphp
-{{-- Topbar --}}
-<header class="topbar">
-    <a href="{{ route('boutique.dashboard') }}" class="topbar-logo">
-        <img src="{{ asset('images/shopio-logo-192.png') }}" alt="Shopio">
-        <span class="topbar-logo-name">Shopio</span>
-    </a>
-    <div class="topbar-sep"></div>
-    <span class="topbar-title">💬 Messages clients</span>
-    <button type="button" class="topbar-dark-btn" id="hubBtnDarkMode" data-dark-toggle
+<div class="vs-wrap">
+    @include('boutique._partials.vendor-sidebar', ['shop' => $shop, 'active' => 'messages'])
+
+<div class="main vs-main hub-page">
+{{-- Barre du haut (classe .topbar conservée : le JS mobile lit sa hauteur) --}}
+<div class="topbar hub-top">
+    <button type="button" class="vs-burger" data-vs-open aria-label="Ouvrir le menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <div class="tb-info">
+        <h1 class="hub-top-title">Messages</h1>
+        <div class="tb-sub">{{ $shop->name }} · conversations avec vos clients</div>
+    </div>
+    <button type="button" class="topbar-dark-btn hub-dark-btn" id="hubBtnDarkMode" data-dark-toggle
             data-moon-icon="{{ $hubIcons['moon'] }}" data-sun-icon="{{ $hubIcons['sun'] }}"
-            title="Mode sombre" style="margin-left:auto;background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.85);width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;">{!! $hubIcons['moon'] !!}</button>
-    <a href="{{ route('boutique.dashboard') }}" class="topbar-back">← Tableau de bord</a>
-</header>
+            title="Mode sombre">{!! $hubIcons['moon'] !!}</button>
+</div>
 
 <div class="hub" id="hub">
 
@@ -764,7 +845,7 @@ $hubIcons = [
             </div>
             @empty
             <div class="hub-conv-empty">
-                <span class="hub-conv-empty-ico">💬</span>
+                <span class="hub-conv-empty-ico"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4zM8 9h8M8 12h5"/></svg></span>
                 Aucun message client pour le moment.
             </div>
             @endforelse
@@ -775,9 +856,9 @@ $hubIcons = [
     <main class="hub-main" id="hubMain">
 
         <div class="hub-welcome" id="hubWelcome">
-            <div class="hub-welcome-ico">💬</div>
+            <div class="hub-welcome-ico"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4zM8 9h8M8 12h5"/></svg></div>
             <div class="hub-welcome-title">Messages clients</div>
-            <div class="hub-welcome-sub">Sélectionnez une conversation</div>
+            <div class="hub-welcome-sub">Choisissez une conversation à gauche pour lire les messages et répondre.</div>
         </div>
 
         <div class="hub-chat" id="hubChat">
@@ -795,7 +876,7 @@ $hubIcons = [
             {{-- Bande produit --}}
             <div class="hub-prod-strip" id="hubProdStrip" style="display:none">
                 <a href="#" id="hubProdImgLink" target="_blank" style="flex-shrink:0;display:block">
-                    <div class="hub-prod-img-ph" id="hubProdImgPh">🏷️</div>
+                    <div class="hub-prod-img-ph" id="hubProdImgPh"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12 12 3h8v8l-9 9zM15.5 8.5h.01"/></svg></div>
                     <img class="hub-prod-img" id="hubProdImg" src="" alt="" style="display:none">
                 </a>
                 <div class="hub-prod-info">
@@ -815,7 +896,7 @@ $hubIcons = [
 
             {{-- Offer panel --}}
             <div class="hub-offer-panel" id="hubOfferPanel">
-                <div class="hub-offer-panel-title">💰 Envoyer une offre de prix au client</div>
+                <div class="hub-offer-panel-title">Envoyer une offre de prix au client</div>
                 <div class="hub-offer-hint" id="hubOfferHint"></div>
                 <div class="hub-offer-panel-row">
                     <input type="number" class="hub-offer-input" id="hubOfferInput"
@@ -828,7 +909,7 @@ $hubIcons = [
 
             {{-- Thread --}}
             <div class="hub-thread" id="hubThread">
-                <div class="hub-thread-loader">⏳ Chargement…</div>
+                <div class="hub-thread-loader">Chargement…</div>
             </div>
 
             {{-- Input --}}
@@ -840,7 +921,7 @@ $hubIcons = [
                 <div class="hub-input-row">
                     {{-- Bouton + photo (vendeur seulement) --}}
                     <input type="file" id="hubImgInput" accept="image/*" multiple style="display:none" onchange="onImgSelected(this)">
-                    <button class="hub-attach-btn" title="Envoyer des photos (max 20)" onclick="document.getElementById('hubImgInput').click()">📷</button>
+                    <button class="hub-attach-btn" title="Envoyer des photos (max 20)" onclick="document.getElementById('hubImgInput').click()" aria-label="Envoyer des photos"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3.5L9 5.5h6L16.5 8H20v11H4zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg></button>
 
                     @if($isPro)
                     <button class="hub-attach-btn" id="hubAiBtn" title="Shopio IA — suggérer une réponse" onclick="suggestAiReply()" style="color:#1668D8;border-color:#D6E6FF;background:#EAF2FF">✨</button>
@@ -851,12 +932,14 @@ $hubIcons = [
                     <textarea id="hubInput" class="hub-textarea" placeholder="Écrire un message au client…" rows="1"
                         onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendHubMsg()}"
                         oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
-                    <button class="hub-send-btn" onclick="sendHubMsg()" id="hubSendBtn" title="Envoyer">➤</button>
+                    <button class="hub-send-btn" onclick="sendHubMsg()" id="hubSendBtn" title="Envoyer" aria-label="Envoyer"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12 20 4l-6 16-3-7zM11 13l9-9"/></svg></button>
                 </div>
             </div>
         </div>
     </main>
 </div>
+</div>{{-- /.vs-main --}}
+</div>{{-- /.vs-wrap --}}
 
 <div class="hub-toast" id="hubToast"></div>
 
@@ -881,7 +964,7 @@ $hubIcons = [
 
         {{-- Image principale --}}
         <div class="prod-modal-img-wrap" id="pmImgWrap">
-            <div class="prod-modal-img-ph" id="pmImgPh">🏷️</div>
+            <div class="prod-modal-img-ph" id="pmImgPh"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12 12 3h8v8l-9 9zM15.5 8.5h.01"/></svg></div>
             <img class="prod-modal-img" id="pmImg" src="" alt="" style="display:none">
             {{-- Flèches navigation --}}
             <button class="pm-arrow pm-arrow-l" id="pmArrowL" onclick="pmNav(-1)" style="display:none">‹</button>

@@ -416,7 +416,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
 {{-- NAVBAR --}}
 <nav class="nav">
     <a href="{{ route('client.dashboard') }}" class="nav-logo">Ma<span>Boutique</span></a>
-    <a href="{{ route('client.shops.show', $shop) }}" class="nav-back">← {{ Str::limit($shop->name, 20) }}</a>
+    <a href="{{ route('public.shops.products', $shop) }}" class="nav-back">← {{ Str::limit($shop->name, 20) }}</a>
 </nav>
 
 <div class="chat-wrap">
@@ -436,7 +436,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
             <div class="chat-prod-name">{{ $product->name }}</div>
             <div class="chat-prod-price">{{ number_format($product->price, 0, ',', ' ') }} {{ $devise }}</div>
             <div class="chat-prod-shop">
-                Boutique : <a href="{{ route('client.shops.show', $shop) }}">{{ $shop->name }}</a>
+                Boutique : <a href="{{ route('public.shops.products', $shop) }}">{{ $shop->name }}</a>
             </div>
         </div>
         <button class="btn-propose-price" onclick="toggleProposePanel()" type="button" id="btnPropose">

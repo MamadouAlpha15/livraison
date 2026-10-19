@@ -179,7 +179,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 @php
     $cur = $shop->currency ?: 'GNF';
     $money = fn ($v) => number_format((float) $v, 0, ',', ' ') . ' ' . $cur;
-    $srcColors = ['facebook' => '#1F7CF6', 'instagram' => '#D6336C', 'tiktok' => '#0B1E3D', 'whatsapp' => '#16A34A', 'qr' => '#F59E0B', 'google' => '#7C3AED', 'shopio' => '#7DB4FF', 'autre' => '#94A3B8', 'direct' => '#64748B'];
+    $srcColors = ['facebook' => '#1F7CF6', 'instagram' => '#D6336C', 'tiktok' => '#0B1E3D', 'whatsapp' => '#16A34A', 'qr' => '#F59E0B', 'google' => '#7C3AED', 'shopio' => '#7DB4FF', 'app' => '#0EA5E9', 'autre' => '#94A3B8', 'direct' => '#64748B'];
     $maxVisits = max(1, $rows->max('visits') ?? 0);
     $maxDay = max(1, $series->max('visits'));
     $conv = $totals['visits'] > 0 ? round($totals['orders'] / $totals['visits'] * 100, 1) : null;
@@ -411,6 +411,13 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                     <label class="mk-field-lbl" for="mkTarget">Page à partager</label>
                     <select class="mk-select" id="mkTarget">
                         <option value="{{ $publicUrl }}">Ma vitrine (tous les produits)</option>
+                        @if($products->isNotEmpty())
+                        @if(count($categoryLinks))
+                        <optgroup label="Une catégorie">
+                            @foreach($categoryLinks as $c)<option value="{{ $c['url'] }}">{{ $c['name'] }} ({{ $c['count'] }})</option>@endforeach
+                        </optgroup>
+                        @endif
+                        @endif
                         @if($products->isNotEmpty())
                         <optgroup label="Un produit">
                             @foreach($products as $p)<option value="{{ $p['url'] }}">{{ $p['name'] }}</option>@endforeach

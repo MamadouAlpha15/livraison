@@ -8,7 +8,6 @@ use App\Http\Resources\Api\V1\ShopResource;
 use App\Models\Order;
 use App\Models\Review;
 use App\Models\Shop;
-use App\Models\ShopVisit;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -50,7 +49,7 @@ class ShopController extends Controller
     {
         abort_unless($shop->is_approved, 404);
 
-        ShopVisit::record($shop->id);
+        \App\Support\TrafficSource::recordAppVisit($shop, $request);
 
         $reviewStats = Review::where('vendeur_id', $shop->user_id)
             ->selectRaw('COUNT(*) as cnt, AVG(rating) as avg_rating')->first();

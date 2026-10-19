@@ -33,3 +33,12 @@ Schedule::command('cart:remind-abandoned')->dailyAt('10:00')->name('remind-aband
 // vendeur concerné directement dans son compte Shopio.
 // ─────────────────────────────────────────────────────────────────────────────
 Schedule::command('products:check-images')->dailyAt('03:00')->name('check-product-images')->withoutOverlapping();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Vitrines programmées (Faire grandir ma vitrine → Personnalisation) : publiées à l'heure
+// choisie. Elles le sont aussi à la première visite de la boutique, même sans scheduler.
+// ─────────────────────────────────────────────────────────────────────────────
+Schedule::call(function () {
+    \App\Models\Shop::whereNotNull('storefront_publish_at')->where('storefront_publish_at', '<=', now())
+        ->each(fn ($shop) => \App\Support\Growth::applyScheduled($shop));
+})->everyMinute()->name('publish-scheduled-storefronts')->withoutOverlapping();

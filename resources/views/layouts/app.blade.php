@@ -44,7 +44,7 @@
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @auth<meta name="vapid-public-key" content="{{ config('app.vapid_public_key') }}">@endauth
-    <meta name="theme-color" content="#6366f1">
+    <meta name="theme-color" content="#1F7CF6">
     {{-- Une page peut définir son titre et sa description avec @section('title') / @section('description') --}}
     <meta name="description" content="@hasSection('description')@yield('description')@else{{ $description ?? 'Shopio — la plateforme tout-en-un pour créer votre boutique en ligne, gérer vos livraisons et vos clients en Guinée.' }}@endif">
     <title>@hasSection('title')@yield('title')@else{{ $title ?? config('app.name', 'Shopio') }}@endif</title>
@@ -470,6 +470,16 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
     @include('partials.meta-pixel', ['pixelId' => $mpPurchase['pixel'], 'pageView' => false, 'events' => [['Purchase', $mpPurchase['params'], $mpPurchase['event_id']]]])
 @endforeach
 
+{{-- ══ Mode WhatsApp de la boutique : envoyer la commande qui vient d'être enregistrée ══ --}}
+@if(session('wa_order'))
+<div id="waOrder" role="dialog" aria-labelledby="waOrderTitle" style="position:fixed;left:50%;bottom:max(16px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:99990;width:min(420px,calc(100% - 32px));background:#fff;color:#16162A;border-radius:22px;padding:18px;box-shadow:0 24px 60px rgba(11,30,61,.35);font-family:'Plus Jakarta Sans',system-ui,sans-serif;">
+    <button type="button" onclick="document.getElementById('waOrder').remove()" aria-label="Fermer" style="position:absolute;top:10px;right:10px;width:36px;height:36px;border:0;border-radius:999px;background:#F1F5FB;color:#16162A;font-size:20px;cursor:pointer">&times;</button>
+    <strong id="waOrderTitle" style="display:block;font-size:16px;padding-right:40px">Commande enregistrée</strong>
+    <p style="margin:6px 0 12px;font-size:14px;color:#45455E">Envoyez-la aussi à {{ session('wa_order')['shop'] }} sur WhatsApp : le message est déjà prêt.</p>
+    <a href="{{ session('wa_order')['url'] }}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;min-height:48px;border-radius:999px;background:#15803D;color:#fff;font-weight:800;text-decoration:none">Envoyer sur WhatsApp</a>
+</div>
+@endif
+
 {{-- ══ Célébration : objectif journalier du livreur atteint (gamification) ══ --}}
 @auth
 @if(session('daily_bonus_unlocked'))
@@ -838,9 +848,12 @@ document.addEventListener('click', function (e) {
 /* ══ Skeleton Shimmer — toutes les images du site ══ */
 (function () {
     function applyToImg(img) {
-        if (!img.src || img.src.startsWith('data:')) return;
+        // src="" : img.src renvoie l'adresse de la page, il faut lire l'attribut
+        if (!img.getAttribute('src') || img.src.startsWith('data:')) return;
         if (img.src.endsWith('.svg')) return;
-        if (img.complete && img.naturalHeight > 0) return; // déjà en cache
+        // Déjà terminée (en cache, ou en erreur) : aucun événement load/error ne viendra
+        // retirer l'animation, qui tournerait sans fin (ex. aperçu vide du formulaire produit)
+        if (img.complete) return;
         if (img.dataset.noSkeleton !== undefined) return;  // exclusion manuelle
 
         const parent = img.parentElement;

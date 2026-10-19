@@ -131,7 +131,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 <nav class="amz-nav">
     <a href="{{ route('client.dashboard') }}" class="amz-nav-logo">Ma<span>Boutique</span></a>
-    <a href="{{ route('client.shops.show', $shop) }}" class="amz-back">← {{ Str::limit($shop->name, 20) }}</a>
+    <a href="{{ route('public.shops.products', $shop) }}" class="amz-back">← {{ Str::limit($shop->name, 20) }}</a>
     <div class="amz-nav-search">
         <input type="text" placeholder="Rechercher un produit…">
         <button class="amz-nav-search-btn">🔍</button>
@@ -140,7 +140,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 <div class="breadcrumb">
     <a href="{{ route('client.dashboard') }}">Accueil</a> ›
-    <a href="{{ route('client.shops.show', $shop) }}">{{ $shop->name }}</a> ›
+    <a href="{{ route('public.shops.products', $shop) }}">{{ $shop->name }}</a> ›
     @if($product->category)<span>{{ $product->category }}</span> › @endif
     <span style="color:var(--text)">{{ Str::limit($product->name, 50) }}</span>
 </div>
@@ -184,7 +184,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
         <h1 class="prod-info-name">{{ $product->name }}</h1>
         <div class="prod-info-shop">
             Vendu par &nbsp;
-            <a href="{{ route('client.shops.show', $shop) }}">{{ $shop->name }}</a>
+            <a href="{{ route('public.shops.products', $shop) }}">{{ $shop->name }}</a>
             @if($shop->type) &nbsp;·&nbsp; {{ $shop->type }} @endif
         </div>
         <div class="prod-stars">
@@ -255,7 +255,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
         <a href="{{ route('register') }}" class="prod-order-btn">S'inscrire pour commander</a>
         @endauth
         <div class="prod-order-sep"></div>
-        <div class="prod-order-shop">Vendu par : <a href="{{ route('client.shops.show', $shop) }}">{{ $shop->name }}</a></div>
+        <div class="prod-order-shop">Vendu par : <a href="{{ route('public.shops.products', $shop) }}">{{ $shop->name }}</a></div>
         <div class="prod-order-info"><span>🔒</span><span>Paiement cash à la livraison</span></div>
         <div class="prod-order-info"><span>🔄</span><span>Retour possible en cas de problème</span></div>
         <div class="prod-order-info"><span>📞</span><span>Support disponible</span></div>

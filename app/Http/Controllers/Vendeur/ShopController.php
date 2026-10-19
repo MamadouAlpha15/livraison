@@ -156,7 +156,7 @@ public function update(Request $request, \App\Models\Shop $shop)
         // Pixel Meta (Facebook) du vendeur — vide = désactivé
         'meta_pixel_id'   => ['nullable', 'regex:/^\d{10,20}$/'],
         // Couleur d'accent de la vitrine (Ma boutique → Concevoir)
-        'accent_color'    => ['nullable', Rule::in(self::ACCENT_COLORS)],
+        'accent_color'    => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
         'name'            => ['required','string','max:255'],
         'type'            => ['nullable','string','max:100'],
         'description'     => ['nullable','string','max:2000'],

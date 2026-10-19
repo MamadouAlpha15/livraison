@@ -88,10 +88,10 @@ $I['users_ql']  = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" s
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
-    --brand:      #6366f1; --brand-dk:  #4f46e5;
-    --brand-lt:   #e0e7ff; --brand-mlt: #eef2ff;
+    --brand:      #1F7CF6; --brand-dk:  #1668D8;
+    --brand-lt:   #D6E6FF; --brand-mlt: #EAF2FF;
     --sb-bg:      #0e0e16; --sb-border: rgba(255,255,255,.08);
-    --sb-act:     rgba(99,102,241,.52);
+    --sb-act:     rgba(31,124,246,.52);
     --sb-hov:     rgba(255,255,255,.10);
     --sb-txt:     rgba(255,255,255,.88);
     --sb-txt-act: #fff;
@@ -109,8 +109,8 @@ $I['users_ql']  = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" s
 
 /* ══ MODE SOMBRE ══ */
 [data-theme="dark"] {
-    --brand-lt: rgba(99,102,241,.16);
-    --brand-mlt: rgba(99,102,241,.09);
+    --brand-lt: rgba(31,124,246,.16);
+    --brand-mlt: rgba(31,124,246,.09);
     --bg: #0b0f1a;
     --surface: #141925;
     --border: #262d3d;
@@ -134,18 +134,18 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 /* SIDEBAR */
 .sidebar {
     background: linear-gradient(180deg,#0f0f59 0%,#0e0e16 40%,#10103a 100%);
-    border-right: 1px solid rgba(99,102,241,.15);
+    border-right: 1px solid rgba(31,124,246,.15);
     box-shadow: 6px 0 30px rgba(0,0,0,.35);
     display: flex; flex-direction: column;
     position: fixed; top: 0; left: 0; bottom: 0;
     width: var(--sb-w); overflow-y: scroll;
-    scrollbar-width: thin; scrollbar-color: rgba(99,102,241,.35) transparent;
+    scrollbar-width: thin; scrollbar-color: rgba(31,124,246,.35) transparent;
     z-index: 40;
 }
 .sidebar::-webkit-scrollbar { width: 3px; }
 .sidebar::-webkit-scrollbar-track { background: transparent; }
-.sidebar::-webkit-scrollbar-thumb { background: rgba(99,102,241,.35); border-radius: 3px; }
-.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,.6); }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(31,124,246,.35); border-radius: 3px; }
+.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(31,124,246,.6); }
 .sb-brand { padding: 18px 16px 14px; border-bottom: 1px solid var(--sb-border); flex-shrink: 0; position: relative; }
 .sb-close { display: none; position: absolute; top: 14px; right: 12px; width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.10); color: rgba(255,255,255,.6); font-size: 18px; cursor: pointer; align-items: center; justify-content: center; transition: background .15s, color .15s; }
 .sb-close:hover { background: rgba(239,68,68,.18); border-color: rgba(239,68,68,.3); color: #fca5a5; }
@@ -160,8 +160,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .sb-section { font-size: 9.5px; text-transform: uppercase; letter-spacing: 1.8px; color: rgba(255,255,255,.48); padding: 16px 10px 5px; font-weight: 800; }
 .sb-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--r-sm); font-size: 13.5px; font-weight: 600; color: var(--sb-txt); text-decoration: none; transition: background .15s, color .15s; position: relative; letter-spacing: -.1px; }
 .sb-item:hover { background: var(--sb-hov); color: #fff; }
-.sb-item.active { background: var(--sb-act); color: var(--sb-txt-act); box-shadow: 0 2px 12px rgba(99,102,241,.25); }
-.sb-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #a5b4fc; border-radius: 0 3px 3px 0; box-shadow: 2px 0 8px rgba(165,180,252,.5); }
+.sb-item.active { background: var(--sb-act); color: var(--sb-txt-act); box-shadow: 0 2px 12px rgba(31,124,246,.25); }
+.sb-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #A9CCFF; border-radius: 0 3px 3px 0; box-shadow: 2px 0 8px rgba(125,180,255,.5); }
 .sb-item .ico { font-size: 13px; width: 26px; height: 26px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 7px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); transition: background .15s; }
 .sb-item:hover .ico { background: rgba(255,255,255,.11); border-color: rgba(255,255,255,.14); }
 .sb-item.active .ico { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.25); }
@@ -183,14 +183,14 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .sb-scroll-hint { position: sticky; bottom: 0; width: 100%; height: 44px; background: linear-gradient(to bottom, transparent, rgba(17,17,24,.95)); pointer-events: none; z-index: 2; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px; transition: opacity .3s; margin-top: -44px; align-self: flex-end; }
 .sb-scroll-hint.hidden { opacity: 0; }
 .sb-scroll-hint-arrow { display: flex; flex-direction: column; align-items: center; gap: 2px; animation: bounceDown 1.5s ease-in-out infinite; }
-.sb-scroll-hint-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(99,102,241,.7); }
+.sb-scroll-hint-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(31,124,246,.7); }
 .sb-scroll-hint-dot:nth-child(2) { opacity: .5; margin-top: -2px; }
 .sb-scroll-hint-dot:nth-child(3) { opacity: .25; margin-top: -2px; }
 @keyframes bounceDown { 0%,100%{transform:translateY(0)} 50%{transform:translateY(4px)} }
 .sb-footer { padding: 12px 10px; border-top: 1px solid rgba(255,255,255,.08); flex-shrink: 0; display: flex; flex-direction: column; gap: 6px; position: sticky; bottom: 0; background: linear-gradient(180deg,transparent 0%,#0b0b12 25%); z-index: 1; }
 .sb-user { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--r-sm); text-decoration: none; border: 1px solid transparent; transition: background .15s, border-color .15s; }
 .sb-user:hover { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.07); }
-.sb-av { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#4338ca); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(99,102,241,.45),0 2px 8px rgba(99,102,241,.3); letter-spacing: -.5px; }
+.sb-av { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,#1F7CF6,#1260C9); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(31,124,246,.45),0 2px 8px rgba(31,124,246,.3); letter-spacing: -.5px; }
 .sb-uname { font-size: 12.5px; font-weight: 700; color: rgba(255,255,255,.9); }
 .sb-urole { font-size: 10px; color: var(--sb-txt); margin-top: 1px; }
 .sb-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; border-radius: var(--r-sm); background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.15); color: rgba(252,165,165,.85); font-size: 12px; font-weight: 600; font-family: var(--font); cursor: pointer; text-decoration: none; transition: background .15s, color .15s, border-color .15s; text-align: left; }
@@ -221,7 +221,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .period-btns { display: flex; gap: 6px; flex-wrap: wrap; }
 .period-btn { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid var(--border-dk); background: var(--bg); color: var(--text-2); cursor: pointer; text-decoration: none; transition: all .15s; }
 .period-btn:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-mlt); }
-.period-btn.active { background: var(--brand); color: #fff; border-color: var(--brand-dk); box-shadow: 0 2px 8px rgba(99,102,241,.3); }
+.period-btn.active { background: var(--brand); color: #fff; border-color: var(--brand-dk); box-shadow: 0 2px 8px rgba(31,124,246,.3); }
 .filter-sep { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
 .custom-dates { display: flex; align-items: center; gap: 8px; }
 .custom-dates input[type="date"] { padding: 5px 10px; border: 1px solid var(--border-dk); border-radius: var(--r-sm); font-size: 12px; font-family: var(--font); color: var(--text); background: var(--bg); cursor: pointer; }
@@ -349,8 +349,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     $processedCount = $shop->orders()->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->where(function($q){$q->whereNotNull('livreur_id')->orWhereNotNull('delivery_company_id');})->count();
     $productCount   = $shop->products()->count();
     $_sbCmdMax = 10; $_sbProdMax = 5;
-    if ($isPro)                            { $_sbCmdClr = '#10b981'; } elseif ($processedCount >= $_sbCmdMax) { $_sbCmdClr = '#ef4444'; } elseif ($processedCount >= 7) { $_sbCmdClr = '#f59e0b'; } else { $_sbCmdClr = '#8b5cf6'; }
-    if ($isPro)                           { $_sbProdClr = '#10b981'; } elseif ($productCount >= $_sbProdMax) { $_sbProdClr = '#ef4444'; } elseif ($productCount >= 4)  { $_sbProdClr = '#f59e0b'; } else { $_sbProdClr = '#8b5cf6'; }
+    if ($isPro)                            { $_sbCmdClr = '#10b981'; } elseif ($processedCount >= $_sbCmdMax) { $_sbCmdClr = '#ef4444'; } elseif ($processedCount >= 7) { $_sbCmdClr = '#f59e0b'; } else { $_sbCmdClr = '#0B1E3D'; }
+    if ($isPro)                           { $_sbProdClr = '#10b981'; } elseif ($productCount >= $_sbProdMax) { $_sbProdClr = '#ef4444'; } elseif ($productCount >= 4)  { $_sbProdClr = '#f59e0b'; } else { $_sbProdClr = '#0B1E3D'; }
 
     $exportUrl = route('boutique.reports.export', array_filter([
         'period' => $period,
@@ -410,6 +410,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         <a href="{{ route('boutique.subscription.upgrade') }}" class="sb-item" style="opacity:.6;" title="Plan Pro requis"><span class="ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></span> Codes promo <span class="sb-badge" style="background:#f59e0b;">🔒</span></a>
         @endif
         <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">{!! $I['users_nav'] !!}</span> Clients</a>
+        @if(auth()->user()->role === 'admin')<a href="{{ route('boutique.marketing') }}" class="sb-item"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h3l6 4V6l-6 4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></span> Marketing</a>@endif
         @if($isPro)
         <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">{!! $I['team_nav'] !!}</span> Équipe</a>
         @else
@@ -524,7 +525,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     <div class="sec-title">{!! $I['calendar_sec'] !!} {{ $periodLabel }}</div>
     <div class="kpi-grid-2" style="margin-bottom:14px">
 
-        <div class="kpi" style="--kc:#6366f1">
+        <div class="kpi" style="--kc:#1F7CF6">
             <div class="kpi-ico">{!! $I['coin_kpi'] !!}</div>
             <div class="kpi-lbl">Revenu net — période</div>
             <div class="kpi-val" title="{{ number_format($revenueThisMonth, 0, ',', ' ') }} {{ $devise }}">
@@ -563,7 +564,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <div class="kpi-val">{{ $pendingOrders }}</div>
             <div class="kpi-unit">à traiter</div>
         </div>
-        <div class="kpi" style="--kc:#8b5cf6">
+        <div class="kpi" style="--kc:#0B1E3D">
             <div class="kpi-ico">{!! $I['bike_kpi'] !!}</div><div class="kpi-lbl">En livraison</div>
             <div class="kpi-val">{{ $deliveringOrders }}</div>
             <div class="kpi-unit">en route</div>
@@ -578,12 +579,12 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     {{-- SECTION 3 : PERFORMANCE --}}
     <div class="sec-title">{!! $I['target_sec'] !!} Performance — période</div>
     <div class="kpi-grid-4">
-        <div class="kpi" style="--kc:#6366f1">
+        <div class="kpi" style="--kc:#1F7CF6">
             <div class="kpi-ico">{!! $I['check_kpi'] !!}</div><div class="kpi-lbl">Livrées</div>
             <div class="kpi-val">{{ $deliveredOrders }}</div>
             <div class="kpi-unit">livrées avec succès</div>
         </div>
-        <div class="kpi" style="--kc:{{ $tauxLivraison >= 80 ? '#6366f1' : ($tauxLivraison >= 50 ? '#f59e0b' : '#ef4444') }}">
+        <div class="kpi" style="--kc:{{ $tauxLivraison >= 80 ? '#1F7CF6' : ($tauxLivraison >= 50 ? '#f59e0b' : '#ef4444') }}">
             <div class="kpi-ico">{!! $tauxLivraison >= 80 ? $I['trophy_kpi'] : ($tauxLivraison >= 50 ? $I['warn_kpi'] : $I['alert_kpi']) !!}</div>
             <div class="kpi-lbl">Taux livraison</div>
             <div class="kpi-val">{{ $tauxLivraison }}%</div>
@@ -633,7 +634,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
     {{-- SECTION 5 : FINANCES PÉRIODE --}}
     <div class="sec-title">{!! $I['card_sec'] !!} Finances — {{ $periodLabel }}</div>
     <div class="kpi-grid-3">
-        <div class="kpi" style="--kc:#6366f1">
+        <div class="kpi" style="--kc:#1F7CF6">
             <div class="kpi-ico">{!! $I['money_kpi'] !!}</div><div class="kpi-lbl">Revenu net — période</div>
             <div class="kpi-val" title="{{ number_format($revenueThisMonth, 0, ',', ' ') }} {{ $devise }}">
                 {{ $fmt($revenueThisMonth) }}
@@ -680,7 +681,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <div class="kpi-unit">vendeurs actifs</div>
         </div>
         @endif
-        <div class="kpi" style="--kc:#7c3aed">
+        <div class="kpi" style="--kc:#1260C9">
             <div class="kpi-ico">{!! $I['bike_kpi'] !!}</div><div class="kpi-lbl">Livreurs actifs — période</div>
             <div class="kpi-val">{{ $livreurs }}</div>
             <div class="kpi-unit">ont livré sur cette période</div>
@@ -754,12 +755,12 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <div class="client-stats-wrap">
                 <div>
                     <div class="client-stat-row">
-                        <span class="client-stat-dot" style="background:#6366f1"></span>
+                        <span class="client-stat-dot" style="background:#1F7CF6"></span>
                         <span class="client-stat-label">Nouveaux clients</span>
                         <span class="client-stat-val">{{ $cNouveaux }}<span class="client-stat-pct">({{ $pctNouv }}%)</span></span>
                     </div>
                     <div class="client-bar-wrap">
-                        <div class="client-bar-fill" data-pct="{{ $pctNouv }}" style="width:0%;background:#6366f1"></div>
+                        <div class="client-bar-fill" data-pct="{{ $pctNouv }}" style="width:0%;background:#1F7CF6"></div>
                     </div>
                 </div>
                 <div>
@@ -787,7 +788,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         </div>
 
         <div class="kpi-grid-2" style="margin:0;align-content:start;gap:12px">
-            <div class="kpi" style="--kc:#6366f1;grid-column:1/-1">
+            <div class="kpi" style="--kc:#1F7CF6;grid-column:1/-1">
                 <div class="kpi-ico">{!! $I['list_kpi'] !!}</div>
                 <div class="kpi-lbl">Export CSV</div>
                 <div style="font-size:13px;color:var(--text-2);margin:6px 0 12px;line-height:1.5">
@@ -809,7 +810,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                     @endif
                 </div>
             </div>
-            <div class="kpi" style="--kc:#6366f1">
+            <div class="kpi" style="--kc:#1F7CF6">
                 <div class="kpi-ico">{!! $I['star_kpi'] !!}</div>
                 <div class="kpi-lbl">Nouveaux clients</div>
                 <div class="kpi-val">{{ $cNouveaux }}</div>
@@ -879,7 +880,7 @@ const chartOrders  = {!! $chartOrders !!};
 const actuelIdx    = {{ $chartActuel !== false ? (int)$chartActuel : 5 }};
 const devise       = '{{ $devise }}';
 
-const bgColors = chartLabels.map((_, i) => i === actuelIdx ? 'rgba(99,102,241,1)' : 'rgba(99,102,241,0.5)');
+const bgColors = chartLabels.map((_, i) => i === actuelIdx ? 'rgba(31,124,246,1)' : 'rgba(31,124,246,0.5)');
 const bgGreen  = chartLabels.map((_, i) => i === actuelIdx ? 'rgba(34,197,94,1)'   : 'rgba(34,197,94,0.5)');
 
 let currentMode = 'revenue';
@@ -929,8 +930,11 @@ function buildChart(mode) {
                 x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#94a3b8' } },
                 y: {
                     beginAtZero: true,
+                    // Sans données, Chart.js affiche 0 à 1 par pas de 0.1 : on garde une échelle entière lisible
+                    suggestedMax: Math.max(...data) > 0 ? undefined : 5,
                     grid: { color: 'rgba(0,0,0,.04)' },
                     ticks: {
+                        precision: 0,
                         font: { size: 11 }, color: '#94a3b8',
                         callback: (v) => isRev ? formatNum(v) : v
                     }
@@ -961,4 +965,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
+@endpush
+
+@push('styles')
+@include('boutique._partials.sv-theme')
 @endpush

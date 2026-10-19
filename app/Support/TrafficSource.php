@@ -7,8 +7,10 @@ use App\Models\MarketingCampaign;
 use App\Models\Product;
 use App\Models\ProductView;
 use App\Models\ShopTraffic;
+use App\Models\ShopVisit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * D'où viennent les visiteurs et les commandes d'une boutique.
@@ -34,6 +36,7 @@ class TrafficSource
         'qr'        => 'QR code',
         'google'    => 'Google',
         'shopio'    => 'Marketplace Shopio',
+        'app'       => 'Application Shopio',
         'autre'     => 'Autres sites',
         'direct'    => 'Accès direct',
     ];
@@ -114,6 +117,25 @@ class TrafficSource
         $session->put($seenKey, now()->toDateString());
 
         ShopTraffic::record($shop->id, $detected ?? 'shopio', (int) $campaign?->id);
+        // Même visite pour les compteurs du tableau de bord (aujourd'hui / semaine / mois)
+        ShopVisit::record($shop->id);
+    }
+
+    /**
+     * Visite depuis l'application mobile (API sans session) : une par utilisateur — ou, sans
+     * compte, par appareil (IP + navigateur) — par boutique et par jour, retenue dans le cache.
+     */
+    public static function recordAppVisit(Shop $shop, Request $request): void
+    {
+        $user = $request->user();
+        if (self::isBot($request) || ($user && ((int) $user->id === (int) $shop->user_id || (int) $user->shop_id === (int) $shop->id))) return;
+
+        $who = $user ? 'u' . $user->id : sha1($request->ip() . '|' . $request->userAgent());
+        $key = 'shop_app_visit:' . $shop->id . ':' . $who . ':' . now()->toDateString();
+        if (!Cache::add($key, 1, now()->endOfDay())) return;
+
+        ShopTraffic::record($shop->id, 'app');
+        ShopVisit::record($shop->id);
     }
 
     /** Compte une vue de fiche produit (une par visiteur, par produit et par jour). */
