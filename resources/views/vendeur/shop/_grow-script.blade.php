@@ -173,7 +173,7 @@
     const paintRanges = () => Object.entries(ranges).forEach(([id, [k, u]]) => { $(id).value = C[k]; $(id + 'Out').textContent = C[k] + u; });
     Object.entries(ranges).forEach(([id, [k, u]]) => $(id).addEventListener('input', () => { C[k] = +$(id).value; $(id + 'Out').textContent = C[k] + u; renderPreview(); syncHidden(); }));
     paintRanges();
-    function counters() { $('gwNameCount').textContent = $('gwName').value.length + ' / 30'; $('gwSloganCount').textContent = $('gwSlogan').value.length + ' / 60'; }
+    function counters() { $('gwNameCount').textContent = $('gwName').value.length + ' / 30' + ($('gwName').value.length > 30 ? ' · nom actuel gardé tel quel, raccourcissez-le pour le modifier' : ''); $('gwSloganCount').textContent = $('gwSlogan').value.length + ' / 60'; }
     $('gwName').addEventListener('input', () => { C.name = $('gwName').value; $('gwNameErr').textContent = ''; $('gwName').removeAttribute('aria-invalid'); counters(); renderPreview(); });
     $('gwSlogan').addEventListener('input', () => { C.slogan = $('gwSlogan').value; counters(); renderPreview(); });
     counters();

@@ -173,11 +173,17 @@ window.SM = (function () {
     $('smScrim').addEventListener('click', close);
     document.querySelectorAll('[data-sm-close]').forEach(b => b.addEventListener('click', close));
 
+    /* Vue comptée pour les statistiques du vendeur (pas sur un lien d'aperçu) */
+    const COUNT_VIEWS = @json(!$previewLink);
+    function countView(id) {
+        if (!COUNT_VIEWS) return;
+        try { fetch(PM.urls.view.replace(/\/0$/, '/' + id), { method: 'POST', keepalive: true, headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' } }).catch(() => {}); } catch (e) {}
+    }
     let quickId = null;
     function open(id) {
         const p = byId(id);
         if (!p) return;
-        quickId = p.id; seen(p.id);
+        quickId = p.id; seen(p.id); countView(p.id);
         $('smQMedia').innerHTML = p.photo ? '<img src="' + esc(p.photo) + '" alt="' + esc(p.name) + '">' : '<span>' + esc(p.name) + '</span>';
         $('smQCat').textContent = p.cat || PM.shop.name;
         $('smQName').textContent = p.name;

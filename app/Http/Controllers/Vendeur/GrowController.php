@@ -211,8 +211,10 @@ class GrowController extends Controller
     public function saveIdentity(Request $request): RedirectResponse
     {
         $shop = $this->shop();
+        // 30 caractères pour un nouveau nom ; un nom existant plus long reste accepté tel quel (jamais tronqué)
+        $nameMax = max(30, mb_strlen((string) $shop->name));
         $data = $request->validate([
-            'name'        => ['required', 'string', 'min:2', 'max:30'],
+            'name'        => ['required', 'string', 'min:2', 'max:' . $nameMax, fn ($a, $v, $fail) => mb_strlen($v) > 30 && trim($v) !== $shop->name ? $fail('Le nom ne peut pas dépasser 30 caractères.') : null],
             'slogan'      => ['nullable', 'string', 'max:60'],
             'color'       => ['required', Rule::in(array_keys(Storefront::IDENTITY_COLORS + [Growth::accent($shop) => '']))],
             'cover_src'   => ['required', Rule::in(array_keys(Storefront::COVER_SOURCES))],

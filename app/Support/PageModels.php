@@ -98,6 +98,7 @@ class PageModels
             'user'       => $user ? ['name' => $user->name, 'phone' => (string) ($user->phone ?? '')] : null,
             'urls'       => [
                 'order'  => route('public.shops.order', $shop),
+                'view'   => route('public.shops.view', [$shop, 0]), // « 0 » remplacé par l'identifiant du produit
                 'login'  => route('login', ['redirect' => Storefront::publicUrl($shop)]),
                 'follow' => $isClient ? route('client.favorites.toggle', $shop) : route('register', ['redirect' => Storefront::publicUrl($shop), 'role' => 'client']),
                 'followIsForm' => $isClient,

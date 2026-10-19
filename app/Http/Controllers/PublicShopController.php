@@ -124,6 +124,16 @@ class PublicShopController extends Controller
         return back()->with('feedback_sent', true);
     }
 
+    /**
+     * Vue d'un produit ouverte en fiche rapide dans un modèle de page boutique : comptée comme une vue
+     * de sa fiche (une par visiteur et par jour, hors vendeur et robots), pour les statistiques du vendeur.
+     */
+    public function productView(Shop $shop, \App\Models\Product $product, Request $request)
+    {
+        if ($product->shop_id === $shop->id && $product->is_active) TrafficSource::recordProductView($product, $request);
+        return response()->noContent();
+    }
+
     /** Clic dans une section de la vitrine (onglet Qualité, « clics par section »). */
     public function click(Shop $shop, Request $request)
     {

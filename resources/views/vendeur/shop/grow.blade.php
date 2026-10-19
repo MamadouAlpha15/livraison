@@ -427,7 +427,7 @@ textarea.gw-input { padding: 10px 12px; min-height: 96px; resize: vertical; line
                     <h2 id="gwNameH">Nom, slogan et couleur</h2>
                     <div class="gw-field">
                         <label class="gw-lbl" for="gwName">Nom de la boutique</label>
-                        <input class="gw-input" id="gwName" name="name" maxlength="30" required value="{{ old('name', mb_substr($shop->name, 0, 30)) }}" aria-describedby="gwNameCount gwNameErr" @error('name') aria-invalid="true" @enderror>
+                        <input class="gw-input" id="gwName" name="name" maxlength="{{ max(30, mb_strlen($shop->name)) }}" data-max="30" required value="{{ old('name', $shop->name) }}" aria-describedby="gwNameCount gwNameErr" @error('name') aria-invalid="true" @enderror>
                         <span class="gw-count" id="gwNameCount"></span>
                         <p class="gw-err" id="gwNameErr" role="alert">@error('name'){{ $message }}@enderror</p>
                     </div>

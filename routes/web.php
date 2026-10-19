@@ -236,6 +236,11 @@ Route::post('/shops/{shop}/commande', [\App\Http\Controllers\StorefrontOrderCont
     ->middleware('throttle:10,1')
     ->name('public.shops.order');
 
+/* Vue d'un produit en fiche rapide (modèles de page boutique) : comptée comme une vue de sa fiche */
+Route::post('/shops/{shop}/vue/{product}', [PublicShopController::class, 'productView'])
+    ->middleware('throttle:60,1')
+    ->name('public.shops.view');
+
 /* Clic dans une section de la vitrine (statistiques « clics par section ») */
 Route::post('/shops/{shop}/clic', [PublicShopController::class, 'click'])
     ->middleware('throttle:120,1')
