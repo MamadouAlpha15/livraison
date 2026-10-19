@@ -101,7 +101,7 @@
                     <li><span>{!! $I('check', 15) !!}</span>Négociation des prix dans le chat</li>
                     <li><span>{!! $I('check', 15) !!}</span>Statistiques de vos ventes</li>
                 </ul>
-                <div class="h3-cta"><a class="btn3 btn3-p btn3-lg" href="{{ route('register') }}">Ouvrir ma boutique</a><a class="btn3 btn3-s btn3-lg" href="{{ route('register') }}">Devenir livreur partenaire</a></div>
+                <div class="h3-cta"><a class="btn3 btn3-p btn3-lg" href="{{ route('register') }}">Ouvrir ma boutique</a><a class="btn3 btn3-s btn3-lg" href="{{ route('register') }}">Devenir entreprise partenaire</a></div>
             </div>
             <div class="lap3d" aria-hidden="true">
                 <div class="dash3-frame">
