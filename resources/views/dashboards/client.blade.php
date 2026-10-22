@@ -14,26 +14,25 @@
 @php $bodyClass = 'is-dashboard'; @endphp
 
 @push('styles')
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="{{ \App\Support\Assets::v('fonts/dashboard-fonts.css') }}" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
-    --orange:     #6366f1;
-    --orange-dk:  #4f46e5;
-    --orange-lt:  #e0e7ff;
-    --navy:       #2c3e50;
-    --navy-2:     #34495e;
-    --grey:       #f4f6f8;
-    --grey-2:     #e8ecf0;
-    --border:     #dde3ea;
-    --text:       #2c3e50;
-    --text-2:     #5a6a7a;
-    --muted:      #8a9bb0;
+    --orange:     #1668D8;
+    --orange-dk:  #1260C9;
+    --orange-lt:  #EAF2FF;
+    --navy:       #0B1E3D;
+    --navy-2:     #132B52;
+    --grey:       #F6F9FF;
+    --grey-2:     #EEF2F8;
+    --border:     #E3E8F2;
+    --text:       #0B1E3D;
+    --text-2:     #45455E;
+    --muted:      #62627C;
     --surface:    #ffffff;
-    --font:       'Open Sans', sans-serif;
-    --display:    'Nunito', sans-serif;
+    --font:       'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --display:    'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --r:          10px;
     --r-sm:       7px;
     --shadow-sm:  0 1px 4px rgba(0,0,0,.07);
@@ -92,7 +91,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 }
 .nav-search:focus-within {
     border-color: var(--orange);
-    box-shadow: 0 0 0 3px rgba(99,102,241,.1);
+    box-shadow: 0 0 0 3px rgba(31,124,246,.1);
     background: var(--surface);
 }
 .nav-search input {
@@ -179,7 +178,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     font-size: 9px; font-weight: 800;
     border-radius: 20px; padding: 1px 5px;
     min-width: 16px; text-align: center;
-    font-family: monospace; border: 1.5px solid var(--surface);
+    font-variant-numeric: tabular-nums; border: 1.5px solid var(--surface);
     display: none;
 }
 .nav-msg-badge.show { display: block; }
@@ -251,7 +250,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     background: var(--orange); color: #fff;
     font-size: 10px; font-weight: 700;
     border-radius: 20px; padding: 2px 8px;
-    font-family: monospace;
+    font-variant-numeric: tabular-nums;
 }
 .msg-drawer-close {
     width: 32px; height: 32px; border-radius: 50%;
@@ -316,7 +315,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .msg-conv-unread {
     background: var(--orange); color: #fff;
     font-size: 9px; font-weight: 800; border-radius: 20px;
-    padding: 1px 6px; font-family: monospace; min-width: 16px; text-align: center;
+    padding: 1px 6px; font-variant-numeric: tabular-nums; min-width: 16px; text-align: center;
 }
 
 .msg-conv-empty {
@@ -410,7 +409,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     font-size: 16px; flex-shrink: 0;
 }
 .msg-prod-name { font-size: 12px; font-weight: 700; color: var(--text); }
-.msg-prod-price { font-size: 11px; font-weight: 800; color: var(--orange); font-family: monospace; }
+.msg-prod-price { font-size: 11px; font-weight: 800; color: var(--orange); font-variant-numeric: tabular-nums; }
 .msg-prod-link {
     font-size: 11px; color: var(--orange); font-weight: 600;
     text-decoration: none; margin-left: auto; white-space: nowrap;
@@ -476,7 +475,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 }
 .msg-reply-input:focus {
     border-color: var(--orange); background: var(--surface);
-    box-shadow: 0 0 0 3px rgba(99,102,241,.1);
+    box-shadow: 0 0 0 3px rgba(31,124,246,.1);
 }
 .msg-send-btn {
     width: 42px; height: 42px; border-radius: 50%;
@@ -484,13 +483,13 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     cursor: pointer; font-size: 16px;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0; transition: all .15s;
-    box-shadow: 0 2px 8px rgba(99,102,241,.3);
+    box-shadow: 0 2px 8px rgba(31,124,246,.3);
 }
 .msg-send-btn:hover { background: var(--orange-dk); transform: scale(1.08); }
 
 /* ══ HERO BANNER ══ */
 .hero {
-    background: linear-gradient(135deg, var(--navy) 0%, #3d5a73 100%);
+    background: linear-gradient(135deg, var(--navy) 0%, #1F3F75 100%);
     border-radius: var(--r);
     display: flex; align-items: center;
     overflow: hidden; position: relative;
@@ -505,7 +504,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     content: '';
     position: absolute; right: 100px; bottom: -80px;
     width: 200px; height: 200px; border-radius: 50%;
-    background: rgba(99,102,241,.12); pointer-events: none;
+    background: rgba(31,124,246,.12); pointer-events: none;
 }
 .hero-text { flex: 1; position: relative; z-index: 1; }
 .hero-title {
@@ -605,9 +604,9 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     font-size: 17px; flex-shrink: 0;
 }
 .order-info { flex: 1; min-width: 0; overflow: hidden; }
-.order-ref  { font-size: 12.5px; font-weight: 700; color: var(--text); font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.order-ref  { font-size: 12.5px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .order-shop { font-size: 11.5px; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.order-amount { font-size: 13.5px; font-weight: 700; color: var(--text); font-family: monospace; white-space: nowrap; flex-shrink: 0; }
+.order-amount { font-size: 13.5px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; flex-shrink: 0; }
 .order-pill {
     display: inline-flex; align-items: center; gap: 4px;
     font-size: 10.5px; font-weight: 700; padding: 3px 10px; border-radius: 20px;
@@ -643,12 +642,12 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     border-color: var(--orange); color: var(--orange);
     background: var(--orange-lt);
     transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(99,102,241,.18);
+    box-shadow: 0 3px 10px rgba(31,124,246,.18);
 }
 .cat-pill.active {
     background: linear-gradient(135deg, var(--orange), var(--orange-dk));
     color: #fff; border-color: var(--orange-dk);
-    box-shadow: 0 4px 14px rgba(99,102,241,.35);
+    box-shadow: 0 4px 14px rgba(31,124,246,.35);
     transform: translateY(-1px);
 }
 .cat-pill.active:hover { opacity: .9; }
@@ -735,8 +734,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .reco-card-rating svg { width: 12px; height: 12px; fill: #f59e0b; stroke: #f59e0b; flex-shrink: 0; }
 .reco-card-rating strong { color: var(--text); font-weight: 700; }
 .reco-card-price-row { display: flex; align-items: baseline; gap: 6px; margin-top: auto; flex-wrap: wrap; }
-.reco-card-price { font-size: 14px; font-weight: 800; color: var(--orange); font-family: monospace; }
-.reco-card-orig { font-size: 10.5px; color: var(--muted); text-decoration: line-through; font-family: monospace; }
+.reco-card-price { font-size: 14px; font-weight: 800; color: var(--orange); font-variant-numeric: tabular-nums; }
+.reco-card-orig { font-size: 10.5px; color: var(--muted); text-decoration: line-through; font-variant-numeric: tabular-nums; }
 
 /* Bouton "Ajouter au panier" sur les cartes produit */
 .reco-card-addcart {
@@ -831,7 +830,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .flash-card-img img { width: 100%; height: 100%; object-fit: cover; }
 .flash-card-badge {
     position: absolute; top: 7px; left: 7px;
-    background: var(--navy); color: #c7d2fe; font-size: 10.5px; font-weight: 900;
+    background: var(--navy); color: #D6E6FF; font-size: 10.5px; font-weight: 900;
     padding: 3px 8px; border-radius: 20px;
 }
 .flash-card-body { padding: 9px 11px 11px; display: flex; flex-direction: column; gap: 3px; }
@@ -842,13 +841,13 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     min-height: 2.4em;
 }
 .flash-card-price-row { display: flex; align-items: baseline; gap: 5px; flex-wrap: wrap; }
-.flash-card-price { font-size: 14px; font-weight: 900; color: var(--orange); font-family: monospace; }
-.flash-card-orig { font-size: 10px; color: var(--muted); text-decoration: line-through; font-family: monospace; }
+.flash-card-price { font-size: 14px; font-weight: 900; color: var(--orange); font-variant-numeric: tabular-nums; }
+.flash-card-orig { font-size: 10px; color: var(--muted); text-decoration: line-through; font-variant-numeric: tabular-nums; }
 .flash-card-countdown {
     margin-top: 4px; display: inline-flex; align-items: center; gap: 4px;
     background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c;
     font-size: 10.5px; font-weight: 800; padding: 3px 8px; border-radius: 8px;
-    font-family: ui-monospace, monospace; width: fit-content;
+    font-variant-numeric: tabular-nums; width: fit-content;
 }
 
 @media (max-width: 480px) {
@@ -913,7 +912,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .bg-fashion { background: linear-gradient(135deg, #fce4ec, #f8bbd0); }
 .bg-tech    { background: linear-gradient(135deg, #e3f2fd, #bbdefb); }
 .bg-beauty  { background: linear-gradient(135deg, #fff8e1, #ffecb3); }
-.bg-default { background: linear-gradient(135deg, #f3f4f6, #e5e7eb); }
+.bg-default { background: linear-gradient(135deg, #EEF2F8, #E3E8F2); }
 
 .shop-card-badge {
     position: absolute; top: 10px; left: 10px;
@@ -1047,8 +1046,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 /* ══ FIDÉLITÉ (sidebar) ══ */
 .sb-loyalty-card {
-    background: linear-gradient(135deg, #eef2ff, #e0e7ff);
-    border: 1px solid #c7d2fe;
+    background: linear-gradient(135deg, #EAF2FF, #EAF2FF);
+    border: 1px solid #D6E6FF;
     border-radius: var(--r); padding: 14px 16px;
     box-shadow: var(--shadow-sm);
 }
@@ -1057,7 +1056,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .sb-loyalty-pts { font-family: var(--display); font-size: 16px; font-weight: 900; color: var(--orange-dk); line-height: 1.1; }
 .sb-loyalty-pts span { font-size: 11px; font-weight: 600; color: var(--text-2); }
 .sb-loyalty-value { font-size: 11px; color: var(--text-2); margin-top: 2px; }
-.sb-loyalty-bar-wrap { height: 7px; background: rgba(99,102,241,.15); border-radius: 20px; overflow: hidden; margin-bottom: 6px; }
+.sb-loyalty-bar-wrap { height: 7px; background: rgba(31,124,246,.15); border-radius: 20px; overflow: hidden; margin-bottom: 6px; }
 .sb-loyalty-bar { height: 100%; background: linear-gradient(90deg, var(--orange), var(--orange-dk)); border-radius: 20px; transition: width .4s ease; }
 .sb-loyalty-next { font-size: 10.5px; color: var(--text-2); line-height: 1.4; margin-bottom: 10px; text-decoration: none; display: block; }
 .sb-loyalty-refer {
@@ -1070,7 +1069,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .sb-loyalty-refer:hover { background: var(--orange); color: #fff; }
 
 .sb-cta {
-    background: linear-gradient(135deg, var(--navy) 0%, #3d5a73 100%);
+    background: linear-gradient(135deg, var(--navy) 0%, #1F3F75 100%);
     border-radius: var(--r); padding: 18px 14px; text-align: center;
     position: relative; overflow: hidden;
 }
@@ -1246,8 +1245,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     color: #fff; line-height: 1.15; margin: 0 0 8px; letter-spacing: -.5px;
 }
 .hero-title .country {
-    color: var(--orange);
-    text-shadow: 0 0 24px rgba(99,102,241,.45);
+    color: #7DB4FF;
+    text-shadow: 0 0 24px rgba(31,124,246,.45);
 }
 .hero-subtitle {
     font-size: 12.5px; color: rgba(255,255,255,.58);
@@ -1293,9 +1292,9 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     font-size: 20px; flex-shrink: 0;
 }
 .stat-ico.s1 { background: #eff6ff; color: #3b82f6; }
-.stat-ico.s2 { background: #eef2ff; color: var(--orange); }
+.stat-ico.s2 { background: #EAF2FF; color: var(--orange); }
 .stat-ico.s3 { background: #f0fdf4; color: #22c55e; }
-.stat-ico.s4 { background: #fdf4ff; color: #a855f7; }
+.stat-ico.s4 { background: #fdf4ff; color: #7DB4FF; }
 .stat-val {
     font-family: var(--display); font-size: 22px; font-weight: 900;
     color: var(--text); line-height: 1; white-space: nowrap;
@@ -1319,7 +1318,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     box-shadow: var(--shadow-sm); text-decoration: none;
     flex-shrink: 0; min-width: 90px; text-align: center;
 }
-.pop-cat-chip:hover { border-color: var(--orange); box-shadow: 0 4px 14px rgba(99,102,241,.18); transform: translateY(-2px); }
+.pop-cat-chip:hover { border-color: var(--orange); box-shadow: 0 4px 14px rgba(31,124,246,.18); transform: translateY(-2px); }
 .pop-cat-chip.active { background: var(--orange-lt); border-color: var(--orange); }
 .pop-cat-chip.active .pop-cat-name { color: var(--orange); }
 .pop-cat-ico { font-size: 24px; line-height: 1; }
@@ -1387,7 +1386,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     font-size: 9px; font-weight: 800;
     border-radius: 20px; padding: 1px 5px;
     min-width: 16px; text-align: center;
-    font-family: monospace; border: 1.5px solid var(--surface);
+    font-variant-numeric: tabular-nums; border: 1.5px solid var(--surface);
     display: none;
 }
 .nav-fav-badge.show { display: block; }
@@ -1408,7 +1407,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     font-size: 9px; font-weight: 800;
     border-radius: 20px; padding: 1px 5px;
     min-width: 16px; text-align: center;
-    font-family: monospace; border: 1.5px solid var(--surface);
+    font-variant-numeric: tabular-nums; border: 1.5px solid var(--surface);
     display: none;
 }
 .nav-cart-badge.show { display: block; }
@@ -1655,7 +1654,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     body.is-dashboard .page-wrap { flex-direction: column !important; padding: 10px 10px 70px !important; gap: 14px !important; }
     body.is-dashboard .main-col { gap: 14px !important; order: 1 !important; }
 
-    /* ── Sidebar : on cache les cartes inutiles, on garde 🏆 top boutiques ── */
+    /* ── Sidebar : on cache les cartes inutiles, on garde le top des boutiques ── */
     body.is-dashboard .sidebar { display: flex !important; flex-direction: column !important; order: 2 !important; width: 100% !important; }
     body.is-dashboard .sidebar-sticky { gap: 0 !important; position: static !important; max-height: none !important; overflow-y: visible !important; }
     body.is-dashboard .sb-card-explorer { display: none !important; }
@@ -1879,7 +1878,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     font-size: 8px; font-weight: 800;
     border-radius: 10px; padding: 1px 4px;
     min-width: 14px; text-align: center;
-    font-family: monospace; border: 1.5px solid var(--surface);
+    font-variant-numeric: tabular-nums; border: 1.5px solid var(--surface);
     display: none; line-height: 1.4;
 }
 .mob-nav-badge.show { display: block; }
@@ -1978,14 +1977,14 @@ html, body { overscroll-behavior-y: none; }
 .shop-prod-match {
     display: none; align-items: center; gap: 4px;
     font-size: 10.5px; font-weight: 700;
-    color: var(--orange); background: rgba(99,102,241,.08);
-    border: 1px solid rgba(99,102,241,.25);
+    color: var(--orange); background: rgba(31,124,246,.08);
+    border: 1px solid rgba(31,124,246,.25);
     padding: 2px 8px; border-radius: 20px;
     margin-top: 4px; width: fit-content;
 }
 .shop-card.prod-match .shop-prod-match { display: inline-flex; }
 .shop-name-clamp mark {
-    background: rgba(99,102,241,.18); color: var(--orange-dk);
+    background: rgba(31,124,246,.18); color: var(--orange-dk);
     border-radius: 3px; padding: 0 2px; font-style: normal;
 }
 #searchLiveInfo {
@@ -2039,7 +2038,7 @@ html, body { overscroll-behavior-y: none; }
     position: absolute; top: -4px; right: -4px;
     background: var(--orange); color: #fff; font-size: 9px; font-weight: 800;
     border-radius: 20px; padding: 1px 5px; min-width: 16px; text-align: center;
-    font-family: monospace; border: 1.5px solid var(--surface); display: none;
+    font-variant-numeric: tabular-nums; border: 1.5px solid var(--surface); display: none;
 }
 .cn-bell-badge.show { display: block; }
 
@@ -2082,20 +2081,20 @@ html, body { overscroll-behavior-y: none; }
 .cn-notif-item:last-child { border-bottom: none; }
 .cn-notif-section { padding: 6px 14px 3px; font-size: 9.5px; font-weight: 800; letter-spacing: 1.2px; color: #94a3b8; text-transform: uppercase; display: flex; align-items: center; gap: 5px; }
 .cn-notif-ico { width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; }
-.cn-notif-ico.msg   { background: linear-gradient(135deg, #818cf8, #6366f1); }
+.cn-notif-ico.msg   { background: linear-gradient(135deg, #7DB4FF, #1668D8); }
 .cn-notif-ico.c-ok  { background: linear-gradient(135deg, #22c55e, #16a34a); }
 .cn-notif-ico.c-del { background: linear-gradient(135deg, #f59e0b, #d97706); }
-.cn-notif-ico.c-done{ background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+.cn-notif-ico.c-done{ background: linear-gradient(135deg, #1F7CF6, #1260C9); }
 .cn-notif-body { flex: 1; min-width: 0; }
 .cn-notif-name { font-size: 12px; font-weight: 700; color: var(--text); }
 .cn-notif-txt { font-size: 11.5px; color: #64748b; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-top: 2px; }
 .cn-notif-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
 .cn-notif-time { font-size: 10px; color: #94a3b8; }
 .cn-notif-badge { font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 20px; }
-.cn-notif-badge.badge-msg  { background: #ede9fe; color: #5b21b6; }
+.cn-notif-badge.badge-msg  { background: #EAF2FF; color: #5b21b6; }
 .cn-notif-badge.badge-ok   { background: #d1fae5; color: #065f46; }
 .cn-notif-badge.badge-del  { background: #fef3c7; color: #92400e; }
-.cn-notif-badge.badge-done { background: #ede9fe; color: #5b21b6; }
+.cn-notif-badge.badge-done { background: #EAF2FF; color: #5b21b6; }
 .cn-notif-dismiss { width: 22px; height: 22px; border-radius: 6px; border: none; background: none; cursor: pointer; color: var(--muted); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all .12s; align-self: flex-start; margin-top: 1px; }
 .cn-notif-dismiss:hover { background: #fee2e2; color: #e53e3e; }
 .cn-drop-empty { padding: 28px 16px; text-align: center; color: var(--muted); font-size: 12.5px; }
@@ -2128,6 +2127,7 @@ html, body { overscroll-behavior-y: none; }
 @endpush
 
 @section('content')
+<script>window.SIco = {!! json_encode(collect(['package', 'check', 'alert', 'message', 'truck', 'x', 'eye', 'eye-off', 'sparkles', 'globe'])->mapWithKeys(fn ($n) => [$n => \App\Support\IconLibrary::svg($n, '', 18)])) !!};</script>
 
 @php
 /* ════════════════════════════════════
@@ -2273,11 +2273,11 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 
     $statusMap = [
         'livrée'       => ['pill-livree',    '✓ Livrée'],
-        'pending'      => ['pill-pending',   '⏳ En attente'],
-        'en attente'   => ['pill-pending',   '⏳ En attente'],
-        'en_attente'   => ['pill-pending',   '⏳ En attente'],
+        'pending'      => ['pill-pending',   'En attente'],
+        'en attente'   => ['pill-pending',   'En attente'],
+        'en_attente'   => ['pill-pending',   'En attente'],
         'confirmée'    => ['pill-livraison', '✓ Confirmée'],
-        'en_livraison' => ['pill-livraison', '🚴 En livraison'],
+        'en_livraison' => ['pill-livraison', 'En livraison'],
         'annulée'      => ['pill-cancelled', '✕ Annulée'],
         'cancelled'    => ['pill-cancelled', '✕ Annulée'],
     ];
@@ -2541,10 +2541,11 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
                 <a href="#" onclick="openProfileModal();return false;">{!! $si('user',15) !!} Modifier mon profil</a>
                 <a href="{{ route('client.orders.index') }}">{!! $si('package',15) !!} Mes commandes</a>
                 <a href="{{ route('client.loyalty.index') }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-                    <span style="display:flex;align-items:center;gap:8px">🎁 Mes points &amp; Parrainage</span>
-                    <span style="background:var(--orange,#6366f1);color:#fff;font-size:10.5px;font-weight:800;padding:1px 7px;border-radius:20px">{{ number_format(auth()->user()->loyalty_points ?? 0, 0, ',', ' ') }}</span>
+                    <span style="display:flex;align-items:center;gap:8px">{!! \App\Support\IconLibrary::svg('gift', '', 16) !!} Mes points &amp; Parrainage</span>
+                    <span style="background:var(--orange,#1668D8);color:#fff;font-size:10.5px;font-weight:800;padding:1px 7px;border-radius:20px">{{ number_format(auth()->user()->loyalty_points ?? 0, 0, ',', ' ') }}</span>
                 </a>
-                <a href="{{ route('client.wishlist.index') }}">❤️ Ma liste de souhaits</a>
+                <a href="{{ route('client.wishlist.index') }}">{!! \App\Support\IconLibrary::svg('heart', '', 16) !!} Ma liste de souhaits</a>
+                <a href="{{ route('client.addresses.index') }}">{!! \App\Support\IconLibrary::svg('map-pin', '', 16) !!} Mes adresses</a>
                 <div class="sep"></div>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -2565,7 +2566,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
     {{-- Fidélité --}}
     <div class="sb-loyalty-card">
         <a href="{{ route('client.loyalty.index') }}" class="sb-loyalty-top">
-            <span class="sb-loyalty-ico">🎁</span>
+            <span class="sb-loyalty-ico">{!! \App\Support\IconLibrary::svg('gift', '', 26) !!}</span>
             <div style="flex:1;min-width:0">
                 <div class="sb-loyalty-pts">{{ number_format($loyaltyPoints, 0, ',', ' ') }} <span>points</span></div>
                 <div class="sb-loyalty-value">= {{ number_format($loyaltyPoints, 0, ',', ' ') }} GNF de réduction</div>
@@ -2577,7 +2578,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
         <a href="{{ route('client.loyalty.index') }}" class="sb-loyalty-next">
             Encore {{ number_format($loyaltyNextMilestone - $loyaltyPoints, 0, ',', ' ') }} points pour {{ number_format($loyaltyNextMilestone, 0, ',', ' ') }} GNF de réduction
         </a>
-        <a href="{{ route('client.loyalty.index') }}" class="sb-loyalty-refer">👥 Parrainez un ami → +{{ number_format($loyaltyReferralBonus, 0, ',', ' ') }} GNF</a>
+        <a href="{{ route('client.loyalty.index') }}" class="sb-loyalty-refer">{!! \App\Support\IconLibrary::svg('user', '', 14) !!} Parrainez un ami → +{{ number_format($loyaltyReferralBonus, 0, ',', ' ') }} GNF</a>
     </div>
 
     {{-- Explorer catégories --}}
@@ -2633,7 +2634,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
         <div style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Où souhaitez-vous être livré ?</div>
         <div style="display:flex;align-items:center;justify-content:space-between;background:var(--grey);border:1px solid var(--border);border-radius:8px;padding:8px 12px">
             <div style="display:flex;align-items:center;gap:8px">
-                <span style="font-size:18px">{{ $countryFlag ?: '📍' }}</span>
+                <span style="font-size:18px">@if($countryFlag){{ $countryFlag }}@else{!! \App\Support\IconLibrary::svg('map-pin', '', 18) !!}@endif</span>
                 <span style="font-size:12.5px;font-weight:700;color:var(--text)">{{ $countryName }}</span>
             </div>
             <span style="color:var(--muted);font-size:13px">→</span>
@@ -2651,7 +2652,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 
 {{-- Notifications push — activation manuelle si la bannière automatique n'est pas apparue --}}
 <div id="notifSettingsCard" style="display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:16px;">
-    <span style="font-size:26px">🔔</span>
+    <span style="display:inline-flex;color:#F59E0B">{!! \App\Support\IconLibrary::svg('bell', '', 26) !!}</span>
     <div style="flex:1;min-width:160px">
         <div style="font-weight:700;font-size:14px;color:var(--text)">Notifications push</div>
         <div id="notifSettingsSub" style="font-size:13px;color:var(--muted);margin-top:2px">Recevez vos commandes et messages en temps réel, même application fermée.</div>
@@ -2704,57 +2705,59 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 {{-- Hero --}}
 <div class="hero">
     {{-- Image de fond téléphone (droite, sans recadrage) --}}
-    {{-- Carte rating flottante en haut à droite --}}
+    {{-- Note moyenne réelle des boutiques : seulement à partir de 3 avis de clients livrés --}}
+    @if($siteRating)
     <div class="hero-rating-card">
-        <div class="hero-rating-stars" style="display:flex;gap:2px;justify-content:center">{!! $sif('star-o',13).$sif('star-o',13).$sif('star-o',13).$sif('star-o',13).$sif('star-o',13) !!}</div>
-        <div class="hero-rating-val">4.8<span style="font-size:13px;font-weight:600;color:rgba(255,255,255,.6)">/5</span></div>
+        <div class="hero-rating-stars" style="display:flex;gap:2px;justify-content:center">{!! str_repeat($sif('star-o',13), (int) round($siteRating['avg'])) !!}</div>
+        <div class="hero-rating-val">{{ number_format($siteRating['avg'], 1, ',', ' ') }}<span style="font-size:13px;font-weight:600;color:rgba(255,255,255,.6)">/5</span></div>
         <div class="hero-rating-lbl">Note moyenne</div>
-        <div class="hero-rating-reviews">+{{ number_format(($shopCount ?? 0) * 12) }} avis clients</div>
+        <div class="hero-rating-reviews">{{ number_format($siteRating['count'], 0, ',', ' ') }} avis clients</div>
     </div>
+    @endif
 
     {{-- Contenu texte par-dessus l'image de fond --}}
     <div class="hero-content">
-        <div class="hero-welcome">Bienvenue sur Shopio 👋</div>
+        <div class="hero-welcome">Bonjour {{ \Illuminate\Support\Str::of(Auth::user()->name)->explode(' ')->first() }}</div>
         <h1 class="hero-title">
-            Les meilleurs produits de <span class="country">{{ $countryName ?: 'Guinée' }}</span>, au même endroit.
+            Achetez en confiance. <span class="country">Payez à la livraison.</span>
         </h1>
         <p class="hero-subtitle">
-            Découvrez des milliers de produits de qualité
-            et une livraison rapide <strong>dans tout le pays.</strong>
+            Boutiques, produits et livraison au même endroit, en {{ $countryName ?: 'Guinée' }}.
+            Vous ne payez <strong>qu’à la réception.</strong>
         </p>
         <div class="hero-badges">
             <span class="hero-badge">
-                <span class="hero-badge-ico">{!! $si('shield-ok',15) !!}</span>
-                <span class="hero-badge-txt">
-                    <span class="hero-badge-label">Produits vérifiés</span>
-                    <span class="hero-badge-sub">Sélectionnés avec soin</span>
-                </span>
-            </span>
-            <span class="hero-badge">
                 <span class="hero-badge-ico">{!! $si('truck',15) !!}</span>
                 <span class="hero-badge-txt">
-                    <span class="hero-badge-label">Livraison rapide</span>
-                    <span class="hero-badge-sub">Partout en {{ $countryName ?: 'Guinée' }}</span>
+                    <span class="hero-badge-label">Paiement à la livraison</span>
+                    <span class="hero-badge-sub">En espèces, au livreur</span>
                 </span>
             </span>
             <span class="hero-badge">
-                <span class="hero-badge-ico">{!! $si('lock',15) !!}</span>
+                <span class="hero-badge-ico">{!! $si('shield-ok',15) !!}</span>
                 <span class="hero-badge-txt">
-                    <span class="hero-badge-label">Paiement sécurisé</span>
-                    <span class="hero-badge-sub">100% sécurisé</span>
+                    <span class="hero-badge-label">Boutiques vérifiées</span>
+                    <span class="hero-badge-sub">Contrôlées par Shopio</span>
                 </span>
             </span>
             <span class="hero-badge">
-                <span class="hero-badge-ico">{!! $si('headset',15) !!}</span>
+                <span class="hero-badge-ico">{!! $si('package',15) !!}</span>
                 <span class="hero-badge-txt">
-                    <span class="hero-badge-label">Support 24/7</span>
-                    <span class="hero-badge-sub">Toujours disponible</span>
+                    <span class="hero-badge-label">Suivi de commande</span>
+                    <span class="hero-badge-sub">Jusqu’à chez vous</span>
+                </span>
+            </span>
+            <span class="hero-badge">
+                <span class="hero-badge-ico">{!! $si('message',15) !!}</span>
+                <span class="hero-badge-txt">
+                    <span class="hero-badge-label">Écrivez aux boutiques</span>
+                    <span class="hero-badge-sub">Questions et prix, dans le chat</span>
                 </span>
             </span>
         </div>
         <div class="hero-btns" style="display:flex;gap:12px;margin-top:22px;flex-wrap:wrap">
             <a href="#catalogue"
-               style="display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:14px;background:linear-gradient(135deg,var(--orange),var(--orange-dk));color:#fff;font-size:14px;font-weight:700;text-decoration:none;box-shadow:0 4px 16px rgba(99,102,241,.35);transition:.2s">
+               style="display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:999px;background:var(--orange);color:#fff;font-size:14px;font-weight:700;text-decoration:none;box-shadow:0 4px 16px rgba(31,124,246,.35);transition:.2s">
                 {!! $si('tag',16) !!} Voir tous les produits
             </a>
         </div>
@@ -2766,33 +2769,33 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
     <div class="stat-card">
         <div class="stat-ico s1">{!! $si('store',22) !!}</div>
         <div>
-            <div class="stat-val">{{ number_format($shopCount ?? 0) }}+</div>
-            <div class="stat-lbl">Boutiques actives</div>
-            <div class="stat-sub">Vérifiées et fiables</div>
+            <div class="stat-val">{{ number_format($shopCount ?? 0, 0, ',', ' ') }}</div>
+            <div class="stat-lbl">Boutiques vérifiées</div>
+            <div class="stat-sub">Contrôlées par Shopio</div>
         </div>
     </div>
     <div class="stat-card">
         <div class="stat-ico s2">{!! $si('bag',22) !!}</div>
         <div>
-            <div class="stat-val">{{ number_format($productCount ?? 0) }}+</div>
-            <div class="stat-lbl">Produits disponibles</div>
+            <div class="stat-val">{{ number_format($productCount ?? 0, 0, ',', ' ') }}</div>
+            <div class="stat-lbl">Produits en ligne</div>
             <div class="stat-sub">Dans toutes les catégories</div>
         </div>
     </div>
     <div class="stat-card">
         <div class="stat-ico s3">{!! $si('truck',22) !!}</div>
         <div>
-            <div class="stat-val">{{ number_format($deliveredCount ?? 0) }}+</div>
-            <div class="stat-lbl">Livraisons réussies</div>
-            <div class="stat-sub">Dans les délais</div>
+            <div class="stat-val">{{ number_format($deliveredCount ?? 0, 0, ',', ' ') }}</div>
+            <div class="stat-lbl">Commandes livrées</div>
+            <div class="stat-sub">Payées à la réception</div>
         </div>
     </div>
     <div class="stat-card">
         <div class="stat-ico s4">{!! $si('users',22) !!}</div>
         <div>
-            <div class="stat-val">{{ number_format($clientCount ?? 0) }}+</div>
-            <div class="stat-lbl">Clients satisfaits</div>
-            <div class="stat-sub">Rejoignez-les !</div>
+            <div class="stat-val">{{ number_format($clientCount ?? 0, 0, ',', ' ') }}</div>
+            <div class="stat-lbl">Clients inscrits</div>
+            <div class="stat-sub">Sur Shopio</div>
         </div>
     </div>
 </div>
@@ -2806,7 +2809,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 <div class="flash-section">
     <div class="flash-section-hd">
         <div>
-            <div class="flash-section-title"><span class="bolt">⚡</span> Ventes Flash</div>
+            <div class="flash-section-title"><span class="bolt">{!! \App\Support\IconLibrary::svg('zap', '', 18) !!}</span> Ventes Flash</div>
             <div class="flash-section-sub">Offres à durée limitée — dépêchez-vous !</div>
         </div>
     </div>
@@ -2832,7 +2835,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
                             <span style="font-size:10px;color:var(--muted)">{{ $fp->shop->currency ?? 'GNF' }}</span>
                         </div>
                         <div class="flash-card-countdown" data-ends="{{ $fp->flash_ends_at->timestamp }}">
-                            ⏳ <span class="flash-cd-val">--:--:--</span>
+                            {!! \App\Support\IconLibrary::svg('clock', '', 14) !!} <span class="flash-cd-val">--:--:--</span>
                         </div>
                     </div>
                 </a>
@@ -2910,7 +2913,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
                             <div class="reco-card-ph">{!! $si('bag', 30) !!}</div>
                         @endif
                         @if($rp->is_flash_active)
-                            <span class="reco-card-badge">⚡ -{{ $rp->flash_discount_percent }}%</span>
+                            <span class="reco-card-badge">{!! \App\Support\IconLibrary::svg('zap', '', 11) !!} -{{ $rp->flash_discount_percent }}%</span>
                         @elseif($rp->has_promo)
                             <span class="reco-card-badge">-{{ $rp->discount_percent }}%</span>
                         @endif
@@ -2973,9 +2976,9 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
                         <div class="reco-card-ph">{!! $si('bag', 30) !!}</div>
                     @endif
                     @if($gp->is_flash_active)
-                        <span class="reco-card-badge">⚡ -{{ $gp->flash_discount_percent }}%</span>
+                        <span class="reco-card-badge">{!! \App\Support\IconLibrary::svg('zap', '', 11) !!} -{{ $gp->flash_discount_percent }}%</span>
                     @elseif(isset($gp->total_sold) && $gp->total_sold > 0)
-                        <span class="reco-card-badge">🏆 {{ $gp->total_sold }} vendus</span>
+                        <span class="reco-card-badge">{!! \App\Support\IconLibrary::svg('trophy', '', 11) !!} {{ $gp->total_sold }} vendus</span>
                     @elseif($gpHasPromo)
                         <span class="reco-card-badge">-{{ $gp->discount_percent }}%</span>
                     @endif
@@ -3122,7 +3125,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
                     <div class="reco-card-ph">{!! $si('bag', 30) !!}</div>
                 @endif
                 @if($p->is_flash_active)
-                    <span class="reco-card-badge">⚡ -{{ $p->flash_discount_percent }}%</span>
+                    <span class="reco-card-badge">{!! \App\Support\IconLibrary::svg('zap', '', 11) !!} -{{ $p->flash_discount_percent }}%</span>
                 @elseif($pHasPromo)
                     <span class="reco-card-badge">-{{ $p->discount_percent }}%</span>
                 @endif
@@ -3205,7 +3208,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
     background: linear-gradient(135deg, var(--orange), var(--orange-dk));
     color: #fff; border: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 6px 20px rgba(99,102,241,.45);
+    box-shadow: 0 6px 20px rgba(31,124,246,.45);
     font-size: 24px; transition: transform .2s;
 }
 .ai-chat-fab:hover { transform: scale(1.06); }
@@ -3257,7 +3260,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 .ai-product-img img { width: 100%; height: 100%; object-fit: cover; }
 .ai-product-info { flex: 1; min-width: 0; }
 .ai-product-name { font-size: 12px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ai-product-price { font-size: 12.5px; font-weight: 800; color: var(--orange-dk); font-family: monospace; margin-top: 2px; }
+.ai-product-price { font-size: 12.5px; font-weight: 800; color: var(--orange-dk); font-variant-numeric: tabular-nums; margin-top: 2px; }
 .ai-product-stock { font-size: 10px; color: var(--muted); margin-top: 1px; }
 .ai-product-stock.out { color: #e53e3e; font-weight: 700; }
 
@@ -3289,11 +3292,11 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 }
 </style>
 
-<button class="ai-chat-fab" id="aiChatFab" onclick="toggleAiChat()" title="Assistant d'achat">🤖</button>
+<button class="ai-chat-fab" id="aiChatFab" onclick="toggleAiChat()" title="Assistant d'achat" aria-label="Assistant d'achat">{!! \App\Support\IconLibrary::svg('sparkles', '', 24) !!}</button>
 
 <div class="ai-chat-panel" id="aiChatPanel">
     <div class="ai-chat-hd">
-        <div class="ai-chat-hd-ico">🤖</div>
+        <div class="ai-chat-hd-ico">{!! \App\Support\IconLibrary::svg('sparkles', '', 20) !!}</div>
         <div style="flex:1;min-width:0">
             <div class="ai-chat-hd-title">Assistant Shopio</div>
             <div class="ai-chat-hd-sub">Trouvez vite ce que vous cherchez</div>
@@ -3302,7 +3305,7 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
         <button class="ai-chat-hd-btn" onclick="toggleAiChat()" title="Fermer">✕</button>
     </div>
     <div class="ai-chat-body" id="aiChatBody">
-        <div class="ai-msg bot">Bonjour 👋 Je suis l'assistant Shopio. Dites-moi ce que vous cherchez (un produit, un budget, une catégorie…) et je vous aide à le trouver !</div>
+        <div class="ai-msg bot">Bonjour, je suis l'assistant Shopio. Dites-moi ce que vous cherchez (un produit, un budget, une catégorie…) et je vous aide à le trouver !</div>
     </div>
     <div class="ai-chat-input-row">
         <input type="text" id="aiChatInput" class="ai-chat-input" placeholder="Ex: une montre à moins de 500 000 GNF" autocomplete="off" onkeydown="if(event.key==='Enter')sendAiChat()">
@@ -3361,7 +3364,7 @@ function _aiAppendProducts(products, label) {
         a.className = 'ai-product-card';
         const stockTxt = p.out_of_stock ? 'Rupture de stock' : (p.stock !== null ? p.stock + ' en stock' : 'En stock');
         a.innerHTML = `
-            <div class="ai-product-img">${p.image ? `<img src="${escHtml(p.image)}" alt="">` : '📦'}</div>
+            <div class="ai-product-img">${p.image ? `<img src="${escHtml(p.image)}" alt="">` : SIco.package}</div>
             <div class="ai-product-info">
                 <div class="ai-product-name">${escHtml(p.name)}</div>
                 <div class="ai-product-price">${Number(p.price).toLocaleString('fr-FR')} ${escHtml(p.currency || 'GNF')}</div>
@@ -3380,7 +3383,7 @@ function _aiAppendOrderCard(order) {
     if (order.success) {
         card.className = 'ai-order-card ok';
         card.innerHTML = `
-            <div class="ai-order-ico">✅</div>
+            <div class="ai-order-ico">${SIco.check}</div>
             <div class="ai-order-info">
                 <div class="ai-order-title">Commande #${order.order_id} confirmée</div>
                 <div class="ai-order-sub">${escHtml(order.product_name)} × ${escHtml(order.quantity)} — ${Number(order.total).toLocaleString('fr-FR')} GNF</div>
@@ -3389,7 +3392,7 @@ function _aiAppendOrderCard(order) {
     } else {
         card.className = 'ai-order-card fail';
         card.innerHTML = `
-            <div class="ai-order-ico">⚠️</div>
+            <div class="ai-order-ico">${SIco.alert}</div>
             <div class="ai-order-info">
                 <div class="ai-order-title">Commande impossible</div>
                 <div class="ai-order-sub">${order.error || 'Une erreur est survenue.'}</div>
@@ -3428,7 +3431,7 @@ function sendAiChat() {
         document.getElementById('aiTypingIndicator')?.remove();
         _aiAppendMsg(data.reply, 'bot');
         _aiAppendProducts(data.products);
-        _aiAppendProducts(data.recommended, '💡 Vous pourriez aussi aimer');
+        _aiAppendProducts(data.recommended, 'Vous pourriez aussi aimer');
         _aiAppendOrderCard(data.order);
     })
     .catch(() => {
@@ -3444,7 +3447,7 @@ function sendAiChat() {
 @if(isset($allTopShops) && $allTopShops->isNotEmpty())
 @php
 $rGrads = [
-    'linear-gradient(135deg,#667eea,#764ba2)',
+    'linear-gradient(135deg,#1F7CF6,#1260C9)',
     'linear-gradient(135deg,#f5576c,#f093fb)',
     'linear-gradient(135deg,#4facfe,#00c6fb)',
     'linear-gradient(135deg,#cc2b5e,#753a88)',
@@ -3457,7 +3460,7 @@ $rGrads = [
 <div class="rank-overlay" id="rankOverlay" onclick="if(event.target===this)closeRankingModal()">
     <div class="rank-modal">
         <div class="rank-modal-head">
-            <span class="rank-modal-title">🏆 Classement des boutiques</span>
+            <span class="rank-modal-title">{!! \App\Support\IconLibrary::svg('trophy', '', 18) !!} Classement des boutiques</span>
             <button class="rank-modal-close" onclick="closeRankingModal()">✕</button>
         </div>
         <div class="rank-modal-body" id="rankModalBody">
@@ -3466,7 +3469,7 @@ $rGrads = [
                 $rParts   = explode(' ', $ts->name);
                 $rInit    = strtoupper(substr($rParts[0],0,1)) . strtoupper(substr($rParts[1] ?? 'X',0,1));
                 $rGrad    = $rGrads[abs(crc32($ts->name)) % count($rGrads)];
-                $medal    = $i === 0 ? '🥇' : ($i === 1 ? '🥈' : ($i === 2 ? '🥉' : null));
+                $medal    = null;
                 $posClass = $i === 0 ? 'gold' : ($i === 1 ? 'silver' : ($i === 2 ? 'bronze' : ''));
             @endphp
             <a href="{{ route('public.shops.products', $ts) }}" class="rank-row" data-rank-idx="{{ $i }}">
@@ -3481,7 +3484,7 @@ $rGrads = [
                 <div class="rank-info">
                     <div class="rank-name">{{ $ts->name }}</div>
                     <div class="rank-stats">
-                        ⭐ <strong>{{ $ts->avg_rating ? number_format($ts->avg_rating, 1) : '—' }}</strong>
+                        {!! \App\Support\IconLibrary::svg('star', '', 13) !!} <strong>{{ $ts->avg_rating ? number_format($ts->avg_rating, 1) : '—' }}</strong>
                         &nbsp;·&nbsp; {{ number_format($ts->sales_count ?? 0) }} ventes
                     </div>
                 </div>
@@ -3505,7 +3508,7 @@ $rGrads = [
     <div style="background:#fff;border-radius:20px;width:100%;max-width:500px;max-height:90vh;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.3);animation:slideUp .28s cubic-bezier(.23,1,.32,1);display:flex;flex-direction:column">
 
         {{-- ── HEADER ── --}}
-        <div style="background:linear-gradient(135deg,#6366f1 0%,#4f46e5 100%);padding:24px 24px 20px;flex-shrink:0;position:relative;overflow:hidden">
+        <div style="background:linear-gradient(135deg,#1668D8 0%,#1260C9 100%);padding:24px 24px 20px;flex-shrink:0;position:relative;overflow:hidden">
             {{-- Cercles déco --}}
             <div style="position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.08);pointer-events:none"></div>
             <div style="position:absolute;right:50px;bottom:-40px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none"></div>
@@ -3517,7 +3520,7 @@ $rGrads = [
                         {{ $initials }}
                     </div>
                     @if($countryFlag)
-                    <span style="position:absolute;bottom:-2px;right:-4px;font-size:18px;line-height:1;background:#fff;border-radius:50%;padding:2px;box-shadow:0 0 0 2px rgba(99,102,241,.4)">{{ $countryFlag }}</span>
+                    <span style="position:absolute;bottom:-2px;right:-4px;font-size:18px;line-height:1;background:#fff;border-radius:50%;padding:2px;box-shadow:0 0 0 2px rgba(31,124,246,.4)">{{ $countryFlag }}</span>
                     @endif
                 </div>
                 {{-- Infos --}}
@@ -3540,21 +3543,21 @@ $rGrads = [
             <div style="display:flex;gap:6px;margin-top:18px;position:relative;z-index:1">
                 <button id="ptab-info" onclick="switchProfileTab('info')"
                         style="flex:1;padding:8px 4px;border-radius:10px;border:none;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;transition:all .18s;background:rgba(255,255,255,.25);color:#fff">
-                    👤 Profil
+                    {!! \App\Support\IconLibrary::svg('user', '', 15) !!} Profil
                 </button>
                 <button id="ptab-pwd" onclick="switchProfileTab('pwd')"
                         style="flex:1;padding:8px 4px;border-radius:10px;border:none;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;transition:all .18s;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7)">
-                    🔒 Mot de passe
+                    {!! \App\Support\IconLibrary::svg('lock', '', 15) !!} Mot de passe
                 </button>
                 <button id="ptab-del" onclick="switchProfileTab('del')"
                         style="flex:1;padding:8px 4px;border-radius:10px;border:none;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;transition:all .18s;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7)">
-                    🗑️ Supprimer
+                    {!! \App\Support\IconLibrary::svg('trash', '', 15) !!} Supprimer
                 </button>
             </div>
         </div>
 
         {{-- ── CORPS SCROLLABLE ── --}}
-        <div style="overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:#dde3ea transparent">
+        <div style="overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:#E3E8F2 transparent">
 
             {{-- ════ ONGLET 1 : INFORMATIONS ════ --}}
             <div id="ptab-info-body">
@@ -3565,7 +3568,7 @@ $rGrads = [
                         {{-- Flash erreurs profil --}}
                         @if($errors->any() && !$errors->updatePassword->any() && !$errors->userDeletion->any())
                         <div style="background:#fff7ed;border:1.5px solid #f06a0f;border-radius:10px;padding:10px 14px;font-size:12.5px;color:#92400e;display:flex;gap:8px;align-items:flex-start">
-                            <span>⚠️</span>
+                            <span style="display:inline-flex">{!! \App\Support\IconLibrary::svg('alert', '', 16) !!}</span>
                             <div>@foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach</div>
                         </div>
                         @endif
@@ -3584,9 +3587,9 @@ $rGrads = [
                         <div>
                             <label style="{{ $lStyle }}">Nom complet</label>
                             <div style="position:relative">
-                                <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none">👤</span>
+                                <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;display:inline-flex;color:#62627C">{!! \App\Support\IconLibrary::svg('user', '', 15) !!}</span>
                                 <input type="text" name="name" value="{{ old('name', $user->name) }}" required style="{{ $iStyle }}"
-                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.1)'"
+                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(31,124,246,.1)'"
                                        onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
                             </div>
                         </div>
@@ -3595,13 +3598,13 @@ $rGrads = [
                         <div>
                             <label style="{{ $lStyle }}">Adresse email</label>
                             <div style="position:relative">
-                                <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none">✉️</span>
+                                <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;display:inline-flex;color:#62627C">{!! \App\Support\IconLibrary::svg('mail', '', 15) !!}</span>
                                 <input type="email" name="email" value="{{ old('email', $user->email) }}" required style="{{ $iStyle }}"
-                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.1)'"
+                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(31,124,246,.1)'"
                                        onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
                             </div>
                             @if($user->email_verified_at)
-                            <div style="font-size:11px;color:#16a34a;margin-top:5px">✅ Email vérifié</div>
+                            <div style="font-size:11px;color:#16a34a;margin-top:5px">{!! \App\Support\IconLibrary::svg('check', '', 12) !!} Email vérifié</div>
                             @endif
                         </div>
 
@@ -3609,9 +3612,9 @@ $rGrads = [
                         <div>
                             <label style="{{ $lStyle }}">Téléphone</label>
                             <div style="position:relative">
-                                <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none">📱</span>
+                                <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;display:inline-flex;color:#62627C">{!! \App\Support\IconLibrary::svg('smartphone', '', 15) !!}</span>
                                 <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" placeholder="+224 6XX XXX XXX" style="{{ $iStyle }}"
-                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.1)'"
+                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(31,124,246,.1)'"
                                        onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
                             </div>
                         </div>
@@ -3620,9 +3623,9 @@ $rGrads = [
                         <div>
                             <label style="{{ $lStyle }}">Adresse de livraison</label>
                             <div style="position:relative">
-                                <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none">📍</span>
+                                <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;display:inline-flex;color:#62627C">{!! \App\Support\IconLibrary::svg('map-pin', '', 15) !!}</span>
                                 <input type="text" name="address" value="{{ old('address', $user->address) }}" placeholder="Quartier, rue…" style="{{ $iStyle }}"
-                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.1)'"
+                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(31,124,246,.1)'"
                                        onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
                             </div>
                         </div>
@@ -3630,14 +3633,14 @@ $rGrads = [
                         {{-- Pays --}}
                         <div>
                             <label style="{{ $lStyle }}">
-                                🌍 Pays
+                                {!! \App\Support\IconLibrary::svg('globe', '', 15) !!} Pays
                                 <span style="font-size:10px;font-weight:500;color:var(--orange);text-transform:none;letter-spacing:0"> — changer de pays actualise vos boutiques</span>
                             </label>
                             <div style="position:relative">
-                                <span id="modalFlagPreview" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:20px;pointer-events:none;z-index:1;line-height:1">{{ $countryFlag ?: '🌍' }}</span>
+                                <span id="modalFlagPreview" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:20px;pointer-events:none;z-index:1;line-height:1">@if($countryFlag){{ $countryFlag }}@else{!! \App\Support\IconLibrary::svg('globe', '', 18) !!}@endif</span>
                                 <select name="country" id="modalCountry" onchange="updateModalFlag(this)"
                                         style="width:100%;padding:10px 14px 10px 44px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:var(--font);color:var(--text);background:#fff;appearance:none;-webkit-appearance:none;cursor:pointer;outline:none;box-sizing:border-box"
-                                        onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.1)'"
+                                        onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(31,124,246,.1)'"
                                         onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
                                     <option value="">-- Sélectionner un pays --</option>
                                     @php
@@ -3745,10 +3748,10 @@ $rGrads = [
                             Annuler
                         </button>
                         <button type="submit"
-                                style="padding:10px 26px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange-dk));color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:7px;box-shadow:0 4px 14px rgba(99,102,241,.4);transition:all .15s"
-                                onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(99,102,241,.5)'"
-                                onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 14px rgba(99,102,241,.4)'">
-                            💾 Enregistrer
+                                style="padding:10px 26px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange-dk));color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:7px;box-shadow:0 4px 14px rgba(31,124,246,.4);transition:all .15s"
+                                onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(31,124,246,.5)'"
+                                onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 14px rgba(31,124,246,.4)'">
+                            {!! \App\Support\IconLibrary::svg('check', '', 16) !!} Enregistrer
                         </button>
                     </div>
                 </form>
@@ -3763,7 +3766,7 @@ $rGrads = [
                     <div style="padding:22px 24px 0">
                         {{-- Info --}}
                         <div style="background:linear-gradient(135deg,#fff7ed,#fff3e0);border:1.5px solid #fed7aa;border-radius:12px;padding:14px 16px;margin-bottom:18px;display:flex;gap:10px;align-items:flex-start">
-                            <span style="font-size:20px;flex-shrink:0">🔒</span>
+                            <span style="flex-shrink:0;display:inline-flex">{!! \App\Support\IconLibrary::svg('lock', '', 20) !!}</span>
                             <div>
                                 <div style="font-size:13px;font-weight:700;color:#92400e">Changer votre mot de passe</div>
                                 <div style="font-size:12px;color:#b45309;margin-top:3px">Choisissez un mot de passe fort avec au moins 8 caractères.</div>
@@ -3774,7 +3777,7 @@ $rGrads = [
                         @if($errors->updatePassword->any())
                         <div style="background:#fff5f5;border:1.5px solid #fca5a5;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12.5px;color:#991b1b">
                             @foreach($errors->updatePassword->all() as $e)
-                                <div>⚠️ {{ $e }}</div>
+                                <div>{!! \App\Support\IconLibrary::svg('alert', '', 14) !!} {{ $e }}</div>
                             @endforeach
                         </div>
                         @endif
@@ -3782,7 +3785,7 @@ $rGrads = [
                         {{-- Succès --}}
                         @if(session('status') === 'password-updated')
                         <div style="background:#f0fdf4;border:1.5px solid #6ee7b7;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12.5px;color:#065f46">
-                            ✅ Mot de passe modifié avec succès !
+                            {!! \App\Support\IconLibrary::svg('check', '', 14) !!} Mot de passe modifié avec succès !
                         </div>
                         @endif
                     </div>
@@ -3792,7 +3795,7 @@ $rGrads = [
                         {{-- Mot de passe actuel (caché pour les comptes Google) --}}
                         @if($user->google_id)
                         <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px">
-                            <span style="font-size:20px;flex-shrink:0">🔗</span>
+                            <span style="flex-shrink:0;display:inline-flex">{!! \App\Support\IconLibrary::svg('globe', '', 20) !!}</span>
                             <div>
                                 <div style="font-size:13px;font-weight:700;color:#15803d">Compte connecté via Google</div>
                                 <div style="font-size:12px;color:#166534;margin-top:2px">Vous pouvez définir un mot de passe directement sans saisir l'ancien. Vous pourrez toujours vous connecter avec Google aussi.</div>
@@ -3802,13 +3805,13 @@ $rGrads = [
                         <div>
                             <label style="display:block;font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.6px">Mot de passe actuel</label>
                             <div style="position:relative">
-                                <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;z-index:1">🔑</span>
+                                <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;z-index:1;display:inline-flex;color:#62627C">{!! \App\Support\IconLibrary::svg('lock', '', 15) !!}</span>
                                 <input type="password" name="current_password" id="pwdCurrent" placeholder="••••••••" autocomplete="current-password"
                                        style="width:100%;padding:10px 44px 10px 40px;border:1.5px solid {{ $errors->updatePassword->has('current_password') ? '#ef4444' : 'var(--border)' }};border-radius:9px;font-size:14px;font-family:var(--font);color:var(--text);background:#fff;outline:none;box-sizing:border-box"
-                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.1)'"
+                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(31,124,246,.1)'"
                                        onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
                                 <button type="button" onclick="togglePwd('pwdCurrent',this)"
-                                        style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);z-index:1">👁</button>
+                                        style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);z-index:1;display:inline-flex" aria-label="Afficher le mot de passe">{!! \App\Support\IconLibrary::svg('eye', '', 16) !!}</button>
                             </div>
                         </div>
                         @endif
@@ -3817,18 +3820,18 @@ $rGrads = [
                         <div>
                             <label style="display:block;font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.6px">Nouveau mot de passe</label>
                             <div style="position:relative">
-                                <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;z-index:1">🔐</span>
+                                <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;z-index:1;display:inline-flex;color:#62627C">{!! \App\Support\IconLibrary::svg('lock', '', 15) !!}</span>
                                 <input type="password" name="password" id="pwdNew" placeholder="Min. 8 caractères" autocomplete="new-password"
                                        oninput="evalPwdStrength(this.value)"
                                        style="width:100%;padding:10px 44px 10px 40px;border:1.5px solid {{ $errors->updatePassword->has('password') ? '#ef4444' : 'var(--border)' }};border-radius:9px;font-size:14px;font-family:var(--font);color:var(--text);background:#fff;outline:none;box-sizing:border-box"
-                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.1)'"
+                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(31,124,246,.1)'"
                                        onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
                                 <button type="button" onclick="togglePwd('pwdNew',this)"
-                                        style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);z-index:1">👁</button>
+                                        style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);z-index:1;display:inline-flex" aria-label="Afficher le mot de passe">{!! \App\Support\IconLibrary::svg('eye', '', 16) !!}</button>
                             </div>
                             {{-- Barre de force --}}
                             <div style="margin-top:8px">
-                                <div style="height:4px;background:#e5e7eb;border-radius:4px;overflow:hidden">
+                                <div style="height:4px;background:#E3E8F2;border-radius:4px;overflow:hidden">
                                     <div id="pwdStrengthBar" style="height:100%;width:0%;border-radius:4px;transition:width .3s,background .3s"></div>
                                 </div>
                                 <div id="pwdStrengthLabel" style="font-size:11px;color:var(--muted);margin-top:4px"></div>
@@ -3839,13 +3842,13 @@ $rGrads = [
                         <div>
                             <label style="display:block;font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.6px">Confirmer le nouveau mot de passe</label>
                             <div style="position:relative">
-                                <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;z-index:1">✅</span>
+                                <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;z-index:1;display:inline-flex;color:#62627C">{!! \App\Support\IconLibrary::svg('check', '', 15) !!}</span>
                                 <input type="password" name="password_confirmation" id="pwdConfirm" placeholder="Répétez le nouveau mot de passe" autocomplete="new-password"
                                        style="width:100%;padding:10px 44px 10px 40px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:var(--font);color:var(--text);background:#fff;outline:none;box-sizing:border-box"
-                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(99,102,241,.1)'"
+                                       onfocus="this.style.borderColor='var(--orange)';this.style.boxShadow='0 0 0 3px rgba(31,124,246,.1)'"
                                        onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
                                 <button type="button" onclick="togglePwd('pwdConfirm',this)"
-                                        style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);z-index:1">👁</button>
+                                        style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);z-index:1;display:inline-flex" aria-label="Afficher le mot de passe">{!! \App\Support\IconLibrary::svg('eye', '', 16) !!}</button>
                             </div>
                         </div>
 
@@ -3857,10 +3860,10 @@ $rGrads = [
                             Annuler
                         </button>
                         <button type="submit"
-                                style="padding:10px 26px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange-dk));color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:7px;box-shadow:0 4px 14px rgba(99,102,241,.4);transition:all .15s"
-                                onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(99,102,241,.5)'"
-                                onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 14px rgba(99,102,241,.4)'">
-                            🔒 Changer le mot de passe
+                                style="padding:10px 26px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange-dk));color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:7px;box-shadow:0 4px 14px rgba(31,124,246,.4);transition:all .15s"
+                                onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(31,124,246,.5)'"
+                                onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 14px rgba(31,124,246,.4)'">
+                            {!! \App\Support\IconLibrary::svg('lock', '', 16) !!} Changer le mot de passe
                         </button>
                     </div>
                 </form>
@@ -3877,7 +3880,7 @@ $rGrads = [
                         {{-- Zone danger --}}
                         <div style="background:#fff5f5;border:2px solid #fca5a5;border-radius:14px;padding:18px 20px;margin-bottom:20px">
                             <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:14px">
-                                <div style="width:40px;height:40px;border-radius:10px;background:#fee2e2;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">⚠️</div>
+                                <div style="width:40px;height:40px;border-radius:10px;background:#fee2e2;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#B91C1C">{!! \App\Support\IconLibrary::svg('alert', '', 20) !!}</div>
                                 <div>
                                     <div style="font-size:14px;font-weight:800;color:#991b1b">Suppression définitive du compte</div>
                                     <div style="font-size:12.5px;color:#b91c1c;margin-top:4px;line-height:1.55">
@@ -3896,7 +3899,7 @@ $rGrads = [
                         @if($errors->userDeletion->any())
                         <div style="background:#fff5f5;border:1.5px solid #fca5a5;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12.5px;color:#991b1b">
                             @foreach($errors->userDeletion->all() as $e)
-                                <div>⚠️ {{ $e }}</div>
+                                <div>{!! \App\Support\IconLibrary::svg('alert', '', 14) !!} {{ $e }}</div>
                             @endforeach
                         </div>
                         @endif
@@ -3908,13 +3911,13 @@ $rGrads = [
                                     Confirmez avec votre mot de passe
                                 </label>
                                 <div style="position:relative">
-                                    <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;z-index:1">🔑</span>
+                                    <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;z-index:1;display:inline-flex;color:#62627C">{!! \App\Support\IconLibrary::svg('lock', '', 15) !!}</span>
                                     <input type="password" name="password" id="delPassword" placeholder="Votre mot de passe actuel" autocomplete="current-password"
                                            style="width:100%;padding:10px 44px 10px 40px;border:2px solid {{ $errors->userDeletion->has('password') ? '#ef4444' : '#fca5a5' }};border-radius:9px;font-size:14px;font-family:var(--font);color:var(--text);background:#fff;outline:none;box-sizing:border-box"
                                            onfocus="this.style.borderColor='#ef4444';this.style.boxShadow='0 0 0 3px rgba(239,68,68,.15)'"
                                            onblur="this.style.borderColor='#fca5a5';this.style.boxShadow='none'">
                                     <button type="button" onclick="togglePwd('delPassword',this)"
-                                            style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);z-index:1">👁</button>
+                                            style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);z-index:1;display:inline-flex" aria-label="Afficher le mot de passe">{!! \App\Support\IconLibrary::svg('eye', '', 16) !!}</button>
                                 </div>
                             </div>
 
@@ -3937,7 +3940,7 @@ $rGrads = [
                         </button>
                         <button type="submit" id="delBtn" disabled
                                 style="padding:10px 20px;border-radius:9px;border:none;background:#d1d5db;color:#fff;font-size:13px;font-weight:700;cursor:not-allowed;font-family:var(--font);display:flex;align-items:center;gap:7px;transition:all .2s">
-                            🗑️ Supprimer mon compte
+                            {!! \App\Support\IconLibrary::svg('trash', '', 16) !!} Supprimer mon compte
                         </button>
                     </div>
                 </form>
@@ -4418,7 +4421,7 @@ function loadFavList() {
             const shopUrl = `{{ url('/client/shops') }}/${s.id}`;
             const imgHtml = s.image
                 ? `<img src="/storage/${escHtml(s.image)}" alt="${escHtml(s.name)}" loading="lazy">`
-                : `<div class="fav-shop-img-ph" style="background:linear-gradient(135deg,#f4f6f8,#e8ecf0)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8a9bb0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18v10a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M3 9l2-6h14l2 6"/><line x1="12" y1="9" x2="12" y2="21"/></svg></div>`;
+                : `<div class="fav-shop-img-ph" style="background:linear-gradient(135deg,#F6F9FF,#EEF2F8)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#62627C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18v10a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M3 9l2-6h14l2 6"/><line x1="12" y1="9" x2="12" y2="21"/></svg></div>`;
             const card = document.createElement('div');
             card.style.cssText = 'display:flex;position:relative';
             card.innerHTML = `
@@ -4465,7 +4468,7 @@ function openMsgModal(conv) {
         av.style.padding = '';
     }
     document.getElementById('mmName').textContent = conv.shopName;
-    document.getElementById('mmProd').textContent = conv.prodName ? '🏷️ ' + conv.prodName : '';
+    document.getElementById('mmProd').textContent = conv.prodName ? conv.prodName : '';
     document.getElementById('mmProductId').value = conv.productId ?? '';
 
     /* Bande produit */
@@ -4493,7 +4496,7 @@ function openMsgModal(conv) {
     if (conv.msgs && conv.msgs.length > 0) {
         conv.msgs.forEach(m => thread.appendChild(buildBubble(m)));
     } else {
-        thread.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--muted);font-size:13px">Aucun message. Écrivez le premier ! 💬</div>';
+        thread.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--muted);font-size:13px">Aucun message. Écrivez le premier !</div>';
     }
 
     /* Ouvrir le modal */
@@ -4781,7 +4784,7 @@ function switchProfileTab(name) {
         var active = (t === name);
         body.style.display  = active ? 'block' : 'none';
         btn.style.background = active ? 'rgba(255,255,255,.95)' : 'rgba(255,255,255,.12)';
-        btn.style.color      = active ? '#6366f1' : 'rgba(255,255,255,.75)';
+        btn.style.color      = active ? '#1668D8' : 'rgba(255,255,255,.75)';
         btn.style.fontWeight = active ? '800' : '700';
         btn.style.boxShadow  = active ? '0 2px 8px rgba(0,0,0,.12)' : 'none';
     });
@@ -4792,8 +4795,8 @@ function updateModalFlag(select) {
     var opt  = select.options[select.selectedIndex];
     var text = opt.textContent.trim();
     var flag = text.split(' ')[0];
-    document.getElementById('modalFlagPreview').textContent =
-        (flag && flag !== '--') ? flag : '🌍';
+    var fp = document.getElementById('modalFlagPreview');
+    if (flag && flag !== '--') fp.textContent = flag; else fp.innerHTML = SIco.globe || '';
 }
 
 /* ── Bascule visibilité mot de passe ── */
@@ -4801,7 +4804,8 @@ function togglePwd(inputId, btn) {
     var inp = document.getElementById(inputId);
     if (!inp) return;
     inp.type = inp.type === 'password' ? 'text' : 'password';
-    btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+    btn.innerHTML = inp.type === 'password' ? SIco.eye : SIco['eye-off'];
+    btn.setAttribute('aria-label', inp.type === 'password' ? 'Afficher le mot de passe' : 'Masquer le mot de passe');
 }
 
 /* ── Force mot de passe ── */
@@ -4817,11 +4821,11 @@ function evalPwdStrength(val) {
     if (/[0-9]/.test(val)) score++;
     if (/[^A-Za-z0-9]/.test(val)) score++;
     var levels = [
-        { pct:'20%', color:'#ef4444', text:'⚠️ Très faible' },
-        { pct:'40%', color:'#f97316', text:'🔸 Faible' },
-        { pct:'60%', color:'#eab308', text:'🔶 Moyen' },
-        { pct:'80%', color:'#22c55e', text:'✅ Fort' },
-        { pct:'100%',color:'#15803d', text:'🛡️ Très fort' },
+        { pct:'20%', color:'#ef4444', text:'Très faible' },
+        { pct:'40%', color:'#f97316', text:'Faible' },
+        { pct:'60%', color:'#eab308', text:'Moyen' },
+        { pct:'80%', color:'#22c55e', text:'Fort' },
+        { pct:'100%',color:'#15803d', text:'Très fort' },
     ];
     var lv = levels[Math.max(0, score - 1)] || levels[0];
     bar.style.width      = lv.pct;
@@ -4857,12 +4861,12 @@ document.addEventListener('DOMContentLoaded', () => {
     @if(session('status') === 'profile-updated')
         openProfileModal('info');
         if (window.Swal) {
-            Swal.fire({ icon: 'success', title: 'Modifié avec succès !', text: 'Vos informations ont bien été mises à jour.', confirmButtonColor: '#6366f1' });
+            Swal.fire({ icon: 'success', title: 'Modifié avec succès !', text: 'Vos informations ont bien été mises à jour.', confirmButtonColor: '#1668D8' });
         }
     @endif
     @if(session('status') === 'password-updated')
         if (window.Swal) {
-            Swal.fire({ icon: 'success', title: 'Modifié avec succès !', text: 'Votre mot de passe a bien été changé.', confirmButtonColor: '#6366f1' });
+            Swal.fire({ icon: 'success', title: 'Modifié avec succès !', text: 'Votre mot de passe a bien été changé.', confirmButtonColor: '#1668D8' });
         }
     @endif
     @if($errors->updatePassword->any())
@@ -4999,14 +5003,14 @@ function filterByCat(type) {
 
     /* ── Map statuts → libellés + style ── */
     const STATUS_MAP = {
-        'livrée':        { label:'Livré 🎉',        cls:'pill-success', ico:'🎉', bg:'background:#d1fae5' },
-        'en_livraison':  { label:'En livraison 🚴',  cls:'pill-info',    ico:'🚴', bg:'background:#dbeafe' },
-        'en livraison':  { label:'En livraison 🚴',  cls:'pill-info',    ico:'🚴', bg:'background:#dbeafe' },
-        'annulée':       { label:'Annulée ✕',        cls:'pill-danger',  ico:'✕',  bg:'background:#fee2e2' },
-        'cancelled':     { label:'Annulée ✕',        cls:'pill-danger',  ico:'✕',  bg:'background:#fee2e2' },
-        'pending':       { label:'En attente ⏳',    cls:'pill-pending', ico:'📦', bg:'background:#fef3c7' },
-        'confirmée':     { label:'Confirmée ✓',      cls:'pill-info',    ico:'📦', bg:'background:#dbeafe' },
-        'processing':    { label:'En traitement ⚙️', cls:'pill-info',    ico:'📦', bg:'background:#fef3c7' },
+        'livrée':        { label:'Livré',        cls:'pill-success', ico:'check', bg:'background:#d1fae5' },
+        'en_livraison':  { label:'En livraison',  cls:'pill-info',    ico:'truck', bg:'background:#dbeafe' },
+        'en livraison':  { label:'En livraison',  cls:'pill-info',    ico:'truck', bg:'background:#dbeafe' },
+        'annulée':       { label:'Annulée',        cls:'pill-danger',  ico:'x',  bg:'background:#fee2e2' },
+        'cancelled':     { label:'Annulée',        cls:'pill-danger',  ico:'x',  bg:'background:#fee2e2' },
+        'pending':       { label:'En attente',    cls:'pill-pending', ico:'package', bg:'background:#fef3c7' },
+        'confirmée':     { label:'Confirmée',      cls:'pill-info',    ico:'package', bg:'background:#dbeafe' },
+        'processing':    { label:'En traitement', cls:'pill-info',    ico:'package', bg:'background:#fef3c7' },
     };
 
     /* ── Toast ── */
@@ -5014,7 +5018,7 @@ function filterByCat(type) {
         const t = document.createElement('div');
         t.style.cssText = `
             position:fixed;bottom:20px;right:20px;
-            background:${type==='order'?'#2c3e50':'#1e40af'};
+            background:${type==='order'?'#0B1E3D':'#1e40af'};
             color:#fff;padding:12px 18px;border-radius:12px;
             font-size:13px;font-weight:600;z-index:99999;
             box-shadow:0 8px 24px rgba(0,0,0,.25);
@@ -5056,7 +5060,7 @@ function filterByCat(type) {
             /* Badge géré exclusivement par pollClientMessages — pas de conflit */
             if (d.messages_unread > _prevMsg && _prevMsg >= 0) {
                 const n = d.messages_unread - _prevMsg;
-                showClientToast(`💬 <div>${n} nouveau${n>1?'x':''} message${n>1?'s':''} de vendeur</div>`, 'msg');
+                showClientToast(`${SIco.message}<div>${n} nouveau${n>1?'x':''} message${n>1?'s':''} de vendeur</div>`, 'msg');
             }
             _prevMsg = d.messages_unread;
 
@@ -5068,7 +5072,7 @@ function filterByCat(type) {
                 if (prev !== order.status) {
                     /* Statut changé → mettre à jour l'UI */
                     _orderStatuses[order.id] = order.status;
-                    const info = STATUS_MAP[order.status] || { label: order.status, cls: 'pill-pending', ico:'📦', bg:'background:#fef3c7' };
+                    const info = STATUS_MAP[order.status] || { label: order.status, cls: 'pill-pending', ico:'package', bg:'background:#fef3c7' };
 
                     const pill = document.getElementById('oPill' + order.id);
                     if (pill) {
@@ -5078,10 +5082,10 @@ function filterByCat(type) {
                         requestAnimationFrame(() => { pill.style.animation = 'rtPulse .5s ease'; });
                     }
                     const ico = document.getElementById('oIco' + order.id);
-                    if (ico) { ico.style.cssText = ico.style.cssText.replace(/background:[^;]+/, info.bg); ico.textContent = info.ico; }
+                    if (ico) { ico.style.cssText = ico.style.cssText.replace(/background:[^;]+/, info.bg); ico.innerHTML = SIco[info.ico] || SIco.package; }
 
                     /* Toast */
-                    showClientToast(`📦 <div>Commande <strong>#${order.id}</strong> — ${info.label}<br><small style="opacity:.75">${escHtml(order.shop_name)}</small></div>`, 'order');
+                    showClientToast(`${SIco.package}<div>Commande <strong>#${order.id}</strong> — ${info.label}<br><small style="opacity:.75">${escHtml(order.shop_name)}</small></div>`, 'order');
                 }
             });
 
@@ -5290,8 +5294,8 @@ function filterByCat(type) {
 
             const avBg = isOk   ? 'linear-gradient(135deg,#22c55e,#16a34a)'
                        : isDel  ? 'linear-gradient(135deg,#f59e0b,#d97706)'
-                       : isDone ? 'linear-gradient(135deg,#8b5cf6,#7c3aed)'
-                                : 'linear-gradient(135deg,#818cf8,#6366f1)';
+                       : isDone ? 'linear-gradient(135deg,#1F7CF6,#1260C9)'
+                                : 'linear-gradient(135deg,#7DB4FF,#1668D8)';
             const avIco = isMsg
                 ? _ICO.msg
                 : isOk   ? _ICO.order_ok
@@ -5377,7 +5381,7 @@ function filterByCat(type) {
         const txt = count > 1
             ? `${senderName} — ${count} messages non lus`
             : `${senderName} — nouveau message`;
-        const sub = shopName ? `📦 ${shopName}` : '💬 Message';
+        const sub = shopName ? `${shopName}` : 'Message';
         const existing = _alerts.find(a => a.type === 'msg' && a.senderId === senderId);
         if (existing) { existing.txt = txt; existing.sub = sub; existing.time = time; }
         else { _alerts.unshift({ id: ++_seq, type: 'msg', txt, sub, time, senderId, url: @json(route('client.messages.hub')) }); }
@@ -5387,9 +5391,9 @@ function filterByCat(type) {
     /* ── Ajouter une alerte commande ── */
     function pushOrder(orderId, status, shopName, time) {
         const map = {
-            'confirmée':    { type: 'order_ok',   txt: `Commande #${orderId} confirmée ✅`, sub: `🏪 ${shopName}` },
-            'en_livraison': { type: 'order_del',  txt: `Commande #${orderId} en livraison 🚴`, sub: `🏪 ${shopName}` },
-            'livrée':       { type: 'order_done', txt: `Commande #${orderId} livrée ! 🎉`, sub: `🏪 ${shopName}` },
+            'confirmée':    { type: 'order_ok',   txt: `Commande #${orderId} confirmée`, sub: `${shopName}` },
+            'en_livraison': { type: 'order_del',  txt: `Commande #${orderId} en livraison`, sub: `${shopName}` },
+            'livrée':       { type: 'order_done', txt: `Commande #${orderId} livrée`, sub: `${shopName}` },
         };
         const info = map[status]; if (!info) return;
         const key  = `${orderId}_${status}`;

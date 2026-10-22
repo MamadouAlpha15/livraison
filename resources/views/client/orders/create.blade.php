@@ -19,14 +19,14 @@
 
 @section('content')
 <div class="container">
-    <h2 class="mb-4">🛒 Nouvelle commande</h2>
+    <h2 class="mb-4">Nouvelle commande</h2>
 
     <form id="orderForm" method="POST" action="{{ route('client.orders.store') }}" enctype="multipart/form-data">
         @csrf
 
         {{-- Boutique --}}
         <div class="mb-3">
-            <label for="shop_id" class="form-label">🏪 Sélectionner une boutique</label>
+            <label for="shop_id" class="form-label">Sélectionner une boutique</label>
             <select name="shop_id" id="shop_id" class="form-select" required>
                 <option value="">-- Choisir une boutique --</option>
                 @foreach($shops as $shop)
@@ -41,7 +41,7 @@
 
         {{-- Produits (non pharmacie) --}}
         <div class="mb-3" id="productGroup" style="display:none;">
-            <label for="product_id" class="form-label">🍔 Choisir un produit</label>
+            <label for="product_id" class="form-label">Choisir un produit</label>
             <select name="product_id" id="product_id" class="form-select">
                 <option value="">-- Choisir un produit --</option>
             </select>
@@ -60,7 +60,7 @@
                     </div>
                     <div>
                         <h6 id="previewName" class="mb-1"></h6>
-                        <div class="text-muted">💰 <span id="previewPrice"></span> GNF</div>
+                        <div class="text-muted"><span id="previewPrice"></span> GNF</div>
                         <small id="previewDesc" class="text-muted"></small>
                     </div>
                 </div>
@@ -69,27 +69,27 @@
 
         {{-- Quantité (non pharmacie) --}}
         <div class="mb-3" id="quantityGroup" style="display:none;max-width:220px;">
-            <label for="quantity" class="form-label">🔢 Quantité</label>
+            <label for="quantity" class="form-label">Quantité</label>
             <input type="number" name="quantity" id="quantity" class="form-control" value="1" min="1">
         </div>
 
         {{-- Montant total --}}
         <div class="mb-3" id="totalGroup" style="max-width:260px;">
-            <label for="total" class="form-label">💰 Montant total (GNF)</label>
+            <label for="total" class="form-label">Montant total (GNF)</label>
             <input type="number" name="total" id="total" class="form-control" readonly>
             <small class="text-muted" id="totalHelp" style="display:none;">Pour les pharmacies, saisissez le total.</small>
         </div>
 
         {{-- Ordonnance (pharmacie) --}}
         <div class="mb-3" id="ordonnanceGroup" style="display:none;">
-            <label for="ordonnance" class="form-label">📎 Joindre une ordonnance (PDF/JPG/PNG)</label>
+            <label for="ordonnance" class="form-label">Joindre une ordonnance (PDF/JPG/PNG)</label>
             <input type="file" name="ordonnance" id="ordonnance" class="form-control" accept="image/*,.pdf">
             <small class="text-muted">Requis uniquement pour les pharmacies</small>
         </div>
 
-        <div class="alert alert-info">💵 Paiement : <strong>Cash à la livraison</strong></div>
+        <div class="alert alert-info">Paiement : <strong>Cash à la livraison</strong></div>
 
-        <button type="submit" class="btn btn-success w-100">✅ Valider ma commande</button>
+        <button type="submit" class="btn btn-success w-100">Valider ma commande</button>
     </form>
 </div>
 @endsection

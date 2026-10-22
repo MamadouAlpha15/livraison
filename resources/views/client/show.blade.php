@@ -22,13 +22,14 @@
     $allergens = $product->allergens ? array_filter(array_map('trim', explode(',', $product->allergens))) : [];
 @endphp
 
+@push('styles')
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{ color-scheme: light only; }
-body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111 !important}
+body{background:#F6F9FF !important;font-family:'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;color:#111 !important}
 @media (prefers-color-scheme: dark){
     body,*{background-color:revert;color:revert}
-    body{background:#f0f2f5 !important;color:#111 !important}
+    body{background:#F6F9FF !important;color:#111 !important}
     .card{background:#fff !important}
     .info-section,.product-name,.price,.desc,.section-label{color:inherit !important}
     .price{color:#111 !important}
@@ -40,7 +41,7 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
     position:sticky;top:0;z-index:50;
     background:rgba(255,255,255,.92);
     backdrop-filter:blur(12px);
-    border-bottom:1px solid #e5e7eb;
+    border-bottom:1px solid #E3E8F2;
     display:flex;align-items:center;gap:10px;
     padding:0 16px;height:52px;
 }
@@ -63,8 +64,8 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
 @keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── GALLERY ── */
-.gallery-section{position:relative;background:#f9fafb}
-.main-img-wrap{position:relative;overflow:hidden;aspect-ratio:4/3;background:#f3f4f6;cursor:zoom-in}
+.gallery-section{position:relative;background:#F6F9FF}
+.main-img-wrap{position:relative;overflow:hidden;aspect-ratio:4/3;background:#EEF2F8;cursor:zoom-in}
 .main-image{width:100%;height:100%;object-fit:cover;transition:opacity .18s}
 .no-img{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:72px;color:#d1d5db}
 
@@ -93,8 +94,8 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
 }
 
 /* miniatures */
-.thumbs{display:flex;gap:8px;padding:10px 12px;overflow-x:auto;background:#fff;border-top:1px solid #f3f4f6;scroll-snap-type:x mandatory}
-.thumbs::-webkit-scrollbar{height:3px}.thumbs::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:3px}
+.thumbs{display:flex;gap:8px;padding:10px 12px;overflow-x:auto;background:#fff;border-top:1px solid #EEF2F8;scroll-snap-type:x mandatory}
+.thumbs::-webkit-scrollbar{height:3px}.thumbs::-webkit-scrollbar-thumb{background:#E3E8F2;border-radius:3px}
 .thumb{
     width:60px;height:60px;border-radius:10px;object-fit:cover;
     flex-shrink:0;scroll-snap-align:start;cursor:pointer;
@@ -107,18 +108,20 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
 
 .cat-chip{
     display:inline-block;font-size:11px;font-weight:700;
-    color:#6366f1;background:#eef2ff;padding:3px 10px;
+    color:#1668D8;background:#EAF2FF;padding:3px 10px;
     border-radius:20px;margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px
 }
 .wish-btn{
     width:38px;height:38px;border-radius:50%;flex-shrink:0;
-    background:#f9fafb;border:1px solid #e5e7eb;cursor:pointer;
+    background:#F6F9FF;border:1px solid #E3E8F2;cursor:pointer;
     display:flex;align-items:center;justify-content:center;font-size:17px;
     transition:transform .15s,background .15s;
 }
 .wish-btn:hover{transform:scale(1.08);background:#fef2f2}
 .wish-btn:active{transform:scale(.92)}
 .wish-btn.active{background:#fef2f2;border-color:#fecaca}
+.wish-btn #wishIcon{display:inline-flex;color:#E11D48}
+.wish-btn.active #wishIcon svg{fill:currentColor}
 .product-name{font-size:22px;font-weight:800;line-height:1.25;color:#111;margin-bottom:16px}
 
 /* PRIX */
@@ -136,7 +139,7 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
 /* VENTE FLASH */
 .flash-badge{
     display:inline-flex;align-items:center;gap:5px;
-    background:linear-gradient(135deg,#1a1a2e,#6366f1);color:#fff;
+    background:linear-gradient(135deg,#0B1E3D,#1668D8);color:#fff;
     font-size:11.5px;font-weight:800;letter-spacing:.3px;
     padding:4px 12px;border-radius:20px;margin-bottom:10px;
     animation:flashPulse 1.6s ease-in-out infinite;
@@ -147,15 +150,15 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
     background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;
     font-size:12.5px;font-weight:700;
     padding:6px 12px;border-radius:10px;margin-bottom:16px;
-    font-family:ui-monospace,monospace;
+    font-variant-numeric: tabular-nums;
 }
 
 /* VARIANTES */
 .variant-picker{margin-bottom:18px}
 .variant-pills{display:flex;flex-wrap:wrap;gap:8px}
-.variant-pill{padding:9px 16px;border-radius:20px;border:1.5px solid #e5e7eb;background:#f9fafb;font-size:13px;font-weight:600;color:#374151;cursor:pointer;transition:all .15s;font-family:inherit}
+.variant-pill{padding:9px 16px;border-radius:20px;border:1.5px solid #E3E8F2;background:#F6F9FF;font-size:13px;font-weight:600;color:#374151;cursor:pointer;transition:all .15s;font-family:inherit}
 .variant-pill:hover:not(.disabled){border-color:#111}
-.variant-pill.selected{background:#111;color:#fff;border-color:#111}
+.variant-pill.selected{background:#1668D8;color:#fff;border-color:#1668D8}
 .variant-pill.disabled{opacity:.45;text-decoration:line-through;cursor:not-allowed}
 .variant-hint{margin-top:8px;font-size:12px;color:#9ca3af}
 
@@ -169,7 +172,7 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
 .stock-note{color:#9ca3af;font-weight:400}
 
 /* SÉPARATEUR */
-.sep{height:1px;background:#f3f4f6;margin:18px 0}
+.sep{height:1px;background:#EEF2F8;margin:18px 0}
 
 /* DESCRIPTION */
 .section-label{font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px}
@@ -179,14 +182,14 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
 .chip{
     display:inline-flex;align-items:center;gap:5px;
-    background:#f9fafb;border:1px solid #e5e7eb;
+    background:#F6F9FF;border:1px solid #E3E8F2;
     color:#374151;font-size:12.5px;font-weight:600;
     padding:5px 12px;border-radius:20px
 }
 
 /* TAGS */
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
-.tag{font-size:12px;font-weight:600;color:#6366f1;background:#eef2ff;padding:4px 10px;border-radius:20px}
+.tag{font-size:12px;font-weight:600;color:#1668D8;background:#EAF2FF;padding:4px 10px;border-radius:20px}
 
 /* ALLERGENS */
 .allergens{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
@@ -195,11 +198,11 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
 /* BOUTIQUE */
 .shop-row{
     display:flex;align-items:center;gap:12px;
-    background:#f9fafb;border:1px solid #e5e7eb;
+    background:#F6F9FF;border:1px solid #E3E8F2;
     border-radius:14px;padding:13px 15px;margin-bottom:22px;
     text-decoration:none;transition:.15s;
 }
-.shop-row:hover{background:#f3f4f6;border-color:#d1d5db}
+.shop-row:hover{background:#EEF2F8;border-color:#d1d5db}
 .shop-av{
     width:42px;height:42px;border-radius:11px;
     display:flex;align-items:center;justify-content:center;
@@ -214,28 +217,51 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
 .cta-stack{display:flex;flex-direction:column;gap:10px}
 .btn-order{
     display:flex;align-items:center;justify-content:center;gap:8px;
-    background:#111;color:#fff;
+    background:#1668D8;color:#fff;
     font-size:15px;font-weight:800;letter-spacing:.2px;
-    padding:16px 24px;border-radius:14px;
+    padding:16px 24px;border-radius:999px;
     text-decoration:none;transition:.18s;border:none;cursor:pointer
 }
-.btn-order:hover{background:#000;transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.btn-order:hover{background:#1260C9;color:#fff;transform:translateY(-1px);box-shadow:0 12px 24px -10px rgba(22,104,216,.6)}
 .btn-order:active{transform:scale(.97)}
-.btn-order.off{background:#e5e7eb;color:#9ca3af;pointer-events:none;cursor:default;transform:none;box-shadow:none}
+.btn-order.off{background:#E3E8F2;color:#9ca3af;pointer-events:none;cursor:default;transform:none;box-shadow:none}
 .btn-addcart{
     display:flex;align-items:center;justify-content:center;gap:8px;
-    background:#fff;color:#6366f1;border:1.5px solid #6366f1;
+    background:#fff;color:#1668D8;border:1.5px solid #1668D8;
     font-size:14.5px;font-weight:800;letter-spacing:.2px;
     padding:14px 24px;border-radius:14px;
     text-decoration:none;transition:.18s;cursor:pointer
 }
-.btn-addcart:hover{background:#eef2ff}
+.btn-addcart:hover{background:#EAF2FF}
 .btn-addcart:active{transform:scale(.97)}
 .btn-addcart.added{background:#10b981;border-color:#10b981;color:#fff}
 .btn-addcart:disabled{opacity:.7;cursor:default}
+.btn-addcart.is-on{background:#EAF2FF;border-color:#CFE1FF;color:#1260C9}
+/* Questions sur le produit */
+.qa{display:grid;gap:10px;scroll-margin-top:80px}
+.qa-item{padding:12px 14px;border-radius:16px;background:#F6F9FF;display:grid;gap:6px}
+.qa-item.is-pending{background:#fff;box-shadow:inset 0 0 0 1.5px #E3E8F2}
+.qa-q,.qa-a{display:flex;gap:8px;font-size:14px;line-height:1.5;color:#16162A;overflow-wrap:anywhere}
+.qa-q{font-weight:700}
+.qa-a{color:#45455E}
+.qa-tag{flex-shrink:0;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background:#0B1E3D;color:#fff}
+.qa-tag.is-a{background:#1668D8}
+.qa-meta{font-size:12px;color:#62627C;padding-left:30px}
+.qa-empty{margin:0;font-size:13.5px;color:#62627C}
+.qa-flash{padding:10px 14px;border-radius:12px;font-size:13px;font-weight:600}
+.qa-flash.ok{background:#ECFDF5;color:#065F46}
+.qa-flash.warn{background:#FFFBEB;color:#92400E}
+.qa-form{display:grid;gap:8px;margin-top:4px}
+.qa-label{font-size:13px;font-weight:700;color:#16162A}
+.qa-form textarea{width:100%;padding:12px 14px;border:1.5px solid #E3E8F2;border-radius:14px;font:inherit;font-size:14px;color:#16162A;resize:vertical;min-height:70px}
+.qa-form textarea:focus{outline:none;border-color:#1F7CF6;box-shadow:0 0 0 4px rgba(31,124,246,.12)}
+.qa-err{font-size:12.5px;color:#B91C1C;font-weight:600}
+.qa-submit{justify-self:start;min-height:42px;padding:0 20px;border:none;border-radius:999px;background:#1668D8;color:#fff;font-family: inherit; font-size: 13.5px; font-weight: 800;cursor:pointer}
+.qa-submit:hover{background:#1260C9}
+.qa-login{font-size:13.5px;font-weight:700;color:#1260C9}
 .btn-back{
     display:flex;align-items:center;justify-content:center;gap:7px;
-    background:#fff;border:1.5px solid #e5e7eb;color:#374151;
+    background:#fff;border:1.5px solid #E3E8F2;color:#374151;
     font-size:14px;font-weight:700;padding:13px 24px;border-radius:14px;
     text-decoration:none;transition:.15s
 }
@@ -257,7 +283,7 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
 @media(min-width:768px){
     .page{padding:32px 24px 80px}
     .card{display:grid;grid-template-columns:420px 1fr;align-items:stretch}
-    .gallery-section{border-right:1px solid #f3f4f6;display:flex;flex-direction:column}
+    .gallery-section{border-right:1px solid #EEF2F8;display:flex;flex-direction:column}
     .main-img-wrap{aspect-ratio:4/3}
     .info-section{padding:30px 28px 36px;overflow-y:auto;max-height:calc(100vh - 120px);display:flex;flex-direction:column}
     .cta-stack{margin-top:auto;padding-top:18px}
@@ -270,6 +296,9 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
     .product-name{font-size:26px}
 }
 </style>
+@endpush
+
+@section('content')
 
 {{-- BACK BAR --}}
 <div class="back-bar">
@@ -295,12 +324,12 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
             @if(count($allPhotos))
                 <img id="mainImage" src="{{ $allPhotos[0] }}" class="main-image" alt="{{ $product->name }}" onclick="openLightbox(_curIdx)">
             @else
-                <div class="no-img">🛍</div>
+                <div class="no-img">{!! \App\Support\IconLibrary::svg('bag', '', 72) !!}</div>
             @endif
 
             <div class="img-badges">
                 @if($hasPromo)<span class="bdg bdg-promo">-{{ $discountPct }}%</span>@endif
-                @if($product->is_featured)<span class="bdg bdg-featured">⭐ Vedette</span>@endif
+                @if($product->is_featured)<span class="bdg bdg-featured">{!! \App\Support\IconLibrary::svg('star', '', 11) !!} Vedette</span>@endif
             </div>
 
             @if(count($allPhotos) > 1)
@@ -332,7 +361,7 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
             @auth
             <button type="button" class="wish-btn {{ ($isFavorited ?? false) ? 'active' : '' }}"
                     id="wishBtn" onclick="toggleWish({{ $product->id }})" title="Ajouter à ma liste de souhaits">
-                <span id="wishIcon">{{ ($isFavorited ?? false) ? '❤️' : '🤍' }}</span>
+                <span id="wishIcon">{!! \App\Support\IconLibrary::svg('heart', '', 20) !!}</span>
             </button>
             @endauth
         </div>
@@ -341,14 +370,14 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
 
         {{-- PRIX --}}
         @if($product->is_flash_active)
-            <div class="flash-badge">⚡ VENTE FLASH −{{ $product->flash_discount_percent }}%</div>
+            <div class="flash-badge">{!! \App\Support\IconLibrary::svg('zap', '', 14) !!} VENTE FLASH −{{ $product->flash_discount_percent }}%</div>
             <div class="price-row">
                 <span class="price" style="color:#dc2626">{{ number_format($product->flash_price, 0, ',', ' ') }}</span>
                 <span class="currency">GNF</span>
                 <span class="old-price">{{ number_format($product->price, 0, ',', ' ') }} GNF</span>
             </div>
             <div class="flash-countdown" id="flashCountdown" data-ends="{{ $product->flash_ends_at->timestamp }}">
-                ⏳ Se termine dans <span id="flashTimer">--:--:--</span>
+                {!! \App\Support\IconLibrary::svg('clock', '', 14) !!} Se termine dans <span id="flashTimer">--:--:--</span>
             </div>
         @else
             <div class="price-row">
@@ -398,12 +427,12 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
 
         {{-- CHIPS --}}
         @php $chips = [] @endphp
-        @if($product->unit) @php $chips[]=['⚖️',$product->unit] @endphp @endif
-        @if($product->preparation_time) @php $chips[]=['⏱',$product->preparation_time.' min'] @endphp @endif
+        @if($product->unit) @php $chips[]=['package',$product->unit] @endphp @endif
+        @if($product->preparation_time) @php $chips[]=['clock',$product->preparation_time.' min'] @endphp @endif
         @if(count($chips))
         <div class="chips">
             @foreach($chips as [$ico,$txt])
-                <span class="chip">{{ $ico }} {{ $txt }}</span>
+                <span class="chip">{!! \App\Support\IconLibrary::svg($ico, '', 13) !!} {{ $txt }}</span>
             @endforeach
         </div>
         @endif
@@ -423,7 +452,7 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
 
         @if(count($allergens))
         <div class="sep"></div>
-        <div class="section-label">⚠️ Allergènes</div>
+        <div class="section-label">{!! \App\Support\IconLibrary::svg('alert', '', 13) !!} Allergènes</div>
         <div class="allergens">
             @foreach($allergens as $a)<span class="allergen">{{ $a }}</span>@endforeach
         </div>
@@ -432,7 +461,7 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
         @if($shop)
         <div class="sep"></div>
         @php
-            $grads=['linear-gradient(135deg,#667eea,#764ba2)','linear-gradient(135deg,#f5576c,#f093fb)','linear-gradient(135deg,#4facfe,#00c6fb)','linear-gradient(135deg,#ee0979,#ff6a00)','linear-gradient(135deg,#11998e,#38ef7d)','linear-gradient(135deg,#fc4a1a,#f7b733)'];
+            $grads=['linear-gradient(135deg,#1F7CF6,#1260C9)','linear-gradient(135deg,#f5576c,#f093fb)','linear-gradient(135deg,#4facfe,#00c6fb)','linear-gradient(135deg,#ee0979,#ff6a00)','linear-gradient(135deg,#11998e,#38ef7d)','linear-gradient(135deg,#fc4a1a,#f7b733)'];
             $grad=$grads[abs(crc32($shop->name??''))%count($grads)];
         @endphp
         <a href="{{ route('public.shops.products', $shop) }}" class="shop-row">
@@ -459,20 +488,81 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
                 <a href="{{ route('client.orders.createFromProduct', $product) }}"
                    data-base-href="{{ route('client.orders.createFromProduct', $product) }}"
                    id="orderCta" class="btn-order">
-                    🛒 Commander maintenant
+                    {!! \App\Support\IconLibrary::svg('cart', '', 17) !!} Commander maintenant
                 </a>
                 @auth
                 <button type="button" id="addCartBtn" onclick="addToCartFromPage({{ $product->id }}, this)" class="btn-addcart">
-                    🛍️ Ajouter au panier
+                    {!! \App\Support\IconLibrary::svg('bag', '', 17) !!} Ajouter au panier
                 </button>
                 @endauth
             @else
-                <span class="btn-order off">🚫 Indisponible actuellement</span>
+                <span class="btn-order off">Indisponible actuellement</span>
+                @if($stockOut)
+                    @auth
+                    @php $hasStockAlert = \App\Models\StockAlert::where('user_id', auth()->id())->where('product_id', $product->id)->exists(); @endphp
+                    <button type="button" id="stockAlertBtn" class="btn-addcart {{ $hasStockAlert ? 'is-on' : '' }}"
+                            data-url="{{ route('client.products.stock-alert', $product) }}" aria-pressed="{{ $hasStockAlert ? 'true' : 'false' }}">
+                        {!! \App\Support\IconLibrary::svg('bell', '', 17) !!}
+                        <span>{{ $hasStockAlert ? 'Alerte activée · vous serez prévenu' : 'Me prévenir du retour en stock' }}</span>
+                    </button>
+                    @else
+                    <a href="{{ route('login', ['redirect' => url()->current()]) }}" class="btn-addcart">
+                        {!! \App\Support\IconLibrary::svg('bell', '', 17) !!} Me prévenir du retour en stock
+                    </a>
+                    @endauth
+                @endif
             @endif
             <a href="{{ auth()->check() ? route('client.products.index') : route('shops.index') }}" class="btn-back">
                 ← Tous les produits
             </a>
         </div>
+
+        {{-- QUESTIONS PUBLIQUES : la réponse de la boutique sert à tous les acheteurs --}}
+        @php
+            $qaPublic = \App\Models\ProductQuestion::with('user:id,name')->where('product_id', $product->id)->answered()->latest('answered_at')->take(10)->get();
+            $qaMine   = auth()->check()
+                ? \App\Models\ProductQuestion::where('product_id', $product->id)->where('user_id', auth()->id())->unanswered()->latest()->get()
+                : collect();
+            $qaCanAsk = auth()->check() && auth()->user()->role === 'client';
+        @endphp
+        <div class="sep"></div>
+        <section class="qa" id="questions" aria-labelledby="qaTitle">
+            <div class="section-label" id="qaTitle">Questions sur ce produit</div>
+
+            @if(session('qa_success'))<div class="qa-flash ok" role="status">{{ session('qa_success') }}</div>@endif
+            @if(session('qa_warning'))<div class="qa-flash warn" role="alert">{{ session('qa_warning') }}</div>@endif
+
+            @foreach($qaMine as $q)
+            <div class="qa-item is-pending">
+                <div class="qa-q"><span class="qa-tag">Q</span> {{ $q->question }}</div>
+                <div class="qa-meta">Votre question · en attente de la réponse de la boutique</div>
+            </div>
+            @endforeach
+
+            @forelse($qaPublic as $q)
+            <div class="qa-item">
+                <div class="qa-q"><span class="qa-tag">Q</span> {{ $q->question }}</div>
+                <div class="qa-a"><span class="qa-tag is-a">R</span> {{ $q->answer }}</div>
+                <div class="qa-meta">{{ $q->author_first_name }} · réponse de {{ $shop->name ?? 'la boutique' }} {{ $q->answered_at->diffForHumans() }}</div>
+            </div>
+            @empty
+                @if($qaMine->isEmpty())
+                <p class="qa-empty">Aucune question pour l'instant. Posez la première : la réponse de la boutique sera visible par tous.</p>
+                @endif
+            @endforelse
+
+            @if($qaCanAsk)
+            <form method="POST" action="{{ route('client.products.questions.store', $product) }}" class="qa-form">
+                @csrf
+                <label for="qaQuestion" class="qa-label">Votre question</label>
+                <textarea id="qaQuestion" name="question" rows="2" maxlength="500" required placeholder="Ex. Quelle est la taille exacte ? Est-ce livré à Kindia ?">{{ old('question') }}</textarea>
+                @error('question')<div class="qa-err">{{ $message }}</div>@enderror
+                <button type="submit" class="qa-submit">Envoyer la question</button>
+            </form>
+            @elseguest
+            <a href="{{ route('login', ['redirect' => url()->current() . '#questions']) }}" class="qa-login">Connectez-vous pour poser une question</a>
+            @endif
+        </section>
 
     </div>
 </div>
@@ -665,8 +755,28 @@ async function toggleWish(productId){
         });
         const data = await res.json();
         btn.classList.toggle('active', data.favorited);
-        icon.textContent = data.favorited ? '❤️' : '🤍';
     } catch(e) {}
     btn.disabled = false;
 }
+
+/* « Me prévenir du retour en stock » */
+document.getElementById('stockAlertBtn')?.addEventListener('click', async function () {
+    const btn = this, label = btn.querySelector('span');
+    btn.disabled = true;
+    try {
+        const res = await fetch(btn.dataset.url, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json' },
+        });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        btn.classList.toggle('is-on', data.active);
+        btn.setAttribute('aria-pressed', data.active ? 'true' : 'false');
+        label.textContent = data.active ? 'Alerte activée · vous serez prévenu' : 'Me prévenir du retour en stock';
+    } catch (e) {
+        label.textContent = 'Réessayez dans un instant';
+    }
+    btn.disabled = false;
+});
 </script>
+@endsection

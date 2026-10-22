@@ -609,6 +609,12 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
                                 <span class="val">📍 {{ $order->delivery_destination }}</span>
                             </div>
                             @endif
+                            @if($order->delivery_slot)
+                            <div class="info-row">
+                                <span class="lbl">Créneau</span>
+                                <span class="val">{{ $order->delivery_slot }}</span>
+                            </div>
+                            @endif
                             @if($cl->created_at)
                             <div class="info-row">
                                 <span class="lbl">Client depuis</span>
@@ -638,6 +644,12 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
                             <div class="info-row">
                                 <span class="lbl">Livraison</span>
                                 <span class="val">📍 {{ $order->delivery_destination }}</span>
+                            </div>
+                            @endif
+                            @if($order->delivery_slot)
+                            <div class="info-row">
+                                <span class="lbl">Créneau</span>
+                                <span class="val">{{ $order->delivery_slot }}</span>
                             </div>
                             @endif
                         </div>

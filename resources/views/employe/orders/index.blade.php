@@ -1307,6 +1307,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         <td>
                             @php $addr = $order->delivery_destination ?: ($client?->address ?? ''); @endphp
                             @if($addr)<div class="addr-cell" title="{{ $addr }}">{!! $I['pin_addr'] !!} {{ $addr }}</div>@else<span class="addr-empty">—</span>@endif
+                            @if($order->delivery_slot)<div style="font-size:11.5px;font-weight:700;color:#1260C9;margin-top:3px">Créneau : {{ $order->delivery_slot }}</div>@endif
                         </td>
                         <td>
                             <div class="amount">{{ number_format($order->total,0,',',' ') }} <small>{{ $devise }}</small></div>

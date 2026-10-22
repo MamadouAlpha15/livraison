@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Services\PushService;
+use App\Support\DeliveryCode;
 
 class OrderController extends Controller
 {
@@ -219,7 +220,7 @@ class OrderController extends Controller
                     app(PushService::class)->sendToUser(
                         $order->client,
                         'Commande en route 🚚',
-                        'Votre commande #' . str_pad($order->id, 4, '0', STR_PAD_LEFT) . ' est en cours de livraison !',
+                        'Votre commande #' . str_pad($order->id, 4, '0', STR_PAD_LEFT) . ' est en cours de livraison !' . (filled($order->delivery_code) ? ' Code de remise à donner au livreur : ' . $order->delivery_code : ''),
                         1,
                         '/client/orders'
                     );
@@ -238,10 +239,19 @@ class OrderController extends Controller
         $driver = $this->myDriver();
         $user   = Auth::user();
         $data   = $request->validate([
-            'order_ids'   => 'required|array|min:1',
-            'proof_photo' => ['nullable', 'image', 'mimes:jpeg,png,webp,gif', 'max:8192'],
+            'order_ids'     => 'required|array|min:1',
+            'proof_photo'   => ['nullable', 'image', 'mimes:jpeg,png,webp,gif', 'max:8192'],
+            'delivery_code' => ['nullable', 'string', 'max:10'],
         ]);
         $ids = $data['order_ids'];
+
+        // Un trajet groupé = un même client : son code (commun aux commandes d'un même panier) valide la remise
+        $toCheck = Order::whereIn('id', $ids)->whereNotIn('status', [Order::STATUS_LIVREE, Order::STATUS_ANNULEE])->get();
+        foreach ($toCheck->groupBy('delivery_code') as $sameCode) {
+            if ($codeError = DeliveryCode::check($sameCode, $request->input('delivery_code'))) {
+                return back()->with('error', $codeError);
+            }
+        }
 
         // Une seule photo prise pour tout le trajet groupé (même client) → appliquée à chaque commande du lot
         $proofPhotoPath = $request->hasFile('proof_photo')
@@ -393,7 +403,7 @@ class OrderController extends Controller
                         app(PushService::class)->sendToUser(
                             $order->client,
                             'Commande en route 🚚',
-                            'Votre commande #' . str_pad($order->id, 4, '0', STR_PAD_LEFT) . ' est en cours de livraison !',
+                            'Votre commande #' . str_pad($order->id, 4, '0', STR_PAD_LEFT) . ' est en cours de livraison !' . (filled($order->delivery_code) ? ' Code de remise à donner au livreur : ' . $order->delivery_code : ''),
                             1,
                             '/client/orders'
                         );
@@ -427,7 +437,7 @@ class OrderController extends Controller
                 app(PushService::class)->sendToUser(
                     $order->client,
                     'Commande en route 🚚',
-                    'Votre commande #' . str_pad($order->id, 4, '0', STR_PAD_LEFT) . ' est en cours de livraison !',
+                    'Votre commande #' . str_pad($order->id, 4, '0', STR_PAD_LEFT) . ' est en cours de livraison !' . (filled($order->delivery_code) ? ' Code de remise à donner au livreur : ' . $order->delivery_code : ''),
                     1,
                     '/client/orders'
                 );
@@ -449,8 +459,15 @@ class OrderController extends Controller
         $driver = $this->authorizeOrder($order);
 
         $request->validate([
-            'proof_photo' => ['nullable', 'image', 'mimes:jpeg,png,webp,gif', 'max:8192'],
+            'proof_photo'   => ['nullable', 'image', 'mimes:jpeg,png,webp,gif', 'max:8192'],
+            'delivery_code' => ['nullable', 'string', 'max:10'],
         ]);
+
+        if ($codeError = DeliveryCode::check([$order], $request->input('delivery_code'))) {
+            return $request->expectsJson()
+                ? response()->json(['message' => $codeError], 422)
+                : back()->with('error', $codeError);
+        }
 
         DB::beginTransaction();
 

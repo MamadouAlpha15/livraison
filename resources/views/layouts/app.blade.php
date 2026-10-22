@@ -349,6 +349,9 @@
         }
     </style>
 
+    {{-- Police Shopio (Plus Jakarta Sans), auto-hébergée : disponible pour toutes les pages --}}
+    <link href="{{ \App\Support\Assets::v('fonts/dashboard-fonts.css') }}" rel="stylesheet">
+    <style>svg.ico{flex-shrink:0;vertical-align:-.15em}</style>
     @stack('styles')
 </head>
 <body class="pg-loading {{ $bodyClass ?? '' }}">
@@ -508,7 +511,7 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
 @if(in_array(auth()->user()->role ?? '', ['admin', 'company', 'client', 'vendeur', 'employe', 'livreur']))
 @if(!session('push_banner_dismissed'))
 <div id="pushNotifBanner" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:9999;width:calc(100% - 32px);max-width:420px;background:#1e293b;color:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,.35);align-items:center;gap:12px;">
-    <span style="font-size:22px">🔔</span>
+    <span style="display:inline-flex;color:#F59E0B">{!! \App\Support\IconLibrary::svg('bell', '', 22) !!}</span>
     <div style="flex:1;font-size:13px;line-height:1.4">
         <strong>Activez les notifications</strong><br>
         <span style="opacity:.8">Recevez vos commandes en temps réel</span>
@@ -621,7 +624,7 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
 
         {{-- Instructions iOS --}}
         <div id="pwaIosHint" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px 14px;margin-bottom:18px;font-size:13px;color:#166534;line-height:1.6">
-            Sur iPhone : appuyez sur <strong>⬆ Partager</strong> puis <strong>"Sur l'écran d'accueil"</strong>
+            Sur iPhone : appuyez sur <strong>Partager</strong> puis <strong>"Sur l'écran d'accueil"</strong>
         </div>
 
         <button id="pwaInstallBtn" onclick="pwaInstall()" style="
@@ -631,7 +634,7 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
             box-shadow:0 4px 16px rgba(5,150,105,.35);margin-bottom:12px;
             display:flex;align-items:center;justify-content:center;gap:8px;
         ">
-            📲 Installer l'application
+            {!! \App\Support\IconLibrary::svg('smartphone', '', 18) !!} Installer l'application
         </button>
         <button onclick="pwaDismiss()" style="
             width:100%;padding:12px;border:1.5px solid #e5e7eb;border-radius:14px;

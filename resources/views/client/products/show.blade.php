@@ -12,28 +12,27 @@
 
 
 @push('styles')
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="{{ \App\Support\Assets::v('fonts/dashboard-fonts.css') }}" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 :root {
-    --amazon:    #6366f1;
-    --amazon-dk: #4f46e5;
-    --amazon-lt: #e0e7ff;
-    --navy:      #131921;
-    --navy-2:    #232f3e;
-    --blue:      #007185;
+    --amazon:    #1668D8;
+    --amazon-dk: #1260C9;
+    --amazon-lt: #EAF2FF;
+    --navy:      #0B1E3D;
+    --navy-2:    #132B52;
+    --blue:      #1668D8;
     --green:     #067d62;
     --green-lt:  #e8f5e9;
-    --red:       #b12704;
-    --grey:      #f3f3f3;
-    --grey-2:    #eaeded;
+    --red:       #1260C9;
+    --grey:      #F6F9FF;
+    --grey-2:    #EEF2F8;
     --border:    #ddd;
-    --text:      #0f1111;
+    --text:      #16162A;
     --text-2:    #333;
-    --muted:     #565959;
+    --muted:     #62627C;
     --surface:   #fff;
-    --font:      'Noto Sans', sans-serif;
+    --font:      'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --r:         8px;
     --r-sm:      4px;
     --shadow-sm: 0 1px 2px rgba(0,0,0,.1);
@@ -130,11 +129,11 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 @endphp
 
 <nav class="amz-nav">
-    <a href="{{ route('client.dashboard') }}" class="amz-nav-logo">Ma<span>Boutique</span></a>
+    <a href="{{ route('client.dashboard') }}" class="amz-nav-logo" aria-label="Shopio, accueil"><img src="{{ asset('images/shopio-logo-192.png') }}" alt="Shopio" style="height:38px;width:auto;border-radius:10px;display:block"></a>
     <a href="{{ route('public.shops.products', $shop) }}" class="amz-back">← {{ Str::limit($shop->name, 20) }}</a>
     <div class="amz-nav-search">
         <input type="text" placeholder="Rechercher un produit…">
-        <button class="amz-nav-search-btn">🔍</button>
+        <button class="amz-nav-search-btn" aria-label="Rechercher">{!! \App\Support\IconLibrary::svg('search', '', 16) !!}</button>
     </div>
 </nav>
 
@@ -164,7 +163,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                      class="prod-main-img" id="mainImg" alt="{{ $product->name }}"
                      fetchpriority="high" decoding="async" width="500" height="500">
             @else
-                <div class="prod-main-img-ph">🏷️</div>
+                <div class="prod-main-img-ph">{!! \App\Support\IconLibrary::svg('tag', '', 72) !!}</div>
             @endif
         </div>
         @if(count($allPhotos) > 1)
@@ -221,7 +220,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
             <div class="prod-spec-row"><span class="prod-spec-key">Livraison</span><span class="prod-spec-val" style="color:var(--green)">✓ Paiement à la livraison</span></div>
         </div>
         @auth @if(Auth::user()->role === 'client')
-        <a href="{{ route('client.messages.index', $product) }}" class="prod-msg-btn">💬 Poser une question au vendeur</a>
+        <a href="{{ route('client.messages.index', $product) }}" class="prod-msg-btn">{!! \App\Support\IconLibrary::svg('message', '', 16) !!} Poser une question au vendeur</a>
         @endif @endauth
     </div>
 
@@ -232,7 +231,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
         <div class="prod-order-delivery">✓ Livraison disponible</div>
         @if($stockVal !== null)
             @if($stockOut)<div class="prod-order-stock-out">Rupture de stock</div>
-            @elseif($stockLow)<div class="prod-order-stock-low">⚠ Plus que {{ $stockVal }} en stock</div>
+            @elseif($stockLow)<div class="prod-order-stock-low">{!! \App\Support\IconLibrary::svg('alert', '', 13) !!} Plus que {{ $stockVal }} en stock</div>
             @else<div class="prod-order-stock-ok">En stock</div>
             @endif
         @endif
@@ -246,9 +245,9 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
         @endif
         @auth @if(Auth::user()->role === 'client')
             @if(!$stockOut)
-            <a href="{{ route('client.orders.createFromProduct', $product) }}" class="prod-order-btn">🛒 Commander maintenant</a>
+            <a href="{{ route('client.orders.createFromProduct', $product) }}" class="prod-order-btn">{!! \App\Support\IconLibrary::svg('cart', '', 16) !!} Commander maintenant</a>
             @else
-            <div class="prod-order-btn out">❌ Indisponible</div>
+            <div class="prod-order-btn out">Indisponible</div>
             @endif
         @endif
         @else
@@ -256,9 +255,9 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
         @endauth
         <div class="prod-order-sep"></div>
         <div class="prod-order-shop">Vendu par : <a href="{{ route('public.shops.products', $shop) }}">{{ $shop->name }}</a></div>
-        <div class="prod-order-info"><span>🔒</span><span>Paiement cash à la livraison</span></div>
-        <div class="prod-order-info"><span>🔄</span><span>Retour possible en cas de problème</span></div>
-        <div class="prod-order-info"><span>📞</span><span>Support disponible</span></div>
+        <div class="prod-order-info"><span style="display:inline-flex;color:#1668D8">{!! \App\Support\IconLibrary::svg('lock', '', 14) !!}</span><span>Paiement cash à la livraison</span></div>
+        <div class="prod-order-info"><span style="display:inline-flex;color:#1668D8">{!! \App\Support\IconLibrary::svg('refresh', '', 14) !!}</span><span>Retour possible en cas de problème</span></div>
+        <div class="prod-order-info"><span style="display:inline-flex;color:#1668D8">{!! \App\Support\IconLibrary::svg('phone', '', 14) !!}</span><span>Support disponible</span></div>
     </div>
 </div>
 @endsection

@@ -340,6 +340,7 @@ body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
                     <div class="ord-step-name">{{ $grpClient?->name ?? 'Client inconnu' }}</div>
                     @if($grpDest)
                     <div class="ord-step-addr">📍 {{ $grpDest }}</div>
+                    @if($grpOrd->delivery_slot)<div style="font-size:11.5px;font-weight:700;color:#1260C9;margin-top:3px">Créneau : {{ $grpOrd->delivery_slot }}</div>@endif
                     @else
                     <div class="ord-step-addr" style="font-style:italic">Adresse de livraison non renseignée</div>
                     @endif

@@ -3,267 +3,72 @@
 @section('title', 'Tous les produits' . ($countryName ? ' — ' . $countryName : ''))
 @php $bodyClass = 'is-dashboard'; @endphp
 
+@push('styles')
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 
-body { background: #0f0f1a; color: #e2e8f0; }
+body { background: #F6F9FF; color: #16162A; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; }
 
-/* ── HEADER ── */
+/* ── En-tête bleu nuit avec halo bleu ── */
 .catalog-header {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    padding: 36px 24px 28px;
+    background: radial-gradient(110% 160% at 100% 0%, rgba(31,124,246,.42), transparent 60%), linear-gradient(135deg, #0B1E3D, #132B52);
+    padding: 34px 24px 30px;
     text-align: center;
-    border-bottom: 1px solid rgba(255,255,255,.08);
 }
-.catalog-header h1 {
-    font-size: clamp(22px, 4vw, 34px);
-    font-weight: 800;
-    margin: 0 0 6px;
-    background: linear-gradient(135deg, #fff 0%, #a78bfa 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-.catalog-header p {
-    margin: 0;
-    font-size: 14px;
-    color: rgba(255,255,255,.55);
-}
-.back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 16px;
-    font-size: 13px;
-    color: rgba(255,255,255,.55);
-    text-decoration: none;
-    transition: color .15s;
-}
-.back-link:hover { color: #fff; }
+.catalog-header h1 { font-size: clamp(24px, 4vw, 36px); font-weight: 800; letter-spacing: -.025em; margin: 0 0 6px; color: #fff; text-wrap: balance; }
+.catalog-header p { margin: 0; font-size: 14.5px; color: #C9D6EA; }
+.back-link { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 14px; min-height: 36px; padding: 0 14px; border-radius: 999px; background: rgba(255,255,255,.1); font-size: 13px; font-weight: 700; color: #fff; text-decoration: none; transition: background-color .18s; }
+.back-link:hover { background: rgba(255,255,255,.18); color: #fff; }
 
-/* ── TOOLBAR ── */
-.catalog-toolbar {
-    max-width: 1200px;
-    margin: 24px auto 0;
-    padding: 0 20px;
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    align-items: center;
-}
-.search-bar {
-    flex: 1;
-    min-width: 200px;
-    display: flex;
-    background: #1e1e30;
-    border: 1px solid rgba(255,255,255,.12);
-    border-radius: 12px;
-    overflow: hidden;
-}
-.search-bar input {
-    flex: 1;
-    background: none;
-    border: none;
-    outline: none;
-    color: #e2e8f0;
-    font-size: 14px;
-    padding: 11px 16px;
-}
-.search-bar input::placeholder { color: rgba(255,255,255,.3); }
-.search-bar button {
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-    border: none;
-    color: #fff;
-    padding: 0 18px;
-    font-size: 15px;
-    cursor: pointer;
-    transition: opacity .15s;
-}
-.search-bar button:hover { opacity: .85; }
+/* ── Recherche ── */
+.catalog-toolbar { max-width: 1200px; margin: 22px auto 0; padding: 0 20px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.search-bar { flex: 1; min-width: 200px; display: flex; gap: 6px; padding: 5px; background: #fff; border-radius: 999px; box-shadow: inset 0 0 0 1.5px #E3E8F2; transition: box-shadow .18s; }
+.search-bar:focus-within { box-shadow: inset 0 0 0 2px #1F7CF6, 0 0 0 4px rgba(31,124,246,.12); }
+.search-bar input { flex: 1; min-width: 0; background: none; border: none; outline: none; color: #16162A; font-family: inherit; font-size: 15px; font-weight: 500; padding: 9px 14px; }
+.search-bar input::placeholder { color: #9AA3B8; }
+.search-bar button { min-height: 44px; min-width: 52px; border: none; border-radius: 999px; background: #1668D8; color: #fff; padding: 0 18px; font-size: 15px; cursor: pointer; transition: background-color .18s; }
+.search-bar button:hover { background: #1260C9; }
 
-/* ── CATS ── */
-.cat-pills {
-    max-width: 1200px;
-    margin: 14px auto 0;
-    padding: 0 20px;
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-.cat-pill {
-    display: inline-block;
-    padding: 6px 14px;
-    border-radius: 30px;
-    font-size: 12.5px;
-    font-weight: 600;
-    text-decoration: none;
-    background: #f3f4f6;
-    border: 1px solid #e5e7eb;
-    color: #374151;
-    transition: .15s;
-}
-.cat-pill:hover, .cat-pill.active {
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-    border-color: transparent;
-    color: #fff;
-}
+/* ── Catégories en pastilles ── */
+.cat-pills { max-width: 1200px; margin: 14px auto 0; padding: 0 20px; display: flex; gap: 8px; flex-wrap: wrap; }
+.cat-pill { display: inline-flex; align-items: center; min-height: 38px; padding: 0 16px; border-radius: 999px; font-size: 13.5px; font-weight: 700; text-decoration: none; background: rgba(22,22,42,.07); color: #45455E; transition: background-color .18s, color .18s; }
+.cat-pill:hover { background: rgba(22,22,42,.12); color: #16162A; }
+.cat-pill.active { background: #1668D8; color: #fff; }
 
-/* ── GRID ── */
-.catalog-grid {
-    max-width: 1200px;
-    margin: 24px auto 0;
-    padding: 0 20px 48px;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 18px;
-}
+/* ── Grille ── */
+.catalog-grid { max-width: 1200px; margin: 22px auto 0; padding: 0 20px 48px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px; }
 
-/* ── CARD ── */
-.p-card {
-    background: #1a1a2e;
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 16px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    transition: transform .18s, box-shadow .18s;
-    text-decoration: none;
-    color: inherit;
-}
-.p-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 32px rgba(0,0,0,.35);
-    border-color: rgba(99,102,241,.35);
-}
-.p-card-img {
-    position: relative;
-    height: 170px;
-    background: #13131f;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.p-card-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform .3s;
-}
-.p-card:hover .p-card-img img { transform: scale(1.04); }
-.p-card-ph {
-    font-size: 40px;
-    opacity: .25;
-}
-.p-card-badge {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-    color: #fff;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 20px;
-}
-.p-card-body {
-    padding: 13px 14px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-.p-card-name {
-    font-size: 13.5px;
-    font-weight: 700;
-    color: #e2e8f0;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-.p-card-shop {
-    font-size: 11.5px;
-    color: rgba(255,255,255,.45);
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin-top: 2px;
-}
-.p-card-cat {
-    font-size: 10.5px;
-    color: #a78bfa;
-    font-weight: 600;
-}
-.p-card-footer {
-    padding: 10px 14px 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-top: 1px solid rgba(255,255,255,.06);
-    margin-top: auto;
-}
-.p-card-price {
-    font-size: 14px;
-    font-weight: 800;
-    color: #6366f1;
-}
-.p-card-orig {
-    font-size: 11px;
-    color: rgba(255,255,255,.3);
-    text-decoration: line-through;
-    margin-left: 4px;
-}
-.p-card-link {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-    flex: 1;
-}
-.p-card-cta {
-    font-size: 11.5px;
-    font-weight: 700;
-    color: #fff;
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-    border: none;
-    border-radius: 8px;
-    padding: 6px 14px;
-    cursor: pointer;
-    text-decoration: none;
-    transition: opacity .15s;
-    white-space: nowrap;
-}
-.p-card-cta:hover { opacity: .85; }
+/* ── Carte produit ── */
+.p-card { background: #fff; border-radius: 22px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 0 0 1px #E3E8F2; transition: transform .22s cubic-bezier(.22,1,.36,1), box-shadow .22s; text-decoration: none; color: inherit; }
+.p-card:hover { transform: translateY(-3px); box-shadow: 0 0 0 1px #D6E6FF, 0 16px 32px -18px rgba(11,30,61,.35); }
+.p-card-img { position: relative; aspect-ratio: 1; background: #EAF2FF; overflow: hidden; display: flex; align-items: center; justify-content: center; color: #7DB4FF; }
+.p-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s cubic-bezier(.22,1,.36,1); }
+.p-card:hover .p-card-img img { transform: scale(1.05); }
+.p-card-ph { font-size: 40px; display: inline-flex; }
+.p-card-badge { position: absolute; top: 10px; left: 10px; display: inline-flex; align-items: center; gap: 4px; background: #1668D8; color: #fff; font-size: 11px; font-weight: 800; padding: 4px 9px; border-radius: 999px; }
+.p-card-body { padding: 12px 14px 6px; flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.p-card-name { font-size: 14px; font-weight: 700; color: #16162A; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.p-card-shop { font-size: 12px; color: #62627C; display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+.p-card-cat { font-size: 11px; color: #1260C9; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.p-card-footer { padding: 8px 14px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; }
+.p-card-price { font-size: 15px; font-weight: 800; color: #1260C9; font-variant-numeric: tabular-nums; }
+.p-card-orig { font-size: 11.5px; color: #9AA3B8; text-decoration: line-through; margin-left: 4px; }
+.p-card-link { display: block; text-decoration: none; color: inherit; flex: 1; }
+.p-card-cta { font-size: 12.5px; font-weight: 800; color: #fff; background: #1668D8; border: none; border-radius: 999px; padding: 8px 14px; cursor: pointer; text-decoration: none; transition: background-color .18s; white-space: nowrap; }
+.p-card-cta:hover { background: #1260C9; color: #fff; }
 
-/* ── EMPTY ── */
-.catalog-empty {
-    max-width: 1200px;
-    margin: 60px auto;
-    padding: 0 20px;
-    text-align: center;
-    color: rgba(255,255,255,.4);
-}
-.catalog-empty-ico { font-size: 52px; margin-bottom: 12px; }
-.catalog-empty-title { font-size: 18px; font-weight: 700; color: rgba(255,255,255,.6); }
-.catalog-empty-sub { font-size: 13px; margin-top: 6px; }
+/* ── Aucun résultat ── */
+.catalog-empty { max-width: 1200px; margin: 60px auto; padding: 0 20px; text-align: center; color: #45455E; }
+.catalog-empty-ico { font-size: 52px; margin-bottom: 12px; color: #9AA3B8; display: inline-flex; }
+.catalog-empty-title { font-size: 18px; font-weight: 800; color: #16162A; }
+.catalog-empty-sub { font-size: 14px; margin-top: 6px; }
 
-/* ── PAGINATION ── */
-.catalog-pagination {
-    max-width: 1200px;
-    margin: 0 auto 48px;
-    padding: 0 20px;
-    display: flex;
-    justify-content: center;
-}
+/* ── Pagination ── */
+.catalog-pagination { max-width: 1200px; margin: 0 auto 48px; padding: 0 20px; display: flex; justify-content: center; }
 .catalog-pagination nav { display: flex; gap: 6px; flex-wrap: wrap; }
 
-/* ── RESULT COUNT ── */
-.catalog-count {
-    max-width: 1200px;
-    margin: 16px auto 0;
-    padding: 0 20px;
-    font-size: 13px;
-    color: rgba(255,255,255,.4);
-}
+/* ── Nombre de résultats ── */
+.catalog-count { max-width: 1200px; margin: 16px auto 0; padding: 0 20px; font-size: 13.5px; color: #62627C; }
 
 /* ══ RESPONSIVE ══ */
 
@@ -306,7 +111,7 @@ body { background: #0f0f1a; color: #e2e8f0; }
     .p-card-price {
         font-size: 13px;
         font-weight: 900;
-        color: #6366f1;
+        color: #1668D8;
         line-height: 1.2;
         white-space: nowrap;
     }
@@ -352,6 +157,7 @@ body { background: #0f0f1a; color: #e2e8f0; }
     .p-card-shop { display: flex; }
 }
 </style>
+@endpush
 
 @section('content')
 
@@ -371,7 +177,7 @@ body { background: #0f0f1a; color: #e2e8f0; }
     <div class="catalog-toolbar">
         <div class="search-bar">
             <input type="text" name="s" value="{{ request('s') }}" placeholder="Rechercher un produit…">
-            <button type="submit">&#x1F50D;</button>
+            <button type="submit" aria-label="Rechercher">{!! \App\Support\IconLibrary::svg('search', '', 18) !!}</button>
         </div>
         @if(request('s') || request('cat'))
             <a href="{{ route('client.products.index') }}"
@@ -410,7 +216,7 @@ body { background: #0f0f1a; color: #e2e8f0; }
 {{-- Grid --}}
 @if($products->isEmpty())
 <div class="catalog-empty">
-    <div class="catalog-empty-ico">📦</div>
+    <div class="catalog-empty-ico">{!! \App\Support\IconLibrary::svg('package', '', 44) !!}</div>
     <div class="catalog-empty-title">Aucun produit trouvé</div>
     <p class="catalog-empty-sub">Essayez une autre recherche ou catégorie.</p>
 </div>
@@ -426,10 +232,10 @@ body { background: #0f0f1a; color: #e2e8f0; }
                 @if($product->image)
                     <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" loading="lazy" decoding="async" width="400" height="170">
                 @else
-                    <div class="p-card-ph">🛍</div>
+                    <div class="p-card-ph">{!! \App\Support\IconLibrary::svg('bag', '', 26) !!}</div>
                 @endif
                 @if($product->is_flash_active)
-                    <span class="p-card-badge" style="background:linear-gradient(135deg,#1a1a2e,#6366f1)">⚡ Flash −{{ $product->flash_discount_percent }}%</span>
+                    <span class="p-card-badge" style="background:#0B1E3D">{!! \App\Support\IconLibrary::svg('zap', '', 16) !!} Flash −{{ $product->flash_discount_percent }}%</span>
                 @elseif($hasPromo)
                     <span class="p-card-badge">Promo</span>
                 @endif
@@ -441,7 +247,7 @@ body { background: #0f0f1a; color: #e2e8f0; }
                 @endif
                 @if($product->shop)
                     <div class="p-card-shop">
-                        <span style="font-size:11px">🏪</span>
+                        <span style="font-size:11px">{!! \App\Support\IconLibrary::svg('store', '', 12) !!}</span>
                         {{ Str::limit($product->shop->name, 22) }}
                     </div>
                 @endif

@@ -1760,6 +1760,8 @@ $I = [
             <a href="{{ route('boutique.dashboard') }}" class="sb-item active" style="margin-bottom:4px"><span class="ico">{!! $I['grid'] !!}</span> Tableau de bord</a>
             <div class="sb-section">Boutique</div>
             <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">{!! $I['msg'] !!}</span> Messages <span class="sb-badge" id="sbMsgBadge" style="display:none"></span></a>
+            @php $qaToAnswer = $shop ? \App\Models\ProductQuestion::where('shop_id', $shop->id)->unanswered()->count() : 0; @endphp
+            <a href="{{ route('boutique.questions.index') }}" class="sb-item"><span class="ico">{!! \App\Support\IconLibrary::svg('message', '', 17) !!}</span> Questions produits @if($qaToAnswer > 0)<span class="sb-badge">{{ $qaToAnswer }}</span>@endif</a>
             <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">{!! $I['box'] !!}</span> Commandes
                 @if(!$isPro)
                     <span class="sb-badge" style="background:{{ $cmdClass === 'danger' ? '#dc2626' : ($cmdClass === 'warn' ? '#d97706' : '#1668D8') }};margin-left:auto;">{{ $cmdMonth }}/{{ $maxCmdMois }}</span>

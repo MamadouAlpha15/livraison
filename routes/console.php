@@ -42,3 +42,9 @@ Schedule::call(function () {
     \App\Models\Shop::whereNotNull('storefront_publish_at')->where('storefront_publish_at', '<=', now())
         ->each(fn ($shop) => \App\Support\Growth::applyScheduled($shop));
 })->everyMinute()->name('publish-scheduled-storefronts')->withoutOverlapping();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Résumé de la journée envoyé aux boutiques à 20h (heure de Conakry = UTC) :
+// commandes reçues, livrées et encaissées, en attente, questions sans réponse, stock faible.
+// ─────────────────────────────────────────────────────────────────────────────
+Schedule::command('shops:daily-summary')->dailyAt('20:00')->name('shop-daily-summary')->withoutOverlapping();

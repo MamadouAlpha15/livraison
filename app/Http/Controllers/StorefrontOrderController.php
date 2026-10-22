@@ -94,6 +94,11 @@ class StorefrontOrderController extends Controller
             return response()->json(['message' => $e->getMessage()], 422);
         }
 
+        // Sans compte : le code de remise reste lisible sur la page de suivi depuis cet appareil
+        if ($guest) {
+            \App\Support\DeliveryCode::rememberGuestOrder($order);
+        }
+
         // Prévenir la boutique (propriétaire et équipe)
         $lines = $order->items()->with('product:id,name')->get();
         $summary = $lines->map(fn ($l) => ($l->product->name ?? 'Produit') . ' × ' . $l->quantity)->implode(', ') . ' — ' . number_format($order->total, 0, ',', ' ') . ' ' . ($shop->currency ?? 'GNF');

@@ -7,28 +7,28 @@
 @php $bodyClass = 'is-dashboard'; @endphp
 
 @push('styles')
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="{{ \App\Support\Assets::v('fonts/dashboard-fonts.css') }}" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 :root {
-    --orange:    #6366f1;
-    --orange-dk: #4f46e5;
-    --orange-lt: #e0e7ff;
-    --navy:      #131921;
-    --navy-2:    #232f3e;
+    --orange:    #1668D8;
+    --orange-dk: #1260C9;
+    --orange-lt: #EAF2FF;
+    --navy:      #0B1E3D;
+    --navy-2:    #132B52;
     --green:     #067d62;
     --green-lt:  #e8f5e9;
-    --purple:    #7c3aed;
-    --purple-lt: #ede9fe;
-    --grey:      #f3f3f3;
-    --grey-2:    #eaeded;
+    --purple:    #1260C9;
+    --purple-lt: #EAF2FF;
+    --grey:      #F6F9FF;
+    --grey-2:    #EEF2F8;
     --border:    #ddd;
-    --text:      #0f1111;
+    --text:      #16162A;
     --text-2:    #333;
-    --muted:     #565959;
+    --muted:     #62627C;
     --surface:   #fff;
-    --font:      'Open Sans', sans-serif;
-    --display:   'Nunito', sans-serif;
+    --font:      'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --display:   'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --r:         10px;
     --r-sm:      6px;
     --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
@@ -55,11 +55,11 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .points-hero::before {
     content: ''; position: absolute; top: -60px; right: -40px;
     width: 220px; height: 220px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(99,102,241,.18) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(31,124,246,.18) 0%, transparent 70%);
 }
 .points-hero-lbl { font-size: 12.5px; font-weight: 700; color: rgba(255,255,255,.6); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; }
 .points-hero-val { font-family: var(--display); font-size: 40px; font-weight: 900; color: #fff; letter-spacing: -1px; line-height: 1; }
-.points-hero-val span { font-size: 18px; font-weight: 700; color: var(--orange); margin-left: 6px; }
+.points-hero-val span { font-size: 18px; font-weight: 700; color: #7DB4FF; margin-left: 6px; }
 .points-hero-sub { font-size: 12.5px; color: rgba(255,255,255,.55); margin-top: 6px; }
 .points-hero-ico { font-size: 52px; flex-shrink: 0; z-index: 1; }
 
@@ -79,7 +79,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .ref-link-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .ref-link-input {
     flex: 1; min-width: 200px; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--r-sm);
-    font-size: 13px; font-family: monospace; color: var(--text); background: var(--grey); outline: none;
+    font-size: 13px; font-variant-numeric: tabular-nums; color: var(--text); background: var(--grey); outline: none;
 }
 .btn-copy, .btn-share {
     display: inline-flex; align-items: center; gap: 6px; padding: 11px 18px; border-radius: var(--r-sm);
@@ -109,9 +109,9 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .tx-row:last-child { border-bottom: none; }
 .tx-desc { font-size: 12.5px; color: var(--text); font-weight: 600; }
 .tx-date { font-size: 11px; color: var(--muted); margin-top: 2px; }
-.tx-pts { font-family: monospace; font-size: 14px; font-weight: 800; white-space: nowrap; }
+.tx-pts { font-variant-numeric: tabular-nums; font-size: 14px; font-weight: 800; white-space: nowrap; }
 .tx-pts.pos { color: var(--green); }
-.tx-pts.neg { color: #b12704; }
+.tx-pts.neg { color: #1260C9; }
 
 .pag-wrap { padding: 12px 20px; }
 
@@ -136,28 +136,28 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     {{-- HERO SOLDE --}}
     <div class="points-hero">
         <div>
-            <div class="points-hero-lbl">🎁 Mon solde de points fidélité</div>
+            <div class="points-hero-lbl">{!! \App\Support\IconLibrary::svg('gift', '', 16) !!} Mon solde de points fidélité</div>
             <div class="points-hero-val">{{ number_format($user->loyalty_points, 0, ',', ' ') }}<span>points</span></div>
             <div class="points-hero-sub">1 point = 1 GNF de réduction sur votre prochaine commande</div>
         </div>
-        <div class="points-hero-ico">💎</div>
+        <div class="points-hero-ico">{!! \App\Support\IconLibrary::svg('gem', '', 26) !!}</div>
     </div>
 
     {{-- COMMENT ÇA MARCHE --}}
     <div class="card">
-        <div class="card-hd">✨ Comment gagner des points</div>
+        <div class="card-hd">{!! \App\Support\IconLibrary::svg('sparkles', '', 16) !!} Comment gagner des points</div>
         <div class="card-body">
             <div class="how-grid">
                 <div class="how-item">
-                    <div class="how-ico">🛒</div>
+                    <div class="how-ico">{!! \App\Support\IconLibrary::svg('cart', '', 26) !!}</div>
                     <div class="how-txt"><strong>0,1% de cashback</strong><br>sur chaque commande livrée</div>
                 </div>
                 <div class="how-item">
-                    <div class="how-ico">👥</div>
+                    <div class="how-ico">{!! \App\Support\IconLibrary::svg('user', '', 26) !!}</div>
                     <div class="how-txt"><strong>2 000 points</strong><br>pour chaque ami parrainé qui commande</div>
                 </div>
                 <div class="how-item">
-                    <div class="how-ico">🏷️</div>
+                    <div class="how-ico">{!! \App\Support\IconLibrary::svg('tag', '', 26) !!}</div>
                     <div class="how-txt"><strong>Utilisez vos points</strong><br>jusqu'à 50% de réduction à la commande</div>
                 </div>
             </div>
@@ -166,7 +166,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
     {{-- PARRAINAGE --}}
     <div class="card">
-        <div class="card-hd">🔗 Parrainez vos amis</div>
+        <div class="card-hd">{!! \App\Support\IconLibrary::svg('globe', '', 16) !!} Parrainez vos amis</div>
         <div class="card-body">
             <p style="font-size:13px;color:var(--text-2);margin:0 0 14px;line-height:1.6">
                 Partagez votre lien : dès que votre filleul reçoit sa première commande, vous gagnez
@@ -175,10 +175,10 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
             </p>
             <div class="ref-link-row">
                 <input type="text" class="ref-link-input" id="refLinkInput" value="{{ $referralUrl }}" readonly>
-                <button type="button" class="btn-copy" onclick="copyRefLink()">📋 Copier</button>
+                <button type="button" class="btn-copy" onclick="copyRefLink()">{!! \App\Support\IconLibrary::svg('list', '', 16) !!} Copier</button>
                 <a class="btn-share" target="_blank"
                    href="https://wa.me/?text={{ urlencode('Rejoins-moi sur Shopio et profite de bons plans ! ' . $referralUrl) }}">
-                   💬 Partager sur WhatsApp
+                   {!! \App\Support\IconLibrary::svg('message', '', 16) !!} Partager sur WhatsApp
                 </a>
             </div>
 
@@ -197,7 +197,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                         @if($ref->referral_rewarded_at)
                             <span class="ref-status done">✓ Récompensé</span>
                         @else
-                            <span class="ref-status pending">⏳ En attente de sa 1ère commande</span>
+                            <span class="ref-status pending">{!! \App\Support\IconLibrary::svg('clock', '', 16) !!} En attente de sa 1ère commande</span>
                         @endif
                     </div>
                     @endforeach
@@ -209,7 +209,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
     {{-- HISTORIQUE --}}
     <div class="card">
-        <div class="card-hd">📜 Historique de mes points</div>
+        <div class="card-hd">{!! \App\Support\IconLibrary::svg('list', '', 16) !!} Historique de mes points</div>
         @if($transactions->isEmpty())
             <div class="empty-txt">Aucun mouvement pour le moment. Passez votre première commande pour gagner des points !</div>
         @else

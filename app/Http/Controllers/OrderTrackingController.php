@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\CourierCommission;
 use App\Models\Payment;
 use App\Services\PushService;
+use App\Support\DeliveryCode;
 use Illuminate\Http\Request;
 
 class OrderTrackingController extends Controller
@@ -148,6 +149,18 @@ class OrderTrackingController extends Controller
             'Commande déjà terminée.'
         );
 
+        // Remise au client : le code qu'il a reçu valide la livraison (commande + celles du même trajet et du même panier)
+        if ($data['status'] === Order::STATUS_LIVREE) {
+            $handover = $order->delivery_batch_id
+                ? Order::where('delivery_batch_id', $order->delivery_batch_id)
+                    ->whereNotIn('status', [Order::STATUS_LIVREE, Order::STATUS_ANNULEE])
+                    ->where('delivery_code', $order->delivery_code)->get()
+                : collect([$order]);
+            if ($codeError = DeliveryCode::check($handover, $request->input('delivery_code'))) {
+                return response()->json(['message' => $codeError], 422);
+            }
+        }
+
         // Preuve de livraison : photo prise par le livreur au moment de la remise (optionnelle)
         $proofPhotoPath = $request->hasFile('proof_photo')
             ? \App\Services\ImageOptimizer::store($request->file('proof_photo'), 'delivery_proofs')
@@ -168,6 +181,8 @@ class OrderTrackingController extends Controller
                 (clone $siblings)->where('status', Order::STATUS_CONFIRMEE)
                     ->update(['status' => Order::STATUS_EN_LIVRAISON]);
             } elseif ($data['status'] === Order::STATUS_LIVREE) {
+                // Seules les commandes remises avec le même code (même client, même panier) passent livrées
+                $siblings->where(fn ($q) => $q->whereNull('delivery_code')->orWhere('delivery_code', $order->delivery_code));
                 // Mass-update bypass le mutateur setStatusAttribute → delivered_at doit être explicite
                 $siblings->update(array_filter([
                     'status'               => Order::STATUS_LIVREE,
@@ -192,7 +207,7 @@ class OrderTrackingController extends Controller
                     $data['status'] === Order::STATUS_LIVREE ? 'Commande livrée ✅' : 'Commande en route 🚚',
                     $data['status'] === Order::STATUS_LIVREE
                         ? 'Votre commande #' . str_pad($o->id, 4, '0', STR_PAD_LEFT) . ' a été livrée avec succès !'
-                        : 'Votre commande #' . str_pad($o->id, 4, '0', STR_PAD_LEFT) . ' est en cours de livraison !',
+                        : 'Votre commande #' . str_pad($o->id, 4, '0', STR_PAD_LEFT) . ' est en cours de livraison !' . (filled($o->delivery_code) ? ' Code de remise à donner au livreur : ' . $o->delivery_code : ''),
                     1,
                     '/client/orders'
                 );

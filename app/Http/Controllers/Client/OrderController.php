@@ -457,6 +457,7 @@ class OrderController extends Controller
             'discount_amount'      => $promoDiscount,
             'status'               => Order::STATUS_EN_ATTENTE,
             'delivery_destination' => $request->delivery_destination,
+            'delivery_slot'        => \App\Support\DeliverySlot::labelFor($request->input('delivery_slot')),
             'client_phone'         => $request->client_phone,
             'source'               => \App\Support\TrafficSource::forOrder($product->shop->id), // canal d'arrivée du client
             'campaign_id'          => \App\Support\TrafficSource::campaignForOrder($product->shop->id),
@@ -542,6 +543,13 @@ class OrderController extends Controller
         // Si paiement en ligne demandé : on initie l'opération ChapChap Pay et on
         // redirige le client vers leur page de paiement hébergée. En cas d'échec
         // d'initiation, on ne bloque pas la commande — elle reste valable en cash.
+        // Sans compte : le code de remise reste lisible sur la page de suivi depuis cet appareil
+        if (!Auth::check()) {
+            \App\Support\DeliveryCode::rememberGuestOrder($order);
+        } elseif ($request->boolean('save_address')) {
+            \App\Models\ClientAddress::remember(Auth::user(), $request->delivery_destination);
+        }
+
         $onlinePaymentFailedMessage = null;
         if ($wantsOnlinePayment) {
             $result = app(ChapChapPayService::class)->createOperation(

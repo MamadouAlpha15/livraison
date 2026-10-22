@@ -638,6 +638,11 @@ Route::middleware(['auth', 'role:admin'])
         /* Tableau de bord boutique */
         Route::get('/dashboard', [ShopController::class, 'admin'])->name('dashboard');
 
+        /* Questions publiques des clients sur les fiches produits */
+        Route::get('/questions',                        [\App\Http\Controllers\Boutique\ProductQuestionController::class, 'index'])  ->name('questions.index');
+        Route::post('/questions/{question}/repondre',   [\App\Http\Controllers\Boutique\ProductQuestionController::class, 'answer']) ->name('questions.answer');
+        Route::delete('/questions/{question}',          [\App\Http\Controllers\Boutique\ProductQuestionController::class, 'destroy'])->name('questions.destroy');
+
         /* Gestion de la boutique */
         Route::resource('shops', ShopController::class)->only(['create', 'store', 'index']);
 
@@ -961,7 +966,9 @@ Route::middleware(['auth', 'role:client'])
         Route::resource('orders', OrderController::class)->only(['index', 'store', 'create']);
         Route::post('/orders/badge-seen', [ClientOrderController::class, 'markBadgeSeen'])->name('orders.badge-seen');
         Route::get('/orders/{order}/invoice', [ClientOrderController::class, 'downloadInvoice'])->name('orders.invoice');
-       
+        Route::post('/orders/{order}/cancel',  [\App\Http\Controllers\Client\OrderActionController::class, 'cancel'])->name('orders.cancel');
+        Route::post('/orders/{order}/reorder', [\App\Http\Controllers\Client\OrderActionController::class, 'reorder'])->name('orders.reorder');
+
         
 
         /* Avis sur une commande */
@@ -982,6 +989,14 @@ Route::middleware(['auth', 'role:client'])
         /* Liste de souhaits produit */
         Route::get('/wishlist', [\App\Http\Controllers\Client\ProductFavoriteController::class, 'index'])->name('wishlist.index');
         Route::post('/products/{product}/favorite', [\App\Http\Controllers\Client\ProductFavoriteController::class, 'toggle'])->name('products.favorite.toggle');
+        Route::post('/products/{product}/stock-alert', [\App\Http\Controllers\Client\StockAlertController::class, 'toggle'])->name('products.stock-alert');
+        Route::post('/products/{product}/questions',   [\App\Http\Controllers\Client\ProductQuestionController::class, 'store'])->name('products.questions.store');
+
+        /* Carnet d'adresses */
+        Route::get('/adresses',                       [\App\Http\Controllers\Client\AddressController::class, 'index'])      ->name('addresses.index');
+        Route::post('/adresses',                      [\App\Http\Controllers\Client\AddressController::class, 'store'])      ->name('addresses.store');
+        Route::post('/adresses/{address}/principale', [\App\Http\Controllers\Client\AddressController::class, 'makeDefault'])->name('addresses.default');
+        Route::delete('/adresses/{address}',          [\App\Http\Controllers\Client\AddressController::class, 'destroy'])    ->name('addresses.destroy');
 
         /* Favoris */
         Route::post('/favorites/{shop}/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
