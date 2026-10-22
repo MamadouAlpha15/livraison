@@ -7,19 +7,19 @@
 @endphp
 
 @push('styles')
-<script>(function(){ if(localStorage.getItem('cx-theme')==='light') document.documentElement.classList.add('cx-prelight'); })();</script>
-<style>html.cx-prelight body{background:#F5F7FA!important}</style>
+<script>(function(){ if(localStorage.getItem('cx-theme')!=='dark') document.documentElement.classList.add('cx-prelight'); })();</script>
+<style>html.cx-prelight body{background:#F6F9FF!important}</style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 *,*::before,*::after{box-sizing:border-box}
 :root{
-    --cx-bg:#0b0d22;--cx-surface:#0d1226;--cx-surface2:#111930;
-    --cx-border:rgba(255,255,255,.07);--cx-brand:#7c3aed;--cx-brand2:#6d28d9;
+    --cx-bg:#071630;--cx-surface:#0B1E3D;--cx-surface2:#132B52;
+    --cx-border:rgba(255,255,255,.07);--cx-brand:#1668D8;--cx-brand2:#1260C9;
     --cx-text:#e2e8f0;--cx-text2:#94a3b8;--cx-muted:#475569;
     --cx-green:#10b981;--cx-amber:#f59e0b;--cx-red:#ef4444;--cx-blue:#3b82f6;
     --cx-sb-w:220px;--cx-topbar-h:56px;--r:16px;--r-sm:10px;--r-xs:7px;
 }
-html,body{margin:0;font-family:'Segoe UI',system-ui,sans-serif;background:var(--cx-bg)!important;color:var(--cx-text);-webkit-font-smoothing:antialiased;height:100%;overflow:hidden}
+html,body{margin:0;font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--cx-bg)!important;color:var(--cx-text);-webkit-font-smoothing:antialiased;height:100%;overflow:hidden}
 a{text-decoration:none;color:inherit}
 
 body.cx-dashboard>nav,body.cx-dashboard>header,body.cx-dashboard .navbar,
@@ -33,20 +33,20 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 /* ── SIDEBAR ── */
 .cx-sidebar{
     position:fixed;top:0;left:0;bottom:0;width:var(--cx-sb-w);
-    background:linear-gradient(180deg,#0f0f59 0%,#0e0e16 40%,#10103a 100%);
+    background:linear-gradient(180deg,#0B1E3D 0%,#081831 55%,#0B1E3D 100%);
     display:flex;flex-direction:column;
-    border-right:1px solid rgba(99,102,241,.15);
+    border-right:1px solid rgba(31,124,246,.15);
     box-shadow:6px 0 30px rgba(0,0,0,.35);
     z-index:1200;overflow-y:auto;
-    scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.3) transparent;
+    scrollbar-width:thin;scrollbar-color:rgba(31,124,246,.3) transparent;
     transition:transform .25s cubic-bezier(.23,1,.32,1)
 }
 .cx-sidebar::-webkit-scrollbar{width:3px}
-.cx-sidebar::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3);border-radius:3px}
+.cx-sidebar::-webkit-scrollbar-thumb{background:rgba(31,124,246,.3);border-radius:3px}
 .cx-brand-hd{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0}
 .cx-brand-top{display:flex;align-items:center;justify-content:space-between}
 .cx-logo{display:flex;align-items:center;gap:9px;color:#fff;font-size:16px;font-weight:800}
-.cx-logo-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.cx-logo-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#1668D8,#1260C9);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .cx-sys-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--cx-green);padding:3px 8px;border-radius:20px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);margin-top:8px}
 .cx-sys-dot{width:6px;height:6px;border-radius:50%;background:var(--cx-green);animation:blink 2.2s ease-in-out infinite;flex-shrink:0}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
@@ -55,24 +55,24 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .cx-nav{padding:8px 8px 12px;flex:1}
 .cx-nav-sec{font-size:10px;font-weight:800;letter-spacing:1.6px;color:rgba(255,255,255,.58);padding:14px 10px 5px;text-transform:uppercase}
 .cx-nav-item{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:var(--r-xs);color:rgba(255,255,255,.85);font-size:13.5px;font-weight:600;transition:all .22s cubic-bezier(.23,1,.32,1);position:relative;cursor:pointer;margin-bottom:2px;border:1px solid transparent}
-.cx-nav-item:hover{background:rgba(124,58,237,.18);color:#fff;border-color:rgba(124,58,237,.25);box-shadow:0 2px 12px rgba(124,58,237,.2),inset 0 1px 0 rgba(255,255,255,.06)}
-.cx-nav-item:hover .cx-nav-ico{background:rgba(139,92,246,.25);box-shadow:0 0 8px rgba(139,92,246,.3)}
-.cx-nav-item.active{background:linear-gradient(90deg,rgba(124,58,237,.35) 0%,rgba(99,102,241,.2) 100%);color:#fff;font-weight:700;border-color:rgba(139,92,246,.3);box-shadow:0 4px 16px rgba(124,58,237,.25),inset 0 1px 0 rgba(255,255,255,.08)}
-.cx-nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:linear-gradient(180deg,#a78bfa,#7c3aed);border-radius:0 3px 3px 0;box-shadow:2px 0 12px rgba(167,139,250,.7)}
+.cx-nav-item:hover{background:rgba(31,124,246,.18);color:#fff;border-color:rgba(31,124,246,.25);box-shadow:0 2px 12px rgba(31,124,246,.2),inset 0 1px 0 rgba(255,255,255,.06)}
+.cx-nav-item:hover .cx-nav-ico{background:rgba(31,124,246,.25);box-shadow:0 0 8px rgba(31,124,246,.3)}
+.cx-nav-item.active{background:linear-gradient(90deg,rgba(31,124,246,.35) 0%,rgba(31,124,246,.2) 100%);color:#fff;font-weight:700;border-color:rgba(31,124,246,.3);box-shadow:0 4px 16px rgba(31,124,246,.25),inset 0 1px 0 rgba(255,255,255,.08)}
+.cx-nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:linear-gradient(180deg,#7DB4FF,#1668D8);border-radius:0 3px 3px 0;box-shadow:2px 0 12px rgba(125,180,255,.7)}
 .cx-nav-ico{width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .22s cubic-bezier(.23,1,.32,1)}
-.cx-nav-item.active .cx-nav-ico{background:rgba(139,92,246,.3);border-color:rgba(139,92,246,.4);box-shadow:0 0 10px rgba(139,92,246,.4)}
+.cx-nav-item.active .cx-nav-ico{background:rgba(31,124,246,.3);border-color:rgba(31,124,246,.4);box-shadow:0 0 10px rgba(31,124,246,.4)}
 .cx-nav-ico svg{display:block;}
-.cx-nav-item.active:hover{background:linear-gradient(90deg,rgba(124,58,237,.45) 0%,rgba(99,102,241,.3) 100%);box-shadow:0 4px 20px rgba(124,58,237,.35),inset 0 1px 0 rgba(255,255,255,.1)}
+.cx-nav-item.active:hover{background:linear-gradient(90deg,rgba(31,124,246,.45) 0%,rgba(31,124,246,.3) 100%);box-shadow:0 4px 20px rgba(31,124,246,.35),inset 0 1px 0 rgba(255,255,255,.1)}
 .cx-user-foot{padding:10px 10px 12px;border-top:1px solid rgba(255,255,255,.07);flex-shrink:0}
 .cx-user-row{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:var(--r-xs);background:rgba(255,255,255,.04);cursor:pointer;transition:background .15s;margin-bottom:6px}
 .cx-user-row:hover{background:rgba(255,255,255,.08)}
-.cx-user-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4338ca);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+.cx-user-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1668D8,#1260C9);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
 .cx-user-name{font-size:12px;font-weight:700;color:#fff;line-height:1.2}
-.cx-user-role{font-size:10px;color:var(--cx-text2)}
+.cx-user-role{font-size:10px;color:rgba(255,255,255,.62)}
 .cx-logout-btn{width:30px;height:30px;border-radius:8px;flex-shrink:0;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);display:flex;align-items:center;justify-content:center;color:#f87171;cursor:pointer;transition:background .15s,color .15s;padding:0}
 .cx-logout-btn:hover{background:rgba(239,68,68,.22);color:#fff}
 .cx-dark-row{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;cursor:pointer}
-.cx-dark-lbl{font-size:11.5px;color:var(--cx-text2)}
+.cx-dark-lbl{font-size:11.5px;color:rgba(255,255,255,.72)}
 .cx-toggle{width:34px;height:18px;background:#475569;border-radius:9px;position:relative;transition:background .25s;flex-shrink:0}
 .cx-toggle::after{content:'';position:absolute;top:3px;left:3px;width:12px;height:12px;background:#fff;border-radius:50%;transition:left .25s}
 .cx-toggle.on{background:var(--cx-brand)}
@@ -101,11 +101,11 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 /* bouton panneau dans la topbar (tablette) */
 .cx-panel-toggle{
     display:none;height:32px;padding:0 10px;border-radius:8px;
-    background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);
-    color:#c4b5fd;font-size:12px;font-weight:700;cursor:pointer;
+    background:rgba(31,124,246,.15);border:1px solid rgba(31,124,246,.3);
+    color:#1F7CF6;font-size:12px;font-weight:700;cursor:pointer;
     align-items:center;gap:5px;white-space:nowrap;flex-shrink:0;
 }
-.cx-panel-toggle:hover{background:rgba(124,58,237,.25)}
+.cx-panel-toggle:hover{background:rgba(31,124,246,.25)}
 
 /* ── BODY ── */
 .map-body{display:flex;flex:1;overflow:hidden;position:relative}
@@ -121,14 +121,14 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .map-panel-hd{padding:14px 16px 10px;border-bottom:1px solid var(--cx-border);flex-shrink:0}
 .map-panel-title{font-size:13px;font-weight:800;color:var(--cx-text);margin-bottom:2px}
 .map-panel-sub{font-size:11px;color:var(--cx-muted)}
-.map-panel-list{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.2) transparent}
+.map-panel-list{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(31,124,246,.2) transparent}
 .map-panel-list::-webkit-scrollbar{width:3px}
-.map-panel-list::-webkit-scrollbar-thumb{background:rgba(124,58,237,.2);border-radius:3px}
+.map-panel-list::-webkit-scrollbar-thumb{background:rgba(31,124,246,.2);border-radius:3px}
 
 /* Carte livraison dans le panneau */
 .mp-card{padding:12px 14px;border-bottom:1px solid var(--cx-border);cursor:pointer;transition:background .12s;position:relative}
 .mp-card:hover{background:rgba(255,255,255,.04)}
-.mp-card.selected{background:rgba(124,58,237,.1);border-left:3px solid var(--cx-brand)}
+.mp-card.selected{background:rgba(31,124,246,.1);border-left:3px solid var(--cx-brand)}
 .mp-card-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .mp-color{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .mp-id{font-size:11px;font-weight:800;color:var(--cx-brand)}
@@ -164,7 +164,7 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
     z-index:1;
 }
 .map-panel-close:hover{background:rgba(239,68,68,.2);color:#f87171;border-color:rgba(239,68,68,.25)}
-body.cx-light .map-panel-close{background:rgba(0,0,0,.06);border-color:rgba(0,0,0,.10);color:#6b7280}
+body.cx-light .map-panel-close{background:rgba(0,0,0,.06);border-color:rgba(0,0,0,.10);color:#62627C}
 body.cx-light .map-panel-close:hover{background:rgba(239,68,68,.1);color:#dc2626}
 
 /* FAB mobile — liste chauffeurs */
@@ -176,7 +176,7 @@ body.cx-light .map-panel-close:hover{background:rgba(239,68,68,.1);color:#dc2626
     border:none;border-radius:30px;
     padding:10px 20px;font-size:13px;font-weight:800;
     cursor:pointer;gap:8px;align-items:center;
-    box-shadow:0 4px 20px rgba(124,58,237,.5);
+    box-shadow:0 4px 20px rgba(31,124,246,.5);
     white-space:nowrap;
     transition:background .15s,opacity .2s,transform .1s;
 }
@@ -200,7 +200,8 @@ body.cx-light .map-panel-close:hover{background:rgba(239,68,68,.1);color:#dc2626
 .map-no-signal.show{display:flex}
 
 /* Compteur topbar */
-.map-count{background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.35);color:#c4b5fd;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.map-count{background:rgba(31,124,246,.2);border:1px solid rgba(31,124,246,.35);color:#1F7CF6;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+body.cx-light .map-count{background:#EAF2FF;border-color:#CFE1FF;color:#1260C9}
 
 /* Leaflet popup dark */
 .leaflet-popup-content-wrapper{background:var(--cx-surface);color:var(--cx-text);border:1px solid var(--cx-border);border-radius:var(--r-sm);box-shadow:0 8px 32px rgba(0,0,0,.6)}
@@ -211,17 +212,17 @@ body.cx-light .map-panel-close:hover{background:rgba(239,68,68,.1);color:#dc2626
 .lp-row strong{color:var(--cx-text)}
 
 /* MODE CLAIR */
-body.cx-light{--cx-bg:#F5F7FA;--cx-surface:#fff;--cx-surface2:#eef1f7;--cx-border:rgba(0,0,0,.08);--cx-text:#111827;--cx-text2:#4b5563;--cx-muted:#9ca3af}
-body.cx-light,html.cx-light,html.cx-light body{background:#F5F7FA!important}
+body.cx-light{--cx-bg:#F6F9FF;--cx-surface:#fff;--cx-surface2:#EEF3FB;--cx-border:rgba(0,0,0,.08);--cx-text:#16162A;--cx-text2:#45455E;--cx-muted:#9ca3af}
+body.cx-light,html.cx-light,html.cx-light body{background:#F6F9FF!important}
 body.cx-light .cx-topbar{background:#fff;border-bottom-color:rgba(0,0,0,.07);box-shadow:0 1px 4px rgba(0,0,0,.06)}
 body.cx-light .cx-tb-btn{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.08);color:#374151}
 body.cx-light .map-panel{background:#fff;border-right-color:rgba(0,0,0,.08)}
 body.cx-light .map-panel-drag{background:rgba(0,0,0,.15)}
 body.cx-light .mp-card:hover{background:rgba(0,0,0,.02)}
-body.cx-light .mp-card.selected{background:rgba(124,58,237,.06)}
+body.cx-light .mp-card.selected{background:rgba(31,124,246,.06)}
 body.cx-light .leaflet-popup-content-wrapper{background:#fff;color:#111}
 body.cx-light .leaflet-popup-tip{background:#fff}
-body.cx-light .cx-panel-toggle{background:rgba(124,58,237,.08);border-color:rgba(124,58,237,.2);color:#7c3aed}
+body.cx-light .cx-panel-toggle{background:rgba(31,124,246,.08);border-color:rgba(31,124,246,.2);color:#1668D8}
 
 /* ═══════════════════════════════════════
    RESPONSIVE
@@ -318,14 +319,14 @@ body.cx-light .cx-panel-toggle{background:rgba(124,58,237,.08);border-color:rgba
         <a href="{{ route('company.orders.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Commandes
             @if(!$isBusiness)
-                @php $oBg = $usedOrders >= $maxOrders ? '#ef4444' : ($usedOrders >= $maxOrders * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                @php $oBg = $usedOrders >= $maxOrders ? '#ef4444' : ($usedOrders >= $maxOrders * 0.7 ? '#f59e0b' : '#1668D8'); @endphp
                 <span class="cx-nav-badge" style="background:{{ $oBg }};margin-left:auto">{{ $usedOrders }}/{{ $maxOrders }}</span>
             @endif
         </a>
         <a href="{{ route('company.drivers.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></span> Chauffeurs
             @if(!$isBusiness)
-                @php $dBg = $totalDrivers >= $maxDrivers ? '#ef4444' : ($totalDrivers >= $maxDrivers * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                @php $dBg = $totalDrivers >= $maxDrivers ? '#ef4444' : ($totalDrivers >= $maxDrivers * 0.7 ? '#f59e0b' : '#1668D8'); @endphp
                 <span class="cx-nav-badge" style="background:{{ $dBg }};margin-left:auto">{{ $totalDrivers }}/{{ $maxDrivers }}</span>
             @endif
         </a>
@@ -346,7 +347,7 @@ body.cx-light .cx-panel-toggle{background:rgba(124,58,237,.08);border-color:rgba
         <a href="{{ route('company.zones.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span> Zone de livraison
             @if(!$isBusiness)
-                @php $zNavBg = $totalZones >= $maxZones ? '#ef4444' : ($totalZones >= $maxZones * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                @php $zNavBg = $totalZones >= $maxZones ? '#ef4444' : ($totalZones >= $maxZones * 0.7 ? '#f59e0b' : '#1668D8'); @endphp
                 <span class="cx-nav-badge" style="background:{{ $zNavBg }};margin-left:auto">{{ $totalZones }}/{{ $maxZones }}</span>
             @endif
         </a>
@@ -355,7 +356,7 @@ body.cx-light .cx-panel-toggle{background:rgba(124,58,237,.08);border-color:rgba
         </a>
         <a href="{{ $isBusiness ? route('company.rapport.index') : route('company.subscription.upgrade') }}" class="cx-nav-item" @if(!$isBusiness) style="opacity:.6" title="Plan Business requis" @endif>
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span> Rapport
-            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917">🔒</span>@endif
+            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>@endif
         </a>
 
         <div class="cx-nav-sec">Configuration</div>
@@ -364,7 +365,7 @@ body.cx-light .cx-panel-toggle{background:rgba(124,58,237,.08);border-color:rgba
         </a>
         <a href="{{ $isBusiness ? route('company.users.index') : route('company.subscription.upgrade') }}" class="cx-nav-item" @if(!$isBusiness) style="opacity:.6" title="Plan Business requis" @endif>
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Utilisateurs
-            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917">🔒</span>@endif
+            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>@endif
         </a>
         <a href="{{ route('company.support.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span> Support
@@ -465,9 +466,9 @@ body.cx-light .cx-panel-toggle{background:rgba(124,58,237,.08);border-color:rgba
 (function(){
     const body=document.body, sw=document.getElementById('cxDarkSwitch'),
           lbl=document.getElementById('cxDarkLbl'), row=document.getElementById('cxDarkToggle');
-    const saved=localStorage.getItem('cx-theme')||'dark';
+    const saved=localStorage.getItem('cx-theme') || 'light';
     function apply(t){
-        if(t==='light'){body.classList.remove('cx-dark');body.classList.add('cx-light');sw?.classList.remove('on');if(lbl)lbl.textContent='Mode clair';}
+        if(t!=='dark'){body.classList.remove('cx-dark');body.classList.add('cx-light');sw?.classList.remove('on');if(lbl)lbl.textContent = 'Mode sombre';}
         else{body.classList.remove('cx-light');body.classList.add('cx-dark');sw?.classList.add('on');if(lbl)lbl.textContent='Mode sombre';}
     }
     apply(saved); document.documentElement.classList.remove('cx-prelight');
@@ -523,12 +524,12 @@ if (drag) {
 
 /* ── Couleurs par chauffeur ── */
 const COLORS = [
-    '#f59e0b','#3b82f6','#10b981','#ec4899','#8b5cf6',
-    '#06b6d4','#f97316','#84cc16','#ef4444','#a78bfa',
-    '#14b8a6','#f43f5e','#6366f1','#eab308','#0ea5e9',
+    '#f59e0b','#3b82f6','#10b981','#ec4899','#1F7CF6',
+    '#06b6d4','#f97316','#84cc16','#ef4444','#7DB4FF',
+    '#14b8a6','#f43f5e','#1F7CF6','#eab308','#0ea5e9',
     '#d946ef','#22c55e','#fb923c','#38bdf8','#c084fc',
     '#4ade80','#fbbf24','#e879f9','#34d399','#f87171',
-    '#60a5fa','#a3e635','#fb7185','#2dd4bf','#818cf8',
+    '#60a5fa','#a3e635','#fb7185','#2dd4bf','#7DB4FF',
 ];
 function getColor(idx){ return COLORS[idx % COLORS.length]; }
 
@@ -706,7 +707,7 @@ function clientIcon() {
 
 function vendorIcon() {
     return L.divIcon({
-        html: `<div style="width:26px;height:26px;border-radius:7px;background:#f59e0b;border:2px solid #fff;box-shadow:0 0 0 3px rgba(245,158,11,.25),0 2px 8px rgba(245,158,11,.5);display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1">🏪</div>`,
+        html: `<div style="width:26px;height:26px;border-radius:7px;background:#f59e0b;border:2px solid #fff;box-shadow:0 0 0 3px rgba(245,158,11,.25),0 2px 8px rgba(245,158,11,.5);display:flex;align-items:center;justify-content:center;color:#fff;line-height:1">{!! \App\Support\IconLibrary::svg('store', '', 13) !!}</div>`,
         iconSize:[26,26], iconAnchor:[13,13], popupAnchor:[0,-14], className:''
     });
 }
@@ -878,7 +879,7 @@ function updateMap(drivers) {
                 } else {
                     vendorMarkers[ord.id] = L.marker(pos, { icon: vendorIcon() })
                         .addTo(map)
-                        .bindPopup(`<div style="font-family:system-ui;padding:2px 4px"><b style="font-size:12px;display:flex;align-items:center;gap:4px">🏪 ${esc(ord.shop)}</b><br><span style="font-size:10.5px;color:#94a3b8">Point de ramassage · commande #${ord.id}</span></div>`);
+                        .bindPopup(`<div style="font-family:system-ui;padding:2px 4px"><b style="font-size:12px;display:flex;align-items:center;gap:4px">${esc(ord.shop)}</b><br><span style="font-size:10.5px;color:#94a3b8">Point de ramassage · commande #${ord.id}</span></div>`);
                 }
             }
         });
@@ -913,8 +914,8 @@ function buildPopup(o) {
             <div class="lp-row"><span>Client&nbsp;</span><strong>${esc(ord.client)}</strong></div>`;
     }
     const phaseLabel = o.phase === 2
-        ? '<span style="color:#10b981">🚚 Phase 2 · En livraison → Client</span>'
-        : '<span style="color:#f59e0b">🏪 Phase 1 · Récupération → Boutique</span>';
+        ? '<span style="color:#10b981">Phase 2 · En livraison → Client</span>'
+        : '<span style="color:#f59e0b">Phase 1 · Récupération → Boutique</span>';
     return `<div class="lp-title" style="color:${color};display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg> ${esc(o.driver)}</div>
         <div class="lp-row" style="margin-bottom:3px">${phaseLabel}</div>
         ${ordersHtml}
@@ -955,5 +956,22 @@ setInterval(poll, 4000);
 window.addEventListener('resize', () => map.invalidateSize());
 window.addEventListener('orientationchange', () => { setTimeout(() => map.invalidateSize(), 200); });
 screen.orientation?.addEventListener('change', () => { setTimeout(() => map.invalidateSize(), 200); });
+</script>
+<style>.cx-dark-row:focus-visible{outline:2px solid #7DB4FF;outline-offset:2px}</style>
+<script>
+/* Interrupteur « Mode sombre » : même comportement sur toutes les pages (clavier et lecteur d'écran) */
+(function () {
+    var row = document.querySelector('.cx-dark-row'), sw = row && row.querySelector('.cx-toggle');
+    if (!row || !sw) return;
+    row.setAttribute('role', 'switch');
+    row.setAttribute('tabindex', '0');
+    row.setAttribute('aria-label', 'Mode sombre');
+    var sync = function () { row.setAttribute('aria-checked', sw.classList.contains('on') ? 'true' : 'false'); };
+    new MutationObserver(sync).observe(sw, { attributes: true, attributeFilter: ['class'] });
+    row.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); }
+    });
+    sync();
+})();
 </script>
 @endpush

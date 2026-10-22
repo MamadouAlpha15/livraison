@@ -7,18 +7,18 @@
 @endphp
 
 @push('styles')
-<script>(function(){ if(localStorage.getItem('cx-theme')==='light') document.documentElement.classList.add('cx-prelight'); })();</script>
-<style>html.cx-prelight body{background:#F5F7FA!important}</style>
+<script>(function(){ if(localStorage.getItem('cx-theme')!=='dark') document.documentElement.classList.add('cx-prelight'); })();</script>
+<style>html.cx-prelight body{background:#F6F9FF!important}</style>
 <style>
 *,*::before,*::after{box-sizing:border-box}
 :root{
-    --cx-bg:#0b0d22; --cx-surface:#0d1226; --cx-surface2:#111930;
-    --cx-border:rgba(255,255,255,.07); --cx-brand:#7c3aed; --cx-brand2:#6d28d9;
+    --cx-bg:#071630; --cx-surface:#0B1E3D; --cx-surface2:#132B52;
+    --cx-border:rgba(255,255,255,.07); --cx-brand:#1668D8; --cx-brand2:#1260C9;
     --cx-text:#e2e8f0; --cx-text2:#94a3b8; --cx-muted:#475569;
     --cx-green:#10b981; --cx-amber:#f59e0b; --cx-red:#ef4444; --cx-blue:#3b82f6;
     --cx-sb-w:220px; --r:16px; --r-sm:10px; --r-xs:7px;
 }
-html,body{margin:0;font-family:'Segoe UI',system-ui,sans-serif;background:var(--cx-bg)!important;color:var(--cx-text);-webkit-font-smoothing:antialiased}
+html,body{margin:0;font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--cx-bg)!important;color:var(--cx-text);-webkit-font-smoothing:antialiased}
 a{text-decoration:none;color:inherit}
 
 body.cx-dashboard>nav,body.cx-dashboard>header,body.cx-dashboard .navbar,
@@ -32,20 +32,20 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 /* ── SIDEBAR ── */
 .cx-sidebar{
     position:fixed;top:0;left:0;bottom:0;width:var(--cx-sb-w);
-    background:linear-gradient(180deg,#0f0f59 0%,#0e0e16 40%,#10103a 100%);
+    background:linear-gradient(180deg,#0B1E3D 0%,#081831 55%,#0B1E3D 100%);
     display:flex;flex-direction:column;
-    border-right:1px solid rgba(99,102,241,.15);
+    border-right:1px solid rgba(31,124,246,.15);
     box-shadow:6px 0 30px rgba(0,0,0,.35);
     z-index:1200;overflow-y:auto;
-    scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.3) transparent;
+    scrollbar-width:thin;scrollbar-color:rgba(31,124,246,.3) transparent;
     transition:transform .25s cubic-bezier(.23,1,.32,1);
 }
 .cx-sidebar::-webkit-scrollbar{width:3px}
-.cx-sidebar::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3);border-radius:3px}
+.cx-sidebar::-webkit-scrollbar-thumb{background:rgba(31,124,246,.3);border-radius:3px}
 .cx-brand-hd{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0}
 .cx-brand-top{display:flex;align-items:center;justify-content:space-between}
 .cx-logo{display:flex;align-items:center;gap:9px;color:#fff;font-size:16px;font-weight:800}
-.cx-logo-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.cx-logo-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#1668D8,#1260C9);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .cx-sys-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--cx-green);padding:3px 8px;border-radius:20px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);margin-top:8px}
 .cx-sys-dot{width:6px;height:6px;border-radius:50%;background:var(--cx-green);animation:blink 2.2s ease-in-out infinite;flex-shrink:0}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
@@ -54,26 +54,26 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .cx-nav{padding:8px 8px 12px;flex:1}
 .cx-nav-sec{font-size:10px;font-weight:800;letter-spacing:1.6px;color:rgba(255,255,255,.58);padding:14px 10px 5px;text-transform:uppercase}
 .cx-nav-item{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:var(--r-xs);color:rgba(255,255,255,.85);font-size:13.5px;font-weight:600;transition:all .22s cubic-bezier(.23,1,.32,1);position:relative;cursor:pointer;margin-bottom:2px;border:1px solid transparent}
-.cx-nav-item:hover{background:rgba(124,58,237,.18);color:#fff;border-color:rgba(124,58,237,.25);box-shadow:0 2px 12px rgba(124,58,237,.2),inset 0 1px 0 rgba(255,255,255,.06)}
-.cx-nav-item:hover .cx-nav-ico{background:rgba(139,92,246,.25);box-shadow:0 0 8px rgba(139,92,246,.3)}
-.cx-nav-item.active{background:linear-gradient(90deg,rgba(124,58,237,.35) 0%,rgba(99,102,241,.2) 100%);color:#fff;font-weight:700;border-color:rgba(139,92,246,.3);box-shadow:0 4px 16px rgba(124,58,237,.25),inset 0 1px 0 rgba(255,255,255,.08)}
-.cx-nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:linear-gradient(180deg,#a78bfa,#7c3aed);border-radius:0 3px 3px 0;box-shadow:2px 0 12px rgba(167,139,250,.7)}
+.cx-nav-item:hover{background:rgba(31,124,246,.18);color:#fff;border-color:rgba(31,124,246,.25);box-shadow:0 2px 12px rgba(31,124,246,.2),inset 0 1px 0 rgba(255,255,255,.06)}
+.cx-nav-item:hover .cx-nav-ico{background:rgba(31,124,246,.25);box-shadow:0 0 8px rgba(31,124,246,.3)}
+.cx-nav-item.active{background:linear-gradient(90deg,rgba(31,124,246,.35) 0%,rgba(31,124,246,.2) 100%);color:#fff;font-weight:700;border-color:rgba(31,124,246,.3);box-shadow:0 4px 16px rgba(31,124,246,.25),inset 0 1px 0 rgba(255,255,255,.08)}
+.cx-nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:linear-gradient(180deg,#7DB4FF,#1668D8);border-radius:0 3px 3px 0;box-shadow:2px 0 12px rgba(125,180,255,.7)}
 .cx-nav-ico{width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .22s cubic-bezier(.23,1,.32,1)}
-.cx-nav-item.active .cx-nav-ico{background:rgba(139,92,246,.3);border-color:rgba(139,92,246,.4);box-shadow:0 0 10px rgba(139,92,246,.4)}
+.cx-nav-item.active .cx-nav-ico{background:rgba(31,124,246,.3);border-color:rgba(31,124,246,.4);box-shadow:0 0 10px rgba(31,124,246,.4)}
 .cx-nav-ico svg,.lv-stat-ico svg{display:block;}
 .lv-stat-ico{color:var(--s-color,currentColor)}
-.cx-nav-item.active:hover{background:linear-gradient(90deg,rgba(124,58,237,.45) 0%,rgba(99,102,241,.3) 100%);box-shadow:0 4px 20px rgba(124,58,237,.35),inset 0 1px 0 rgba(255,255,255,.1)}
+.cx-nav-item.active:hover{background:linear-gradient(90deg,rgba(31,124,246,.45) 0%,rgba(31,124,246,.3) 100%);box-shadow:0 4px 20px rgba(31,124,246,.35),inset 0 1px 0 rgba(255,255,255,.1)}
 .cx-nav-badge{margin-left:auto;background:var(--cx-brand);color:#fff;font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:20px;min-width:18px;text-align:center}
 .cx-user-foot{padding:10px 10px 12px;border-top:1px solid rgba(255,255,255,.07);flex-shrink:0}
 .cx-user-row{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:var(--r-xs);background:rgba(255,255,255,.04);cursor:pointer;transition:background .15s;margin-bottom:6px}
 .cx-user-row:hover{background:rgba(255,255,255,.08)}
-.cx-user-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4338ca);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+.cx-user-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1668D8,#1260C9);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
 .cx-user-name{font-size:12px;font-weight:700;color:#fff;line-height:1.2}
-.cx-user-role{font-size:10px;color:var(--cx-text2)}
+.cx-user-role{font-size:10px;color:rgba(255,255,255,.62)}
 .cx-logout-btn{width:30px;height:30px;border-radius:8px;flex-shrink:0;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);display:flex;align-items:center;justify-content:center;color:#f87171;cursor:pointer;transition:background .15s,color .15s;padding:0}
 .cx-logout-btn:hover{background:rgba(239,68,68,.22);color:#fff}
 .cx-dark-row{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;cursor:pointer}
-.cx-dark-lbl{font-size:11.5px;color:var(--cx-text2)}
+.cx-dark-lbl{font-size:11.5px;color:rgba(255,255,255,.72)}
 .cx-toggle{width:34px;height:18px;background:#475569;border-radius:9px;position:relative;transition:background .25s;flex-shrink:0}
 .cx-toggle::after{content:'';position:absolute;top:3px;left:3px;width:12px;height:12px;background:#fff;border-radius:50%;transition:left .25s}
 .cx-toggle.on{background:var(--cx-brand)}
@@ -104,7 +104,7 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .lv-search-wrap{position:relative;flex:1;min-width:200px;max-width:340px}
 .lv-search-ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--cx-muted);pointer-events:none}
 .lv-search{width:100%;padding:9px 12px 9px 34px;background:var(--cx-surface);border:1px solid var(--cx-border);border-radius:var(--r-xs);color:var(--cx-text);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
-.lv-search:focus{border-color:var(--cx-brand);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+.lv-search:focus{border-color:var(--cx-brand);box-shadow:0 0 0 3px rgba(31,124,246,.12)}
 .lv-search::placeholder{color:var(--cx-muted)}
 .lv-filter-btn{padding:8px 16px;border-radius:30px;font-size:12.5px;font-weight:700;border:1px solid transparent;cursor:pointer;transition:all .15s;background:transparent;color:var(--cx-text2);font-family:inherit}
 .lv-filter-btn:hover{background:var(--cx-surface2);color:var(--cx-text)}
@@ -133,7 +133,7 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 
 /* Chauffeur */
 .lv-driver{display:flex;align-items:center;gap:8px}
-.lv-driver-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0}
+.lv-driver-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#1668D8,#1260C9);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0}
 .lv-driver-name{font-size:12.5px;font-weight:700;color:var(--cx-text)}
 .lv-driver-phone{font-size:11px;color:var(--cx-muted)}
 
@@ -142,7 +142,7 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 
 /* Actions */
 .lv-act-btn{width:30px;height:30px;border-radius:var(--r-xs);border:1px solid var(--cx-border);background:var(--cx-surface2);color:var(--cx-text2);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:13px;transition:all .14s}
-.lv-act-btn:hover{background:rgba(124,58,237,.15);border-color:rgba(124,58,237,.3);color:#c4b5fd}
+.lv-act-btn:hover{background:rgba(31,124,246,.15);border-color:rgba(31,124,246,.3);color:#1F7CF6}
 .lv-act-btn.done:hover{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.3);color:#34d399}
 .lv-act-btn.cancel:hover{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:#f87171}
 
@@ -171,12 +171,12 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 /* ── Cartes mobile ── */
 .lv-mc-card{background:var(--cx-surface);border:1px solid var(--cx-border);border-radius:var(--r-sm);margin-bottom:12px;overflow:hidden}
 .lv-mc-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--cx-border);gap:8px;flex-wrap:wrap}
-.lv-mc-id{font-size:15px;font-weight:900;color:var(--cx-brand);font-family:monospace}
+.lv-mc-id{font-size:15px;font-weight:900;color:var(--cx-brand);font-variant-numeric:tabular-nums}
 .lv-mc-time{font-size:11px;color:var(--cx-muted);margin-left:6px}
 .lv-mc-time.urgent{color:var(--cx-amber);font-weight:700}
 .lv-mc-fee-box{padding:13px 14px;background:var(--cx-surface2);border-bottom:1px solid var(--cx-border);display:flex;align-items:center;justify-content:space-between}
 .lv-mc-fee-lbl{font-size:10.5px;font-weight:700;color:var(--cx-muted);text-transform:uppercase;letter-spacing:.5px}
-.lv-mc-fee-val{font-size:20px;font-weight:900;font-family:monospace;color:var(--cx-green)}
+.lv-mc-fee-val{font-size:20px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--cx-green)}
 .lv-mc-rows{padding:4px 0}
 .lv-mc-row{display:flex;align-items:flex-start;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--cx-border);gap:10px}
 .lv-mc-lbl{font-size:12px;font-weight:700;color:var(--cx-muted);flex-shrink:0;min-width:100px}
@@ -189,8 +189,8 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .lv-mc-btn-cancel:hover{background:rgba(239,68,68,.18)}
 
 /* ── MODE CLAIR ── */
-body.cx-light{--cx-bg:#F5F7FA;--cx-surface:#fff;--cx-surface2:#eef1f7;--cx-border:rgba(0,0,0,.08);--cx-text:#111827;--cx-text2:#4b5563;--cx-muted:#9ca3af}
-body.cx-light,html.cx-light,html.cx-light body{background:#F5F7FA!important}
+body.cx-light{--cx-bg:#F6F9FF;--cx-surface:#fff;--cx-surface2:#EEF3FB;--cx-border:rgba(0,0,0,.08);--cx-text:#16162A;--cx-text2:#45455E;--cx-muted:#9ca3af}
+body.cx-light,html.cx-light,html.cx-light body{background:#F6F9FF!important}
 body.cx-light .cx-topbar{background:#fff;border-bottom-color:rgba(0,0,0,.07);box-shadow:0 1px 4px rgba(0,0,0,.06)}
 body.cx-light .cx-tb-btn{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.08);color:#374151}
 body.cx-light .lv-stat,body.cx-light .lv-search{background:#fff;border-color:rgba(0,0,0,.08)}
@@ -277,14 +277,14 @@ body.cx-light .lv-mc-btn-cancel{background:rgba(239,68,68,.06);color:#b91c1c}
         <a href="{{ route('company.orders.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Commandes
             @if(!$isBusiness)
-                @php $oBg = $usedOrders >= $maxOrders ? '#ef4444' : ($usedOrders >= $maxOrders * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                @php $oBg = $usedOrders >= $maxOrders ? '#ef4444' : ($usedOrders >= $maxOrders * 0.7 ? '#f59e0b' : '#1668D8'); @endphp
                 <span class="cx-nav-badge" style="background:{{ $oBg }};margin-left:auto">{{ $usedOrders }}/{{ $maxOrders }}</span>
             @endif
         </a>
         <a href="{{ route('company.drivers.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></span> Chauffeurs
             @if(!$isBusiness)
-                @php $dBg = $totalDrivers >= $maxDrivers ? '#ef4444' : ($totalDrivers >= $maxDrivers * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                @php $dBg = $totalDrivers >= $maxDrivers ? '#ef4444' : ($totalDrivers >= $maxDrivers * 0.7 ? '#f59e0b' : '#1668D8'); @endphp
                 <span class="cx-nav-badge" style="background:{{ $dBg }};margin-left:auto">{{ $totalDrivers }}/{{ $maxDrivers }}</span>
             @endif
         </a>
@@ -293,7 +293,7 @@ body.cx-light .lv-mc-btn-cancel{background:rgba(239,68,68,.06);color:#b91c1c}
         </a>
         <a href="{{ $isBusiness ? route('company.carte.index') : route('company.subscription.upgrade') }}" class="cx-nav-item" @if(!$isBusiness) style="opacity:.6" title="Plan Business requis" @endif>
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span> Carte en direct
-            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917">🔒</span>@endif
+            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>@endif
         </a>
         <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span> Boutiques
@@ -306,7 +306,7 @@ body.cx-light .lv-mc-btn-cancel{background:rgba(239,68,68,.06);color:#b91c1c}
         <a href="{{ route('company.zones.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span> Zone de livraison
             @if(!$isBusiness)
-                @php $zNavBg = $totalZones >= $maxZones ? '#ef4444' : ($totalZones >= $maxZones * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                @php $zNavBg = $totalZones >= $maxZones ? '#ef4444' : ($totalZones >= $maxZones * 0.7 ? '#f59e0b' : '#1668D8'); @endphp
                 <span class="cx-nav-badge" style="background:{{ $zNavBg }};margin-left:auto">{{ $totalZones }}/{{ $maxZones }}</span>
             @endif
         </a>
@@ -315,7 +315,7 @@ body.cx-light .lv-mc-btn-cancel{background:rgba(239,68,68,.06);color:#b91c1c}
         </a>
         <a href="{{ $isBusiness ? route('company.rapport.index') : route('company.subscription.upgrade') }}" class="cx-nav-item" @if(!$isBusiness) style="opacity:.6" title="Plan Business requis" @endif>
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span> Rapport
-            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917">🔒</span>@endif
+            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>@endif
         </a>
 
         <div class="cx-nav-sec">Configuration</div>
@@ -324,7 +324,7 @@ body.cx-light .lv-mc-btn-cancel{background:rgba(239,68,68,.06);color:#b91c1c}
         </a>
         <a href="{{ $isBusiness ? route('company.users.index') : route('company.subscription.upgrade') }}" class="cx-nav-item" @if(!$isBusiness) style="opacity:.6" title="Plan Business requis" @endif>
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Utilisateurs
-            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917">🔒</span>@endif
+            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>@endif
         </a>
         <a href="{{ route('company.support.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span> Support
@@ -578,9 +578,9 @@ const CSRF = document.querySelector('meta[name=csrf-token]')?.content ?? '';
     const sw   = document.getElementById('cxDarkSwitch');
     const lbl  = document.getElementById('cxDarkLbl');
     const row  = document.getElementById('cxDarkToggle');
-    const saved = localStorage.getItem('cx-theme') || 'dark';
+    const saved = localStorage.getItem('cx-theme') || 'light';
     function apply(t) {
-        if (t === 'light') { body.classList.remove('cx-dark'); body.classList.add('cx-light'); sw?.classList.remove('on'); if(lbl) lbl.textContent='Mode clair'; }
+        if (t === 'light') { body.classList.remove('cx-dark'); body.classList.add('cx-light'); sw?.classList.remove('on'); if(lbl) lbl.textContent = 'Mode sombre'; }
         else               { body.classList.remove('cx-light'); body.classList.add('cx-dark'); sw?.classList.add('on');    if(lbl) lbl.textContent='Mode sombre'; }
     }
     apply(saved);
@@ -762,5 +762,22 @@ lastTs = {{ $orders->max(fn($o) => $o->updated_at->timestamp) }};
 
 pollData();
 setInterval(pollData, 5000);
+</script>
+<style>.cx-dark-row:focus-visible{outline:2px solid #7DB4FF;outline-offset:2px}</style>
+<script>
+/* Interrupteur « Mode sombre » : même comportement sur toutes les pages (clavier et lecteur d'écran) */
+(function () {
+    var row = document.querySelector('.cx-dark-row'), sw = row && row.querySelector('.cx-toggle');
+    if (!row || !sw) return;
+    row.setAttribute('role', 'switch');
+    row.setAttribute('tabindex', '0');
+    row.setAttribute('aria-label', 'Mode sombre');
+    var sync = function () { row.setAttribute('aria-checked', sw.classList.contains('on') ? 'true' : 'false'); };
+    new MutationObserver(sync).observe(sw, { attributes: true, attributeFilter: ['class'] });
+    row.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); }
+    });
+    sync();
+})();
 </script>
 @endpush
