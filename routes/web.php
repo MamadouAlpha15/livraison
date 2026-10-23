@@ -250,20 +250,23 @@ Route::post('/shops/{shop}/clic', [PublicShopController::class, 'click'])
 Route::get('/shops/{shop}/catalogue-meta.csv', [\App\Http\Controllers\CatalogFeedController::class, 'meta'])
     ->name('public.shops.catalog');
 
-/* Suivi de commande (public — lien partageable) */
+/* Suivi de commande : client, personnel concerné, ou lien signé partagé (voir App\Support\OrderAccess) */
 Route::get('/suivi/{order}', [SuiviController::class, 'show'])
     ->name('suivi.show');
 
-/* Position GPS publique pour le suivi (pas d'auth requise) */
+/* Position GPS pour le suivi */
 Route::get('/suivi/{order}/position', [SuiviController::class, 'position'])
+    ->middleware('throttle:60,1')
     ->name('suivi.position');
 
 /* Données complètes pour le rafraîchissement auto (statut + GPS + livreur) */
 Route::get('/suivi/{order}/data', [SuiviController::class, 'data'])
+    ->middleware('throttle:60,1')
     ->name('suivi.data');
 
-/* Position GPS du client (public — envoyée depuis la page de suivi) */
+/* Position GPS du client, envoyée depuis la page de suivi */
 Route::post('/suivi/{order}/client-location', [SuiviController::class, 'updateClientLocation'])
+    ->middleware('throttle:30,1')
     ->name('suivi.client-location');
 
 /* Liste publique des entreprises de livraison (accessible sans connexion) */
@@ -638,11 +641,6 @@ Route::middleware(['auth', 'role:admin'])
         /* Tableau de bord boutique */
         Route::get('/dashboard', [ShopController::class, 'admin'])->name('dashboard');
 
-        /* Questions publiques des clients sur les fiches produits */
-        Route::get('/questions',                        [\App\Http\Controllers\Boutique\ProductQuestionController::class, 'index'])  ->name('questions.index');
-        Route::post('/questions/{question}/repondre',   [\App\Http\Controllers\Boutique\ProductQuestionController::class, 'answer']) ->name('questions.answer');
-        Route::delete('/questions/{question}',          [\App\Http\Controllers\Boutique\ProductQuestionController::class, 'destroy'])->name('questions.destroy');
-
         /* Gestion de la boutique */
         Route::resource('shops', ShopController::class)->only(['create', 'store', 'index']);
 
@@ -990,7 +988,6 @@ Route::middleware(['auth', 'role:client'])
         Route::get('/wishlist', [\App\Http\Controllers\Client\ProductFavoriteController::class, 'index'])->name('wishlist.index');
         Route::post('/products/{product}/favorite', [\App\Http\Controllers\Client\ProductFavoriteController::class, 'toggle'])->name('products.favorite.toggle');
         Route::post('/products/{product}/stock-alert', [\App\Http\Controllers\Client\StockAlertController::class, 'toggle'])->name('products.stock-alert');
-        Route::post('/products/{product}/questions',   [\App\Http\Controllers\Client\ProductQuestionController::class, 'store'])->name('products.questions.store');
 
         /* Carnet d'adresses */
         Route::get('/adresses',                       [\App\Http\Controllers\Client\AddressController::class, 'index'])      ->name('addresses.index');
@@ -1025,10 +1022,10 @@ Route::prefix('client')->name('client.')->group(function () {
 
     /* Commander depuis un produit spécifique — invité ou client connecté */
     Route::get('/orders/create-from-product/{product}', [ClientOrderController::class, 'createFromProduct'])->name('orders.createFromProduct');
-    Route::post('/orders/store-product',                 [ClientOrderController::class, 'storeProduct'])     ->name('orders.storeProduct');
+    Route::post('/orders/store-product',                 [ClientOrderController::class, 'storeProduct'])     ->middleware('throttle:10,1')->name('orders.storeProduct');
 
     /* Vérification AJAX d'un code promo (aperçu du total avant validation de la commande) */
-    Route::post('/orders/promo/check', [ClientOrderController::class, 'checkPromoCode'])->name('orders.promo.check');
+    Route::post('/orders/promo/check', [ClientOrderController::class, 'checkPromoCode'])->middleware('throttle:30,1')->name('orders.promo.check');
 });
 
 

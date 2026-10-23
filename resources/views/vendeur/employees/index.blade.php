@@ -286,7 +286,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 @section('content')
 
 @php
-    $shop     = auth()->user()->shop ?? auth()->user()->assignedShop ?? null;
+    $shop     = auth()->user()->shop;
     $parts    = explode(' ', auth()->user()->name);
     $initials = strtoupper(substr($parts[0],0,1)) . strtoupper(substr($parts[1] ?? 'X',0,1));
     $pendingCount   = $shop ? $shop->orders()->whereIn('status',['pending','en attente','en_attente'])->count() : 0;

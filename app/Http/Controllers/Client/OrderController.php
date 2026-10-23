@@ -598,7 +598,7 @@ class OrderController extends Controller
 
         // Un invité n'a pas de compte pour voir "Mes commandes" → on l'envoie sur le suivi public de sa commande
         if (!Auth::check()) {
-            $redirect = redirect()->route('suivi.show', $order)->with('success', $successMsg);
+            $redirect = redirect(\App\Support\OrderAccess::trackingUrl($order))->with('success', $successMsg);
             return $onlinePaymentFailedMessage ? $redirect->with('warning', $onlinePaymentFailedMessage) : $redirect;
         }
 

@@ -15,7 +15,7 @@ class CommissionController extends Controller
         $livreur   = Auth::user();
         $livreurId = $livreur->id;
         abort_unless($livreurId, 403);
-        $shop  = $livreur->shop ?? $livreur->assignedShop;
+        $shop  = $livreur->shop;
 
         $driver          = Driver::with('company')->where('user_id', $livreurId)->first();
         $isCompanyDriver = $driver && $driver->delivery_company_id;

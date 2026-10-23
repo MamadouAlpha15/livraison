@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('auth/google',          [GoogleController::class, 'redirect'])    ->name('google.redirect');
 Route::get('auth/google/callback', [GoogleController::class, 'callback'])    ->name('google.callback');
 Route::get('auth/google/setup',    [GoogleController::class, 'setup'])       ->name('google.setup');
-Route::post('auth/google/setup',   [GoogleController::class, 'storeSetup']) ->name('google.setup.store');
+Route::post('auth/google/setup',   [GoogleController::class, 'storeSetup']) ->middleware('throttle:10,1')->name('google.setup.store');
 
 /* App mobile Flutter : même redirect_uri Google que le site (fixé côté Google
    Cloud Console), mais un flag en session fait bifurquer callback() vers un
@@ -40,7 +40,8 @@ Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
 
-    Route::post('register', [RegisteredUserController::class, 'store']);
+    Route::post('register', [RegisteredUserController::class, 'store'])
+        ->middleware('throttle:10,10');
 
     Route::get('verify-otp', [OtpVerificationController::class, 'show'])
         ->name('verification.otp.show');

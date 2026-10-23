@@ -13,37 +13,23 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Services\PushService;
 use App\Support\DeliveryCode;
+use App\Support\OrderAccess;
 
 class OrderController extends Controller
 {
-    /**
-     * Retourne le Driver lié au compte connecté (null si livreur boutique).
-     */
+    /** Fiche chauffeur du compte connecté (null si livreur boutique). */
     private function myDriver(): ?Driver
     {
-        return Driver::where('user_id', Auth::id())->first();
+        return Driver::forUser(Auth::user());
     }
 
     /**
-     * Vérifie que l'utilisateur est autorisé à agir sur cette commande.
+     * Vérifie que l'utilisateur livre cette commande (sinon 403).
      * Retourne le Driver si c'est un livreur d'entreprise, null si livreur boutique.
      */
     private function authorizeOrder(Order $order): ?Driver
     {
-        $user = Auth::user();
-
-        // Livreur boutique (ancien système via livreur_id)
-        if ($order->livreur_id === $user->id) {
-            return null;
-        }
-
-        // Livreur entreprise (nouveau système via driver_id)
-        $driver = $this->myDriver();
-        if ($driver && (int) $order->driver_id === $driver->id) {
-            return $driver;
-        }
-
-        abort(403, 'Accès interdit');
+        return OrderAccess::authorizeCourier(Auth::user(), $order);
     }
 
     /**
@@ -53,7 +39,7 @@ class OrderController extends Controller
     public function index()
     {
         $user   = Auth::user();
-        $shop   = $user->shop ?? $user->assignedShop;
+        $shop   = $user->shop;
         $driver = $this->myDriver();
         $devise = $shop?->currency ?? $driver?->company?->currency ?? 'GNF';
 
@@ -212,7 +198,7 @@ class OrderController extends Controller
 
         $orders = Order::whereIn('id', $ids)->get();
         foreach ($orders as $order) {
-            if ($order->livreur_id !== $user->id && (!$driver || (int)$order->driver_id !== $driver->id)) continue;
+            if (! OrderAccess::isAssignedCourier($user, $order, $driver)) continue;
             $order->status = Order::STATUS_EN_LIVRAISON;
             $order->save();
             if ($order->client) {
@@ -266,7 +252,7 @@ class OrderController extends Controller
             $seenBatches = [];
 
             foreach ($orders as $order) {
-                if ($order->livreur_id !== $user->id && (!$driver || (int)$order->driver_id !== $driver->id)) continue;
+                if (! OrderAccess::isAssignedCourier($user, $order, $driver)) continue;
                 $order->status = Order::STATUS_LIVREE;
                 if ($proofPhotoPath) {
                     $order->delivery_proof_photo = $proofPhotoPath;
@@ -353,9 +339,7 @@ class OrderController extends Controller
         $orders = Order::whereIn('id', $ids)->get();
 
         foreach ($orders as $order) {
-            if ($order->livreur_id !== $user->id && (!$driver || (int)$order->driver_id !== $driver->id)) {
-                abort(403);
-            }
+            abort_unless(OrderAccess::isAssignedCourier($user, $order, $driver), 403);
         }
 
         // Créer un batch_id commun si les commandes n'en ont pas encore
@@ -381,9 +365,7 @@ class OrderController extends Controller
         $orders = Order::whereIn('id', $ids)->get();
 
         foreach ($orders as $order) {
-            if ($order->livreur_id !== $user->id && (!$driver || (int)$order->driver_id !== $driver->id)) {
-                abort(403);
-            }
+            abort_unless(OrderAccess::isAssignedCourier($user, $order, $driver), 403);
         }
 
         // Créer un batch commun si plusieurs commandes sans batch

@@ -120,7 +120,7 @@ class StorefrontOrderController extends Controller
         return response()->json([
             'id'       => $order->id,
             'total'    => (int) $order->total,
-            'tracking' => route('suivi.show', $order),
+            'tracking' => \App\Support\OrderAccess::trackingUrl($order),
             'wa'       => $wa,
         ], 201);
     }

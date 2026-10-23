@@ -1014,6 +1014,7 @@ function toggleGroup(btn) {
             }
             return;
         }
+        const _esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); // nom saisi par un autre utilisateur
         lname = livreur.name;
         const ini = getInitials(livreur.name);
         const dotColor = d.is_delivered ? '#22c55e' : d.is_ongoing ? '#f59e0b' : '#94a3b8';
@@ -1021,9 +1022,9 @@ function toggleGroup(btn) {
         row.innerHTML = `<div class="info-row" style="align-items:center">
             <span class="lbl">Livreur</span>
             <div class="livreur-inline">
-                <div class="l-av">${ini}</div>
+                <div class="l-av">${_esc(ini)}</div>
                 <div>
-                    <div class="l-name">${livreur.name}</div>
+                    <div class="l-name">${_esc(livreur.name)}</div>
                     <div class="l-avail"><span class="l-dot" style="background:${dotColor}"></span> ${dotLabel}</div>
                 </div>
             </div>

@@ -237,28 +237,6 @@ body{background:#F6F9FF !important;font-family:'Plus Jakarta Sans', system-ui, -
 .btn-addcart.added{background:#10b981;border-color:#10b981;color:#fff}
 .btn-addcart:disabled{opacity:.7;cursor:default}
 .btn-addcart.is-on{background:#EAF2FF;border-color:#CFE1FF;color:#1260C9}
-/* Questions sur le produit */
-.qa{display:grid;gap:10px;scroll-margin-top:80px}
-.qa-item{padding:12px 14px;border-radius:16px;background:#F6F9FF;display:grid;gap:6px}
-.qa-item.is-pending{background:#fff;box-shadow:inset 0 0 0 1.5px #E3E8F2}
-.qa-q,.qa-a{display:flex;gap:8px;font-size:14px;line-height:1.5;color:#16162A;overflow-wrap:anywhere}
-.qa-q{font-weight:700}
-.qa-a{color:#45455E}
-.qa-tag{flex-shrink:0;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background:#0B1E3D;color:#fff}
-.qa-tag.is-a{background:#1668D8}
-.qa-meta{font-size:12px;color:#62627C;padding-left:30px}
-.qa-empty{margin:0;font-size:13.5px;color:#62627C}
-.qa-flash{padding:10px 14px;border-radius:12px;font-size:13px;font-weight:600}
-.qa-flash.ok{background:#ECFDF5;color:#065F46}
-.qa-flash.warn{background:#FFFBEB;color:#92400E}
-.qa-form{display:grid;gap:8px;margin-top:4px}
-.qa-label{font-size:13px;font-weight:700;color:#16162A}
-.qa-form textarea{width:100%;padding:12px 14px;border:1.5px solid #E3E8F2;border-radius:14px;font:inherit;font-size:14px;color:#16162A;resize:vertical;min-height:70px}
-.qa-form textarea:focus{outline:none;border-color:#1F7CF6;box-shadow:0 0 0 4px rgba(31,124,246,.12)}
-.qa-err{font-size:12.5px;color:#B91C1C;font-weight:600}
-.qa-submit{justify-self:start;min-height:42px;padding:0 20px;border:none;border-radius:999px;background:#1668D8;color:#fff;font-family: inherit; font-size: 13.5px; font-weight: 800;cursor:pointer}
-.qa-submit:hover{background:#1260C9}
-.qa-login{font-size:13.5px;font-weight:700;color:#1260C9}
 .btn-back{
     display:flex;align-items:center;justify-content:center;gap:7px;
     background:#fff;border:1.5px solid #E3E8F2;color:#374151;
@@ -516,53 +494,6 @@ body{background:#F6F9FF !important;font-family:'Plus Jakarta Sans', system-ui, -
                 ← Tous les produits
             </a>
         </div>
-
-        {{-- QUESTIONS PUBLIQUES : la réponse de la boutique sert à tous les acheteurs --}}
-        @php
-            $qaPublic = \App\Models\ProductQuestion::with('user:id,name')->where('product_id', $product->id)->answered()->latest('answered_at')->take(10)->get();
-            $qaMine   = auth()->check()
-                ? \App\Models\ProductQuestion::where('product_id', $product->id)->where('user_id', auth()->id())->unanswered()->latest()->get()
-                : collect();
-            $qaCanAsk = auth()->check() && auth()->user()->role === 'client';
-        @endphp
-        <div class="sep"></div>
-        <section class="qa" id="questions" aria-labelledby="qaTitle">
-            <div class="section-label" id="qaTitle">Questions sur ce produit</div>
-
-            @if(session('qa_success'))<div class="qa-flash ok" role="status">{{ session('qa_success') }}</div>@endif
-            @if(session('qa_warning'))<div class="qa-flash warn" role="alert">{{ session('qa_warning') }}</div>@endif
-
-            @foreach($qaMine as $q)
-            <div class="qa-item is-pending">
-                <div class="qa-q"><span class="qa-tag">Q</span> {{ $q->question }}</div>
-                <div class="qa-meta">Votre question · en attente de la réponse de la boutique</div>
-            </div>
-            @endforeach
-
-            @forelse($qaPublic as $q)
-            <div class="qa-item">
-                <div class="qa-q"><span class="qa-tag">Q</span> {{ $q->question }}</div>
-                <div class="qa-a"><span class="qa-tag is-a">R</span> {{ $q->answer }}</div>
-                <div class="qa-meta">{{ $q->author_first_name }} · réponse de {{ $shop->name ?? 'la boutique' }} {{ $q->answered_at->diffForHumans() }}</div>
-            </div>
-            @empty
-                @if($qaMine->isEmpty())
-                <p class="qa-empty">Aucune question pour l'instant. Posez la première : la réponse de la boutique sera visible par tous.</p>
-                @endif
-            @endforelse
-
-            @if($qaCanAsk)
-            <form method="POST" action="{{ route('client.products.questions.store', $product) }}" class="qa-form">
-                @csrf
-                <label for="qaQuestion" class="qa-label">Votre question</label>
-                <textarea id="qaQuestion" name="question" rows="2" maxlength="500" required placeholder="Ex. Quelle est la taille exacte ? Est-ce livré à Kindia ?">{{ old('question') }}</textarea>
-                @error('question')<div class="qa-err">{{ $message }}</div>@enderror
-                <button type="submit" class="qa-submit">Envoyer la question</button>
-            </form>
-            @elseguest
-            <a href="{{ route('login', ['redirect' => url()->current() . '#questions']) }}" class="qa-login">Connectez-vous pour poser une question</a>
-            @endif
-        </section>
 
     </div>
 </div>

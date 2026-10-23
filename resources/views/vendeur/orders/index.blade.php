@@ -3,7 +3,7 @@
 @section('title', 'Commandes reçues')
 @php
     $bodyClass = 'is-dashboard';
-    $devise = auth()->user()->shop?->currency ?? auth()->user()->assignedShop?->currency ?? 'GNF';
+    $devise = auth()->user()->shop?->currency ?? 'GNF';
 @endphp
 
 @push('styles')

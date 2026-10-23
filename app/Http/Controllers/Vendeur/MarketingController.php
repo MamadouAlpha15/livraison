@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Vendeur;
 
 use App\Http\Controllers\CatalogFeedController;
+use App\Http\Controllers\Concerns\ResolvesOwnShop;
 use App\Http\Controllers\Controller;
 use App\Models\MarketingCampaign;
 use App\Models\Order;
@@ -16,7 +17,6 @@ use App\Support\Storefront;
 use App\Support\TrafficSource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -32,18 +32,13 @@ use Illuminate\View\View;
  */
 class MarketingController extends Controller
 {
+    use ResolvesOwnShop;
+
     public const PERIODS = [7, 30, 90];
 
     /** Vues minimum avant de signaler une fiche « à revoir ». */
     public const REVIEW_MIN_VIEWS = 15;
 
-    private function shop(): Shop
-    {
-        $user = Auth::user();
-        $shop = $user->shop ?? Shop::where('user_id', $user->id)->first();
-        abort_unless($shop, 404, 'Aucune boutique associée à ce compte.');
-        return $shop;
-    }
 
     public function index(Request $request): View
     {

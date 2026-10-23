@@ -4,21 +4,32 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Support\OrderAccess;
 
 class SuiviController extends Controller
 {
-    public function show(Order $order)
+    /** 404 plutôt que 403 : ne pas confirmer qu'une commande existe à ce numéro. */
+    private function authorizeTracking(Order $order, Request $request): void
     {
+        abort_unless(OrderAccess::canTrack($order, $request), 404);
+    }
+
+    public function show(Request $request, Order $order)
+    {
+        $this->authorizeTracking($order, $request);
         $order->load(['livreur', 'shop', 'items.product', 'review']);
 
         // Trouver les commandes du même groupe (batch_id commun = bulk-assignées ensemble)
         $groupOrders = collect([$order]);
 
         if ($order->delivery_batch_id) {
-            // Commandes du même lot : toutes celles avec le même batch_id
+            // Commandes du même lot ET du même client : un lot regroupe souvent plusieurs clients
             $siblings = Order::with(['items.product'])
                 ->where('delivery_batch_id', $order->delivery_batch_id)
                 ->where('id', '!=', $order->id)
+                ->where(fn ($q) => $order->user_id
+                    ? $q->where('user_id', $order->user_id)
+                    : $q->whereNull('user_id')->where('client_phone', $order->client_phone))
                 ->get();
 
             if ($siblings->isNotEmpty()) {
@@ -29,13 +40,9 @@ class SuiviController extends Controller
         return view('orders.show', compact('order', 'groupOrders'));
     }
 
-    public function gps(Order $order){
-         $order->load(['livreur', 'shop', 'items.product', 'review']);
-        return view('orders.show2', compact('order'));
-    }
-
-    public function position(Order $order)
+    public function position(Request $request, Order $order)
     {
+        $this->authorizeTracking($order, $request);
         return response()->json([
             'order_id' => $order->id,
             'lat'      => $order->current_lat,
@@ -45,8 +52,9 @@ class SuiviController extends Controller
         ]);
     }
 
-    public function data(Order $order)
+    public function data(Request $request, Order $order)
     {
+        $this->authorizeTracking($order, $request);
         $order->load(['livreur', 'shop']);
 
         $statusMap = [
@@ -58,29 +66,13 @@ class SuiviController extends Controller
         ];
         $sInfo = $statusMap[$order->status] ?? $statusMap['en_attente'];
 
-        $livreur = null;
-        if ($order->livreur) {
-            // Livreur boutique (livreur_id → User)
-            $name    = $order->livreur->name;
-            $parts   = explode(' ', $name);
-            $livreur = [
-                'name'     => $name,
-                'initials' => strtoupper(substr($parts[0], 0, 1)).strtoupper(substr($parts[1] ?? substr($name, 1, 1), 0, 1)),
-                'phone'    => $order->livreur->phone,
-            ];
-        } elseif ($order->driver_id) {
-            // Chauffeur entreprise (driver_id → Driver)
-            $driver = \App\Models\Driver::find($order->driver_id);
-            if ($driver) {
-                $name    = $driver->name;
-                $parts   = explode(' ', $name);
-                $livreur = [
-                    'name'     => $name,
-                    'initials' => strtoupper(substr($parts[0], 0, 1)).strtoupper(substr($parts[1] ?? substr($name, 1, 1), 0, 1)),
-                    'phone'    => $driver->phone,
-                ];
-            }
-        }
+        // Livreur boutique (livreur_id → User) ou chauffeur entreprise (driver_id → Driver)
+        $courier = $order->livreur ?? ($order->driver_id ? \App\Models\Driver::find($order->driver_id) : null);
+        $livreur = $courier ? [
+            'name'     => $courier->name,
+            'initials' => $this->initials($courier->name),
+            'phone'    => $courier->phone,
+        ] : null;
 
         return response()->json([
             'status'              => $order->status,
@@ -105,8 +97,19 @@ class SuiviController extends Controller
         ]);
     }
 
+    /** « Mamadou Diallo » → « MD » ; un seul mot → ses deux premières lettres. */
+    private function initials(string $name): string
+    {
+        $parts = explode(' ', $name);
+        return strtoupper(substr($parts[0], 0, 1)) . strtoupper(substr($parts[1] ?? substr($name, 1, 1), 0, 1));
+    }
+
     public function updateClientLocation(Request $request, Order $order)
     {
+        // Le client, ou la personne à qui il a partagé le lien (celle qui réceptionne le colis)
+        abort_unless($request->hasValidRelativeSignature() || OrderAccess::isOwner($order), 404);
+        abort_if(in_array($order->status, [Order::STATUS_LIVREE, Order::STATUS_ANNULEE], true), 422);
+
         $request->validate([
             'lat' => 'required|numeric|between:-90,90',
             'lng' => 'required|numeric|between:-180,180',

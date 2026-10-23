@@ -7,6 +7,7 @@ use App\Models\CourierCommission;
 use App\Models\Payment;
 use App\Services\PushService;
 use App\Support\DeliveryCode;
+use App\Support\OrderAccess;
 use Illuminate\Http\Request;
 
 class OrderTrackingController extends Controller
@@ -16,17 +17,7 @@ class OrderTrackingController extends Controller
         $user = auth()->user();
         abort_unless($user, 401);
 
-        $authorized = false;
-        if (in_array($user->role, ['superadmin','admin'])) $authorized = true;
-        if ($user->shop_id && $user->shop_id === $order->shop_id) $authorized = true;
-        if ($order->user_id === $user->id) $authorized = true;
-        if ($order->livreur_id === $user->id) $authorized = true;
-        if (! $authorized) {
-            $driver = \App\Models\Driver::where('user_id', $user->id)->first();
-            if ($driver && (int) $order->driver_id === $driver->id) $authorized = true;
-        }
-
-        abort_unless($authorized, 403, 'Non autorisé');
+        abort_unless(OrderAccess::isOwner($order) || OrderAccess::isStaff($user, $order), 403, 'Non autorisé');
 
         return response()->json([
             'order_id'   => $order->id,
@@ -46,18 +37,8 @@ class OrderTrackingController extends Controller
         $user = auth()->user();
         abort_unless($user, 401);
 
-        // Autorisé : livreur boutique, chauffeur entreprise, admin, vendeur de la boutique
-        $authorized = in_array($user->role, ['superadmin', 'admin'])
-            || ($user->shop_id && $user->shop_id === $order->shop_id)
-            || $order->livreur_id === $user->id;
-
-        if (! $authorized) {
-            $driver = \App\Models\Driver::where('user_id', $user->id)->first();
-            if ($driver && (int) $order->driver_id === $driver->id) {
-                $authorized = true;
-            }
-        }
-        abort_unless($authorized, 403);
+        // Autorisé : livreur boutique, chauffeur entreprise, boutique, société de livraison, super-admin
+        abort_unless(OrderAccess::isStaff($user, $order), 403);
 
         $order->load(['shop', 'client']);
 
@@ -74,15 +55,7 @@ class OrderTrackingController extends Controller
         abort_unless($user, 401);
 
         // Livreur boutique (livreur_id) OU chauffeur entreprise (driver_id)
-        $authorized = $order->livreur_id === $user->id;
-        $driver = null;
-        if (! $authorized) {
-            $driver = \App\Models\Driver::where('user_id', $user->id)->first();
-            if ($driver && (int) $order->driver_id === $driver->id) {
-                $authorized = true;
-            }
-        }
-        abort_unless($authorized, 403, 'Réservé au livreur assigné');
+        $driver = OrderAccess::authorizeCourier($user, $order, 'Réservé au livreur assigné');
 
         $data = $request->validate([
             'lat' => ['required','numeric','between:-90,90'],
@@ -123,15 +96,7 @@ class OrderTrackingController extends Controller
         abort_unless($user, 401);
 
         // Seul le chauffeur assigné peut changer le statut
-        $authorized = $order->livreur_id === $user->id;
-        $driver = null;
-        if (! $authorized) {
-            $driver = \App\Models\Driver::where('user_id', $user->id)->first();
-            if ($driver && (int) $order->driver_id === $driver->id) {
-                $authorized = true;
-            }
-        }
-        abort_unless($authorized, 403, 'Réservé au chauffeur assigné.');
+        $driver = OrderAccess::authorizeCourier($user, $order, 'Réservé au chauffeur assigné.');
 
         $data = $request->validate([
             'status'      => ['required', 'in:en_livraison,livrée'],

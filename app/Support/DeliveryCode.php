@@ -58,13 +58,7 @@ class DeliveryCode
     /** Le visiteur a-t-il le droit de voir le code de cette commande ? */
     public static function visibleTo(Order $order): bool
     {
-        if (! filled($order->delivery_code)) {
-            return false;
-        }
-        if (auth()->check()) {
-            return (int) $order->user_id === (int) auth()->id();
-        }
-        return is_null($order->user_id) && in_array($order->id, (array) session('guest_order_ids', []), true);
+        return filled($order->delivery_code) && OrderAccess::isOwner($order);
     }
 
     /** Mémorise en session une commande passée sans compte, pour lui montrer son code. */

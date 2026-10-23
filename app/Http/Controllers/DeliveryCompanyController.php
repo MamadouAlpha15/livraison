@@ -18,7 +18,6 @@ class DeliveryCompanyController extends Controller
         if (auth()->check()) {
             $authUser      = auth()->user();
             $filterCountry = $authUser->shop?->country
-                ?? $authUser->assignedShop?->country
                 ?? $authUser->country;
         }
 

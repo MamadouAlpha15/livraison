@@ -5,13 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class UsersController extends Controller
 {
     public function index(Request $request)
     {
-        $meInit = strtoupper(substr(Auth::user()->name ?? 'S', 0, 1));
         $role   = $request->input('role', 'all');
         $search = $request->input('search');
 
@@ -57,7 +55,7 @@ class UsersController extends Controller
             'staff'      => User::where('role', 'staff')->count(),
         ];
 
-        return view('admin.users.index', compact('users', 'stats', 'role', 'search', 'meInit'));
+        return view('admin.users.index', compact('users', 'stats', 'role', 'search'));
     }
 
     /**

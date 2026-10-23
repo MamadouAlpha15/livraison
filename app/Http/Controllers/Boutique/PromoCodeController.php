@@ -11,7 +11,7 @@ class PromoCodeController extends Controller
 {
     protected function shop()
     {
-        $shop = Auth::user()->shop ?? Auth::user()->assignedShop;
+        $shop = Auth::user()->shop;
         abort_unless($shop, 403);
 
         return $shop;

@@ -7,13 +7,11 @@ use App\Models\CourierCommission;
 use App\Models\Shop;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class CommissionController extends Controller
 {
     public function index(Request $request)
     {
-        $meInit = strtoupper(substr(Auth::user()->name ?? 'S', 0, 1));
 
         $shopId    = $request->filled('shop_id')    ? (int) $request->shop_id    : null;
         $livreurId = $request->filled('livreur_id') ? (int) $request->livreur_id : null;
@@ -77,7 +75,7 @@ class CommissionController extends Controller
         $livreurs = User::where('role', 'livreur')->orderBy('name')->get(['id', 'name']);
 
         return view('admin.commissions.index', compact(
-            'commissions', 'stats', 'period', 'meInit',
+            'commissions', 'stats', 'period',
             'shops', 'livreurs', 'shopId', 'livreurId', 'shopFilter', 'livreurFilter'
         ));
     }

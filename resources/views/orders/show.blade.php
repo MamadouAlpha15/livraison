@@ -688,7 +688,7 @@ $init = fn(string $n): string =>
     {{-- ── Partager le suivi (ex. au proche qui réceptionne le colis) ── --}}
     @if(!$isCancelled)
     @php
-        $shareText = 'Suivez ma commande Shopio n°' . str_pad($order->id, 5, '0', STR_PAD_LEFT) . ' : ' . route('suivi.show', $order);
+        $shareText = 'Suivez ma commande Shopio n°' . str_pad($order->id, 5, '0', STR_PAD_LEFT) . ' : ' . \App\Support\OrderAccess::trackingUrl($order);
         if (!$isDelivered && \App\Support\DeliveryCode::visibleTo($order)) {
             $shareText .= "\nCode de remise à donner au livreur : " . $order->delivery_code;
         }
@@ -702,7 +702,7 @@ $init = fn(string $n): string =>
             <a class="share-wa" href="https://wa.me/?text={{ rawurlencode($shareText) }}" target="_blank" rel="noopener">
                 {!! \App\Support\IconLibrary::svg('message', '', 16) !!} WhatsApp
             </a>
-            <button type="button" class="share-copy" id="shareCopyBtn" data-url="{{ route('suivi.show', $order) }}">
+            <button type="button" class="share-copy" id="shareCopyBtn" data-url="{{ \App\Support\OrderAccess::trackingUrl($order) }}">
                 {!! \App\Support\IconLibrary::svg('list', '', 16) !!} <span>Copier le lien</span>
             </button>
         </div>
@@ -815,7 +815,7 @@ $init = fn(string $n): string =>
 @if(!auth()->check() && is_null($order->user_id))
 {{-- ── Modal invitation à créer un compte (commande passée sans compte) ── --}}
 @php
-    $suiviUrl    = route('suivi.show', $order);
+    $suiviUrl    = \App\Support\OrderAccess::trackingUrl($order);
     $registerUrl = route('register', ['redirect' => $suiviUrl, 'order_id' => $order->id, 'role' => 'client']);
     $loginUrl    = route('login',    ['redirect' => $suiviUrl, 'order_id' => $order->id]);
     $googleUrl   = route('google.redirect', ['redirect' => $suiviUrl, 'order_id' => $order->id]);
@@ -872,7 +872,7 @@ window.SIco = {!! json_encode(collect(['clock', 'package', 'truck', 'check', 'x'
     @endphp
 
     /* ── Constantes Blade → JS ── */
-    const DATA_URL     = '{{ route('suivi.data', $order) }}';
+    const DATA_URL     = '{{ \App\Support\OrderAccess::trackingUrl($order, 'suivi.data') }}';
     const IS_DELIVERED = {{ $isDelivered ? 'true' : 'false' }};
     const IS_CANCELLED = {{ $isCancelled ? 'true' : 'false' }};
     const HAS_GPS      = {{ $hasGPS ? 'true' : 'false' }};
@@ -1103,8 +1103,8 @@ window.SIco = {!! json_encode(collect(['clock', 'package', 'truck', 'check', 'x'
             if (mapPos) {
                 const el = document.createElement('div');
                 el.className = 'map-livreur-overlay'; el.id = 'livreurOverlay';
-                el.innerHTML = `<div class="mlo-av">${ini}</div><div>
-                    <div class="mlo-name">${livreur.name}</div>
+                el.innerHTML = `<div class="mlo-av">${_esc(ini)}</div><div>
+                    <div class="mlo-name">${_esc(livreur.name)}</div>
                     <div class="mlo-status"><span class="mlo-dot"></span> En route vers vous</div>
                 </div>`;
                 mapPos.appendChild(el);
@@ -1280,7 +1280,7 @@ window.SIco = {!! json_encode(collect(['clock', 'package', 'truck', 'check', 'x'
     /* ══════════════════════════════════════════════════════════════════
      *  PARTAGE DE POSITION CLIENT
      * ══════════════════════════════════════════════════════════════════ */
-    const CLIENT_LOC_URL  = '{{ route('suivi.client-location', $order) }}';
+    const CLIENT_LOC_URL  = '{{ \App\Support\OrderAccess::trackingUrl($order, 'suivi.client-location') }}';
     const CSRF_TOKEN      = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
     let clientLat    = {{ $order->client_lat ?? 'null' }};

@@ -166,8 +166,10 @@ protected $casts = [
             return;
         }
 
-        $orderId = session()->pull('link_order_id');
-        if (!$orderId) {
+        $orderId = (int) session()->pull('link_order_id');
+        // L'identifiant vient de l'URL : on ne rattache que les commandes passées depuis ce navigateur,
+        // sinon n'importe quel compte pourrait s'approprier la commande (adresse, téléphone, code) d'un autre
+        if (!$orderId || !in_array($orderId, array_map('intval', (array) session('guest_order_ids', [])), true)) {
             return;
         }
 

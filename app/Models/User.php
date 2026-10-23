@@ -74,15 +74,8 @@ class User extends Authenticatable
      | Relations
      |=========================*/
 
-    // Boutique principale (FK users.shop_id)
+    // Boutique du compte (FK users.shop_id) : propriétaire, employé ou livreur de la boutique
     public function shop()
-    {
-        return $this->belongsTo(Shop::class, 'shop_id');
-    }
-
-    // Alias — boutique assignée (pour employés/livreurs qui n'ont pas créé la boutique)
-    // Identique à shop() mais nommé explicitement pour la lisibilité
-    public function assignedShop()
     {
         return $this->belongsTo(Shop::class, 'shop_id');
     }

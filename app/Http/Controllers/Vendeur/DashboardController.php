@@ -12,7 +12,7 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $shop = $user->shop ?: $user->assignedShop;
+        $shop = $user->shop;
 
         if (!$shop) {
             return view('vendeur.no_shop');

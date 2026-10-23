@@ -13,8 +13,8 @@ class DashboardController extends Controller
     public function index()
     {
         $livreur = Auth::user();
-        $shop    = $livreur->shop ?? $livreur->assignedShop;
-        $driver  = Driver::where('user_id', $livreur->id)->first();
+        $shop    = $livreur->shop;
+        $driver  = Driver::forUser($livreur);
         $devise  = $shop?->currency ?? $driver?->company?->currency ?? 'GNF';
 
         $data = $this->buildData($livreur, $driver);
@@ -41,8 +41,8 @@ class DashboardController extends Controller
     public function data()
     {
         $livreur = Auth::user();
-        $driver  = Driver::where('user_id', $livreur->id)->first();
-        $devise  = ($livreur->shop ?? $livreur->assignedShop)?->currency
+        $driver  = Driver::forUser($livreur);
+        $devise  = ($livreur->shop)?->currency
                    ?? $driver?->company?->currency
                    ?? 'GNF';
 

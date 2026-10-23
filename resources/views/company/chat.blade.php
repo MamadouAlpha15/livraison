@@ -810,6 +810,9 @@ window.selectOrder = function(el, orderId) {
     omUpdateBtn();
 };
 
+/* Nom de zone saisi par une société de livraison : toujours échappé avant innerHTML */
+const zoneEsc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
 window.omFilterZones = function(raw) {
     const q       = (raw || '').toLowerCase().trim();
     const results = document.getElementById('omZoneResults');
@@ -825,14 +828,14 @@ window.omFilterZones = function(raw) {
     list.forEach(z => {
         const item = document.createElement('div');
         item.className = 'om-zone-result';
-        const color = z.color || '#059669';
+        const color = /^#[0-9a-f]{3,8}$/i.test(z.color || '') ? z.color : '#059669';
         const price = new Intl.NumberFormat('fr-FR').format(z.price);
         item.innerHTML =
             `<span class="om-zone-result-dot" style="background:${color};box-shadow:0 0 5px ${color}88;"></span>` +
-            `<span class="om-zone-result-name">${z.name}</span>` +
+            `<span class="om-zone-result-name">${zoneEsc(z.name)}</span>` +
             `<div class="om-zone-result-right">` +
                 `<div class="om-zone-result-price">${price} ${DEVISE}</div>` +
-                `<div class="om-zone-result-delay">~${z.estimated_minutes} min</div>` +
+                `<div class="om-zone-result-delay">~${Number(z.estimated_minutes) || 0} min</div>` +
             `</div>`;
         item.addEventListener('click', () => omSelectZone(z));
         results.appendChild(item);
@@ -845,14 +848,14 @@ window.omSelectZone = function(z) {
     const chip      = document.getElementById('omZoneSelectedChip');
     if (searchBox) searchBox.style.display = 'none';
     if (!chip) return;
-    const color = z.color || '#059669';
+    const color = /^#[0-9a-f]{3,8}$/i.test(z.color || '') ? z.color : '#059669';
     const price = new Intl.NumberFormat('fr-FR').format(z.price);
     chip.innerHTML =
         `<div class="om-zone-chip">` +
             `<span class="om-zone-chip-dot" style="background:${color};box-shadow:0 0 5px ${color}88;"></span>` +
             `<div class="om-zone-chip-info">` +
-                `<div class="om-zone-chip-name">${z.name}</div>` +
-                `<div class="om-zone-chip-details">${price} ${DEVISE} · ~${z.estimated_minutes} min</div>` +
+                `<div class="om-zone-chip-name">${zoneEsc(z.name)}</div>` +
+                `<div class="om-zone-chip-details">${price} ${DEVISE} · ~${Number(z.estimated_minutes) || 0} min</div>` +
             `</div>` +
             `<button class="om-zone-chip-change" onclick="omClearZoneSelection()" type="button">✕ Changer</button>` +
         `</div>`;

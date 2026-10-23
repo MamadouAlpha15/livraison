@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\ProductQuestion;
 use App\Models\Shop;
 use App\Services\PushService;
 use Illuminate\Console\Command;
@@ -32,11 +31,10 @@ class SendShopDailySummary extends Command
                 $doneCount = (clone $delivered)->count();
                 $cashed    = (float) (clone $delivered)->sum('total');
                 $pending   = Order::where('shop_id', $shop->id)->where('status', Order::STATUS_EN_ATTENTE)->count();
-                $questions = ProductQuestion::where('shop_id', $shop->id)->unanswered()->count();
                 $lowStock  = Product::where('shop_id', $shop->id)->where('is_active', true)->whereNotNull('stock')
                     ->whereColumn('stock', '<=', 'low_stock_threshold')->count();
 
-                if (! $received && ! $doneCount && ! $pending && ! $questions && ! $lowStock) continue;
+                if (! $received && ! $doneCount && ! $pending && ! $lowStock) continue;
 
                 $parts = [];
                 $parts[] = $received . ' commande' . ($received > 1 ? 's' : '') . ' reçue' . ($received > 1 ? 's' : '');
@@ -44,7 +42,6 @@ class SendShopDailySummary extends Command
                     $parts[] = $doneCount . ' livrée' . ($doneCount > 1 ? 's' : '') . ' (' . number_format($cashed, 0, ',', ' ') . ' ' . ($shop->currency ?? 'GNF') . ')';
                 }
                 if ($pending)   $parts[] = $pending . ' en attente';
-                if ($questions) $parts[] = $questions . ' question' . ($questions > 1 ? 's' : '') . ' sans réponse';
                 if ($lowStock)  $parts[] = $lowStock . ' produit' . ($lowStock > 1 ? 's' : '') . ' en stock faible';
 
                 $body = "Aujourd'hui : " . implode(' · ', $parts) . '.';

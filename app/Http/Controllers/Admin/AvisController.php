@@ -6,13 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Review;
 use App\Models\DeliveryCompanyReview;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class AvisController extends Controller
 {
     public function index(Request $request)
     {
-        $meInit = strtoupper(substr(Auth::user()->name ?? 'S', 0, 1));
         $tab    = $request->input('tab', 'boutiques');
         $search = $request->input('search');
         $rating = $request->input('rating');
@@ -59,7 +57,7 @@ class AvisController extends Controller
         }
 
         return view('admin.avis.index', compact(
-            'reviews', 'tab', 'search', 'rating', 'statsShop', 'statsCo', 'meInit'
+            'reviews', 'tab', 'search', 'rating', 'statsShop', 'statsCo'
         ));
     }
 
