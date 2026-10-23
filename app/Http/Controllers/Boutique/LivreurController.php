@@ -14,7 +14,7 @@ class LivreurController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $shop = $user->shop ?? $user->assignedShop ?? null;
+        $shop = $user->shop;
 
         abort_unless($shop, 403, 'Aucune boutique rattachée.');
 

@@ -6,6 +6,8 @@ use App\Models\Order;
 use App\Models\CourierCommission;
 use App\Models\Payment;
 use App\Services\PushService;
+use App\Support\DeliveryCode;
+use App\Support\OrderAccess;
 use Illuminate\Http\Request;
 
 class OrderTrackingController extends Controller
@@ -15,17 +17,7 @@ class OrderTrackingController extends Controller
         $user = auth()->user();
         abort_unless($user, 401);
 
-        $authorized = false;
-        if (in_array($user->role, ['superadmin','admin'])) $authorized = true;
-        if ($user->shop_id && $user->shop_id === $order->shop_id) $authorized = true;
-        if ($order->user_id === $user->id) $authorized = true;
-        if ($order->livreur_id === $user->id) $authorized = true;
-        if (! $authorized) {
-            $driver = \App\Models\Driver::where('user_id', $user->id)->first();
-            if ($driver && (int) $order->driver_id === $driver->id) $authorized = true;
-        }
-
-        abort_unless($authorized, 403, 'Non autorisé');
+        abort_unless(OrderAccess::isOwner($order) || OrderAccess::isStaff($user, $order), 403, 'Non autorisé');
 
         return response()->json([
             'order_id'   => $order->id,
@@ -45,18 +37,8 @@ class OrderTrackingController extends Controller
         $user = auth()->user();
         abort_unless($user, 401);
 
-        // Autorisé : livreur boutique, chauffeur entreprise, admin, vendeur de la boutique
-        $authorized = in_array($user->role, ['superadmin', 'admin'])
-            || ($user->shop_id && $user->shop_id === $order->shop_id)
-            || $order->livreur_id === $user->id;
-
-        if (! $authorized) {
-            $driver = \App\Models\Driver::where('user_id', $user->id)->first();
-            if ($driver && (int) $order->driver_id === $driver->id) {
-                $authorized = true;
-            }
-        }
-        abort_unless($authorized, 403);
+        // Autorisé : livreur boutique, chauffeur entreprise, boutique, société de livraison, super-admin
+        abort_unless(OrderAccess::isStaff($user, $order), 403);
 
         $order->load(['shop', 'client']);
 
@@ -73,15 +55,7 @@ class OrderTrackingController extends Controller
         abort_unless($user, 401);
 
         // Livreur boutique (livreur_id) OU chauffeur entreprise (driver_id)
-        $authorized = $order->livreur_id === $user->id;
-        $driver = null;
-        if (! $authorized) {
-            $driver = \App\Models\Driver::where('user_id', $user->id)->first();
-            if ($driver && (int) $order->driver_id === $driver->id) {
-                $authorized = true;
-            }
-        }
-        abort_unless($authorized, 403, 'Réservé au livreur assigné');
+        $driver = OrderAccess::authorizeCourier($user, $order, 'Réservé au livreur assigné');
 
         $data = $request->validate([
             'lat' => ['required','numeric','between:-90,90'],
@@ -122,15 +96,7 @@ class OrderTrackingController extends Controller
         abort_unless($user, 401);
 
         // Seul le chauffeur assigné peut changer le statut
-        $authorized = $order->livreur_id === $user->id;
-        $driver = null;
-        if (! $authorized) {
-            $driver = \App\Models\Driver::where('user_id', $user->id)->first();
-            if ($driver && (int) $order->driver_id === $driver->id) {
-                $authorized = true;
-            }
-        }
-        abort_unless($authorized, 403, 'Réservé au chauffeur assigné.');
+        $driver = OrderAccess::authorizeCourier($user, $order, 'Réservé au chauffeur assigné.');
 
         $data = $request->validate([
             'status'      => ['required', 'in:en_livraison,livrée'],
@@ -147,6 +113,18 @@ class OrderTrackingController extends Controller
             422,
             'Commande déjà terminée.'
         );
+
+        // Remise au client : le code qu'il a reçu valide la livraison (commande + celles du même trajet et du même panier)
+        if ($data['status'] === Order::STATUS_LIVREE) {
+            $handover = $order->delivery_batch_id
+                ? Order::where('delivery_batch_id', $order->delivery_batch_id)
+                    ->whereNotIn('status', [Order::STATUS_LIVREE, Order::STATUS_ANNULEE])
+                    ->where('delivery_code', $order->delivery_code)->get()
+                : collect([$order]);
+            if ($codeError = DeliveryCode::check($handover, $request->input('delivery_code'))) {
+                return response()->json(['message' => $codeError], 422);
+            }
+        }
 
         // Preuve de livraison : photo prise par le livreur au moment de la remise (optionnelle)
         $proofPhotoPath = $request->hasFile('proof_photo')
@@ -168,6 +146,8 @@ class OrderTrackingController extends Controller
                 (clone $siblings)->where('status', Order::STATUS_CONFIRMEE)
                     ->update(['status' => Order::STATUS_EN_LIVRAISON]);
             } elseif ($data['status'] === Order::STATUS_LIVREE) {
+                // Seules les commandes remises avec le même code (même client, même panier) passent livrées
+                $siblings->where(fn ($q) => $q->whereNull('delivery_code')->orWhere('delivery_code', $order->delivery_code));
                 // Mass-update bypass le mutateur setStatusAttribute → delivered_at doit être explicite
                 $siblings->update(array_filter([
                     'status'               => Order::STATUS_LIVREE,
@@ -192,7 +172,7 @@ class OrderTrackingController extends Controller
                     $data['status'] === Order::STATUS_LIVREE ? 'Commande livrée ✅' : 'Commande en route 🚚',
                     $data['status'] === Order::STATUS_LIVREE
                         ? 'Votre commande #' . str_pad($o->id, 4, '0', STR_PAD_LEFT) . ' a été livrée avec succès !'
-                        : 'Votre commande #' . str_pad($o->id, 4, '0', STR_PAD_LEFT) . ' est en cours de livraison !',
+                        : 'Votre commande #' . str_pad($o->id, 4, '0', STR_PAD_LEFT) . ' est en cours de livraison !' . (filled($o->delivery_code) ? ' Code de remise à donner au livreur : ' . $o->delivery_code : ''),
                     1,
                     '/client/orders'
                 );

@@ -7,12 +7,12 @@
 *,*::before,*::after{box-sizing:border-box}
 
 :root{
-    --cx-bg:      #0b0d22;
-    --cx-surface: #0d1226;
-    --cx-surface2:#111930;
+    --cx-bg:      #071630;
+    --cx-surface: #0B1E3D;
+    --cx-surface2:#132B52;
     --cx-border:  rgba(255,255,255,.07);
-    --cx-brand:   #7c3aed;
-    --cx-brand2:  #6d28d9;
+    --cx-brand:   #1668D8;
+    --cx-brand2:  #1260C9;
     --cx-text:    #e2e8f0;
     --cx-text2:   #94a3b8;
     --cx-muted:   #475569;
@@ -27,16 +27,16 @@
     --top-h:60px;
 }
 body.cx-light{
-    --cx-bg:      #F5F7FA;
+    --cx-bg:      #F6F9FF;
     --cx-surface: #ffffff;
-    --cx-surface2:#eef1f7;
+    --cx-surface2:#EEF3FB;
     --cx-border:  rgba(0,0,0,.08);
-    --cx-text:    #111827;
-    --cx-text2:   #4b5563;
+    --cx-text:    #16162A;
+    --cx-text2:   #45455E;
     --cx-muted:   #9ca3af;
 }
 
-html,body{margin:0;font-family:'Segoe UI',system-ui,sans-serif;background:var(--cx-bg);color:var(--cx-text);-webkit-font-smoothing:antialiased;}
+html,body{margin:0;font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--cx-bg);color:var(--cx-text);-webkit-font-smoothing:antialiased;}
 a{text-decoration:none;color:inherit;}
 
 body.is-dashboard>nav,
@@ -51,21 +51,21 @@ body.is-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 /* ══ SIDEBAR ══ */
 .cx-sidebar{
     position:fixed;top:0;left:0;bottom:0;width:var(--sb-w);
-    background:linear-gradient(180deg,#0f0f59 0%,#0e0e16 40%,#10103a 100%);
+    background:linear-gradient(180deg,#0B1E3D 0%,#081831 55%,#0B1E3D 100%);
     display:flex;flex-direction:column;z-index:1200;overflow-y:auto;
-    scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.3) transparent;
+    scrollbar-width:thin;scrollbar-color:rgba(31,124,246,.3) transparent;
     transition:transform .25s cubic-bezier(.23,1,.32,1);
-    border-right:1px solid rgba(99,102,241,.1);
+    border-right:1px solid rgba(31,124,246,.1);
     box-shadow:6px 0 30px rgba(0,0,0,.35);
 }
 .cx-sidebar::-webkit-scrollbar{width:3px;}
-.cx-sidebar::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3);border-radius:3px;}
+.cx-sidebar::-webkit-scrollbar-thumb{background:rgba(31,124,246,.3);border-radius:3px;}
 
 /* Brand */
 .cx-brand-hd{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;flex-direction:column;gap:8px;}
 .cx-brand-top{display:flex;align-items:center;justify-content:space-between;}
 .cx-logo{display:flex;align-items:center;gap:9px;color:#fff;font-size:16px;font-weight:800;}
-.cx-logo-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.cx-logo-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#1668D8,#1260C9);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
 .cx-sys-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--cx-green);padding:3px 8px;border-radius:20px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);}
 .cx-sys-dot{width:6px;height:6px;border-radius:50%;background:var(--cx-green);animation:blink 2.2s ease-in-out infinite;flex-shrink:0;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
@@ -76,27 +76,27 @@ body.is-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .cx-nav{padding:8px 8px 12px;flex:1}
 .cx-nav-sec{font-size:10px;font-weight:800;letter-spacing:1.6px;color:rgba(255,255,255,.58);padding:14px 10px 5px;text-transform:uppercase}
 .cx-nav-item{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:var(--r-xs);color:rgba(255,255,255,.85);font-size:13.5px;font-weight:600;transition:all .22s cubic-bezier(.23,1,.32,1);position:relative;cursor:pointer;margin-bottom:2px;border:1px solid transparent}
-.cx-nav-item:hover{background:rgba(124,58,237,.18);color:#fff;border-color:rgba(124,58,237,.25);box-shadow:0 2px 12px rgba(124,58,237,.2),inset 0 1px 0 rgba(255,255,255,.06)}
-.cx-nav-item:hover .cx-nav-ico{background:rgba(139,92,246,.25);box-shadow:0 0 8px rgba(139,92,246,.3)}
-.cx-nav-item.active{background:linear-gradient(90deg,rgba(124,58,237,.35) 0%,rgba(99,102,241,.2) 100%);color:#fff;font-weight:700;border-color:rgba(139,92,246,.3);box-shadow:0 4px 16px rgba(124,58,237,.25),inset 0 1px 0 rgba(255,255,255,.08)}
-.cx-nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:linear-gradient(180deg,#a78bfa,#7c3aed);border-radius:0 3px 3px 0;box-shadow:2px 0 12px rgba(167,139,250,.7)}
+.cx-nav-item:hover{background:rgba(31,124,246,.18);color:#fff;border-color:rgba(31,124,246,.25);box-shadow:0 2px 12px rgba(31,124,246,.2),inset 0 1px 0 rgba(255,255,255,.06)}
+.cx-nav-item:hover .cx-nav-ico{background:rgba(31,124,246,.25);box-shadow:0 0 8px rgba(31,124,246,.3)}
+.cx-nav-item.active{background:linear-gradient(90deg,rgba(31,124,246,.35) 0%,rgba(31,124,246,.2) 100%);color:#fff;font-weight:700;border-color:rgba(31,124,246,.3);box-shadow:0 4px 16px rgba(31,124,246,.25),inset 0 1px 0 rgba(255,255,255,.08)}
+.cx-nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:linear-gradient(180deg,#7DB4FF,#1668D8);border-radius:0 3px 3px 0;box-shadow:2px 0 12px rgba(125,180,255,.7)}
 .cx-nav-ico{width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .22s cubic-bezier(.23,1,.32,1)}
-.cx-nav-item.active .cx-nav-ico{background:rgba(139,92,246,.3);border-color:rgba(139,92,246,.4);box-shadow:0 0 10px rgba(139,92,246,.4)}
+.cx-nav-item.active .cx-nav-ico{background:rgba(31,124,246,.3);border-color:rgba(31,124,246,.4);box-shadow:0 0 10px rgba(31,124,246,.4)}
 .cx-nav-ico svg{display:block;}
 .stat-ico svg{display:block;}
-.stat-ico.purple{color:#a78bfa;}
+.stat-ico.purple{color:#1F7CF6;}
 .stat-ico.green{color:var(--cx-green);}
 .stat-ico.amber{color:var(--cx-amber);}
-.cx-nav-item.active:hover{background:linear-gradient(90deg,rgba(124,58,237,.45) 0%,rgba(99,102,241,.3) 100%);box-shadow:0 4px 20px rgba(124,58,237,.35),inset 0 1px 0 rgba(255,255,255,.1)}
+.cx-nav-item.active:hover{background:linear-gradient(90deg,rgba(31,124,246,.45) 0%,rgba(31,124,246,.3) 100%);box-shadow:0 4px 20px rgba(31,124,246,.35),inset 0 1px 0 rgba(255,255,255,.1)}
 .cx-nav-badge{margin-left:auto;background:var(--cx-brand);color:#fff;font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:20px;min-width:18px;text-align:center}
 
 /* User foot */
 .cx-user-foot{padding:10px 10px 12px;border-top:1px solid rgba(255,255,255,.07);flex-shrink:0}
 .cx-user-row{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:var(--r-xs);background:rgba(255,255,255,.04);cursor:pointer;transition:background .15s;margin-bottom:6px}
 .cx-user-row:hover{background:rgba(255,255,255,.08)}
-.cx-user-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4338ca);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;}
+.cx-user-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1668D8,#1260C9);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;}
 .cx-user-name{font-size:12px;font-weight:700;color:#fff;line-height:1.2}
-.cx-user-role{font-size:10px;color:var(--cx-text2)}
+.cx-user-role{font-size:10px;color:rgba(255,255,255,.62)}
 .cx-logout-btn{width:30px;height:30px;border-radius:8px;flex-shrink:0;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);display:flex;align-items:center;justify-content:center;color:#f87171;cursor:pointer;transition:background .15s;padding:0;}
 .cx-logout-btn:hover{background:rgba(239,68,68,.22);color:#fff}
 
@@ -108,7 +108,7 @@ body.is-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .cx-tb-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
 .cx-tb-user{display:flex;align-items:center;gap:8px;padding:5px 10px;border-radius:var(--r-sm);transition:background .14s;flex-shrink:0;}
 .cx-tb-user:hover{background:rgba(255,255,255,.06);}
-.cx-tb-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4338ca);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;}
+.cx-tb-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1668D8,#1260C9);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;}
 .cx-tb-uname{font-size:12.5px;font-weight:700;color:var(--cx-text);line-height:1.2;}
 .cx-tb-urole{font-size:10px;color:var(--cx-text2);}
 body.cx-light .cx-topbar{background:#fff;border-bottom-color:rgba(0,0,0,.07);box-shadow:0 1px 4px rgba(0,0,0,.06);}
@@ -121,7 +121,7 @@ body.cx-light .cx-topbar{background:#fff;border-bottom-color:rgba(0,0,0,.07);box
 .stat-card{background:var(--cx-surface);border:1px solid var(--cx-border);border-radius:var(--r);padding:18px 20px;display:flex;align-items:center;gap:14px;transition:box-shadow .2s;}
 .stat-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.15);}
 .stat-ico{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
-.stat-ico.purple{background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.2);}
+.stat-ico.purple{background:rgba(31,124,246,.15);border:1px solid rgba(31,124,246,.2);}
 .stat-ico.green{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.2);}
 .stat-ico.amber{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.2);}
 .stat-val{font-size:22px;font-weight:800;color:var(--cx-text);line-height:1;}
@@ -131,7 +131,7 @@ body.cx-light .cx-topbar{background:#fff;border-bottom-color:rgba(0,0,0,.07);box
 .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
 .toolbar-title{font-size:17px;font-weight:800;color:var(--cx-text);flex:1;min-width:140px;}
 .search-box{display:flex;align-items:center;gap:8px;background:var(--cx-surface);border:1px solid var(--cx-border);border-radius:var(--r-sm);padding:0 12px;height:38px;min-width:220px;transition:border-color .15s;}
-.search-box:focus-within{border-color:rgba(124,58,237,.5);}
+.search-box:focus-within{border-color:rgba(31,124,246,.5);}
 .search-box input{border:none;background:none;color:var(--cx-text);font-size:13px;outline:none;flex:1;min-width:0;}
 .search-box input::placeholder{color:var(--cx-muted);}
 .btn-search{background:none;border:none;color:var(--cx-muted);cursor:pointer;font-size:14px;padding:0;}
@@ -141,17 +141,17 @@ body.cx-light .cx-topbar{background:#fff;border-bottom-color:rgba(0,0,0,.07);box
 
 /* Shop card */
 .shop-card{background:var(--cx-surface);border:1px solid var(--cx-border);border-radius:var(--r);overflow:hidden;transition:transform .2s,box-shadow .2s;display:flex;flex-direction:column;}
-.shop-card:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.2),0 0 0 1px rgba(124,58,237,.15);}
-.shop-banner{height:140px;background:linear-gradient(135deg,#1e1b4b 0%,#312e81 50%,#1e1b4b 100%);position:relative;overflow:hidden;flex-shrink:0;}
+.shop-card:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.2),0 0 0 1px rgba(31,124,246,.15);}
+.shop-banner{height:140px;background:linear-gradient(135deg,#0B1E3D 0%,#132B52 50%,#0B1E3D 100%);position:relative;overflow:hidden;flex-shrink:0;}
 .shop-banner-img{width:100%;height:100%;object-fit:cover;object-position:center;}
 .shop-banner-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.08) 0%,rgba(0,0,0,.18) 50%,rgba(0,0,0,.55) 100%);}
 .shop-banner-name{position:absolute;bottom:28px;left:80px;right:12px;font-size:13px;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.shop-avatar{position:absolute;bottom:-22px;left:14px;width:60px;height:60px;border-radius:12px;border:3px solid var(--cx-surface);background:linear-gradient(135deg,#312e81,#1e1b4b);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,.4);}
+.shop-avatar{position:absolute;bottom:-22px;left:14px;width:60px;height:60px;border-radius:12px;border:3px solid var(--cx-surface);background:linear-gradient(135deg,#132B52,#0B1E3D);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,.4);}
 .shop-avatar img{width:100%;height:100%;object-fit:cover;}
 .shop-body{padding:32px 16px 16px;flex:1;display:flex;flex-direction:column;}
 .shop-name{font-size:14.5px;font-weight:800;color:var(--cx-text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .shop-meta{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
-.shop-type{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.2);color:#a78bfa;}
+.shop-type{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(31,124,246,.12);border:1px solid rgba(31,124,246,.2);color:#1F7CF6;}
 .shop-country{font-size:10.5px;color:var(--cx-muted);}
 .shop-addr{font-size:11.5px;color:var(--cx-text2);margin-bottom:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .shop-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;}
@@ -160,14 +160,14 @@ body.cx-light .cx-topbar{background:#fff;border-bottom-color:rgba(0,0,0,.07);box
 .shop-stat-lbl{font-size:9.5px;color:var(--cx-muted);margin-top:2px;}
 .shop-stat.green .shop-stat-val{color:#34d399;}
 .shop-stat.red .shop-stat-val{color:#f87171;}
-.shop-revenue{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.15);border-radius:var(--r-xs);margin-bottom:12px;}
+.shop-revenue{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(31,124,246,.08);border:1px solid rgba(31,124,246,.15);border-radius:var(--r-xs);margin-bottom:12px;}
 .shop-revenue-lbl{font-size:11px;color:var(--cx-text2);}
-.shop-revenue-val{font-size:14px;font-weight:800;color:#a78bfa;}
+.shop-revenue-val{font-size:14px;font-weight:800;color:#1F7CF6;}
 .shop-actions{display:flex;gap:8px;margin-top:auto;}
 .btn-shop{flex:1;height:34px;border-radius:var(--r-xs);border:1px solid var(--cx-border);background:var(--cx-surface2);color:var(--cx-text2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px;}
-.btn-shop:hover{background:rgba(124,58,237,.15);border-color:rgba(124,58,237,.3);color:#a78bfa;}
-.btn-shop.primary{background:rgba(124,58,237,.2);border-color:rgba(124,58,237,.35);color:#c4b5fd;}
-.btn-shop.primary:hover{background:rgba(124,58,237,.35);color:#fff;}
+.btn-shop:hover{background:rgba(31,124,246,.15);border-color:rgba(31,124,246,.3);color:#1F7CF6;}
+.btn-shop.primary{background:rgba(31,124,246,.2);border-color:rgba(31,124,246,.35);color:#1F7CF6;}
+.btn-shop.primary:hover{background:rgba(31,124,246,.35);color:#fff;}
 
 /* Empty state */
 .empty-state{text-align:center;padding:60px 20px;color:var(--cx-text2);}
@@ -180,9 +180,9 @@ body.cx-light .cx-topbar{background:#fff;border-bottom-color:rgba(0,0,0,.07);box
 
 /* Light mode */
 body.cx-light .shop-card{background:#fff;border-color:rgba(0,0,0,.07);}
-body.cx-light .shop-banner{background:linear-gradient(135deg,#c7d2fe 0%,#818cf8 100%);}
-body.cx-light .shop-avatar{border-color:#fff;background:linear-gradient(135deg,#818cf8,#6366f1);}
-body.cx-light .shop-stat{background:#f5f7fa;}
+body.cx-light .shop-banner{background:linear-gradient(135deg,#CFE1FF 0%,#7DB4FF 100%);}
+body.cx-light .shop-avatar{border-color:#fff;background:linear-gradient(135deg,#7DB4FF,#1F7CF6);}
+body.cx-light .shop-stat{background:#F6F9FF;}
 body.cx-light .stat-card{background:#fff;}
 body.cx-light .toolbar .search-box{background:#fff;}
 body.cx-light .shop-banner-name{text-shadow:0 1px 3px rgba(0,0,0,.5);}
@@ -227,6 +227,15 @@ body.cx-light .shop-banner-name{text-shadow:0 1px 3px rgba(0,0,0,.5);}
 }
 .cx-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1100;}
 .cx-overlay.open{display:block;}
+
+/* Interrupteur « Mode sombre » (identique dans tout l'espace société) */
+.cx-dark-row{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;margin-top:6px;cursor:pointer;border-radius:8px;transition:background .14s}
+.cx-dark-row:hover{background:rgba(255,255,255,.05)}
+.cx-dark-lbl{font-size:11.5px;color:rgba(255,255,255,.72)}
+.cx-toggle{width:34px;height:18px;background:#475569;border-radius:9px;position:relative;transition:background .25s;flex-shrink:0}
+.cx-toggle::after{content:'';position:absolute;top:3px;left:3px;width:12px;height:12px;background:#fff;border-radius:50%;transition:left .25s}
+.cx-toggle.on{background:#1668D8}
+.cx-toggle.on::after{left:19px}
 </style>
 @endpush
 
@@ -260,14 +269,14 @@ body.cx-light .shop-banner-name{text-shadow:0 1px 3px rgba(0,0,0,.5);}
         <a href="{{ route('company.orders.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Commandes
             @if(!$isBusiness)
-                @php $oBg = $usedOrders >= $maxOrders ? '#ef4444' : ($usedOrders >= $maxOrders * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                @php $oBg = $usedOrders >= $maxOrders ? '#ef4444' : ($usedOrders >= $maxOrders * 0.7 ? '#f59e0b' : '#1668D8'); @endphp
                 <span class="cx-nav-badge" style="background:{{ $oBg }};margin-left:auto">{{ $usedOrders }}/{{ $maxOrders }}</span>
             @endif
         </a>
         <a href="{{ route('company.drivers.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></span> Chauffeurs
             @if(!$isBusiness)
-                @php $dBg = $totalDrivers >= $maxDrivers ? '#ef4444' : ($totalDrivers >= $maxDrivers * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                @php $dBg = $totalDrivers >= $maxDrivers ? '#ef4444' : ($totalDrivers >= $maxDrivers * 0.7 ? '#f59e0b' : '#1668D8'); @endphp
                 <span class="cx-nav-badge" style="background:{{ $dBg }};margin-left:auto">{{ $totalDrivers }}/{{ $maxDrivers }}</span>
             @endif
         </a>
@@ -276,7 +285,7 @@ body.cx-light .shop-banner-name{text-shadow:0 1px 3px rgba(0,0,0,.5);}
         </a>
         <a href="{{ $isBusiness ? route('company.carte.index') : route('company.subscription.upgrade') }}" class="cx-nav-item" @if(!$isBusiness) style="opacity:.6" title="Plan Business requis" @endif>
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span> Carte en direct
-            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917">🔒</span>@endif
+            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>@endif
         </a>
         <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item active">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9l1-5h16l1 5"/><path d="M3 9a2 2 0 0 0 4 0m4 0a2 2 0 0 0 4 0m4 0a2 2 0 0 0-4 0m-8 0a2 2 0 0 0-4 0"/><path d="M5 9v12h14V9"/><path d="M10 14h4v6h-4z"/></svg></span> Boutiques
@@ -289,7 +298,7 @@ body.cx-light .shop-banner-name{text-shadow:0 1px 3px rgba(0,0,0,.5);}
         <a href="{{ route('company.zones.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span> Zone de livraison
             @if(!$isBusiness)
-                @php $zNavBg = $totalZones >= $maxZones ? '#ef4444' : ($totalZones >= $maxZones * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                @php $zNavBg = $totalZones >= $maxZones ? '#ef4444' : ($totalZones >= $maxZones * 0.7 ? '#f59e0b' : '#1668D8'); @endphp
                 <span class="cx-nav-badge" style="background:{{ $zNavBg }};margin-left:auto">{{ $totalZones }}/{{ $maxZones }}</span>
             @endif
         </a>
@@ -298,7 +307,7 @@ body.cx-light .shop-banner-name{text-shadow:0 1px 3px rgba(0,0,0,.5);}
         </a>
         <a href="{{ $isBusiness ? route('company.rapport.index') : route('company.subscription.upgrade') }}" class="cx-nav-item" @if(!$isBusiness) style="opacity:.6" title="Plan Business requis" @endif>
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span> Rapport
-            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917">🔒</span>@endif
+            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>@endif
         </a>
 
         <div class="cx-nav-sec">Configuration</div>
@@ -307,7 +316,7 @@ body.cx-light .shop-banner-name{text-shadow:0 1px 3px rgba(0,0,0,.5);}
         </a>
         <a href="{{ $isBusiness ? route('company.users.index') : route('company.subscription.upgrade') }}" class="cx-nav-item" @if(!$isBusiness) style="opacity:.6" title="Plan Business requis" @endif>
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Utilisateurs
-            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917">🔒</span>@endif
+            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>@endif
         </a>
         <a href="{{ route('company.support.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span> Support
@@ -316,15 +325,6 @@ body.cx-light .shop-banner-name{text-shadow:0 1px 3px rgba(0,0,0,.5);}
     </nav>
 
     <div class="cx-user-foot">
-        <button id="themeToggle" onclick="toggleTheme()" style="
-            width:100%;display:flex;align-items:center;gap:10px;
-            padding:8px 10px;border-radius:8px;margin-bottom:8px;
-            background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);
-            color:rgba(255,255,255,.75);font-size:12.5px;font-weight:600;
-            cursor:pointer;transition:background .15s;text-align:left;font-family:inherit;">
-            <span id="themeIco" style="display:flex;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>
-            <span id="themeLbl">Mode sombre</span>
-        </button>
         <div class="cx-user-row">
             <div class="cx-user-av">{{ $ini }}</div>
             <div style="flex:1;min-width:0;">
@@ -335,6 +335,10 @@ body.cx-light .shop-banner-name{text-shadow:0 1px 3px rgba(0,0,0,.5);}
                 @csrf
                 <button type="submit" class="cx-logout-btn" title="Déconnexion"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
             </form>
+        </div>
+        <div class="cx-dark-row" id="cxDarkToggle">
+            <span class="cx-dark-lbl">Mode sombre</span>
+            <div class="cx-toggle" id="cxDarkSwitch"></div>
         </div>
     </div>
 </aside>
@@ -471,7 +475,7 @@ body.cx-light .shop-banner-name{text-shadow:0 1px 3px rgba(0,0,0,.5);}
                         @if($shop->en_cours > 0)
                             <a href="{{ route('company.livraisons.index') }}" class="btn-shop" style="position:relative;">
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg> En cours
-                                <span style="position:absolute;top:-5px;right:-5px;background:#7c3aed;color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;">{{ $shop->en_cours }}</span>
+                                <span style="position:absolute;top:-5px;right:-5px;background:#1668D8;color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;">{{ $shop->en_cours }}</span>
                             </a>
                         @else
                             <a href="{{ route('company.historique.index', ['shop_id' => $shop->id]) }}" class="btn-shop" style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg> Historique</a>
@@ -496,7 +500,7 @@ body.cx-light .shop-banner-name{text-shadow:0 1px 3px rgba(0,0,0,.5);}
             <div class="empty-sub">
                 @if($search)
                     Aucun résultat pour "{{ $search }}".
-                    <a href="{{ route('company.boutiques.index') }}" style="color:#a78bfa;">Voir toutes les boutiques</a>
+                    <a href="{{ route('company.boutiques.index') }}" style="color:#1F7CF6;">Voir toutes les boutiques</a>
                 @else
                     Les boutiques apparaîtront ici dès qu'elles auront passé des commandes via votre service.
                 @endif
@@ -521,7 +525,7 @@ cl?.addEventListener('click', closeSb);
 
 // Dark/light mode
 const saved = localStorage.getItem('cx-theme');
-if (saved) document.body.classList.add('cx-' + saved);
+if (saved !== 'dark') document.body.classList.add('cx-light'); // clair par défaut (Shopio)
 updateThemeBtn(document.body.classList.contains('cx-light'));
 
 window.toggleTheme = function() {
@@ -530,13 +534,25 @@ window.toggleTheme = function() {
     updateThemeBtn(isLight);
 };
 function updateThemeBtn(isLight) {
-    const ico = document.getElementById('themeIco');
-    const lbl = document.getElementById('themeLbl');
-    if (!ico || !lbl) return;
-    const moonSvg = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
-    const sunSvg  = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
-    ico.innerHTML = isLight ? moonSvg : sunSvg;
-    lbl.textContent = isLight ? 'Mode sombre' : 'Mode clair';
+    document.getElementById('cxDarkSwitch')?.classList.toggle('on', !isLight);
 }
+document.getElementById('cxDarkToggle')?.addEventListener('click', () => window.toggleTheme());
+</script>
+<style>.cx-dark-row:focus-visible{outline:2px solid #7DB4FF;outline-offset:2px}</style>
+<script>
+/* Interrupteur « Mode sombre » : même comportement sur toutes les pages (clavier et lecteur d'écran) */
+(function () {
+    var row = document.querySelector('.cx-dark-row'), sw = row && row.querySelector('.cx-toggle');
+    if (!row || !sw) return;
+    row.setAttribute('role', 'switch');
+    row.setAttribute('tabindex', '0');
+    row.setAttribute('aria-label', 'Mode sombre');
+    var sync = function () { row.setAttribute('aria-checked', sw.classList.contains('on') ? 'true' : 'false'); };
+    new MutationObserver(sync).observe(sw, { attributes: true, attributeFilter: ['class'] });
+    row.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); }
+    });
+    sync();
+})();
 </script>
 @endsection

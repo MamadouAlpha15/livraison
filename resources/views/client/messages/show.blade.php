@@ -8,28 +8,28 @@
 @php $bodyClass = 'is-dashboard'; @endphp
 
 @push('styles')
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="{{ \App\Support\Assets::v('fonts/dashboard-fonts.css') }}" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 :root {
-    --orange:    #6366f1;
-    --orange-dk: #4f46e5;
-    --navy:      #131921;
-    --navy-2:    #232f3e;
-    --blue:      #007185;
+    --orange:    #1668D8;
+    --orange-dk: #1260C9;
+    --navy:      #0B1E3D;
+    --navy-2:    #132B52;
+    --blue:      #1668D8;
     --green:     #067d62;
     --green-lt:  #d1fae5;
     --red:       #dc2626;
     --red-lt:    #fee2e2;
     --yellow:    #f59e0b;
     --yellow-lt: #fef3c7;
-    --grey:      #f3f3f3;
-    --grey-2:    #eaeded;
+    --grey:      #F6F9FF;
+    --grey-2:    #EEF2F8;
     --border:    #ddd;
-    --text:      #0f1111;
-    --muted:     #565959;
+    --text:      #16162A;
+    --muted:     #62627C;
     --surface:   #fff;
-    --font:      'Noto Sans', sans-serif;
+    --font:      'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --r:         8px;
     --nav-h:     60px;
 }
@@ -60,7 +60,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
 .chat-prod-img-ph { width: 56px; height: 56px; border-radius: var(--r); background: var(--grey-2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
 .chat-prod-info { flex: 1; min-width: 0; }
 .chat-prod-name { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.chat-prod-price { font-size: 17px; font-weight: 700; color: #b12704; font-family: monospace; }
+.chat-prod-price { font-size: 17px; font-weight: 700; color: #1260C9; font-variant-numeric: tabular-nums; }
 .chat-prod-shop { font-size: 12px; color: var(--muted); margin-top: 2px; }
 .chat-prod-shop a { color: var(--blue); text-decoration: none; }
 .chat-prod-shop a:hover { text-decoration: underline; }
@@ -96,7 +96,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
     flex: 1; min-width: 150px;
     padding: 9px 14px; border: 1.5px solid var(--yellow);
     border-radius: 20px; font-size: 14px; font-weight: 600;
-    font-family: monospace; color: var(--text); outline: none;
+    font-variant-numeric: tabular-nums; color: var(--text); outline: none;
     background: #fff; transition: border-color .15s, box-shadow .15s;
 }
 .propose-message-input {
@@ -126,7 +126,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
 
 /* THREAD */
 .chat-thread {
-    background: #f0f2f5;
+    background: #F6F9FF;
     border-left: 1px solid var(--border);
     border-right: 1px solid var(--border);
     padding: 20px 18px;
@@ -141,7 +141,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
 .msg-row.mine { margin-left: auto; flex-direction: row-reverse; }
 .msg-av { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; align-self: flex-end; }
 .msg-row.mine    .msg-av { background: linear-gradient(135deg, var(--orange), var(--orange-dk)); }
-.msg-row.theirs  .msg-av { background: linear-gradient(135deg, var(--navy-2), #3d5a73); }
+.msg-row.theirs  .msg-av { background: linear-gradient(135deg, var(--navy-2), #1F3F75); }
 .msg-content { display: flex; flex-direction: column; gap: 3px; }
 .msg-bubble { padding: 10px 14px; border-radius: 16px; font-size: 13.5px; line-height: 1.55; word-break: break-word; }
 .msg-row.mine   .msg-bubble { background: var(--orange); color: #fff; border-bottom-right-radius: 3px; }
@@ -168,23 +168,23 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
 .price-card.proposal .price-card-header { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; }
 .price-card.offer    .price-card-header { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
 .price-card.order-ok .price-card-header { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1d4ed8; }
-.price-card.counter  .price-card-header { background: linear-gradient(135deg, #ede9fe, #ddd6fe); color: #5b21b6; }
+.price-card.counter  .price-card-header { background: linear-gradient(135deg, #EAF2FF, #ddd6fe); color: #5b21b6; }
 
 .btn-counter-offer {
     display: inline-flex; align-items: center; gap: 7px;
     width: 100%; padding: 10px 16px; margin-top: 8px;
     background: transparent;
-    border: 1.5px solid #7c3aed; border-radius: 10px;
-    color: #7c3aed; font-size: 13px; font-weight: 700;
+    border: 1.5px solid #1260C9; border-radius: 10px;
+    color: #1260C9; font-size: 13px; font-weight: 700;
     cursor: pointer; transition: all .2s; font-family: var(--font);
     justify-content: center;
 }
-.btn-counter-offer:hover { background: #ede9fe; }
+.btn-counter-offer:hover { background: #EAF2FF; }
 .price-card-body { background: #fff; padding: 14px; border: 1px solid var(--border); border-top: none; border-radius: 0 0 14px 14px; }
-.price-card-amount { font-size: 22px; font-weight: 900; color: #0f1111; font-family: monospace; line-height: 1; margin-bottom: 4px; }
+.price-card-amount { font-size: 22px; font-weight: 900; color: #16162A; font-variant-numeric: tabular-nums; line-height: 1; margin-bottom: 4px; }
 .price-card-original { font-size: 11px; color: var(--muted); text-decoration: line-through; margin-bottom: 2px; }
 .price-card-discount { font-size: 11px; font-weight: 700; color: var(--green); background: var(--green-lt); display: inline-flex; padding: 2px 8px; border-radius: 20px; margin-bottom: 10px; }
-.price-card-note { font-size: 12.5px; color: #374151; background: #f9fafb; border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; margin-bottom: 10px; white-space: pre-wrap; }
+.price-card-note { font-size: 12.5px; color: #374151; background: #F6F9FF; border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; margin-bottom: 10px; white-space: pre-wrap; }
 .price-card-status { font-size: 11.5px; font-weight: 700; padding: 5px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; margin-top: 4px; }
 .status-pending  { background: var(--yellow-lt); color: #92400e; }
 .status-accepted { background: var(--green-lt);  color: #065f46; }
@@ -221,14 +221,14 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
 /* ZONE DE SAISIE */
 .chat-input-zone { background: var(--surface); border: 1px solid var(--border); border-top: 2px solid var(--orange); border-radius: 0 0 var(--r) var(--r); padding: 12px 16px; display: flex; gap: 10px; align-items: flex-end; }
 .chat-textarea { flex: 1; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 20px; font-size: 13.5px; font-family: var(--font); color: var(--text); background: var(--grey); outline: none; resize: none; min-height: 40px; max-height: 100px; line-height: 1.5; transition: border-color .15s, background .15s; }
-.chat-textarea:focus { border-color: var(--orange); background: var(--surface); box-shadow: 0 0 0 3px rgba(99,102,241,.1); }
-.chat-send-btn { width: 42px; height: 42px; border-radius: 50%; background: var(--orange); color: #fff; border: none; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .15s; box-shadow: 0 2px 8px rgba(99,102,241,.3); font-weight: 700; }
+.chat-textarea:focus { border-color: var(--orange); background: var(--surface); box-shadow: 0 0 0 3px rgba(31,124,246,.1); }
+.chat-send-btn { width: 42px; height: 42px; border-radius: 50%; background: var(--orange); color: #fff; border: none; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .15s; box-shadow: 0 2px 8px rgba(31,124,246,.3); font-weight: 700; }
 .chat-send-btn:hover { background: var(--orange-dk); transform: scale(1.07); }
 
 /* Toast notification */
 .chat-toast {
     position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
-    background: #0f1111; color: #fff;
+    background: #16162A; color: #fff;
     padding: 12px 24px; border-radius: 24px;
     font-size: 13.5px; font-weight: 600;
     box-shadow: 0 8px 30px rgba(0,0,0,.25);
@@ -276,7 +276,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
     display: flex; align-items: center; justify-content: center;
     font-size: 19px; transition: all .15s;
 }
-.chat-photo-btn:hover { border-color: var(--orange); color: var(--orange); background: #eef2ff; }
+.chat-photo-btn:hover { border-color: var(--orange); color: var(--orange); background: #EAF2FF; }
 
 /* ── Preview avant envoi ── */
 .chat-img-preview {
@@ -415,7 +415,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
 
 {{-- NAVBAR --}}
 <nav class="nav">
-    <a href="{{ route('client.dashboard') }}" class="nav-logo">Ma<span>Boutique</span></a>
+    <a href="{{ route('client.dashboard') }}" class="nav-logo" aria-label="Shopio, accueil"><img src="{{ asset('images/shopio-logo-192.png') }}" alt="Shopio" style="height:38px;width:auto;border-radius:10px;display:block"></a>
     <a href="{{ route('public.shops.products', $shop) }}" class="nav-back">← {{ Str::limit($shop->name, 20) }}</a>
 </nav>
 
@@ -430,7 +430,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
         @if($product->image)
             <img src="{{ asset('storage/'.$product->image) }}" class="chat-prod-img" alt="{{ $product->name }}">
         @else
-            <div class="chat-prod-img-ph">🏷️</div>
+            <div class="chat-prod-img-ph">{!! \App\Support\IconLibrary::svg('tag', '', 24) !!}</div>
         @endif
         <div class="chat-prod-info">
             <div class="chat-prod-name">{{ $product->name }}</div>
@@ -440,13 +440,13 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
             </div>
         </div>
         <button class="btn-propose-price" onclick="toggleProposePanel()" type="button" id="btnPropose">
-            💰 Proposer un prix
+            {!! \App\Support\IconLibrary::svg('wallet', '', 16) !!} Proposer un prix
         </button>
     </div>
 
     {{-- PANNEAU CONTRE-OFFRE CLIENT --}}
     <div class="propose-panel" id="counterPanel">
-        <div class="propose-panel-title">🔄 Votre contre-offre</div>
+        <div class="propose-panel-title">{!! \App\Support\IconLibrary::svg('refresh', '', 15) !!} Votre contre-offre</div>
         <div class="propose-panel-sub">
             Proposez un nouveau prix au vendeur.
         </div>
@@ -469,7 +469,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
 
     {{-- PANNEAU PROPOSITION DE PRIX --}}
     <div class="propose-panel" id="proposePanel">
-        <div class="propose-panel-title">💰 Faire une proposition de prix</div>
+        <div class="propose-panel-title">{!! \App\Support\IconLibrary::svg('wallet', '', 15) !!} Faire une proposition de prix</div>
         <div class="propose-panel-sub">
             Prix actuel : <strong>{{ number_format($product->price, 0, ',', ' ') }} {{ $devise }}</strong> · Proposez votre prix, le vendeur pourra accepter ou refuser.
         </div>
@@ -547,7 +547,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
                     @if($msgType === 'price_proposal')
                     {{-- Proposition de prix (envoyée par le client) --}}
                     <div class="price-card proposal">
-                        <div class="price-card-header">💰 Proposition de prix</div>
+                        <div class="price-card-header">{!! \App\Support\IconLibrary::svg('wallet', '', 14) !!} Proposition de prix</div>
                         <div class="price-card-body">
                             <div class="price-card-amount">{{ number_format($msg->proposed_price, 0, ',', ' ') }} {{ $devise }}</div>
                             <div class="price-card-original">Prix original : {{ number_format($product->price, 0, ',', ' ') }} {{ $devise }}</div>
@@ -559,7 +559,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
                             <div class="price-card-note">{{ $msg->note }}</div>
                             @endif
                             @if($msg->proposal_status === 'pending')
-                                <div class="price-card-status status-pending">⏳ En attente de réponse…</div>
+                                <div class="price-card-status status-pending">En attente de réponse…</div>
                             @elseif($msg->proposal_status === 'accepted')
                                 <div class="price-card-status status-accepted">✓ Proposition acceptée</div>
                             @elseif($msg->proposal_status === 'refused')
@@ -571,7 +571,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
                     @elseif($msgType === 'price_offer')
                     {{-- Offre du vendeur (reçue par le client) --}}
                     <div class="price-card offer">
-                        <div class="price-card-header">🎉 Offre spéciale du vendeur</div>
+                        <div class="price-card-header">{!! \App\Support\IconLibrary::svg('gift', '', 14) !!} Offre spéciale du vendeur</div>
                         <div class="price-card-body">
                             <div class="price-card-amount">{{ number_format($msg->proposed_price, 0, ',', ' ') }} {{ $devise }}</div>
                             <div class="price-card-original">Prix original : {{ number_format($product->price, 0, ',', ' ') }} {{ $devise }}</div>
@@ -589,7 +589,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
                                 <div class="price-card-status status-accepted">✓ Offre confirmée — commande créée</div>
                                 @if($msg->negotiated_order_id)
                                 <div class="order-badge">
-                                    <span class="order-badge-ico">📦</span>
+                                    <span class="order-badge-ico">{!! \App\Support\IconLibrary::svg('package', '', 20) !!}</span>
                                     <div>
                                         <div class="order-badge-text">Commande n°{{ $msg->negotiated_order_id }}</div>
                                         <a href="{{ route('client.orders.index') }}" class="order-badge-link">Voir mes commandes →</a>
@@ -599,7 +599,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
                             @elseif($msg->proposal_status === 'refused')
                                 <div class="price-card-status status-refused">✕ Offre expirée</div>
                             @elseif($isMine)
-                                <div class="price-card-status status-pending">⏳ En attente de confirmation client…</div>
+                                <div class="price-card-status status-pending">En attente de confirmation client…</div>
                             @endif
                         </div>
                     </div>
@@ -607,7 +607,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
                     @elseif($msgType === 'price_counter')
                     {{-- Contre-offre vendeur ou client --}}
                     <div class="price-card counter">
-                        <div class="price-card-header">🔄 Contre-proposition {{ $isMine ? 'envoyée' : 'du vendeur' }}</div>
+                        <div class="price-card-header">{!! \App\Support\IconLibrary::svg('refresh', '', 14) !!} Contre-proposition {{ $isMine ? 'envoyée' : 'du vendeur' }}</div>
                         <div class="price-card-body">
                             <div class="price-card-amount">{{ number_format($msg->proposed_price, 0, ',', ' ') }} {{ $devise }}</div>
                             <div class="price-card-original">Prix original : {{ number_format($product->price, 0, ',', ' ') }} {{ $devise }}</div>
@@ -627,10 +627,10 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
                                 </button>
                                 <button class="btn-counter-offer"
                                         onclick="openCounterPanel({{ $msg->id }}, {{ $msg->proposed_price }})">
-                                    🔄 Faire une contre-offre
+                                    {!! \App\Support\IconLibrary::svg('refresh', '', 15) !!} Faire une contre-offre
                                 </button>
                             @elseif($msg->proposal_status === 'pending' && $isMine)
-                                <div class="price-card-status status-pending">⏳ En attente de réponse…</div>
+                                <div class="price-card-status status-pending">En attente de réponse…</div>
                             @elseif($msg->proposal_status === 'accepted')
                                 <div class="price-card-status status-accepted">✓ Acceptée — commande créée</div>
                             @elseif($msg->proposal_status === 'refused')
@@ -642,12 +642,12 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
                     @elseif($msgType === 'order_created')
                     {{-- Confirmation de commande --}}
                     <div class="price-card order-ok">
-                        <div class="price-card-header">📦 Commande confirmée !</div>
+                        <div class="price-card-header">{!! \App\Support\IconLibrary::svg('package', '', 14) !!} Commande confirmée !</div>
                         <div class="price-card-body">
                             <div class="price-card-amount">{{ number_format($msg->proposed_price, 0, ',', ' ') }} {{ $devise }}</div>
-                            <div class="price-card-status status-accepted">✅ Commande n°{{ $msg->negotiated_order_id }} créée</div>
+                            <div class="price-card-status status-accepted">{!! \App\Support\IconLibrary::svg('check', '', 14) !!} Commande n°{{ $msg->negotiated_order_id }} créée</div>
                             <div class="order-badge" style="margin-top:10px">
-                                <span class="order-badge-ico">📦</span>
+                                <span class="order-badge-ico">{!! \App\Support\IconLibrary::svg('package', '', 20) !!}</span>
                                 <div>
                                     <div class="order-badge-text">Prix négocié appliqué</div>
                                     <a href="{{ route('client.orders.index') }}" class="order-badge-link">Voir mes commandes →</a>
@@ -681,7 +681,7 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
 
         @empty
         <div class="chat-empty">
-            <div class="chat-empty-ico">💬</div>
+            <div class="chat-empty-ico">{!! \App\Support\IconLibrary::svg('message', '', 40) !!}</div>
             <div class="chat-empty-txt">
                 Aucun message pour le moment.<br>
                 Posez votre première question au vendeur !
@@ -695,8 +695,8 @@ html, body { font-family: var(--font); margin: 0; background: var(--grey); color
            style="display:none" onchange="onFilesSelected(event)">
     <div class="chat-img-preview hidden" id="imgPreviewStrip"></div>
     <div class="chat-input-zone">
-        <button type="button" class="chat-photo-btn" onclick="document.getElementById('photoFileInput').click()" title="Envoyer des photos">
-            📷
+        <button type="button" class="chat-photo-btn" onclick="document.getElementById('photoFileInput').click()" title="Envoyer des photos" aria-label="Envoyer des photos">
+            {!! \App\Support\IconLibrary::svg('camera', '', 20) !!}
         </button>
         <form method="POST"
               action="{{ route('client.messages.store', $product) }}"
@@ -765,7 +765,7 @@ function closeCounterPanel() {
 async function sendCounterOffer() {
     const input = document.getElementById('counterPriceInput');
     const price = parseFloat(input.value);
-    if (!price || price < 1) { showToast('❌ Veuillez entrer un prix valide.', 'error'); return; }
+    if (!price || price < 1) { showToast('Veuillez entrer un prix valide.', 'error'); return; }
     const message = document.getElementById('counterMessageInput')?.value.trim() || '';
     try {
         const res = await fetch(COUNTER_OFFER_URL, {
@@ -774,11 +774,11 @@ async function sendCounterOffer() {
             body: JSON.stringify({ message_id: _counterMsgId, counter_price: price, message }),
         });
         if (!res.ok) throw new Error();
-        showToast('🔄 Contre-offre envoyée au vendeur !', 'success');
+        showToast('Contre-offre envoyée au vendeur !', 'success');
         document.getElementById('counterMessageInput').value = '';
         closeCounterPanel();
         setTimeout(() => location.reload(), 1200);
-    } catch(e) { showToast('❌ Erreur lors de l\'envoi. Réessayez.', 'error'); }
+    } catch(e) { showToast('Erreur lors de l\'envoi. Réessayez.', 'error'); }
 }
 
 let _lastMsgId     = {{ $messages->isNotEmpty() ? $messages->last()->id : 0 }};
@@ -1016,7 +1016,7 @@ async function sendMessage() {
             scrollBottom();
         }
     } catch(e) {
-        showToast('❌ Erreur réseau. Réessayez.', 'error');
+        showToast('Erreur réseau. Réessayez.', 'error');
     } finally {
         if (btn) btn.disabled = false;
     }
@@ -1071,7 +1071,7 @@ async function sendPhotos() {
         }
     } catch(e) {
         row.remove();
-        showToast('❌ Erreur envoi photo. Réessayez.', 'error');
+        showToast('Erreur envoi photo. Réessayez.', 'error');
     }
 }
 
@@ -1116,7 +1116,7 @@ function toggleProposePanel() {
 async function sendPriceProposal() {
     const input = document.getElementById('proposePriceInput');
     const price = parseFloat(input.value);
-    if (!price || price < 1) { showToast('❌ Veuillez entrer un prix valide.', 'error'); return; }
+    if (!price || price < 1) { showToast('Veuillez entrer un prix valide.', 'error'); return; }
     const message = document.getElementById('proposeMessageInput')?.value.trim() || '';
     try {
         const res = await fetch(PROPOSE_URL, {
@@ -1125,12 +1125,12 @@ async function sendPriceProposal() {
             body: JSON.stringify({ product_id: PRODUCT_ID, proposed_price: price, message }),
         });
         if (!res.ok) throw new Error();
-        showToast('💰 Proposition envoyée au vendeur !', 'success');
+        showToast('Proposition envoyée au vendeur !', 'success');
         document.getElementById('proposePanel').classList.remove('open');
         document.getElementById('proposeMessageInput').value = '';
         input.value = '';
         setTimeout(() => location.reload(), 1200);
-    } catch(e) { showToast('❌ Erreur lors de l\'envoi. Réessayez.', 'error'); }
+    } catch(e) { showToast('Erreur lors de l\'envoi. Réessayez.', 'error'); }
 }
 
 /* ════════════════════════════════════
@@ -1139,7 +1139,7 @@ async function sendPriceProposal() {
 async function confirmOffer(messageId, btn) {
     if (!confirm('Confirmer cette offre et créer la commande ?')) return;
     btn.disabled = true; btn.classList.add('loading');
-    btn.textContent = '⏳ Création de la commande…';
+    btn.textContent = 'Création de la commande…';
     try {
         const res  = await fetch(CONFIRM_URL + '/' + messageId, {
             method: 'POST',
@@ -1147,13 +1147,13 @@ async function confirmOffer(messageId, btn) {
         });
         const data = await res.json();
         if (data.success) {
-            showToast('🎉 Commande n°' + data.order_id + ' créée avec succès !', 'success');
+            showToast('Commande n°' + data.order_id + ' créée avec succès !', 'success');
             setTimeout(() => location.reload(), 1500);
         } else throw new Error();
     } catch(e) {
         btn.disabled = false; btn.classList.remove('loading');
         btn.textContent = '✓ Confirmer cette offre et commander';
-        showToast('❌ Erreur. Réessayez.', 'error');
+        showToast('Erreur. Réessayez.', 'error');
     }
 }
 

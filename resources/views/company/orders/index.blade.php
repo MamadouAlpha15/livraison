@@ -12,23 +12,23 @@
 })();
 </script>
 <style>
-html.cx-preorders-dark body{background:#0b0d22!important}
+html.cx-preorders-dark body{background:#071630!important}
 </style>
 <style>
 *,*::before,*::after{box-sizing:border-box}
 
 :root{
-    --cx-bg:     #F5F7FA;
+    --cx-bg:     #F6F9FF;
     --cx-card:   #ffffff;
-    --cx-card2:  #EEF1F7;
+    --cx-card2:  #EEF3FB;
     --cx-border: rgba(0,0,0,.08);
     --cx-border2:rgba(0,0,0,.13);
-    --cx-brand:  #7c3aed;
-    --cx-brand2: #6d28d9;
-    --cx-brand3: #5b21b6;
-    --cx-lt:     rgba(124,58,237,.08);
-    --cx-text:   #111827;
-    --cx-text2:  #4b5563;
+    --cx-brand:  #1668D8;
+    --cx-brand2: #1260C9;
+    --cx-brand3: #1260C9;
+    --cx-lt:     rgba(31,124,246,.08);
+    --cx-text:   #16162A;
+    --cx-text2:  #45455E;
     --cx-muted:  #9ca3af;
     --cx-green:  #10b981;
     --cx-amber:  #f59e0b;
@@ -46,7 +46,7 @@ body.is-dashboard > nav,
 body.is-dashboard > header,
 body.is-dashboard .navbar { display:none !important; }
 
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--cx-bg);color:var(--cx-text);margin:0;-webkit-font-smoothing:antialiased;}
+body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--cx-bg);color:var(--cx-text);margin:0;-webkit-font-smoothing:antialiased;}
 a{text-decoration:none;color:inherit;}
 
 /* ══ STRUCTURE ══ */
@@ -55,21 +55,21 @@ a{text-decoration:none;color:inherit;}
 /* ══ SIDEBAR ══ */
 .cx-sidebar{
     position:fixed;top:0;left:0;bottom:0;width:var(--sb-w);
-    background:linear-gradient(180deg,#0f0f59 0%,#0e0e16 40%,#10103a 100%);
+    background:linear-gradient(180deg,#0B1E3D 0%,#081831 55%,#0B1E3D 100%);
     display:flex;flex-direction:column;
     z-index:1200;overflow-y:auto;
-    scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.3) transparent;
+    scrollbar-width:thin;scrollbar-color:rgba(31,124,246,.3) transparent;
     transition:transform .25s cubic-bezier(.23,1,.32,1);
-    border-right:1px solid rgba(99,102,241,.1);
+    border-right:1px solid rgba(31,124,246,.1);
     box-shadow:6px 0 30px rgba(0,0,0,.35);
 }
 .cx-sidebar::-webkit-scrollbar{width:3px;}
-.cx-sidebar::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3);border-radius:3px;}
+.cx-sidebar::-webkit-scrollbar-thumb{background:rgba(31,124,246,.3);border-radius:3px;}
 /* Brand */
 .cx-brand-hd{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;display:flex;flex-direction:column;gap:8px;}
 .cx-brand-top{display:flex;align-items:center;justify-content:space-between;}
 .cx-logo{display:flex;align-items:center;gap:9px;color:#fff;font-size:16px;font-weight:800;}
-.cx-logo-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.cx-logo-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#1668D8,#1260C9);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
 .cx-sys-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--cx-green);padding:3px 8px;border-radius:20px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);}
 .cx-sys-dot{width:6px;height:6px;border-radius:50%;background:var(--cx-green);animation:blink 2.2s ease-in-out infinite;flex-shrink:0;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
@@ -80,22 +80,22 @@ a{text-decoration:none;color:inherit;}
 .cx-nav{padding:8px 8px 12px;flex:1;}
 .cx-nav-sec{font-size:10px;font-weight:800;letter-spacing:1.6px;color:rgba(255,255,255,.58);padding:14px 10px 5px;text-transform:uppercase;}
 .cx-nav-item{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:var(--r-sm);color:rgba(255,255,255,.85);font-size:13.5px;font-weight:600;transition:all .22s cubic-bezier(.23,1,.32,1);position:relative;cursor:pointer;margin-bottom:2px;border:1px solid transparent;}
-.cx-nav-item:hover{background:rgba(124,58,237,.18);color:#fff;border-color:rgba(124,58,237,.25);box-shadow:0 2px 12px rgba(124,58,237,.2),inset 0 1px 0 rgba(255,255,255,.06);}
-.cx-nav-item:hover .cx-nav-ico{background:rgba(139,92,246,.25);box-shadow:0 0 8px rgba(139,92,246,.3);}
-.cx-nav-item.active{background:linear-gradient(90deg,rgba(124,58,237,.35) 0%,rgba(99,102,241,.2) 100%);color:#fff;font-weight:700;border-color:rgba(139,92,246,.3);box-shadow:0 4px 16px rgba(124,58,237,.25),inset 0 1px 0 rgba(255,255,255,.08);}
-.cx-nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:linear-gradient(180deg,#a78bfa,#7c3aed);border-radius:0 3px 3px 0;box-shadow:2px 0 12px rgba(167,139,250,.7);}
+.cx-nav-item:hover{background:rgba(31,124,246,.18);color:#fff;border-color:rgba(31,124,246,.25);box-shadow:0 2px 12px rgba(31,124,246,.2),inset 0 1px 0 rgba(255,255,255,.06);}
+.cx-nav-item:hover .cx-nav-ico{background:rgba(31,124,246,.25);box-shadow:0 0 8px rgba(31,124,246,.3);}
+.cx-nav-item.active{background:linear-gradient(90deg,rgba(31,124,246,.35) 0%,rgba(31,124,246,.2) 100%);color:#fff;font-weight:700;border-color:rgba(31,124,246,.3);box-shadow:0 4px 16px rgba(31,124,246,.25),inset 0 1px 0 rgba(255,255,255,.08);}
+.cx-nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:linear-gradient(180deg,#7DB4FF,#1668D8);border-radius:0 3px 3px 0;box-shadow:2px 0 12px rgba(125,180,255,.7);}
 .cx-nav-ico{width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .22s cubic-bezier(.23,1,.32,1);}
-.cx-nav-item.active .cx-nav-ico{background:rgba(139,92,246,.3);border-color:rgba(139,92,246,.4);box-shadow:0 0 10px rgba(139,92,246,.4);}
+.cx-nav-item.active .cx-nav-ico{background:rgba(31,124,246,.3);border-color:rgba(31,124,246,.4);box-shadow:0 0 10px rgba(31,124,246,.4);}
 .cx-nav-ico svg,.cx-toast-ico svg{display:block;}
-.cx-nav-item.active:hover{background:linear-gradient(90deg,rgba(124,58,237,.45) 0%,rgba(99,102,241,.3) 100%);box-shadow:0 4px 20px rgba(124,58,237,.35),inset 0 1px 0 rgba(255,255,255,.1);}
+.cx-nav-item.active:hover{background:linear-gradient(90deg,rgba(31,124,246,.45) 0%,rgba(31,124,246,.3) 100%);box-shadow:0 4px 20px rgba(31,124,246,.35),inset 0 1px 0 rgba(255,255,255,.1);}
 
 /* User foot */
 .cx-user-foot{padding:10px 10px 12px;border-top:1px solid rgba(255,255,255,.07);flex-shrink:0;}
 .cx-user-row{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:var(--r-sm);background:rgba(255,255,255,.04);cursor:pointer;transition:background .15s;margin-bottom:6px;}
 .cx-user-row:hover{background:rgba(255,255,255,.08);}
-.cx-user-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4338ca);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;}
+.cx-user-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1668D8,#1260C9);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;}
 .cx-user-name{font-size:12px;font-weight:700;color:#fff;line-height:1.2;}
-.cx-user-role{font-size:10px;color:var(--cx-text2);}
+.cx-user-role{font-size:10px;color:rgba(255,255,255,.62);}
 .cx-logout-btn{width:30px;height:30px;border-radius:8px;flex-shrink:0;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);display:flex;align-items:center;justify-content:center;color:#f87171;cursor:pointer;transition:background .15s,color .15s;padding:0;}
 .cx-logout-btn:hover{background:rgba(239,68,68,.22);color:#fff;}
 
@@ -113,7 +113,7 @@ a{text-decoration:none;color:inherit;}
 .cx-tb-right{display:flex;align-items:center;gap:10px;margin-left:auto;}
 .cx-tb-user{display:flex;align-items:center;gap:8px;cursor:pointer;padding:5px 10px;border-radius:var(--r-sm);transition:background .14s;flex-shrink:0;}
 .cx-tb-user:hover{background:rgba(0,0,0,.04);}
-.cx-tb-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4338ca);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;}
+.cx-tb-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1668D8,#1260C9);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;}
 .cx-tb-uname{font-size:12.5px;font-weight:700;color:var(--cx-text);line-height:1.2;}
 .cx-tb-urole{font-size:10px;color:var(--cx-text2);}
 .cx-tb-btn{width:36px;height:36px;border-radius:10px;background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;color:var(--cx-text2);font-size:16px;cursor:pointer;transition:background .14s,color .14s;flex-shrink:0;text-decoration:none;}
@@ -121,13 +121,13 @@ a{text-decoration:none;color:inherit;}
 
 /* ── PAGE BANNER ── */
 .page-banner{
-    background:linear-gradient(135deg,#1e1b4b 0%,#312e81 40%,#4338ca 100%);
+    background:linear-gradient(135deg,#0B1E3D 0%,#132B52 40%,#1260C9 100%);
     padding:28px 28px 24px;position:relative;overflow:hidden;
 }
 .page-banner::before{
     content:'';position:absolute;top:-60px;right:-80px;
     width:300px;height:300px;border-radius:50%;
-    background:radial-gradient(circle,rgba(124,58,237,.18) 0%,transparent 70%);
+    background:radial-gradient(circle,rgba(31,124,246,.18) 0%,transparent 70%);
     pointer-events:none;
 }
 .banner-grid{
@@ -210,21 +210,21 @@ thead th{
 }
 tbody tr{border-bottom:1px solid var(--cx-border);transition:background .12s;}
 tbody tr:last-child{border-bottom:none;}
-tbody tr:hover{background:rgba(124,58,237,.05);}
+tbody tr:hover{background:rgba(31,124,246,.05);}
 tbody tr:nth-child(even){background:rgba(0,0,0,.018);}
-tbody tr:nth-child(even):hover{background:rgba(124,58,237,.05);}
+tbody tr:nth-child(even):hover{background:rgba(31,124,246,.05);}
 td{padding:14px 16px;font-size:14.5px;vertical-align:middle;}
 .td-dest{max-width:160px;}
 .td-date{white-space:nowrap;}
 
-.order-id{font-size:15px;font-weight:800;color:var(--cx-text);font-family:monospace;}
+.order-id{font-size:15px;font-weight:800;color:var(--cx-text);font-variant-numeric:tabular-nums;}
 .order-items{font-size:12.5px;color:var(--cx-muted);margin-top:3px;}
 .client-name{font-size:14.5px;font-weight:700;color:var(--cx-text);}
 .client-phone{font-size:12.5px;color:var(--cx-muted);}
 .shop-badge{
     display:inline-flex;align-items:center;gap:5px;
-    background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);
-    color:#6d28d9;font-size:13px;font-weight:600;padding:4px 12px;border-radius:20px;
+    background:rgba(31,124,246,.08);border:1px solid rgba(31,124,246,.2);
+    color:#1260C9;font-size:13px;font-weight:600;padding:4px 12px;border-radius:20px;
 }
 .shop-addr{font-size:12.5px;color:var(--cx-muted);margin-top:5px;line-height:1.35;}
 .driver-cell{display:flex;align-items:center;gap:8px;}
@@ -237,13 +237,13 @@ td{padding:14px 16px;font-size:14.5px;vertical-align:middle;}
 .driver-name{font-weight:700;color:var(--cx-text);font-size:14px;}
 .driver-phone{font-size:12.5px;color:var(--cx-muted);}
 .no-driver{color:var(--cx-muted);font-size:13.5px;font-style:italic;}
-.amount-val{font-weight:800;color:var(--cx-text);font-family:monospace;font-size:15px;}
+.amount-val{font-weight:800;color:var(--cx-text);font-variant-numeric:tabular-nums;font-size:15px;}
 .fee-val{font-size:13px;color:#059669;font-weight:700;}
 
 .badge{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:700;padding:4px 12px;border-radius:20px;white-space:nowrap;}
 .badge-wait   {background:rgba(245,158,11,.1); color:#b45309;border:1px solid rgba(245,158,11,.25);}
 .badge-confirm{background:rgba(59,130,246,.1); color:#1d4ed8;border:1px solid rgba(59,130,246,.25);}
-.badge-deliv  {background:rgba(124,58,237,.1); color:#6d28d9;border:1px solid rgba(124,58,237,.25);}
+.badge-deliv  {background:rgba(31,124,246,.1); color:#1260C9;border:1px solid rgba(31,124,246,.25);}
 .badge-done   {background:rgba(16,185,129,.1); color:#065f46;border:1px solid rgba(16,185,129,.25);}
 .badge-cancel {background:rgba(239,68,68,.08); color:#b91c1c;border:1px solid rgba(239,68,68,.2);}
 
@@ -252,8 +252,8 @@ td{padding:14px 16px;font-size:14.5px;vertical-align:middle;}
     padding:8px 14px;border-radius:var(--r-xs);font-size:13px;font-weight:700;
     border:1px solid;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;background:transparent;
 }
-.btn-assign{color:#a78bfa;border-color:rgba(139,92,246,.3);}
-.btn-assign:hover{background:rgba(139,92,246,.15);}
+.btn-assign{color:#1F7CF6;border-color:rgba(31,124,246,.3);}
+.btn-assign:hover{background:rgba(31,124,246,.15);}
 .btn-done{color:#34d399;border-color:rgba(16,185,129,.3);}
 .btn-done:hover{background:rgba(16,185,129,.1);}
 .btn-status{color:var(--cx-text2);border-color:var(--cx-border);}
@@ -267,8 +267,8 @@ td{padding:14px 16px;font-size:14.5px;vertical-align:middle;}
 /* ── Barre sélection multiple ── */
 .sel-bar{
     display:none;align-items:center;gap:12px;flex-wrap:wrap;
-    background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(99,102,241,.06));
-    border:1.5px solid rgba(124,58,237,.25);border-radius:var(--r-sm);
+    background:linear-gradient(135deg,rgba(31,124,246,.08),rgba(31,124,246,.06));
+    border:1.5px solid rgba(31,124,246,.25);border-radius:var(--r-sm);
     padding:12px 16px;margin-bottom:12px;
 }
 .sel-bar.show{display:flex;}
@@ -279,9 +279,9 @@ td{padding:14px 16px;font-size:14.5px;vertical-align:middle;}
     background:linear-gradient(135deg,var(--cx-brand),var(--cx-brand2));
     color:#fff;font-size:13px;font-weight:800;
     display:flex;align-items:center;gap:6px;
-    box-shadow:0 3px 10px rgba(124,58,237,.3);transition:all .15s;
+    box-shadow:0 3px 10px rgba(31,124,246,.3);transition:all .15s;
 }
-.btn-sel-assign:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(124,58,237,.45);}
+.btn-sel-assign:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(31,124,246,.45);}
 .btn-sel-cancel{
     padding:9px 14px;border-radius:var(--r-xs);border:1px solid var(--cx-border);
     background:var(--cx-card2);color:var(--cx-text2);font-size:13px;font-weight:700;
@@ -316,18 +316,18 @@ td{padding:14px 16px;font-size:14.5px;vertical-align:middle;}
 .chk-th{width:44px;padding:12px 8px 12px 16px!important;}
 .chk-td{padding:12px 8px 12px 16px!important;}
 /* Ligne sélectionnée */
-tbody tr.row-selected{background:rgba(124,58,237,.07)!important;}
-body.cx-dark tbody tr.row-selected{background:rgba(124,58,237,.13)!important;}
-.mc-card.row-selected{border-color:rgba(124,58,237,.4)!important;box-shadow:0 0 0 2px rgba(124,58,237,.15)!important;}
-body.cx-dark .mc-card.row-selected{border-color:rgba(139,92,246,.5)!important;box-shadow:0 0 0 2px rgba(124,58,237,.25)!important;}
+tbody tr.row-selected{background:rgba(31,124,246,.07)!important;}
+body.cx-dark tbody tr.row-selected{background:rgba(31,124,246,.13)!important;}
+.mc-card.row-selected{border-color:rgba(31,124,246,.4)!important;box-shadow:0 0 0 2px rgba(31,124,246,.15)!important;}
+body.cx-dark .mc-card.row-selected{border-color:rgba(31,124,246,.5)!important;box-shadow:0 0 0 2px rgba(31,124,246,.25)!important;}
 /* Multi-mode : infos commandes dans le modal */
 .multi-orders-list{max-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;margin-bottom:14px;
-    scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.3) transparent;}
+    scrollbar-width:thin;scrollbar-color:rgba(31,124,246,.3) transparent;}
 .multi-orders-list::-webkit-scrollbar{width:4px;}
-.multi-orders-list::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3);border-radius:4px;}
+.multi-orders-list::-webkit-scrollbar-thumb{background:rgba(31,124,246,.3);border-radius:4px;}
 .multi-order-item{font-size:12px;font-weight:600;color:var(--cx-text2);padding:5px 10px;
     background:var(--cx-card2);border:1px solid var(--cx-border);border-radius:var(--r-xs);}
-body.cx-dark .sel-bar{background:rgba(124,58,237,.12);border-color:rgba(124,58,237,.3);}
+body.cx-dark .sel-bar{background:rgba(31,124,246,.12);border-color:rgba(31,124,246,.3);}
 body.cx-dark .btn-sel-cancel{background:var(--cx-card2);border-color:var(--cx-border);color:var(--cx-text2);}
 body.cx-dark .multi-order-item{background:var(--cx-card2);border-color:var(--cx-border);color:var(--cx-text2);}
 .multi-order-item-dest{font-size:10.5px;color:var(--cx-muted);font-weight:400;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -358,12 +358,12 @@ body.cx-dark .multi-common-dest-fee{color:#34d399;}
 /* ── Mobile cards (mc-*) ── */
 .mc-card{background:var(--cx-card);border:1px solid var(--cx-border);border-radius:var(--r-sm);margin-bottom:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .mc-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--cx-border);gap:8px;flex-wrap:wrap}
-.mc-id{font-size:15px;font-weight:900;color:var(--cx-brand);font-family:monospace}
+.mc-id{font-size:15px;font-weight:900;color:var(--cx-brand);font-variant-numeric:tabular-nums}
 .mc-amounts{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--cx-border)}
 .mc-amount-box{padding:13px 14px;background:var(--cx-card2)}
 .mc-amount-fee{border-right:1px solid var(--cx-border)}
 .mc-amount-lbl{font-size:10.5px;font-weight:700;color:var(--cx-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
-.mc-amount-val{font-size:18px;font-weight:900;font-family:monospace;color:#059669;word-break:break-all;line-height:1.2}
+.mc-amount-val{font-size:18px;font-weight:900;font-variant-numeric:tabular-nums;color:#059669;word-break:break-all;line-height:1.2}
 .mc-amount-total .mc-amount-val{color:var(--cx-text)}
 .mc-rows{padding:4px 0}
 .mc-row{display:flex;align-items:flex-start;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--cx-border);gap:10px}
@@ -403,17 +403,17 @@ body.cx-dark .mc-amount-total .mc-amount-val{color:var(--cx-text)}
 .cx-modal-body{padding:20px 22px;}
 
 .driver-radio{display:flex;flex-direction:column;gap:8px;max-height:280px;overflow-y:auto;
-    scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.25) transparent;margin-bottom:4px;}
+    scrollbar-width:thin;scrollbar-color:rgba(31,124,246,.25) transparent;margin-bottom:4px;}
 .driver-radio::-webkit-scrollbar{width:3px;}
-.driver-radio::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3);border-radius:3px;}
+.driver-radio::-webkit-scrollbar-thumb{background:rgba(31,124,246,.3);border-radius:3px;}
 .driver-opt{
     display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--r-sm);
     border:1.5px solid var(--cx-border);cursor:pointer;transition:all .14s;background:var(--cx-card2);
 }
-.driver-opt:hover{border-color:rgba(124,58,237,.4);background:rgba(124,58,237,.04);}
+.driver-opt:hover{border-color:rgba(31,124,246,.4);background:rgba(31,124,246,.04);}
 .driver-opt input[type=radio]{display:none;}
-.driver-opt.selected{border-color:var(--cx-brand);background:rgba(124,58,237,.08);
-    box-shadow:0 0 0 3px rgba(124,58,237,.1);}
+.driver-opt.selected{border-color:var(--cx-brand);background:rgba(31,124,246,.08);
+    box-shadow:0 0 0 3px rgba(31,124,246,.1);}
 .driver-opt.not-avail{opacity:.5;cursor:default;}
 .driver-opt.not-avail:hover{border-color:var(--cx-border);background:var(--cx-card2);}
 .d-av-lg{
@@ -427,7 +427,7 @@ body.cx-dark .mc-amount-total .mc-amount-val{color:var(--cx-text)}
 .d-status-badge{margin-left:auto;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
 .ds-avail{background:rgba(16,185,129,.12);color:#065f46;border:1px solid rgba(16,185,129,.3);}
 .ds-busy {background:rgba(245,158,11,.1);color:#92400e;border:1px solid rgba(245,158,11,.25);}
-.ds-off  {background:rgba(100,116,139,.08);color:#6b7280;border:1px solid rgba(0,0,0,.1);}
+.ds-off  {background:rgba(100,116,139,.08);color:#62627C;border:1px solid rgba(0,0,0,.1);}
 .avail-section-lbl{
     font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;
     color:var(--cx-muted);padding:8px 2px 4px;
@@ -461,15 +461,15 @@ body.cx-dark .mc-amount-total .mc-amount-val{color:var(--cx-text)}
     width:100%;padding:10px 14px;background:var(--cx-card2);border:1.5px solid var(--cx-border);
     border-radius:var(--r-sm);color:var(--cx-text);font-size:13.5px;font-family:inherit;outline:none;transition:border-color .15s;
 }
-.form-input:focus{border-color:var(--cx-brand);box-shadow:0 0 0 3px rgba(124,58,237,.12);}
+.form-input:focus{border-color:var(--cx-brand);box-shadow:0 0 0 3px rgba(31,124,246,.12);}
 .form-input::placeholder{color:var(--cx-muted);}
 .btn-primary{
     width:100%;padding:13px;background:linear-gradient(135deg,var(--cx-brand),var(--cx-brand2));
     color:#fff;border:none;border-radius:var(--r-sm);font-size:14px;font-weight:800;font-family:inherit;
-    cursor:pointer;box-shadow:0 4px 14px rgba(124,58,237,.35);transition:all .18s;
+    cursor:pointer;box-shadow:0 4px 14px rgba(31,124,246,.35);transition:all .18s;
     display:flex;align-items:center;justify-content:center;gap:8px;
 }
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(124,58,237,.5);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(31,124,246,.5);}
 .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none;}
 
 .status-radio{display:flex;flex-direction:column;gap:8px;}
@@ -565,13 +565,13 @@ body.cx-dark .mc-amount-total .mc-amount-val{color:var(--cx-text)}
 @keyframes slideDown{from{opacity:0;transform:translateX(-50%) translateY(-12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 @keyframes pulse-dot{0%,100%{transform:scale(1)}50%{transform:scale(1.4)}}
 .live-dot{width:8px;height:8px;border-radius:50%;background:#34d399;display:inline-block;animation:pulse-dot 1.6s ease-in-out infinite;flex-shrink:0;}
-.live-banner{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:2000;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;padding:10px 22px;border-radius:30px;font-size:13px;font-weight:800;box-shadow:0 4px 24px rgba(124,58,237,.55);cursor:pointer;display:flex;align-items:center;gap:9px;animation:slideDown .3s cubic-bezier(.23,1,.32,1);white-space:nowrap;}
-.live-banner:hover{background:linear-gradient(135deg,#6d28d9,#5b21b6);}
+.live-banner{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:2000;background:linear-gradient(135deg,#1668D8,#1260C9);color:#fff;padding:10px 22px;border-radius:30px;font-size:13px;font-weight:800;box-shadow:0 4px 24px rgba(31,124,246,.55);cursor:pointer;display:flex;align-items:center;gap:9px;animation:slideDown .3s cubic-bezier(.23,1,.32,1);white-space:nowrap;}
+.live-banner:hover{background:linear-gradient(135deg,#1260C9,#1260C9);}
 
 /* ══ TOGGLE MODE SOMBRE ══ */
 .cx-dark-row{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;cursor:pointer;border-radius:var(--r-sm);transition:background .14s;}
 .cx-dark-row:hover{background:rgba(255,255,255,.04);}
-.cx-dark-lbl{font-size:11.5px;color:rgba(255,255,255,.45);}
+.cx-dark-lbl{font-size:11.5px;color:rgba(255,255,255,.72);}
 .cx-toggle{width:34px;height:18px;background:#475569;border-radius:9px;position:relative;transition:background .25s;flex-shrink:0;}
 .cx-toggle::after{content:'';position:absolute;top:3px;left:3px;width:12px;height:12px;background:#fff;border-radius:50%;transition:left .25s;}
 .cx-toggle.on{background:var(--cx-brand);}
@@ -579,9 +579,9 @@ body.cx-dark .mc-amount-total .mc-amount-val{color:var(--cx-text)}
 
 /* ══ MODE SOMBRE ══ */
 body.cx-dark{
-    --cx-bg:     #0b0d22;
-    --cx-card:   #0d1226;
-    --cx-card2:  #111930;
+    --cx-bg:     #071630;
+    --cx-card:   #0B1E3D;
+    --cx-card2:  #132B52;
     --cx-border: rgba(255,255,255,.07);
     --cx-border2:rgba(255,255,255,.12);
     --cx-text:   #e2e8f0;
@@ -609,18 +609,18 @@ body.cx-dark .date-input{background:var(--cx-card2);border-color:var(--cx-border
 body.cx-dark .table-card{background:var(--cx-card);border-color:var(--cx-border);}
 body.cx-dark thead th{background:var(--cx-card2);border-bottom-color:var(--cx-border);color:var(--cx-muted);}
 body.cx-dark tbody tr{border-bottom-color:var(--cx-border);}
-body.cx-dark tbody tr:hover{background:rgba(124,58,237,.08);}
+body.cx-dark tbody tr:hover{background:rgba(31,124,246,.08);}
 body.cx-dark tbody tr:nth-child(even){background:rgba(255,255,255,.018);}
-body.cx-dark tbody tr:nth-child(even):hover{background:rgba(124,58,237,.08);}
+body.cx-dark tbody tr:nth-child(even):hover{background:rgba(31,124,246,.08);}
 body.cx-dark .order-id{color:var(--cx-text);}
 body.cx-dark .client-name{color:var(--cx-text);}
 body.cx-dark .driver-name{color:var(--cx-text);}
 body.cx-dark .amount-val{color:var(--cx-text);}
 body.cx-dark .fee-val{color:#34d399;}
-body.cx-dark .shop-badge{background:rgba(124,58,237,.18);color:#a78bfa;border-color:rgba(124,58,237,.35);}
+body.cx-dark .shop-badge{background:rgba(31,124,246,.18);color:#7DB4FF;border-color:rgba(31,124,246,.35);}
 body.cx-dark .badge-wait   {color:#fbbf24;border-color:rgba(245,158,11,.3);}
 body.cx-dark .badge-confirm{color:#60a5fa;border-color:rgba(59,130,246,.3);}
-body.cx-dark .badge-deliv  {color:#a78bfa;border-color:rgba(124,58,237,.3);}
+body.cx-dark .badge-deliv  {color:#7DB4FF;border-color:rgba(31,124,246,.3);}
 body.cx-dark .badge-done   {color:#34d399;border-color:rgba(16,185,129,.3);}
 body.cx-dark .badge-cancel {color:#f87171;border-color:rgba(239,68,68,.25);}
 body.cx-dark .no-driver{color:var(--cx-muted);}
@@ -701,7 +701,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
         <a href="{{ route('company.orders.index') }}" class="cx-nav-item active">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Commandes
             @if(!$isBusiness)
-                @php $oBg = $usedOrders >= $maxOrders ? '#ef4444' : ($usedOrders >= $maxOrders * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                @php $oBg = $usedOrders >= $maxOrders ? '#ef4444' : ($usedOrders >= $maxOrders * 0.7 ? '#f59e0b' : '#1668D8'); @endphp
                 <span class="cx-nav-badge" style="background:{{ $oBg }};margin-left:auto">{{ $usedOrders }}/{{ $maxOrders }}</span>
             @endif
         </a>
@@ -710,12 +710,12 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
         </a>
         <a href="{{ $isBusiness ? route('company.carte.index') : route('company.subscription.upgrade') }}" class="cx-nav-item" @if(!$isBusiness) style="opacity:.6" title="Plan Business requis" @endif>
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span> Carte en direct
-            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917">🔒</span>@endif
+            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>@endif
         </a>
         <a href="{{ route('company.drivers.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></span> Chauffeurs
             @if(!$isBusiness)
-                @php $dBg = $totalDrivers >= $maxDrivers ? '#ef4444' : ($totalDrivers >= $maxDrivers * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                @php $dBg = $totalDrivers >= $maxDrivers ? '#ef4444' : ($totalDrivers >= $maxDrivers * 0.7 ? '#f59e0b' : '#1668D8'); @endphp
                 <span class="cx-nav-badge" style="background:{{ $dBg }};margin-left:auto">{{ $totalDrivers }}/{{ $maxDrivers }}</span>
             @endif
         </a>
@@ -730,7 +730,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
         <a href="{{ route('company.zones.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span> Zone de livraison
             @if(!$isBusiness)
-                @php $zNavBg = $totalZones >= $maxZones ? '#ef4444' : ($totalZones >= $maxZones * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                @php $zNavBg = $totalZones >= $maxZones ? '#ef4444' : ($totalZones >= $maxZones * 0.7 ? '#f59e0b' : '#1668D8'); @endphp
                 <span class="cx-nav-badge" style="background:{{ $zNavBg }};margin-left:auto">{{ $totalZones }}/{{ $maxZones }}</span>
             @endif
         </a>
@@ -739,7 +739,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
         </a>
         <a href="{{ $isBusiness ? route('company.rapport.index') : route('company.subscription.upgrade') }}" class="cx-nav-item" @if(!$isBusiness) style="opacity:.6" title="Plan Business requis" @endif>
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span> Rapport
-            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917">🔒</span>@endif
+            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>@endif
         </a>
 
         <div class="cx-nav-sec">Configuration</div>
@@ -748,7 +748,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
         </a>
         <a href="{{ $isBusiness ? route('company.users.index') : route('company.subscription.upgrade') }}" class="cx-nav-item" @if(!$isBusiness) style="opacity:.6" title="Plan Business requis" @endif>
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Utilisateurs
-            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917">🔒</span>@endif
+            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>@endif
         </a>
         <a href="{{ route('company.support.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span> Support
@@ -819,7 +819,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
             </div>
             <button type="button" class="btn-sel-assign" id="bulkAutoAssignBtn" onclick="bulkAutoAssignAll()"
                     title="Assigne automatiquement toutes les commandes en attente au meilleur chauffeur disponible (zone + charge de travail)">
-                🤖 Assigner tout automatiquement
+                {!! \App\Support\IconLibrary::svg('zap', '', 14) !!} Assigner tout automatiquement
             </button>
         </div>
         @php
@@ -833,7 +833,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
             };
         @endphp
         <div class="stats-bar">
-            <div class="stat-pill" style="--s-accent:#a78bfa">
+            <div class="stat-pill" style="--s-accent:#7DB4FF">
                 <div class="stat-pill-val">{{ $stats['total'] }}</div>
                 <div class="stat-pill-lbl">Total</div>
             </div>
@@ -841,7 +841,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                 <div class="stat-pill-val">{{ $stats['en_attente'] }}</div>
                 <div class="stat-pill-lbl">En attente</div>
             </div>
-            <div class="stat-pill" style="--s-accent:#a78bfa">
+            <div class="stat-pill" style="--s-accent:#7DB4FF">
                 <div class="stat-pill-val">{{ $stats['en_livraison'] }}</div>
                 <div class="stat-pill-lbl">En livraison</div>
             </div>
@@ -861,13 +861,13 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
 
     {{-- BADGE BOUTIQUE FILTRÉE --}}
     @if($shopFilter)
-    <div style="background:linear-gradient(90deg,rgba(124,58,237,.15),rgba(99,102,241,.08));border:1px solid rgba(124,58,237,.2);border-radius:var(--r-sm);padding:10px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <div style="background:linear-gradient(90deg,rgba(31,124,246,.15),rgba(31,124,246,.08));border:1px solid rgba(31,124,246,.2);border-radius:var(--r-sm);padding:10px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7DB4FF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         <div>
-            <div style="font-size:13px;font-weight:800;color:#a78bfa;">Filtré par boutique : {{ $shopFilter->name }}</div>
+            <div style="font-size:13px;font-weight:800;color:#1F7CF6;">Filtré par boutique : {{ $shopFilter->name }}</div>
             <div style="font-size:11.5px;color:var(--cx-text2);">Affichage des commandes uniquement pour cette boutique</div>
         </div>
-        <a href="{{ route('company.orders.index') }}" style="margin-left:auto;font-size:12px;padding:5px 12px;border:1px solid rgba(124,58,237,.3);border-radius:6px;background:rgba(124,58,237,.1);color:#c4b5fd;white-space:nowrap;">
+        <a href="{{ route('company.orders.index') }}" style="margin-left:auto;font-size:12px;padding:5px 12px;border:1px solid rgba(31,124,246,.3);border-radius:6px;background:rgba(31,124,246,.1);color:#1F7CF6;white-space:nowrap;">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:4px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Voir toutes les commandes
         </a>
     </div>
@@ -923,8 +923,8 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
                 <span id="selBtnLabel">Assigner</span>
             </button>
-            <button class="btn-sel-annuler" onclick="bulkCancelOrders()">🚫 Annuler</button>
-            <button class="btn-sel-restaurer" onclick="bulkRestoreOrders()">♻️ Restaurer</button>
+            <button class="btn-sel-annuler" onclick="bulkCancelOrders()">{!! \App\Support\IconLibrary::svg('x', '', 14) !!} Annuler</button>
+            <button class="btn-sel-restaurer" onclick="bulkRestoreOrders()">{!! \App\Support\IconLibrary::svg('refresh', '', 14) !!} Restaurer</button>
             <button class="btn-sel-cancel" onclick="clearSelection()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:3px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Effacer</button>
         </div>
     </div>
@@ -1000,6 +1000,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                         @php $dest = $order->delivery_destination ?: ($order->client->address ?? null); @endphp
                         @if($dest)
                             <div style="font-size:12px;line-height:1.4;">{{ $dest }}</div>
+                            @if($order->delivery_slot)<div style="font-size:11.5px;font-weight:700;color:#1260C9;margin-top:3px">Créneau : {{ $order->delivery_slot }}</div>@endif
                         @else
                             <span style="color:var(--cx-muted);font-style:italic;font-size:11.5px;">Non renseignée</span>
                         @endif
@@ -1034,7 +1035,7 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                     <td data-label="Statut">
                         <span class="badge {{ $st['cls'] }}">{{ $st['lbl'] }}</span>
                         @if($order->delivery_proof_photo)
-                        <a href="{{ $order->delivery_proof_photo_url }}" target="_blank" rel="noopener" title="Voir la preuve de livraison" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;text-decoration:none;font-size:11px;margin-left:4px;vertical-align:middle">📸</a>
+                        <a href="{{ $order->delivery_proof_photo_url }}" target="_blank" rel="noopener" title="Voir la preuve de livraison" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;text-decoration:none;font-size:11px;margin-left:4px;vertical-align:middle">{!! \App\Support\IconLibrary::svg('camera', '', 14) !!}</a>
                         @endif
                     </td>
                     <td data-label="Date" style="color:var(--cx-muted);font-size:12px;" class="td-date">
@@ -1057,19 +1058,19 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                             </button>
                             <button class="btn-action btn-assign" title="Assigner automatiquement au meilleur chauffeur disponible"
                                     onclick="autoAssignOrder({{ $order->id }}, this)">
-                                🤖 Auto
+                                {!! \App\Support\IconLibrary::svg('zap', '', 14) !!} Auto
                             </button>
                             @endif
                             @if(!in_array($order->status, ['livrée','annulée']))
                             <button class="btn-action-cancel"
                                     onclick="cancelOrder({{ $order->id }}, this)">
-                                🚫 Annuler
+                                {!! \App\Support\IconLibrary::svg('x', '', 14) !!} Annuler
                             </button>
                             @endif
                             @if($order->status === 'annulée')
                             <button class="btn-action-restore"
                                     onclick="restoreOrder({{ $order->id }}, this)">
-                                ♻️ Restaurer
+                                {!! \App\Support\IconLibrary::svg('refresh', '', 14) !!} Restaurer
                             </button>
                             @endif
                         </div>
@@ -1170,10 +1171,10 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
             </div>
             @if($order->delivery_proof_photo)
             <div class="mc-row">
-                <span class="mc-lbl" style="display:inline-flex;align-items:center;gap:4px">📸 Preuve</span>
+                <span class="mc-lbl" style="display:inline-flex;align-items:center;gap:4px">{!! \App\Support\IconLibrary::svg('camera', '', 14) !!} Preuve</span>
                 <span class="mc-val">
                     <a href="{{ $order->delivery_proof_photo_url }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;text-decoration:none;font-size:11.5px;font-weight:700">
-                        📸 Voir la photo
+                        {!! \App\Support\IconLibrary::svg('camera', '', 14) !!} Voir la photo
                     </a>
                 </span>
             </div>
@@ -1197,25 +1198,25 @@ body.cx-dark .table-wrap tbody tr{background:var(--cx-card);border-color:var(--c
                     data-shop-addr="{{ $order->shop->address ?? '' }}"
                     data-client-addr="{{ $order->client->address ?? '' }}"
                     onclick="openAssign(this)">
-                🚴 Assigner
+                {!! \App\Support\IconLibrary::svg('truck', '', 14) !!} Assigner
             </button>
             <button class="btn-action btn-assign" title="Assigner automatiquement au meilleur chauffeur disponible"
                     onclick="autoAssignOrder({{ $order->id }}, this)">
-                🤖 Auto
+                {!! \App\Support\IconLibrary::svg('zap', '', 14) !!} Auto
             </button>
             @endif
             @if(!in_array($order->status, ['livrée','annulée']))
-            <button class="btn-action-cancel" onclick="cancelOrder({{ $order->id }}, this)">🚫 Annuler</button>
+            <button class="btn-action-cancel" onclick="cancelOrder({{ $order->id }}, this)">{!! \App\Support\IconLibrary::svg('x', '', 14) !!} Annuler</button>
             @endif
             @if($order->status === 'annulée')
-            <button class="btn-action-restore" onclick="restoreOrder({{ $order->id }}, this)">♻️ Restaurer</button>
+            <button class="btn-action-restore" onclick="restoreOrder({{ $order->id }}, this)">{!! \App\Support\IconLibrary::svg('refresh', '', 14) !!} Restaurer</button>
             @endif
         </div>
 
     </div>
     @empty
     <div class="empty-state" style="background:var(--cx-card);border:1px solid var(--cx-border);border-radius:var(--r-sm);">
-        <div class="empty-ico">📦</div>
+        <div class="empty-ico">{!! \App\Support\IconLibrary::svg('package', '', 40) !!}</div>
         <div class="empty-txt">Aucune commande assignée à votre entreprise</div>
         <div class="empty-sub">Les boutiques vous confient leurs livraisons depuis leur tableau de bord.</div>
     </div>
@@ -1406,7 +1407,7 @@ const DEVISE = @json($devise);
         } else {
             body.classList.remove('cx-dark');
             sw?.classList.remove('on');
-            if(lbl) lbl.textContent = 'Mode clair';
+            if(lbl) lbl.textContent = 'Mode sombre';
         }
     };
     apply(saved);
@@ -1415,7 +1416,7 @@ const DEVISE = @json($devise);
     row?.addEventListener('click', () => {
         const isDark = body.classList.toggle('cx-dark');
         sw?.classList.toggle('on', isDark);
-        if(lbl) lbl.textContent = isDark ? 'Mode sombre' : 'Mode clair';
+        if(lbl) lbl.textContent = 'Mode sombre';
         localStorage.setItem('cx-theme', isDark ? 'dark' : 'light');
     });
 })();
@@ -1599,7 +1600,7 @@ function openMultiAssign(){
             card.innerHTML=
                 '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;">'
                     +'<div style="font-size:12.5px;font-weight:800;color:var(--cx-text);">'+g.clientName+'</div>'
-                    +'<span style="font-size:10.5px;font-weight:700;background:#eef2ff;color:#4f46e5;border:1.5px solid #c7d2fe;border-radius:6px;padding:2px 8px;white-space:nowrap;">'+g.orders.length+' commande'+(g.orders.length>1?'s':'')+' · 1 trajet</span>'
+                    +'<span style="font-size:10.5px;font-weight:700;background:#eef2ff;color:#1260C9;border:1.5px solid #CFE1FF;border-radius:6px;padding:2px 8px;white-space:nowrap;">'+g.orders.length+' commande'+(g.orders.length>1?'s':'')+' · 1 trajet</span>'
                 +'</div>'
                 +(g.dest ? '<div style="font-size:11.5px;color:var(--cx-muted);margin-bottom:6px;">'+g.dest+'</div>' : '')
                 +'<div style="font-size:11px;color:var(--cx-muted);margin-bottom:5px;">'+nums+'</div>'
@@ -1771,10 +1772,10 @@ async function submitAssign(){
         if(_isMultiClientBulk){
             /* Groupes séparés par client : chaque groupe avec son propre frais */
             var totalOrders = _assignGroups.reduce(function(s,g){ return s+g.orders.length; },0);
-            btn.textContent='⏳ Groupe 1/'+_assignGroups.length+'…';
+            btn.textContent='Groupe 1/'+_assignGroups.length+'…';
 
             for(var gi=0;gi<_assignGroups.length;gi++){
-                btn.textContent='⏳ Groupe '+(gi+1)+'/'+_assignGroups.length+'…';
+                btn.textContent='Groupe '+(gi+1)+'/'+_assignGroups.length+'…';
                 var group = _assignGroups[gi];
                 var groupFee = parseFloat(document.getElementById('group-fee-'+gi).value)||0;
 
@@ -1795,11 +1796,11 @@ async function submitAssign(){
         } else {
             /* Même client ou destinations différentes : frais global */
             var ids=Array.from(_bulkOrderIds);
-            btn.textContent='⏳ 0/'+ids.length+'…';
+            btn.textContent='0/'+ids.length+'…';
             var isSingleClientBulk = _assignGroups.length===1 && _assignGroups[0].orders.length>1;
 
             for(var i=0;i<ids.length;i++){
-                btn.textContent='⏳ '+(i+1)+'/'+ids.length+'…';
+                btn.textContent=''+(i+1)+'/'+ids.length+'…';
                 /* Même client → fee uniquement sur 1ère commande */
                 var orderFee = (isSingleClientBulk && i>0) ? 0 : Number(fee);
                 var fd=new FormData();
@@ -1827,7 +1828,7 @@ async function submitAssign(){
 
     /* ── Mode simple (une commande) ── */
     if(!currentOrderId){ toast('Aucune commande.','error'); btn.disabled=false; return; }
-    btn.textContent='⏳ En cours…';
+    btn.textContent='En cours…';
     var fd=new FormData();
     fd.append('_token',CSRF);
     fd.append('driver_id',selectedDriverId);
@@ -1842,11 +1843,11 @@ async function submitAssign(){
             setTimeout(function(){ location.reload(); },1200);
         } else {
             toast('Erreur : '+(data.message||'inconnue'),'error');
-            btn.disabled=false; btn.textContent='🚴 Confirmer l\'assignation';
+            btn.disabled=false; btn.textContent='Confirmer l\'assignation';
         }
     }catch(err){
         toast('Erreur réseau : '+err.message,'error');
-        btn.disabled=false; btn.textContent='🚴 Confirmer l\'assignation';
+        btn.disabled=false; btn.textContent='Confirmer l\'assignation';
     }
 }
 
@@ -1854,7 +1855,7 @@ async function submitAssign(){
 async function autoAssignOrder(orderId, btn){
     var original = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '⏳…';
+    btn.innerHTML = '…';
     var fd = new FormData();
     fd.append('_token', CSRF);
     try{
@@ -1862,10 +1863,10 @@ async function autoAssignOrder(orderId, btn){
         var data = await r.json();
         if(data.success){
             var grpMsg = data.grouped_count > 1 ? ' ('+data.grouped_count+' commandes du même client regroupées, frais appliqués 1 seule fois)' : '';
-            toast('🤖 '+data.driver_name+' assigné automatiquement · '+data.delivery_fee+' '+DEVISE+grpMsg, 'success');
+            toast(''+data.driver_name+' assigné automatiquement · '+data.delivery_fee+' '+DEVISE+grpMsg, 'success');
             setTimeout(function(){ location.reload(); }, 1200);
         } else {
-            toast('❌ '+(data.message||'Aucun chauffeur disponible.'), 'error');
+            toast(''+(data.message||'Aucun chauffeur disponible.'), 'error');
             btn.disabled = false; btn.innerHTML = original;
         }
     }catch(err){
@@ -1879,7 +1880,7 @@ async function bulkAutoAssignAll(){
     var btn = document.getElementById('bulkAutoAssignBtn');
     var original = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '⏳ Assignation en cours…';
+    btn.innerHTML = 'Assignation en cours…';
     var fd = new FormData();
     fd.append('_token', CSRF);
     try{
@@ -1889,14 +1890,14 @@ async function bulkAutoAssignAll(){
             if(data.assigned > 0){
                 var msg = data.assigned+' commande'+(data.assigned>1?'s':'')+' assignée'+(data.assigned>1?'s':'')+' automatiquement sur '+data.trips+' trajet'+(data.trips>1?'s':'')+' (frais appliqués 1 seule fois par client).';
                 if(data.skipped > 0) msg += ' ('+data.skipped+' laissée'+(data.skipped>1?'s':'')+' en attente, aucun chauffeur disponible.)';
-                toast('🤖 '+msg, 'success');
+                toast(''+msg, 'success');
                 setTimeout(function(){ location.reload(); }, 1500);
             } else {
                 toast('Aucune commande en attente à assigner, ou aucun chauffeur disponible.', 'error');
                 btn.disabled = false; btn.innerHTML = original;
             }
         } else {
-            toast('❌ Erreur lors de l\'assignation automatique.', 'error');
+            toast('Erreur lors de l\'assignation automatique.', 'error');
             btn.disabled = false; btn.innerHTML = original;
         }
     }catch(err){
@@ -1927,7 +1928,7 @@ document.querySelectorAll('.status-opt').forEach(function(opt){
 function submitStatus(){
     if(!currentOrderId||!selectedStatusVal){ toast('Choisissez un statut.','error'); return; }
     var btn=document.getElementById('statusBtn');
-    btn.disabled=true; btn.textContent='⏳ En cours…';
+    btn.disabled=true; btn.textContent='En cours…';
     var fd=new FormData();
     fd.append('_token',CSRF); fd.append('status',selectedStatusVal);
     fetch('/company/orders/'+currentOrderId+'/status',{method:'POST',body:fd})
@@ -1960,7 +1961,7 @@ function cancelOrder(orderId, btn) {
         method: 'POST',
         headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json' }
     }).then(r => r.json()).then(data => {
-        if (data.success) { toast('🚫 Commande annulée.', 'success'); setTimeout(() => location.reload(), 1200); }
+        if (data.success) { toast('Commande annulée.', 'success'); setTimeout(() => location.reload(), 1200); }
         else { toast('Erreur lors de l\'annulation.', 'error'); btn.disabled = false; }
     }).catch(() => { toast('Erreur réseau.', 'error'); btn.disabled = false; });
 }
@@ -1971,7 +1972,7 @@ function restoreOrder(orderId, btn) {
         method: 'POST',
         headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Accept': 'application/json' }
     }).then(r => r.json()).then(data => {
-        if (data.success) { toast('♻️ Commande restaurée.', 'success'); setTimeout(() => location.reload(), 1200); }
+        if (data.success) { toast('Commande restaurée.', 'success'); setTimeout(() => location.reload(), 1200); }
         else { toast('Erreur lors de la restauration.', 'error'); btn.disabled = false; }
     }).catch(() => { toast('Erreur réseau.', 'error'); btn.disabled = false; });
 }
@@ -1988,7 +1989,7 @@ async function bulkCancelOrders() {
         });
         const data = await res.json();
         if (data.success) {
-            toast('🚫 ' + data.count + ' commande(s) annulée(s).', 'success');
+            toast('' + data.count + ' commande(s) annulée(s).', 'success');
             clearSelection();
             setTimeout(() => location.reload(), 1400);
         } else { toast('Erreur lors de l\'annulation.', 'error'); }
@@ -2005,7 +2006,7 @@ async function bulkRestoreOrders() {
         });
         const data = await res.json();
         if (data.success) {
-            toast('♻️ ' + data.count + ' commande(s) restaurée(s).', 'success');
+            toast('' + data.count + ' commande(s) restaurée(s).', 'success');
             clearSelection();
             setTimeout(() => location.reload(), 1400);
         } else { toast('Erreur lors de la restauration.', 'error'); }
@@ -2076,5 +2077,22 @@ function toast(msg,type){
     el.textContent=msg; el.className='toast toast-'+type+' show';
     setTimeout(function(){ el.classList.remove('show'); },3500);
 }
+</script>
+<style>.cx-dark-row:focus-visible{outline:2px solid #7DB4FF;outline-offset:2px}</style>
+<script>
+/* Interrupteur « Mode sombre » : même comportement sur toutes les pages (clavier et lecteur d'écran) */
+(function () {
+    var row = document.querySelector('.cx-dark-row'), sw = row && row.querySelector('.cx-toggle');
+    if (!row || !sw) return;
+    row.setAttribute('role', 'switch');
+    row.setAttribute('tabindex', '0');
+    row.setAttribute('aria-label', 'Mode sombre');
+    var sync = function () { row.setAttribute('aria-checked', sw.classList.contains('on') ? 'true' : 'false'); };
+    new MutationObserver(sync).observe(sw, { attributes: true, attributeFilter: ['class'] });
+    row.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); }
+    });
+    sync();
+})();
 </script>
 @endpush

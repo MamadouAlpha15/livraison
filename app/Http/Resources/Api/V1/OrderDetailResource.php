@@ -12,6 +12,10 @@ class OrderDetailResource extends JsonResource
         return [
             'id'                    => $this->id,
             'status'                => $this->status,
+            // Code à donner au livreur à la remise (le client propriétaire est seul à lire cette ressource)
+            'delivery_code'         => in_array($this->status, [\App\Models\Order::STATUS_LIVREE, \App\Models\Order::STATUS_ANNULEE], true) ? null : $this->delivery_code,
+            'cancel_reason'         => $this->cancel_reason,
+            'cancelled_by'          => $this->cancelled_by,
             'total'                 => (float) $this->total,
             'delivery_destination'  => $this->delivery_destination,
             'client_phone'          => $this->client_phone,

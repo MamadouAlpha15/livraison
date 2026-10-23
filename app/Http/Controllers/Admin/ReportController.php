@@ -21,7 +21,7 @@ class ReportController extends Controller
         $shopId  = $user->currentShopId();
         $isSuper = ($user->role === 'superadmin');
         $now     = Carbon::now();
-        $shop    = $user->shop ?? $user->assignedShop;
+        $shop    = $user->shop;
         $devise  = $shop?->currency ?? 'GNF';
 
         $period = $request->get('period', 'month');
@@ -178,7 +178,7 @@ class ReportController extends Controller
         $shopId  = $user->currentShopId();
         $isSuper = ($user->role === 'superadmin');
         $now     = Carbon::now();
-        $shop    = $user->shop ?? $user->assignedShop;
+        $shop    = $user->shop;
         $devise  = $shop?->currency ?? 'GNF';
 
         $period = $request->get('period', 'month');

@@ -19,9 +19,9 @@ class OrderController extends Controller
      */
     public function index()
     {
-        // Supporte: propriétaire (->shop) ou employé rattaché (->assignedShop via shop_id)
+        // Propriétaire ou employé : la boutique vient de users.shop_id dans les deux cas
         $user   = Auth::user();
-        $shop   = $user->shop ?: $user->assignedShop;   // <= clé de l’isolation
+        $shop   = $user->shop;   // <= clé de l’isolation
         $shopId = $shop?->id;
 
         if (!$shopId) {
@@ -40,7 +40,7 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         $user   = Auth::user();
-        $shop   = $user->shop ?: $user->assignedShop;
+        $shop   = $user->shop;
         $shopId = $shop?->id;
 
         abort_unless($shopId && $order->shop_id === $shopId, 403, 'Action non autorisée.');
@@ -57,7 +57,7 @@ class OrderController extends Controller
     public function confirm(Order $order)
     {
         $user   = Auth::user();
-        $shop   = $user->shop ?: $user->assignedShop;
+        $shop   = $user->shop;
         $shopId = $shop?->id;
 
         abort_unless($shopId && $order->shop_id === $shopId, 403, 'Action non autorisée.');
@@ -93,7 +93,7 @@ class OrderController extends Controller
     public function location(Order $order)
     {
         $user   = Auth::user();
-        $shop   = $user->shop ?: $user->assignedShop;
+        $shop   = $user->shop;
         abort_unless($shop && $order->shop_id === $shop->id, 403);
 
         return response()->json([
@@ -108,7 +108,7 @@ class OrderController extends Controller
     public function showAssign(Order $order)
     {
         $user   = Auth::user();
-        $shop   = $user->shop ?: $user->assignedShop;
+        $shop   = $user->shop;
         $shopId = $shop?->id;
 
         abort_unless($shopId && $order->shop_id === $shopId, 403, 'Action non autorisée.');
@@ -138,7 +138,7 @@ class OrderController extends Controller
    public function assign(Request $request, Order $order)
 {
     $user   = Auth::user();
-    $shop   = $user->shop ?: $user->assignedShop;
+    $shop   = $user->shop;
     $shopId = $shop?->id;
 
     abort_unless($shopId && $order->shop_id === $shopId, 403, 'Action non autorisée.');
@@ -229,7 +229,7 @@ class OrderController extends Controller
     public function sendToCompany(Request $request, Order $order)
     {
         $user   = Auth::user();
-        $shop   = $user->shop ?: $user->assignedShop;
+        $shop   = $user->shop;
         $shopId = $shop?->id;
 
         abort_unless($shopId && $order->shop_id === $shopId, 403, 'Action non autorisée.');
@@ -274,7 +274,7 @@ class OrderController extends Controller
     public function cancel(Order $order)
     {
         $user   = Auth::user();
-        $shop   = $user->shop ?: $user->assignedShop;
+        $shop   = $user->shop;
         $shopId = $shop?->id;
 
         abort_unless($shopId && $order->shop_id === $shopId, 403, 'Action non autorisée.');

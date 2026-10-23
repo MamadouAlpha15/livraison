@@ -14,17 +14,17 @@ Route::middleware(['auth:sanctum', 'throttle:30,1'])
 Route::prefix('v1')->name('api.v1.')->group(function () {
 
     Route::prefix('auth')->name('auth.')->group(function () {
-        Route::post('/register',    [AuthController::class, 'register'])   ->name('register');
-        Route::post('/verify-otp',  [AuthController::class, 'verifyOtp'])  ->name('verify-otp');
-        Route::post('/resend-otp',  [AuthController::class, 'resendOtp'])  ->name('resend-otp');
-        Route::post('/login',       [AuthController::class, 'login'])      ->name('login');
+        Route::post('/register',    [AuthController::class, 'register'])   ->middleware('throttle:10,10')->name('register');
+        Route::post('/verify-otp',  [AuthController::class, 'verifyOtp'])  ->middleware('throttle:10,1')->name('verify-otp');
+        Route::post('/resend-otp',  [AuthController::class, 'resendOtp'])  ->middleware('throttle:5,10')->name('resend-otp');
+        Route::post('/login',       [AuthController::class, 'login'])      ->middleware('throttle:10,1')->name('login');
 
         // Connexion "Continuer avec Google" — le flux OAuth passe par
         // auth.google.redirect.mobile (routes/auth.php) ; ici seulement la suite
         // (finalisation d'un nouveau compte + page de secours du retour vers l'app).
         Route::prefix('google')->name('google.')->group(function () {
             Route::get('/return',   [\App\Http\Controllers\Api\V1\GoogleAuthController::class, 'returnFallback'])->name('return');
-            Route::post('/complete',[\App\Http\Controllers\Api\V1\GoogleAuthController::class, 'complete']) ->name('complete');
+            Route::post('/complete',[\App\Http\Controllers\Api\V1\GoogleAuthController::class, 'complete']) ->middleware('throttle:10,1')->name('complete');
         });
 
         Route::middleware('auth:sanctum')->group(function () {
@@ -57,8 +57,8 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     // via $request->user('sanctum'). Attention à l'ordre : doit être déclarée
     // AVANT /orders/{order} (dans le groupe protégé plus bas), sinon Laravel
     // essaierait de traiter "direct" comme un ID de commande.
-    Route::post('/orders/direct',       [\App\Http\Controllers\Api\V1\OrderController::class, 'storeDirect'])   ->name('orders.direct');
-    Route::post('/orders/check-promo',  [\App\Http\Controllers\Api\V1\OrderController::class, 'checkPromoCode'])->name('orders.check-promo');
+    Route::post('/orders/direct',       [\App\Http\Controllers\Api\V1\OrderController::class, 'storeDirect'])   ->middleware('throttle:10,1')->name('orders.direct');
+    Route::post('/orders/check-promo',  [\App\Http\Controllers\Api\V1\OrderController::class, 'checkPromoCode'])->middleware('throttle:30,1')->name('orders.check-promo');
 
     /* Panier & Commandes — nécessitent un compte (comme sur le site) */
     Route::middleware('auth:sanctum')->group(function () {

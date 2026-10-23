@@ -19,11 +19,14 @@ use App\Http\Controllers\Controller;
 use App\Mail\OtpVerificationMail;
 use App\Models\Order;
 use App\Models\User;
+use App\Support\OtpAttempts;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 
@@ -102,14 +105,20 @@ class AuthController extends Controller
             return response()->json(['message' => 'Compte introuvable ou déjà vérifié.'], 404);
         }
 
+        if ($blocked = OtpAttempts::blockedMessage($user)) {
+            return response()->json(['message' => $blocked], 429);
+        }
+
         if (!$user->otp_expires_at || now()->greaterThan($user->otp_expires_at)) {
             return response()->json(['message' => 'Ce code a expiré. Demandez-en un nouveau.'], 422);
         }
 
-        if ($request->code !== $user->otp_code) {
+        if (!hash_equals((string) $user->otp_code, $request->code)) {
+            OtpAttempts::failed($user);
             return response()->json(['message' => 'Le code saisi est incorrect.'], 422);
         }
 
+        OtpAttempts::reset($user);
         $user->forceFill([
             'email_verified_at' => now(),
             'otp_code'          => null,
@@ -154,11 +163,20 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
+        // Même règle que la connexion du site (LoginRequest) : 5 essais par email et par IP
+        $throttleKey = Str::transliterate(Str::lower($request->email) . '|' . $request->ip());
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return response()->json(['message' => "Trop de tentatives. Réessayez dans {$seconds} secondes."], 429);
+        }
+
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
+            RateLimiter::hit($throttleKey);
             return response()->json(['message' => 'Identifiants incorrects.'], 401);
         }
+        RateLimiter::clear($throttleKey);
 
         // Cette app mobile est réservée aux clients (voir SubscriptionService/roles) —
         // les autres rôles restent sur le site + l'app Capacitor pour l'instant.
@@ -213,6 +231,7 @@ class AuthController extends Controller
             'otp_code'       => $code,
             'otp_expires_at' => now()->addMinutes(10),
         ])->save();
+        OtpAttempts::reset($user);
 
         Mail::to($user->email)->send(new OtpVerificationMail($user->name, $code));
     }

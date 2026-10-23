@@ -11,19 +11,19 @@
 @endphp
 
 @push('styles')
-<script>(function(){ if(localStorage.getItem('cx-theme')==='light') document.documentElement.classList.add('cx-prelight'); })();</script>
-<style>html.cx-prelight body{background:#F5F7FA!important}</style>
+<script>(function(){ if(localStorage.getItem('cx-theme')!=='dark') document.documentElement.classList.add('cx-prelight'); })();</script>
+<style>html.cx-prelight body{background:#F6F9FF!important}</style>
 <style>
 *,*::before,*::after{box-sizing:border-box}
 :root{
-    --cx-bg:#0b0d22; --cx-surface:#0d1226; --cx-surface2:#111930;
+    --cx-bg:#071630; --cx-surface:#0B1E3D; --cx-surface2:#132B52;
     --cx-border:rgba(255,255,255,.07); --cx-border2:rgba(255,255,255,.12);
-    --cx-brand:#7c3aed; --cx-brand2:#6d28d9;
+    --cx-brand:#1668D8; --cx-brand2:#1260C9;
     --cx-text:#e2e8f0; --cx-text2:#94a3b8; --cx-muted:#475569;
     --cx-green:#10b981; --cx-amber:#f59e0b; --cx-red:#ef4444; --cx-blue:#3b82f6;
     --cx-sb-w:220px; --r:16px; --r-sm:10px; --r-xs:7px;
 }
-html,body{margin:0;font-family:'Segoe UI',system-ui,sans-serif;background:var(--cx-bg)!important;color:var(--cx-text);-webkit-font-smoothing:antialiased}
+html,body{margin:0;font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--cx-bg)!important;color:var(--cx-text);-webkit-font-smoothing:antialiased}
 a{text-decoration:none;color:inherit}
 
 body.cx-dashboard>nav,body.cx-dashboard>header,body.cx-dashboard .navbar,
@@ -37,16 +37,16 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 /* ── SIDEBAR ── */
 .cx-sidebar{
     position:fixed;top:0;left:0;bottom:0;width:var(--cx-sb-w);
-    background:linear-gradient(180deg,#0f0f59 0%,#0e0e16 40%,#10103a 100%);
+    background:linear-gradient(180deg,#0B1E3D 0%,#081831 55%,#0B1E3D 100%);
     display:flex;flex-direction:column;
-    border-right:1px solid rgba(99,102,241,.15);
+    border-right:1px solid rgba(31,124,246,.15);
     box-shadow:6px 0 30px rgba(0,0,0,.35);
     z-index:1200;overflow-y:auto;
-    scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.3) transparent;
+    scrollbar-width:thin;scrollbar-color:rgba(31,124,246,.3) transparent;
     transition:transform .25s cubic-bezier(.23,1,.32,1);
 }
 .cx-sidebar::-webkit-scrollbar{width:3px}
-.cx-sidebar::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3);border-radius:3px}
+.cx-sidebar::-webkit-scrollbar-thumb{background:rgba(31,124,246,.3);border-radius:3px}
 .cx-brand-hd{padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0}
 .cx-brand-top{display:flex;align-items:center;justify-content:space-between}
 .cx-logo{display:flex;align-items:center;gap:9px;color:#fff;font-size:16px;font-weight:800}
@@ -58,24 +58,24 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .cx-nav{padding:8px 8px 12px;flex:1}
 .cx-nav-sec{font-size:10px;font-weight:800;letter-spacing:1.6px;color:rgba(255,255,255,.58);padding:14px 10px 5px;text-transform:uppercase}
 .cx-nav-item{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:var(--r-xs);color:rgba(255,255,255,.85);font-size:13.5px;font-weight:600;transition:all .22s cubic-bezier(.23,1,.32,1);position:relative;cursor:pointer;margin-bottom:2px;border:1px solid transparent}
-.cx-nav-item:hover{background:rgba(124,58,237,.18);color:#fff;border-color:rgba(124,58,237,.25);box-shadow:0 2px 12px rgba(124,58,237,.2),inset 0 1px 0 rgba(255,255,255,.06)}
-.cx-nav-item:hover .cx-nav-ico{background:rgba(139,92,246,.25);box-shadow:0 0 8px rgba(139,92,246,.3)}
-.cx-nav-item.active{background:linear-gradient(90deg,rgba(124,58,237,.35) 0%,rgba(99,102,241,.2) 100%);color:#fff;font-weight:700;border-color:rgba(139,92,246,.3);box-shadow:0 4px 16px rgba(124,58,237,.25),inset 0 1px 0 rgba(255,255,255,.08)}
-.cx-nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:linear-gradient(180deg,#a78bfa,#7c3aed);border-radius:0 3px 3px 0;box-shadow:2px 0 12px rgba(167,139,250,.7)}
+.cx-nav-item:hover{background:rgba(31,124,246,.18);color:#fff;border-color:rgba(31,124,246,.25);box-shadow:0 2px 12px rgba(31,124,246,.2),inset 0 1px 0 rgba(255,255,255,.06)}
+.cx-nav-item:hover .cx-nav-ico{background:rgba(31,124,246,.25);box-shadow:0 0 8px rgba(31,124,246,.3)}
+.cx-nav-item.active{background:linear-gradient(90deg,rgba(31,124,246,.35) 0%,rgba(31,124,246,.2) 100%);color:#fff;font-weight:700;border-color:rgba(31,124,246,.3);box-shadow:0 4px 16px rgba(31,124,246,.25),inset 0 1px 0 rgba(255,255,255,.08)}
+.cx-nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:linear-gradient(180deg,#7DB4FF,#1668D8);border-radius:0 3px 3px 0;box-shadow:2px 0 12px rgba(125,180,255,.7)}
 .cx-nav-ico{width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .22s cubic-bezier(.23,1,.32,1)}
 .cx-nav-ico svg{display:block}
-.cx-nav-item.active .cx-nav-ico{background:rgba(139,92,246,.3);border-color:rgba(139,92,246,.4);box-shadow:0 0 10px rgba(139,92,246,.4)}
-.cx-nav-item.active:hover{background:linear-gradient(90deg,rgba(124,58,237,.45) 0%,rgba(99,102,241,.3) 100%);box-shadow:0 4px 20px rgba(124,58,237,.35),inset 0 1px 0 rgba(255,255,255,.1)}
+.cx-nav-item.active .cx-nav-ico{background:rgba(31,124,246,.3);border-color:rgba(31,124,246,.4);box-shadow:0 0 10px rgba(31,124,246,.4)}
+.cx-nav-item.active:hover{background:linear-gradient(90deg,rgba(31,124,246,.45) 0%,rgba(31,124,246,.3) 100%);box-shadow:0 4px 20px rgba(31,124,246,.35),inset 0 1px 0 rgba(255,255,255,.1)}
 .cx-user-foot{padding:10px 10px 12px;border-top:1px solid rgba(255,255,255,.07);flex-shrink:0}
 .cx-user-row{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:var(--r-xs);background:rgba(255,255,255,.04);cursor:pointer;transition:background .15s;margin-bottom:6px}
 .cx-user-row:hover{background:rgba(255,255,255,.08)}
-.cx-user-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4338ca);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+.cx-user-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1668D8,#1260C9);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
 .cx-user-name{font-size:12px;font-weight:700;color:#fff;line-height:1.2}
-.cx-user-role{font-size:10px;color:var(--cx-text2)}
+.cx-user-role{font-size:10px;color:rgba(255,255,255,.62)}
 .cx-logout-btn{width:30px;height:30px;border-radius:8px;flex-shrink:0;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);display:flex;align-items:center;justify-content:center;color:#f87171;cursor:pointer;transition:background .15s,color .15s;padding:0}
 .cx-logout-btn:hover{background:rgba(239,68,68,.22);color:#fff}
 .cx-dark-row{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;cursor:pointer}
-.cx-dark-lbl{font-size:11.5px;color:var(--cx-text2)}
+.cx-dark-lbl{font-size:11.5px;color:rgba(255,255,255,.72)}
 .cx-toggle{width:34px;height:18px;background:#475569;border-radius:9px;position:relative;transition:background .25s;flex-shrink:0}
 .cx-toggle::after{content:'';position:absolute;top:3px;left:3px;width:12px;height:12px;background:#fff;border-radius:50%;transition:left .25s}
 .cx-toggle.on{background:var(--cx-brand)}
@@ -96,10 +96,10 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 
 /* ── BANNER ── */
 .hx-banner{
-    background:linear-gradient(135deg,#1e1b4b 0%,#312e81 40%,#4338ca 100%);
+    background:linear-gradient(135deg,#0B1E3D 0%,#132B52 40%,#1260C9 100%);
     padding:24px 28px 20px;position:relative;overflow:hidden;flex-shrink:0;
 }
-.hx-banner::before{content:'';position:absolute;top:-60px;right:-80px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.18) 0%,transparent 70%);pointer-events:none}
+.hx-banner::before{content:'';position:absolute;top:-60px;right:-80px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(31,124,246,.18) 0%,transparent 70%);pointer-events:none}
 .hx-banner-grid{position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:40px 40px}
 .hx-banner-inner{max-width:1300px;margin:0 auto;position:relative;z-index:1}
 .hx-banner-title{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.4px;display:flex;align-items:center;gap:10px;margin-bottom:4px}
@@ -124,12 +124,12 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .hx-period-btn.active{background:var(--cx-brand);color:#fff;border-color:var(--cx-brand)}
 .hx-sep{width:1px;height:24px;background:var(--cx-border);flex-shrink:0}
 .hx-input{padding:8px 12px;background:var(--cx-surface2);border:1px solid var(--cx-border);border-radius:var(--r-xs);color:var(--cx-text);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
-.hx-input:focus{border-color:var(--cx-brand);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+.hx-input:focus{border-color:var(--cx-brand);box-shadow:0 0 0 3px rgba(31,124,246,.12)}
 .hx-select{padding:8px 12px;background:var(--cx-surface2);border:1px solid var(--cx-border);border-radius:var(--r-xs);color:var(--cx-text);font-size:13px;font-family:inherit;outline:none;cursor:pointer;min-width:160px}
 .hx-search-wrap{position:relative;flex:1;min-width:180px}
 .hx-search-ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--cx-muted);pointer-events:none}
 .hx-search{width:100%;padding:8px 12px 8px 34px;background:var(--cx-surface2);border:1px solid var(--cx-border);border-radius:var(--r-xs);color:var(--cx-text);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
-.hx-search:focus{border-color:var(--cx-brand);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+.hx-search:focus{border-color:var(--cx-brand);box-shadow:0 0 0 3px rgba(31,124,246,.12)}
 .hx-search::placeholder,.hx-input::placeholder{color:var(--cx-muted)}
 .hx-filter-second{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--cx-border)}
 .hx-date-range{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -146,7 +146,7 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .hx-table tbody tr:hover{background:rgba(255,255,255,.03)}
 
 /* Cellules */
-.hx-order-id{font-size:14px;font-weight:800;color:var(--cx-brand);font-family:monospace}
+.hx-order-id{font-size:14px;font-weight:800;color:var(--cx-brand);font-variant-numeric:tabular-nums}
 .hx-date{font-size:12px;color:var(--cx-muted);margin-top:2px}
 .hx-shop{font-weight:700;color:var(--cx-text);font-size:13.5px}
 .hx-shop-addr{font-size:11.5px;color:var(--cx-muted);margin-top:2px}
@@ -159,8 +159,8 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .hx-driver-name{font-weight:700;color:var(--cx-text);font-size:13px}
 .hx-driver-phone{font-size:11.5px;color:var(--cx-muted)}
 .hx-no-driver{color:var(--cx-muted);font-size:12.5px;font-style:italic}
-.hx-fee{font-weight:800;color:var(--cx-green);font-size:13.5px;font-family:monospace}
-.hx-amount{font-weight:800;color:var(--cx-text);font-family:monospace;font-size:13.5px}
+.hx-fee{font-weight:800;color:var(--cx-green);font-size:13.5px;font-variant-numeric:tabular-nums}
+.hx-amount{font-weight:800;color:var(--cx-text);font-variant-numeric:tabular-nums;font-size:13.5px}
 
 /* Badges */
 .hx-badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;white-space:nowrap}
@@ -187,13 +187,13 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 /* ── Mobile cards (mc-*) ── */
 .mc-card{background:var(--cx-surface);border:1px solid var(--cx-border);border-radius:var(--r-sm);margin-bottom:12px;overflow:hidden}
 .mc-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--cx-border);gap:8px;flex-wrap:wrap}
-.mc-id{font-size:15px;font-weight:900;color:var(--cx-brand);font-family:monospace}
+.mc-id{font-size:15px;font-weight:900;color:var(--cx-brand);font-variant-numeric:tabular-nums}
 .mc-date{font-size:11px;color:var(--cx-muted);margin-left:8px}
 .mc-amounts{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--cx-border)}
 .mc-amount-box{padding:13px 14px;background:var(--cx-surface2)}
 .mc-amount-fee{border-right:1px solid var(--cx-border)}
 .mc-amount-lbl{font-size:10.5px;font-weight:700;color:var(--cx-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
-.mc-amount-val{font-size:18px;font-weight:900;font-family:monospace;color:var(--cx-green);word-break:break-all;line-height:1.2}
+.mc-amount-val{font-size:18px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--cx-green);word-break:break-all;line-height:1.2}
 .mc-amount-total .mc-amount-val{color:var(--cx-text)}
 .mc-rows{padding:4px 0}
 .mc-row{display:flex;align-items:flex-start;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--cx-border);gap:10px}
@@ -201,19 +201,19 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 .mc-val{font-size:13px;font-weight:600;color:var(--cx-text);text-align:right;word-break:break-word}
 
 /* ── MODE CLAIR ── */
-body.cx-light{--cx-bg:#F5F7FA;--cx-surface:#fff;--cx-surface2:#eef1f7;--cx-border:rgba(0,0,0,.08);--cx-border2:rgba(0,0,0,.13);--cx-text:#111827;--cx-text2:#4b5563;--cx-muted:#9ca3af}
-body.cx-light,html.cx-light body{background:#F5F7FA!important}
+body.cx-light{--cx-bg:#F6F9FF;--cx-surface:#fff;--cx-surface2:#EEF3FB;--cx-border:rgba(0,0,0,.08);--cx-border2:rgba(0,0,0,.13);--cx-text:#16162A;--cx-text2:#45455E;--cx-muted:#9ca3af}
+body.cx-light,html.cx-light body{background:#F6F9FF!important}
 body.cx-light .cx-topbar{background:#fff;border-bottom-color:rgba(0,0,0,.07);box-shadow:0 1px 4px rgba(0,0,0,.06)}
 body.cx-light .cx-tb-link{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.08);color:#374151}
 body.cx-light .hx-filters{background:#fff;border-color:rgba(0,0,0,.08)}
 body.cx-light .hx-table-card{background:#fff;border-color:rgba(0,0,0,.08)}
-body.cx-light .hx-input,.body.cx-light .hx-select,.body.cx-light .hx-search{background:#f3f4f6;border-color:rgba(0,0,0,.1);color:#111827}
-body.cx-light .hx-input{background:#f3f4f6;border-color:rgba(0,0,0,.1);color:#111827}
-body.cx-light .hx-select{background:#f3f4f6;border-color:rgba(0,0,0,.1);color:#111827}
-body.cx-light .hx-search{background:#f3f4f6;border-color:rgba(0,0,0,.1);color:#111827}
+body.cx-light .hx-input,.body.cx-light .hx-select,.body.cx-light .hx-search{background:#f3f4f6;border-color:rgba(0,0,0,.1);color:#16162A}
+body.cx-light .hx-input{background:#f3f4f6;border-color:rgba(0,0,0,.1);color:#16162A}
+body.cx-light .hx-select{background:#f3f4f6;border-color:rgba(0,0,0,.1);color:#16162A}
+body.cx-light .hx-search{background:#f3f4f6;border-color:rgba(0,0,0,.1);color:#16162A}
 body.cx-light .hx-table thead th{background:#f3f4f6}
 body.cx-light .hx-table tbody tr:hover{background:rgba(0,0,0,.02)}
-body.cx-light .hx-period-btn{color:#4b5563;border-color:rgba(0,0,0,.1)}
+body.cx-light .hx-period-btn{color:#45455E;border-color:rgba(0,0,0,.1)}
 body.cx-light .hx-period-btn:hover{background:#e5e7eb}
 body.cx-light .hx-period-btn.active{background:var(--cx-brand);color:#fff}
 body.cx-light .hx-sep{background:rgba(0,0,0,.1)}
@@ -230,7 +230,7 @@ body.cx-light .mc-amounts{border-bottom-color:rgba(0,0,0,.07)}
 body.cx-light .mc-amount-fee{border-right-color:rgba(0,0,0,.07)}
 body.cx-light .mc-row{border-bottom-color:rgba(0,0,0,.06)}
 body.cx-light .mc-amount-val{color:#059669}
-body.cx-light .mc-amount-total .mc-amount-val{color:#111827}
+body.cx-light .mc-amount-total .mc-amount-val{color:#16162A}
 
 /* ══ RESPONSIVE ══ */
 
@@ -343,7 +343,7 @@ body.cx-light .mc-amount-total .mc-amount-val{color:#111827}
             @if(!$isBusiness)
                 @php
                     $pctO = $maxOrders > 0 ? $usedOrders / $maxOrders : 0;
-                    $colO = $pctO >= 1 ? '#ef4444' : ($pctO >= 0.7 ? '#f59e0b' : '#7c3aed');
+                    $colO = $pctO >= 1 ? '#ef4444' : ($pctO >= 0.7 ? '#f59e0b' : '#1668D8');
                 @endphp
                 <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:{{ $colO }};color:#fff;">
                     {{ $usedOrders }}/{{ $maxOrders }}
@@ -358,7 +358,7 @@ body.cx-light .mc-amount-total .mc-amount-val{color:#111827}
             @if(!$isBusiness)
                 @php
                     $pctD = $maxDrivers > 0 ? $totalDrivers / $maxDrivers : 0;
-                    $colD = $pctD >= 1 ? '#ef4444' : ($pctD >= 0.7 ? '#f59e0b' : '#7c3aed');
+                    $colD = $pctD >= 1 ? '#ef4444' : ($pctD >= 0.7 ? '#f59e0b' : '#1668D8');
                 @endphp
                 <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:{{ $colD }};color:#fff;">
                     {{ $totalDrivers }}/{{ $maxDrivers }}
@@ -378,7 +378,7 @@ body.cx-light .mc-amount-total .mc-amount-val{color:#111827}
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span>
             Carte en direct
             @if(!$isBusiness)
-                <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#f59e0b;color:#1c1917;">🔒</span>
+                <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>
             @endif
         </a>
 
@@ -400,7 +400,7 @@ body.cx-light .mc-amount-total .mc-amount-val{color:#111827}
             @if(!$isBusiness)
                 @php
                     $pctZ = $maxZones > 0 ? $totalZones / $maxZones : 0;
-                    $colZ = $pctZ >= 1 ? '#ef4444' : ($pctZ >= 0.7 ? '#f59e0b' : '#7c3aed');
+                    $colZ = $pctZ >= 1 ? '#ef4444' : ($pctZ >= 0.7 ? '#f59e0b' : '#1668D8');
                 @endphp
                 <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:{{ $colZ }};color:#fff;">
                     {{ $totalZones }}/{{ $maxZones }}
@@ -421,7 +421,7 @@ body.cx-light .mc-amount-total .mc-amount-val{color:#111827}
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
             Rapport
             @if(!$isBusiness)
-                <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#f59e0b;color:#1c1917;">🔒</span>
+                <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>
             @endif
         </a>
 
@@ -438,7 +438,7 @@ body.cx-light .mc-amount-total .mc-amount-val{color:#111827}
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
             Utilisateurs
             @if(!$isBusiness)
-                <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#f59e0b;color:#1c1917;">🔒</span>
+                <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>
             @endif
         </a>
 
@@ -478,7 +478,7 @@ body.cx-light .mc-amount-total .mc-amount-val{color:#111827}
         <span class="cx-topbar-title">{{ $shopFilter ? 'Historique · '.$shopFilter->name : 'Historique des livraisons' }}</span>
         <div class="cx-tb-right">
             @if(request('shop_id'))
-                <a href="{{ route('company.historique.index') }}" class="cx-tb-link" style="background:rgba(124,58,237,.15);border-color:rgba(124,58,237,.3);color:#c4b5fd;">
+                <a href="{{ route('company.historique.index') }}" class="cx-tb-link" style="background:rgba(31,124,246,.15);border-color:rgba(31,124,246,.3);color:#1F7CF6;">
                     ✕ Voir tout l'historique
                 </a>
             @endif
@@ -490,13 +490,13 @@ body.cx-light .mc-amount-total .mc-amount-val{color:#111827}
     @if(request('shop_id'))
     @php $filteredShop = \App\Models\Shop::find(request('shop_id')); @endphp
     @if($filteredShop)
-    <div style="background:linear-gradient(90deg,rgba(124,58,237,.15),rgba(99,102,241,.08));border-bottom:1px solid rgba(124,58,237,.2);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-        <span style="flex-shrink:0;display:flex;align-items:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+    <div style="background:linear-gradient(90deg,rgba(31,124,246,.15),rgba(31,124,246,.08));border-bottom:1px solid rgba(31,124,246,.2);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span style="flex-shrink:0;display:flex;align-items:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B9D6FF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
         <div style="flex:1;min-width:0;">
-            <div style="font-size:13px;font-weight:800;color:#c4b5fd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Filtré : {{ $filteredShop->name }}</div>
+            <div style="font-size:13px;font-weight:800;color:#1F7CF6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Filtré : {{ $filteredShop->name }}</div>
             <div style="font-size:11px;color:var(--cx-text2);">Historique de cette boutique uniquement</div>
         </div>
-        <a href="{{ route('company.historique.index') }}" style="flex-shrink:0;font-size:11.5px;padding:5px 10px;border:1px solid rgba(124,58,237,.3);border-radius:6px;background:rgba(124,58,237,.1);color:#c4b5fd;white-space:nowrap;">
+        <a href="{{ route('company.historique.index') }}" style="flex-shrink:0;font-size:11.5px;padding:5px 10px;border:1px solid rgba(31,124,246,.3);border-radius:6px;background:rgba(31,124,246,.1);color:#1F7CF6;white-space:nowrap;">
             ✕ Tout voir
         </a>
     </div>
@@ -534,7 +534,7 @@ body.cx-light .mc-amount-total .mc-amount-val{color:#111827}
                     <div class="hx-stat-val">{{ $stats['total_annulees'] }}</div>
                     <div class="hx-stat-lbl">{{ $annuleesLbl }}</div>
                 </div>
-                <div class="hx-stat" style="--s-accent:#a78bfa">
+                <div class="hx-stat" style="--s-accent:#7DB4FF">
                     <div class="hx-stat-val" style="font-size:clamp(12px,2.5vw,15px);word-break:break-all">{{ $fmt($stats['revenus']) }}</div>
                     <div class="hx-stat-lbl">{{ $revenusLbl }}</div>
                 </div>
@@ -564,8 +564,8 @@ body.cx-light .mc-amount-total .mc-amount-val{color:#111827}
                     <div class="hx-sep"></div>
                     <select class="hx-select" name="status" onchange="document.getElementById('hxForm').submit()">
                         <option value="all"    {{ $curStatus==='all'?'selected':'' }}>Tous les statuts</option>
-                        <option value="livrée" {{ $curStatus==='livrée'?'selected':'' }}>✅ Livrées</option>
-                        <option value="annulée"{{ $curStatus==='annulée'?'selected':'' }}>❌ Annulées</option>
+                        <option value="livrée" {{ $curStatus==='livrée'?'selected':'' }}>Livrées</option>
+                        <option value="annulée"{{ $curStatus==='annulée'?'selected':'' }}>Annulées</option>
                     </select>
                     @if($drivers->count())
                     <select class="hx-select" name="driver_id" onchange="document.getElementById('hxForm').submit()">
@@ -800,9 +800,9 @@ body.cx-light .mc-amount-total .mc-amount-val{color:#111827}
     const sw   = document.getElementById('cxDarkSwitch');
     const lbl  = document.getElementById('cxDarkLbl');
     const row  = document.getElementById('cxDarkToggle');
-    const saved = localStorage.getItem('cx-theme') || 'dark';
+    const saved = localStorage.getItem('cx-theme') || 'light';
     function apply(t) {
-        if (t === 'light') { body.classList.remove('cx-dark'); body.classList.add('cx-light'); sw?.classList.remove('on'); if(lbl) lbl.textContent='Mode clair'; }
+        if (t === 'light') { body.classList.remove('cx-dark'); body.classList.add('cx-light'); sw?.classList.remove('on'); if(lbl) lbl.textContent = 'Mode sombre'; }
         else               { body.classList.remove('cx-light'); body.classList.add('cx-dark'); sw?.classList.add('on');    if(lbl) lbl.textContent='Mode sombre'; }
     }
     apply(saved);
@@ -834,5 +834,22 @@ document.getElementById('hxSearch')?.addEventListener('input', function() {
     clearTimeout(_st);
     _st = setTimeout(() => document.getElementById('hxForm').submit(), 500);
 });
+</script>
+<style>.cx-dark-row:focus-visible{outline:2px solid #7DB4FF;outline-offset:2px}</style>
+<script>
+/* Interrupteur « Mode sombre » : même comportement sur toutes les pages (clavier et lecteur d'écran) */
+(function () {
+    var row = document.querySelector('.cx-dark-row'), sw = row && row.querySelector('.cx-toggle');
+    if (!row || !sw) return;
+    row.setAttribute('role', 'switch');
+    row.setAttribute('tabindex', '0');
+    row.setAttribute('aria-label', 'Mode sombre');
+    var sync = function () { row.setAttribute('aria-checked', sw.classList.contains('on') ? 'true' : 'false'); };
+    new MutationObserver(sync).observe(sw, { attributes: true, attributeFilter: ['class'] });
+    row.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); }
+    });
+    sync();
+})();
 </script>
 @endpush

@@ -136,9 +136,9 @@ button { font-family: inherit; }
 .sm-banner.is-plink b { color: #FCD34D; }
 .sm-fb { max-width: 640px; margin: 40px auto; padding: 22px; border-radius: 20px; background: #fff; color: #16162A; box-shadow: 0 0 0 1px #E3E8F2; display: flex; flex-direction: column; gap: 10px; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
 .sm-fb h2 { margin: 0; font-size: 19px; } .sm-fb p { margin: 0; color: #45455E; }
-.sm-fb input, .sm-fb textarea { width: 100%; border: 0; border-radius: 12px; padding: 12px 14px; background: #F1F5FB; font: 500 15px inherit; font-family: inherit; box-shadow: inset 0 0 0 1.5px #E3E8F2; }
+.sm-fb input, .sm-fb textarea { width: 100%; border: 0; border-radius: 12px; padding: 12px 14px; background: #F1F5FB; font-family: inherit; font-size: 15px; font-weight: 500; box-shadow: inset 0 0 0 1.5px #E3E8F2; }
 .sm-fb textarea { min-height: 96px; }
-.sm-fb button { align-self: flex-start; min-height: 46px; padding: 0 20px; border: 0; border-radius: 999px; background: #1668D8; color: #fff; font: 800 15px inherit; font-family: inherit; cursor: pointer; }
+.sm-fb button { align-self: flex-start; min-height: 46px; padding: 0 20px; border: 0; border-radius: 999px; background: #1668D8; color: #fff; font-family: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
 @media (max-width: 760px) {
     .sm-quick { grid-template-columns: minmax(0, 1fr); top: auto; bottom: 0; left: 0; transform: none; width: 100%; max-height: 92vh; border-radius: var(--m-radius) var(--m-radius) 0 0; animation: smSheetIn 460ms cubic-bezier(.22,1,.36,1); }
     @keyframes smSheetIn { from { transform: translateY(40px) perspective(1200px) rotateX(-10deg); opacity: 0; } }

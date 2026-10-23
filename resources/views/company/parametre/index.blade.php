@@ -29,19 +29,19 @@
 @endphp
 
 @push('styles')
-<script>(function(){ var t=localStorage.getItem('cx-theme'); if(t==='light') document.documentElement.classList.add('cx-prelight'); })();</script>
-<style>html.cx-prelight body { background:#F5F7FA !important; }</style>
+<script>(function(){ var t=localStorage.getItem('cx-theme'); if(t!=='dark') document.documentElement.classList.add('cx-prelight'); })();</script>
+<style>html.cx-prelight body { background:#F6F9FF !important; }</style>
 <style>
 *,*::before,*::after { box-sizing:border-box; }
 :root {
-    --cx-bg:#0b0d22; --cx-surface:#0d1226; --cx-surface2:#111930;
-    --cx-sb:#06070f; --cx-border:rgba(255,255,255,.07);
-    --cx-brand:#7c3aed; --cx-brand2:#6d28d9; --cx-brand-lt:#a78bfa;
+    --cx-bg:#071630; --cx-surface:#0B1E3D; --cx-surface2:#132B52;
+    --cx-sb:#061226; --cx-border:rgba(255,255,255,.07);
+    --cx-brand:#1668D8; --cx-brand2:#1260C9; --cx-brand-lt:#7DB4FF;
     --cx-text:#e2e8f0; --cx-text2:#94a3b8; --cx-muted:#475569;
     --cx-green:#10b981; --cx-amber:#f59e0b; --cx-red:#ef4444;
     --cx-sb-w:220px; --r:16px; --r-sm:10px; --r-xs:7px;
 }
-html,body { margin:0; font-family:'Segoe UI',system-ui,sans-serif; background:var(--cx-bg) !important; color:var(--cx-text); -webkit-font-smoothing:antialiased; }
+html,body { margin:0; font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif; background:var(--cx-bg) !important; color:var(--cx-text); -webkit-font-smoothing:antialiased; }
 a { text-decoration:none; color:inherit; }
 body.cx-dashboard > nav, body.cx-dashboard > header, body.cx-dashboard .navbar,
 body.cx-dashboard > .topbar-global, body.cx-dashboard .app-footer, body.cx-dashboard .app-flash { display:none !important; }
@@ -53,20 +53,20 @@ body.cx-dashboard > main.app-main { padding:0 !important; margin:0 !important; m
 /* ══ SIDEBAR ══ */
 .cx-sidebar {
     position:fixed; top:0; left:0; bottom:0; width:var(--cx-sb-w);
-    background:linear-gradient(180deg,#0f0f59 0%,#0e0e16 40%,#10103a 100%);
+    background:linear-gradient(180deg,#0B1E3D 0%,#081831 55%,#0B1E3D 100%);
     display:flex; flex-direction:column;
-    border-right:1px solid rgba(99,102,241,.15);
+    border-right:1px solid rgba(31,124,246,.15);
     box-shadow:6px 0 30px rgba(0,0,0,.35);
     z-index:1200; overflow-y:auto;
-    scrollbar-width:thin; scrollbar-color:rgba(124,58,237,.3) transparent;
+    scrollbar-width:thin; scrollbar-color:rgba(31,124,246,.3) transparent;
     transition:transform .25s cubic-bezier(.23,1,.32,1);
 }
 .cx-sidebar::-webkit-scrollbar { width:3px; }
-.cx-sidebar::-webkit-scrollbar-thumb { background:rgba(124,58,237,.3); border-radius:3px; }
+.cx-sidebar::-webkit-scrollbar-thumb { background:rgba(31,124,246,.3); border-radius:3px; }
 .cx-brand-hd { padding:14px 14px 10px; border-bottom:1px solid rgba(255,255,255,.06); flex-shrink:0; }
 .cx-brand-top { display:flex; align-items:center; justify-content:space-between; }
 .cx-logo { display:flex; align-items:center; gap:9px; color:#fff; font-size:16px; font-weight:800; }
-.cx-logo-icon { width:34px; height:34px; border-radius:9px; background:linear-gradient(135deg,#7c3aed,#4f46e5); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.cx-logo-icon { width:34px; height:34px; border-radius:9px; background:linear-gradient(135deg,#1668D8,#1260C9); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
 .cx-sys-badge { display:inline-flex; align-items:center; gap:5px; font-size:10px; font-weight:600; color:var(--cx-green); padding:3px 8px; border-radius:20px; background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.2); margin-top:8px; }
 .cx-sys-dot { width:6px; height:6px; border-radius:50%; background:var(--cx-green); animation:blink 2.2s ease-in-out infinite; flex-shrink:0; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
@@ -75,22 +75,22 @@ body.cx-dashboard > main.app-main { padding:0 !important; margin:0 !important; m
 .cx-nav { padding:8px 8px 12px; flex:1; }
 .cx-nav-sec { font-size:10px; font-weight:800; letter-spacing:1.6px; color:rgba(255,255,255,.58); padding:14px 10px 5px; text-transform:uppercase; }
 .cx-nav-item { display:flex; align-items:center; gap:10px; padding:8px 11px; border-radius:var(--r-xs); color:rgba(255,255,255,.85); font-size:13.5px; font-weight:600; transition:all .22s; position:relative; cursor:pointer; margin-bottom:2px; border:1px solid transparent; }
-.cx-nav-item:hover { background:rgba(124,58,237,.18); color:#fff; border-color:rgba(124,58,237,.25); }
-.cx-nav-item.active { background:linear-gradient(90deg,rgba(124,58,237,.35),rgba(99,102,241,.2)); color:#fff; font-weight:700; border-color:rgba(139,92,246,.3); }
-.cx-nav-item.active::before { content:''; position:absolute; left:0; top:50%; transform:translateY(-50%); width:3px; height:22px; background:linear-gradient(180deg,#a78bfa,#7c3aed); border-radius:0 3px 3px 0; }
+.cx-nav-item:hover { background:rgba(31,124,246,.18); color:#fff; border-color:rgba(31,124,246,.25); }
+.cx-nav-item.active { background:linear-gradient(90deg,rgba(31,124,246,.35),rgba(31,124,246,.2)); color:#fff; font-weight:700; border-color:rgba(31,124,246,.3); }
+.cx-nav-item.active::before { content:''; position:absolute; left:0; top:50%; transform:translateY(-50%); width:3px; height:22px; background:linear-gradient(180deg,#7DB4FF,#1668D8); border-radius:0 3px 3px 0; }
 .cx-nav-ico { width:26px; height:26px; border-radius:7px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.07); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .22s; }
 .cx-nav-ico svg { display:block; }
-.cx-nav-item:hover .cx-nav-ico { background:rgba(139,92,246,.25); box-shadow:0 0 8px rgba(139,92,246,.3); }
-.cx-nav-item.active .cx-nav-ico { background:rgba(139,92,246,.3); border-color:rgba(139,92,246,.4); box-shadow:0 0 10px rgba(139,92,246,.4); }
+.cx-nav-item:hover .cx-nav-ico { background:rgba(31,124,246,.25); box-shadow:0 0 8px rgba(31,124,246,.3); }
+.cx-nav-item.active .cx-nav-ico { background:rgba(31,124,246,.3); border-color:rgba(31,124,246,.4); box-shadow:0 0 10px rgba(31,124,246,.4); }
 .cx-user-foot { padding:10px 12px 14px; border-top:1px solid rgba(255,255,255,.07); flex-shrink:0; }
 .cx-user-row { display:flex; align-items:center; gap:9px; margin-bottom:10px; }
-.cx-user-av { width:32px; height:32px; border-radius:9px; background:linear-gradient(135deg,#7c3aed,#4f46e5); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; flex-shrink:0; }
+.cx-user-av { width:32px; height:32px; border-radius:9px; background:linear-gradient(135deg,#1668D8,#1260C9); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; flex-shrink:0; }
 .cx-user-name { font-size:12px; font-weight:700; color:var(--cx-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.cx-user-role { font-size:10px; color:var(--cx-text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cx-user-role { font-size:10px; color:rgba(255,255,255,.62); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .cx-logout-btn { background:none; border:none; color:var(--cx-muted); cursor:pointer; font-size:16px; padding:3px 5px; border-radius:5px; transition:color .2s; }
 .cx-logout-btn:hover { color:var(--cx-red); }
 .cx-dark-row { display:flex; align-items:center; justify-content:space-between; cursor:pointer; padding:4px 2px; border-radius:6px; user-select:none; }
-.cx-dark-lbl { font-size:11px; color:var(--cx-text2); }
+.cx-dark-lbl { font-size:11px; color:rgba(255,255,255,.72); }
 .cx-toggle { width:32px; height:17px; border-radius:9px; background:rgba(255,255,255,.12); position:relative; transition:background .25s; }
 .cx-toggle::after { content:''; position:absolute; left:2px; top:2px; width:13px; height:13px; border-radius:50%; background:#fff; transition:transform .25s; }
 .cx-toggle.on { background:var(--cx-brand); }
@@ -103,7 +103,7 @@ body.cx-dashboard > main.app-main { padding:0 !important; margin:0 !important; m
 .cx-topbar-title { font-size:14px; font-weight:700; color:var(--cx-text); }
 .cx-topbar-sub { font-size:12px; color:var(--cx-text2); }
 .cx-tb-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
-.cx-tb-av { width:30px; height:30px; border-radius:8px; background:linear-gradient(135deg,#7c3aed,#4f46e5); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; }
+.cx-tb-av { width:30px; height:30px; border-radius:8px; background:linear-gradient(135deg,#1668D8,#1260C9); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; }
 
 /* ══ RESPONSIVE SIDEBAR ══ */
 @media (max-width:768px) {
@@ -121,12 +121,12 @@ body.cx-dashboard > main.app-main { padding:0 !important; margin:0 !important; m
 
 /* ══ LIGHT MODE ══ */
 body.cx-light {
-    --cx-bg:#f5f7fa; --cx-surface:#ffffff; --cx-surface2:#eef1f7;
+    --cx-bg:#F6F9FF; --cx-surface:#ffffff; --cx-surface2:#EEF3FB;
     --cx-sb:#1e2035; --cx-border:rgba(0,0,0,.08);
-    --cx-text:#1a1d2e; --cx-text2:#6b7280; --cx-muted:#9ca3af;
+    --cx-text:#1a1d2e; --cx-text2:#62627C; --cx-muted:#9ca3af;
 }
 body.cx-light .cx-topbar { background:#fff; border-bottom:1px solid #e5e7eb; }
-body.cx-light .cx-main { background:#f5f7fa; }
+body.cx-light .cx-main { background:#F6F9FF; }
 
 /* ══ SETTINGS CONTENT ══ */
 .pm-body {
@@ -141,7 +141,7 @@ body.cx-light .cx-main { background:#f5f7fa; }
 
 /* ── Banner ── */
 .pm-banner {
-    background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 60%, #7c3aed 100%);
+    background: linear-gradient(135deg, #0F2547 0%, #1260C9 60%, #1668D8 100%);
     border-radius: var(--r);
     padding: 1.5rem 2rem;
     display: flex;
@@ -220,13 +220,13 @@ body.cx-light .pm-field textarea,
 body.cx-light .pm-field select {
     border-color: #e5e7eb;
     background: #f9fafb;
-    color: #111827;
+    color: #16162A;
 }
 .pm-field input:focus,
 .pm-field textarea:focus,
 .pm-field select:focus {
     border-color: var(--cx-brand);
-    box-shadow: 0 0 0 3px rgba(124,58,237,.18);
+    box-shadow: 0 0 0 3px rgba(31,124,246,.18);
 }
 .pm-field textarea { resize: vertical; min-height: 80px; }
 .pm-field .is-invalid { border-color: var(--cx-red) !important; }
@@ -272,9 +272,9 @@ body.cx-light .pm-field select {
     transition: border-color .2s, background .2s;
     position: relative;
 }
-.pm-img-zone:hover { border-color: var(--cx-brand); background: rgba(124,58,237,.06); }
+.pm-img-zone:hover { border-color: var(--cx-brand); background: rgba(31,124,246,.06); }
 body.cx-light .pm-img-zone { border-color: #d1d5db; }
-body.cx-light .pm-img-zone:hover { border-color: #7c3aed; background: #f5f0ff; }
+body.cx-light .pm-img-zone:hover { border-color: #1668D8; background: #f5f0ff; }
 .pm-img-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
 .pm-img-current { display:flex; align-items:center; gap:1rem; pointer-events:none; }
 .pm-img-current img { width:56px; height:56px; object-fit:cover; border-radius:10px; border:2px solid rgba(255,255,255,.12); }
@@ -299,7 +299,7 @@ body.cx-light .pm-img-zone:hover { border-color: #7c3aed; background: #f5f0ff; }
 .pm-btn-spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: pm-btn-spin .7s linear infinite; flex-shrink: 0; display: none; }
 .pm-btn.is-loading .pm-btn-spinner { display: inline-block; }
 @keyframes pm-btn-spin { to { transform: rotate(360deg); } }
-.pm-btn-primary { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; box-shadow: 0 3px 12px rgba(124,58,237,.35); }
+.pm-btn-primary { background: linear-gradient(135deg, #1668D8, #1260C9); color: #fff; box-shadow: 0 3px 12px rgba(31,124,246,.35); }
 .pm-btn-green   { background: linear-gradient(135deg, #10b981, #059669); color: #fff; box-shadow: 0 3px 12px rgba(16,185,129,.3); }
 .pm-btn-red     { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; box-shadow: 0 3px 12px rgba(239,68,68,.3); }
 .pm-btn-actions { display: flex; justify-content: flex-end; margin-top: 1.25rem; }
@@ -346,7 +346,7 @@ body.cx-light .pw-strength { background: #e5e7eb; }
             @if(!$isBusiness)
                 @php
                     $pctO = $maxOrders > 0 ? $usedOrders / $maxOrders : 0;
-                    $colO = $pctO >= 1 ? '#ef4444' : ($pctO >= 0.7 ? '#f59e0b' : '#7c3aed');
+                    $colO = $pctO >= 1 ? '#ef4444' : ($pctO >= 0.7 ? '#f59e0b' : '#1668D8');
                 @endphp
                 <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:{{ $colO }};color:#fff;">
                     {{ $usedOrders }}/{{ $maxOrders }}
@@ -361,7 +361,7 @@ body.cx-light .pw-strength { background: #e5e7eb; }
             @if(!$isBusiness)
                 @php
                     $pctD = $maxDrivers > 0 ? $totalDrivers / $maxDrivers : 0;
-                    $colD = $pctD >= 1 ? '#ef4444' : ($pctD >= 0.7 ? '#f59e0b' : '#7c3aed');
+                    $colD = $pctD >= 1 ? '#ef4444' : ($pctD >= 0.7 ? '#f59e0b' : '#1668D8');
                 @endphp
                 <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:{{ $colD }};color:#fff;">
                     {{ $totalDrivers }}/{{ $maxDrivers }}
@@ -381,7 +381,7 @@ body.cx-light .pw-strength { background: #e5e7eb; }
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span>
             Carte en direct
             @if(!$isBusiness)
-                <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#f59e0b;color:#1c1917;">🔒</span>
+                <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>
             @endif
         </a>
 
@@ -403,7 +403,7 @@ body.cx-light .pw-strength { background: #e5e7eb; }
             @if(!$isBusiness)
                 @php
                     $pctZ = $maxZones > 0 ? $totalZones / $maxZones : 0;
-                    $colZ = $pctZ >= 1 ? '#ef4444' : ($pctZ >= 0.7 ? '#f59e0b' : '#7c3aed');
+                    $colZ = $pctZ >= 1 ? '#ef4444' : ($pctZ >= 0.7 ? '#f59e0b' : '#1668D8');
                 @endphp
                 <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:{{ $colZ }};color:#fff;">
                     {{ $totalZones }}/{{ $maxZones }}
@@ -423,7 +423,7 @@ body.cx-light .pw-strength { background: #e5e7eb; }
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
             Rapport
             @if(!$isBusiness)
-                <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#f59e0b;color:#1c1917;">🔒</span>
+                <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>
             @endif
         </a>
 
@@ -442,7 +442,7 @@ body.cx-light .pw-strength { background: #e5e7eb; }
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
             Utilisateurs
             @if(!$isBusiness)
-                <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#f59e0b;color:#1c1917;">🔒</span>
+                <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>
             @endif
         </a>
 
@@ -502,7 +502,7 @@ body.cx-light .pw-strength { background: #e5e7eb; }
         {{-- ══ SECTION 1 : Informations ══ --}}
         <div class="pm-section">
             <div class="pm-section-head">
-                <div class="sh-icon" style="background:rgba(124,58,237,.15)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg></div>
+                <div class="sh-icon" style="background:rgba(31,124,246,.15)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7DB4FF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg></div>
                 <div>
                     <h3>Informations de l'entreprise</h3>
                     <p>Nom, description, contacts et logo</p>
@@ -676,7 +676,7 @@ body.cx-light .pw-strength { background: #e5e7eb; }
                     <div class="pm-grid">
                         @if(auth()->user()->google_id)
                         <div class="pm-field col-full" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(34,197,94,.1);border:1.5px solid rgba(34,197,94,.35);border-radius:8px">
-                            <span style="font-size:20px">🔗</span>
+                            <span style="font-size:20px">{!! \App\Support\IconLibrary::svg('link', '', 14) !!}</span>
                             <div>
                                 <div style="font-size:13px;font-weight:700;color:#15803d">Compte connecté via Google</div>
                                 <div style="font-size:12px;color:#166534;margin-top:2px">Vous pouvez définir un mot de passe directement sans saisir l'ancien. Vous pourrez ensuite vous connecter avec ce mot de passe ou continuer avec Google.</div>
@@ -730,7 +730,7 @@ body.cx-light .pw-strength { background: #e5e7eb; }
     const saved = localStorage.getItem('cx-theme');
     const body  = document.body;
     const tog   = document.getElementById('cxToggle');
-    if (saved === 'light') { body.classList.add('cx-light'); } else { tog?.classList.add('on'); }
+    if (saved !== 'dark') { body.classList.add('cx-light'); } else { tog?.classList.add('on'); }
     document.getElementById('cxThemeRow')?.addEventListener('click', () => {
         const isLight = body.classList.toggle('cx-light');
         tog?.classList.toggle('on', !isLight);
@@ -795,6 +795,23 @@ body.cx-light .pw-strength { background: #e5e7eb; }
     guardSubmit('pmInfoForm',     'pmInfoBtn',     'Enregistrement…');
     guardSubmit('pmCountryForm',  'pmCountryBtn',  'Mise à jour…');
     guardSubmit('pmPasswordForm', 'pmPasswordBtn', 'Changement en cours…');
+})();
+</script>
+<style>.cx-dark-row:focus-visible{outline:2px solid #7DB4FF;outline-offset:2px}</style>
+<script>
+/* Interrupteur « Mode sombre » : même comportement sur toutes les pages (clavier et lecteur d'écran) */
+(function () {
+    var row = document.querySelector('.cx-dark-row'), sw = row && row.querySelector('.cx-toggle');
+    if (!row || !sw) return;
+    row.setAttribute('role', 'switch');
+    row.setAttribute('tabindex', '0');
+    row.setAttribute('aria-label', 'Mode sombre');
+    var sync = function () { row.setAttribute('aria-checked', sw.classList.contains('on') ? 'true' : 'false'); };
+    new MutationObserver(sync).observe(sw, { attributes: true, attributeFilter: ['class'] });
+    row.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); }
+    });
+    sync();
 })();
 </script>
 @endpush

@@ -250,20 +250,23 @@ Route::post('/shops/{shop}/clic', [PublicShopController::class, 'click'])
 Route::get('/shops/{shop}/catalogue-meta.csv', [\App\Http\Controllers\CatalogFeedController::class, 'meta'])
     ->name('public.shops.catalog');
 
-/* Suivi de commande (public — lien partageable) */
+/* Suivi de commande : client, personnel concerné, ou lien signé partagé (voir App\Support\OrderAccess) */
 Route::get('/suivi/{order}', [SuiviController::class, 'show'])
     ->name('suivi.show');
 
-/* Position GPS publique pour le suivi (pas d'auth requise) */
+/* Position GPS pour le suivi */
 Route::get('/suivi/{order}/position', [SuiviController::class, 'position'])
+    ->middleware('throttle:60,1')
     ->name('suivi.position');
 
 /* Données complètes pour le rafraîchissement auto (statut + GPS + livreur) */
 Route::get('/suivi/{order}/data', [SuiviController::class, 'data'])
+    ->middleware('throttle:60,1')
     ->name('suivi.data');
 
-/* Position GPS du client (public — envoyée depuis la page de suivi) */
+/* Position GPS du client, envoyée depuis la page de suivi */
 Route::post('/suivi/{order}/client-location', [SuiviController::class, 'updateClientLocation'])
+    ->middleware('throttle:30,1')
     ->name('suivi.client-location');
 
 /* Liste publique des entreprises de livraison (accessible sans connexion) */
@@ -961,7 +964,9 @@ Route::middleware(['auth', 'role:client'])
         Route::resource('orders', OrderController::class)->only(['index', 'store', 'create']);
         Route::post('/orders/badge-seen', [ClientOrderController::class, 'markBadgeSeen'])->name('orders.badge-seen');
         Route::get('/orders/{order}/invoice', [ClientOrderController::class, 'downloadInvoice'])->name('orders.invoice');
-       
+        Route::post('/orders/{order}/cancel',  [\App\Http\Controllers\Client\OrderActionController::class, 'cancel'])->name('orders.cancel');
+        Route::post('/orders/{order}/reorder', [\App\Http\Controllers\Client\OrderActionController::class, 'reorder'])->name('orders.reorder');
+
         
 
         /* Avis sur une commande */
@@ -982,6 +987,13 @@ Route::middleware(['auth', 'role:client'])
         /* Liste de souhaits produit */
         Route::get('/wishlist', [\App\Http\Controllers\Client\ProductFavoriteController::class, 'index'])->name('wishlist.index');
         Route::post('/products/{product}/favorite', [\App\Http\Controllers\Client\ProductFavoriteController::class, 'toggle'])->name('products.favorite.toggle');
+        Route::post('/products/{product}/stock-alert', [\App\Http\Controllers\Client\StockAlertController::class, 'toggle'])->name('products.stock-alert');
+
+        /* Carnet d'adresses */
+        Route::get('/adresses',                       [\App\Http\Controllers\Client\AddressController::class, 'index'])      ->name('addresses.index');
+        Route::post('/adresses',                      [\App\Http\Controllers\Client\AddressController::class, 'store'])      ->name('addresses.store');
+        Route::post('/adresses/{address}/principale', [\App\Http\Controllers\Client\AddressController::class, 'makeDefault'])->name('addresses.default');
+        Route::delete('/adresses/{address}',          [\App\Http\Controllers\Client\AddressController::class, 'destroy'])    ->name('addresses.destroy');
 
         /* Favoris */
         Route::post('/favorites/{shop}/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
@@ -1010,10 +1022,10 @@ Route::prefix('client')->name('client.')->group(function () {
 
     /* Commander depuis un produit spécifique — invité ou client connecté */
     Route::get('/orders/create-from-product/{product}', [ClientOrderController::class, 'createFromProduct'])->name('orders.createFromProduct');
-    Route::post('/orders/store-product',                 [ClientOrderController::class, 'storeProduct'])     ->name('orders.storeProduct');
+    Route::post('/orders/store-product',                 [ClientOrderController::class, 'storeProduct'])     ->middleware('throttle:10,1')->name('orders.storeProduct');
 
     /* Vérification AJAX d'un code promo (aperçu du total avant validation de la commande) */
-    Route::post('/orders/promo/check', [ClientOrderController::class, 'checkPromoCode'])->name('orders.promo.check');
+    Route::post('/orders/promo/check', [ClientOrderController::class, 'checkPromoCode'])->middleware('throttle:30,1')->name('orders.promo.check');
 });
 
 

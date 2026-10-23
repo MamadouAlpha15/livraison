@@ -20,6 +20,12 @@ class ProductVariant extends Model
         static::updated(function (ProductVariant $variant) {
             if ($variant->wasChanged('stock')) {
                 app(StockAlertService::class)->checkVariant($variant);
+
+                // Une variante revient en stock : le produit redevient commandable
+                $before = $variant->getOriginal('stock');
+                if ($before !== null && $before <= 0 && $variant->stock > 0 && $variant->product) {
+                    app(\App\Services\ClientProductAlertService::class)->productRestocked($variant->product);
+                }
             }
         });
     }

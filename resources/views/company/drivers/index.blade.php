@@ -15,20 +15,20 @@
 })();
 </script>
 <style>
-html.cx-prelight body { background:#F5F7FA !important; }
+html.cx-prelight body { background:#F6F9FF !important; }
 </style>
 <style>
 *,*::before,*::after { box-sizing:border-box; }
 
 :root {
-    --cx-bg:        #0b0d22;
-    --cx-surface:   #0d1226;
-    --cx-surface2:  #111930;
-    --cx-sb:        #06070f;
+    --cx-bg:        #071630;
+    --cx-surface:   #0B1E3D;
+    --cx-surface2:  #132B52;
+    --cx-sb:        #061226;
     --cx-border:    rgba(255,255,255,.07);
-    --cx-brand:     #7c3aed;
-    --cx-brand2:    #6d28d9;
-    --cx-brand-lt:  #a78bfa;
+    --cx-brand:     #1668D8;
+    --cx-brand2:    #1260C9;
+    --cx-brand-lt:  #7DB4FF;
     --cx-text:      #e2e8f0;
     --cx-text2:     #94a3b8;
     --cx-muted:     #475569;
@@ -42,7 +42,7 @@ html.cx-prelight body { background:#F5F7FA !important; }
 }
 
 html, body {
-    margin:0; font-family:'Segoe UI',system-ui,sans-serif;
+    margin:0; font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
     background:var(--cx-bg) !important;
     color:var(--cx-text); -webkit-font-smoothing:antialiased;
 }
@@ -67,23 +67,23 @@ body.cx-dashboard > main.app-main {
 /* ══ SIDEBAR ══ */
 .cx-sidebar {
     position:fixed; top:0; left:0; bottom:0; width:var(--cx-sb-w);
-    background:linear-gradient(180deg,#0f0f59 0%,#0e0e16 40%,#10103a 100%);
+    background:linear-gradient(180deg,#0B1E3D 0%,#081831 55%,#0B1E3D 100%);
     display:flex; flex-direction:column;
-    border-right:1px solid rgba(99,102,241,.15);
+    border-right:1px solid rgba(31,124,246,.15);
     box-shadow:6px 0 30px rgba(0,0,0,.35);
     z-index:1200; overflow-y:auto;
-    scrollbar-width:thin; scrollbar-color:rgba(124,58,237,.3) transparent;
+    scrollbar-width:thin; scrollbar-color:rgba(31,124,246,.3) transparent;
     transition:transform .25s cubic-bezier(.23,1,.32,1);
 }
 .cx-sidebar::-webkit-scrollbar { width:3px; }
-.cx-sidebar::-webkit-scrollbar-thumb { background:rgba(124,58,237,.3); border-radius:3px; }
+.cx-sidebar::-webkit-scrollbar-thumb { background:rgba(31,124,246,.3); border-radius:3px; }
 /* Brand */
 .cx-brand-hd { padding:14px 14px 10px; border-bottom:1px solid rgba(255,255,255,.06); flex-shrink:0; }
 .cx-brand-top { display:flex; align-items:center; justify-content:space-between; }
 .cx-logo { display:flex; align-items:center; gap:9px; color:#fff; font-size:16px; font-weight:800; }
 .cx-logo-icon {
     width:34px; height:34px; border-radius:9px;
-    background:linear-gradient(135deg,#7c3aed,#4f46e5);
+    background:linear-gradient(135deg,#1668D8,#1260C9);
     display:flex; align-items:center; justify-content:center;
     font-size:16px; flex-shrink:0;
 }
@@ -109,13 +109,13 @@ body.cx-dashboard > main.app-main {
     transition:all .22s cubic-bezier(.23,1,.32,1); position:relative;
     cursor:pointer; margin-bottom:2px; border:1px solid transparent;
 }
-.cx-nav-item:hover { background:rgba(124,58,237,.18); color:#fff; border-color:rgba(124,58,237,.25); box-shadow:0 2px 12px rgba(124,58,237,.2),inset 0 1px 0 rgba(255,255,255,.06); }
-.cx-nav-item:hover .cx-nav-ico { background:rgba(139,92,246,.25); box-shadow:0 0 8px rgba(139,92,246,.3); }
-.cx-nav-item.active { background:linear-gradient(90deg,rgba(124,58,237,.35) 0%,rgba(99,102,241,.2) 100%); color:#fff; font-weight:700; border-color:rgba(139,92,246,.3); box-shadow:0 4px 16px rgba(124,58,237,.25),inset 0 1px 0 rgba(255,255,255,.08); }
+.cx-nav-item:hover { background:rgba(31,124,246,.18); color:#fff; border-color:rgba(31,124,246,.25); box-shadow:0 2px 12px rgba(31,124,246,.2),inset 0 1px 0 rgba(255,255,255,.06); }
+.cx-nav-item:hover .cx-nav-ico { background:rgba(31,124,246,.25); box-shadow:0 0 8px rgba(31,124,246,.3); }
+.cx-nav-item.active { background:linear-gradient(90deg,rgba(31,124,246,.35) 0%,rgba(31,124,246,.2) 100%); color:#fff; font-weight:700; border-color:rgba(31,124,246,.3); box-shadow:0 4px 16px rgba(31,124,246,.25),inset 0 1px 0 rgba(255,255,255,.08); }
 .cx-nav-item.active::before {
     content:''; position:absolute; left:0; top:50%; transform:translateY(-50%);
-    width:3px; height:22px; background:linear-gradient(180deg,#a78bfa,#7c3aed);
-    border-radius:0 3px 3px 0; box-shadow:2px 0 12px rgba(167,139,250,.7);
+    width:3px; height:22px; background:linear-gradient(180deg,#7DB4FF,#1668D8);
+    border-radius:0 3px 3px 0; box-shadow:2px 0 12px rgba(125,180,255,.7);
 }
 .cx-nav-ico {
     width:26px; height:26px; border-radius:7px;
@@ -124,8 +124,8 @@ body.cx-dashboard > main.app-main {
     font-size:13px; flex-shrink:0; transition:all .22s cubic-bezier(.23,1,.32,1);
 }
 .cx-nav-ico svg { display:block; }
-.cx-nav-item.active .cx-nav-ico { background:rgba(139,92,246,.3); border-color:rgba(139,92,246,.4); box-shadow:0 0 10px rgba(139,92,246,.4); }
-.cx-nav-item.active:hover { background:linear-gradient(90deg,rgba(124,58,237,.45) 0%,rgba(99,102,241,.3) 100%); box-shadow:0 4px 20px rgba(124,58,237,.35),inset 0 1px 0 rgba(255,255,255,.1); }
+.cx-nav-item.active .cx-nav-ico { background:rgba(31,124,246,.3); border-color:rgba(31,124,246,.4); box-shadow:0 0 10px rgba(31,124,246,.4); }
+.cx-nav-item.active:hover { background:linear-gradient(90deg,rgba(31,124,246,.45) 0%,rgba(31,124,246,.3) 100%); box-shadow:0 4px 20px rgba(31,124,246,.35),inset 0 1px 0 rgba(255,255,255,.1); }
 .cx-nav-badge {
     margin-left:auto; background:var(--cx-brand); color:#fff;
     font-size:9.5px; font-weight:700; padding:1px 6px;
@@ -143,12 +143,12 @@ body.cx-dashboard > main.app-main {
 .cx-user-row:hover { background:rgba(255,255,255,.08); }
 .cx-user-av {
     width:32px; height:32px; border-radius:50%;
-    background:linear-gradient(135deg,#7c3aed,#4338ca);
+    background:linear-gradient(135deg,#1668D8,#1260C9);
     display:flex; align-items:center; justify-content:center;
     font-size:11px; font-weight:800; color:#fff; flex-shrink:0;
 }
 .cx-user-name { font-size:12px; font-weight:700; color:#fff; line-height:1.2; }
-.cx-user-role { font-size:10px; color:var(--cx-text2); }
+.cx-user-role { font-size:10px; color:rgba(255,255,255,.62); }
 .cx-logout-btn {
     width:30px; height:30px; border-radius:8px; flex-shrink:0;
     background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.2);
@@ -157,7 +157,7 @@ body.cx-dashboard > main.app-main {
 }
 .cx-logout-btn:hover { background:rgba(239,68,68,.22); color:#fff; }
 .cx-dark-row { display:flex; align-items:center; justify-content:space-between; padding:4px 8px; cursor:pointer; }
-.cx-dark-lbl { font-size:11.5px; color:var(--cx-text2); }
+.cx-dark-lbl { font-size:11.5px; color:rgba(255,255,255,.72); }
 .cx-toggle { width:34px; height:18px; background:#475569; border-radius:9px; position:relative; transition:background .25s; flex-shrink:0; }
 .cx-toggle::after { content:''; position:absolute; top:3px; left:3px; width:12px; height:12px; background:#fff; border-radius:50%; transition:left .25s; }
 .cx-toggle.on { background:var(--cx-brand); }
@@ -193,21 +193,21 @@ body.cx-dashboard > main.app-main {
 .cx-tb-btn:hover { background:rgba(255,255,255,.1); color:#fff; }
 .cx-tb-user { display:flex; align-items:center; gap:8px; cursor:pointer; padding:5px 10px; border-radius:8px; transition:background .14s; flex-shrink:0; min-width:0; }
 .cx-tb-user:hover { background:rgba(255,255,255,.06); }
-.cx-tb-av { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#7c3aed,#4338ca); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#fff; flex-shrink:0; }
+.cx-tb-av { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#1668D8,#1260C9); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#fff; flex-shrink:0; }
 .cx-tb-uname { font-size:12.5px; font-weight:700; color:var(--cx-text); line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:120px; }
 .cx-tb-urole { font-size:10px; color:var(--cx-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:120px; }
 
 /* ══ MODE CLAIR ══ */
 body.cx-light {
-    --cx-bg:       #F5F7FA;
+    --cx-bg:       #F6F9FF;
     --cx-surface:  #ffffff;
-    --cx-surface2: #eef1f7;
+    --cx-surface2: #EEF3FB;
     --cx-border:   rgba(0,0,0,.08);
-    --cx-text:     #111827;
-    --cx-text2:    #4b5563;
+    --cx-text:     #16162A;
+    --cx-text2:    #45455E;
     --cx-muted:    #9ca3af;
 }
-body.cx-light, html.cx-light, html.cx-light body { background:#F5F7FA !important; }
+body.cx-light, html.cx-light, html.cx-light body { background:#F6F9FF !important; }
 body.cx-light .cx-topbar { background:#fff; border-bottom-color:rgba(0,0,0,.07); box-shadow:0 1px 4px rgba(0,0,0,.06); }
 body.cx-light .cx-tb-btn { background:rgba(0,0,0,.05); border-color:rgba(0,0,0,.08); color:#374151; }
 body.cx-light .cx-tb-btn:hover { background:rgba(0,0,0,.1); color:#111; }
@@ -217,7 +217,7 @@ body.cx-light .cx-tb-btn:hover { background:rgba(0,0,0,.1); color:#111; }
 
 /* Banner */
 .page-banner {
-    background:linear-gradient(135deg,#1e1b4b 0%,#2d2470 35%,#3d1fa5 65%,#5b21b6 100%);
+    background:linear-gradient(135deg,#0B1E3D 0%,#0F2547 35%,#163A6E 65%,#1260C9 100%);
     padding:28px 32px 24px; position:relative; overflow:hidden;
 }
 .banner-grid {
@@ -225,7 +225,7 @@ body.cx-light .cx-tb-btn:hover { background:rgba(0,0,0,.1); color:#111; }
     background-image: linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px), linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
     background-size:44px 44px;
 }
-.banner-glow  { position:absolute; top:-100px; right:-60px; width:400px; height:400px; border-radius:50%; background:radial-gradient(circle,rgba(124,58,237,.2) 0%,transparent 65%); pointer-events:none; }
+.banner-glow  { position:absolute; top:-100px; right:-60px; width:400px; height:400px; border-radius:50%; background:radial-gradient(circle,rgba(31,124,246,.2) 0%,transparent 65%); pointer-events:none; }
 .banner-glow2 { position:absolute; bottom:-80px; left:-40px; width:280px; height:280px; border-radius:50%; background:radial-gradient(circle,rgba(59,130,246,.1) 0%,transparent 65%); pointer-events:none; }
 .banner-inner { max-width:1200px; margin:0 auto; position:relative; z-index:1; }
 .banner-top { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:20px; }
@@ -240,7 +240,7 @@ body.cx-light .cx-tb-btn:hover { background:rgba(0,0,0,.1); color:#111; }
 .stats-bar { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
 .stat-pill { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.11); border-radius:var(--r-sm); padding:14px 16px; backdrop-filter:blur(4px); position:relative; overflow:hidden; transition:background .15s; }
 .stat-pill:hover { background:rgba(255,255,255,.1); }
-.stat-pill::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--s-accent,#a78bfa); }
+.stat-pill::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--s-accent,#7DB4FF); }
 .stat-pill-ico { font-size:16px; margin-bottom:5px; }
 .stat-pill-val { font-size:22px; font-weight:900; color:#fff; line-height:1; letter-spacing:-.6px; }
 .stat-pill-lbl { font-size:10px; font-weight:600; color:rgba(255,255,255,.48); text-transform:uppercase; letter-spacing:.5px; margin-top:4px; }
@@ -261,14 +261,14 @@ body.cx-light .cx-tb-btn:hover { background:rgba(0,0,0,.1); color:#111; }
 .search-ico { position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--cx-muted); pointer-events:none; }
 .search-input { width:100%; padding:9px 12px 9px 35px; background:var(--cx-surface2); border:1px solid var(--cx-border); border-radius:var(--r-xs); color:var(--cx-text); font-size:13px; font-family:inherit; outline:none; transition:border-color .15s; }
 .search-input::placeholder { color:var(--cx-muted); }
-.search-input:focus { border-color:var(--cx-brand); box-shadow:0 0 0 3px rgba(124,58,237,.12); }
+.search-input:focus { border-color:var(--cx-brand); box-shadow:0 0 0 3px rgba(31,124,246,.12); }
 
 /* ── DRIVER GRID ── */
 .drivers-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:18px; }
 
 /* Driver card */
 .driver-card { background:var(--cx-surface); border:1px solid var(--cx-border); border-radius:var(--r); overflow:hidden; transition:border-color .18s,box-shadow .18s,transform .18s; position:relative; }
-.driver-card:hover { border-color:rgba(124,58,237,.35); box-shadow:0 8px 32px rgba(124,58,237,.15),0 2px 8px rgba(0,0,0,.3); transform:translateY(-2px); }
+.driver-card:hover { border-color:rgba(31,124,246,.35); box-shadow:0 8px 32px rgba(31,124,246,.15),0 2px 8px rgba(0,0,0,.3); transform:translateY(-2px); }
 .driver-card-accent { height:3px; width:100%; }
 
 /* Card header */
@@ -282,7 +282,7 @@ body.cx-light .cx-tb-btn:hover { background:rgba(0,0,0,.1); color:#111; }
 .dot-off   { background:#475569; }
 .dc-actions { display:flex; gap:6px; flex-shrink:0; }
 .dc-action-btn { width:32px; height:32px; border-radius:var(--r-xs); display:flex; align-items:center; justify-content:center; border:1px solid var(--cx-border); background:var(--cx-surface2); color:var(--cx-text2); cursor:pointer; transition:all .14s; font-size:14px; }
-.dc-action-btn:hover { background:rgba(124,58,237,.15); border-color:rgba(124,58,237,.3); color:#c4b5fd; }
+.dc-action-btn:hover { background:rgba(31,124,246,.15); border-color:rgba(31,124,246,.3); color:#1F7CF6; }
 .dc-action-btn.del:hover { background:rgba(239,68,68,.1); border-color:rgba(239,68,68,.3); color:#f87171; }
 
 /* Card body */
@@ -311,7 +311,7 @@ body.cx-light .cx-tb-btn:hover { background:rgba(0,0,0,.1); color:#111; }
 
 /* Empty state */
 .empty-state { grid-column:1/-1; text-align:center; padding:64px 24px; display:flex; flex-direction:column; align-items:center; gap:14px; }
-.empty-ico-wrap { width:72px; height:72px; border-radius:20px; background:rgba(124,58,237,.1); border:1px solid rgba(124,58,237,.2); display:flex; align-items:center; justify-content:center; font-size:32px; }
+.empty-ico-wrap { width:72px; height:72px; border-radius:20px; background:rgba(31,124,246,.1); border:1px solid rgba(31,124,246,.2); display:flex; align-items:center; justify-content:center; font-size:32px; }
 .empty-title { font-size:17px; font-weight:800; color:var(--cx-text); }
 .empty-sub { font-size:13px; color:var(--cx-muted); max-width:320px; line-height:1.6; }
 
@@ -322,15 +322,15 @@ body.cx-light .cx-tb-btn:hover { background:rgba(0,0,0,.1); color:#111; }
 .modal-overlay.open .modal { transform:translateY(0) scale(1); }
 .modal-hd { padding:20px 24px; border-bottom:1px solid var(--cx-border); display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; background:var(--cx-surface); z-index:1; }
 .modal-title { font-size:15px; font-weight:900; color:var(--cx-text); display:flex; align-items:center; gap:9px; }
-.modal-title-ico { width:30px; height:30px; border-radius:8px; background:rgba(124,58,237,.2); border:1px solid rgba(124,58,237,.3); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+.modal-title-ico { width:30px; height:30px; border-radius:8px; background:rgba(31,124,246,.2); border:1px solid rgba(31,124,246,.3); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
 .modal-close { width:30px; height:30px; border-radius:var(--r-xs); background:var(--cx-surface2); border:1px solid var(--cx-border); display:flex; align-items:center; justify-content:center; color:var(--cx-text2); cursor:pointer; font-size:16px; transition:all .14s; }
 .modal-close:hover { background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.3); color:#f87171; }
 .modal-body { padding:22px 24px; }
 
 /* Avatar upload */
 .avatar-upload { display:flex; flex-direction:column; align-items:center; gap:12px; margin-bottom:22px; }
-.avatar-preview { width:90px; height:90px; border-radius:22px; background:linear-gradient(135deg,var(--cx-brand),var(--cx-brand2)); border:2px solid rgba(124,58,237,.3); display:flex; align-items:center; justify-content:center; font-size:36px; font-weight:900; color:#fff; overflow:hidden; cursor:pointer; position:relative; transition:all .18s; }
-.avatar-preview:hover { border-color:var(--cx-brand); box-shadow:0 0 0 4px rgba(124,58,237,.15); }
+.avatar-preview { width:90px; height:90px; border-radius:22px; background:linear-gradient(135deg,var(--cx-brand),var(--cx-brand2)); border:2px solid rgba(31,124,246,.3); display:flex; align-items:center; justify-content:center; font-size:36px; font-weight:900; color:#fff; overflow:hidden; cursor:pointer; position:relative; transition:all .18s; }
+.avatar-preview:hover { border-color:var(--cx-brand); box-shadow:0 0 0 4px rgba(31,124,246,.15); }
 .avatar-preview img { width:100%; height:100%; object-fit:cover; }
 .avatar-preview-overlay { position:absolute; inset:0; background:rgba(0,0,0,.5); display:flex; align-items:center; justify-content:center; font-size:22px; opacity:0; transition:opacity .15s; border-radius:20px; }
 .avatar-preview:hover .avatar-preview-overlay { opacity:1; }
@@ -343,12 +343,12 @@ body.cx-light .cx-tb-btn:hover { background:rgba(0,0,0,.1); color:#111; }
 .form-group.full { grid-column:1/-1; }
 .form-label { font-size:11.5px; font-weight:700; color:var(--cx-text2); text-transform:uppercase; letter-spacing:.5px; }
 .form-input { padding:11px 14px; background:var(--cx-surface2); border:1.5px solid var(--cx-border); border-radius:var(--r-sm); color:var(--cx-text); font-size:13.5px; font-family:inherit; outline:none; transition:border-color .15s,box-shadow .15s; }
-.form-input:focus { border-color:var(--cx-brand); box-shadow:0 0 0 3px rgba(124,58,237,.15); }
+.form-input:focus { border-color:var(--cx-brand); box-shadow:0 0 0 3px rgba(31,124,246,.15); }
 .form-input::placeholder { color:var(--cx-muted); }
 select.form-input { cursor:pointer; }
-select.form-input option { background:#1e1b4b; color:#e2e8f0; }
-.btn-submit { width:100%; padding:14px; margin-top:18px; background:linear-gradient(135deg,var(--cx-brand),var(--cx-brand2)); color:#fff; border:none; border-radius:var(--r-sm); font-size:14px; font-weight:800; font-family:inherit; cursor:pointer; box-shadow:0 4px 16px rgba(124,58,237,.4); transition:all .18s; display:flex; align-items:center; justify-content:center; gap:9px; }
-.btn-submit:hover { transform:translateY(-1px); box-shadow:0 6px 22px rgba(124,58,237,.5); }
+select.form-input option { background:#0B1E3D; color:#e2e8f0; }
+.btn-submit { width:100%; padding:14px; margin-top:18px; background:linear-gradient(135deg,var(--cx-brand),var(--cx-brand2)); color:#fff; border:none; border-radius:var(--r-sm); font-size:14px; font-weight:800; font-family:inherit; cursor:pointer; box-shadow:0 4px 16px rgba(31,124,246,.4); transition:all .18s; display:flex; align-items:center; justify-content:center; gap:9px; }
+.btn-submit:hover { transform:translateY(-1px); box-shadow:0 6px 22px rgba(31,124,246,.5); }
 .btn-submit:disabled { opacity:.6; cursor:not-allowed; transform:none; }
 
 /* Delete modal */
@@ -378,7 +378,7 @@ body.cx-light .filter-bar,
 body.cx-light .modal,
 body.cx-light .modal-hd { background:#fff; border-color:rgba(0,0,0,.08); }
 body.cx-light .driver-card { background:#fff; border-color:rgba(0,0,0,.07); }
-body.cx-light .driver-card:hover { border-color:rgba(124,58,237,.3); }
+body.cx-light .driver-card:hover { border-color:rgba(31,124,246,.3); }
 body.cx-light .dc-stats,
 body.cx-light .dc-status-info,
 body.cx-light .search-input,
@@ -438,14 +438,14 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
         <a href="{{ route('company.orders.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Commandes
             @if(!$isBusiness)
-                @php $oBg = $usedOrders >= $maxOrders ? '#ef4444' : ($usedOrders >= $maxOrders * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                @php $oBg = $usedOrders >= $maxOrders ? '#ef4444' : ($usedOrders >= $maxOrders * 0.7 ? '#f59e0b' : '#1668D8'); @endphp
                 <span class="cx-nav-badge" style="background:{{ $oBg }};margin-left:auto">{{ $usedOrders }}/{{ $maxOrders }}</span>
             @endif
         </a>
         <a href="{{ route('company.drivers.index') }}" class="cx-nav-item active">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></span> Chauffeurs
             @if(!$isBusiness)
-                @php $dBg = $totalDrivers >= $maxDrivers ? '#ef4444' : ($totalDrivers >= $maxDrivers * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                @php $dBg = $totalDrivers >= $maxDrivers ? '#ef4444' : ($totalDrivers >= $maxDrivers * 0.7 ? '#f59e0b' : '#1668D8'); @endphp
                 <span class="cx-nav-badge" style="background:{{ $dBg }};margin-left:auto">{{ $totalDrivers }}/{{ $maxDrivers }}</span>
             @endif
         </a>
@@ -454,7 +454,7 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
         </a>
         <a href="{{ $isBusiness ? route('company.carte.index') : route('company.subscription.upgrade') }}" class="cx-nav-item" @if(!$isBusiness) style="opacity:.6" title="Plan Business requis" @endif>
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span> Carte en direct
-            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917">🔒</span>@endif
+            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>@endif
         </a>
         <a href="{{ route('company.boutiques.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span> Boutiques
@@ -467,7 +467,7 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
         <a href="{{ route('company.zones.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span> Zone de livraison
             @if(!$isBusiness)
-                @php $zNavBg = $totalZones >= $maxZones ? '#ef4444' : ($totalZones >= $maxZones * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                @php $zNavBg = $totalZones >= $maxZones ? '#ef4444' : ($totalZones >= $maxZones * 0.7 ? '#f59e0b' : '#1668D8'); @endphp
                 <span class="cx-nav-badge" style="background:{{ $zNavBg }};margin-left:auto">{{ $totalZones }}/{{ $maxZones }}</span>
             @endif
         </a>
@@ -476,7 +476,7 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
         </a>
         <a href="{{ $isBusiness ? route('company.rapport.index') : route('company.subscription.upgrade') }}" class="cx-nav-item" @if(!$isBusiness) style="opacity:.6" title="Plan Business requis" @endif>
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span> Rapport
-            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917">🔒</span>@endif
+            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>@endif
         </a>
 
         <div class="cx-nav-sec">Configuration</div>
@@ -485,7 +485,7 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
         </a>
         <a href="{{ $isBusiness ? route('company.users.index') : route('company.subscription.upgrade') }}" class="cx-nav-item" @if(!$isBusiness) style="opacity:.6" title="Plan Business requis" @endif>
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Utilisateurs
-            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917">🔒</span>@endif
+            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>@endif
         </a>
         <a href="{{ route('company.support.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span> Support
@@ -562,8 +562,8 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
                 </div>
 
                 <div class="stats-bar">
-                    <div class="stat-pill" style="--s-accent:#a78bfa">
-                        <div class="stat-pill-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                    <div class="stat-pill" style="--s-accent:#7DB4FF">
+                        <div class="stat-pill-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7DB4FF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
                         <div class="stat-pill-val">{{ $stats['total'] }}</div>
                         <div class="stat-pill-lbl">Total</div>
                     </div>
@@ -595,13 +595,13 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
         <div class="pw">
 
             @if(session('success'))
-            <div class="flash flash-success">✅ {{ session('success') }}</div>
+            <div class="flash flash-success">{!! \App\Support\IconLibrary::svg('check', '', 14) !!} {{ session('success') }}</div>
             @endif
             @if(session('error'))
-            <div class="flash flash-error">❌ {{ session('error') }}</div>
+            <div class="flash flash-error">{!! \App\Support\IconLibrary::svg('x', '', 14) !!} {{ session('error') }}</div>
             @endif
             @if(session('plan_error'))
-            <div class="flash flash-error">🔒 {{ session('plan_error') }}</div>
+            <div class="flash flash-error">{!! \App\Support\IconLibrary::svg('lock', '', 14) !!} {{ session('plan_error') }}</div>
             @endif
 
             {{-- Filter bar --}}
@@ -632,7 +632,7 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
                     <div class="driver-card-accent" style="background:{{ $statusCfg['accent'] }}"></div>
                     <div class="dc-header">
                         <div class="dc-avatar-wrap">
-                            <div class="dc-avatar" style="background:linear-gradient(135deg,#7c3aed,#4f46e5)">
+                            <div class="dc-avatar" style="background:linear-gradient(135deg,#1668D8,#1260C9)">
                                 @if($driver->photo)
                                     <img src="{{ asset('storage/'.$driver->photo) }}" alt="{{ $driver->name }}">
                                 @else
@@ -703,13 +703,13 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
                 </div>
                 @empty
                 <div class="empty-state">
-                    <div class="empty-ico-wrap"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></div>
+                    <div class="empty-ico-wrap"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#7DB4FF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></div>
                     <div class="empty-title">Aucun chauffeur enregistré</div>
                     <div class="empty-sub">Commencez par ajouter votre premier chauffeur pour assigner des livraisons.</div>
                     @if($canAdd)
                     <a href="{{ route('company.drivers.create') }}" class="btn-add-driver" style="font-size:13px;padding:11px 20px;">+ Ajouter le premier chauffeur</a>
                     @else
-                    <a href="{{ route('company.subscription.upgrade') }}" class="btn-add-driver" style="font-size:13px;padding:11px 20px;background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3);box-shadow:none">🔒 Limite atteinte — Plan Business requis</a>
+                    <a href="{{ route('company.subscription.upgrade') }}" class="btn-add-driver" style="font-size:13px;padding:11px 20px;background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3);box-shadow:none">{!! \App\Support\IconLibrary::svg('lock', '', 14) !!} Limite atteinte — Plan Business requis</a>
                     @endif
                 </div>
                 @endforelse
@@ -736,7 +736,7 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
                 @csrf
                 <div class="avatar-upload">
                     <div class="avatar-preview" id="addAvatarPreview" onclick="document.getElementById('addPhotoInput').click()">
-                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg><div class="avatar-preview-overlay">📷</div>
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg><div class="avatar-preview-overlay">{!! \App\Support\IconLibrary::svg('camera', '', 16) !!}</div>
                     </div>
                     <div class="avatar-hint">Cliquez pour ajouter une photo (optionnel)</div>
                     <input type="file" name="photo" id="addPhotoInput" class="avatar-file-input" accept="image/*" onchange="previewAvatar(this,'addAvatarPreview')">
@@ -753,8 +753,8 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
                     <div class="form-group">
                         <label class="form-label">Statut initial</label>
                         <select name="status" class="form-input">
-                            <option value="available">🟢 Disponible</option>
-                            <option value="offline">⚫ Hors ligne</option>
+                            <option value="available">Disponible</option>
+                            <option value="offline">Hors ligne</option>
                         </select>
                     </div>
                 </div>
@@ -779,7 +779,7 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
                 @csrf @method('PUT')
                 <div class="avatar-upload">
                     <div class="avatar-preview" id="editAvatarPreview" onclick="document.getElementById('editPhotoInput').click()">
-                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><div class="avatar-preview-overlay">📷</div>
+                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><div class="avatar-preview-overlay">{!! \App\Support\IconLibrary::svg('camera', '', 16) !!}</div>
                     </div>
                     <div class="avatar-hint">Cliquez pour changer la photo</div>
                     <input type="file" name="photo" id="editPhotoInput" class="avatar-file-input" accept="image/*" onchange="previewAvatar(this,'editAvatarPreview')">
@@ -796,9 +796,9 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
                     <div class="form-group">
                         <label class="form-label">Statut</label>
                         <select name="status" id="editStatus" class="form-input">
-                            <option value="available">🟢 Disponible</option>
-                            <option value="busy">🟡 En mission</option>
-                            <option value="offline">⚫ Hors ligne</option>
+                            <option value="available">Disponible</option>
+                            <option value="busy">En mission</option>
+                            <option value="offline">Hors ligne</option>
                         </select>
                     </div>
                 </div>
@@ -843,13 +843,13 @@ body.cx-light .status-off { background:rgba(100,116,139,.06); color:#64748b; }
     const sw     = document.getElementById('cxDarkSwitch');
     const lbl    = document.getElementById('cxDarkLbl');
     const toggle = document.getElementById('cxDarkToggle');
-    const saved  = localStorage.getItem('cx-theme') || 'dark';
+    const saved  = localStorage.getItem('cx-theme') || 'light';
 
     function apply(theme) {
         if (theme === 'light') {
             body.classList.remove('cx-dark'); body.classList.add('cx-light');
             if (sw)  sw.classList.remove('on');
-            if (lbl) lbl.textContent = 'Mode clair';
+            if (lbl) lbl.textContent = 'Mode sombre';
         } else {
             body.classList.remove('cx-light'); body.classList.add('cx-dark');
             if (sw)  sw.classList.add('on');
@@ -894,7 +894,7 @@ function openEditModal(id, name, phone, status) {
     document.getElementById('editPhone').value  = phone;
     document.getElementById('editStatus').value = status;
     const prev = document.getElementById('editAvatarPreview');
-    prev.innerHTML = `✏️<div class="avatar-preview-overlay">📷</div>`;
+    prev.innerHTML = `{!! \App\Support\IconLibrary::svg('user', '', 28) !!}<div class="avatar-preview-overlay">{!! \App\Support\IconLibrary::svg('camera', '', 16) !!}</div>`;
     openModal('editModal');
 }
 
@@ -911,7 +911,7 @@ function previewAvatar(input, previewId) {
     const reader = new FileReader();
     reader.onload = e => {
         const prev = document.getElementById(previewId);
-        prev.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:20px"><div class="avatar-preview-overlay">📷</div>`;
+        prev.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:20px"><div class="avatar-preview-overlay">{!! \App\Support\IconLibrary::svg('camera', '', 16) !!}</div>`;
     };
     reader.readAsDataURL(file);
 }
@@ -946,7 +946,7 @@ function filterCards() {
             empty = document.createElement('div');
             empty.id = 'dynamicEmpty';
             empty.className = 'empty-state';
-            empty.innerHTML = '<div class="empty-ico-wrap">🔍</div><div class="empty-title">Aucun résultat</div><div class="empty-sub">Essayez un autre filtre ou une autre recherche.</div>';
+            empty.innerHTML = '<div class="empty-ico-wrap"></div><div class="empty-title">Aucun résultat</div><div class="empty-sub">Essayez un autre filtre ou une autre recherche.</div>';
             document.getElementById('driversGrid').appendChild(empty);
         }
         empty.style.display = '';
@@ -963,10 +963,27 @@ function toast(msg, type = 'success') {
     setTimeout(() => el.classList.remove('show'), 4000);
 }
 @if(session('success'))
-    setTimeout(() => toast('✅ {{ session('success') }}', 'success'), 200);
+    setTimeout(() => toast('{{ session('success') }}', 'success'), 200);
 @endif
 @if(session('error'))
-    setTimeout(() => toast('❌ {{ session('error') }}', 'error'), 200);
+    setTimeout(() => toast('{{ session('error') }}', 'error'), 200);
 @endif
+</script>
+<style>.cx-dark-row:focus-visible{outline:2px solid #7DB4FF;outline-offset:2px}</style>
+<script>
+/* Interrupteur « Mode sombre » : même comportement sur toutes les pages (clavier et lecteur d'écran) */
+(function () {
+    var row = document.querySelector('.cx-dark-row'), sw = row && row.querySelector('.cx-toggle');
+    if (!row || !sw) return;
+    row.setAttribute('role', 'switch');
+    row.setAttribute('tabindex', '0');
+    row.setAttribute('aria-label', 'Mode sombre');
+    var sync = function () { row.setAttribute('aria-checked', sw.classList.contains('on') ? 'true' : 'false'); };
+    new MutationObserver(sync).observe(sw, { attributes: true, attributeFilter: ['class'] });
+    row.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); }
+    });
+    sync();
+})();
 </script>
 @endpush

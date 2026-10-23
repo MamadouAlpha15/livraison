@@ -6,13 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Shop;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class RevenusShopsController extends Controller
 {
     public function index(Request $request)
     {
-        $meInit  = strtoupper(substr(Auth::user()->name ?? 'S', 0, 1));
         $period  = $request->input('period', 'all');
         $country = $request->input('country');
         $search  = $request->input('search');
@@ -69,13 +67,12 @@ class RevenusShopsController extends Controller
         $globalStats['total_net'] = $globalStats['total_brut'] - $globalStats['total_livr'];
 
         return view('admin.revenus.boutiques', compact(
-            'shops', 'period', 'globalStats', 'meInit', 'countries', 'country', 'heroDevise', 'search'
+            'shops', 'period', 'globalStats', 'countries', 'country', 'heroDevise', 'search'
         ));
     }
 
     public function show(Shop $shop, Request $request)
     {
-        $meInit = strtoupper(substr(Auth::user()->name ?? 'S', 0, 1));
         $period = $request->input('period', 'all');
 
         $periodScope = $this->periodScope($period);
@@ -96,7 +93,7 @@ class RevenusShopsController extends Controller
         ];
         $stats['total_net'] = $stats['total_brut'] - $stats['total_livraison'];
 
-        return view('admin.revenus.boutique-show', compact('shop', 'orders', 'stats', 'period', 'meInit'));
+        return view('admin.revenus.boutique-show', compact('shop', 'orders', 'stats', 'period'));
     }
 
     private function periodScope(string $period): \Closure

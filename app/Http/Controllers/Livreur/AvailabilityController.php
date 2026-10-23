@@ -24,7 +24,7 @@ class AvailabilityController extends Controller
         $user->save();
 
         // Synchroniser le Driver lie (via user_id)
-        $driver = Driver::where('user_id', $user->id)->first();
+        $driver = Driver::forUser($user);
         if ($driver) {
             if ($goingOnline) {
                 // En ligne -> disponible (sauf si deja en mission)

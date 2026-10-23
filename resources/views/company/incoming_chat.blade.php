@@ -7,23 +7,23 @@
 {{-- Anti-flash : applique le fond avant le premier paint --}}
 <script>
 (function(){
-    if(localStorage.getItem('cx-theme')==='light')
+    if(localStorage.getItem('cx-theme')!=='dark')
         document.documentElement.classList.add('cx-prelight');
 })();
 </script>
 <style>
-html.cx-prelight body{background:#eef1f7!important}
+html.cx-prelight body{background:#EEF3FB!important}
 </style>
 <style>
 *,*::before,*::after{box-sizing:border-box}
 :root{
-    --cx-bg:#07091a; --cx-surface:#0d1226; --cx-surface2:#111930;
-    --cx-border:rgba(255,255,255,.07); --cx-brand:#7c3aed;
-    --cx-brand-lt:#a78bfa; --cx-brand-mlt:rgba(124,58,237,.12);
+    --cx-bg:#07091a; --cx-surface:#0B1E3D; --cx-surface2:#132B52;
+    --cx-border:rgba(255,255,255,.07); --cx-brand:#1668D8;
+    --cx-brand-lt:#7DB4FF; --cx-brand-mlt:rgba(31,124,246,.12);
     --cx-text:#e2e8f0; --cx-text2:#94a3b8; --cx-muted:#475569;
     --cx-green:#10b981; --r:12px; --r-sm:8px;
 }
-html,body{margin:0;font-family:'Segoe UI',sans-serif;background:var(--cx-bg)!important;color:var(--cx-text)}
+html,body{margin:0;font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--cx-bg)!important;color:var(--cx-text)}
 a{text-decoration:none;color:inherit}
 body.cx-dashboard>nav,body.cx-dashboard>header,body.cx-dashboard .navbar{display:none!important}
 body.cx-dashboard .app-footer{display:none!important}
@@ -32,10 +32,10 @@ body.cx-dashboard>main.app-main{padding:0!important;margin:0!important;max-width
 
 /* ══ MODE CLAIR — inbox ══ */
 body.cx-light{
-    --cx-bg:#eef1f7; --cx-surface:#ffffff; --cx-surface2:#f4f6fb;
-    --cx-border:rgba(0,0,0,.09); --cx-text:#111827;
-    --cx-text2:#4b5563; --cx-muted:#9ca3af;
-    --cx-brand-mlt:rgba(124,58,237,.07);
+    --cx-bg:#EEF3FB; --cx-surface:#ffffff; --cx-surface2:#f4f6fb;
+    --cx-border:rgba(0,0,0,.09); --cx-text:#16162A;
+    --cx-text2:#45455E; --cx-muted:#9ca3af;
+    --cx-brand-mlt:rgba(31,124,246,.07);
     background:var(--cx-bg)!important;
 }
 
@@ -44,7 +44,7 @@ body.cx-light .ic-main{background:var(--cx-bg)}
 
 /* Header conversation */
 body.cx-light .ic-main-hd{background:var(--cx-surface);border-bottom-color:rgba(0,0,0,.08)}
-body.cx-light .ic-main-name{color:#111827}
+body.cx-light .ic-main-name{color:#16162A}
 body.cx-light .ic-hd-btn{
     background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.08);
 }
@@ -52,19 +52,19 @@ body.cx-light .ic-hd-btn:hover{background:rgba(0,0,0,.1)}
 body.cx-light .ic-mob-btn{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.08);color:#374151}
 
 /* Écran d'accueil */
-body.cx-light .ic-welcome h3{color:#111827}
-body.cx-light .ic-welcome p{color:#4b5563}
+body.cx-light .ic-welcome h3{color:#16162A}
+body.cx-light .ic-welcome p{color:#45455E}
 
 /* Bulles de messages */
 body.cx-light .msg-row.other .msg-bubble{
-    background:#ffffff;border-color:rgba(0,0,0,.1);color:#111827;
+    background:#ffffff;border-color:rgba(0,0,0,.1);color:#16162A;
     box-shadow:0 1px 3px rgba(0,0,0,.07);
 }
 body.cx-light .msg-time{color:#9ca3af}
 
 /* Séparateur de date */
 body.cx-light .msg-date-sep span{
-    background:rgba(0,0,0,.07);color:#6b7280;
+    background:rgba(0,0,0,.07);color:#62627C;
 }
 
 /* Zone de saisie */
@@ -74,8 +74,8 @@ body.cx-light .ic-input-area{
 body.cx-light .ic-input-row{
     background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.1);
 }
-body.cx-light .ic-input-row:focus-within{border-color:rgba(124,58,237,.4);background:#fff}
-body.cx-light .ic-textarea{color:#111827}
+body.cx-light .ic-input-row:focus-within{border-color:rgba(31,124,246,.4);background:#fff}
+body.cx-light .ic-textarea{color:#16162A}
 body.cx-light .ic-textarea::placeholder{color:#9ca3af}
 body.cx-light .ic-input-hint{color:#9ca3af}
 
@@ -132,12 +132,12 @@ body.cx-light .ic-empty-conv{color:var(--cx-text2)}
     border:1px solid rgba(255,255,255,.08);border-radius:8px;
     padding:8px 12px;color:var(--cx-text);font-size:13px;font-family:inherit;outline:none;
 }
-.ic-search-wrap input:focus{border-color:rgba(139,92,246,.4)}
+.ic-search-wrap input:focus{border-color:rgba(31,124,246,.4)}
 .ic-search-wrap input::placeholder{color:var(--cx-muted)}
 
-.ic-conv-list{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.25) transparent}
+.ic-conv-list{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(31,124,246,.25) transparent}
 .ic-conv-list::-webkit-scrollbar{width:3px}
-.ic-conv-list::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3);border-radius:3px}
+.ic-conv-list::-webkit-scrollbar-thumb{background:rgba(31,124,246,.3);border-radius:3px}
 
 .ic-conv{
     display:flex;align-items:center;gap:11px;
@@ -146,7 +146,7 @@ body.cx-light .ic-empty-conv{color:var(--cx-text2)}
     transition:background .14s;
 }
 .ic-conv:hover{background:rgba(255,255,255,.04)}
-.ic-conv.active{background:rgba(124,58,237,.12)}
+.ic-conv.active{background:rgba(31,124,246,.12)}
 .ic-conv-av{
     width:44px;height:44px;border-radius:12px;flex-shrink:0;
     display:flex;align-items:center;justify-content:center;
@@ -204,14 +204,14 @@ body.cx-light .ic-empty-conv{color:var(--cx-text2)}
 .ic-messages{
     flex:1;min-height:0;overflow-y:auto;padding:20px 24px;
     display:flex;flex-direction:column;gap:4px;
-    scrollbar-width:thin;scrollbar-color:rgba(124,58,237,.25) transparent;
+    scrollbar-width:thin;scrollbar-color:rgba(31,124,246,.25) transparent;
 }
 /* Spacer qui pousse les messages vers le bas (comme WhatsApp) :
    quand peu de messages → spacer prend la place vide → messages en bas
    quand beaucoup → spacer = 0, scroll normal */
 .ic-messages::before{content:'';flex:1;min-height:0}
 .ic-messages::-webkit-scrollbar{width:4px}
-.ic-messages::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3);border-radius:4px}
+.ic-messages::-webkit-scrollbar-thumb{background:rgba(31,124,246,.3);border-radius:4px}
 
 .msg-row{display:flex;gap:8px;max-width:74%}
 .msg-row.mine{align-self:flex-end;flex-direction:row-reverse}
@@ -228,7 +228,7 @@ body.cx-light .ic-empty-conv{color:var(--cx-text2)}
     font-size:13.5px;line-height:1.55;word-break:break-word;
 }
 .msg-row.mine .msg-bubble{
-    background:linear-gradient(135deg,#7c3aed,#5b21b6);
+    background:linear-gradient(135deg,#1668D8,#1260C9);
     color:#fff;border-bottom-right-radius:4px;
 }
 .msg-row.other .msg-bubble{
@@ -252,7 +252,7 @@ body.cx-light .ic-empty-conv{color:var(--cx-text2)}
     background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
     border-radius:16px;padding:10px 14px;transition:border-color .15s;
 }
-.ic-input-row:focus-within{border-color:rgba(139,92,246,.4)}
+.ic-input-row:focus-within{border-color:rgba(31,124,246,.4)}
 .ic-textarea{
     flex:1;background:none;border:none;outline:none;
     color:var(--cx-text);font-size:13.5px;font-family:inherit;
@@ -265,7 +265,7 @@ body.cx-light .ic-empty-conv{color:var(--cx-text2)}
     display:flex;align-items:center;justify-content:center;
     font-size:16px;color:#fff;transition:background .14s;
 }
-.ic-send:hover{background:#6d28d9}
+.ic-send:hover{background:#1260C9}
 .ic-send:disabled{opacity:.4;cursor:not-allowed}
 .ic-input-hint{margin-top:6px;text-align:center;font-size:10.5px;color:var(--cx-muted)}
 
@@ -370,22 +370,22 @@ button,input,textarea,select,
 
 /* ── Carte commande confiée ── */
 .order-bubble{padding:0!important;background:none!important;border:none!important;box-shadow:none!important;}
-.msg-order-card{min-width:260px;max-width:310px;border-radius:14px;overflow:hidden;border:1px solid rgba(124,58,237,.35);box-shadow:0 6px 24px rgba(0,0,0,.35);}
-.moc-hd{background:linear-gradient(135deg,#7c3aed,#4f46e5);padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.msg-order-card{min-width:260px;max-width:310px;border-radius:14px;overflow:hidden;border:1px solid rgba(31,124,246,.35);box-shadow:0 6px 24px rgba(0,0,0,.35);}
+.moc-hd{background:linear-gradient(135deg,#1668D8,#1260C9);padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .moc-badge{font-size:10px;font-weight:800;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:.6px;}
-.moc-num{font-size:15px;font-weight:800;color:#fff;font-family:monospace;background:rgba(255,255,255,.18);padding:2px 9px;border-radius:7px;letter-spacing:-.5px;}
-.moc-body{background:#0d1226;padding:11px 14px;display:flex;flex-direction:column;gap:0;}
+.moc-num{font-size:15px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;background:rgba(255,255,255,.18);padding:2px 9px;border-radius:7px;letter-spacing:-.5px;}
+.moc-body{background:#0B1E3D;padding:11px 14px;display:flex;flex-direction:column;gap:0;}
 .moc-row{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);}
 .moc-row:last-child{border-bottom:none;}
 .moc-key{font-size:10.5px;color:rgba(255,255,255,.45);width:110px;flex-shrink:0;font-weight:500;padding-top:1px;line-height:1.4;}
 .moc-val{font-size:12.5px;color:#e2e8f0;font-weight:600;flex:1;word-break:break-word;line-height:1.4;}
 .moc-val.moc-amount{color:#34d399;font-size:13px;font-weight:800;}
 /* Mode clair */
-body.cx-light .msg-order-card{border-color:rgba(124,58,237,.25);box-shadow:0 4px 16px rgba(0,0,0,.1);}
+body.cx-light .msg-order-card{border-color:rgba(31,124,246,.25);box-shadow:0 4px 16px rgba(0,0,0,.1);}
 body.cx-light .moc-body{background:#f8fafc;}
 body.cx-light .moc-row{border-bottom-color:rgba(0,0,0,.07);}
 body.cx-light .moc-key{color:#9ca3af;}
-body.cx-light .moc-val{color:#1e293b;}
+body.cx-light .moc-val{color:#0B1E3D;}
 </style>
 @endpush
 
@@ -402,7 +402,7 @@ body.cx-light .moc-val{color:#1e293b;}
         'linear-gradient(135deg,#ec4899,#be185d)',
         'linear-gradient(135deg,#06b6d4,#0891b2)',
         'linear-gradient(135deg,#84cc16,#4d7c0f)',
-        'linear-gradient(135deg,#8b5cf6,#6d28d9)',
+        'linear-gradient(135deg,#1F7CF6,#1260C9)',
     ];
     $activeConv      = $conversations->firstWhere('shop_id', (int)$activeShopId);
     $activeConvIndex = $conversations->search(fn($c) => (string)$c['shop_id'] === (string)$activeShopId);
@@ -428,7 +428,7 @@ body.cx-light .moc-val{color:#1e293b;}
     </div>
 
     <div class="ic-search-wrap">
-        <input type="text" id="icSearch" placeholder="🔍  Rechercher une boutique...">
+        <input type="text" id="icSearch" placeholder=" Rechercher une boutique...">
     </div>
 
     <div class="ic-conv-list" id="icConvList">
@@ -460,7 +460,7 @@ body.cx-light .moc-val{color:#1e293b;}
         </div>
         @empty
         <div class="ic-empty-conv">
-            <div class="eico">💬</div>
+            <div class="eico">{!! \App\Support\IconLibrary::svg('message', '', 40) !!}</div>
             <p>Aucune conversation.<br>Les boutiques vous contacteront depuis leur espace.</p>
         </div>
         @endforelse
@@ -473,7 +473,7 @@ body.cx-light .moc-val{color:#1e293b;}
     {{-- Barre mobile quand aucune conv sélectionnée (hamburger toujours accessible) --}}
     <div class="ic-mob-topbar" id="icMobTopbar" style="{{ $activeShopId ? 'display:none' : '' }}">
         <div class="ic-mob-btn" onclick="document.getElementById('icSidebar').classList.add('open');document.getElementById('icOverlay').classList.add('open')">☰</div>
-        <span class="ic-mob-topbar-title">💬 {{ $company->name }}</span>
+        <span class="ic-mob-topbar-title">{!! \App\Support\IconLibrary::svg('message', '', 14) !!} {{ $company->name }}</span>
     </div>
 
     {{-- Header conversation --}}
@@ -488,13 +488,13 @@ body.cx-light .moc-val{color:#1e293b;}
             <div class="ic-main-status">● Conversation active</div>
         </div>
         <div class="ic-main-hd-right">
-            <div class="ic-hd-btn" title="Informations">ℹ️</div>
+            <div class="ic-hd-btn" title="Informations">{!! \App\Support\IconLibrary::svg('info', '', 14) !!}</div>
         </div>
     </div>
 
     {{-- Welcome --}}
     <div class="ic-welcome" id="icWelcome" style="{{ $activeShopId ? 'display:none' : '' }}">
-        <div class="wico">💬</div>
+        <div class="wico">{!! \App\Support\IconLibrary::svg('message', '', 40) !!}</div>
         <h3>Bienvenue dans votre messagerie</h3>
         <p>Sélectionnez une boutique dans la liste pour voir et répondre à ses messages.</p>
     </div>
@@ -518,7 +518,7 @@ body.cx-light .moc-val{color:#1e293b;}
         @endphp
         <div class="msg-row {{ $isMine ? 'mine' : 'other' }}">
             <div class="msg-av" style="background:{{ $isMine
-                ? 'linear-gradient(135deg,#7c3aed,#5b21b6)'
+                ? 'linear-gradient(135deg,#1668D8,#1260C9)'
                 : $activeConvBg }}">
                 {{ $isMine ? $uIni : $activeConvIni }}
             </div>
@@ -527,15 +527,15 @@ body.cx-light .moc-val{color:#1e293b;}
                 <div class="msg-bubble order-bubble">
                     <div class="msg-order-card">
                         <div class="moc-hd">
-                            <span class="moc-badge">📦 Commande confiée</span>
+                            <span class="moc-badge">{!! \App\Support\IconLibrary::svg('package', '', 14) !!} Commande confiée</span>
                             <span class="moc-num">{{ $mocNum }}</span>
                         </div>
                         <div class="moc-body">
-                            @if($mocClient)<div class="moc-row"><span class="moc-key">👤 Client</span><span class="moc-val">{{ $mocClient }}</span></div>@endif
-                            @if($mocDest)<div class="moc-row"><span class="moc-key">📍 Destination</span><span class="moc-val">{{ $mocDest }}</span></div>@endif
-                            @if($mocZone)<div class="moc-row"><span class="moc-key">🗺️ Zone</span><span class="moc-val">{{ $mocZone }}</span></div>@endif
-                            @if($mocFrais)<div class="moc-row"><span class="moc-key">🚚 Frais livraison</span><span class="moc-val">{{ $mocFrais }}</span></div>@endif
-                            @if($mocMont)<div class="moc-row"><span class="moc-key">💰 Montant total</span><span class="moc-val moc-amount">{{ $mocMont }}</span></div>@endif
+                            @if($mocClient)<div class="moc-row"><span class="moc-key">{!! \App\Support\IconLibrary::svg('user', '', 14) !!} Client</span><span class="moc-val">{{ $mocClient }}</span></div>@endif
+                            @if($mocDest)<div class="moc-row"><span class="moc-key">{!! \App\Support\IconLibrary::svg('map-pin', '', 14) !!} Destination</span><span class="moc-val">{{ $mocDest }}</span></div>@endif
+                            @if($mocZone)<div class="moc-row"><span class="moc-key">{!! \App\Support\IconLibrary::svg('map-pin', '', 14) !!} Zone</span><span class="moc-val">{{ $mocZone }}</span></div>@endif
+                            @if($mocFrais)<div class="moc-row"><span class="moc-key">{!! \App\Support\IconLibrary::svg('truck', '', 14) !!} Frais livraison</span><span class="moc-val">{{ $mocFrais }}</span></div>@endif
+                            @if($mocMont)<div class="moc-row"><span class="moc-key">{!! \App\Support\IconLibrary::svg('wallet', '', 14) !!} Montant total</span><span class="moc-val moc-amount">{{ $mocMont }}</span></div>@endif
                         </div>
                     </div>
                 </div>
@@ -582,7 +582,7 @@ const AV_COLORS = [
     'linear-gradient(135deg,#ec4899,#be185d)',
     'linear-gradient(135deg,#06b6d4,#0891b2)',
     'linear-gradient(135deg,#84cc16,#4d7c0f)',
-    'linear-gradient(135deg,#8b5cf6,#6d28d9)',
+    'linear-gradient(135deg,#1F7CF6,#1260C9)',
     'linear-gradient(135deg,#f97316,#c2410c)',
 ];
 function esc(s) {
@@ -708,13 +708,13 @@ function buildOrderCardHtml(p) {
         ? `<div class="moc-row"><span class="moc-key">${icon} ${label}</span><span class="moc-val${cls?' '+cls:''}">${esc(val)}</span></div>`
         : '';
     return `<div class="msg-order-card">` +
-        `<div class="moc-hd"><span class="moc-badge">📦 Commande confiée</span><span class="moc-num">${esc(p.num)}</span></div>` +
+        `<div class="moc-hd"><span class="moc-badge">{!! \App\Support\IconLibrary::svg('package', '', 12) !!} Commande confiée</span><span class="moc-num">${esc(p.num)}</span></div>` +
         `<div class="moc-body">` +
-            row('👤','Client',    p.client,  '') +
-            row('📍','Destination',p.dest,   '') +
-            row('🗺️','Zone',      p.zone,    '') +
-            row('🚚','Frais livraison',p.frais,'') +
-            row('💰','Montant total',p.montant,'moc-amount') +
+            row('{!! \App\Support\IconLibrary::svg('user', '', 12) !!}','Client',    p.client,  '') +
+            row('{!! \App\Support\IconLibrary::svg('map-pin', '', 12) !!}','Destination',p.dest,   '') +
+            row('{!! \App\Support\IconLibrary::svg('map-pin', '', 12) !!}','Zone',      p.zone,    '') +
+            row('{!! \App\Support\IconLibrary::svg('truck', '', 12) !!}','Frais livraison',p.frais,'') +
+            row('{!! \App\Support\IconLibrary::svg('wallet', '', 12) !!}','Montant total',p.montant,'moc-amount') +
         `</div></div>`;
 }
 
@@ -726,7 +726,7 @@ function renderMsg(m) {
 
     const av = document.createElement('div');
     av.className = 'msg-av';
-    av.style.background = mine ? 'linear-gradient(135deg,#7c3aed,#5b21b6)' : activeBg;
+    av.style.background = mine ? 'linear-gradient(135deg,#1668D8,#1260C9)' : activeBg;
     av.textContent = mine ? uIni : (activeIni || '?');
 
     const body   = document.createElement('div'); body.className = 'msg-body';
@@ -927,7 +927,7 @@ if (activeShopId) {
 
 /* ── Synchroniser le thème avec le dashboard ── */
 (function(){
-    const saved = localStorage.getItem('cx-theme') || 'dark';
+    const saved = localStorage.getItem('cx-theme') || 'light';
     if (saved === 'light') {
         document.body.classList.add('cx-light');
     } else {

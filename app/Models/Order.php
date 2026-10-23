@@ -15,6 +15,11 @@ class Order extends Model
 
     protected static function booted(): void
     {
+        // Code de remise donné par le client au livreur (voir App\Support\DeliveryCode)
+        static::creating(function (Order $order) {
+            $order->delivery_code ??= \App\Support\DeliveryCode::forNewOrder();
+        });
+
         static::updated(function (Order $order) {
             if (!$order->wasChanged('status')) {
                 return;
@@ -34,7 +39,10 @@ class Order extends Model
     'client_lat','client_lng','client_location_shared_at',
     'vendor_lat','vendor_lng','vendor_location_shared_at','delivered_at','delivery_proof_photo',
     // Canal d'arrivée du client (facebook, instagram, whatsapp…) — App\Support\TrafficSource
-    'source', 'campaign_id'];
+    'source', 'campaign_id', 'cancel_reason', 'cancelled_by', 'delivery_slot'];
+
+    // Le code de remise ne doit jamais partir dans une réponse JSON lue par le livreur ou la boutique
+    protected $hidden = ['delivery_code'];
 
     // Nom du client à afficher : compte connecté sinon nom saisi en tant qu'invité
     public function getDisplayNameAttribute(): string
@@ -158,8 +166,10 @@ protected $casts = [
             return;
         }
 
-        $orderId = session()->pull('link_order_id');
-        if (!$orderId) {
+        $orderId = (int) session()->pull('link_order_id');
+        // L'identifiant vient de l'URL : on ne rattache que les commandes passées depuis ce navigateur,
+        // sinon n'importe quel compte pourrait s'approprier la commande (adresse, téléphone, code) d'un autre
+        if (!$orderId || !in_array($orderId, array_map('intval', (array) session('guest_order_ids', [])), true)) {
             return;
         }
 

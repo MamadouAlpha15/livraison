@@ -16,7 +16,7 @@ class CommissionController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $shop = $user->shop ?: $user->assignedShop;
+        $shop = $user->shop;
         abort_unless($shop, 403);
 
         $status = $request->get('status', CourierCommission::STATUS_EN_ATTENTE);
@@ -126,7 +126,7 @@ class CommissionController extends Controller
         ]);
 
         $user = Auth::user();
-        $shop = $user->shop ?: $user->assignedShop;
+        $shop = $user->shop;
         abort_unless($shop, 403);
 
         DB::transaction(function () use ($data, $shop) {
@@ -169,7 +169,7 @@ class CommissionController extends Controller
     public function export(Request $request): StreamedResponse
     {
         $user = Auth::user();
-        $shop = $user->shop ?: $user->assignedShop;
+        $shop = $user->shop;
         abort_unless($shop, 403);
 
         $type = in_array($request->get('type'), ['shop', 'company']) ? $request->get('type') : 'shop';

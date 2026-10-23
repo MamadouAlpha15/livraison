@@ -7,10 +7,10 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 :root {
-    --orange:#6366f1; --orange-dk:#4f46e5; --navy:#131921; --navy-2:#232f3e;
-    --blue:#007185; --green:#067d62; --green-lt:#d1fae5; --yellow:#f59e0b;
-    --border:#e9edef; --text:#111b21; --muted:#667781; --surface:#fff; --bg:#f0f2f5;
-    --font:'Segoe UI',sans-serif; --nav-h:60px; --sidebar-w:360px;
+    --orange:#1668D8; --orange-dk:#1260C9; --navy:#0B1E3D; --navy-2:#132B52;
+    --blue:#1668D8; --green:#067d62; --green-lt:#d1fae5; --yellow:#f59e0b;
+    --border:#E3E8F2; --text:#16162A; --muted:#62627C; --surface:#fff; --bg:#F6F9FF;
+    --font:'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; --nav-h:60px; --sidebar-w:360px;
 }
 body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text); }
 .is-dashboard { overflow:hidden; }
@@ -18,12 +18,12 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 
 /* ─── SIDEBAR ─── */
 .hub-sidebar { width:var(--sidebar-w); flex-shrink:0; display:flex; flex-direction:column; background:var(--surface); border-right:1px solid var(--border); }
-.hub-sidebar-head { padding:14px 16px 10px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; background:#f0f2f5; }
+.hub-sidebar-head { padding:14px 16px 10px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; background:#F6F9FF; }
 .hub-sidebar-title { font-size:19px; font-weight:700; color:var(--text); flex:1; }
 .hub-back-dash { background:var(--orange); color:#fff; border:none; border-radius:50%; width:34px; height:34px; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; text-decoration:none; font-weight:700; flex-shrink:0; transition:background .15s,transform .1s; }
 .hub-back-dash:hover { background:var(--orange-dk); transform:scale(1.08); }
 .hub-search-wrap { padding:8px 10px; background:var(--surface); border-bottom:1px solid var(--border); }
-.hub-search { width:100%; padding:9px 14px; border-radius:8px; border:none; background:#f0f2f5; font-size:13.5px; color:var(--text); outline:none; }
+.hub-search { width:100%; padding:9px 14px; border-radius:8px; border:none; background:#F6F9FF; font-size:13.5px; color:var(--text); outline:none; }
 .hub-search::placeholder { color:var(--muted); }
 .hub-conv-list { flex:1; overflow-y:auto; }
 .hub-conv-list::-webkit-scrollbar { width:4px; }
@@ -31,8 +31,8 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 
 .hub-conv-item { display:flex; align-items:center; gap:12px; padding:11px 16px; cursor:pointer; border-bottom:1px solid #f5f6f6; transition:background .12s; }
 .hub-conv-item:hover { background:#f5f6f6; }
-.hub-conv-item.active { background:#f0f2f5; }
-.hub-conv-av { width:50px; height:50px; border-radius:50%; background:linear-gradient(135deg,var(--navy-2),#3d5a73); color:#fff; font-size:15px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; }
+.hub-conv-item.active { background:#F6F9FF; }
+.hub-conv-av { width:50px; height:50px; border-radius:50%; background:linear-gradient(135deg,var(--navy-2),#1F3F75); color:#fff; font-size:15px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; }
 .hub-conv-av img { width:100%; height:100%; object-fit:cover; }
 .hub-conv-body { flex:1; min-width:0; }
 .hub-conv-name { font-size:14px; font-weight:600; color:var(--text); margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -53,25 +53,25 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 .hub-chat { flex:1; display:none; flex-direction:column; overflow:hidden; }
 
 /* Header */
-.hub-chat-head { background:#f0f2f5; border-bottom:1px solid var(--border); padding:10px 16px; display:flex; align-items:center; gap:12px; flex-shrink:0; }
-.hub-chat-av { width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,var(--navy-2),#3d5a73); color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; }
+.hub-chat-head { background:#F6F9FF; border-bottom:1px solid var(--border); padding:10px 16px; display:flex; align-items:center; gap:12px; flex-shrink:0; }
+.hub-chat-av { width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,var(--navy-2),#1F3F75); color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; }
 .hub-chat-av img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
 .hub-chat-info { flex:1; min-width:0; }
 .hub-chat-name { font-size:14.5px; font-weight:700; color:var(--text); margin-bottom:2px; }
 .hub-chat-sub { font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .hub-back-btn { display:none; background:none; border:none; font-size:22px; color:var(--muted); cursor:pointer; padding:4px 6px; border-radius:6px; }
-.hub-back-btn:hover { background:#e9edef; }
+.hub-back-btn:hover { background:#E3E8F2; }
 
 /* Bande produit */
 .hub-prod-strip { background:#fff; border-bottom:2px solid var(--orange); padding:10px 16px; display:flex; align-items:center; gap:12px; flex-shrink:0; }
 .hub-prod-img-wrap { flex-shrink:0; display:block; cursor:pointer; border-radius:8px; overflow:hidden; }
 .hub-prod-img { width:54px; height:54px; border-radius:8px; object-fit:cover; border:2px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,.12); display:block; transition:opacity .15s; }
 .hub-prod-img:hover { opacity:.85; }
-.hub-prod-img-ph { width:54px; height:54px; border-radius:8px; background:#f0f2f5; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:22px; }
+.hub-prod-img-ph { width:54px; height:54px; border-radius:8px; background:#F6F9FF; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:22px; }
 .hub-prod-info { flex:1; min-width:0; }
 .hub-prod-label { font-size:10px; font-weight:700; color:var(--orange); text-transform:uppercase; letter-spacing:.5px; margin-bottom:2px; }
 .hub-prod-name { font-size:13.5px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.hub-prod-price { font-size:13px; color:#b12704; font-weight:800; font-family:monospace; margin-top:1px; }
+.hub-prod-price { font-size:13px; color:#1260C9; font-weight:800; font-variant-numeric: tabular-nums; margin-top:1px; }
 .hub-strip-actions { display:flex; gap:8px; align-items:center; flex-shrink:0; }
 .hub-prod-link { font-size:12px; color:var(--blue); text-decoration:none; font-weight:700; white-space:nowrap; padding:7px 12px; border-radius:8px; border:1.5px solid var(--blue); background:#e8f4f8; transition:all .15s; }
 .hub-prod-link:hover { background:#bee3f8; }
@@ -82,7 +82,7 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 .hub-propose-panel { display:none; background:linear-gradient(135deg,#fffbeb,#fef3c7); border-bottom:1px solid #fde68a; padding:12px 16px; flex-wrap:wrap; gap:8px; align-items:center; flex-shrink:0; }
 .hub-propose-panel.open { display:flex; }
 .hub-propose-label { font-size:12px; font-weight:700; color:#92400e; width:100%; margin-bottom:2px; }
-.hub-propose-input { flex:1; min-width:120px; padding:9px 14px; border-radius:20px; border:1.5px solid var(--yellow); font-size:14px; font-weight:600; font-family:monospace; outline:none; background:#fff; transition:box-shadow .15s; }
+.hub-propose-input { flex:1; min-width:120px; padding:9px 14px; border-radius:20px; border:1.5px solid var(--yellow); font-size:14px; font-weight:600; font-variant-numeric: tabular-nums; outline:none; background:#fff; transition:box-shadow .15s; }
 .hub-propose-input:focus { box-shadow:0 0 0 3px rgba(245,158,11,.2); }
 .hub-propose-devise { font-size:12px; font-weight:700; color:#92400e; }
 .hub-propose-send { padding:9px 18px; border-radius:20px; background:var(--yellow); color:#fff; border:none; font-size:13px; font-weight:700; cursor:pointer; font-family:var(--font); transition:all .15s; }
@@ -106,7 +106,7 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 .hub-msg-row.mine   .hub-msg-bubble { background:#dcf8c6; color:#111; border-bottom-right-radius:2px; }
 .hub-msg-row.theirs .hub-msg-bubble { background:#fff; color:#111; border-bottom-left-radius:2px; }
 .hub-msg-meta { display:flex; align-items:center; gap:4px; margin-top:3px; justify-content:flex-end; }
-.hub-msg-time { font-size:10.5px; color:#667781; }
+.hub-msg-time { font-size:10.5px; color:#62627C; }
 .hub-msg-tick { font-size:11px; color:#53bdeb; }
 
 /* ─── CARTES NÉGOCIATION ─── */
@@ -118,10 +118,10 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 .nego-offer    .nego-head { background:linear-gradient(135deg,#d1fae5,#a7f3d0); color:#065f46; }
 .nego-order    .nego-head { background:linear-gradient(135deg,#dbeafe,#bfdbfe); color:#1d4ed8; }
 .nego-body { background:#fff; padding:14px; border:1px solid var(--border); border-top:none; border-radius:0 0 14px 14px; }
-.nego-amount { font-size:24px; font-weight:900; font-family:monospace; color:#111; line-height:1; margin-bottom:4px; }
+.nego-amount { font-size:24px; font-weight:900; font-variant-numeric: tabular-nums; color:#111; line-height:1; margin-bottom:4px; }
 .nego-original { font-size:11px; color:var(--muted); text-decoration:line-through; margin-bottom:3px; }
 .nego-discount { font-size:11px; font-weight:700; color:var(--green); background:var(--green-lt); padding:2px 8px; border-radius:20px; display:inline-flex; margin-bottom:10px; }
-.nego-note { font-size:12.5px; color:#374151; background:#f9fafb; border:1px solid var(--border); border-radius:10px; padding:8px 10px; margin-bottom:10px; white-space:pre-wrap; }
+.nego-note { font-size:12.5px; color:#374151; background:#F6F9FF; border:1px solid var(--border); border-radius:10px; padding:8px 10px; margin-bottom:10px; white-space:pre-wrap; }
 .nego-status { font-size:11.5px; font-weight:700; padding:5px 10px; border-radius:20px; display:inline-flex; align-items:center; gap:5px; }
 .s-pending  { background:#fef3c7; color:#92400e; }
 .s-accepted { background:#d1fae5; color:#065f46; }
@@ -129,7 +129,7 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 .nego-confirm-btn { display:flex; align-items:center; justify-content:center; gap:7px; width:100%; padding:11px; margin-top:10px; border-radius:10px; background:linear-gradient(135deg,#10b981,#059669); color:#fff; border:none; font-size:14px; font-weight:800; cursor:pointer; font-family:var(--font); box-shadow:0 4px 14px rgba(16,185,129,.35); transition:all .2s; }
 .nego-confirm-btn:hover { background:linear-gradient(135deg,#059669,#047857); transform:translateY(-1px); }
 .nego-confirm-btn:disabled { opacity:.6; cursor:not-allowed; transform:none; }
-.nego-meta { font-size:10.5px; color:#667781; margin-top:6px; text-align:right; }
+.nego-meta { font-size:10.5px; color:#62627C; margin-top:6px; text-align:right; }
 
 /* Boutons action négociation client */
 .nego-card-actions { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
@@ -144,24 +144,24 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 .nego-counter-message { width:100%; padding:8px 12px; border:1.5px solid #fde68a; border-radius:10px; font-size:12.5px; font-family:inherit; resize:vertical; min-height:36px; outline:none; }
 .nego-counter-message:focus { box-shadow:0 0 0 3px rgba(245,158,11,.2); }
 .nego-counter-row  { display:flex; gap:6px; align-items:center; margin-top:6px; flex-wrap:wrap; }
-.nego-counter-input { flex:1; min-width:80px; padding:8px 12px; border-radius:20px; border:1.5px solid #fde68a; font-size:13px; font-weight:600; font-family:monospace; outline:none; background:#fff; }
+.nego-counter-input { flex:1; min-width:80px; padding:8px 12px; border-radius:20px; border:1.5px solid #fde68a; font-size:13px; font-weight:600; font-variant-numeric: tabular-nums; outline:none; background:#fff; }
 .nego-counter-input:focus { box-shadow:0 0 0 3px rgba(245,158,11,.2); }
 .nego-counter-devise { font-size:11px; font-weight:700; color:#92400e; white-space:nowrap; }
 .nego-counter-send { padding:8px 14px; border-radius:20px; background:var(--yellow); color:#fff; border:none; font-size:12px; font-weight:700; cursor:pointer; font-family:var(--font); }
 .nego-counter-send:hover { background:#d97706; }
-.nego-counter-card .nego-head { background:linear-gradient(135deg,#ede9fe,#ddd6fe); color:#5b21b6; }
+.nego-counter-card .nego-head { background:linear-gradient(135deg,#EAF2FF,#ddd6fe); color:#5b21b6; }
 
 /* Input zone */
-.hub-input-zone { background:#f0f2f5; border-top:1px solid var(--border); padding:10px 14px; display:flex; flex-direction:column; gap:6px; flex-shrink:0; }
+.hub-input-zone { background:#F6F9FF; border-top:1px solid var(--border); padding:10px 14px; display:flex; flex-direction:column; gap:6px; flex-shrink:0; }
 .hub-input-row { display:flex; gap:10px; align-items:flex-end; width:100%; }
 .hub-textarea { flex:1; padding:10px 16px; border-radius:24px; border:none; background:#fff; font-size:13.5px; font-family:var(--font); outline:none; resize:none; min-height:42px; max-height:120px; line-height:1.5; box-shadow:0 1px 2px rgba(0,0,0,.1); }
-.hub-send-btn { width:44px; height:44px; border-radius:50%; background:var(--orange); color:#fff; border:none; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .15s,transform .1s; box-shadow:0 2px 6px rgba(99,102,241,.35); }
+.hub-send-btn { width:44px; height:44px; border-radius:50%; background:var(--orange); color:#fff; border:none; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .15s,transform .1s; box-shadow:0 2px 6px rgba(31,124,246,.35); }
 .hub-send-btn:hover { background:var(--orange-dk); transform:scale(1.06); }
 .hub-send-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
 
 /* Bouton photo */
-.hub-attach-btn { width:44px; height:44px; border-radius:50%; flex-shrink:0; background:#fff; border:1.5px solid var(--border); font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s,border-color .15s; color:#667781; }
-.hub-attach-btn:hover { background:#e9edef; border-color:#aaa; }
+.hub-attach-btn { width:44px; height:44px; border-radius:50%; flex-shrink:0; background:#fff; border:1.5px solid var(--border); font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s,border-color .15s; color:#62627C; }
+.hub-attach-btn:hover { background:#E3E8F2; border-color:#aaa; }
 
 /* Preview images avant envoi */
 .hub-img-preview { display:none; flex-wrap:wrap; gap:8px; padding:6px 0 0; width:100%; }
@@ -169,11 +169,11 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 .hub-img-thumb-wrap { position:relative; width:68px; height:68px; border-radius:8px; overflow:hidden; border:2px solid var(--orange); flex-shrink:0; }
 .hub-img-thumb-wrap img { width:100%; height:100%; object-fit:cover; display:block; }
 .hub-img-thumb-del { position:absolute; top:2px; right:2px; width:18px; height:18px; background:rgba(0,0,0,.6); border-radius:50%; border:none; color:#fff; font-size:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; }
-.hub-img-count { font-size:11px; font-weight:700; color:var(--muted); align-self:flex-end; padding:2px 6px; background:#e9edef; border-radius:10px; }
+.hub-img-count { font-size:11px; font-weight:700; color:var(--muted); align-self:flex-end; padding:2px 6px; background:#E3E8F2; border-radius:10px; }
 
 /* Bulle "envoi / optimisation en cours" */
 .img-sending-bubble { display:flex; align-items:center; gap:10px; background:#fff; border-radius:12px; padding:12px 16px; max-width:260px; box-shadow:0 1px 3px rgba(0,0,0,.15); }
-.img-sending-spinner { width:20px; height:20px; border:3px solid #e9edef; border-top-color:var(--orange); border-radius:50%; animation:spinImg .7s linear infinite; flex-shrink:0; }
+.img-sending-spinner { width:20px; height:20px; border:3px solid #E3E8F2; border-top-color:var(--orange); border-radius:50%; animation:spinImg .7s linear infinite; flex-shrink:0; }
 @keyframes spinImg { to { transform:rotate(360deg); } }
 .img-sending-text { font-size:13px; color:var(--muted); font-weight:600; }
 
@@ -197,11 +197,11 @@ body { margin:0; font-family:var(--font); background:var(--bg); color:var(--text
 .wsp-grid.n5 .wsp-cell:first-child { grid-column:1/3; }
 .wsp-grid.n6plus { grid-template-columns:repeat(3,1fr); }
 .wsp-grid.n6plus .wsp-cell { height:88px; }
-.wsp-cell { position:relative; overflow:hidden; background:#e9edef; cursor:zoom-in; }
+.wsp-cell { position:relative; overflow:hidden; background:#E3E8F2; cursor:zoom-in; }
 .wsp-cell img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .25s,filter .2s; }
 .wsp-cell:hover img { transform:scale(1.04); filter:brightness(.88); }
 .wsp-more-overlay { position:absolute; inset:0; background:rgba(0,0,0,.52); display:flex; align-items:center; justify-content:center; color:#fff; font-size:22px; font-weight:700; pointer-events:none; }
-.msg-img-meta { display:flex; justify-content:flex-end; align-items:center; gap:4px; padding:3px 6px 2px; font-size:11px; color:#667781; }
+.msg-img-meta { display:flex; justify-content:flex-end; align-items:center; gap:4px; padding:3px 6px 2px; font-size:11px; color:#62627C; }
 .hub-msg-row.mine .msg-img-meta { color:#59724a; }
 
 /* ═══ LIGHTBOX — responsive ═══ */
@@ -347,7 +347,7 @@ a, button, [onclick], .hub-conv-item {
 
 /* Tap feedback sur mobile */
 @media (hover:none) {
-    .hub-conv-item:active  { background:#e9edef !important; }
+    .hub-conv-item:active  { background:#E3E8F2 !important; }
     .hub-send-btn:active   { transform:scale(.93) !important; }
     .hub-attach-btn:active { transform:scale(.93) !important; }
     .hub-back-dash:active  { transform:scale(.90) !important; }
@@ -506,6 +506,7 @@ a, button, [onclick], .hub-conv-item {
 @endpush
 
 @section('content')
+<script>window.SIco = {!! json_encode(collect(['wallet', 'gift', 'package'])->mapWithKeys(fn ($n) => [$n => \App\Support\IconLibrary::svg($n, '', 14)])) !!};</script>
 @php
     $user     = auth()->user();
     $parts    = explode(' ', $user->name);
@@ -517,7 +518,7 @@ a, button, [onclick], .hub-conv-item {
 {{-- ═══ SIDEBAR ═══ --}}
 <aside class="hub-sidebar">
     <div class="hub-sidebar-head">
-        <span class="hub-sidebar-title">💬 Messages</span>
+        <span class="hub-sidebar-title">{!! \App\Support\IconLibrary::svg('message', '', 18) !!} Messages</span>
         <a href="{{ route('client.dashboard') }}" class="hub-back-dash" title="Tableau de bord">←</a>
     </div>
     <div class="hub-search-wrap">
@@ -559,7 +560,7 @@ a, button, [onclick], .hub-conv-item {
             </div>
             <div class="hub-conv-body">
                 <div class="hub-conv-name">{{ $shopName }}</div>
-                <div class="hub-conv-preview">@if($product)🏷️ {{ Str::limit($product->name,22) }} · @endif{{ $preview }}</div>
+                <div class="hub-conv-preview">@if($product){{ Str::limit($product->name,22) }} · @endif{{ $preview }}</div>
             </div>
             <div class="hub-conv-meta">
                 <span class="hub-conv-time">{{ $timeAgo }}</span>
@@ -568,7 +569,7 @@ a, button, [onclick], .hub-conv-item {
         </div>
         @empty
         <div class="hub-conv-empty">
-            <span class="hub-conv-empty-ico">💬</span>
+            <span class="hub-conv-empty-ico">{!! \App\Support\IconLibrary::svg('message', '', 40) !!}</span>
             Aucune conversation.<br>Visitez une boutique et posez une question !
         </div>
         @endforelse
@@ -579,7 +580,7 @@ a, button, [onclick], .hub-conv-item {
 <main class="hub-main" id="hubMain">
 
     <div class="hub-welcome" id="hubWelcome">
-        <div class="hub-welcome-ico">💬</div>
+        <div class="hub-welcome-ico">{!! \App\Support\IconLibrary::svg('message', '', 70) !!}</div>
         <div class="hub-welcome-title">Shopio Messages</div>
         <div class="hub-welcome-sub">Sélectionnez une conversation pour commencer</div>
     </div>
@@ -599,7 +600,7 @@ a, button, [onclick], .hub-conv-item {
         {{-- Bande produit --}}
         <div class="hub-prod-strip" id="hubProdStrip" style="display:none">
             <a class="hub-prod-img-wrap" id="hubProdImgLink" href="#" target="_blank">
-                <div class="hub-prod-img-ph" id="hubProdImgPh">🏷️</div>
+                <div class="hub-prod-img-ph" id="hubProdImgPh">{!! \App\Support\IconLibrary::svg('tag', '', 22) !!}</div>
                 <img class="hub-prod-img" id="hubProdImg" src="" alt="" style="display:none">
             </a>
             <div class="hub-prod-info">
@@ -608,14 +609,14 @@ a, button, [onclick], .hub-conv-item {
                 <div class="hub-prod-price" id="hubProdPrice"></div>
             </div>
             <div class="hub-strip-actions">
-                <button class="hub-propose-btn" id="hubProposeBtn" onclick="toggleProposePanel()">💰 Proposer un prix</button>
+                <button class="hub-propose-btn" id="hubProposeBtn" onclick="toggleProposePanel()">{!! \App\Support\IconLibrary::svg('wallet', '', 16) !!} Proposer un prix</button>
                 <a class="hub-prod-link" id="hubProdLink" href="#" target="_blank">Voir →</a>
             </div>
         </div>
 
         {{-- Panneau proposition prix --}}
         <div class="hub-propose-panel" id="hubProposePanel">
-            <div class="hub-propose-label">💰 Faire une proposition de prix au vendeur</div>
+            <div class="hub-propose-label">{!! \App\Support\IconLibrary::svg('wallet', '', 15) !!} Faire une proposition de prix au vendeur</div>
             <textarea id="hubProposeMessage" class="hub-propose-input" style="width:100%;resize:vertical;min-height:38px;margin-bottom:8px" placeholder="Votre message (optionnel) — ex: Est-ce que je peux avoir ça à ce prix ?" rows="2" maxlength="500"></textarea>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
                 <input type="number" id="hubProposeInput" class="hub-propose-input" placeholder="Votre prix…" min="1" step="500">
@@ -627,7 +628,7 @@ a, button, [onclick], .hub-conv-item {
 
         {{-- Thread --}}
         <div class="hub-thread" id="hubThread">
-            <div class="hub-thread-loader">⏳ Chargement…</div>
+            <div class="hub-thread-loader">Chargement…</div>
         </div>
 
         {{-- Input --}}
@@ -635,7 +636,7 @@ a, button, [onclick], .hub-conv-item {
             <div class="hub-img-preview" id="hubImgPreview"></div>
             <div class="hub-input-row">
                 <input type="file" id="hubImgInput" accept="image/*" multiple style="display:none" onchange="onImgSelected(this)">
-                <button class="hub-attach-btn" title="Envoyer des photos (max 20)" onclick="document.getElementById('hubImgInput').click()">📷</button>
+                <button class="hub-attach-btn" title="Envoyer des photos (max 20)" aria-label="Envoyer des photos" onclick="document.getElementById('hubImgInput').click()">{!! \App\Support\IconLibrary::svg('camera', '', 20) !!}</button>
                 <textarea id="hubInput" class="hub-textarea" placeholder="Écrire un message…" rows="1"
                     onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendHubMsg()}"
                     oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
@@ -723,7 +724,7 @@ async function selectConv(productId, el) {
         av.textContent = _prodData.shopInit || '?';
     }
     document.getElementById('hubChatName').textContent = _prodData.shopName || '—';
-    document.getElementById('hubChatSub').textContent  = _prodData.prodName ? '🏷️ ' + _prodData.prodName : 'Discussion générale';
+    document.getElementById('hubChatSub').textContent  = _prodData.prodName ? _prodData.prodName : 'Discussion générale';
 
     /* Bande produit */
     updateProdStrip();
@@ -739,7 +740,7 @@ async function selectConv(productId, el) {
     _pendingFiles = [];
     renderImgPreview();
 
-    document.getElementById('hubThread').innerHTML = '<div class="hub-thread-loader">⏳ Chargement…</div>';
+    document.getElementById('hubThread').innerHTML = '<div class="hub-thread-loader">Chargement…</div>';
     _lastMsgId = 0;
 
     stopPoll();
@@ -796,7 +797,7 @@ async function sendPriceProposal() {
     const message = document.getElementById('hubProposeMessage')?.value.trim() || '';
 
     const btn = document.querySelector('.hub-propose-send');
-    btn.disabled = true; btn.textContent = '⏳ Envoi…';
+    btn.disabled = true; btn.textContent = 'Envoi…';
 
     try {
         const res = await fetch('/client/messages/propose-price', {
@@ -831,7 +832,7 @@ async function loadConv() {
         thread.innerHTML = '';
 
         if (!msgs.length) {
-            thread.innerHTML = '<div class="hub-thread-empty">💬 Aucun message. Posez votre première question !</div>';
+            thread.innerHTML = '<div class="hub-thread-empty">Aucun message. Posez votre première question !</div>';
             _lastMsgId = 0; return;
         }
 
@@ -1023,7 +1024,7 @@ async function sendImagesMsg() {
             renderImgPreview();
             if (_convEl) {
                 const p = _convEl.querySelector('.hub-conv-preview');
-                if (p) p.textContent = `📷 ${data.count} photo(s)`;
+                if (p) p.textContent = `${data.count} photo(s)`;
                 const t = _convEl.querySelector('.hub-conv-time');
                 if (t) t.textContent = 'À l\'instant';
             }
@@ -1046,7 +1047,7 @@ function buildProcessingRow(msgId, count, time) {
     row.dataset.processing = '1';
     row.innerHTML = `<div class="img-sending-bubble">
         <div class="img-sending-spinner"></div>
-        <span class="img-sending-text">⚙️ Optimisation de ${count} photo(s)…</span>
+        <span class="img-sending-text">Optimisation de ${count} photo(s)…</span>
         <span style="font-size:10px;color:var(--muted);margin-left:4px">${time}</span>
     </div>`;
     return row;
@@ -1070,7 +1071,7 @@ function pollImageReady(msgId, row, count) {
             } else if (data.status === 'failed') {
                 clearInterval(interval);
                 row.innerHTML = `<div class="img-sending-bubble" style="background:#fee2e2">
-                    <span style="color:#991b1b;font-size:13px">❌ Échec optimisation — ${count} photo(s)</span>
+                    <span style="color:#991b1b;font-size:13px">Échec optimisation — ${count} photo(s)</span>
                 </div>`;
             }
         } catch(e) {}
@@ -1081,7 +1082,7 @@ function pollImageReady(msgId, row, count) {
 /* ── Confirmer une offre vendeur ── */
 async function confirmOffer(msgId, btn) {
     if (!confirm('Confirmer cette offre et créer la commande ?')) return;
-    btn.disabled = true; btn.textContent = '⏳ Création…';
+    btn.disabled = true; btn.textContent = 'Création…';
     try {
         const res  = await fetch(`/client/messages/confirm-offer/${msgId}`, {
             method: 'POST',
@@ -1089,7 +1090,7 @@ async function confirmOffer(msgId, btn) {
         });
         const data = await res.json();
         if (data.success) {
-            btn.textContent = '✅ Commande n°' + data.order_id + ' créée !';
+            btn.textContent = 'Commande n°' + data.order_id + ' créée !';
             btn.style.background = '#065f46';
             setTimeout(() => loadConv(), 1500);
         } else throw new Error();
@@ -1248,19 +1249,19 @@ function buildProposalCard(msg) {
     const raw = _prodData.prodPriceRaw ? parseFloat(_prodData.prodPriceRaw) : 0;
     const devise = _prodData.devise || 'GNF';
     const disc = raw > 0 ? Math.round((1 - msg.proposed_price / raw) * 100) : 0;
-    const statusMap = { pending:'⏳ En attente de réponse…', accepted:'✓ Proposition acceptée', refused:'✕ Proposition refusée' };
+    const statusMap = { pending:'En attente de réponse…', accepted:'Proposition acceptée', refused:'Proposition refusée' };
     const statusClass = { pending:'s-pending', accepted:'s-accepted', refused:'s-refused' };
     const wrap = document.createElement('div');
     wrap.className = 'nego-wrap mine'; if (msg.id) wrap.dataset.msgId = msg.id;
     wrap.innerHTML = `
       <div class="nego-card nego-proposal">
-        <div class="nego-head">💰 Proposition de prix</div>
+        <div class="nego-head">${SIco.wallet} Proposition de prix</div>
         <div class="nego-body">
           <div class="nego-amount">${fmtPrice(msg.proposed_price, devise)}</div>
           ${raw>0 ? `<div class="nego-original">Prix catalogue : ${fmtPrice(raw, devise)}</div>` : ''}
           ${disc>0 ? `<div class="nego-discount">-${disc}% de réduction</div>` : ''}
           ${msg.note ? `<div class="nego-note">${escHtml(msg.note)}</div>` : ''}
-          <div class="nego-status ${statusClass[msg.proposal_status]||'s-pending'}">${statusMap[msg.proposal_status]||'⏳ En attente…'}</div>
+          <div class="nego-status ${statusClass[msg.proposal_status]||'s-pending'}">${statusMap[msg.proposal_status]||'En attente…'}</div>
           <div class="nego-meta">${escHtml(msg.time||'')}</div>
         </div>
       </div>`;
@@ -1279,8 +1280,8 @@ function buildOfferCard(msg) {
     if (isPending) {
         actionsHtml = `
           <div class="nego-card-actions">
-            <button class="nego-card-btn nego-btn-accept" onclick="confirmOffer(${msg.id},this)">✅ Accepter</button>
-            <button class="nego-card-btn nego-btn-counter" onclick="toggleClientCounterInput(this,${msg.id},${msg.proposed_price})">🔄 Contre-offre</button>
+            <button class="nego-card-btn nego-btn-accept" onclick="confirmOffer(${msg.id},this)">Accepter</button>
+            <button class="nego-card-btn nego-btn-counter" onclick="toggleClientCounterInput(this,${msg.id},${msg.proposed_price})">Contre-offre</button>
             <button class="nego-card-btn nego-btn-refuse" onclick="refuseClientOffer(${msg.id},this)">✕ Refuser</button>
           </div>
           <div class="nego-counter-form" id="cliCounterForm_${msg.id}">
@@ -1293,14 +1294,14 @@ function buildOfferCard(msg) {
           </div>`;
     } else {
         const st = msg.proposal_status === 'accepted'
-            ? '<div class="nego-status s-accepted">✅ Offre confirmée — commande créée</div>'
+            ? '<div class="nego-status s-accepted">Offre confirmée — commande créée</div>'
             : '<div class="nego-status s-refused">✕ Offre refusée</div>';
         actionsHtml = st;
     }
 
     wrap.innerHTML = `
       <div class="nego-card nego-offer">
-        <div class="nego-head">🎉 Offre spéciale du vendeur</div>
+        <div class="nego-head">${SIco.gift} Offre spéciale du vendeur</div>
         <div class="nego-body">
           <div class="nego-amount">${fmtPrice(msg.proposed_price, devise)}</div>
           ${raw>0 ? `<div class="nego-original">Prix catalogue : ${fmtPrice(raw, devise)}</div>` : ''}
@@ -1318,10 +1319,10 @@ function buildOrderCard(msg) {
     wrap.className = 'nego-wrap mine'; if (msg.id) wrap.dataset.msgId = msg.id;
     wrap.innerHTML = `
       <div class="nego-card nego-order">
-        <div class="nego-head">📦 Commande confirmée !</div>
+        <div class="nego-head">${SIco.package} Commande confirmée !</div>
         <div class="nego-body">
           <div class="nego-amount">${fmtPrice(msg.proposed_price, devise)}</div>
-          <div class="nego-status s-accepted">✅ Prix négocié appliqué</div>
+          <div class="nego-status s-accepted">Prix négocié appliqué</div>
           ${msg.negotiated_order_id ? `<div style="margin-top:8px;font-size:12px;color:#1d4ed8;font-weight:700">Commande n°${msg.negotiated_order_id}</div>` : ''}
           <div class="nego-meta">${escHtml(msg.time||'')}</div>
         </div>
@@ -1342,8 +1343,8 @@ function buildCounterCard(msg) {
     if (!msg.mine && isPending) {
         actionsHtml = `
           <div class="nego-card-actions">
-            <button class="nego-card-btn nego-btn-accept" onclick="confirmOffer(${msg.id},this)">✅ Accepter</button>
-            <button class="nego-card-btn nego-btn-counter" onclick="toggleClientCounterInput(this,${msg.id},${msg.proposed_price})">🔄 Contre-offre</button>
+            <button class="nego-card-btn nego-btn-accept" onclick="confirmOffer(${msg.id},this)">Accepter</button>
+            <button class="nego-card-btn nego-btn-counter" onclick="toggleClientCounterInput(this,${msg.id},${msg.proposed_price})">Contre-offre</button>
             <button class="nego-card-btn nego-btn-refuse" onclick="refuseClientOffer(${msg.id},this)">✕ Refuser</button>
           </div>
           <div class="nego-counter-form" id="cliCounterForm_${msg.id}">
@@ -1356,14 +1357,14 @@ function buildCounterCard(msg) {
           </div>`;
     } else if (!isPending) {
         const st = msg.proposal_status === 'accepted'
-            ? '<div class="nego-status s-accepted">✅ Acceptée</div>'
+            ? '<div class="nego-status s-accepted">Acceptée</div>'
             : '<div class="nego-status s-refused">✕ Refusée</div>';
         actionsHtml = st;
     } else {
-        actionsHtml = '<div class="nego-status s-pending">⏳ En attente de réponse…</div>';
+        actionsHtml = '<div class="nego-status s-pending">En attente de réponse…</div>';
     }
 
-    const label = msg.mine ? '🔄 Votre contre-offre' : '🔄 Contre-offre du vendeur';
+    const label = msg.mine ? 'Votre contre-offre' : 'Contre-offre du vendeur';
     wrap.innerHTML = `
       <div class="nego-card nego-counter-card">
         <div class="nego-head">${label}</div>
@@ -1396,7 +1397,7 @@ async function sendClientCounter(msgId, btn) {
     if (!price || price < 1) { alert('Entrez un prix valide.'); return; }
     const message = document.getElementById('cliCounterMessage_' + msgId)?.value.trim() || '';
 
-    btn.disabled = true; btn.textContent = '⏳…';
+    btn.disabled = true; btn.textContent = '…';
     try {
         const res = await fetch('/client/messages/counter-offer', {
             method: 'POST',
@@ -1419,7 +1420,7 @@ async function sendClientCounter(msgId, btn) {
 
 async function refuseClientOffer(msgId, btn) {
     if (!confirm('Refuser cette offre ?')) return;
-    btn.disabled = true; btn.textContent = '⏳…';
+    btn.disabled = true; btn.textContent = '…';
     try {
         const res = await fetch(`/client/messages/refuse-offer/${msgId}`, {
             method: 'POST',

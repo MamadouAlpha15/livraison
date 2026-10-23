@@ -15,6 +15,18 @@ class Product extends Model
         static::updated(function (Product $product) {
             if ($product->wasChanged('stock')) {
                 app(StockAlertService::class)->checkProduct($product);
+
+                // Retour en stock : prévenir les clients qui ont demandé « Me prévenir »
+                $before = $product->getOriginal('stock');
+                if ($before !== null && $before <= 0 && $product->stock > 0) {
+                    app(\App\Services\ClientProductAlertService::class)->productRestocked($product);
+                }
+            }
+
+            // Baisse du prix appliqué (prix normal ou vente flash) : prévenir les clients qui l'ont en favori
+            if ($product->wasChanged(['price', 'flash_price', 'flash_starts_at', 'flash_ends_at'])) {
+                $alerts = app(\App\Services\ClientProductAlertService::class);
+                $alerts->priceDropped($product, $alerts::originalCurrentPrice($product), $product->current_price);
             }
         });
     }

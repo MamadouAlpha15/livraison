@@ -6,13 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\Shop;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
     public function index(Request $request)
     {
-        $meInit = strtoupper(substr(Auth::user()->name ?? 'S', 0, 1));
 
         $shopId     = $request->filled('shop_id') ? (int) $request->shop_id : null;
         $shopFilter = $shopId ? Shop::find($shopId) : null;
@@ -79,7 +77,7 @@ class PaymentController extends Controller
                          ->distinct()->orderBy('country')->pluck('country');
 
         return view('admin.paiements.index', compact(
-            'payments', 'stats', 'period', 'meInit', 'shops', 'shopId', 'shopFilter', 'country', 'countries'
+            'payments', 'stats', 'period', 'shops', 'shopId', 'shopFilter', 'country', 'countries'
         ));
     }
 

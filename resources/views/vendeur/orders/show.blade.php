@@ -609,6 +609,12 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
                                 <span class="val">📍 {{ $order->delivery_destination }}</span>
                             </div>
                             @endif
+                            @if($order->delivery_slot)
+                            <div class="info-row">
+                                <span class="lbl">Créneau</span>
+                                <span class="val">{{ $order->delivery_slot }}</span>
+                            </div>
+                            @endif
                             @if($cl->created_at)
                             <div class="info-row">
                                 <span class="lbl">Client depuis</span>
@@ -638,6 +644,12 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
                             <div class="info-row">
                                 <span class="lbl">Livraison</span>
                                 <span class="val">📍 {{ $order->delivery_destination }}</span>
+                            </div>
+                            @endif
+                            @if($order->delivery_slot)
+                            <div class="info-row">
+                                <span class="lbl">Créneau</span>
+                                <span class="val">{{ $order->delivery_slot }}</span>
                             </div>
                             @endif
                         </div>
@@ -1002,6 +1014,7 @@ function toggleGroup(btn) {
             }
             return;
         }
+        const _esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); // nom saisi par un autre utilisateur
         lname = livreur.name;
         const ini = getInitials(livreur.name);
         const dotColor = d.is_delivered ? '#22c55e' : d.is_ongoing ? '#f59e0b' : '#94a3b8';
@@ -1009,9 +1022,9 @@ function toggleGroup(btn) {
         row.innerHTML = `<div class="info-row" style="align-items:center">
             <span class="lbl">Livreur</span>
             <div class="livreur-inline">
-                <div class="l-av">${ini}</div>
+                <div class="l-av">${_esc(ini)}</div>
                 <div>
-                    <div class="l-name">${livreur.name}</div>
+                    <div class="l-name">${_esc(livreur.name)}</div>
                     <div class="l-avail"><span class="l-dot" style="background:${dotColor}"></span> ${dotLabel}</div>
                 </div>
             </div>

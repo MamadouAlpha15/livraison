@@ -6,13 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\DeliveryCompany;
 use App\Models\Order;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class RevenusEntreprisesController extends Controller
 {
     public function index(Request $request)
     {
-        $meInit  = strtoupper(substr(Auth::user()->name ?? 'S', 0, 1));
         $period  = $request->input('period', 'all');
         $country = $request->input('country');
         $search  = $request->input('search');
@@ -63,14 +61,13 @@ class RevenusEntreprisesController extends Controller
         ];
 
         return view('admin.revenus.entreprises', compact(
-            'companies', 'period', 'globalStats', 'meInit',
+            'companies', 'period', 'globalStats',
             'countries', 'country', 'heroDevise', 'search'
         ));
     }
 
     public function show(DeliveryCompany $company, Request $request)
     {
-        $meInit = strtoupper(substr(Auth::user()->name ?? 'S', 0, 1));
         $period = $request->input('period', 'all');
 
         $periodScope = $this->periodScope($period);
@@ -89,7 +86,7 @@ class RevenusEntreprisesController extends Controller
             'total_frais' => (float)(clone $statsBase)->sum('delivery_fee'),
         ];
 
-        return view('admin.revenus.entreprise-show', compact('company', 'orders', 'stats', 'period', 'meInit'));
+        return view('admin.revenus.entreprise-show', compact('company', 'orders', 'stats', 'period'));
     }
 
     private function periodScope(string $period): \Closure

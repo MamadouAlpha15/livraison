@@ -13,7 +13,7 @@ class EmployeeController extends Controller
     public function index()
     {
         $user   = Auth::user();
-        $shop   = $user->shop ?: $user->assignedShop;
+        $shop   = $user->shop;
         $shopId = $shop?->id;
 
         abort_unless($shopId, 403, 'Aucune boutique rattachée.');
@@ -34,7 +34,7 @@ class EmployeeController extends Controller
     public function store(Request $request)
     {
         $user   = Auth::user();
-        $shop   = $user->shop ?: $user->assignedShop;
+        $shop   = $user->shop;
         $shopId = $shop?->id;
 
         abort_unless($shopId, 403, 'Aucune boutique rattachée.');
@@ -76,7 +76,7 @@ class EmployeeController extends Controller
     public function edit(User $employee)
     {
         $user   = Auth::user();
-        $shop   = $user->shop ?: $user->assignedShop;
+        $shop   = $user->shop;
         abort_unless($shop && $employee->shop_id === $shop->id, 403);
 
         return view('vendeur.employees.edit', compact('employee'));
@@ -85,7 +85,7 @@ class EmployeeController extends Controller
     public function update(Request $request, User $employee)
     {
         $user   = Auth::user();
-        $shop   = $user->shop ?: $user->assignedShop;
+        $shop   = $user->shop;
         abort_unless($shop && $employee->shop_id === $shop->id, 403);
 
         $request->validate([
@@ -114,7 +114,7 @@ class EmployeeController extends Controller
     public function destroy(User $employee)
     {
         $user   = Auth::user();
-        $shop   = $user->shop ?: $user->assignedShop;
+        $shop   = $user->shop;
         $shopId = $shop?->id;
 
         abort_unless($shopId && $employee->shop_id === $shopId, 403, 'Action non autorisée.');

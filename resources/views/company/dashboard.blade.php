@@ -1,35 +1,35 @@
 @extends('layouts.app')
-@section('title', 'Dashboard · ShipXpress')
+@section('title', 'Tableau de bord · Shopio')
 @php $bodyClass = 'cx-dashboard'; @endphp
 
 @push('styles')
 {{-- Anti-flash : applique le thème sauvegardé avant le premier paint --}}
 <script>
 (function(){
-    if(localStorage.getItem('cx-theme')==='light')
+    if(localStorage.getItem('cx-theme')!=='dark')
         document.documentElement.classList.add('cx-prelight');
 })();
 </script>
 <style>
-html.cx-prelight body { background:#F5F7FA !important; }
+html.cx-prelight body { background:#F6F9FF !important; }
 </style>
 @if($isBusiness)<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>@endif
 <style>
 /* ═══════════════════════════════════════════════════════════
-   ShipXpress — Company Dashboard — Dark Theme
+   Shopio — Tableau de bord société de livraison (clair par défaut, sombre en option)
 ═══════════════════════════════════════════════════════════ */
 *,*::before,*::after { box-sizing:border-box; }
 
 :root {
-    --cx-bg:        #0b0d22;
-    --cx-surface:   #0d1226;
-    --cx-surface2:  #111930;
-    --cx-sb:        #06070f;
+    --cx-bg:        #071630;
+    --cx-surface:   #0B1E3D;
+    --cx-surface2:  #132B52;
+    --cx-sb:        #061226;
     --cx-border:    rgba(255,255,255,.07);
-    --cx-brand:     #7c3aed;
-    --cx-brand2:    #6d28d9;
-    --cx-brand-lt:  #a78bfa;
-    --cx-brand-mlt: rgba(124,58,237,.12);
+    --cx-brand:     #1668D8;
+    --cx-brand2:    #1260C9;
+    --cx-brand-lt:  #7DB4FF;
+    --cx-brand-mlt: rgba(31,124,246,.12);
     --cx-text:      #e2e8f0;
     --cx-text2:     #94a3b8;
     --cx-muted:     #475569;
@@ -45,7 +45,7 @@ html.cx-prelight body { background:#F5F7FA !important; }
 }
 
 html,body {
-    margin:0; font-family:'Segoe UI',sans-serif;
+    margin:0; font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
     background:var(--cx-bg) !important;
     color:var(--cx-text);
     -webkit-font-smoothing:antialiased;
@@ -74,17 +74,17 @@ body.cx-dashboard > main.app-main {
 /* ══ SIDEBAR ══ */
 .cx-sidebar {
     position:fixed; top:0; left:0; bottom:0; width:var(--cx-sb-w);
-    background: linear-gradient(180deg, #0f0f59 0%, #0e0e16 40%, #10103a 100%); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; width: var(--sb-w); overflow-y: scroll; scrollbar-width: thin; scrollbar-color: rgba(99,102,241,.35) transparent; z-index: 40; border-right: 1px solid rgba(99,102,241,.15); box-shadow: 6px 0 30px rgba(0,0,0,.35); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; 
-    border-right:1px solid rgba(99,102,241,.1);
+    background: linear-gradient(180deg, #0B1E3D 0%, #081831 55%, #0B1E3D 100%); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; width: var(--sb-w); overflow-y: scroll; scrollbar-width: thin; scrollbar-color: rgba(31,124,246,.35) transparent; z-index: 40; border-right: 1px solid rgba(31,124,246,.15); box-shadow: 6px 0 30px rgba(0,0,0,.35); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; 
+    border-right:1px solid rgba(31,124,246,.1);
     backdrop-filter: blur(6px); /* effet moderne */
     display:flex; flex-direction:column;
     z-index:1200; overflow-y:auto;
-    scrollbar-width:thin; scrollbar-color:rgba(124,58,237,.3) transparent;
+    scrollbar-width:thin; scrollbar-color:rgba(31,124,246,.3) transparent;
     transition:transform .25s cubic-bezier(.23,1,.32,1);
 }
 
 .cx-sidebar::-webkit-scrollbar { width:3px; }
-.cx-sidebar::-webkit-scrollbar-thumb { background:rgba(124,58,237,.3); border-radius:3px; }
+.cx-sidebar::-webkit-scrollbar-thumb { background:rgba(31,124,246,.3); border-radius:3px; }
 
 /* Brand */
 .cx-brand-hd {
@@ -98,7 +98,7 @@ body.cx-dashboard > main.app-main {
 }
 .cx-logo-icon {
     width:34px; height:34px; border-radius:9px;
-    background:linear-gradient(135deg,#7c3aed,#4f46e5);
+    background:linear-gradient(135deg,#1668D8,#1260C9);
     display:flex; align-items:center; justify-content:center;
     font-size:16px; flex-shrink:0;
 }
@@ -138,17 +138,17 @@ body.cx-dashboard > main.app-main {
     transition:all .22s cubic-bezier(.23,1,.32,1); position:relative;
     cursor:pointer; margin-bottom:2px; border:1px solid transparent;
 }
-.cx-nav-item:hover { background:rgba(124,58,237,.18); color:#fff; border-color:rgba(124,58,237,.25); box-shadow:0 2px 12px rgba(124,58,237,.2),inset 0 1px 0 rgba(255,255,255,.06); }
-.cx-nav-item:hover .cx-nav-ico { background:rgba(139,92,246,.25); box-shadow:0 0 8px rgba(139,92,246,.3); }
+.cx-nav-item:hover { background:rgba(31,124,246,.18); color:#fff; border-color:rgba(31,124,246,.25); box-shadow:0 2px 12px rgba(31,124,246,.2),inset 0 1px 0 rgba(255,255,255,.06); }
+.cx-nav-item:hover .cx-nav-ico { background:rgba(31,124,246,.25); box-shadow:0 0 8px rgba(31,124,246,.3); }
 .cx-nav-item.active {
-    background:linear-gradient(90deg,rgba(124,58,237,.35) 0%,rgba(99,102,241,.2) 100%);
-    color:#fff; font-weight:700; border-color:rgba(139,92,246,.3);
-    box-shadow:0 4px 16px rgba(124,58,237,.25),inset 0 1px 0 rgba(255,255,255,.08);
+    background:linear-gradient(90deg,rgba(31,124,246,.35) 0%,rgba(31,124,246,.2) 100%);
+    color:#fff; font-weight:700; border-color:rgba(31,124,246,.3);
+    box-shadow:0 4px 16px rgba(31,124,246,.25),inset 0 1px 0 rgba(255,255,255,.08);
 }
 .cx-nav-item.active::before {
     content:''; position:absolute; left:0; top:50%; transform:translateY(-50%);
-    width:3px; height:22px; background:linear-gradient(180deg,#a78bfa,#7c3aed);
-    border-radius:0 3px 3px 0; box-shadow:2px 0 12px rgba(167,139,250,.7);
+    width:3px; height:22px; background:linear-gradient(180deg,#7DB4FF,#1668D8);
+    border-radius:0 3px 3px 0; box-shadow:2px 0 12px rgba(125,180,255,.7);
 }
 .cx-nav-ico {
     width:26px; height:26px; border-radius:7px;
@@ -156,14 +156,14 @@ body.cx-dashboard > main.app-main {
     display:flex; align-items:center; justify-content:center;
     font-size:13px; flex-shrink:0; transition:all .22s cubic-bezier(.23,1,.32,1);
 }
-.cx-nav-item.active .cx-nav-ico { background:rgba(139,92,246,.3); border-color:rgba(139,92,246,.4); box-shadow:0 0 10px rgba(139,92,246,.4); }
+.cx-nav-item.active .cx-nav-ico { background:rgba(31,124,246,.3); border-color:rgba(31,124,246,.4); box-shadow:0 0 10px rgba(31,124,246,.4); }
 /* SVG icon rendering */
 .cx-nav-ico svg { display:block; }
 .cx-stat-ico svg { display:block; }
 .cx-perf-ico svg { display:block; }
 .cx-toast-ico svg { display:block; }
 .cx-perf-ico { color:var(--cx-brand-lt); }
-.cx-nav-item.active:hover { background:linear-gradient(90deg,rgba(124,58,237,.45) 0%,rgba(99,102,241,.3) 100%); box-shadow:0 4px 20px rgba(124,58,237,.35),inset 0 1px 0 rgba(255,255,255,.1); }
+.cx-nav-item.active:hover { background:linear-gradient(90deg,rgba(31,124,246,.45) 0%,rgba(31,124,246,.3) 100%); box-shadow:0 4px 20px rgba(31,124,246,.35),inset 0 1px 0 rgba(255,255,255,.1); }
 .cx-nav-badge {
     margin-left:auto; background:var(--cx-brand); color:#fff;
     font-size:9.5px; font-weight:700; padding:1px 6px;
@@ -184,12 +184,12 @@ body.cx-dashboard > main.app-main {
 .cx-user-row:hover { background:rgba(255,255,255,.08); }
 .cx-user-av {
     width:32px; height:32px; border-radius:50%;
-    background:linear-gradient(135deg,#7c3aed,#4338ca);
+    background:linear-gradient(135deg,#1668D8,#1260C9);
     display:flex; align-items:center; justify-content:center;
     font-size:11px; font-weight:800; color:#fff; flex-shrink:0;
 }
 .cx-user-name { font-size:12px; font-weight:700; color:#fff; line-height:1.2; }
-.cx-user-role { font-size:10px; color:var(--cx-text2); }
+.cx-user-role { font-size:10px; color:rgba(255,255,255,.62); } /* barre latérale toujours bleu nuit */
 .cx-logout-btn {
     width:30px; height:30px; border-radius:8px; flex-shrink:0;
     background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.2);
@@ -202,7 +202,7 @@ body.cx-dashboard > main.app-main {
     display:flex; align-items:center; justify-content:space-between;
     padding:4px 8px; cursor:pointer;
 }
-.cx-dark-lbl { font-size:11.5px; color:var(--cx-text2); }
+.cx-dark-lbl { font-size:11.5px; color:rgba(255,255,255,.72); }
 .cx-toggle {
     width:34px; height:18px; background:#475569;
     border-radius:9px; position:relative; transition:background .25s;
@@ -218,18 +218,18 @@ body.cx-dashboard > main.app-main {
 
 /* ══ MODE CLAIR ══ */
 body.cx-light {
-    --cx-bg:        #F5F7FA;
+    --cx-bg:        #F6F9FF;
     --cx-surface:   #ffffff;
-    --cx-surface2:  #eef1f7;
+    --cx-surface2:  #EEF3FB;
     --cx-border:    rgba(0,0,0,.08);
-    --cx-text:      #111827;
-    --cx-text2:     #4b5563;
+    --cx-text:      #16162A;
+    --cx-text2:     #45455E;
     --cx-muted:     #9ca3af;
-    --cx-brand-mlt: rgba(124,58,237,.07);
+    --cx-brand-mlt: rgba(31,124,246,.07);
 }
 body.cx-light,
 html.cx-light,
-html.cx-light body { background:#F5F7FA !important; }
+html.cx-light body { background:#F6F9FF !important; }
 
 /* Topbar clair */
 body.cx-light .cx-topbar {
@@ -241,8 +241,8 @@ body.cx-light .cx-tb-btn {
     background:rgba(0,0,0,.05); border-color:rgba(0,0,0,.08); color:#374151;
 }
 body.cx-light .cx-tb-btn:hover { background:rgba(0,0,0,.1); color:#111; }
-body.cx-light .cx-tb-uname  { color:#111827; }
-body.cx-light .cx-tb-urole  { color:#6b7280; }
+body.cx-light .cx-tb-uname  { color:#16162A; }
+body.cx-light .cx-tb-urole  { color:#62627C; }
 body.cx-light .cx-tb-status {
     background:rgba(16,185,129,.07); border-color:rgba(16,185,129,.2);
 }
@@ -252,7 +252,7 @@ body.cx-light .cx-search {
 body.cx-light .cx-search input { color:#111; }
 body.cx-light .cx-search input::placeholder { color:#9ca3af; }
 body.cx-light .cx-kbd {
-    background:rgba(0,0,0,.06); border-color:rgba(0,0,0,.1); color:#6b7280;
+    background:rgba(0,0,0,.06); border-color:rgba(0,0,0,.1); color:#62627C;
 }
 body.cx-light .cx-date-badge {
     background:rgba(0,0,0,.05); border-color:rgba(0,0,0,.1); color:#374151;
@@ -267,7 +267,7 @@ body.cx-light .cx-stat {
 body.cx-light .cx-stat:hover {
     box-shadow:0 4px 16px rgba(0,0,0,.1), 0 1px 4px rgba(0,0,0,.06);
 }
-body.cx-light .cx-stat-val { color:#111827; }
+body.cx-light .cx-stat-val { color:#16162A; }
 
 /* Panels clairs */
 body.cx-light .cx-panel {
@@ -276,45 +276,45 @@ body.cx-light .cx-panel {
     box-shadow:0 1px 3px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.03);
 }
 body.cx-light .cx-panel-hd { border-bottom-color:rgba(0,0,0,.06); }
-body.cx-light .cx-panel-title { color:#111827; }
+body.cx-light .cx-panel-title { color:#16162A; }
 body.cx-light .cx-panel-link { color:var(--cx-brand); }
 
 /* Chat items clairs */
 body.cx-light .cx-chat-item { border-bottom-color:rgba(0,0,0,.05); }
 body.cx-light .cx-chat-item:hover { background:rgba(0,0,0,.03); }
-body.cx-light .cx-chat-name { color:#111827; }
-body.cx-light .cx-chat-msg  { color:#4b5563; }
+body.cx-light .cx-chat-name { color:#16162A; }
+body.cx-light .cx-chat-msg  { color:#45455E; }
 body.cx-light .cx-chat-time { color:#9ca3af; }
 body.cx-light .cx-chat-foot { }
 body.cx-light .cx-chat-cta  {
-    background:rgba(124,58,237,.06); border-color:rgba(124,58,237,.15);
+    background:rgba(31,124,246,.06); border-color:rgba(31,124,246,.15);
 }
 
 /* Pipeline clair */
 body.cx-light .cx-pipe-fill { opacity:.75; }
-body.cx-light .cx-pipe-val  { color:#111827; }
+body.cx-light .cx-pipe-val  { color:#16162A; }
 
 /* Livreurs clairs */
 body.cx-light .cx-driv-card {
     background:var(--cx-surface2); border-color:rgba(0,0,0,.07);
 }
-body.cx-light .cx-driv-name { color:#111827; }
+body.cx-light .cx-driv-name { color:#16162A; }
 
 /* Charts clairs */
 body.cx-light .cx-chart-wrap {
     background:#fff; border-color:rgba(0,0,0,.07);
     box-shadow:0 1px 3px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.03);
 }
-body.cx-light .cx-chart-title { color:#111827; }
-body.cx-light .cx-rev-big     { color:#111827; }
+body.cx-light .cx-chart-title { color:#16162A; }
+body.cx-light .cx-rev-big     { color:#16162A; }
 
 /* Performances claires */
 body.cx-light .cx-perf-card {
-    background:#F5F7FA; border-color:rgba(0,0,0,.07);
+    background:#F6F9FF; border-color:rgba(0,0,0,.07);
     box-shadow:0 1px 2px rgba(0,0,0,.05);
 }
-body.cx-light .cx-perf-val { color:#111827; }
-body.cx-light .cx-perf-lbl { color:#4b5563; }
+body.cx-light .cx-perf-val { color:#16162A; }
+body.cx-light .cx-perf-lbl { color:#45455E; }
 
 /* Notification dropdown clair */
 body.cx-light .cx-notif-panel {
@@ -322,38 +322,38 @@ body.cx-light .cx-notif-panel {
     box-shadow:0 12px 40px rgba(0,0,0,.12);
 }
 body.cx-light .cx-notif-panel-hd  { border-bottom-color:rgba(0,0,0,.07); }
-body.cx-light .cx-notif-panel-title { color:#111827; }
+body.cx-light .cx-notif-panel-title { color:#16162A; }
 body.cx-light .cx-notif-item { border-bottom-color:rgba(0,0,0,.05); }
 body.cx-light .cx-notif-item:hover { background:rgba(0,0,0,.03); }
-body.cx-light .cx-notif-name  { color:#111827; }
-body.cx-light .cx-notif-msg   { color:#4b5563; }
+body.cx-light .cx-notif-name  { color:#16162A; }
+body.cx-light .cx-notif-msg   { color:#45455E; }
 body.cx-light .cx-notif-time  { color:#9ca3af; }
 body.cx-light .cx-notif-footer { border-top-color:rgba(0,0,0,.07); }
 body.cx-light .cx-notif-empty { color:#9ca3af; }
 
 /* Label dark mode toggle en mode clair */
-body.cx-light .cx-dark-lbl { color:#4b5563; }
+body.cx-light .cx-dark-lbl { color:rgba(255,255,255,.72); }
 
 /* Éléments avec rgba blancs à inverser en mode clair */
 body.cx-light .cx-driver:hover { background:rgba(0,0,0,.03); }
 body.cx-light .cx-pipe-track   { background:rgba(0,0,0,.07); }
-body.cx-light .cx-pipe-lbl     { color:#4b5563; }
-body.cx-light .cx-driv-loc     { color:#6b7280; }
+body.cx-light .cx-pipe-lbl     { color:#45455E; }
+body.cx-light .cx-driv-loc     { color:#62627C; }
 body.cx-light .cx-driv-rating  { color:#d97706; }
 body.cx-light .cx-driv-phone   { background:rgba(0,0,0,.05); border-color:rgba(0,0,0,.09); color:#374151; }
 body.cx-light .cx-driv-phone:hover { background:rgba(16,185,129,.1); }
 body.cx-light .cx-chart-sel    { background:#fff; border-color:rgba(0,0,0,.1); color:#374151; }
 body.cx-light .cx-rev-sub      { color:#059669; }
 body.cx-light .cx-map-legend   { border-top-color:rgba(0,0,0,.06); }
-body.cx-light .cx-legend-item  { color:#4b5563; }
+body.cx-light .cx-legend-item  { color:#45455E; }
 body.cx-light .cx-perf-trend   { }
-body.cx-light .cx-stat-lbl     { color:#4b5563; }
+body.cx-light .cx-stat-lbl     { color:#45455E; }
 body.cx-light .cx-stat-trend   { color:#059669; }
 /* Fond Leaflet toujours clair (les tuiles OSM sont claires) */
 /* Topbar en mode clair : fond blanc net */
 body.cx-light .cx-topbar { background:#fff; box-shadow:0 1px 0 rgba(0,0,0,.07); }
 /* Wrap global en mode clair */
-body.cx-light .cx-wrap { background:#F5F7FA; }
+body.cx-light .cx-wrap { background:#F6F9FF; }
 
 /* ══ OVERLAY ══ */
 .cx-overlay {
@@ -366,9 +366,9 @@ body.cx-light .cx-wrap { background:#F5F7FA; }
 .cx-main {
     display:flex; flex-direction:column;
     min-height:100vh; min-width:0; flex:1;
-    background:#0b0d22;
+    background:#071630;
 }
-body.cx-light .cx-main { background:#F5F7FA; }
+body.cx-light .cx-main { background:#F6F9FF; }
 
 /* ══ TOPBAR ══ */
 .cx-topbar {
@@ -391,7 +391,7 @@ body.cx-light .cx-main { background:#F5F7FA; }
     border-radius:var(--r-sm); padding:8px 14px; cursor:text;
     transition:border-color .15s;
 }
-.cx-search:focus-within { border-color:rgba(139,92,246,.4); }
+.cx-search:focus-within { border-color:rgba(31,124,246,.4); }
 .cx-search input {
     flex:1; background:none; border:none; outline:none;
     color:var(--cx-text); font-size:13px; font-family:inherit;
@@ -435,7 +435,7 @@ body.cx-light .cx-main { background:#F5F7FA; }
 .cx-tb-user:hover { background:rgba(255,255,255,.06); }
 .cx-tb-av {
     width:32px; height:32px; border-radius:50%;
-    background:linear-gradient(135deg,#7c3aed,#4338ca);
+    background:linear-gradient(135deg,#1668D8,#1260C9);
     display:flex; align-items:center; justify-content:center;
     font-size:11px; font-weight:800; color:#fff; flex-shrink:0;
 }
@@ -470,7 +470,7 @@ body.cx-light .cx-main { background:#F5F7FA; }
     width:46px; height:46px; border-radius:12px;
     display:flex; align-items:center; justify-content:center;
     font-size:20px; flex-shrink:0;
-    background:var(--s-ico-bg, rgba(124,58,237,.12));
+    background:var(--s-ico-bg, rgba(31,124,246,.12));
     color:var(--s-color, var(--cx-brand-lt));
 }
 .cx-stat-lbl { font-size:11px; font-weight:600; color:var(--cx-text2); margin-bottom:4px; }
@@ -534,7 +534,7 @@ body.cx-light .cx-main { background:#F5F7FA; }
 }
 .b-wait   { background:rgba(234,179,8,.14); color:#fbbf24; border:1px solid rgba(234,179,8,.28); }
 .b-new    { background:rgba(59,130,246,.14); color:#60a5fa; border:1px solid rgba(59,130,246,.28); }
-.b-assign { background:rgba(124,58,237,.18); color:#a78bfa; border:1px solid rgba(124,58,237,.3); }
+.b-assign { background:rgba(31,124,246,.18); color:#7DB4FF; border:1px solid rgba(31,124,246,.3); }
 .b-done   { background:rgba(16,185,129,.14); color:#34d399; border:1px solid rgba(16,185,129,.28); }
 
 /* Chat CTA */
@@ -542,11 +542,11 @@ body.cx-light .cx-main { background:#F5F7FA; }
     margin:10px 14px 12px;
     display:flex; align-items:center; justify-content:center; gap:6px;
     padding:9px; background:var(--cx-brand-mlt);
-    border:1px solid rgba(124,58,237,.22); border-radius:var(--r-sm);
+    border:1px solid rgba(31,124,246,.22); border-radius:var(--r-sm);
     color:var(--cx-brand-lt); font-size:12.5px; font-weight:700;
     cursor:pointer; transition:background .14s;
 }
-.cx-chat-cta:hover { background:rgba(124,58,237,.2); }
+.cx-chat-cta:hover { background:rgba(31,124,246,.2); }
 
 /* Map */
 #cxMap { flex:1; min-height:420px; }
@@ -654,8 +654,8 @@ body.cx-light .cx-main { background:#F5F7FA; }
 
 /* ── 1024px : sidebar drawer, hamburger visible ── */
 @media(max-width:1024px) {
-    .cx-sidebar { transform:translateX(-100%); }
-    .cx-sidebar.open { transform:translateX(0); }
+    .cx-sidebar { transform:translateX(-100%); box-shadow:none; } /* fermée : pas d'ombre qui déborde sur l'écran */
+    .cx-sidebar.open { transform:translateX(0); box-shadow:6px 0 30px rgba(0,0,0,.35); }
     .cx-wrap { padding-left:0; }
     .cx-hamburger { display:flex; }
     .cx-close-btn { display:block; }
@@ -764,10 +764,10 @@ body.cx-light .cx-main { background:#F5F7FA; }
 }
 .cx-notif-list {
     max-height:350px; overflow-y:auto;
-    scrollbar-width:thin; scrollbar-color:rgba(124,58,237,.25) transparent;
+    scrollbar-width:thin; scrollbar-color:rgba(31,124,246,.25) transparent;
 }
 .cx-notif-list::-webkit-scrollbar { width:3px; }
-.cx-notif-list::-webkit-scrollbar-thumb { background:rgba(124,58,237,.3); border-radius:3px; }
+.cx-notif-list::-webkit-scrollbar-thumb { background:rgba(31,124,246,.3); border-radius:3px; }
 .cx-notif-item {
     display:flex; align-items:flex-start; gap:10px;
     padding:11px 16px; cursor:pointer;
@@ -829,7 +829,7 @@ body.cx-light .cx-main { background:#F5F7FA; }
 }
 .cx-toast {
     background:var(--cx-surface);
-    border:1px solid rgba(124,58,237,.25);
+    border:1px solid rgba(31,124,246,.25);
     border-left:3px solid var(--cx-brand);
     border-radius:14px;
     padding:13px 16px;
@@ -867,7 +867,7 @@ body.cx-light .cx-main { background:#F5F7FA; }
     font-family:inherit; cursor:pointer; transition:all .18s; white-space:nowrap;
 }
 .cx-period-btn:hover { color:#fff; }
-.cx-period-btn.active { background:var(--cx-brand); color:#fff; box-shadow:0 2px 8px rgba(124,58,237,.4); }
+.cx-period-btn.active { background:var(--cx-brand); color:#fff; box-shadow:0 2px 8px rgba(31,124,246,.4); }
 .cx-chart-summary { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:14px; }
 .cx-chart-sum-block { }
 .cx-chart-big { font-size:26px; font-weight:900; color:#fff; letter-spacing:-.5px; line-height:1; }
@@ -875,14 +875,16 @@ body.cx-light .cx-main { background:#F5F7FA; }
 .cx-chart-accent { color:#34d399 !important; }
 .cx-chart-area { position:relative; }
 body.cx-light .cx-period-toggle { background:rgba(0,0,0,.04); border-color:rgba(0,0,0,.08); }
-body.cx-light .cx-period-btn { color:#6b7280; }
-body.cx-light .cx-chart-title2 { color:#111827; }
-body.cx-light .cx-chart-big { color:#111827; }
+body.cx-light .cx-period-btn { color:#62627C; }
+body.cx-light .cx-period-btn.active { color:#fff; }
+body.cx-light .cx-chat-cta { color:#1260C9; }
+body.cx-light .cx-chart-title2 { color:#16162A; }
+body.cx-light .cx-chart-big { color:#16162A; }
 
 .tb-info { flex: 1; min-width: 0; overflow: hidden; }
 /* Topbar greeting */
-.tb-greeting { font-size:14px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.tb-greeting-sub { font-size:11px; color:var(--muted); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tb-greeting { font-size:15px; font-weight:800; color:var(--cx-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tb-greeting-sub { font-size:12px; color:var(--cx-text2); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
 
 /* ── Plan Gratuit banner – responsive mobile ── */
@@ -951,7 +953,7 @@ body.cx-light .cx-chart-big { color:#111827; }
 @section('content')
 @php
     $u = auth()->user();
-    $parts = explode(' ', $u->name ?? 'Admin ShipXpress');
+    $parts = explode(' ', $u->name ?? 'Administrateur');
     $ini = strtoupper(substr($parts[0],0,1)) . (isset($parts[1]) ? strtoupper(substr($parts[1],0,1)) : '');
 @endphp
 
@@ -985,7 +987,7 @@ body.cx-light .cx-chart-big { color:#111827; }
         <a href="{{ route('company.orders.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Commandes
             @if(!$isBusiness)
-                @php $oBg = $usedOrders >= $maxOrders ? '#ef4444' : ($usedOrders >= $maxOrders * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                @php $oBg = $usedOrders >= $maxOrders ? '#ef4444' : ($usedOrders >= $maxOrders * 0.7 ? '#f59e0b' : '#1668D8'); @endphp
                 <span class="cx-nav-badge" style="background:{{ $oBg }};margin-left:auto">{{ $usedOrders }}/{{ $maxOrders }}</span>
             @else
                 <span class="cx-nav-badge" id="navOrderBadge" style="display:none"></span>
@@ -996,12 +998,12 @@ body.cx-light .cx-chart-big { color:#111827; }
         </a>
         <a href="{{ $isBusiness ? route('company.carte.index') : route('company.subscription.upgrade') }}" class="cx-nav-item" @if(!$isBusiness) style="opacity:.6" title="Plan Business requis" @endif>
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span> Carte en direct
-            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917">🔒</span>@endif
+            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>@endif
         </a>
         <a href="{{ route('company.drivers.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></span> Chauffeurs
             @if(!$isBusiness)
-                @php $dBg = $totalDrivers >= $maxDrivers ? '#ef4444' : ($totalDrivers >= $maxDrivers * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                @php $dBg = $totalDrivers >= $maxDrivers ? '#ef4444' : ($totalDrivers >= $maxDrivers * 0.7 ? '#f59e0b' : '#1668D8'); @endphp
                 <span class="cx-nav-badge" style="background:{{ $dBg }};margin-left:auto">{{ $totalDrivers }}/{{ $maxDrivers }}</span>
             @endif
         </a>
@@ -1016,7 +1018,7 @@ body.cx-light .cx-chart-big { color:#111827; }
         <a href="{{ route('company.zones.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span> Zone de livraison
             @if(!$isBusiness)
-                @php $zNavBg = $totalZones >= $maxZones ? '#ef4444' : ($totalZones >= $maxZones * 0.7 ? '#f59e0b' : '#7c3aed'); @endphp
+                @php $zNavBg = $totalZones >= $maxZones ? '#ef4444' : ($totalZones >= $maxZones * 0.7 ? '#f59e0b' : '#1668D8'); @endphp
                 <span class="cx-nav-badge" style="background:{{ $zNavBg }};margin-left:auto">{{ $totalZones }}/{{ $maxZones }}</span>
             @endif
         </a>
@@ -1026,7 +1028,7 @@ body.cx-light .cx-chart-big { color:#111827; }
         </a>
         <a href="{{ $isBusiness ? route('company.rapport.index') : route('company.subscription.upgrade') }}" class="cx-nav-item" @if(!$isBusiness) style="opacity:.6" title="Plan Business requis" @endif>
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span> Rapport
-            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917">🔒</span>@endif
+            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>@endif
         </a>
 
         <div class="cx-nav-sec">Configuration</div>
@@ -1035,7 +1037,7 @@ body.cx-light .cx-chart-big { color:#111827; }
         </a>
         <a href="{{ $isBusiness ? route('company.users.index') : route('company.subscription.upgrade') }}" class="cx-nav-item" @if(!$isBusiness) style="opacity:.6" title="Plan Business requis" @endif>
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Utilisateurs
-            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917">🔒</span>@endif
+            @if(!$isBusiness)<span class="cx-nav-badge" style="background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>@endif
         </a>
         <a href="{{ route('company.support.index') }}" class="cx-nav-item">
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span> Support
@@ -1047,7 +1049,7 @@ body.cx-light .cx-chart-big { color:#111827; }
         <div class="cx-user-row">
             <div class="cx-user-av">{{ $ini }}</div>
             <div style="flex:1;min-width:0">
-                <div class="cx-user-name">{{ Str::limit($u->name ?? 'Admin ShipXpress', 18) }}</div>
+                <div class="cx-user-name">{{ Str::limit($u->name ?? 'Administrateur', 18) }}</div>
                 <div class="cx-user-role"> {{$company->name}}</div>
             </div>
             <form method="POST" action="{{ route('logout') }}" style="flex-shrink:0">
@@ -1076,7 +1078,7 @@ body.cx-light .cx-chart-big { color:#111827; }
     {{-- ══ BANNIÈRE PAIEMENT RÉUSSI ══ --}}
     @if($recentPayment ?? false)
     <div id="paymentSuccessBanner" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:12px;border-radius:12px;margin:16px 16px 0;box-shadow:0 4px 20px rgba(16,185,129,.35);">
-        <span style="font-size:22px">🎉</span>
+        <span style="display:inline-flex">{!! \App\Support\IconLibrary::svg('check', '', 22) !!}</span>
         <div style="flex:1">
             <strong style="font-size:15px">Paiement réussi ! Votre abonnement Business est maintenant actif.</strong>
             <div style="font-size:12px;opacity:.85;margin-top:2px">Vous avez accès à toutes les fonctionnalités premium.</div>
@@ -1088,7 +1090,7 @@ body.cx-light .cx-chart-big { color:#111827; }
     {{-- ══ BANNIÈRE PAIEMENT ÉCHOUÉ ══ --}}
     @if(session('payment_failed'))
     <div id="paymentFailedBanner" style="background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:12px;border-radius:12px;margin:16px 16px 0;box-shadow:0 4px 20px rgba(239,68,68,.35);">
-        <span style="font-size:22px">⚠️</span>
+        <span style="display:inline-flex">{!! \App\Support\IconLibrary::svg('alert', '', 22) !!}</span>
         <div style="flex:1">
             <strong style="font-size:15px">Le paiement n'a pas abouti.</strong>
             <div style="font-size:12px;opacity:.85;margin-top:2px">Votre carte ou moyen de paiement a été refusé. Aucun montant n'a été débité — réessayez.</div>
@@ -1136,7 +1138,7 @@ body.cx-light .cx-chart-big { color:#111827; }
             <div class="cx-tb-user">
                 <div class="cx-tb-av">{{ $ini }}</div>
                 <div>
-                    <div class="cx-tb-uname">{{ Str::limit($u->name ?? 'Admin ShipXpress', 16) }}</div>
+                    <div class="cx-tb-uname">{{ Str::limit($u->name ?? 'Administrateur', 16) }}</div>
                     <div class="cx-tb-urole">{{$company->name}}</div>
                 </div>
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--cx-muted);margin-left:2px"><polyline points="6 9 12 15 18 9"/></svg>
@@ -1152,14 +1154,14 @@ body.cx-light .cx-chart-big { color:#111827; }
     <div class="cx-content">
 
         {{-- Notifications push — activation manuelle si la bannière automatique n'est pas apparue --}}
-        <div id="notifSettingsCard" style="display:flex;align-items:center;gap:14px;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:16px 20px;">
-            <span style="font-size:26px">🔔</span>
+        <div id="notifSettingsCard" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--cx-surface);border:1px solid var(--cx-border);border-radius:18px;padding:16px 20px;">
+            <span style="width:42px;height:42px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(245,158,11,.12);color:#D97706">{!! \App\Support\IconLibrary::svg('bell', '', 20) !!}</span>
             <div style="flex:1;min-width:160px">
-                <div style="font-weight:700;font-size:14px;color:#111827">Notifications push</div>
-                <div id="notifSettingsSub" style="font-size:13px;color:#6b7280;margin-top:2px">Recevez vos commandes et messages en temps réel, même application fermée.</div>
+                <div style="font-weight:800;font-size:14px;color:var(--cx-text)">Notifications</div>
+                <div id="notifSettingsSub" style="font-size:13px;color:var(--cx-text2);margin-top:2px">Recevez vos commandes et messages en temps réel, même application fermée.</div>
             </div>
             <button type="button" id="notifSettingsBtn"
-                    style="background:#059669;color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">
+                    style="background:#1668D8;color:#fff;border:none;border-radius:999px;min-height:42px;padding:0 20px;font-family:inherit;font-size:13.5px;font-weight:800;cursor:pointer;white-space:nowrap;">
                 Activer les notifications
             </button>
         </div>
@@ -1177,11 +1179,7 @@ body.cx-light .cx-chart-big { color:#111827; }
 
             function refresh() {
                 if (Notification.permission === 'granted' && localStorage.getItem('push_subscribed')) {
-                    sub.textContent = 'Notifications activées ✓';
-                    btn.textContent = 'Déjà activées';
-                    btn.disabled = true;
-                    btn.style.opacity = '.6';
-                    btn.style.cursor = 'default';
+                    card.style.display = 'none'; // déjà activées : rien à faire ici
                 } else if (Notification.permission === 'denied') {
                     sub.textContent = 'Bloquées dans les réglages de votre navigateur — autorisez les notifications pour ce site pour les activer.';
                     btn.style.display = 'none';
@@ -1205,9 +1203,9 @@ body.cx-light .cx-chart-big { color:#111827; }
 
         {{-- ══ BANNIÈRE PLAN ══ --}}
         @if($isBusiness)
-        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:12px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:14px;padding:14px 20px;">
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:12px;background:radial-gradient(110% 170% at 100% 0%,rgba(31,124,246,.45),transparent 60%),linear-gradient(135deg,#0B1E3D,#132B52);border-radius:18px;padding:14px 20px;">
             <div style="display:flex;align-items:center;gap:10px;min-width:0">
-                <div style="width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">{{ $isOnTrial ? '🎁' : '⚡' }}</div>
+                <div style="width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;color:#FBBF24;flex-shrink:0">{!! \App\Support\IconLibrary::svg($isOnTrial ? 'gift' : 'zap', '', 18) !!}</div>
                 <div style="min-width:0">
                     <div style="font-size:13px;font-weight:800;color:#fff">{{ $isOnTrial ? 'Essai gratuit Business actif' : 'Plan Business actif' }}</div>
                     <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:1px">Expire le {{ $company->plan_expires_at->format('d/m/Y') }} — encore {{ $daysLeft }} jour{{ $daysLeft > 1 ? 's' : '' }}</div>
@@ -1222,12 +1220,12 @@ body.cx-light .cx-chart-big { color:#111827; }
         @endphp
         <div class="cx-free-banner">
             <div class="cx-free-banner-label">
-                <span>⚡</span> Plan Gratuit · Votre entreprise est active
+                <span style="display:inline-flex;color:#FBBF24">{!! \App\Support\IconLibrary::svg('zap', '', 15) !!}</span> Plan Gratuit · Votre entreprise est active
             </div>
             <div class="cx-free-banner-body">
                 <div class="cx-free-banner-stats">
                     <div class="cx-free-stat">
-                        <div class="cx-free-stat-label">🚗 Chauffeurs</div>
+                        <div class="cx-free-stat-label">{!! \App\Support\IconLibrary::svg('truck', '', 13) !!} Chauffeurs</div>
                         <div class="cx-free-stat-val" style="color:{{ $totalDrivers >= $maxDrivers ? '#fca5a5' : '#fff' }}">
                             {{ $totalDrivers }}<span>/{{ $maxDrivers }}</span>
                         </div>
@@ -1236,7 +1234,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                         </div>
                     </div>
                     <div class="cx-free-stat">
-                        <div class="cx-free-stat-label">🗺 Zones</div>
+                        <div class="cx-free-stat-label">{!! \App\Support\IconLibrary::svg('map-pin', '', 13) !!} Zones</div>
                         <div class="cx-free-stat-val" style="color:{{ $totalZones >= $maxZones ? '#fca5a5' : '#fff' }}">
                             {{ $totalZones }}<span>/{{ $maxZones }}</span>
                         </div>
@@ -1245,7 +1243,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                         </div>
                     </div>
                     <div class="cx-free-stat">
-                        <div class="cx-free-stat-label">📦 Cmd/mois</div>
+                        <div class="cx-free-stat-label">{!! \App\Support\IconLibrary::svg('package', '', 13) !!} Cmd/mois</div>
                         <div class="cx-free-stat-val" style="color:{{ $usedOrders >= $maxOrders ? '#fca5a5' : '#fff' }}">
                             {{ $usedOrders }}<span>/{{ $maxOrders }}</span>
                         </div>
@@ -1260,7 +1258,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                 </a>
             </div>
             <div class="cx-free-banner-footer">
-                <span class="ft-lbl">🔒 Business :</span>
+                <span class="ft-lbl">{!! \App\Support\IconLibrary::svg('lock', '', 12) !!} Business :</span>
                 <span>Carte GPS</span><span>·</span>
                 <span>Rapports</span><span>·</span>
                 <span>Stats avancées</span><span>·</span>
@@ -1286,7 +1284,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                     <div class="cx-stat-trend" id="kpi-pending-trend">{{ cxTrend($pendingOrdersToday, $pendingOrdersYday) }}</div>
                 </div>
             </div>
-            <div class="cx-stat" style="--s-color:#8b5cf6;--s-ico-bg:rgba(139,92,246,.12)">
+            <div class="cx-stat" style="--s-color:#1F7CF6;--s-ico-bg:rgba(31,124,246,.12)">
                 <div class="cx-stat-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg></div>
                 <div>
                     <div class="cx-stat-lbl">Chauffeurs disponibles</div>
@@ -1312,7 +1310,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                     <div class="cx-stat-trend" id="kpi-done-trend">{{ cxTrend($deliveredToday, $deliveredYday) }}</div>
                 </div>
             </div>
-            <div class="cx-stat" style="--s-color:#7c3aed;--s-ico-bg:rgba(124,58,237,.12)">
+            <div class="cx-stat" style="--s-color:#1668D8;--s-ico-bg:rgba(31,124,246,.12)">
                 <div class="cx-stat-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
                 <div>
                     <div class="cx-stat-lbl">Revenus livraison</div>
@@ -1340,7 +1338,7 @@ body.cx-light .cx-chart-big { color:#111827; }
                         <span class="cx-sys-dot"></span>
                         <span style="font-size:11px;color:var(--cx-green);font-weight:600">Live</span>
                         @else
-                        <span style="font-size:11px;font-weight:700;background:rgba(245,158,11,.15);color:#f59e0b;padding:2px 8px;border-radius:20px;border:1px solid rgba(245,158,11,.3)">🔒 Plan Business</span>
+                        <span style="font-size:11px;font-weight:700;background:rgba(245,158,11,.15);color:#f59e0b;padding:2px 8px;border-radius:20px;border:1px solid rgba(245,158,11,.3);display:inline-flex;align-items:center;gap:4px">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!} Plan Business</span>
                         @endif
                     </div>
                 </div>
@@ -1352,9 +1350,9 @@ body.cx-light .cx-chart-big { color:#111827; }
                 </div>
                 @else
                 <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:420px;gap:16px;padding:32px;text-align:center">
-                    <div style="width:64px;height:64px;border-radius:16px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.2);display:flex;align-items:center;justify-content:center;font-size:28px">🗺</div>
+                    <div style="width:64px;height:64px;border-radius:16px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.2);display:flex;align-items:center;justify-content:center;color:#D97706">{!! \App\Support\IconLibrary::svg('map-pin', '', 28) !!}</div>
                     <div>
-                        <div style="font-size:16px;font-weight:800;color:#fff;margin-bottom:6px">Carte en direct — Plan Business</div>
+                        <div style="font-size:16px;font-weight:800;color:var(--cx-text);margin-bottom:6px">Carte en direct — Plan Business</div>
                         <div style="font-size:12.5px;color:var(--cx-text2);max-width:320px;line-height:1.6">Suivez vos chauffeurs en temps réel sur la carte GPS. Disponible uniquement avec le Plan Business.</div>
                     </div>
                     <a href="{{ route('company.subscription.upgrade') }}" style="display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:13px;font-weight:800;border-radius:10px;text-decoration:none;box-shadow:0 4px 14px rgba(245,158,11,.35)">
@@ -1413,11 +1411,11 @@ body.cx-light .cx-chart-big { color:#111827; }
                     <div id="cx-drivers-list">
                     @php
                     $driverPalette = [
-                        'linear-gradient(135deg,#6366f1,#4338ca)',
+                        'linear-gradient(135deg,#1F7CF6,#1260C9)',
                         'linear-gradient(135deg,#10b981,#059669)',
                         'linear-gradient(135deg,#f59e0b,#d97706)',
                         'linear-gradient(135deg,#ec4899,#be185d)',
-                        'linear-gradient(135deg,#8b5cf6,#7c3aed)',
+                        'linear-gradient(135deg,#1F7CF6,#1668D8)',
                     ];
                     $statusMap = [
                         'available' => ['label' => 'Disponible',   'class' => 'ds-ok', 'dot' => '#10b981'],
@@ -1497,8 +1495,8 @@ body.cx-light .cx-chart-big { color:#111827; }
                 </div>
                 </div>
                 @if(!$isBusiness)
-                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center;background:rgba(11,13,34,.55);backdrop-filter:blur(2px)">
-                    <div style="font-size:22px">📈</div>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center;background:rgba(11,30,61,.55);backdrop-filter:blur(2px)">
+                    <div style="display:inline-flex;color:#7DB4FF">{!! \App\Support\IconLibrary::svg('trending', '', 24) !!}</div>
                     <div style="font-size:13px;font-weight:800;color:#fff">Graphique Commandes</div>
                     <div style="font-size:11.5px;color:var(--cx-text2);max-width:220px;line-height:1.5">Réservé au Plan Business</div>
                     <a href="{{ route('company.subscription.upgrade') }}" style="display:inline-flex;align-items:center;gap:5px;padding:8px 14px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:11.5px;font-weight:800;border-radius:9px;text-decoration:none;box-shadow:0 3px 12px rgba(245,158,11,.35);white-space:nowrap">
@@ -1538,8 +1536,8 @@ body.cx-light .cx-chart-big { color:#111827; }
                 </div>
                 </div>
                 @if(!$isBusiness)
-                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center;background:rgba(11,13,34,.55);backdrop-filter:blur(2px)">
-                    <div style="font-size:22px">💰</div>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center;background:rgba(11,30,61,.55);backdrop-filter:blur(2px)">
+                    <div style="display:inline-flex;color:#7DB4FF">{!! \App\Support\IconLibrary::svg('wallet', '', 24) !!}</div>
                     <div style="font-size:13px;font-weight:800;color:#fff">Graphique Revenus</div>
                     <div style="font-size:11.5px;color:var(--cx-text2);max-width:220px;line-height:1.5">Réservé au Plan Business</div>
                     <a href="{{ route('company.subscription.upgrade') }}" style="display:inline-flex;align-items:center;gap:5px;padding:8px 14px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:11.5px;font-weight:800;border-radius:9px;text-decoration:none;box-shadow:0 3px 12px rgba(245,158,11,.35);white-space:nowrap">
@@ -1652,7 +1650,7 @@ body.cx-light .cx-chart-big { color:#111827; }
 
 {{-- ══ MODAL AVIS CLIENTS ══ --}}
 <div id="cxReviewsModal" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);align-items:center;justify-content:center;padding:16px;">
-    <div style="background:#1e293b;border-radius:18px;width:100%;max-width:520px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.5);overflow:hidden;">
+    <div style="background:#0B1E3D;border-radius:18px;width:100%;max-width:520px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.5);overflow:hidden;">
         {{-- Header --}}
         <div style="padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
             <div>
@@ -1732,13 +1730,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const lbl  = row?.querySelector('.cx-dark-lbl');
         const body = document.body;
 
-        // Restaurer depuis localStorage (dark = défaut)
-        const saved = localStorage.getItem('cx-theme') || 'dark';
+        // Restaurer depuis localStorage (clair = défaut, aux couleurs de Shopio)
+        const saved = localStorage.getItem('cx-theme') || 'light';
         const applyTheme = (theme) => {
             if (theme === 'light') {
                 body.classList.add('cx-light');
                 sw?.classList.remove('on');
-                if (lbl) lbl.textContent = 'Mode clair';
+                if (lbl) lbl.textContent = 'Mode sombre';
             } else {
                 body.classList.remove('cx-light');
                 sw?.classList.add('on');
@@ -1755,7 +1753,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isLight = body.classList.toggle('cx-light');
             document.documentElement.classList.toggle('cx-light', isLight);
             sw?.classList.toggle('on', !isLight);
-            if (lbl) lbl.textContent = isLight ? 'Mode clair' : 'Mode sombre';
+            if (lbl) lbl.textContent = 'Mode sombre';
             localStorage.setItem('cx-theme', isLight ? 'light' : 'dark');
         });
     })();
@@ -1824,7 +1822,7 @@ document.addEventListener('DOMContentLoaded', () => {
     screen.orientation?.addEventListener('change', () => { setTimeout(() => map.invalidateSize(), 150); });
     L.control.zoom({ position:'bottomright' }).addTo(map);
 
-    const DASH_COLORS = ['#10b981','#f59e0b','#3b82f6','#ec4899','#8b5cf6','#06b6d4','#f97316','#ef4444','#a78bfa','#84cc16'];
+    const DASH_COLORS = ['#10b981','#f59e0b','#3b82f6','#ec4899','#1F7CF6','#06b6d4','#f97316','#ef4444','#7DB4FF','#84cc16'];
     let dashColorMap = {}, dashColorIdx = 0;
     function getDashColor(driverId) {
         if (dashColorMap[driverId] === undefined) dashColorMap[driverId] = dashColorIdx++;
@@ -1840,10 +1838,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function buildMapPopup(o) {
         const isLight = document.body.classList.contains('cx-light');
-        const bg  = isLight ? '#fff'            : '#0d1226';
-        const bdr = isLight ? 'rgba(0,0,0,.1)'  : 'rgba(99,102,241,.22)';
-        const txt = isLight ? '#111827'         : '#e2e8f0';
-        const sub = isLight ? '#6b7280'         : '#94a3b8';
+        const bg  = isLight ? '#fff'            : '#0B1E3D';
+        const bdr = isLight ? 'rgba(0,0,0,.1)'  : 'rgba(31,124,246,.22)';
+        const txt = isLight ? '#16162A'         : '#e2e8f0';
+        const sub = isLight ? '#62627C'         : '#94a3b8';
         let ordersHtml = '';
         if (o.orders && o.orders.length > 1) {
             ordersHtml = o.orders.map(ord =>
@@ -1854,14 +1852,14 @@ document.addEventListener('DOMContentLoaded', () => {
             ordersHtml = `<div style="color:${sub};font-size:11px">Commande #${ord.id} · ${esc(ord.shop)}</div>`;
         }
         const phaseLabel = o.phase === 2
-            ? `<div style="color:#10b981;font-size:10.5px;font-weight:700;margin-bottom:3px">🚚 Phase 2 · En livraison → Client</div>`
-            : `<div style="color:#f59e0b;font-size:10.5px;font-weight:700;margin-bottom:3px">🏪 Phase 1 · Récupération → Boutique</div>`;
+            ? `<div style="color:#10b981;font-size:10.5px;font-weight:700;margin-bottom:3px">Phase 2 · En livraison → Client</div>`
+            : `<div style="color:#f59e0b;font-size:10.5px;font-weight:700;margin-bottom:3px">Phase 1 · Récupération → Boutique</div>`;
         return `<div style="background:${bg};border:1px solid ${bdr};border-radius:9px;padding:10px 14px;color:${txt};font-size:12px;min-width:185px;box-shadow:0 6px 20px rgba(0,0,0,.18)">
-            <div style="font-weight:800;margin-bottom:4px">🚴 ${esc(o.driver)}</div>
+            <div style="font-weight:800;margin-bottom:4px">${esc(o.driver)}</div>
             ${phaseLabel}
             ${ordersHtml}
-            ${o.destination ? `<div style="color:${sub};font-size:11px;margin-top:2px">📍 ${esc(o.destination)}</div>` : ''}
-            ${o.ping_ago && o.ping_ago !== 'jamais' ? `<div style="color:#10b981;margin-top:5px;font-weight:700;font-size:11.5px">📡 ${esc(o.ping_ago)}</div>` : ''}
+            ${o.destination ? `<div style="color:${sub};font-size:11px;margin-top:2px">${esc(o.destination)}</div>` : ''}
+            ${o.ping_ago && o.ping_ago !== 'jamais' ? `<div style="color:#10b981;margin-top:5px;font-weight:700;font-size:11.5px">Position ${esc(o.ping_ago)}</div>` : ''}
         </div>`;
     }
 
@@ -1966,7 +1964,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function vendorPinIcon() {
         return L.divIcon({
-            html: `<div style="width:24px;height:24px;border-radius:6px;background:#f59e0b;border:2px solid #fff;box-shadow:0 0 0 3px rgba(245,158,11,.25),0 2px 8px rgba(245,158,11,.5);display:flex;align-items:center;justify-content:center;font-size:12px;line-height:1">🏪</div>`,
+            html: `<div style="width:24px;height:24px;border-radius:6px;background:#f59e0b;border:2px solid #fff;box-shadow:0 0 0 3px rgba(245,158,11,.25),0 2px 8px rgba(245,158,11,.5);display:flex;align-items:center;justify-content:center;color:#fff;line-height:1">{!! \App\Support\IconLibrary::svg('store', '', 13) !!}</div>`,
             iconSize:[24,24], iconAnchor:[12,12], popupAnchor:[0,-13], className:''
         });
     }
@@ -2043,7 +2041,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const name = ord.client || 'Client';
                         dashClientMarkers[ord.id] = L.marker(cpos, { icon: clientPinIcon() })
                             .addTo(map)
-                            .bindPopup(`<div style="font-family:system-ui;padding:2px 4px"><b style="font-size:12px">📍 ${name}</b><br><span style="font-size:10.5px;color:#94a3b8">Position partagée</span></div>`);
+                            .bindPopup(`<div style="font-family:system-ui;padding:2px 4px"><b style="font-size:12px">${name}</b><br><span style="font-size:10.5px;color:#94a3b8">Position partagée</span></div>`);
                     }
                 }
             });
@@ -2067,7 +2065,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         dashVendorMarkers[ord.id] = L.marker(vpos, { icon: vendorPinIcon() })
                             .addTo(map)
-                            .bindPopup(`<div style="font-family:system-ui;padding:2px 4px"><b style="font-size:12px">🏪 ${esc(ord.shop)}</b><br><span style="font-size:10.5px;color:#94a3b8">Point de ramassage · Cde #${ord.id}</span></div>`);
+                            .bindPopup(`<div style="font-family:system-ui;padding:2px 4px"><b style="font-size:12px">${esc(ord.shop)}</b><br><span style="font-size:10.5px;color:#94a3b8">Point de ramassage · Cde #${ord.id}</span></div>`);
                     }
                 }
             });
@@ -2116,16 +2114,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const isDark   = () => !document.body.classList.contains('cx-light');
         const gridCol  = () => isDark() ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.06)';
         const tickCol  = () => isDark() ? '#64748b' : '#9ca3af';
-        const tipBg    = () => isDark() ? '#0d1226' : '#ffffff';
-        const tipTitle = () => isDark() ? '#e2e8f0' : '#111827';
-        const tipBody  = () => isDark() ? '#94a3b8' : '#4b5563';
-        const ptBg     = () => isDark() ? '#0d1226' : '#ffffff';
+        const tipBg    = () => isDark() ? '#0B1E3D' : '#ffffff';
+        const tipTitle = () => isDark() ? '#e2e8f0' : '#16162A';
+        const tipBody  = () => isDark() ? '#94a3b8' : '#45455E';
+        const ptBg     = () => isDark() ? '#0B1E3D' : '#ffffff';
 
         function lineGrad(ctx, chartArea) {
             const g = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-            g.addColorStop(0, 'rgba(139,92,246,.45)');
-            g.addColorStop(0.6, 'rgba(139,92,246,.12)');
-            g.addColorStop(1,   'rgba(139,92,246,.0)');
+            g.addColorStop(0, 'rgba(31,124,246,.45)');
+            g.addColorStop(0.6, 'rgba(31,124,246,.12)');
+            g.addColorStop(1,   'rgba(31,124,246,.0)');
             return g;
         }
 
@@ -2133,17 +2131,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const g = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
             if (isLast) {
                 g.addColorStop(0, 'rgba(192,162,251,1)');
-                g.addColorStop(1, 'rgba(124,58,237,.75)');
+                g.addColorStop(1, 'rgba(31,124,246,.75)');
             } else {
-                g.addColorStop(0, 'rgba(139,92,246,.65)');
-                g.addColorStop(1, 'rgba(99,102,241,.22)');
+                g.addColorStop(0, 'rgba(31,124,246,.65)');
+                g.addColorStop(1, 'rgba(31,124,246,.22)');
             }
             return g;
         }
 
         const commonTooltip = () => ({
             backgroundColor: tipBg(),
-            borderColor: 'rgba(124,58,237,.35)',
+            borderColor: 'rgba(31,124,246,.35)',
             borderWidth: 1,
             padding: { x:14, y:10 },
             titleColor: tipTitle(),
@@ -2162,19 +2160,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 labels: L7,
                 datasets: [{
                     data: window._cx.O7,
-                    borderColor: '#8b5cf6',
+                    borderColor: '#1F7CF6',
                     backgroundColor: ctx => {
                         const {ctx:c, chartArea} = ctx.chart;
-                        return chartArea ? lineGrad(c, chartArea) : 'rgba(139,92,246,.1)';
+                        return chartArea ? lineGrad(c, chartArea) : 'rgba(31,124,246,.1)';
                     },
                     borderWidth: 2.5,
                     pointRadius: 5,
                     pointHoverRadius: 8,
                     pointBackgroundColor: ptBg(),
-                    pointBorderColor: '#8b5cf6',
+                    pointBorderColor: '#1F7CF6',
                     pointBorderWidth: 2.5,
                     pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: '#a78bfa',
+                    pointHoverBorderColor: '#7DB4FF',
                     fill: true,
                     tension: .42,
                 }]
@@ -2239,7 +2237,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     data: window._cx.R30,
                     backgroundColor: ctx => {
                         const {ctx:c, chartArea} = ctx.chart;
-                        if (!chartArea) return 'rgba(139,92,246,.5)';
+                        if (!chartArea) return 'rgba(31,124,246,.5)';
                         return barGrad(c, chartArea, ctx.dataIndex === ctx.dataset.data.length-1);
                     },
                     hoverBackgroundColor: 'rgba(192,162,251,.9)',
@@ -2338,7 +2336,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let _lastSoundedSupport  = 0;   // ID du dernier message pour lequel le son a joué
 
     const AV_COLORS = [
-        'linear-gradient(135deg,#7c3aed,#5b21b6)',
+        'linear-gradient(135deg,#1668D8,#5b21b6)',
         'linear-gradient(135deg,#10b981,#059669)',
         'linear-gradient(135deg,#3b82f6,#1d4ed8)',
         'linear-gradient(135deg,#ec4899,#be185d)',
@@ -2557,13 +2555,13 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `<div style="padding:6px 12px 2px;font-size:9.5px;font-weight:800;letter-spacing:1.2px;color:var(--cx-muted);text-transform:uppercase;display:flex;align-items:center;gap:5px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>Support</div>`;
             html += `
                 <div class="cx-notif-item" style="position:relative;padding-right:32px" onclick="cxDismissSupport(${sId});window.location.href='{{ route('company.support.index') }}'">
-                    <div class="cx-notif-av" style="background:linear-gradient(135deg,#7c3aed,#4f46e5)">SA</div>
+                    <div class="cx-notif-av" style="background:linear-gradient(135deg,#1668D8,#1260C9)">SA</div>
                     <div class="cx-notif-body">
                         <div class="cx-notif-name">SuperAdmin · Support</div>
                         <div class="cx-notif-msg">${esc(latestSupport.last_body)}</div>
                         <div class="cx-notif-meta">
                             <span class="cx-notif-time">${esc(latestSupport.last_at)}</span>
-                            <span class="cx-notif-unread" style="background:#7c3aed">1</span>
+                            <span class="cx-notif-unread" style="background:#1668D8">1</span>
                         </div>
                     </div>
                     <button onclick="event.stopPropagation();cxDismissSupport(${sId})" title="Marquer comme vu" style="position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;color:#9ca3af;padding:2px;line-height:1"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
@@ -2859,11 +2857,11 @@ document.addEventListener('DOMContentLoaded', () => {
 ═══════════════════════════════════════════════════════ */
 (function(){
     const DRIVER_PALETTES = [
-        'linear-gradient(135deg,#6366f1,#4338ca)',
+        'linear-gradient(135deg,#1F7CF6,#1260C9)',
         'linear-gradient(135deg,#10b981,#059669)',
         'linear-gradient(135deg,#f59e0b,#d97706)',
         'linear-gradient(135deg,#ec4899,#be185d)',
-        'linear-gradient(135deg,#8b5cf6,#7c3aed)',
+        'linear-gradient(135deg,#1F7CF6,#1668D8)',
     ];
     const STATUS_CFG = {
         available: { label:'Disponible',   cls:'ds-ok', dot:'#10b981' },
@@ -2911,15 +2909,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const cfg = STATUS_CFG[d.status] || STATUS_CFG.offline;
             const _esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); // échappe les données saisies par d'autres utilisateurs
             const phoneHtml = d.phone
-                ? `<a href="tel:${_esc(d.phone)}" class="cx-driv-phone" title="Appeler">📞</a>`
-                : `<div class="cx-driv-phone" style="opacity:.35;cursor:default">📞</div>`;
+                ? `<a href="tel:${_esc(d.phone)}" class="cx-driv-phone" title="Appeler" aria-label="Appeler">{!! \App\Support\IconLibrary::svg('phone', '', 15) !!}</a>`
+                : `<div class="cx-driv-phone" style="opacity:.35;cursor:default">{!! \App\Support\IconLibrary::svg('phone', '', 15) !!}</div>`;
             return `<div class="cx-driver">
                 <div class="cx-driv-av" style="background:${bg}">
                     ${_esc(d.ini)}<span class="cx-driv-dot" style="background:${cfg.dot}"></span>
                 </div>
                 <div class="cx-driv-info">
                     <div class="cx-driv-name">${_esc(d.name)}</div>
-                    ${d.phone ? `<div class="cx-driv-loc">📞 ${_esc(d.phone)}</div>` : ''}
+                    ${d.phone ? `<div class="cx-driv-loc">{!! \App\Support\IconLibrary::svg('phone', '', 12) !!} ${_esc(d.phone)}</div>` : ''}
                 </div>
                 <div class="cx-driv-right">
                     <span class="cx-driv-status ${cfg.cls}">● ${cfg.label}</span>
@@ -3000,6 +2998,23 @@ document.addEventListener('DOMContentLoaded', () => {
     /* Première exécution immédiate + toutes les 20s */
     pollLiveStats();
     setInterval(pollLiveStats, 20000);
+})();
+</script>
+<style>.cx-dark-row:focus-visible{outline:2px solid #7DB4FF;outline-offset:2px}</style>
+<script>
+/* Interrupteur « Mode sombre » : même comportement sur toutes les pages (clavier et lecteur d'écran) */
+(function () {
+    var row = document.querySelector('.cx-dark-row'), sw = row && row.querySelector('.cx-toggle');
+    if (!row || !sw) return;
+    row.setAttribute('role', 'switch');
+    row.setAttribute('tabindex', '0');
+    row.setAttribute('aria-label', 'Mode sombre');
+    var sync = function () { row.setAttribute('aria-checked', sw.classList.contains('on') ? 'true' : 'false'); };
+    new MutationObserver(sync).observe(sw, { attributes: true, attributeFilter: ['class'] });
+    row.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); }
+    });
+    sync();
 })();
 </script>
 @endpush

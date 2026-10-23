@@ -13,6 +13,12 @@ class Driver extends Model
 
     protected $casts = ['must_change_password' => 'boolean'];
 
+    /** Fiche chauffeur liée à un compte (livreur d'une société de livraison), null pour un livreur de boutique. */
+    public static function forUser(User $user): ?self
+    {
+        return static::where('user_id', $user->id)->first();
+    }
+
     public function user()
     {
         return $this->belongsTo(\App\Models\User::class);

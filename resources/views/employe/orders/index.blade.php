@@ -1307,6 +1307,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
                         <td>
                             @php $addr = $order->delivery_destination ?: ($client?->address ?? ''); @endphp
                             @if($addr)<div class="addr-cell" title="{{ $addr }}">{!! $I['pin_addr'] !!} {{ $addr }}</div>@else<span class="addr-empty">—</span>@endif
+                            @if($order->delivery_slot)<div style="font-size:11.5px;font-weight:700;color:#1260C9;margin-top:3px">Créneau : {{ $order->delivery_slot }}</div>@endif
                         </td>
                         <td>
                             <div class="amount">{{ number_format($order->total,0,',',' ') }} <small>{{ $devise }}</small></div>
@@ -1826,6 +1827,9 @@ function loadCompanyZones(companyId) {
 }
 
 /* ── Filtre et affiche les zones en temps réel ── */
+/* Nom de zone saisi par une société de livraison : toujours échappé avant innerHTML */
+const zoneEsc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
 function filterZones(raw) {
     const q       = (raw || '').toLowerCase().trim();
     const results = document.getElementById('zoneResults');
@@ -1841,14 +1845,14 @@ function filterZones(raw) {
     list.forEach(z => {
         const item = document.createElement('div');
         item.className = 'zone-result';
-        const color = z.color || '#059669';
+        const color = /^#[0-9a-f]{3,8}$/i.test(z.color || '') ? z.color : '#059669';
         const price = new Intl.NumberFormat('fr-FR').format(z.price);
         item.innerHTML =
             `<span class="zone-result-dot" style="background:${color};box-shadow:0 0 5px ${color}88;"></span>` +
-            `<span class="zone-result-name">${z.name}</span>` +
+            `<span class="zone-result-name">${zoneEsc(z.name)}</span>` +
             `<div class="zone-result-right">` +
                 `<div class="zone-result-price">${price} ${DEVISE}</div>` +
-                `<div class="zone-result-delay">~${z.estimated_minutes} min</div>` +
+                `<div class="zone-result-delay">~${Number(z.estimated_minutes) || 0} min</div>` +
             `</div>`;
         item.addEventListener('click', () => selectZone(z));
         item.addEventListener('touchend', e => { e.preventDefault(); selectZone(z); });
@@ -1863,14 +1867,14 @@ function selectZone(z) {
     const chip      = document.getElementById('zoneSelectedChip');
     if (searchBox) searchBox.style.display = 'none';
     if (!chip) return;
-    const color = z.color || '#059669';
+    const color = /^#[0-9a-f]{3,8}$/i.test(z.color || '') ? z.color : '#059669';
     const price = new Intl.NumberFormat('fr-FR').format(z.price);
     chip.innerHTML =
         `<div class="zone-chip">` +
             `<span class="zone-chip-dot" style="background:${color};box-shadow:0 0 5px ${color}88;"></span>` +
             `<div class="zone-chip-info">` +
-                `<div class="zone-chip-name">${z.name}</div>` +
-                `<div class="zone-chip-details">💰 ${price} ${DEVISE} &nbsp;·&nbsp; ⏱ ~${z.estimated_minutes} min</div>` +
+                `<div class="zone-chip-name">${zoneEsc(z.name)}</div>` +
+                `<div class="zone-chip-details">💰 ${price} ${DEVISE} &nbsp;·&nbsp; ⏱ ~${Number(z.estimated_minutes) || 0} min</div>` +
             `</div>` +
             `<button class="zone-chip-change" onclick="clearZoneSelection()">Changer</button>` +
         `</div>`;

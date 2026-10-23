@@ -117,7 +117,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text)}
 
 @section('content')
 @php
-    $shop   = auth()->user()->shop ?? auth()->user()->assignedShop;
+    $shop   = auth()->user()->shop;
     $devise = $shop?->currency ?? 'GNF';
     $fmt    = fn($n) => number_format($n ?? 0, 0, ',', ' ') . ' ' . $devise;
 @endphp
