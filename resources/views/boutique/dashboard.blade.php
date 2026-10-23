@@ -29,6 +29,7 @@
 @include('boutique.dashboard.styles')
 @endpush
 
+@section('content')
 @php
 /* ══════════════════════════════════════════════════
    BIBLIOTHÈQUE D'ICÔNES SVG PREMIUM — boutique dashboard
@@ -390,6 +391,7 @@ $I = [
      JS dans resources/js/boutique-dashboard.js.
      CSS remis ici en ligne (le fichier externe ne s'affichait pas correctement en prod). --}}
 @include('boutique.dashboard.ai-assistant')
+@endsection
 
 @push('scripts')
 <script>
