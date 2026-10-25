@@ -51,6 +51,11 @@ class ShopController extends Controller
 
         \App\Support\TrafficSource::recordAppVisit($shop, $request);
 
+        // Ouverte depuis « Boutiques à la une » (?c=<campagne>) : clic compté, commande attribuée 7 jours
+        if (ctype_digit((string) $request->query('c'))) {
+            \App\Support\Campaigns\AdAttribution::registerClick((int) $request->query('c'), $request, $request->user('sanctum'));
+        }
+
         $reviewStats = Review::where('vendeur_id', $shop->user_id)
             ->selectRaw('COUNT(*) as cnt, AVG(rating) as avg_rating')->first();
         $reviewCount = (int) ($reviewStats->cnt ?? 0);

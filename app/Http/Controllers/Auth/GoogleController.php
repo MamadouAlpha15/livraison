@@ -280,6 +280,7 @@ class GoogleController extends Controller
         return match($user->role) {
             'superadmin' => redirect()->route('admin.dashboard'),
             'staff'      => redirect()->route('admin.dashboard'),
+            'marketing'  => redirect()->route('admin.campaigns.index'),
             'admin'      => redirect()->route('boutique.dashboard'),
             'company'    => redirect()->route('company.dashboard'),
             'livreur'    => redirect()->route('livreur.dashboard'),

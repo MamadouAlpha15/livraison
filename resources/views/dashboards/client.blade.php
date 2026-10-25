@@ -248,6 +248,9 @@ $sif = function(string $k, int $sz=18) use ($_p): string {
 {{-- Commandes récentes --}}
 @include('dashboards.client.home.recent-orders')
 
+{{-- Boutiques à la une — campagnes payées, rien sans campagne en cours --}}
+@include('partials.featured-shops')
+
 {{-- Recommandé pour vous — défilement automatique en boucle infinie --}}
 @include('dashboards.client.home.recommended')
 

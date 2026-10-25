@@ -8,6 +8,8 @@ class Shop {
   final String? country;
   final String currency;
   final String? imageUrl;
+  /// Campagne « Boutique à la une » qui met cette boutique en avant, sinon null.
+  final int? sponsoredCampaignId;
 
   Shop({
     required this.id,
@@ -19,6 +21,7 @@ class Shop {
     this.country,
     this.currency = 'GNF',
     this.imageUrl,
+    this.sponsoredCampaignId,
   });
 
   factory Shop.fromJson(Map<String, dynamic> json) {
@@ -32,6 +35,7 @@ class Shop {
       country: json['country'],
       currency: json['currency'] ?? 'GNF',
       imageUrl: json['image_url'],
+      sponsoredCampaignId: json['sponsored_campaign_id'],
     );
   }
 }

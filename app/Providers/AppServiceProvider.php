@@ -11,7 +11,15 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        // Paiement des campagnes : ChapChap Pay ; paiement simulé seulement hors production et sans clé configurée
+        $this->app->bind(\App\Support\Campaigns\Payment\CampaignPaymentGateway::class, function ($app) {
+            return !$app->isProduction() && blank(config('chapchappay.api_key'))
+                ? new \App\Support\Campaigns\Payment\FakeCampaignGateway()
+                : $app->make(\App\Support\Campaigns\Payment\ChapChapCampaignGateway::class);
+        });
+
+        // SMS : aucun fournisseur branché, les messages vont dans le journal (voir App\Support\Sms\SmsSender)
+        $this->app->bind(\App\Support\Sms\SmsSender::class, \App\Support\Sms\LogSmsSender::class);
     }
 
     public function boot(): void

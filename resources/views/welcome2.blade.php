@@ -499,7 +499,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 </div>
 <div class="shops-grid">
     @foreach($shops as $shop)
-    <a href="{{ route('public.shops.products', $shop) }}" class="shop-card">
+    <a href="{{ \App\Support\Campaigns\SponsoredPlacements::url(route('public.shops.products', $shop), $shop) }}" class="shop-card">
         <div class="shop-card-img">
             @if($shop->image)
                 <img src="{{ asset('storage/' . $shop->image) }}" alt="{{ $shop->name }}" width="220" height="140">
@@ -509,6 +509,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
             <span class="shop-card-badge">Vérifiée</span>
         </div>
         <div class="shop-card-body">
+            @if($shop->sponsored_campaign_id)@include('partials.sponsored-tag', ['style' => 'align-self:flex-start;margin-bottom:4px'])@endif
             <div class="shop-card-name">{{ $shop->name }}</div>
             <div class="shop-card-count">{{ $shop->products_count }} produit{{ $shop->products_count > 1 ? 's' : '' }}</div>
         </div>

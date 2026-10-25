@@ -1478,6 +1478,11 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
     <div class="reco-row" id="recentlyViewedList"></div>
 </div>
 
+{{-- ══ BOUTIQUES À LA UNE (campagnes payées, rien sans campagne en cours) ══ --}}
+@unless(request('s'))
+@include('partials.featured-shops')
+@endunless
+
 <div id="resultsRoot">
 @include('partials.catalogue-results', ['compactHome' => true])
 </div>

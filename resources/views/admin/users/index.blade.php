@@ -5,32 +5,32 @@
 <style>
 *,*::before,*::after{box-sizing:border-box}
 :root{
-    --brand:#7c3aed;--sb:#1e1b4b;--sb-text:rgba(255,255,255,.88);--sb-w:268px;
-    --bg:#f1f5f9;--card:#fff;--bd:rgba(0,0,0,.07);
-    --text:#0f172a;--muted:#64748b;
+    --brand:#1668D8;--sb:#0B1E3D;--sb-text:rgba(255,255,255,.88);--sb-w:268px;
+    --bg:#F6F9FF;--card:#fff;--bd:rgba(0,0,0,.07);
+    --text:#16162A;--muted:#62627C;
     --green:#10b981;--amber:#f59e0b;--red:#ef4444;--blue:#3b82f6;
-    --font:'Segoe UI',system-ui,sans-serif;
+    --font:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
 }
 body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-webkit-font-smoothing:antialiased}
 .sa{display:flex;min-height:100vh}
 .sb{width:var(--sb-w);background:var(--sb);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;overflow-y:auto;overflow-x:hidden;transition:transform .28s cubic-bezier(.4,0,.2,1);scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent}
 .sb::-webkit-scrollbar{width:3px}.sb::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:2px}
 .sb-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.12);display:flex;align-items:center;gap:11px;flex-shrink:0}
-.sb-ico-wrap{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#a78bfa,#7c3aed);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(167,139,250,.45);flex-shrink:0}
+.sb-ico-wrap{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#7DB4FF,#1668D8);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(31,124,246,.45);flex-shrink:0}
 .sb-appname{font-size:14.5px;font-weight:900;color:#fff;letter-spacing:-.2px}
-.sb-apptag{font-size:10px;font-weight:700;color:#c4b5fd;text-transform:uppercase;letter-spacing:.9px;margin-top:2px}
+.sb-apptag{font-size:10px;font-weight:700;color:#8FA6CC;text-transform:uppercase;letter-spacing:.9px;margin-top:2px}
 .sb-close{margin-left:auto;width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.7);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;font-family:var(--font)}
 .sb-close:hover{background:rgba(255,255,255,.22);color:#fff}
 .sb-me{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
-.sb-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#6d28d9);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0}
+.sb-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7DB4FF,#1260C9);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0}
 .sb-name{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sb-badge{font-size:10px;color:#a78bfa;font-weight:600;margin-top:1px}
+.sb-badge{font-size:10px;color:#7DB4FF;font-weight:600;margin-top:1px}
 .sb-nav{padding:10px 0;flex:1}
 .sb-sec{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.3px;padding:14px 18px 5px;color:rgba(255,255,255,.35)}
-.sb-sec.shop{color:#6ee7b7}.sb-sec.livr{color:#93c5fd}.sb-sec.fin{color:#fcd34d}.sb-sec.plat{color:#c4b5fd}
+.sb-sec.shop{color:#6ee7b7}.sb-sec.livr{color:#93c5fd}.sb-sec.fin{color:#fcd34d}.sb-sec.plat{color:#8FA6CC}
 .sb-a{display:flex;align-items:center;gap:10px;padding:10px 18px;color:var(--sb-text);text-decoration:none;font-size:13px;font-weight:600;border-left:3px solid transparent;transition:all .15s}
 .sb-a:hover{background:rgba(255,255,255,.09);color:#fff}
-.sb-a.on{background:rgba(167,139,250,.22);border-left-color:#a78bfa;color:#fff;font-weight:700;box-shadow:inset 0 0 20px rgba(124,58,237,.08)}
+.sb-a.on{background:rgba(31,124,246,.22);border-left-color:#7DB4FF;color:#fff;font-weight:700;box-shadow:inset 0 0 20px rgba(22,104,216,.08)}
 .sb-i{width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:.85}
 .sb-ft-ico{width:16px;height:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:.7}
 .sb-ft{border-top:1px solid rgba(255,255,255,.1);padding:10px 0}
@@ -40,24 +40,24 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .mn{margin-left:var(--sb-w);flex:1;display:flex;flex-direction:column;min-width:0}
 .tb{height:60px;background:var(--card);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:100}
-.ham{width:34px;height:34px;border-radius:8px;background:none;border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);flex-shrink:0;transition:background .15s}.ham:hover{background:#f1f5f9}
+.ham{width:34px;height:34px;border-radius:8px;background:none;border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);flex-shrink:0;transition:background .15s}.ham:hover{background:var(--bg)}
 .tb-bc{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px;flex:1}
 .tb-bc a{color:var(--muted);text-decoration:none}.tb-bc a:hover{color:var(--brand)}
 .tb-ua{display:flex;align-items:center;gap:10px;margin-left:auto}
-.tb-uav{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#6d28d9);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff}
+.tb-uav{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7DB4FF,#1260C9);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff}
 .tb-uname{font-size:13px;font-weight:700;color:var(--text)}.tb-urole{font-size:10.5px;color:var(--muted);font-weight:600}
 .pw{padding:24px;max-width:1400px;margin:0 auto;width:100%}
 
 /* HERO */
-.hero{background:linear-gradient(135deg,#1e1b4b 0%,#312e81 50%,#4338ca 100%);border-radius:16px;padding:28px 32px;display:flex;align-items:center;gap:24px;margin-bottom:24px;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;top:-30px;right:-30px;width:200px;height:200px;background:radial-gradient(circle,rgba(167,139,250,.2) 0%,transparent 70%);pointer-events:none}
+.hero{background:linear-gradient(135deg,#0B1E3D 0%,#132B52 50%,#1260C9 100%);border-radius:16px;padding:28px 32px;display:flex;align-items:center;gap:24px;margin-bottom:24px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-30px;right:-30px;width:200px;height:200px;background:radial-gradient(circle,rgba(31,124,246,.2) 0%,transparent 70%);pointer-events:none}
 .hero-ico{display:flex;align-items:center;justify-content:center;width:64px;height:64px;background:rgba(255,255,255,.12);border-radius:16px;color:#fff;filter:drop-shadow(0 4px 12px rgba(0,0,0,.3));flex-shrink:0}
 .hero-title{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3px}
-.hero-sub{font-size:13px;color:#c4b5fd;margin-top:3px}
+.hero-sub{font-size:13px;color:#8FA6CC;margin-top:3px}
 .hero-stats{display:flex;gap:12px;margin-left:auto;flex-wrap:wrap}
 .hs{background:rgba(255,255,255,.1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:12px 18px;text-align:center;min-width:90px}
 .hs-v{font-size:22px;font-weight:900;color:#fff;line-height:1}
-.hs-l{font-size:10px;font-weight:700;color:#c4b5fd;text-transform:uppercase;letter-spacing:.6px;margin-top:4px}
+.hs-l{font-size:10px;font-weight:700;color:#8FA6CC;text-transform:uppercase;letter-spacing:.6px;margin-top:4px}
 
 /* FILTRES */
 .filter-bar{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px 20px;margin-bottom:20px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
@@ -68,7 +68,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .chip.c-client.on{background:#10b981;border-color:#10b981}
 .chip.c-livreur.on{background:#f59e0b;border-color:#f59e0b}
 .chip.c-employe.on{background:#3b82f6;border-color:#3b82f6}
-.chip.c-co.on{background:#8b5cf6;border-color:#8b5cf6}
+.chip.c-co.on{background:#1F7CF6;border-color:#1F7CF6}
 .chip.c-company.on{background:#0ea5e9;border-color:#0ea5e9}
 .chip.c-admin.on{background:#ef4444;border-color:#ef4444}
 .fi{padding:8px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);font-size:13px;color:var(--text);font-family:inherit;outline:none}
@@ -79,18 +79,18 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .tcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;overflow:hidden}
 .twrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse}
-th{padding:12px 16px;text-align:left;font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);background:#f8fafc;border-bottom:1px solid var(--bd);white-space:nowrap}
+th{padding:12px 16px;text-align:left;font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap}
 td{padding:13px 16px;border-bottom:1px solid var(--bd);font-size:13px;vertical-align:middle}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:#fafafa}
+tr:hover td{background:var(--bg)}
 .muted{color:var(--muted);font-size:12px}
 .av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:700}
-.role-superadmin{background:#fef3c7;color:#92400e}
-.role-client{background:rgba(16,185,129,.12);color:#047857}
+.role-superadmin{background:var(--abg);color:var(--warn-ink)}
+.role-client{background:rgba(16,185,129,.12);color:var(--ok-ink)}
 .role-livreur{background:rgba(245,158,11,.12);color:#b45309}
-.role-employe,.role-vendeur,.role-admin{background:rgba(59,130,246,.12);color:#1d4ed8}
-.role-co{background:rgba(139,92,246,.12);color:#6d28d9}
+.role-employe,.role-vendeur,.role-admin{background:rgba(59,130,246,.12);color:var(--info-ink)}
+.role-co{background:rgba(31,124,246,.12);color:#1260C9}
 .empty-state{padding:60px 20px;text-align:center}
 .empty-ico{display:flex;justify-content:center;margin-bottom:12px}
 .empty-title{font-size:16px;font-weight:800;margin-bottom:6px}
@@ -105,6 +105,8 @@ tr:hover td{background:#fafafa}
     .filter-bar{flex-direction:column;align-items:stretch}
 }
 </style>
+@include('admin._partials.shopio-theme')
+@include('admin._partials.dark-mode')
 @endpush
 
 @section('content')
@@ -161,11 +163,13 @@ $I = [
         'company'   => 'Sociétés livraison',
         'superadmin'=> 'Super Admins',
         'staff'     => 'Personnel plateforme',
+        'marketing' => 'Équipe marketing',
     ];
 
     $roleColors = [
-        'superadmin' => ['bg'=>'#7c3aed','txt'=>'#fff','ico'=>$I['bolt_xs']],
+        'superadmin' => ['bg'=>'#1668D8','txt'=>'#fff','ico'=>$I['bolt_xs']],
         'staff'      => ['bg'=>'#0d9488','txt'=>'#fff','ico'=>$I['brief_xs']],
+        'marketing'  => ['bg'=>'#132B52','txt'=>'#fff','ico'=>$I['brief_xs']],
         'admin'      => ['bg'=>'#ef4444','txt'=>'#fff','ico'=>$I['key_xs']],
         'employe'    => ['bg'=>'#3b82f6','txt'=>'#fff','ico'=>$I['brief_xs']],
         'vendeur'    => ['bg'=>'#3b82f6','txt'=>'#fff','ico'=>$I['brief_xs']],
@@ -187,8 +191,8 @@ $I = [
 {{-- SIDEBAR --}}
 <aside class="sb" id="sb">
     <div class="sb-logo">
-        <div class="sb-ico-wrap" style="color:#fff">{!! $I['brand_lg'] !!}</div>
-        <div><div class="sb-appname">{{ config('app.name','Shopio') }}</div><div class="sb-apptag">Plateforme · Super Admin</div></div>
+        <div class="sb-ico-wrap"><img src="{{ \App\Support\Assets::v('images/shopio-logo-192.png') }}" alt="" width="42" height="42"></div>
+        <div><div class="sb-appname">Shopio</div><div class="sb-apptag">Plateforme · Super Admin</div></div>
         <button class="sb-close" onclick="closeSb()">{!! $I['close'] !!}</button>
     </div>
     <div class="sb-me">
@@ -197,27 +201,28 @@ $I = [
     </div>
     <nav class="sb-nav">
         <a href="{{ route('admin.dashboard') }}" class="sb-a"><span class="sb-i">{!! $I['home'] !!}</span><span>Vue d'ensemble</span></a>
-        <div class="sb-sec shop">── SaaS Boutiques</div>
+        <div class="sb-sec shop">SaaS Boutiques</div>
         <a href="{{ route('admin.shops.index') }}" class="sb-a"><span class="sb-i">{!! $I['store'] !!}</span><span>Boutiques</span></a>
         <a href="{{ route('admin.products.index') }}" class="sb-a"><span class="sb-i">{!! $I['bag'] !!}</span><span>Produits</span></a>
         <a href="{{ route('admin.orders.index') }}" class="sb-a"><span class="sb-i">{!! $I['box'] !!}</span><span>Commandes boutiques</span></a>
         <a href="{{ route('admin.vendeurs.index') }}" class="sb-a"><span class="sb-i">{!! $I['brief'] !!}</span><span>Vendeurs &amp; Employés</span></a>
         <a href="{{ route('admin.clients.index') }}" class="sb-a"><span class="sb-i">{!! $I['user'] !!}</span><span>Clients boutiques</span></a>
         <a href="{{ route('admin.image-health.index') }}" class="sb-a"><span class="sb-i">{!! $I['image_ico'] !!}</span><span>Santé des images</span></a>
-        <div class="sb-sec livr">── SaaS Livraison</div>
+        <div class="sb-sec livr">SaaS Livraison</div>
         <a href="{{ route('admin.entreprises.index') }}" class="sb-a"><span class="sb-i">{!! $I['truck'] !!}</span><span>Entreprises livraison</span></a>
         <a href="{{ route('admin.livreurs.index') }}" class="sb-a"><span class="sb-i">{!! $I['bike'] !!}</span><span>Livreurs</span></a>
         <a href="{{ route('admin.zones.index') }}" class="sb-a"><span class="sb-i">{!! $I['map'] !!}</span><span>Zones de livraison</span></a>
         <a href="{{ route('admin.suivi.index') }}" class="sb-a"><span class="sb-i">{!! $I['pin'] !!}</span><span>Suivi en temps réel</span></a>
-        <div class="sb-sec fin">── Finance</div>
+        <div class="sb-sec fin">Finance</div>
         <a href="{{ route('admin.paiements.index') }}" class="sb-a"><span class="sb-i">{!! $I['card'] !!}</span><span>Paiements</span></a>
         <a href="{{ route('admin.payouts.index') }}" class="sb-a"><span class="sb-i">{!! $I['dollar'] !!}</span><span>Règlements boutiques</span></a>
+        <a href="{{ route('admin.campaigns.index') }}" class="sb-a"><span class="sb-i">{!! \App\Support\IconLibrary::svg('megaphone', '', 17) !!}</span><span>Campagnes</span></a>
         <a href="{{ route('admin.commissions.index') }}" class="sb-a"><span class="sb-i">{!! $I['trend'] !!}</span><span>Commissions</span></a>
         <a href="{{ route('admin.revenus-boutiques.index') }}" class="sb-a"><span class="sb-i">{!! $I['store'] !!}</span><span>Revenus boutiques</span></a>
         <a href="{{ route('admin.revenus-entreprises.index') }}" class="sb-a"><span class="sb-i">{!! $I['truck'] !!}</span><span>Revenus entreprises</span></a>
         <a href="{{ route('admin.revenus.index') }}" class="sb-a"><span class="sb-i">{!! $I['dollar'] !!}</span><span>Revenus plateforme</span></a>
         <a href="#" class="sb-a" onclick="nt();return false"><span class="sb-i">{!! $I['receipt'] !!}</span><span>Factures &amp; Exports</span></a>
-        <div class="sb-sec plat">── Plateforme</div>
+        <div class="sb-sec plat">Plateforme</div>
         <a href="{{ route('admin.users.index') }}" class="sb-a on"><span class="sb-i">{!! $I['users'] !!}</span><span>Tous les utilisateurs</span></a>
         <a href="{{ route('admin.avis.index') }}" class="sb-a"><span class="sb-i">{!! $I['star'] !!}</span><span>Avis &amp; Notation</span></a>
         <a href="{{ route('admin.support.index') }}" class="sb-a"><span class="sb-i">{!! $I['ticket'] !!}</span><span>Tickets support</span></a>
@@ -245,6 +250,7 @@ $I = [
         <div class="tb-uav">{{ $meInit }}</div>
         <div><div class="tb-uname">{{ Str::limit($meName,14) }}</div><div class="tb-urole">Super Admin</div></div>
     </div>
+    @include('admin._partials.dark-toggle')
 </header>
 
 <div class="pw">
@@ -274,7 +280,7 @@ $I = [
                 <div class="hs-l">Employés</div>
             </div>
             <div class="hs">
-                <div class="hs-v" style="color:#c4b5fd">{{ number_format($stats['entreprises']) }}</div>
+                <div class="hs-v" style="color:#8FA6CC">{{ number_format($stats['entreprises']) }}</div>
                 <div class="hs-l">Sociétés</div>
             </div>
             <div class="hs">
@@ -286,7 +292,7 @@ $I = [
 
     @if(auth()->user()->role === 'superadmin')
     <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
-        <button type="button" onclick="openStaffModal()" class="fb" style="display:inline-flex;align-items:center;gap:7px;background:#0d9488">
+        <button type="button" onclick="openStaffModal()" class="fb" style="display:inline-flex;align-items:center;gap:7px;background:#1668D8;border-radius:999px">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Ajouter un membre du personnel
         </button>
@@ -315,7 +321,7 @@ $I = [
             <button type="submit" class="fb">Chercher</button>
             @if($search)
             <a href="{{ route('admin.users.index', request()->except('search','page')) }}"
-               class="fb" style="background:#64748b;text-decoration:none;display:inline-flex;align-items:center;justify-content:center">{!! $I['close'] !!}</a>
+               class="fb" style="background:#62627C;text-decoration:none;display:inline-flex;align-items:center;justify-content:center">{!! $I['close'] !!}</a>
             @endif
         </form>
     </div>
@@ -412,10 +418,10 @@ $I = [
                     </td>
                     @if(auth()->user()->role === 'superadmin')
                     <td>
-                        @if($user->role === 'staff')
+                        @if(in_array($user->role, \App\Http\Controllers\Admin\UsersController::TEAM_ROLES, true))
                         <form method="POST" action="{{ route('admin.users.destroy-staff', $user) }}" style="margin:0" onsubmit="return confirm('Retirer l\'accès de {{ addslashes($user->name) }} ?');">
                             @csrf @method('DELETE')
-                            <button type="submit" title="Retirer l'accès" style="background:none;border:1px solid #fecaca;color:#dc2626;border-radius:7px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                            <button type="submit" title="Retirer l'accès" style="background:none;border:1px solid var(--rbd);color:#dc2626;border-radius:7px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
                             </button>
                         </form>
@@ -445,34 +451,41 @@ $I = [
 @if(auth()->user()->role === 'superadmin')
 {{-- Modal : ajouter un membre du personnel --}}
 <div id="staffModal" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,.55);align-items:center;justify-content:center" onclick="if(event.target===this)closeStaffModal()">
-    <div style="background:#fff;border-radius:16px;padding:26px 26px 22px;width:90%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.25)">
+    <div style="background:var(--card);border-radius:16px;padding:26px 26px 22px;width:90%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.25)">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-            <div style="width:40px;height:40px;border-radius:11px;background:rgba(13,148,136,.12);display:flex;align-items:center;justify-content:center;color:#0d9488;flex-shrink:0">
+            <div style="width:40px;height:40px;border-radius:11px;background:var(--b50);display:flex;align-items:center;justify-content:center;color:#1668D8;flex-shrink:0">
                 {!! $I['brief'] !!}
             </div>
             <div>
-                <div style="font-size:14.5px;font-weight:900;color:#0f172a">Ajouter un membre du personnel</div>
-                <div style="font-size:11px;color:#64748b">Accès complet au panneau admin, sans suppression définitive</div>
+                <div style="font-size:14.5px;font-weight:900;color:var(--text)">Ajouter un membre du personnel</div>
+                <div style="font-size:11px;color:var(--muted)">Accès complet au panneau admin, sans suppression définitive</div>
             </div>
         </div>
         <form method="POST" action="{{ route('admin.users.store-staff') }}">
             @csrf
             <div style="margin-bottom:12px">
-                <label style="font-size:11.5px;font-weight:700;color:#374151;display:block;margin-bottom:5px">Nom complet</label>
-                <input type="text" name="name" required style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 12px;font-size:13px;outline:none;box-sizing:border-box">
+                <label style="font-size:11.5px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">Nom complet</label>
+                <input type="text" name="name" required style="width:100%;border:1.5px solid var(--bd);border-radius:8px;padding:9px 12px;font-size:13px;outline:none;box-sizing:border-box">
             </div>
             <div style="margin-bottom:12px">
-                <label style="font-size:11.5px;font-weight:700;color:#374151;display:block;margin-bottom:5px">Adresse email</label>
-                <input type="email" name="email" required style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 12px;font-size:13px;outline:none;box-sizing:border-box">
+                <label style="font-size:11.5px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">Adresse email</label>
+                <input type="email" name="email" required style="width:100%;border:1.5px solid var(--bd);border-radius:8px;padding:9px 12px;font-size:13px;outline:none;box-sizing:border-box">
+            </div>
+            <div style="margin-bottom:12px">
+                <label for="staffRole" style="font-size:11.5px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">Accès</label>
+                <select id="staffRole" name="role" style="width:100%;border:1.5px solid var(--bd);border-radius:8px;padding:9px 12px;font-size:13px;outline:none;box-sizing:border-box;background:var(--card)">
+                    <option value="staff">Personnel : tout le panneau admin</option>
+                    <option value="marketing">Marketing : uniquement les campagnes</option>
+                </select>
             </div>
             <div style="margin-bottom:18px">
-                <label style="font-size:11.5px;font-weight:700;color:#374151;display:block;margin-bottom:5px">Mot de passe (min. 8 caractères)</label>
-                <input type="text" name="password" required minlength="8" style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 12px;font-size:13px;outline:none;box-sizing:border-box">
-                <div style="font-size:10.5px;color:#94a3b8;margin-top:4px">À transmettre vous-même à la personne concernée.</div>
+                <label style="font-size:11.5px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">Mot de passe (min. 8 caractères)</label>
+                <input type="text" name="password" required minlength="8" style="width:100%;border:1.5px solid var(--bd);border-radius:8px;padding:9px 12px;font-size:13px;outline:none;box-sizing:border-box">
+                <div style="font-size:10.5px;color:var(--muted);margin-top:4px">À transmettre vous-même à la personne concernée.</div>
             </div>
             <div style="display:flex;gap:8px">
-                <button type="button" onclick="closeStaffModal()" style="flex:1;padding:10px;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:600;background:#f8fafc;cursor:pointer">Annuler</button>
-                <button type="submit" style="flex:1;padding:10px;background:#0d9488;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">Créer l'accès</button>
+                <button type="button" onclick="closeStaffModal()" style="flex:1;padding:10px;border:1px solid var(--bd);border-radius:8px;font-size:12px;font-weight:600;background:var(--bg);cursor:pointer">Annuler</button>
+                <button type="submit" style="flex:1;padding:10px;background:#1668D8;color:#fff;border:none;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer">Créer l'accès</button>
             </div>
         </form>
     </div>

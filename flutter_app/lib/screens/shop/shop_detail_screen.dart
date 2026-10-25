@@ -17,7 +17,9 @@ import '../product/product_detail_screen.dart';
 /// "Suivre" (Api\V1\ShopFavoriteController, distinct des favoris produit).
 class ShopDetailScreen extends StatefulWidget {
   final int shopId;
-  const ShopDetailScreen({super.key, required this.shopId});
+  /// Campagne « Boutique à la une » d'où vient le client (compte le clic), sinon null.
+  final int? campaignId;
+  const ShopDetailScreen({super.key, required this.shopId, this.campaignId});
   @override
   State<ShopDetailScreen> createState() => _ShopDetailScreenState();
 }
@@ -39,7 +41,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> with SingleTickerPr
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final shop = await _service.show(widget.shopId);
+      final shop = await _service.show(widget.shopId, campaignId: widget.campaignId);
       final products = await _service.products(widget.shopId);
       final reviews = await _service.reviews(widget.shopId);
       setState(() {

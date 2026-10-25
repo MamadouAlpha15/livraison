@@ -27,8 +27,11 @@ class ProductService {
     );
   }
 
-  Future<Product> show(int id) async {
-    final res = await _api.safeCall(() => _api.dio.get('/products/$id'));
+  /// [campaignId] : produit ouvert depuis un emplacement sponsorisé (le clic est compté côté serveur).
+  Future<Product> show(int id, {int? campaignId}) async {
+    final res = await _api.safeCall(() => _api.dio.get('/products/$id', queryParameters: {
+          if (campaignId != null) 'c': campaignId,
+        }));
     return Product.fromJson(res.data['data']);
   }
 

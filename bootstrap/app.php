@@ -27,6 +27,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->appendToGroup('web', \App\Http\Middleware\SetLocale::class);
         $middleware->appendToGroup('web', \App\Http\Middleware\ForcePasswordChange::class);
+        // Clic sur une campagne sponsorisée (?c=) : compté et gardé 7 jours pour attribuer la commande
+        $middleware->appendToGroup('web', \App\Http\Middleware\TrackAdCampaignClick::class);
 
         // Fait confiance aux en-têtes X-Forwarded-* (ngrok, load balancer, etc.)
         // pour que route()/url() détectent correctement le HTTPS du tunnel/proxy,

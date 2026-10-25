@@ -5,16 +5,16 @@
 <style>
 *,*::before,*::after{box-sizing:border-box}
 :root{
-    --brand:#7c3aed;--blt:#8b5cf6;--bdk:#5b21b6;--glow:rgba(124,58,237,.22);
-    --sb:#1e1b4b;--sb-text:rgba(255,255,255,.88);--sb-w:268px;
-    --bg:#f1f5f9;--card:#fff;--bd:rgba(0,0,0,.07);
-    --text:#0f172a;--muted:#64748b;
+    --brand:#1668D8;--blt:#1F7CF6;--bdk:#1260C9;--glow:rgba(22,104,216,.22);
+    --sb:#0B1E3D;--sb-text:rgba(255,255,255,.88);--sb-w:268px;
+    --bg:#F6F9FF;--card:#fff;--bd:rgba(0,0,0,.07);
+    --text:#16162A;--muted:#62627C;
     --green:#10b981;--gbg:rgba(16,185,129,.1);
     --amber:#f59e0b;--abg:rgba(245,158,11,.1);
     --red:#ef4444;--rbg:rgba(239,68,68,.1);
     --blue:#3b82f6;--bbg:rgba(59,130,246,.1);
-    --indigo:#6366f1;--ibg:rgba(99,102,241,.1);
-    --font:'Segoe UI',system-ui,sans-serif;
+    --indigo:#1F7CF6;--ibg:rgba(31,124,246,.1);
+    --font:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
 }
 body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-webkit-font-smoothing:antialiased}
 .sa{display:flex;min-height:100vh}
@@ -23,19 +23,19 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .sb{width:var(--sb-w);background:var(--sb);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;overflow-y:auto;overflow-x:hidden;transition:transform .28s cubic-bezier(.4,0,.2,1);scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent}
 .sb::-webkit-scrollbar{width:3px}.sb::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:2px}
 .sb-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.12);display:flex;align-items:center;gap:11px;flex-shrink:0}
-.sb-ico-wrap{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#a78bfa,#7c3aed);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(167,139,250,.45);flex-shrink:0}
+.sb-ico-wrap{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#7DB4FF,#1668D8);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(31,124,246,.45);flex-shrink:0}
 .sb-appname{font-size:14.5px;font-weight:900;color:#fff;letter-spacing:-.2px}
-.sb-apptag{font-size:10px;font-weight:700;color:#c4b5fd;text-transform:uppercase;letter-spacing:.9px;margin-top:2px}
+.sb-apptag{font-size:10px;font-weight:700;color:#8FA6CC;text-transform:uppercase;letter-spacing:.9px;margin-top:2px}
 .sb-me{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.12);display:flex;align-items:center;gap:10px;flex-shrink:0;background:rgba(255,255,255,.05)}
-.sb-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#6d28d9);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0;border:2px solid rgba(196,181,253,.5)}
+.sb-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7DB4FF,#1260C9);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0;border:2px solid rgba(125,180,255,.5)}
 .sb-name{font-size:13px;font-weight:800;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:172px}
-.sb-badge{display:inline-block;font-size:9.5px;font-weight:700;color:#e9d5ff;background:rgba(167,139,250,.22);border:1px solid rgba(196,181,253,.4);padding:2px 8px;border-radius:20px;margin-top:3px;text-transform:uppercase;letter-spacing:.6px}
+.sb-badge{display:inline-block;font-size:9.5px;font-weight:700;color:#D6E6FF;background:rgba(31,124,246,.22);border:1px solid rgba(125,180,255,.4);padding:2px 8px;border-radius:20px;margin-top:3px;text-transform:uppercase;letter-spacing:.6px}
 .sb-nav{padding:8px 0;flex:1}
 .sb-sec{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.3px;padding:16px 18px 6px;display:flex;align-items:center;gap:6px}
-.sb-sec.shop{color:#6ee7b7}.sb-sec.livr{color:#93c5fd}.sb-sec.fin{color:#fcd34d}.sb-sec.plat{color:#c4b5fd}
+.sb-sec.shop{color:#6ee7b7}.sb-sec.livr{color:#93c5fd}.sb-sec.fin{color:#fcd34d}.sb-sec.plat{color:#8FA6CC}
 .sb-a{display:flex;align-items:center;gap:10px;padding:10px 18px;color:var(--sb-text);text-decoration:none;font-size:13px;font-weight:600;border-left:3px solid transparent;transition:all .15s;cursor:pointer}
 .sb-a:hover{background:rgba(255,255,255,.09);color:#fff}
-.sb-a.on{background:rgba(167,139,250,.22);border-left-color:#a78bfa;color:#fff;font-weight:700}
+.sb-a.on{background:rgba(31,124,246,.22);border-left-color:#7DB4FF;color:#fff;font-weight:700}
 .sb-i{width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:.85}
 .sb-ft-ico{width:16px;height:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:.7}
 .sb-pill{margin-left:auto;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;color:#fff}
@@ -64,7 +64,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .tb-user:hover{background:var(--bg)}
 .tb-uav{width:27px;height:27px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--bdk));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff}
 .tb-uname{font-size:12px;font-weight:600;color:var(--text)}.tb-urole{font-size:9.5px;color:var(--muted)}
-.drop{position:absolute;top:calc(100% + 7px);right:0;background:#fff;border:1px solid var(--bd);border-radius:11px;padding:7px;box-shadow:0 8px 32px rgba(0,0,0,.13);min-width:185px;z-index:300;display:none;flex-direction:column;gap:2px}
+.drop{position:absolute;top:calc(100% + 7px);right:0;background:var(--card);border:1px solid var(--bd);border-radius:11px;padding:7px;box-shadow:0 8px 32px rgba(0,0,0,.13);min-width:185px;z-index:300;display:none;flex-direction:column;gap:2px}
 .drop.open{display:flex}
 .drop-i{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;font-size:12.5px;color:var(--text);text-decoration:none;transition:background .13s;background:none;border:none;cursor:pointer;font-family:var(--font);font-weight:500;width:100%}
 .drop-i:hover{background:var(--bg)}.drop-i.d{color:var(--red)}.drop-i.d:hover{background:var(--rbg)}
@@ -72,25 +72,25 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 
 /* ─── CONTENT ─── */
 .con{flex:1;display:flex;flex-direction:column;padding:0;min-height:0}
-.flash{display:flex;align-items:center;gap:10px;padding:11px 18px;font-size:13px;font-weight:600;border-bottom:1px solid rgba(16,185,129,.2);background:var(--gbg);color:#065f46;flex-shrink:0}
+.flash{display:flex;align-items:center;gap:10px;padding:11px 18px;font-size:13px;font-weight:600;border-bottom:1px solid rgba(16,185,129,.2);background:var(--gbg);color:var(--ok-ink);flex-shrink:0}
 
 /* ─── CHAT HUB ─── */
 .sa-hub{flex:1;min-height:0;display:flex;overflow:hidden;border-top:1px solid var(--bd)}
 
 /* LEFT: conversation list */
-.conv-list{width:310px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--bd);background:#fafbfc}
+.conv-list{width:310px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--bd);background:var(--bg)}
 .cl-hdr{padding:14px 16px 10px;border-bottom:1px solid var(--bd);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
 .cl-hdr-t{font-size:13.5px;font-weight:800;color:var(--text)}
-.cl-hdr-c{font-size:11px;font-weight:700;background:rgba(124,58,237,.1);color:var(--brand);padding:2px 8px;border-radius:20px}
+.cl-hdr-c{font-size:11px;font-weight:700;background:rgba(22,104,216,.1);color:var(--brand);padding:2px 8px;border-radius:20px}
 .cl-search{padding:10px 12px;border-bottom:1px solid var(--bd);flex-shrink:0}
 .cl-search input{width:100%;padding:7px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);font-size:12.5px;color:var(--text);font-family:var(--font);outline:none;transition:border-color .13s,background .13s}
-.cl-search input:focus{border-color:var(--blt);background:#fff}
+.cl-search input:focus{border-color:var(--blt);background:var(--card)}
 .cl-search input::placeholder{color:var(--muted)}
 .cl-items{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.1) transparent}
 .cl-items::-webkit-scrollbar{width:3px}.cl-items::-webkit-scrollbar-thumb{background:rgba(0,0,0,.12);border-radius:2px}
 .conv-item{display:flex;align-items:center;gap:11px;padding:13px 14px;cursor:pointer;border-bottom:1px solid rgba(0,0,0,.04);transition:background .13s;position:relative}
-.conv-item:hover{background:rgba(124,58,237,.04)}
-.conv-item.active{background:rgba(124,58,237,.09)}
+.conv-item:hover{background:rgba(22,104,216,.04)}
+.conv-item.active{background:rgba(22,104,216,.09)}
 .ci-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0}
 .ci-body{flex:1;min-width:0}
 .ci-top{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:3px}
@@ -102,38 +102,38 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .ci-unread{margin-left:auto;min-width:20px;height:20px;border-radius:10px;background:var(--brand);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 6px;flex-shrink:0}
 .conv-item.has-unread .ci-name{color:var(--brand);font-weight:800}
 .conv-item.has-unread .ci-preview{color:var(--text);font-weight:600}
-.conv-item.has-unread{background:rgba(124,58,237,.05)}
+.conv-item.has-unread{background:rgba(22,104,216,.05)}
 
 /* RIGHT: chat */
 .conv-main{flex:1;display:flex;flex-direction:column;min-width:0}
-.conv-welcome{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;padding:40px;text-align:center;background:#f8f9fb}
+.conv-welcome{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;padding:40px;text-align:center;background:var(--bg)}
 .conv-welcome svg{opacity:.15;margin-bottom:8px}
 .wt{font-size:15px;font-weight:800;color:var(--text)}
 .ws{font-size:13px;color:var(--muted)}
 .conv-chat{flex:1;display:flex;flex-direction:column;min-height:0}
-.chat-hdr{display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--bd);flex-shrink:0;background:#fff}
+.chat-hdr{display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--bd);flex-shrink:0;background:var(--card)}
 .chat-back{display:none;width:32px;height:32px;border:none;background:var(--bg);border-radius:8px;cursor:pointer;font-size:18px;color:var(--text);align-items:center;justify-content:center;flex-shrink:0;transition:background .13s}
-.chat-back:hover{background:#e2e8f0}
+.chat-back:hover{background:#E3E8F2}
 .chat-hdr-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0}
 .chat-hdr-name{font-size:14px;font-weight:800;color:var(--text)}
 .chat-hdr-sub{font-size:11.5px;color:var(--muted)}
 .chat-hdr-badge{margin-left:auto}
-.chat-thread{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:8px;background:#f0f2f5;scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.1) transparent}
+.chat-thread{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:8px;background:var(--bg);scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.1) transparent}
 .chat-thread::-webkit-scrollbar{width:4px}.chat-thread::-webkit-scrollbar-thumb{background:rgba(0,0,0,.14);border-radius:2px}
 .chat-msg{display:flex}
 .chat-msg.mine{justify-content:flex-end}
 .chat-msg.theirs{justify-content:flex-start}
 .chat-bubble{max-width:72%;padding:9px 13px;border-radius:14px;word-break:break-word}
 .mine .chat-bubble{background:var(--brand);color:#fff;border-radius:14px 14px 4px 14px}
-.theirs .chat-bubble{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:14px 14px 14px 4px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.theirs .chat-bubble{background:var(--card);border:1px solid rgba(0,0,0,.08);border-radius:14px 14px 14px 4px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .chat-author{font-size:10.5px;font-weight:700;color:var(--muted);margin-bottom:3px}
 .chat-text{font-size:13.5px;line-height:1.45}
 .chat-time{font-size:10px;margin-top:5px;text-align:right}
 .mine .chat-time{color:rgba(255,255,255,.65)}
 .theirs .chat-time{color:var(--muted)}
-.chat-input-zone{display:flex;align-items:flex-end;gap:10px;padding:12px 16px;border-top:1px solid var(--bd);background:#fff;flex-shrink:0}
+.chat-input-zone{display:flex;align-items:flex-end;gap:10px;padding:12px 16px;border-top:1px solid var(--bd);background:var(--card);flex-shrink:0}
 #chatInput{flex:1;padding:10px 14px;border-radius:22px;border:1px solid var(--bd);background:var(--bg);font-size:13.5px;font-family:var(--font);color:var(--text);resize:none;outline:none;max-height:120px;line-height:1.4;transition:border-color .13s,background .13s}
-#chatInput:focus{border-color:var(--blt);background:#fff}
+#chatInput:focus{border-color:var(--blt);background:var(--card)}
 #chatInput::placeholder{color:var(--muted)}
 #sendBtn{width:42px;height:42px;border-radius:50%;background:var(--brand);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
 #sendBtn:hover{background:var(--bdk);transform:scale(1.05)}
@@ -158,6 +158,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
     .chat-back{display:flex!important}
 }
 </style>
+@include('admin._partials.shopio-theme')
+@include('admin._partials.dark-mode')
 @endpush
 
 @section('content')
@@ -208,9 +210,9 @@ $I = [
 {{-- ════════ SIDEBAR ════════ --}}
 <aside class="sb" id="sb">
     <div class="sb-logo">
-        <div class="sb-ico-wrap" style="color:#fff">{!! $I['brand_lg'] !!}</div>
+        <div class="sb-ico-wrap"><img src="{{ \App\Support\Assets::v('images/shopio-logo-192.png') }}" alt="" width="42" height="42"></div>
         <div>
-            <div class="sb-appname">{{ config('app.name','Shopio') }}</div>
+            <div class="sb-appname">Shopio</div>
             <div class="sb-apptag">Plateforme · Super Admin</div>
         </div>
         <button class="sb-close" onclick="closeSb()" title="Fermer la sidebar">{!! $I['close'] !!}</button>
@@ -224,25 +226,26 @@ $I = [
     </div>
     <nav class="sb-nav">
         <a href="{{ route('admin.dashboard') }}" class="sb-a"><span class="sb-i">{!! $I['home'] !!}</span><span>Vue d'ensemble</span></a>
-        <div class="sb-sec shop">── SaaS Boutiques</div>
+        <div class="sb-sec shop">SaaS Boutiques</div>
         <a href="{{ route('admin.shops.index') }}" class="sb-a"><span class="sb-i">{!! $I['store'] !!}</span><span>Boutiques</span></a>
         <a href="{{ route('admin.products.index') }}" class="sb-a"><span class="sb-i">{!! $I['bag'] !!}</span><span>Produits</span></a>
         <a href="{{ route('admin.orders.index') }}" class="sb-a"><span class="sb-i">{!! $I['box'] !!}</span><span>Commandes boutiques</span></a>
         <a href="{{ route('admin.vendeurs.index') }}" class="sb-a"><span class="sb-i">{!! $I['brief'] !!}</span><span>Vendeurs &amp; Employés</span></a>
         <a href="{{ route('admin.clients.index') }}" class="sb-a"><span class="sb-i">{!! $I['user'] !!}</span><span>Clients boutiques</span></a>
-        <div class="sb-sec livr">── SaaS Livraison</div>
+        <div class="sb-sec livr">SaaS Livraison</div>
         <a href="{{ route('admin.entreprises.index') }}" class="sb-a"><span class="sb-i">{!! $I['truck'] !!}</span><span>Entreprises livraison</span></a>
         <a href="{{ route('admin.livreurs.index') }}" class="sb-a"><span class="sb-i">{!! $I['bike'] !!}</span><span>Livreurs</span></a>
         <a href="{{ route('admin.zones.index') }}" class="sb-a"><span class="sb-i">{!! $I['map'] !!}</span><span>Zones de livraison</span></a>
         <a href="{{ route('admin.suivi.index') }}" class="sb-a"><span class="sb-i">{!! $I['pin'] !!}</span><span>Suivi en temps réel</span></a>
-        <div class="sb-sec fin">── Finance</div>
+        <div class="sb-sec fin">Finance</div>
         <a href="{{ route('admin.paiements.index') }}" class="sb-a"><span class="sb-i">{!! $I['card'] !!}</span><span>Paiements</span></a>
         <a href="{{ route('admin.payouts.index') }}" class="sb-a"><span class="sb-i">{!! $I['dollar'] !!}</span><span>Règlements boutiques</span></a>
+        <a href="{{ route('admin.campaigns.index') }}" class="sb-a"><span class="sb-i">{!! \App\Support\IconLibrary::svg('megaphone', '', 17) !!}</span><span>Campagnes</span></a>
         <a href="{{ route('admin.commissions.index') }}" class="sb-a"><span class="sb-i">{!! $I['trend'] !!}</span><span>Commissions</span></a>
         <a href="{{ route('admin.revenus-boutiques.index') }}" class="sb-a"><span class="sb-i">{!! $I['store'] !!}</span><span>Revenus boutiques</span></a>
         <a href="{{ route('admin.revenus-entreprises.index') }}" class="sb-a"><span class="sb-i">{!! $I['truck'] !!}</span><span>Revenus entreprises</span></a>
         <a href="{{ route('admin.revenus.index') }}" class="sb-a"><span class="sb-i">{!! $I['dollar'] !!}</span><span>Revenus plateforme</span></a>
-        <div class="sb-sec plat">── Plateforme</div>
+        <div class="sb-sec plat">Plateforme</div>
         <a href="{{ route('admin.users.index') }}" class="sb-a"><span class="sb-i">{!! $I['users'] !!}</span><span>Tous les utilisateurs</span></a>
         <a href="{{ route('admin.avis.index') }}" class="sb-a"><span class="sb-i">{!! $I['star'] !!}</span><span>Avis &amp; Notation</span></a>
         <a href="{{ route('admin.support.index') }}" class="sb-a on"><span class="sb-i">{!! $I['ticket'] !!}</span><span>Support conversations</span></a>
@@ -287,7 +290,8 @@ $I = [
                 </form>
             </div>
         </div>
-    </header>
+        @include('admin._partials.dark-toggle')
+</header>
 
     <div class="con">
         @if(session('success'))
@@ -311,7 +315,7 @@ $I = [
                     @php
                         $shopName = $ticket->shop->name ?? $ticket->creator->name ?? 'Support';
                         $initial  = strtoupper(substr($shopName, 0, 1));
-                        $colors   = ['#7c3aed','#2563eb','#059669','#d97706','#dc2626','#0891b2','#7c3aed'];
+                        $colors   = ['#1668D8','#2563eb','#059669','#d97706','#dc2626','#0891b2','#1668D8'];
                         $color    = $colors[abs(crc32($shopName)) % count($colors)];
                     @endphp
                     <div class="conv-item"
@@ -446,7 +450,7 @@ function openConv(ticketId, el) {
 
     /* update header */
     const name    = el.dataset.name;
-    const color   = el.dataset.color || '#7c3aed';
+    const color   = el.dataset.color || '#1668D8';
     const initial = el.dataset.initial || name.charAt(0).toUpperCase();
     const status  = el.dataset.status;
 
@@ -612,7 +616,7 @@ function _refreshHeaderCount() {
     if (!el) return;
     if (unread > 0) {
         el.textContent = unread + ' non lu' + (unread > 1 ? 's' : '');
-        el.style.background = 'rgba(124,58,237,.18)';
+        el.style.background = 'rgba(22,104,216,.18)';
         el.style.color       = 'var(--brand)';
     } else {
         el.textContent = total;

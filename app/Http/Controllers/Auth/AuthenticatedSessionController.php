@@ -67,6 +67,7 @@ class AuthenticatedSessionController extends Controller
 
         if ($user->role === 'superadmin') return redirect()->route('admin.dashboard');
         if ($user->role === 'staff')      return redirect()->route('admin.dashboard');
+        if ($user->role === 'marketing')  return redirect()->route('admin.campaigns.index');
         if ($user->role === 'admin')      return redirect()->route('boutique.dashboard');
         if ($user->role === 'company')    return redirect()->route('company.dashboard');
         if ($user->role === 'livreur')    return redirect()->route('livreur.dashboard');

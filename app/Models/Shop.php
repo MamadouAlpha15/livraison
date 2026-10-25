@@ -36,6 +36,18 @@ public function orders()
     return $this->hasMany(Order::class);
 }
 
+// Campagnes publicitaires payées (espace vendeur → Campagnes)
+public function adCampaigns()
+{
+    return $this->hasMany(AdCampaign::class);
+}
+
+// Mouvements du Crédit Shopio (solde : App\Support\Campaigns\ShopCredit::balance)
+public function creditEntries()
+{
+    return $this->hasMany(ShopCreditEntry::class);
+}
+
 public function clients()
 {
     return $this->belongsToMany(\App\Models\User::class, 'shop_user')->withTimestamps();  // Une boutique (Shop) peut avoir plusieurs clients (User) abonnés via une table pivot shop_user.

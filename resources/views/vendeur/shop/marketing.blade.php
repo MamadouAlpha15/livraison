@@ -289,15 +289,15 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                 <div class="mk-card-head">
                     <span class="mk-card-ico">{!! $ico('M5 21V4M5 4h11l-2 4 2 4H5') !!}</span>
                     <div>
-                        <h2 class="mk-card-title" id="mkCampTitle">Campagnes</h2>
-                        <p class="mk-card-sub">Un lien à part pour un influenceur, une promotion ou une affiche. Si vous y liez un code promo, il est proposé au client arrivé par ce lien, et les commandes passées avec ce code comptent aussi pour la campagne.</p>
+                        <h2 class="mk-card-title" id="mkCampTitle">Liens de suivi</h2>
+                        <p class="mk-card-sub">Un lien à part pour un influenceur, une promotion ou une affiche. Si vous y liez un code promo, il est proposé au client arrivé par ce lien, et les commandes passées avec ce code comptent aussi pour ce lien.</p>
                     </div>
                 </div>
 
                 <form method="POST" action="{{ route('boutique.marketing.campaigns.store') }}" class="mk-camp-form">
                     @csrf
                     <div class="mk-camp-field mk-camp-name">
-                        <label class="mk-field-lbl" for="mkCampName">Nom de la campagne</label>
+                        <label class="mk-field-lbl" for="mkCampName">Nom du lien</label>
                         <input type="text" class="mk-select" id="mkCampName" name="name" maxlength="60" required value="{{ old('name') }}" placeholder="Ex. Influenceuse Awa, Promo Tabaski" @error('name') aria-invalid="true" @enderror>
                     </div>
                     <div class="mk-camp-field">
@@ -323,7 +323,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                     <p class="mk-form-err" role="alert">{{ $errors->first() }}</p>
                 @endif
                 @if($promoCodes->isEmpty())
-                    <p class="mk-note">Pour offrir une réduction avec une campagne, créez d'abord un code dans <a href="{{ route('boutique.promo-codes.index') }}" style="color:var(--sv-btn);font-weight:700">Codes promo</a>.</p>
+                    <p class="mk-note">Pour offrir une réduction avec un lien de suivi, créez d'abord un code dans <a href="{{ route('boutique.promo-codes.index') }}" style="color:var(--sv-btn);font-weight:700">Codes promo</a>.</p>
                 @endif
 
                 @if($campaigns->isNotEmpty())
@@ -341,7 +341,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                                     <div><dt>Chiffre d'affaires</dt><dd>{{ $money($c['revenue']) }}</dd></div>
                                 </dl>
                                 <div class="mk-copyrow">
-                                    <input type="text" class="mk-url" id="mkCamp-{{ $c['id'] }}" value="{{ $c['url'] }}" readonly aria-label="Lien de la campagne {{ $c['name'] }}">
+                                    <input type="text" class="mk-url" id="mkCamp-{{ $c['id'] }}" value="{{ $c['url'] }}" readonly aria-label="Lien de suivi {{ $c['name'] }}">
                                     <button type="button" class="mk-btn mk-btn-line mk-btn-sm" data-copy="#mkCamp-{{ $c['id'] }}">Copier</button>
                                     <form method="POST" action="{{ route('boutique.marketing.campaigns.archive', $c['id']) }}" data-confirm="Archiver « {{ $c['name'] }} » ? Le lien mènera toujours à votre boutique, mais ses visites ne seront plus comptées à part.">
                                         @csrf

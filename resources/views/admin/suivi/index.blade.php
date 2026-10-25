@@ -6,34 +6,34 @@
 <style>
 *,*::before,*::after{box-sizing:border-box}
 :root{
-    --brand:#7c3aed;--blt:#8b5cf6;--bdk:#5b21b6;--glow:rgba(124,58,237,.22);
-    --sb:#1e1b4b;--sb-text:rgba(255,255,255,.88);--sb-w:268px;
-    --bg:#f1f5f9;--card:#fff;--bd:rgba(0,0,0,.07);
-    --text:#0f172a;--muted:#64748b;
+    --brand:#1668D8;--blt:#1F7CF6;--bdk:#1260C9;--glow:rgba(22,104,216,.22);
+    --sb:#0B1E3D;--sb-text:rgba(255,255,255,.88);--sb-w:268px;
+    --bg:#F6F9FF;--card:#fff;--bd:rgba(0,0,0,.07);
+    --text:#16162A;--muted:#62627C;
     --green:#10b981;--gbg:rgba(16,185,129,.1);
     --amber:#f59e0b;--abg:rgba(245,158,11,.1);
     --red:#ef4444;--rbg:rgba(239,68,68,.1);
     --blue:#3b82f6;--bbg:rgba(59,130,246,.1);
-    --font:'Segoe UI',system-ui,sans-serif;
+    --font:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
 }
 body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-webkit-font-smoothing:antialiased}
 .sa{display:flex;min-height:100vh}
 .sb{width:var(--sb-w);background:var(--sb);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;overflow-y:auto;overflow-x:hidden;transition:transform .28s cubic-bezier(.4,0,.2,1);scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent}
 .sb::-webkit-scrollbar{width:3px}.sb::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:2px}
 .sb-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.12);display:flex;align-items:center;gap:11px;flex-shrink:0}
-.sb-ico-wrap{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#a78bfa,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 4px 16px rgba(167,139,250,.45);flex-shrink:0}
+.sb-ico-wrap{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#7DB4FF,#1668D8);display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 4px 16px rgba(31,124,246,.45);flex-shrink:0}
 .sb-appname{font-size:14.5px;font-weight:900;color:#fff;letter-spacing:-.2px}
-.sb-apptag{font-size:10px;font-weight:700;color:#c4b5fd;text-transform:uppercase;letter-spacing:.9px;margin-top:2px}
+.sb-apptag{font-size:10px;font-weight:700;color:#8FA6CC;text-transform:uppercase;letter-spacing:.9px;margin-top:2px}
 .sb-me{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.12);display:flex;align-items:center;gap:10px;flex-shrink:0;background:rgba(255,255,255,.05)}
-.sb-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#6d28d9);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0;border:2px solid rgba(196,181,253,.5);box-shadow:0 2px 8px rgba(124,58,237,.4)}
+.sb-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7DB4FF,#1260C9);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0;border:2px solid rgba(125,180,255,.5);box-shadow:0 2px 8px rgba(22,104,216,.4)}
 .sb-name{font-size:13px;font-weight:800;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:172px}
-.sb-badge{display:inline-block;font-size:9.5px;font-weight:700;color:#e9d5ff;background:rgba(167,139,250,.22);border:1px solid rgba(196,181,253,.4);padding:2px 8px;border-radius:20px;margin-top:3px;text-transform:uppercase;letter-spacing:.6px}
+.sb-badge{display:inline-block;font-size:9.5px;font-weight:700;color:#D6E6FF;background:rgba(31,124,246,.22);border:1px solid rgba(125,180,255,.4);padding:2px 8px;border-radius:20px;margin-top:3px;text-transform:uppercase;letter-spacing:.6px}
 .sb-nav{padding:8px 0;flex:1}
 .sb-sec{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.3px;padding:16px 18px 6px;display:flex;align-items:center;gap:6px}
-.sb-sec.shop{color:#6ee7b7}.sb-sec.livr{color:#93c5fd}.sb-sec.fin{color:#fcd34d}.sb-sec.plat{color:#c4b5fd}
+.sb-sec.shop{color:#6ee7b7}.sb-sec.livr{color:#93c5fd}.sb-sec.fin{color:#fcd34d}.sb-sec.plat{color:#8FA6CC}
 .sb-a{display:flex;align-items:center;gap:10px;padding:10px 18px;color:var(--sb-text);text-decoration:none;font-size:13px;font-weight:600;border-left:3px solid transparent;transition:all .15s;cursor:pointer;letter-spacing:.1px}
 .sb-a:hover{background:rgba(255,255,255,.09);color:#fff}
-.sb-a.on{background:rgba(167,139,250,.22);border-left-color:#a78bfa;color:#fff;font-weight:700;box-shadow:inset 0 0 0 1px rgba(167,139,250,.15)}
+.sb-a.on{background:rgba(31,124,246,.22);border-left-color:#7DB4FF;color:#fff;font-weight:700;box-shadow:inset 0 0 0 1px rgba(31,124,246,.15)}
 .sb-i{width:18px;text-align:center;font-size:15px;flex-shrink:0}
 .sb-pill{margin-left:auto;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;color:#fff}
 .sb-pill.r{background:var(--red)}.sb-pill.a{background:var(--amber)}.sb-pill.g{background:var(--green)}
@@ -59,14 +59,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .tb-user:hover{background:var(--bg)}
 .tb-uav{width:27px;height:27px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--bdk));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff}
 .tb-uname{font-size:12px;font-weight:600;color:var(--text)}.tb-urole{font-size:9.5px;color:var(--muted)}
-.drop{position:absolute;top:calc(100% + 7px);right:0;background:#fff;border:1px solid var(--bd);border-radius:11px;padding:7px;box-shadow:0 8px 32px rgba(0,0,0,.13);min-width:185px;z-index:300;display:none;flex-direction:column;gap:2px}
+.drop{position:absolute;top:calc(100% + 7px);right:0;background:var(--card);border:1px solid var(--bd);border-radius:11px;padding:7px;box-shadow:0 8px 32px rgba(0,0,0,.13);min-width:185px;z-index:300;display:none;flex-direction:column;gap:2px}
 .drop.open{display:flex}
 .drop-i{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;font-size:12.5px;color:var(--text);text-decoration:none;transition:background .13s;background:none;border:none;cursor:pointer;font-family:var(--font);font-weight:500;width:100%}
 .drop-i:hover{background:var(--bg)}.drop-i.d{color:var(--red)}.drop-i.d:hover{background:var(--rbg)}
 .drop-sep{height:1px;background:var(--bd);margin:4px 0}
 .con{flex:1;padding:24px}
 .flash{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;margin-bottom:20px;font-size:12.5px;font-weight:600}
-.flash.ok{background:var(--gbg);color:#065f46;border:1px solid rgba(16,185,129,.2)}
+.flash.ok{background:var(--gbg);color:var(--ok-ink);border:1px solid rgba(16,185,129,.2)}
 .bc{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);margin-bottom:20px}
 .bc a{color:var(--muted);text-decoration:none}.bc a:hover{color:var(--text)}.bc .bs{color:rgba(0,0,0,.15)}
 .ph{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:22px;flex-wrap:wrap}
@@ -78,17 +78,17 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .kpi{background:var(--card);border-radius:13px;padding:16px;border:1px solid var(--bd);position:relative;overflow:hidden;transition:transform .18s,box-shadow .18s;cursor:default}
 .kpi:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(0,0,0,.08)}
 .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:13px 13px 0 0}
-.kpi.p::before{background:linear-gradient(90deg,#7c3aed,#8b5cf6)}
+.kpi.p::before{background:linear-gradient(90deg,#1668D8,#1F7CF6)}
 .kpi.g::before{background:linear-gradient(90deg,#10b981,#34d399)}
 .kpi.a::before{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
 .kpi.b::before{background:linear-gradient(90deg,#3b82f6,#60a5fa)}
 .kpi.r::before{background:linear-gradient(90deg,#ef4444,#f87171)}
 .kpi-ic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;margin-bottom:11px}
-.kpi-ic.p{background:rgba(139,92,246,.12)}.kpi-ic.g{background:var(--gbg)}.kpi-ic.a{background:var(--abg)}
+.kpi-ic.p{background:rgba(31,124,246,.12)}.kpi-ic.g{background:var(--gbg)}.kpi-ic.a{background:var(--abg)}
 .kpi-ic.b{background:var(--bbg)}.kpi-ic.r{background:var(--rbg)}
 .kpi-v{font-size:24px;font-weight:900;color:var(--text);letter-spacing:-1px;line-height:1;margin-bottom:4px}
 .kpi-l{font-size:11.5px;color:var(--muted);font-weight:500}
-.kpi-s{font-size:10px;color:rgba(100,116,139,.55);margin-top:2px}
+.kpi-s{font-size:10px;color:rgba(98,98,124,.55);margin-top:2px}
 
 /* svg sidebar icons */
 .sb-i{width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:.85}
@@ -113,17 +113,17 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 /* chips */
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
 .chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:700;text-decoration:none;border:1.5px solid var(--bd);color:var(--muted);background:var(--card);transition:all .15s}
-.chip:hover{border-color:#a78bfa;color:var(--brand)}
-.chip.on{background:rgba(124,58,237,.09);border-color:#a78bfa;color:var(--brand)}
-.chip.live-chip{background:var(--gbg);border-color:rgba(16,185,129,.3);color:#065f46}
-.chip.gps-chip{background:var(--bbg);border-color:rgba(59,130,246,.3);color:#1d4ed8}
+.chip:hover{border-color:#7DB4FF;color:var(--brand)}
+.chip.on{background:rgba(22,104,216,.09);border-color:#7DB4FF;color:var(--brand)}
+.chip.live-chip{background:var(--gbg);border-color:rgba(16,185,129,.3);color:var(--ok-ink)}
+.chip.gps-chip{background:var(--bbg);border-color:rgba(59,130,246,.3);color:var(--info-ink)}
 
 /* filter bar */
 .fb{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 .fb-sel{height:34px;border:1px solid var(--bd);border-radius:8px;padding:0 10px;font-size:12px;font-family:var(--font);color:var(--text);background:var(--card);outline:none;cursor:pointer;transition:border-color .15s}
-.fb-sel:focus{border-color:var(--blt);box-shadow:0 0 0 3px rgba(124,58,237,.09)}
+.fb-sel:focus{border-color:var(--blt);box-shadow:0 0 0 3px rgba(22,104,216,.09)}
 .fb-inp{height:34px;border:1px solid var(--bd);border-radius:8px;padding:0 10px;font-size:12px;font-family:var(--font);color:var(--text);background:var(--card);outline:none;width:220px;transition:border-color .15s}
-.fb-inp:focus{border-color:var(--blt);box-shadow:0 0 0 3px rgba(124,58,237,.09)}
+.fb-inp:focus{border-color:var(--blt);box-shadow:0 0 0 3px rgba(22,104,216,.09)}
 .fb-btn{height:34px;padding:0 14px;border-radius:8px;border:1px solid var(--bd);background:var(--card);font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:var(--font);transition:all .13s}
 .fb-btn:hover{background:var(--bg);color:var(--text)}
 
@@ -138,36 +138,36 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .tbl th{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:9px 16px;background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap;text-align:left}
 .tbl td{padding:10px 16px;font-size:12px;color:var(--text);border-bottom:1px solid var(--bd);vertical-align:middle}
 .tbl tr:last-child td{border-bottom:none}
-.tbl tbody tr:hover{background:rgba(124,58,237,.02)}
+.tbl tbody tr:hover{background:rgba(22,104,216,.02)}
 
 /* order row */
 .t-ord{display:flex;align-items:center;gap:8px}
-.t-id{font-size:11px;font-weight:800;color:var(--brand);background:rgba(124,58,237,.07);padding:2px 7px;border-radius:6px;white-space:nowrap}
+.t-id{font-size:11px;font-weight:800;color:var(--brand);background:rgba(22,104,216,.07);padding:2px 7px;border-radius:6px;white-space:nowrap}
 .t-name{font-weight:600;font-size:12px}.t-sub{font-size:10.5px;color:var(--muted)}
 
 /* badges */
 .bdg{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
-.bdg.g{color:#065f46;background:var(--gbg)}.bdg.b{color:#1d4ed8;background:var(--bbg)}
-.bdg.a{color:#92400e;background:var(--abg)}.bdg.m{color:var(--muted);background:rgba(100,116,139,.1)}
-.bdg.r{color:#7f1d1d;background:var(--rbg)}
+.bdg.g{color:var(--ok-ink);background:var(--gbg)}.bdg.b{color:var(--info-ink);background:var(--bbg)}
+.bdg.a{color:var(--warn-ink);background:var(--abg)}.bdg.m{color:var(--muted);background:rgba(98,98,124,.1)}
+.bdg.r{color:var(--err-ink);background:var(--rbg)}
 
 /* gps status */
-.gps-live{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#065f46}
+.gps-live{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--ok-ink)}
 .gps-live::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s ease-in-out infinite;flex-shrink:0}
-.gps-old{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#92400e}
+.gps-old{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--warn-ink)}
 .gps-old::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--amber);flex-shrink:0}
 .gps-none{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--muted)}
 .gps-none::before{content:'';width:7px;height:7px;border-radius:50%;background:#94a3b8;flex-shrink:0}
 
 /* view btn */
-.btn-map{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:7px;font-size:11px;font-weight:700;background:var(--bbg);color:#1d4ed8;border:1px solid rgba(59,130,246,.2);cursor:pointer;transition:all .13s;text-decoration:none}
+.btn-map{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:7px;font-size:11px;font-weight:700;background:var(--bbg);color:var(--info-ink);border:1px solid rgba(59,130,246,.2);cursor:pointer;transition:all .13s;text-decoration:none}
 .btn-map:hover{background:rgba(59,130,246,.18);transform:translateY(-1px)}
 
 /* empty */
 .empty{padding:56px 20px;text-align:center}
 .empty-ico{font-size:36px;opacity:.25;margin-bottom:10px}
 .empty-t{font-size:13px;font-weight:700;color:var(--muted)}
-.empty-s{font-size:11px;color:rgba(100,116,139,.65);margin-top:4px}
+.empty-s{font-size:11px;color:rgba(98,98,124,.65);margin-top:4px}
 
 /* pagination */
 .pag{padding:12px 20px;border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
@@ -176,6 +176,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 @media(max-width:900px){.sb{transform:translateX(-100%)}.sb.open{transform:translateX(0);box-shadow:4px 0 32px rgba(0,0,0,.32)}.sb-ov.open{display:block}.mn{margin-left:0}.kpi-g{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:640px){.con{padding:13px}.tb{padding:0 13px}#map{height:260px}}
 </style>
+@include('admin._partials.shopio-theme')
+@include('admin._partials.dark-mode')
 @endpush
 
 @section('content')
@@ -242,9 +244,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 {{-- ════════ SIDEBAR ════════ --}}
 <aside class="sb" id="sb">
     <div class="sb-logo">
-        <div class="sb-ico-wrap">{!! $I['brand_lg'] !!}</div>
+        <div class="sb-ico-wrap"><img src="{{ \App\Support\Assets::v('images/shopio-logo-192.png') }}" alt="" width="42" height="42"></div>
         <div>
-            <div class="sb-appname">{{ config('app.name','Shopio') }}</div>
+            <div class="sb-appname">Shopio</div>
             <div class="sb-apptag">Plateforme · Super Admin</div>
         </div>
         <button class="sb-close" onclick="closeSb()" title="Fermer">{!! $I['close'] !!}</button>
@@ -258,13 +260,13 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
     </div>
     <nav class="sb-nav">
         <a href="{{ route('admin.dashboard') }}" class="sb-a"><span class="sb-i">{!! $I['home'] !!}</span><span>Vue d'ensemble</span></a>
-        <div class="sb-sec shop">── SaaS Boutiques</div>
+        <div class="sb-sec shop">SaaS Boutiques</div>
         <a href="{{ route('admin.shops.index') }}" class="sb-a"><span class="sb-i">{!! $I['store'] !!}</span><span>Boutiques</span></a>
         <a href="{{ route('admin.products.index') }}" class="sb-a"><span class="sb-i">{!! $I['bag'] !!}</span><span>Produits</span></a>
         <a href="{{ route('admin.orders.index') }}" class="sb-a"><span class="sb-i">{!! $I['box'] !!}</span><span>Commandes boutiques</span></a>
         <a href="{{ route('admin.vendeurs.index') }}" class="sb-a"><span class="sb-i">{!! $I['brief'] !!}</span><span>Vendeurs &amp; Employés</span></a>
         <a href="{{ route('admin.clients.index') }}" class="sb-a"><span class="sb-i">{!! $I['user'] !!}</span><span>Clients boutiques</span></a>
-        <div class="sb-sec livr">── SaaS Livraison</div>
+        <div class="sb-sec livr">SaaS Livraison</div>
         <a href="{{ route('admin.entreprises.index') }}" class="sb-a">
             <span class="sb-i">{!! $I['truck'] !!}</span><span>Entreprises livraison</span>
             @if($totalPending>0)<span class="sb-pill r">{{ $totalPending }}</span>@endif
@@ -275,15 +277,16 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
             <span class="sb-i">{!! $I['pin'] !!}</span><span>Suivi en temps réel</span>
             @if($stats['en_livraison']>0)<span class="sb-pill g">{{ $stats['en_livraison'] }}</span>@endif
         </a>
-        <div class="sb-sec fin">── Finance</div>
+        <div class="sb-sec fin">Finance</div>
         <a href="{{ route('admin.paiements.index') }}" class="sb-a"><span class="sb-i">{!! $I['card'] !!}</span><span>Paiements</span></a>
         <a href="{{ route('admin.payouts.index') }}" class="sb-a"><span class="sb-i">{!! $I['dollar'] !!}</span><span>Règlements boutiques</span></a>
+        <a href="{{ route('admin.campaigns.index') }}" class="sb-a"><span class="sb-i">{!! \App\Support\IconLibrary::svg('megaphone', '', 17) !!}</span><span>Campagnes</span></a>
         <a href="{{ route('admin.commissions.index') }}" class="sb-a"><span class="sb-i">{!! $I['trend'] !!}</span><span>Commissions</span></a>
         <a href="{{ route('admin.revenus-boutiques.index') }}" class="sb-a"><span class="sb-i">{!! $I['store'] !!}</span><span>Revenus boutiques</span></a>
         <a href="{{ route('admin.revenus-entreprises.index') }}" class="sb-a"><span class="sb-i">{!! $I['truck'] !!}</span><span>Revenus entreprises</span></a>
         <a href="{{ route('admin.revenus.index') }}" class="sb-a"><span class="sb-i">{!! $I['dollar'] !!}</span><span>Revenus plateforme</span></a>
         <a href="#" class="sb-a" onclick="nt();return false"><span class="sb-i">{!! $I['receipt'] !!}</span><span>Factures &amp; Exports</span></a>
-        <div class="sb-sec plat">── Plateforme</div>
+        <div class="sb-sec plat">Plateforme</div>
         <a href="{{ route('admin.users.index') }}" class="sb-a"><span class="sb-i">{!! $I['users'] !!}</span><span>Tous les utilisateurs</span></a>
         <a href="{{ route('admin.avis.index') }}" class="sb-a"><span class="sb-i">{!! $I['star'] !!}</span><span>Avis &amp; Notation</span></a>
         <a href="{{ route('admin.support.index') }}" class="sb-a"><span class="sb-i">{!! $I['ticket'] !!}</span><span>Tickets support</span></a>
@@ -337,6 +340,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
             </form>
         </div>
     </div>
+    @include('admin._partials.dark-toggle')
 </header>
 
 <div class="con">
@@ -354,7 +358,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
     <div class="ph">
         <div>
             <h1 style="display:flex;align-items:center;gap:10px">
-                <span style="display:inline-flex;width:34px;height:34px;background:rgba(124,58,237,.1);border-radius:9px;align-items:center;justify-content:center;color:var(--brand)">{!! $I['pin_lg'] !!}</span>
+                <span style="display:inline-flex;width:34px;height:34px;background:rgba(22,104,216,.1);border-radius:9px;align-items:center;justify-content:center;color:var(--brand)">{!! $I['pin_lg'] !!}</span>
                 Suivi en temps réel
             </h1>
             <div class="ph-sub">
@@ -364,7 +368,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
                 @endif
             </div>
         </div>
-        <button onclick="location.reload()" style="display:inline-flex;align-items:center;gap:7px;padding:8px 15px;border-radius:8px;background:var(--bg);border:1px solid var(--bd);font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:var(--font);transition:all .13s" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='var(--bg)'">
+        <button onclick="location.reload()" style="display:inline-flex;align-items:center;gap:7px;padding:8px 15px;border-radius:8px;background:var(--bg);border:1px solid var(--bd);font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:var(--font);transition:all .13s" onmouseover="this.style.background='#E3E8F2'" onmouseout="this.style.background='var(--bg)'">
             {!! $I['refresh'] !!} Actualiser
         </button>
     </div>
@@ -609,7 +613,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 </div>{{-- /mn --}}
 </div>{{-- /sa --}}
 
-<div id="toast" style="position:fixed;bottom:22px;right:22px;background:#1e293b;color:#fff;padding:10px 17px;border-radius:10px;font-size:12px;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.22);transform:translateY(80px);opacity:0;transition:all .27s cubic-bezier(.4,0,.2,1);pointer-events:none;z-index:9999;max-width:270px"></div>
+<div id="toast" style="position:fixed;bottom:22px;right:22px;background:#0B1E3D;color:#fff;padding:10px 17px;border-radius:10px;font-size:12px;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.22);transform:translateY(80px);opacity:0;transition:all .27s cubic-bezier(.4,0,.2,1);pointer-events:none;z-index:9999;max-width:270px"></div>
 @endsection
 
 @push('scripts')
@@ -705,8 +709,8 @@ if (mapPoints.length > 0) {
         const m = L.marker([p.lat, p.lng], {icon: makeIcon(p.live)}).addTo(map);
         m.bindPopup(`
             <strong>${String(p.label ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</strong><br>
-            <span style="font-size:11px;color:#64748b">${p.ping ? '🕐 ' + p.ping : 'Pas de ping'}</span><br>
-            <span style="font-size:10px;color:#64748b">${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}</span>
+            <span style="font-size:11px;color:var(--muted)">${p.ping ? '🕐 ' + p.ping : 'Pas de ping'}</span><br>
+            <span style="font-size:10px;color:var(--muted)">${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}</span>
         `);
         bounds.push([p.lat, p.lng]);
     });

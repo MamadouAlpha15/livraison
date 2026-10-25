@@ -239,6 +239,17 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .sec-title { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin: 28px 0 12px; display: flex; align-items: center; gap: 8px; }
 .sec-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
+/* Factures des campagnes */
+.ci-list { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); box-shadow: var(--shadow-sm); margin-bottom: 22px; overflow: hidden; }
+.ci-row { display: flex; align-items: center; gap: 14px; padding: 12px 18px; flex-wrap: wrap; }
+.ci-row + .ci-row { border-top: 1px solid var(--border); }
+.ci-row > div:first-child { flex: 1 1 220px; }
+.ci-name { font-size: 13.5px; font-weight: 700; color: var(--text); overflow-wrap: anywhere; }
+.ci-sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+.ci-amt { font-size: 13.5px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ci-dl { font-size: 12.5px; font-weight: 700; color: var(--brand); text-decoration: none; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--brand-lt); white-space: nowrap; }
+.ci-dl:hover { background: var(--brand-mlt); }
+
 /* KPI GRIDS */
 .kpi-grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 14px; }
 .kpi-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 22px; }
@@ -404,6 +415,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">{!! $I['tag_nav'] !!}</span> Produits
             @if(!$isPro)<span class="sb-badge" style="background:{{ $_sbProdClr }};color:#fff;font-size:10px;padding:1px 5px;border-radius:8px;margin-left:auto">{{ $productCount }}/{{ $_sbProdMax }}</span>@endif
         </a>
+        @if(auth()->user()?->role === 'admin')<a href="{{ route('boutique.campaigns.index') }}" class="sb-item"><span class="ico">{!! \App\Support\IconLibrary::svg('star', '', 16) !!}</span> Campagnes</a>@endif
         @if($isPro)
         <a href="{{ route('boutique.promo-codes.index') }}" class="sb-item"><span class="ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></span> Codes promo</a>
         @else
@@ -670,6 +682,23 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <div class="kpi-unit">{{ $devise }} · réglés sur la période</div>
         </div>
     </div>
+
+    {{-- FACTURES DES CAMPAGNES (propriétaire de la boutique) --}}
+    @if(($campaignInvoices ?? collect())->isNotEmpty())
+    <div class="sec-title">{!! $I['card_sec'] !!} Factures des campagnes</div>
+    <div class="ci-list">
+        @foreach($campaignInvoices as $ci)
+        <div class="ci-row">
+            <div style="min-width:0">
+                <div class="ci-name">{{ $ci->title() }}</div>
+                <div class="ci-sub">{{ \App\Support\Campaigns\CampaignInvoice::number($ci) }} · payée le {{ $ci->paid_at->format('d/m/Y') }}</div>
+            </div>
+            <div class="ci-amt">{{ number_format($ci->price_gnf, 0, ',', ' ') }} GNF</div>
+            <a href="{{ route('boutique.campaigns.invoice', $ci) }}" class="ci-dl">Facture PDF</a>
+        </div>
+        @endforeach
+    </div>
+    @endif
 
     {{-- SECTION 6 : ÉQUIPE --}}
     <div class="sec-title">{!! $I['users_sec'] !!} Équipe</div>

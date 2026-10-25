@@ -51,6 +51,11 @@ class ProductController extends Controller
 
         $products = $query->latest()->paginate(24)->withQueryString();
 
+        // Campagnes payées : produits sponsorisés dans la recherche et les catégories (pas dans le catalogue d'une boutique)
+        if (!$request->get('shop_id')) {
+            \App\Support\Campaigns\SponsoredPlacements::blend($products, $request->get('s'), $request->get('cat'), $user?->country);
+        }
+
         return response()->json([
             'data' => ProductResource::collection($products->items()),
             'meta' => [
@@ -77,6 +82,11 @@ class ProductController extends Controller
         $user = $request->user('sanctum');
         if ($user) {
             $product->is_favorited = $user->favoriteProducts()->where('product_id', $product->id)->exists();
+        }
+
+        // Ouvert depuis un emplacement sponsorisé de l'app (?c=<campagne>) : clic compté, commande attribuée 7 jours
+        if (ctype_digit((string) $request->query('c'))) {
+            \App\Support\Campaigns\AdAttribution::registerClick((int) $request->query('c'), $request, $user);
         }
 
         return response()->json([

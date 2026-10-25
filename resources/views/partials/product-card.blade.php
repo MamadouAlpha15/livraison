@@ -9,6 +9,8 @@ Carte produit réutilisée dans le catalogue complet et les rangées
   $shopRatings   → array<int, {avg, count}> note moyenne boutique par user_id vendeur (optionnel)
   $cardClass     → classes CSS supplémentaires, ex. 'prod-card--row' dans une rangée horizontale (optionnel)
   $soldCount     → int nombre d'unités vendues, affiché en badge "🏆 X vendus" (optionnel)
+Un produit placé par une campagne (sponsored_campaign_id) porte le badge « Sponsorisé »
+et son lien ?c= qui compte le clic.
 =====================================================
 --}}
 @php
@@ -20,6 +22,7 @@ Carte produit réutilisée dans le catalogue complet et les rangées
         && !$product->is_flash_active && !$hasPromo && !$product->is_featured;
     $vendeurId = $product->shop->user_id ?? null;
     $rating = $vendeurId && isset(($shopRatings ?? [])[$vendeurId]) ? $shopRatings[$vendeurId] : null;
+    $productUrl = \App\Support\Campaigns\SponsoredPlacements::url(route('client.orders.createFromProduct', $product), $product);
 @endphp
 <div class="prod-card {{ $cardClass ?? '' }}">
     @auth
@@ -37,7 +40,7 @@ Carte produit réutilisée dans le catalogue complet et les rangées
         </a>
     @endauth
 
-    <a href="{{ route('client.orders.createFromProduct', $product) }}" class="prod-card-link" style="text-decoration:none;color:inherit">
+    <a href="{{ $productUrl }}" class="prod-card-link" style="text-decoration:none;color:inherit">
         <div class="prod-card-img">
             @if($product->image)
                 <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" loading="lazy" decoding="async" width="190" height="150">
@@ -55,6 +58,7 @@ Carte produit réutilisée dans le catalogue complet et les rangées
             @endif
         </div>
         <div class="prod-card-body">
+            @if($product->sponsored_campaign_id)@include('partials.sponsored-tag', ['style' => 'align-self:flex-start'])@endif
             <div class="prod-card-name">{{ $product->name }}</div>
             @if(isset($soldCount) && $soldCount > 0)
                 <div class="prod-card-sold">{!! \App\Support\IconLibrary::svg('trophy', '', 11) !!} {{ number_format($soldCount) }} vendu{{ $soldCount > 1 ? 's' : '' }}</div>
@@ -80,7 +84,7 @@ Carte produit réutilisée dans le catalogue complet et les rangées
             @endif
         </div>
         @if(!$stockOut)
-            <a href="{{ route('client.orders.createFromProduct', $product) }}" class="prod-card-cta">Commander</a>
+            <a href="{{ $productUrl }}" class="prod-card-cta">Commander</a>
         @else
             <span class="prod-card-cta out">Indisponible</span>
         @endif

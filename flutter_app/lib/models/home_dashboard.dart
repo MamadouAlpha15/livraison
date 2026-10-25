@@ -1,4 +1,5 @@
 import 'product.dart';
+import 'shop.dart';
 
 class CategoryGroup {
   final String name;
@@ -35,8 +36,10 @@ class HomeDashboard {
   final List<Product> recommendedProducts;
   final List<CategoryGroup> categoryGroups;
   final HomeStats stats;
+  /// Boutiques « à la une » (campagnes payées en cours), vide sinon.
+  final List<Shop> featuredShops;
 
-  HomeDashboard({required this.flashProducts, required this.recommendedProducts, required this.categoryGroups, required this.stats});
+  HomeDashboard({required this.flashProducts, required this.recommendedProducts, required this.categoryGroups, required this.stats, this.featuredShops = const []});
 
   factory HomeDashboard.fromJson(Map<String, dynamic> json) {
     return HomeDashboard(
@@ -44,6 +47,7 @@ class HomeDashboard {
       recommendedProducts: (json['recommended_products'] as List).map((e) => Product.fromJson(e)).toList(),
       categoryGroups: (json['category_groups'] as List).map((e) => CategoryGroup.fromJson(e)).toList(),
       stats: json['stats'] != null ? HomeStats.fromJson(json['stats']) : HomeStats(),
+      featuredShops: (json['featured_shops'] as List?)?.map((e) => Shop.fromJson(e)).toList() ?? [],
     );
   }
 

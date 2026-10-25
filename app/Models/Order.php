@@ -39,7 +39,9 @@ class Order extends Model
     'client_lat','client_lng','client_location_shared_at',
     'vendor_lat','vendor_lng','vendor_location_shared_at','delivered_at','delivery_proof_photo',
     // Canal d'arrivée du client (facebook, instagram, whatsapp…) — App\Support\TrafficSource
-    'source', 'campaign_id', 'cancel_reason', 'cancelled_by', 'delivery_slot'];
+    'source', 'campaign_id', 'cancel_reason', 'cancelled_by', 'delivery_slot',
+    // Campagne publicitaire payée qui a amené la commande (≠ campaign_id : lien de suivi de la page Marketing)
+    'ad_campaign_id'];
 
     // Le code de remise ne doit jamais partir dans une réponse JSON lue par le livreur ou la boutique
     protected $hidden = ['delivery_code'];
@@ -76,6 +78,12 @@ class Order extends Model
     public function shop()
     {
         return $this->belongsTo(Shop::class);
+    }
+
+    // Campagne publicitaire qui a amené la commande (voir App\Models\AdCampaign)
+    public function adCampaign()
+    {
+        return $this->belongsTo(AdCampaign::class);
     }
 
     // Items de la commande

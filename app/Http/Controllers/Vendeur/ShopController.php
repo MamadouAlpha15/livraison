@@ -284,8 +284,12 @@ $clientMessages = ShopMessage::where('shop_id', $shop->id)
             ->where('type', \App\Notifications\BrokenProductImageNotification::class)
             ->get();
 
+        // Nouveautés des campagnes (paiement reçu, visuels prêts, fin proche…) : propriétaire seulement
+        $campaignNews = $user->role === 'admin' ? \App\Support\Campaigns\CampaignInbox::latest($user, 2) : collect();
+
         return view('boutique.dashboard', [
             'brokenImageAlerts'   => $brokenImageAlerts,
+            'campaignNews'        => $campaignNews,
             'shop'                => $shop,
             'livreursDisponibles' => $livreursDisponibles,
             'deliveryCompanies'   => $deliveryCompanies,

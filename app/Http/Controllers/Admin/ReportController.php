@@ -156,6 +156,12 @@ class ReportController extends Controller
         /* ── Clients nouveaux vs fidèles ── */
         $clientStats = $this->clientStats($shopId, $dateFrom, $dateTo);
 
+        /* ── Factures des campagnes payées (propriétaire de la boutique) ── */
+        $campaignInvoices = (!$isSuper && $shop && $user->role === 'admin')
+            ? $shop->adCampaigns()->with(['package:id,name', 'items.product:id,name'])->whereNotNull('paid_at')
+                ->latest('paid_at')->take(12)->get()
+            : collect();
+
         return view('admin.reports.index', compact(
             'totalOrders', 'totalRevenue',
             'allOrdersPeriod',
@@ -166,7 +172,7 @@ class ReportController extends Controller
             'commissionsPending', 'commissionsPaid',
             'commissionsPaidPeriod', 'commissionsPendingPeriod',
             'vendors', 'livreurs',
-            'topProducts', 'topLivreurs', 'clientStats',
+            'topProducts', 'topLivreurs', 'clientStats', 'campaignInvoices',
             'shopId', 'isSuper', 'shop', 'devise',
             'period', 'periodLabel', 'dateFrom', 'dateTo'
         ));

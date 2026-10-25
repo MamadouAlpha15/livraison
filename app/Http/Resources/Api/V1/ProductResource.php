@@ -37,6 +37,9 @@ class ProductResource extends JsonResource
                 'image_url' => $this->shop->image ? ImageOptimizer::url($this->shop->image, 'thumb') : null,
                 'currency' => $this->shop->currency ?? 'GNF',
             ],
+            // Produit sponsorisé (campagne payée) : l'app affiche le badge « Sponsorisé »
+            // et ajoute ?c=<id> en ouvrant la fiche, pour compter le clic et attribuer la commande.
+            'sponsored_campaign_id' => $this->sponsored_campaign_id ? (int) $this->sponsored_campaign_id : null,
         ];
     }
 }

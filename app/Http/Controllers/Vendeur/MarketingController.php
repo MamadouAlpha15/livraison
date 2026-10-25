@@ -202,7 +202,7 @@ class MarketingController extends Controller
 
         if (MarketingCampaign::where('shop_id', $shop->id)->active()->count() >= MarketingCampaign::MAX_ACTIVE) {
             return redirect()->to(route('boutique.marketing') . '#campagnes')
-                ->with('error', 'Vous avez déjà ' . MarketingCampaign::MAX_ACTIVE . ' campagnes. Archivez-en une pour en créer une nouvelle.');
+                ->with('error', 'Vous avez déjà ' . MarketingCampaign::MAX_ACTIVE . ' liens de suivi. Archivez-en un pour en créer un nouveau.');
         }
 
         $data = $request->validate([
@@ -213,12 +213,12 @@ class MarketingController extends Controller
                 // Un code promo ne sert qu'à une campagne active, sinon ses ventes seraient comptées deux fois
                 Rule::unique('marketing_campaigns', 'promo_code_id')->where('shop_id', $shop->id)->whereNull('archived_at')],
         ], [
-            'name.required'        => 'Donnez un nom à la campagne (ex. « Influenceuse Awa »).',
-            'name.min'             => 'Le nom de la campagne est trop court.',
-            'name.max'             => 'Le nom de la campagne ne peut pas dépasser 60 caractères.',
+            'name.required'        => 'Donnez un nom au lien (ex. « Influenceuse Awa »).',
+            'name.min'             => 'Le nom du lien est trop court.',
+            'name.max'             => 'Le nom du lien ne peut pas dépasser 60 caractères.',
             'channel.in'           => 'Choisissez où vous allez partager le lien.',
             'promo_code_id.exists' => "Ce code promo n'appartient pas à votre boutique.",
-            'promo_code_id.unique' => 'Ce code promo est déjà lié à une autre campagne.',
+            'promo_code_id.unique' => 'Ce code promo est déjà lié à un autre lien.',
         ]);
 
         MarketingCampaign::create([
@@ -229,7 +229,7 @@ class MarketingController extends Controller
             'promo_code_id' => $data['promo_code_id'] ?? null,
         ]);
 
-        return redirect()->to(route('boutique.marketing') . '#campagnes')->with('success', 'Campagne créée. Copiez son lien et partagez-le.');
+        return redirect()->to(route('boutique.marketing') . '#campagnes')->with('success', 'Lien de suivi créé. Copiez-le et partagez-le.');
     }
 
     /** Archive la campagne : son lien mène toujours à la boutique, mais n'est plus compté à part. */
@@ -238,7 +238,7 @@ class MarketingController extends Controller
         abort_unless((int) $campaign->shop_id === (int) $this->shop()->id, 403);
         $campaign->update(['archived_at' => now()]);
 
-        return redirect()->to(route('boutique.marketing') . '#campagnes')->with('success', 'Campagne « ' . $campaign->name . ' » archivée.');
+        return redirect()->to(route('boutique.marketing') . '#campagnes')->with('success', 'Lien « ' . $campaign->name . ' » archivé.');
     }
 
     /** Active le pixel pour le vendeur pendant 30 minutes et ouvre sa vitrine. */
