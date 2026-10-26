@@ -94,6 +94,7 @@ class OtpVerificationController extends Controller
             'admin'   => redirect()->route('boutique.dashboard'),
             'company' => redirect()->route('company.dashboard'),
             'livreur' => redirect()->route('livreur.dashboard'),
+            'affilie' => redirect()->route('affilie.dashboard'),
             default   => redirect()->route('client.dashboard'),
         };
     }

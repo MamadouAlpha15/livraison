@@ -81,6 +81,7 @@ class StorefrontOrderController extends Controller
                     'client_phone'         => $data['phone'],
                     'source'               => TrafficSource::forOrder($shop->id),
                     'campaign_id'          => TrafficSource::campaignForOrder($shop->id),
+                    'ad_campaign_id'       => \App\Support\Campaigns\AdAttribution::campaignForOrder($shop->id, $request->user()),
                 ]);
                 foreach ($qty as $id => $n) {
                     $p = $products[$id];

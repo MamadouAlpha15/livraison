@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../models/product.dart';
 import '../utils/formatters.dart';
+import 'sponsored_tag.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
@@ -62,6 +63,8 @@ class ProductCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (product.isSponsored)
+                    const Padding(padding: EdgeInsets.only(bottom: 4), child: SponsoredTag()),
                   Text(
                     product.name,
                     maxLines: 1,

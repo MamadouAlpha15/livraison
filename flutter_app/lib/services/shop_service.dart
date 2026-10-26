@@ -7,8 +7,11 @@ class ShopService {
   final ApiClient _api;
   ShopService(this._api);
 
-  Future<ShopDetail> show(int shopId) async {
-    final res = await _api.safeCall(() => _api.dio.get('/shops/$shopId'));
+  /// [campaignId] : boutique ouverte depuis « Boutiques à la une » (le clic est compté côté serveur).
+  Future<ShopDetail> show(int shopId, {int? campaignId}) async {
+    final res = await _api.safeCall(() => _api.dio.get('/shops/$shopId', queryParameters: {
+          if (campaignId != null) 'c': campaignId,
+        }));
     return ShopDetail.fromJson(res.data['data']);
   }
 

@@ -461,6 +461,7 @@ class OrderController extends Controller
             'client_phone'         => $request->client_phone,
             'source'               => \App\Support\TrafficSource::forOrder($product->shop->id), // canal d'arrivée du client
             'campaign_id'          => \App\Support\TrafficSource::campaignForOrder($product->shop->id),
+            'ad_campaign_id'       => \App\Support\Campaigns\AdAttribution::campaignForOrder($product->shop->id, \Illuminate\Support\Facades\Auth::user()),
         ]);
 
         if ($pointsToUse > 0) {

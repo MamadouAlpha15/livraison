@@ -8,6 +8,13 @@ use Illuminate\Http\Request;
 
 class UsersController extends Controller
 {
+    /**
+     * Comptes de l'équipe Shopio créés et retirés par le superadmin :
+     * « staff » (tout le panneau admin, sans suppression définitive) et
+     * « marketing » (uniquement les pages Campagnes).
+     */
+    public const TEAM_ROLES = ['staff', 'marketing'];
+
     public function index(Request $request)
     {
         $role   = $request->input('role', 'all');
@@ -52,7 +59,7 @@ class UsersController extends Controller
                       $q2->whereNotNull('company_id')->where('role', '!=', 'livreur');
                   });
             })->count(),
-            'staff'      => User::where('role', 'staff')->count(),
+            'staff'      => User::whereIn('role', self::TEAM_ROLES)->count(),
         ];
 
         return view('admin.users.index', compact('users', 'stats', 'role', 'search'));
@@ -71,13 +78,14 @@ class UsersController extends Controller
             'name'     => ['required', 'string', 'max:255'],
             'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8'],
+            'role'     => ['nullable', 'in:' . implode(',', self::TEAM_ROLES)],
         ]);
 
         User::create([
             'name'              => $data['name'],
             'email'             => $data['email'],
             'password'          => bcrypt($data['password']),
-            'role'              => 'staff',
+            'role'              => $data['role'] ?? 'staff',
             'email_verified_at' => now(),
         ]);
 
@@ -90,7 +98,7 @@ class UsersController extends Controller
      */
     public function destroyStaff(User $user)
     {
-        if ($user->role !== 'staff') {
+        if (!in_array($user->role, self::TEAM_ROLES, true)) {
             abort(403, 'Seuls les comptes du personnel plateforme peuvent être retirés ici.');
         }
 

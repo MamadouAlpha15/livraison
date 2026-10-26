@@ -186,6 +186,8 @@ class CartController extends Controller
                     'status'               => Order::STATUS_EN_ATTENTE,
                     'delivery_destination' => $request->delivery_destination,
                     'client_phone'         => $request->client_phone,
+                    // Campagne sponsorisée cliquée dans l'app dans les 7 derniers jours (même boutique)
+                    'ad_campaign_id'       => \App\Support\Campaigns\AdAttribution::campaignForOrder((int) $shopId, $user, $request),
                 ]);
 
                 foreach ($group as $item) {

@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Review;
+use App\Support\Campaigns\SponsoredPlacements;
 use Illuminate\Http\Request;
 
 /**
@@ -239,6 +240,13 @@ class WelcomeController extends Controller
            au lieu de tout en haut (sinon il faut redescendre à chaque clic). */
         $products = $query->paginate(24)->withQueryString()->fragment('catalogue');
 
+        /* ── Campagnes payées : produits sponsorisés dans la recherche et les catégories,
+           boutiques « à la une » en tête du bloc boutiques (App\Support\Campaigns\SponsoredPlacements) ── */
+        SponsoredPlacements::blend($products, $request->get('s'), $request->get('cat'), $user?->country);
+        // Pas pendant une recherche ni pour le fragment AJAX : le bloc n'y est pas affiché (aucun affichage compté)
+        $featuredShops = $request->ajax() || $request->filled('s') ? collect() : SponsoredPlacements::featuredShops($user?->country);
+        $shops = $featuredShops->concat($shops->reject(fn ($s) => $featuredShops->contains('id', $s->id)))->take(8)->values();
+
         $categories = Product::select('category')
             ->where('is_active', true)
             ->whereNotNull('category')
@@ -368,7 +376,7 @@ class WelcomeController extends Controller
         return compact(
             'flashProducts', 'recommendedProducts', 'shops', 'products', 'categories',
             'categoryGroups', 'bestSellers', 'testimonials', 'favoritedIds', 'shopRatings', 'stats', 'sort',
-            'minPrice', 'maxPrice', 'categoryCounts'
+            'minPrice', 'maxPrice', 'categoryCounts', 'featuredShops'
         );
     }
 }

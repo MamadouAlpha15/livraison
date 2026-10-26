@@ -121,6 +121,10 @@ class HomeController extends Controller
             'data' => [
                 'flash_products' => ProductResource::collection($flashProducts),
                 'recommended_products' => ProductResource::collection($recommendedProducts),
+                // Boutiques « à la une » payées (6 au plus, ordre aléatoire) ; vide s'il n'y en a pas
+                'featured_shops' => \App\Http\Resources\Api\V1\ShopResource::collection(
+                    \App\Support\Campaigns\SponsoredPlacements::featuredShops($country)
+                ),
                 'category_groups' => $categoryGroups->map(fn ($g) => [
                     'name' => $g['name'],
                     'products' => ProductResource::collection($g['products']),

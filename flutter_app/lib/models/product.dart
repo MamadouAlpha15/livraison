@@ -47,6 +47,8 @@ class Product {
   final List<ProductVariant> variants;
   final ShopMini? shop;
   final bool isFavorited;
+  /// Campagne payée qui a placé ce produit dans la liste (badge « Sponsorisé »), sinon null.
+  final int? sponsoredCampaignId;
 
   Product({
     required this.id,
@@ -66,7 +68,10 @@ class Product {
     this.variants = const [],
     this.shop,
     this.isFavorited = false,
+    this.sponsoredCampaignId,
   });
+
+  bool get isSponsored => sponsoredCampaignId != null;
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
@@ -87,6 +92,7 @@ class Product {
       variants: (json['variants'] as List?)?.map((e) => ProductVariant.fromJson(e)).toList() ?? [],
       shop: json['shop'] != null ? ShopMini.fromJson(json['shop']) : null,
       isFavorited: json['is_favorited'] ?? false,
+      sponsoredCampaignId: json['sponsored_campaign_id'],
     );
   }
 }

@@ -15,7 +15,9 @@ import '../shop/shop_detail_screen.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final int productId;
-  const ProductDetailScreen({super.key, required this.productId});
+  /// Campagne sponsorisée d'où vient le client (compte le clic), sinon null.
+  final int? campaignId;
+  const ProductDetailScreen({super.key, required this.productId, this.campaignId});
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
 }
@@ -38,7 +40,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final p = await ProductService(context.read<ApiClient>()).show(widget.productId);
+      final p = await ProductService(context.read<ApiClient>()).show(widget.productId, campaignId: widget.campaignId);
       setState(() { _product = p; _loading = false; });
     } catch (e) {
       setState(() { _error = 'Impossible de charger ce produit.'; _loading = false; });

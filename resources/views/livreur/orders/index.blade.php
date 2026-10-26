@@ -4,567 +4,361 @@
 
 @push('styles')
 <style>
-:root {
-    --navy:#0f172a; --navy2:#1e1b4b; --brand:#6366f1; --brand-dk:#4f46e5;
-    --green:#10b981; --green-lt:#d1fae5; --green-dk:#065f46;
-    --blue:#3b82f6; --blue-lt:#dbeafe; --blue-dk:#1d4ed8;
-    --yellow:#f59e0b; --yellow-lt:#fef3c7; --yellow-dk:#92400e;
-    --red:#ef4444; --red-lt:#fee2e2; --red-dk:#991b1b;
-    --border:#e9edef; --muted:#64748b; --text:#0f172a; --bg:#f1f5f9;
-    --font:'Segoe UI',sans-serif;
+/* Mes livraisons — même univers que le tableau de bord livreur : en-tête bleu nuit, cartes blanches, actions en pilule */
+.lo {
+    --blue: #1F7CF6; --blue-2: #1668D8; --blue-3: #1260C9; --blue-lt: #EAF2FF; --blue-bd: #CFE1FF;
+    --navy: #0B1E3D; --navy-2: #132B52; --amber: #F59E0B; --amber-lt: #FFF7E6;
+    --green: #059669; --green-lt: #ECFDF5; --red: #B91C1C; --red-lt: #FEF2F2;
+    --ink: #16162A; --ink-2: #45455E; --ink-3: #62627C; --line: #E3E8F2; --bg: #F6F9FF;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    color: var(--ink); background: var(--bg); min-height: 100vh; padding-bottom: 48px;
 }
-*,*::before,*::after{box-sizing:border-box}
-body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text)}
+.lo *, .lo *::before, .lo *::after { box-sizing: border-box; }
+.lo-num { font-variant-numeric: tabular-nums; }
 
-/* ── HERO ── */
-.ord-hero {
-    background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 60%,#1a4a7a 100%);
-    padding:24px 24px 72px; position:relative; overflow:hidden;
+/* ── En-tête ── */
+.lo-head {
+    background: radial-gradient(110% 170% at 100% 0%, rgba(31,124,246,.45), transparent 60%), linear-gradient(135deg, var(--navy), var(--navy-2));
+    color: #fff;
+    padding: 20px max(16px, env(safe-area-inset-right, 0px)) 22px max(16px, env(safe-area-inset-left, 0px));
 }
-.ord-hero::before {
-    content:'';position:absolute;inset:0;
-    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ccircle cx='30' cy='30' r='1.5' fill='%23ffffff' opacity='.06'/%3E%3C/svg%3E");
-}
-.ord-hero-top { display:flex; align-items:center; justify-content:space-between; position:relative; gap:12px; }
-.ord-hero-back { display:inline-flex; align-items:center; gap:8px; padding:9px 16px; background:rgba(255,255,255,.12); color:#fff; border:1.5px solid rgba(255,255,255,.2); border-radius:10px; font-size:13px; font-weight:700; text-decoration:none; transition:all .15s; white-space:nowrap; }
-.ord-hero-back:hover { background:rgba(255,255,255,.22); color:#fff; transform:translateX(-2px); }
-.ord-hero-title { font-size:22px; font-weight:900; color:#fff; margin-top:18px; position:relative; }
-.ord-hero-sub   { font-size:13px; color:rgba(255,255,255,.55); margin-top:4px; position:relative; }
+.lo-head-in { max-width: 860px; margin: 0 auto; display: grid; gap: 18px; }
+.lo-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.lo-back { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 16px 0 12px; border-radius: 999px; background: rgba(255,255,255,.1); color: #fff; font-size: 13.5px; font-weight: 700; text-decoration: none; transition: background-color .18s; }
+.lo-back:hover { background: rgba(255,255,255,.18); color: #fff; }
+.lo-total { font-size: 13px; font-weight: 600; color: #C9D6EA; }
+.lo-title h1 { margin: 0; font-size: clamp(22px, 4vw, 28px); font-weight: 800; letter-spacing: -.02em; }
+.lo-title p { margin: 4px 0 0; font-size: 14px; color: #C9D6EA; }
 
-/* ── FILTRES ── */
-.ord-filters { display:flex; gap:8px; flex-wrap:wrap; padding:0 24px; margin-top:-48px; position:relative; z-index:2; }
-.ord-filter-btn { padding:9px 16px; border-radius:20px; border:none; font-size:12.5px; font-weight:700; cursor:pointer; font-family:var(--font); background:#fff; color:var(--muted); box-shadow:0 2px 8px rgba(0,0,0,.08); transition:all .15s; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
-.ord-filter-btn:hover, .ord-filter-btn.active { background:var(--brand); color:#fff; box-shadow:0 4px 14px rgba(99,102,241,.35); }
+/* ── Onglets ── */
+.lo-tabs { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -2px; padding: 2px; }
+.lo-tabs::-webkit-scrollbar { display: none; }
+.lo-tab { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 16px; border-radius: 999px; white-space: nowrap; background: rgba(255,255,255,.1); color: #fff; font-size: 13.5px; font-weight: 700; text-decoration: none; transition: background-color .18s, color .18s; }
+.lo-tab:hover { background: rgba(255,255,255,.18); color: #fff; }
+.lo-tab.is-active { background: #fff; color: var(--navy); }
+.lo-tab-n { min-width: 22px; height: 22px; padding: 0 7px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; background: rgba(255,255,255,.16); }
+.lo-tab.is-active .lo-tab-n { background: var(--blue-lt); color: var(--blue-3); }
 
-/* ── BODY ── */
-.ord-body { padding:20px 24px; display:flex; flex-direction:column; gap:14px; }
+/* ── Liste ── */
+.lo-main { max-width: 860px; margin: 18px auto 0; padding: 0 16px; display: grid; gap: 14px; }
+.lo-flash { display: flex; align-items: center; gap: 10px; padding: 13px 16px; border-radius: 16px; background: var(--green-lt); color: #065F46; font-size: 14px; font-weight: 700; box-shadow: inset 0 0 0 1px #A7F3D0; }
 
-/* ── CARTE COMMANDE ── */
-.ord-card {
-    background:#fff; border-radius:16px;
-    box-shadow:0 2px 12px rgba(0,0,0,.06);
-    overflow:hidden; transition:transform .15s, box-shadow .15s;
-    border-left:4px solid transparent;
-}
-.ord-card:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(0,0,0,.1); }
-.ord-card.delivering { border-left-color:var(--blue); }
-.ord-card.confirmed  { border-left-color:var(--yellow); }
-.ord-card.delivered  { border-left-color:var(--green); }
-.ord-card.other      { border-left-color:var(--border); }
+.lo-card { background: #fff; border-radius: 22px; box-shadow: 0 0 0 1px var(--line), 0 14px 30px -26px rgba(11,30,61,.45); overflow: hidden; }
+.lo-card-hd { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+.lo-card-num { font-size: 15px; font-weight: 800; }
+.lo-card-sub { font-size: 12.5px; color: var(--ink-3); margin-top: 2px; }
+.lo-st { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
+.lo-st.s-ready { background: var(--amber-lt); color: #92400E; }
+.lo-st.s-route { background: var(--blue-lt); color: var(--blue-3); }
+.lo-st.s-done  { background: var(--green-lt); color: #065F46; }
+.lo-st.s-cancel{ background: var(--red-lt); color: var(--red); }
+.lo-st.s-other { background: #F1F3F8; color: var(--ink-3); }
 
-/* Header carte */
-.ord-card-head { padding:14px 18px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #f8fafc; gap:10px; }
-.ord-card-num { font-size:13px; font-weight:800; color:var(--text); }
-.ord-card-date { font-size:11px; color:var(--muted); margin-top:2px; }
-.ord-badge { font-size:11px; font-weight:700; padding:4px 12px; border-radius:20px; white-space:nowrap; flex-shrink:0; }
-.ord-badge.delivering { background:var(--blue-lt); color:var(--blue-dk); }
-.ord-badge.confirmed  { background:var(--yellow-lt); color:var(--yellow-dk); }
-.ord-badge.delivered  { background:var(--green-lt); color:var(--green-dk); }
-.ord-badge.cancelled  { background:var(--red-lt); color:var(--red-dk); }
-.ord-badge.other      { background:#f3f4f6; color:var(--muted); }
+.lo-card-bd { padding: 18px 20px; display: grid; gap: 16px; }
 
-/* Body carte */
-.ord-card-body { padding:14px 18px; display:flex; gap:14px; align-items:flex-start; }
-.ord-prod-img { width:56px; height:56px; border-radius:10px; object-fit:cover; border:1.5px solid var(--border); flex-shrink:0; }
-.ord-prod-ph  { width:56px; height:56px; border-radius:10px; background:var(--bg); border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
-.ord-info { flex:1; min-width:0; display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.ord-info-block .lbl { font-size:10.5px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin-bottom:3px; }
-.ord-info-block .val { font-size:13px; font-weight:600; color:var(--text); }
-.ord-info-block .val.amount { font-size:15px; font-weight:900; color:var(--navy); font-family:monospace; }
-.ord-info-block .val.phone  { color:var(--brand); }
-.ord-wa-link { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; color:#25d366; text-decoration:none; margin-top:3px; }
+/* Trajet : retrait puis arrêt(s) client */
+.lo-route { display: grid; }
+.lo-stop { display: grid; grid-template-columns: 36px 1fr; gap: 12px; align-items: start; }
+.lo-stop-ico { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.lo-stop.pickup .lo-stop-ico { background: var(--amber-lt); color: #B45309; }
+.lo-stop.drop .lo-stop-ico   { background: var(--blue-lt); color: var(--blue-2); }
+.lo-stop-line { width: 2px; height: 16px; margin: 4px 0 4px 17px; background: var(--line); }
+.lo-stop-lbl { font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); }
+.lo-stop-name { font-size: 15px; font-weight: 800; margin-top: 2px; overflow-wrap: anywhere; }
+.lo-stop-addr { display: flex; align-items: flex-start; gap: 5px; font-size: 13.5px; color: var(--ink-2); margin-top: 3px; overflow-wrap: anywhere; }
+.lo-stop-addr svg { margin-top: 2px; }
+.lo-stop-addr.is-missing { font-style: italic; color: var(--ink-3); }
+.lo-slot { display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; font-size: 12.5px; font-weight: 700; color: var(--blue-3); }
+.lo-contact { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.lo-pill { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 700; text-decoration: none; transition: background-color .18s, color .18s; }
+.lo-pill.call { background: var(--blue-lt); color: var(--blue-3); }
+.lo-pill.call:hover { background: var(--blue-bd); color: var(--blue-3); }
+.lo-pill.wa { background: #E8F8EE; color: #128C4A; }
+.lo-pill.wa:hover { background: #25D366; color: #fff; }
 
-/* Footer carte — boutons action */
-.ord-card-foot { padding:12px 18px; background:#f8fafc; border-top:1px solid var(--border); display:flex; gap:10px; }
-.ord-action-btn {
-    flex:1; padding:11px; border-radius:10px; border:none; cursor:pointer;
-    font-size:13.5px; font-weight:700; font-family:var(--font);
-    display:flex; align-items:center; justify-content:center; gap:8px;
-    transition:all .15s;
-}
-.ord-action-btn.start    { background:linear-gradient(135deg,#3b82f6,#2563eb); color:#fff; box-shadow:0 4px 14px rgba(59,130,246,.35); }
-.ord-action-btn.start:hover { background:linear-gradient(135deg,#2563eb,#1d4ed8); transform:translateY(-1px); }
-.ord-action-btn.complete { background:linear-gradient(135deg,var(--green),#059669); color:#fff; box-shadow:0 4px 14px rgba(16,185,129,.35); }
-.ord-action-btn.complete:hover { background:linear-gradient(135deg,#059669,#047857); transform:translateY(-1px); }
-.ord-action-gps { padding:11px 14px; border-radius:10px; border:1.5px solid var(--blue-lt); background:var(--blue-lt); color:var(--blue-dk); cursor:pointer; font-size:18px; transition:all .15s; }
-.ord-action-gps:hover { background:var(--blue); color:#fff; }
-.ord-action-gps.active { background:var(--blue); color:#fff; border-color:var(--blue); }
+/* Articles et montants */
+.lo-items { display: flex; align-items: center; gap: 12px; }
+.lo-thumb { width: 52px; height: 52px; border-radius: 14px; object-fit: cover; flex-shrink: 0; background: var(--bg); box-shadow: inset 0 0 0 1px var(--line); }
+.lo-thumb-ph { width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--bg); color: var(--ink-3); box-shadow: inset 0 0 0 1px var(--line); }
+.lo-items-txt { min-width: 0; font-size: 14px; font-weight: 700; overflow-wrap: anywhere; }
+.lo-items-txt small { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink-3); margin-top: 2px; }
+.lo-facts { display: flex; flex-wrap: wrap; gap: 8px; }
+.lo-fact { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 12px; background: var(--bg); font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.lo-fact strong { color: var(--ink); }
+.lo-fact.cash { background: var(--amber-lt); color: #92400E; }
+.lo-fact.cash strong { color: #78350F; }
+.lo-fact.paid { background: var(--green-lt); color: #065F46; }
+.lo-fact.earn { background: var(--navy); color: #C9D6EA; }
+.lo-fact.earn strong { color: #fff; }
 
-/* ── ROUTE RETRAIT → LIVRAISON (commandes entreprise) ── */
-.ord-route {
-    display:flex; flex-direction:column; gap:0;
-    margin:0 18px 0; border-radius:14px; overflow:hidden;
-    border:1.5px solid var(--border);
-}
-.ord-step {
-    display:flex; align-items:flex-start; gap:12px;
-    padding:14px 16px;
-}
-.ord-step-pickup  { background:#eff6ff; border-bottom:1.5px solid #bfdbfe; }
-.ord-step-delivery{ background:#f0fdf4; }
-.ord-step-ico {
-    width:38px; height:38px; border-radius:10px; flex-shrink:0;
-    display:flex; align-items:center; justify-content:center; font-size:18px;
-}
-.ord-step-pickup  .ord-step-ico { background:#dbeafe; }
-.ord-step-delivery .ord-step-ico { background:#dcfce7; }
-.ord-step-content { flex:1; min-width:0; }
-.ord-step-tag {
-    font-size:9.5px; font-weight:800; text-transform:uppercase; letter-spacing:1px;
-    margin-bottom:5px; display:flex; align-items:center; gap:5px;
-}
-.ord-step-pickup  .ord-step-tag { color:#1d4ed8; }
-.ord-step-delivery .ord-step-tag { color:#15803d; }
-.ord-step-name { font-size:14px; font-weight:800; color:var(--text); line-height:1.2; }
-.ord-step-addr { font-size:12px; color:var(--muted); margin-top:3px; line-height:1.4; }
-.ord-step-links { display:flex; align-items:center; gap:10px; margin-top:7px; flex-wrap:wrap; }
-.ord-step-call {
-    display:inline-flex; align-items:center; gap:5px;
-    padding:5px 12px; border-radius:20px; font-size:12px; font-weight:700;
-    text-decoration:none; transition:all .15s; white-space:nowrap;
-}
-.ord-step-pickup  .ord-step-call { background:#dbeafe; color:#1d4ed8; }
-.ord-step-pickup  .ord-step-call:hover { background:#bfdbfe; }
-.ord-step-delivery .ord-step-call { background:#dcfce7; color:#15803d; }
-.ord-step-delivery .ord-step-call:hover { background:#bbf7d0; }
-.ord-step-wa {
-    display:inline-flex; align-items:center; gap:5px;
-    padding:5px 12px; border-radius:20px; font-size:12px; font-weight:700;
-    background:#dcfce7; color:#15803d; text-decoration:none; transition:all .15s;
-}
-.ord-step-wa:hover { background:#25d366; color:#fff; }
-.ord-arrow-sep {
-    display:flex; align-items:center; justify-content:center;
-    padding:7px 0; background:#f8fafc; border-top:1px solid var(--border);
-    border-bottom:1px solid var(--border);
-    font-size:11px; font-weight:700; color:var(--muted); gap:6px;
-    letter-spacing:.4px;
-}
+/* Actions */
+.lo-card-ft { padding: 0 20px 20px; display: flex; gap: 8px; }
+.lo-card-ft form { flex: 1; display: flex; }
+.lo-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; padding: 0 22px; border-radius: 999px; border: none; cursor: pointer; font-family: inherit; font-size: 15px; font-weight: 800; text-decoration: none; transition: background-color .18s, transform .18s; }
+.lo-btn:active { transform: scale(.98); }
+.lo-btn-primary { background: var(--blue-2); color: #fff; }
+.lo-btn-primary:hover { background: var(--blue-3); color: #fff; }
+.lo-btn-go { background: var(--navy); color: #fff; }
+.lo-btn-go:hover { background: var(--navy-2); color: #fff; }
 
-/* Info complémentaires (produit, montant, commission) */
-.ord-meta { padding:12px 18px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; border-top:1px solid #f3f4f6; }
-.ord-meta-chip {
-    display:inline-flex; align-items:center; gap:5px;
-    padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600;
-    background:#f8fafc; color:var(--text); border:1px solid var(--border);
-}
-.ord-meta-chip.commission { background:#fef3c7; border-color:#fcd34d; color:#92400e; font-weight:800; font-size:13px; }
+/* Vide */
+.lo-empty { background: #fff; border-radius: 22px; box-shadow: 0 0 0 1px var(--line); padding: 40px 20px; text-align: center; display: grid; gap: 8px; justify-items: center; }
+.lo-empty-ico { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--blue-lt); color: var(--blue-2); }
+.lo-empty-title { font-size: 16px; font-weight: 800; }
+.lo-empty-sub { font-size: 14px; color: var(--ink-2); max-width: 42ch; }
+.lo-pagination { margin-top: 4px; }
 
-/* ── EMPTY ── */
-.ord-empty { padding:60px 24px; text-align:center; color:var(--muted); }
-.ord-empty-ico { font-size:52px; display:block; margin-bottom:14px; opacity:.3; }
-.ord-empty-title { font-size:16px; font-weight:700; color:var(--text); margin-bottom:6px; }
-.ord-empty-sub { font-size:13px; line-height:1.6; }
-
-/* ── PAGINATION ── */
-.ord-pagination { padding:0 24px 24px; }
-
-/* ── SUCCESS TOAST ── */
-.ord-toast { margin:0 24px 16px; padding:14px 18px; background:var(--green-lt); border:1px solid #a7f3d0; border-radius:12px; color:var(--green-dk); font-size:13.5px; font-weight:600; display:flex; align-items:center; gap:10px; }
-
-/* ── RESPONSIVE ── */
-@media(max-width:768px) {
-    .ord-hero { padding:18px 16px 64px; }
-    .ord-hero-title { font-size:18px; }
-    .ord-filters { padding:0 16px; }
-    .ord-body { padding:14px 16px; }
-    .ord-info { grid-template-columns:1fr; gap:8px; }
-    .ord-card-foot { flex-direction:column; }
-}
-@media(max-width:400px) {
-    .ord-hero-back span { display:none; }
-    .ord-card-head { flex-wrap:wrap; }
+@media (max-width: 520px) {
+    .lo-card-hd, .lo-card-bd { padding-left: 16px; padding-right: 16px; }
+    .lo-card-ft { padding: 0 16px 16px; }
+    .lo-back span { display: none; }
+    .lo-back { padding: 0 12px; }
 }
 </style>
 @endpush
 
 @section('content')
 @php
-    $fmt = fn($n) => number_format($n ?? 0, 0, ',', ' ') . ' ' . $devise;
+    use App\Support\IconLibrary as Ico;
+    use App\Models\Payment;
 
-    $statusMap = [
-        'confirmed'    => ['label'=>'📦 Confirmée',    'cls'=>'confirmed'],
-        'confirmée'    => ['label'=>'📦 Confirmée',    'cls'=>'confirmed'],
-        'confirmé'     => ['label'=>'📦 Confirmée',    'cls'=>'confirmed'],
-        'delivering'   => ['label'=>'🚴 En livraison', 'cls'=>'delivering'],
-        'en_livraison' => ['label'=>'🚴 En livraison', 'cls'=>'delivering'],
-        'en-livraison' => ['label'=>'🚴 En livraison', 'cls'=>'delivering'],
-        'shipped'      => ['label'=>'🚴 En livraison', 'cls'=>'delivering'],
-        'delivered'    => ['label'=>'✅ Livrée',        'cls'=>'delivered'],
-        'livrée'       => ['label'=>'✅ Livrée',        'cls'=>'delivered'],
-        'livree'       => ['label'=>'✅ Livrée',        'cls'=>'delivered'],
-        'completed'    => ['label'=>'✅ Livrée',        'cls'=>'delivered'],
-        'cancelled'    => ['label'=>'⚠️ Annulée',      'cls'=>'cancelled'],
-        'annulée'      => ['label'=>'⚠️ Annulée',      'cls'=>'cancelled'],
+    // Espaces insécables : un montant ne se coupe jamais en fin de ligne (« 5 000 GNF »)
+    $fmt = fn ($n) => number_format($n ?? 0, 0, ',', "\u{00A0}") . "\u{00A0}" . $devise;
+
+    $startStatuses   = ['confirmed', 'confirmée', 'confirmé'];
+    $deliverStatuses = ['delivering', 'en_livraison', 'en-livraison', 'shipped'];
+    $doneStatuses    = ['delivered', 'livrée', 'livree', 'completed'];
+
+    // Statut → libellé, classe et icône
+    $statusInfo = fn (string $s) => match (true) {
+        in_array($s, $startStatuses, true)    => ['À récupérer', 's-ready', 'package'],
+        in_array($s, $deliverStatuses, true)  => ['En route', 's-route', 'truck'],
+        in_array($s, $doneStatuses, true)     => ['Livrée', 's-done', 'check'],
+        in_array($s, ['cancelled', 'annulée'], true) => ['Annulée', 's-cancel', 'x'],
+        default                               => [ucfirst($s), 's-other', 'clock'],
+    };
+
+    // Payée en ligne : rien à encaisser chez le client
+    $isPaid = fn ($o) => $o->payment
+        && $o->payment->method !== Payment::METHOD_CASH
+        && $o->payment->status === Payment::STATUS_PAYE;
+
+    $tab = request('status');
+    $tabs = [
+        [null,         'En cours',     ($counts[\App\Models\Order::STATUS_CONFIRMEE] ?? 0) + ($counts[\App\Models\Order::STATUS_EN_LIVRAISON] ?? 0)],
+        ['confirmed',  'À récupérer',  $counts[\App\Models\Order::STATUS_CONFIRMEE] ?? 0],
+        ['delivering', 'En route',     $counts[\App\Models\Order::STATUS_EN_LIVRAISON] ?? 0],
+        ['delivered',  'Historique',   null],
     ];
 
-    $startStatuses    = ['confirmed','confirmée','confirmé'];
-    $deliverStatuses  = ['delivering','en_livraison','en-livraison','shipped'];
-    $doneStatuses     = ['delivered','livrée','livree','completed'];
+    $waIco = '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>';
 @endphp
 
-{{-- HERO --}}
-<div class="ord-hero">
-    <div class="ord-hero-top">
-        <a href="{{ route('livreur.dashboard') }}" class="ord-hero-back">← <span>Tableau de bord</span></a>
-        <div style="color:rgba(255,255,255,.7);font-size:12px;font-weight:600">{{ $orders->total() }} commande(s)</div>
-    </div>
-    <div class="ord-hero-title">🚴 Mes livraisons</div>
-    <div class="ord-hero-sub">Gérez toutes vos commandes assignées</div>
-</div>
-
-{{-- FILTRES --}}
-<div class="ord-filters">
-    <a href="{{ route('livreur.orders.index') }}" class="ord-filter-btn {{ !request('status') ? 'active' : '' }}">⚡ En cours</a>
-    <a href="{{ route('livreur.orders.index', ['status'=>'confirmed']) }}" class="ord-filter-btn {{ request('status')==='confirmed' ? 'active' : '' }}">📦 À récupérer</a>
-    <a href="{{ route('livreur.orders.index', ['status'=>'delivering']) }}" class="ord-filter-btn {{ request('status')==='delivering' ? 'active' : '' }}">🚴 En livraison</a>
-    <a href="{{ route('livreur.orders.index', ['status'=>'delivered']) }}" class="ord-filter-btn {{ request('status')==='delivered' ? 'active' : '' }}">✅ Historique</a>
-</div>
-
-{{-- BODY --}}
-<div class="ord-body">
-
-    @if(session('success'))
-    <div class="ord-toast">✅ {{ session('success') }}</div>
-    @endif
-
-    @forelse($groups as $group)
-    @php
-        $isGroup   = $group['is_group'];
-        $grpOrders = $group['orders'];          // tableau d'Order (1 ou plusieurs)
-        $order     = $grpOrders[0];             // ordre représentatif (pour GPS, id, etc.)
-        $client    = $group['client'];
-        $shop      = $group['shop'];
-        $destAddr  = $group['destination'];
-        $s         = strtolower($group['status'] ?? '');
-        $st        = $statusMap[$s] ?? ['label'=>ucfirst($group['status']),'cls'=>'other'];
-        $waNum     = preg_replace('/\D/', '', $client?->phone ?? '');
-        $shopWaNum = preg_replace('/\D/', '', $shop?->phone ?? '');
-        $isCompanyDriver = (bool)$order->driver_id;              // vrai seulement si chauffeur entreprise (driver_id)
-        $showRoute       = $isCompanyDriver || $isGroup;          // afficher le bloc retrait→livraison
-        $isCompany       = $isCompanyDriver;                      // alias pour les boutons d'action
-        // Collecter tous les items du groupe
-        $allItems  = collect($grpOrders)->flatMap(fn($o) => $o->items)->values();
-        $item      = $allItems->first();
-        $orderIds  = collect($grpOrders)->pluck('id')->toArray();
-        $orderNums = collect($grpOrders)->map(fn($o) => '#'.str_pad($o->id,5,'0',STR_PAD_LEFT))->join(', ');
-        $isBulk    = count($grpOrders) > 1;
-    @endphp
-
-    <div class="ord-card {{ $st['cls'] }}" data-order-id="{{ $order->id }}">
-
-        {{-- ── HEADER ── --}}
-        <div class="ord-card-head">
-            <div>
-                @if($isBulk)
-                <div class="ord-card-num">{{ count($grpOrders) }} commandes · {{ $client?->name ?? 'Client' }}</div>
-                <div class="ord-card-date" style="font-size:10.5px;color:var(--muted)">{{ $orderNums }}</div>
-                @else
-                <div class="ord-card-num">Commande #{{ str_pad($order->id,5,'0',STR_PAD_LEFT) }}</div>
-                <div class="ord-card-date">{{ $order->created_at->format('d/m/Y à H:i') }}</div>
-                @endif
+<div class="lo">
+    {{-- ═══ En-tête ═══ --}}
+    <header class="lo-head">
+        <div class="lo-head-in">
+            <div class="lo-top">
+                <a href="{{ route('livreur.dashboard') }}" class="lo-back">{!! Ico::svg('arrow-left', '', 16) !!} <span>Tableau de bord</span></a>
+                <div class="lo-total lo-num">{{ $orders->total() }} commande{{ $orders->total() > 1 ? 's' : '' }}</div>
             </div>
-            <span class="ord-badge {{ $st['cls'] }}">{{ $st['label'] }}</span>
+            <div class="lo-title">
+                <h1>Mes livraisons</h1>
+                <p>Les commandes qui vous sont confiées, de la boutique jusqu'au client.</p>
+            </div>
+            <nav class="lo-tabs" aria-label="Filtrer les livraisons">
+                @foreach($tabs as [$key, $label, $n])
+                <a href="{{ route('livreur.orders.index', $key ? ['status' => $key] : []) }}"
+                   class="lo-tab {{ $tab === $key ? 'is-active' : '' }}" @if($tab === $key) aria-current="page" @endif>
+                    {{ $label }}
+                    @if($n !== null)<span class="lo-tab-n lo-num">{{ $n }}</span>@endif
+                </a>
+                @endforeach
+            </nav>
         </div>
+    </header>
 
-        @if($showRoute)
-        {{-- ══ BLOC RETRAIT → LIVRAISON (livreur entreprise et livreur boutique groupé) ══ --}}
-        <div class="ord-route" style="margin:14px 18px;">
-
-            {{-- ÉTAPE 1 : Retrait boutique --}}
-            <div class="ord-step ord-step-pickup">
-                <div class="ord-step-ico">🏪</div>
-                <div class="ord-step-content">
-                    <div class="ord-step-tag">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        ÉTAPE 1 · RETRAIT PRODUIT
-                    </div>
-                    <div class="ord-step-name">{{ $shop?->name ?? 'Boutique' }}</div>
-                    @if($shop?->address)
-                    <div class="ord-step-addr">📍 {{ $shop->address }}</div>
-                    @else
-                    <div class="ord-step-addr" style="font-style:italic">Adresse non renseignée</div>
-                    @endif
-                    <div class="ord-step-links">
-                        @if($shop?->phone)
-                        <a href="tel:{{ $shop->phone }}" class="ord-step-call">📞 {{ $shop->phone }}</a>
-                        @endif
-                        @if($shopWaNum)
-                        <a href="https://wa.me/{{ $shopWaNum }}" target="_blank" class="ord-step-wa">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                            WhatsApp
-                        </a>
-                        @endif
-                    </div>
-                </div>
-            </div>
-
-            {{-- Séparateur flèche --}}
-            @php
-                // Dédoublonner les arrêts : même client + même adresse = 1 seul bloc affiché
-                $uniqueStops = collect($grpOrders)->unique(function ($o) {
-                    $cl = strtolower(trim($o->client?->name ?? $o->user?->name ?? ''));
-                    $ds = strtolower(trim($o->delivery_destination ?? $o->client?->address ?? ''));
-                    return $cl . '::' . $ds;
-                })->values();
-                $isMultiStop = $uniqueStops->count() > 1;
-            @endphp
-            <div class="ord-arrow-sep">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
-                PUIS LIVRER AU{{ $isMultiStop ? 'X CLIENTS' : ' CLIENT' }}
-            </div>
-
-            {{-- ÉTAPE(S) LIVRAISON : 1 bloc par arrêt unique (client + destination) --}}
-            @foreach($uniqueStops as $grpOrd)
-            @php
-                $grpClient = $grpOrd->client ?? $grpOrd->user;
-                $grpDest   = $grpOrd->delivery_destination ?? $grpClient?->address;
-                $grpWa     = preg_replace('/\D/', '', $grpClient?->phone ?? '');
-                $stopLabel = $isMultiStop ? 'ARRÊT ' . ($loop->index + 1) . ' · LIVRAISON CLIENT' : 'ÉTAPE 2 · LIVRAISON CLIENT';
-            @endphp
-
-            @if(!$loop->first && $isMultiStop)
-            <div class="ord-arrow-sep" style="background:#fefce8;border-color:#fde68a">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
-                PUIS
-            </div>
-            @endif
-
-            <div class="ord-step ord-step-delivery">
-                <div class="ord-step-ico">🏠</div>
-                <div class="ord-step-content">
-                    <div class="ord-step-tag">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                        {{ $stopLabel }}
-                    </div>
-                    <div class="ord-step-name">{{ $grpClient?->name ?? 'Client inconnu' }}</div>
-                    @if($grpDest)
-                    <div class="ord-step-addr">📍 {{ $grpDest }}</div>
-                    @if($grpOrd->delivery_slot)<div style="font-size:11.5px;font-weight:700;color:#1260C9;margin-top:3px">Créneau : {{ $grpOrd->delivery_slot }}</div>@endif
-                    @else
-                    <div class="ord-step-addr" style="font-style:italic">Adresse de livraison non renseignée</div>
-                    @endif
-                    @php
-                        $stopPhone = $grpOrd->client_phone ?: $grpClient?->phone;
-                        $stopWa    = preg_replace('/\D/', '', $stopPhone ?? '');
-                    @endphp
-                    <div class="ord-step-links">
-                        @if($stopPhone)
-                        <a href="tel:{{ $stopPhone }}" class="ord-step-call">📞 {{ $stopPhone }}</a>
-                        @endif
-                        @if($stopWa)
-                        <a href="https://wa.me/{{ $stopWa }}" target="_blank" class="ord-step-wa">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                            WhatsApp
-                        </a>
-                        @endif
-                    </div>
-                </div>
-            </div>
-            @endforeach
-        </div>
-
-        {{-- Infos produits (tous les articles du groupe) + commission unique --}}
-        <div class="ord-meta">
-            @foreach($allItems->unique(fn($i) => $i->product_id) as $it)
-                @if($it->product?->name)
-                <span class="ord-meta-chip">📦 {{ $it->product->name }}{{ $it->quantity > 1 ? ' ×'.$it->quantity : '' }}</span>
-                @endif
-            @endforeach
-            <span class="ord-meta-chip">💰 {{ $fmt($group['total']) }}</span>
-            @if($group['delivery_fee'])
-            <span class="ord-meta-chip commission">🏆 Commission : {{ number_format($group['delivery_fee'], 0, ',', ' ') }} {{ $devise }}{{ $isBulk ? ' (1 trajet)' : '' }}</span>
-            @endif
-        </div>
-
-        @else
-        {{-- ══ ANCIEN SYSTÈME BOUTIQUE (livreur_id) ══ --}}
-        <div class="ord-card-body">
-            @if($item?->product?->image)
-                <img src="{{ \App\Services\ImageOptimizer::url($item->product->image, 'thumb') ?? asset('storage/'.$item->product->image) }}"
-                     alt="{{ $item->product->name }}" class="ord-prod-img" loading="lazy">
-            @else
-                <div class="ord-prod-ph">📦</div>
-            @endif
-            <div class="ord-info">
-                <div class="ord-info-block">
-                    <div class="lbl">Client</div>
-                    <div class="val">{{ $client?->name ?? 'Inconnu' }}</div>
-                    @php
-                        $displayPhone = $order->client_phone ?: $client?->phone;
-                        $displayWa    = preg_replace('/\D/', '', $displayPhone ?? '');
-                    @endphp
-                    @if($displayPhone)
-                    <a href="tel:{{ $displayPhone }}" class="val phone" style="font-size:12px;text-decoration:none">📞 {{ $displayPhone }}</a>
-                    @if($displayWa)
-                    <a href="https://wa.me/{{ $displayWa }}" target="_blank" class="ord-wa-link">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                        WhatsApp
-                    </a>
-                    @endif
-                    @endif
-                </div>
-                <div class="ord-info-block">
-                    <div class="lbl">Montant</div>
-                    <div class="val amount">{{ $fmt($order->total) }}</div>
-                </div>
-                <div class="ord-info-block">
-                    <div class="lbl">Produit</div>
-                    <div class="val" style="font-size:12px">{{ $item?->product?->name ?? 'N/A' }}</div>
-                    @if($item)<div style="font-size:11px;color:var(--muted)">Qté : {{ $item->quantity }}</div>@endif
-                </div>
-                <div class="ord-info-block">
-                    <div class="lbl">Destination</div>
-                    <div class="val" style="font-size:12px;color:var(--muted)">📍 {{ $destAddr ?? 'Non renseignée' }}</div>
-                </div>
-                @if($order->delivery_fee)
-                <div class="ord-info-block" style="grid-column:1/-1">
-                    <div class="lbl">Ma commission</div>
-                    <div class="val" style="font-size:16px;font-weight:900;color:var(--green-dk);font-family:monospace">
-                        💰 {{ number_format($order->delivery_fee, 0, ',', ' ') }} {{ $devise }}
-                    </div>
-                </div>
-                @endif
-            </div>
-        </div>
+    <main class="lo-main">
+        @if(session('success'))
+        <div class="lo-flash" role="status">{!! Ico::svg('check', '', 18) !!} {{ session('success') }}</div>
         @endif
 
-        {{-- ── FOOTER ACTIONS ── --}}
-        @if(in_array($s, $startStatuses) || in_array($s, $deliverStatuses))
-        <div class="ord-card-foot">
-            @if($isCompany)
-                {{-- ── LIVREUR ENTREPRISE : tout se passe dans nav.blade.php ── --}}
-                @if($isBulk)
-                    {{-- Groupe multi-commandes : créer le batch puis aller en nav --}}
-                    <form action="{{ route('livreur.orders.autoBatchNav') }}" method="POST" style="flex:1">
+        @forelse($groups as $group)
+        @php
+            $grpOrders = $group['orders'];          // tableau d'Order (1 ou plusieurs)
+            $order     = $grpOrders[0];             // commande représentative (id, navigation…)
+            $shop      = $group['shop'];
+            $s         = strtolower($group['status'] ?? '');
+            [$stLabel, $stCls, $stIco] = $statusInfo($s);
+            $isCompany = (bool) $order->driver_id;  // chauffeur d'une société de livraison
+            $isBulk    = count($grpOrders) > 1;
+            $orderIds  = collect($grpOrders)->pluck('id')->toArray();
+            $orderNums = collect($grpOrders)->map(fn ($o) => '#' . str_pad($o->id, 5, '0', STR_PAD_LEFT))->join(', ');
+            $allItems  = collect($grpOrders)->flatMap(fn ($o) => $o->items)->values();
+            $items     = $allItems->unique(fn ($i) => $i->product_id)->filter(fn ($i) => $i->product?->name);
+            $firstItem = $allItems->first();
+            $isActive  = in_array($s, $startStatuses, true) || in_array($s, $deliverStatuses, true);
+            $toCollect = collect($grpOrders)->reject($isPaid)->sum('total');
+            $shopWa    = preg_replace('/\D/', '', $shop?->phone ?? '');
+
+            // Arrêts de livraison : même client + même adresse = un seul arrêt
+            $stops = collect($grpOrders)->unique(function ($o) {
+                $cl = strtolower(trim($o->client?->name ?? $o->client_name ?? ''));
+                $ds = strtolower(trim($o->delivery_destination ?? $o->client?->address ?? ''));
+                return $cl . '::' . $ds;
+            })->values();
+            $multiStop = $stops->count() > 1;
+            // Le retrait en boutique n'apparaît que pour une société de livraison ou un trajet groupé ;
+            // le livreur d'une boutique part déjà de la boutique.
+            $showPickup = $isCompany || $isBulk;
+        @endphp
+
+        <article class="lo-card" data-order-id="{{ $order->id }}">
+            <div class="lo-card-hd">
+                <div style="min-width:0">
+                    @if($isBulk)
+                    <div class="lo-card-num">{{ count($grpOrders) }} commandes · 1 trajet</div>
+                    <div class="lo-card-sub lo-num">{{ $orderNums }}</div>
+                    @else
+                    <div class="lo-card-num lo-num">Commande #{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</div>
+                    <div class="lo-card-sub">{{ $order->created_at->format('d/m/Y à H:i') }}</div>
+                    @endif
+                </div>
+                <span class="lo-st {{ $stCls }}">{!! Ico::svg($stIco, '', 14) !!} {{ $stLabel }}</span>
+            </div>
+
+            <div class="lo-card-bd">
+                {{-- Trajet --}}
+                <div class="lo-route">
+                    @if($showPickup)
+                    <div class="lo-stop pickup">
+                        <span class="lo-stop-ico">{!! Ico::svg('store', '', 17) !!}</span>
+                        <div style="min-width:0">
+                            <div class="lo-stop-lbl">Retrait</div>
+                            <div class="lo-stop-name">{{ $shop?->name ?? 'Boutique' }}</div>
+                            @if($shop?->address)
+                            <div class="lo-stop-addr">{!! Ico::svg('map-pin', '', 14) !!} {{ $shop->address }}</div>
+                            @else
+                            <div class="lo-stop-addr is-missing">Adresse non renseignée</div>
+                            @endif
+                            @if($shop?->phone || $shopWa)
+                            <div class="lo-contact">
+                                @if($shop?->phone)<a href="tel:{{ $shop->phone }}" class="lo-pill call">{!! Ico::svg('phone', '', 15) !!} {{ $shop->phone }}</a>@endif
+                                @if($shopWa)<a href="https://wa.me/{{ $shopWa }}" target="_blank" rel="noopener" class="lo-pill wa">{!! $waIco !!} WhatsApp</a>@endif
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="lo-stop-line" aria-hidden="true"></div>
+                    @endif
+
+                    @foreach($stops as $stop)
+                    @php
+                        $stClient = $stop->client ?? $stop->user;
+                        $stName   = $stClient?->name ?? $stop->client_name ?? 'Client';
+                        $stDest   = $stop->delivery_destination ?? $stClient?->address;
+                        $stPhone  = $stop->client_phone ?: $stClient?->phone;
+                        $stWa     = preg_replace('/\D/', '', $stPhone ?? '');
+                    @endphp
+                    @if(!$loop->first)<div class="lo-stop-line" aria-hidden="true"></div>@endif
+                    <div class="lo-stop drop">
+                        <span class="lo-stop-ico">{!! Ico::svg('map-pin', '', 17) !!}</span>
+                        <div style="min-width:0">
+                            <div class="lo-stop-lbl">{{ $multiStop ? 'Arrêt ' . ($loop->index + 1) . ' · Livraison' : 'Livraison' }}</div>
+                            <div class="lo-stop-name">{{ $stName }}</div>
+                            @if($stDest)
+                            <div class="lo-stop-addr">{!! Ico::svg('map-pin', '', 14) !!} {{ $stDest }}</div>
+                            @else
+                            <div class="lo-stop-addr is-missing">Adresse de livraison non renseignée</div>
+                            @endif
+                            @if($stop->delivery_slot)
+                            <div class="lo-slot">{!! Ico::svg('clock', '', 14) !!} Créneau : {{ $stop->delivery_slot }}</div>
+                            @endif
+                            @if($stPhone)
+                            <div class="lo-contact">
+                                <a href="tel:{{ $stPhone }}" class="lo-pill call">{!! Ico::svg('phone', '', 15) !!} {{ $stPhone }}</a>
+                                @if($stWa)<a href="https://wa.me/{{ $stWa }}" target="_blank" rel="noopener" class="lo-pill wa">{!! $waIco !!} WhatsApp</a>@endif
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+
+                {{-- Articles --}}
+                @if($items->isNotEmpty())
+                <div class="lo-items">
+                    @if($firstItem?->product?->image)
+                    <img src="{{ \App\Services\ImageOptimizer::url($firstItem->product->image, 'thumb') ?? asset('storage/' . $firstItem->product->image) }}"
+                         alt="" class="lo-thumb" loading="lazy">
+                    @else
+                    <span class="lo-thumb-ph">{!! Ico::svg('package', '', 22) !!}</span>
+                    @endif
+                    <div class="lo-items-txt">
+                        {{ $items->map(fn ($i) => $i->product->name . ($i->quantity > 1 ? ' ×' . $i->quantity : ''))->join(', ') }}
+                        <small>{{ $allItems->sum('quantity') }} article{{ $allItems->sum('quantity') > 1 ? 's' : '' }}</small>
+                    </div>
+                </div>
+                @endif
+
+                {{-- Montants --}}
+                <div class="lo-facts">
+                    @if($isActive && $toCollect > 0)
+                    <span class="lo-fact cash">{!! Ico::svg('wallet', '', 14) !!} À encaisser <strong class="lo-num">{{ $fmt($toCollect) }}</strong></span>
+                    @elseif($isActive)
+                    <span class="lo-fact paid">{!! Ico::svg('check', '', 14) !!} Déjà payée en ligne</span>
+                    @else
+                    <span class="lo-fact">{!! Ico::svg('wallet', '', 14) !!} Montant <strong class="lo-num">{{ $fmt($group['total']) }}</strong></span>
+                    @endif
+                    @if($group['delivery_fee'])
+                    <span class="lo-fact earn">{!! Ico::svg('trophy', '', 14) !!} Ma commission <strong class="lo-num">{{ $fmt($group['delivery_fee']) }}</strong>{{ $isBulk ? ' · 1 trajet' : '' }}</span>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Actions --}}
+            @if($isActive)
+            <div class="lo-card-ft">
+                @if($isCompany)
+                    {{-- Société de livraison : tout se passe dans la navigation (retrait puis livraison) --}}
+                    @if($isBulk)
+                    <form action="{{ route('livreur.orders.autoBatchNav') }}" method="POST">
                         @csrf
                         @foreach($orderIds as $oid)<input type="hidden" name="order_ids[]" value="{{ $oid }}">@endforeach
-                        <button type="submit" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-size:14px;font-weight:800;border:none;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(99,102,241,.4)">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                            Commencer ({{ count($grpOrders) }} colis)
-                        </button>
+                        <button type="submit" class="lo-btn lo-btn-primary">{!! Ico::svg('navigation', '', 18) !!} Commencer ({{ count($grpOrders) }} colis)</button>
+                    </form>
+                    @else
+                    <a href="{{ route('orders.nav', $order) }}" class="lo-btn lo-btn-primary">{!! Ico::svg('navigation', '', 18) !!} Commencer</a>
+                    @endif
+                @elseif(in_array($s, $startStatuses, true))
+                    {{-- Livreur de la boutique : déjà sur place, il part directement chez le client --}}
+                    <form action="{{ route('livreur.orders.startBulkNav') }}" method="POST">
+                        @csrf
+                        @foreach($orderIds as $oid)<input type="hidden" name="order_ids[]" value="{{ $oid }}">@endforeach
+                        <button type="submit" class="lo-btn lo-btn-primary">{!! Ico::svg('truck', '', 18) !!} Commencer la livraison{{ $isBulk ? ' (' . count($grpOrders) . ' colis)' : '' }}</button>
                     </form>
                 @else
-                    <a href="{{ route('orders.nav', $order) }}"
-                       style="display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:1;padding:13px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-size:14px;font-weight:800;text-decoration:none;box-shadow:0 4px 14px rgba(99,102,241,.4)">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                        Commencer
-                    </a>
+                    <a href="{{ route('orders.nav', $order) }}" class="lo-btn lo-btn-go">{!! Ico::svg('navigation', '', 18) !!} Naviguer chez le client{{ $isBulk ? ' (' . count($grpOrders) . ')' : '' }}</a>
                 @endif
-
+            </div>
+            @endif
+        </article>
+        @empty
+        <div class="lo-empty">
+            <span class="lo-empty-ico">{!! Ico::svg('package', '', 28) !!}</span>
+            @if($tab === 'delivered')
+            <div class="lo-empty-title">Pas encore de livraison terminée</div>
+            <div class="lo-empty-sub">Vos commandes livrées et annulées apparaîtront ici.</div>
             @else
-                {{-- ── LIVREUR BOUTIQUE : déjà à la boutique → nav directement Phase 2 (chez le client) ── --}}
-                @if(in_array($s, $startStatuses))
-                    {{-- Commencer : marquer en_livraison + batch + aller en nav Phase 2 --}}
-                    <form action="{{ route('livreur.orders.startBulkNav') }}" method="POST" style="flex:1">
-                        @csrf
-                        @foreach($orderIds as $oid)<input type="hidden" name="order_ids[]" value="{{ $oid }}">@endforeach
-                        <button type="submit" class="ord-action-btn start" style="width:100%">
-                            🚴 Commencer la livraison{{ $isBulk ? ' (' . count($grpOrders) . ' colis)' : '' }}
-                        </button>
-                    </form>
-                @elseif(in_array($s, $deliverStatuses))
-                    {{-- Déjà en cours : naviguer directement chez le client (Phase 2) --}}
-                    <a href="{{ route('orders.nav', $order) }}"
-                       style="display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:1;padding:13px;border-radius:10px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:14px;font-weight:800;text-decoration:none;box-shadow:0 4px 14px rgba(16,185,129,.4)">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                        Naviguer chez le client{{ $isBulk ? ' (' . count($grpOrders) . ')' : '' }}
-                    </a>
-                @endif
+            <div class="lo-empty-title">Aucune commande pour le moment</div>
+            <div class="lo-empty-sub">Les commandes qu'on vous confie apparaîtront ici. Restez « disponible » sur votre tableau de bord pour en recevoir.</div>
             @endif
         </div>
+        @endforelse
+
+        @if($orders->hasPages())
+        <div class="lo-pagination">{{ $orders->links() }}</div>
         @endif
-
-    </div>
-    @empty
-    <div class="ord-empty">
-        <span class="ord-empty-ico">📭</span>
-        <div class="ord-empty-title">Aucune commande assignée</div>
-        <div class="ord-empty-sub">Vous n'avez pas encore de livraisons.<br>Revenez plus tard !</div>
-    </div>
-    @endforelse
-
+    </main>
 </div>
-
-@if($orders->hasPages())
-<div class="ord-pagination">{{ $orders->links() }}</div>
-@endif
-
 @endsection
-
-@push('scripts')
-<script>
-const CSRF = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
-const gpsWatchers = {};
-let wakeLock = null;
-
-/* Empêche la mise en veille du téléphone pendant la livraison (HTTPS requis) */
-async function requestWakeLock() {
-    if (!('wakeLock' in navigator)) return;
-    try {
-        wakeLock = await navigator.wakeLock.request('screen');
-        /* Réacquérir après retour en premier plan */
-        document.addEventListener('visibilitychange', async () => {
-            if (document.visibilityState === 'visible' && Object.keys(gpsWatchers).length > 0) {
-                try { wakeLock = await navigator.wakeLock.request('screen'); } catch(_) {}
-            }
-        });
-    } catch(_) {}
-}
-
-function releaseWakeLock() {
-    if (wakeLock) { wakeLock.release(); wakeLock = null; }
-}
-
-function toggleGps(orderId, btn) {
-    if (gpsWatchers[orderId]) {
-        stopGps(orderId, btn);
-    } else {
-        startGps(orderId, btn);
-    }
-}
-
-function startGps(orderId, btn) {
-    if (!('geolocation' in navigator)) { alert('GPS non supporté.'); return; }
-    requestWakeLock();
-    const opts = { enableHighAccuracy:true, maximumAge:5000, timeout:15000 };
-    const id = navigator.geolocation.watchPosition(async pos => {
-        try {
-            await fetch(`/orders/${orderId}/position`, {
-                method:'POST',
-                headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':CSRF,'X-Requested-With':'XMLHttpRequest'},
-                body: JSON.stringify({ lat: pos.coords.latitude, lng: pos.coords.longitude })
-            });
-        } catch(e) { console.warn('GPS err:', e); }
-    }, err => {
-        console.warn('GPS error:', err);
-        stopGps(orderId, btn);
-    }, opts);
-    gpsWatchers[orderId] = id;
-    btn.classList.add('active');
-    btn.title = 'GPS actif — cliquer pour arrêter';
-}
-
-function stopGps(orderId, btn) {
-    navigator.geolocation.clearWatch(gpsWatchers[orderId]);
-    delete gpsWatchers[orderId];
-    if (Object.keys(gpsWatchers).length === 0) releaseWakeLock();
-    btn.classList.remove('active');
-    btn.title = 'Activer le GPS';
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    @if(session('autostart_gps_order_id'))
-    const btn = document.getElementById('gpsBtn_{{ session('autostart_gps_order_id') }}');
-    if (btn) startGps({{ session('autostart_gps_order_id') }}, btn);
-    @endif
-
-    @foreach($orders as $o)
-    @php $os = strtolower($o->status ?? '') @endphp
-    @if(in_array($os, ['delivering','en_livraison','en-livraison','shipped']))
-    (function(){ const btn = document.getElementById('gpsBtn_{{ $o->id }}'); if(btn) startGps({{ $o->id }}, btn); })();
-    @endif
-    @endforeach
-});
-</script>
-@endpush
