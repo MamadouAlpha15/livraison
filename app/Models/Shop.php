@@ -36,6 +36,12 @@ public function orders()
     return $this->hasMany(Order::class);
 }
 
+// Parrainage de la boutique (programme d'affiliation) : un seul parrain
+public function referral()
+{
+    return $this->hasOne(Referral::class, 'referred_shop_id');
+}
+
 // Campagnes publicitaires payées (espace vendeur → Campagnes)
 public function adCampaigns()
 {

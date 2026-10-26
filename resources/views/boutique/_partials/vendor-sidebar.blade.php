@@ -1,7 +1,7 @@
 {{--
     Menu latéral de l'espace vendeur (maquette Main.dc.html), réutilisable.
     @include('boutique._partials.vendor-sidebar', ['shop' => $shop, 'active' => 'settings'])
-    Clés de $active : dash, messages, orders, products, campaigns, promos, clients, marketing, grow, team, riders, partners, finances, commissions, reports, settings, support.
+    Clés de $active : dash, messages, orders, products, campaigns, referral, promos, clients, marketing, grow, team, riders, partners, finances, commissions, reports, settings, support.
     À utiliser dans une page qui inclut aussi boutique._partials.sv-theme (couleurs).
     Structure attendue : <div class="vs-wrap"> [ce menu] <main class="main vs-main"> … </main> </div>
 --}}
@@ -19,6 +19,7 @@
         'orders'   => 'M12 3 4 7v10l8 4 8-4V7zM4 7l8 4 8-4M12 11v10',
         'products' => 'M3 12 12 3h8v8l-9 9zM15.5 8.5h.01',
         'campaigns'=> 'M12 3l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6L3.3 9.2l6.1-.6z',
+        'referral' => 'M4 11h16v9H4zM3 7h18v4H3zM12 7v13M12 7c-1.6-3.2-5-3.4-5-1.2C7 7 9.5 7 12 7zm0 0c1.6-3.2 5-3.4 5-1.2C17 7 14.5 7 12 7z',
         'promos'   => 'M19 5 5 19M7.5 7.5h.01M16.5 16.5h.01',
         'clients'  => 'M9 11.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM3 20c.8-3.4 3.2-5.5 6-5.5s5.2 2.1 6 5.5M16 4.5a3.5 3.5 0 0 1 0 7M21 20c-.5-2.4-1.8-4.1-3.6-4.9',
         'marketing'=> 'M4 10v4h3l6 4V6l-6 4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11',
@@ -43,6 +44,8 @@
             ['products', 'Produits', route('products.index'), false],
             // Campagnes payées : réservé au propriétaire (pas aux employés)
             ...($vsUser->role === 'admin' ? [['campaigns', 'Campagnes', route('boutique.campaigns.index'), false]] : []),
+            // Parrainage (programme d'affiliation) : réservé au propriétaire
+            ...($vsUser->role === 'admin' ? [['referral', 'Parrainage', route('vendeur.parrainage'), false]] : []),
             ['promos', 'Codes promo', route('boutique.promo-codes.index'), true],
             ['clients', 'Clients', route('boutique.clients.index'), false],
             ['marketing', 'Marketing', route('boutique.marketing'), false],

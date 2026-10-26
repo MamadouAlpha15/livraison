@@ -1386,7 +1386,7 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
 
 @section('content')
 @php
-    $roleMap = ['superadmin'=>'admin.dashboard','admin'=>'boutique.dashboard','vendeur'=>'vendeur.dashboard','client'=>'client.dashboard','company'=>'company.dashboard','livreur'=>'livreur.dashboard'];
+    $roleMap = ['affilie'=>'affilie.dashboard','superadmin'=>'admin.dashboard','admin'=>'boutique.dashboard','vendeur'=>'vendeur.dashboard','client'=>'client.dashboard','company'=>'company.dashboard','livreur'=>'livreur.dashboard'];
 @endphp
 
 {{-- ══ NAVBAR ══ --}}
@@ -1398,6 +1398,7 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
     <div class="nav-links">
         <a href="{{ url('/') }}" class="nav-link active">{!! \App\Support\IconLibrary::svg('home') !!} Accueil</a>
         <a href="{{ route('shops.index') }}" class="nav-link">{!! \App\Support\IconLibrary::svg('store') !!} Boutiques</a>
+        <a href="{{ route('affiliation.join') }}" class="nav-link">{!! \App\Support\IconLibrary::svg('gift') !!} Affiliation</a>
     </div>
     <div class="search-wrap">
         <form method="GET" action="{{ url('/') }}" class="nav-search" data-ajax>
@@ -1439,6 +1440,7 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
 <div class="nav-mobile-menu" id="navMobileMenu">
     <a href="{{ url('/') }}" class="nav-mobile-link">{!! \App\Support\IconLibrary::svg('home') !!} Accueil</a>
     <a href="{{ route('shops.index') }}" class="nav-mobile-link">{!! \App\Support\IconLibrary::svg('store') !!} Boutiques</a>
+    <a href="{{ route('affiliation.join') }}" class="nav-mobile-link">{!! \App\Support\IconLibrary::svg('gift') !!} Gagner de l'argent avec Shopio</a>
     <div class="nav-mobile-divider"></div>
     @guest
         <a href="{{ route('login') }}" class="nav-mobile-link">Connexion</a>
@@ -1509,6 +1511,7 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
             <a href="{{ url('/') }}">Accueil</a>
             <a href="{{ route('shops.index') }}">Boutiques</a>
             <a href="{{ route('delivery.companies.index') }}">Entreprises livraison</a>
+            <a href="{{ route('affiliation.join') }}">Programme d'affiliation</a>
         </div>
         <div class="w-footer-col">
             <h4>Compte</h4>

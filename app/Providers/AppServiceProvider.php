@@ -27,6 +27,13 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
         Paginator::useBootstrapFive();
 
+        // Montant en GNF : @gnf($montant) → « 150 000 GNF » (App\Support\Money)
+        \Illuminate\Support\Facades\Blade::directive('gnf', fn ($expression) => "<?php echo e(\\App\\Support\\Money::gnf($expression)); ?>");
+
+        // Programme d'affiliation : un produit ou une commande peut rendre « Active » une boutique parrainée
+        \App\Models\Product::observe(\App\Observers\ReferralActivityObserver::class);
+        \App\Models\Order::observe(\App\Observers\ReferralActivityObserver::class);
+
         /* Le CSS compilé par Vite (app.css, boutique-dashboard.css, ...) ne doit pas
            bloquer le premier affichage sur réseau lent : même astuce media="print" que
            pour Bootstrap/Google Fonts dans layouts/app.blade.php. Le loader plein écran

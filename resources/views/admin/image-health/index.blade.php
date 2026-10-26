@@ -171,6 +171,7 @@ $meInit = strtoupper(substr($meName,0,1));
         <a href="{{ route('admin.paiements.index') }}" class="sb-a"><span class="sb-i">{!! $I['card'] !!}</span><span>Paiements</span></a>
         <a href="{{ route('admin.payouts.index') }}" class="sb-a"><span class="sb-i">{!! $I['dollar'] !!}</span><span>Règlements boutiques</span></a>
         <a href="{{ route('admin.campaigns.index') }}" class="sb-a"><span class="sb-i">{!! \App\Support\IconLibrary::svg('megaphone', '', 17) !!}</span><span>Campagnes</span></a>
+        <a href="{{ route('admin.affiliation.index') }}" class="sb-a"><span class="sb-i">{!! \App\Support\IconLibrary::svg('gift', '', 17) !!}</span><span>Affiliation</span></a>
         <a href="{{ route('admin.commissions.index') }}" class="sb-a"><span class="sb-i">{!! $I['trend'] !!}</span><span>Commissions</span></a>
         <a href="{{ route('admin.revenus.index') }}" class="sb-a"><span class="sb-i">{!! $I['dollar'] !!}</span><span>Revenus plateforme</span></a>
         <div class="sb-sec plat">Plateforme</div>

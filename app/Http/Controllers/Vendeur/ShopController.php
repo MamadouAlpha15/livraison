@@ -12,6 +12,9 @@ use Illuminate\Support\Carbon;
 use App\Models\ShopMessage;
 use App\Models\ShopVisit;
 use App\Services\ImageOptimizer;
+use App\Http\Requests\StoreShopRequest;
+use App\Services\AffiliateService;
+use Illuminate\Support\Facades\DB;
 
 
 class ShopController extends Controller
@@ -40,37 +43,22 @@ class ShopController extends Controller
     /**
      * Formulaire de création d'une boutique
      */
-    public function create()
+    public function create(Request $request, AffiliateService $affiliates)
     {
-        return view('vendeur.shop.create');
+        // Lien de parrainage suivi avant l'inscription : code pré-rempli ; appareil reconnu pour l'anti-fraude
+        $referralCode = $affiliates->codeFromCookie($request);
+        $affiliates->ensureDeviceCookie($request);
+
+        return view('vendeur.shop.create', compact('referralCode'));
     }
 
     /**
      * Sauvegarde d'une nouvelle boutique
      */
-    public function store(Request $request){
-        // ✅ Validation
-                $userEmail = Auth::user()->email;
-                $emailRules = ['nullable', 'email'];
-                // Unique uniquement si l'email n'est pas celui de l'utilisateur connecté
-                if ($request->filled('email') && $request->email !== $userEmail) {
-                    $emailRules[] = Rule::unique('shops', 'email');
-                }
-
-                $validated = $request->validate([
-                    'name'        => 'required|string|max:255',
-                    'type'        => 'nullable|string|max:100',
-                    'address'     => 'nullable|string|max:255',
-                    'email'       => $emailRules,
-                    'phone'       => 'nullable|string|max:20',
-                    'image'       => 'nullable|image',
-                    'description' => 'nullable|string',
-                    'commission_rate' => ['nullable','numeric','between:0,100'],
-                    'currency' => ['nullable','string','max:10'],
-                    // Mobile Money où reverser les paiements en ligne (ChapChap Pay)
-                    'payout_wallet_type'   => ['nullable', Rule::in(['paycard','orange_money','mtn_momo','kulu','soutra_money','akiba'])],
-                    'payout_wallet_number' => ['nullable','string','max:30'],
-                ]);
+    public function store(StoreShopRequest $request, AffiliateService $affiliates)
+    {
+        $validated = $request->safe()->except(['referral_code', 'source']);
+        $userEmail = Auth::user()->email;
 
                 // Si email vide → utilise l'email d'inscription automatiquement
                 if (empty($validated['email'])) {
@@ -87,24 +75,34 @@ class ShopController extends Controller
             $validated['image'] = ImageOptimizer::store($request->file('image'), 'shops');
         }
 
-        // ✅ Création de la boutique — auto-approuvée, plan Pro offert 30 jours (essai gratuit)
-        $shop = new Shop($validated);
-        $shop->user_id     = Auth::id();
-        $shop->country     = Auth::user()->country;
-        $shop->currency    = \App\Models\DeliveryCompany::currencyForCountry(Auth::user()->country ?? '');
-        $shop->is_approved = true;   // approbation automatique, les limites sont gérées par le plan
-        $shop->plan        = 'free'; // valeur par défaut, écrasée juste après par startShopTrial()
-        $shop->save();
+        // Boutique, essai gratuit, rattachement du vendeur et parrainage : tout ou rien
+        $shop = DB::transaction(function () use ($validated, $request, $affiliates) {
+            // ✅ Création de la boutique — auto-approuvée, plan Pro offert 30 jours (essai gratuit)
+            $shop = new Shop($validated);
+            $shop->user_id     = Auth::id();
+            $shop->country     = Auth::user()->country;
+            $shop->currency    = \App\Models\DeliveryCompany::currencyForCountry(Auth::user()->country ?? '');
+            $shop->is_approved = true;   // approbation automatique, les limites sont gérées par le plan
+            $shop->plan        = 'free'; // valeur par défaut, écrasée juste après par startShopTrial()
+            $shop->save();
 
-        // ✅ Essai gratuit : 1 mois de Plan Pro offert à chaque nouvelle boutique
-        app(\App\Services\SubscriptionService::class)->startShopTrial($shop);
+            // ✅ Essai gratuit : 1 mois de Plan Pro offert à chaque nouvelle boutique
+            app(\App\Services\SubscriptionService::class)->startShopTrial($shop);
 
-        // ✅ Mise à jour du vendeur → il devient admin de sa boutique
-        $user = Auth::user();
-        $user->update([
-            'shop_id'      => $shop->id,
-            'role_in_shop' => 'admin',
-        ]);
+            // ✅ Mise à jour du vendeur → il devient admin de sa boutique
+            $user = Auth::user();
+            $user->update([
+                'shop_id'      => $shop->id,
+                'role_in_shop' => 'admin',
+            ]);
+
+            // ✅ Parrainage : code saisi (pré-rempli depuis le lien ?ref=), contrôlé par StoreShopRequest
+            if ($request->filled('referral_code')) {
+                $affiliates->attribute($shop, $user, $request->input('referral_code'), $request->input('source'), $request);
+            }
+
+            return $shop;
+        });
 
         // ✅ Redirection : paiement direct si l'utilisateur venait du Plan Pro
         if (session('payment_intent') === 'pro') {

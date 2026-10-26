@@ -24,12 +24,14 @@ class Subscription extends Model
         'status',
         'started_at',
         'expires_at',
+        'refunded_at',      // paiement remboursé (annule la commission d'affiliation liée)
         'gateway_response',
     ];
 
     protected $casts = [
         'started_at'       => 'datetime',
         'expires_at'       => 'datetime',
+        'refunded_at'      => 'datetime',
         'gateway_response' => 'array',
         'amount'           => 'integer',
     ];

@@ -133,6 +133,48 @@
     </div>
 </section>
 
+{{-- ═════════════ AFFILIATION : faire connaître Shopio (chiffres = réglages réels du programme) ═════════════ --}}
+@php
+    $aff3 = \App\Models\AffiliateSetting::current();
+    $aff3Rate = rtrim(rtrim(number_format((float) $aff3->default_rate, 2, ',', ''), '0'), ',');
+@endphp
+<section class="rel3" id="affiliation" aria-labelledby="aff3Title">
+    <div class="w3 sec3">
+        <div class="g2-3 aff3-g">
+            <div class="rv3 stack3">
+                <h2 class="h2-3" id="aff3Title">Faites connaître Shopio. <span class="blue3">Gagnez de l'argent.</span></h2>
+                <p class="p3">Pas besoin d'avoir une boutique. Partagez votre lien à des commerçants : quand ils ouvrent leur boutique et paient leur abonnement, vous touchez une commission.</p>
+                <ul class="checks3">
+                    <li><span>{!! $I('check', 15) !!}</span>{{ $aff3Rate }} % de chaque abonnement payé, pendant {{ $aff3->commission_months }} mois</li>
+                    <li><span>{!! $I('check', 15) !!}</span>Un lien et un QR code à partager sur WhatsApp</li>
+                    <li><span>{!! $I('check', 15) !!}</span>Retrait par Mobile Money dès {{ \App\Support\Money::gnf($aff3->payout_threshold) }}</li>
+                    <li><span>{!! $I('check', 15) !!}</span>Inscription gratuite</li>
+                </ul>
+                <div class="h3-cta"><a class="btn3 btn3-p btn3-lg" href="{{ route('affiliation.join') }}">{!! $I('gift', 20) !!} Devenir affilié</a></div>
+            </div>
+            <ol class="aff3-steps rv3 rv3-2">
+                <li><span class="aff3-n">1</span><div><strong>Inscrivez-vous</strong><span>Après validation par l'équipe Shopio, vous recevez votre code et votre lien.</span></div></li>
+                <li><span class="aff3-n">2</span><div><strong>Partagez votre lien</strong><span>À des vendeurs sur WhatsApp, Facebook, au marché.</span></div></li>
+                <li><span class="aff3-n">3</span><div><strong>Ils ouvrent leur boutique</strong><span>Votre code est déjà rempli pour eux.</span></div></li>
+                <li><span class="aff3-n">4</span><div><strong>Vous êtes payé</strong><span>Une commission à chacun de leurs abonnements.</span></div></li>
+            </ol>
+        </div>
+    </div>
+</section>
+<style>
+.aff3-g { align-items: center; }
+.aff3-steps { list-style: none; margin: 0; padding: 24px; display: grid; gap: 18px; background: #fff; border-radius: 24px;
+    box-shadow: 0 1px 0 #E3E8F2, 0 24px 48px -28px rgba(11,30,61,.35); }
+.aff3-steps li { display: flex; gap: 14px; align-items: flex-start; }
+.aff3-steps strong { display: block; font-size: 16px; color: #16162A; }
+.aff3-steps li span:not(.aff3-n) { display: block; font-size: 14px; color: #45455E; margin-top: 2px; }
+.aff3-n { flex: none; width: 36px; height: 36px; border-radius: 999px; background: #EAF2FF; color: #1668D8; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+[data-theme="dark"] .aff3-steps { background: #10203B; box-shadow: 0 0 0 1px #22355A; }
+[data-theme="dark"] .aff3-steps strong { color: #EAF0FA; }
+[data-theme="dark"] .aff3-steps li span:not(.aff3-n) { color: #C3CEE0; }
+[data-theme="dark"] .aff3-n { background: #13284B; color: #7DB4FF; }
+</style>
+
 {{-- ═════════════ TÉMOIGNAGES (avis réels uniquement) ═════════════ --}}
 @if(($testimonials ?? collect())->isNotEmpty())
 <section class="w3 sec3" aria-labelledby="rev3Title">

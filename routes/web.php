@@ -293,6 +293,7 @@ Route::get('/dashboard', function () {
         'livreur'    => redirect()->route('livreur.dashboard'),
         'vendeur'    => redirect()->route('vendeur.dashboard'),
         'employe'    => redirect()->route('employe.dashboard'),
+        'affilie'    => redirect()->route('affilie.dashboard'),
         default      => redirect()->route('client.dashboard'),
     };
 })->middleware(['auth'])->name('dashboard');
@@ -540,6 +541,64 @@ Route::middleware(['auth', 'role:superadmin,staff,marketing'])
         Route::post('{campaign}/lancer', 'launch')->whereNumber('campaign')->name('launch');
         Route::post('{campaign}/stats', 'storeStats')->whereNumber('campaign')->name('stats.store');
         Route::post('{campaign}/cloturer', 'close')->whereNumber('campaign')->name('close');
+    });
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+|  Programme d'affiliation (parrainage des boutiques)
+|  /vendeur/parrainage      : propriétaire de boutique (role:admin)
+|  /affilie/tableau-de-bord : affilié externe (role:affilie)
+|  /admin/affiliation       : équipe Shopio (role:superadmin,staff)
+══════════════════════════════════════════════════════════════════════════ */
+
+// Page publique « Devenir affilié » (lien sur l'accueil) : inscription d'une personne externe
+Route::get('devenir-affilie', [\App\Http\Controllers\AffiliateJoinController::class, 'show'])->name('affiliation.join');
+Route::post('devenir-affilie', [\App\Http\Controllers\AffiliateJoinController::class, 'store'])
+    ->middleware(['guest', 'throttle:10,10'])->name('affiliation.join.store');
+
+Route::middleware(['auth', 'role:admin'])
+    ->prefix('vendeur/parrainage')
+    ->name('vendeur.parrainage')
+    ->controller(\App\Http\Controllers\AffiliateDashboardController::class)
+    ->group(function () {
+        Route::get('/', 'index');
+        Route::get('qr-code', 'qr')->name('.qr');
+        Route::get('commissions.csv', 'export')->name('.export');
+        Route::post('retrait', 'payout')->middleware('throttle:5,1')->name('.payout');
+    });
+
+Route::middleware(['auth', 'role:affilie'])
+    ->prefix('affilie')
+    ->name('affilie.')
+    ->controller(\App\Http\Controllers\AffiliateDashboardController::class)
+    ->group(function () {
+        Route::get('tableau-de-bord', 'index')->name('dashboard');
+        Route::get('qr-code', 'qr')->name('qr');
+        Route::get('commissions.csv', 'export')->name('export');
+        Route::post('retrait', 'payout')->middleware('throttle:5,1')->name('payout');
+    });
+
+Route::middleware(['auth', 'role:superadmin,staff'])
+    ->prefix('admin/affiliation')
+    ->name('admin.affiliation.')
+    ->controller(\App\Http\Controllers\Admin\AffiliationController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('affilies', 'storeAffiliate')->name('affiliates.store');
+        Route::put('affilies/{affiliate}', 'updateAffiliate')->whereNumber('affiliate')->name('affiliates.update');
+        Route::post('affilies/{affiliate}/valider', 'approveAffiliate')->whereNumber('affiliate')->name('affiliates.approve');
+        Route::post('affilies/{affiliate}/refuser', 'rejectAffiliate')->whereNumber('affiliate')->name('affiliates.reject');
+        Route::get('filleuls', 'referrals')->name('referrals');
+        Route::post('filleuls/{referral}/verifie', 'clearFlag')->whereNumber('referral')->name('referrals.clear');
+        Route::post('filleuls/{referral}/annuler', 'cancelReferral')->whereNumber('referral')->name('referrals.cancel');
+        Route::get('commissions', 'commissions')->name('commissions');
+        Route::get('commissions.csv', 'exportCommissions')->name('commissions.export');
+        Route::post('commissions/{commission}/rembourse', 'refund')->whereNumber('commission')->name('commissions.refund');
+        Route::get('retraits', 'payouts')->name('payouts');
+        Route::post('retraits/{payout}/paye', 'payPayout')->whereNumber('payout')->name('payouts.pay');
+        Route::post('retraits/{payout}/refuse', 'rejectPayout')->whereNumber('payout')->name('payouts.reject');
+        Route::get('reglages', 'settings')->name('settings');
+        Route::put('reglages', 'updateSettings')->name('settings.update');
     });
 
 

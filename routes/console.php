@@ -61,3 +61,9 @@ Schedule::command('campaigns:flush-stats')->everyTenMinutes()->name('campaigns-f
 // rappels (visuels à valider, fin dans 2 jours) et annulation des visuels restés sans réponse.
 // ─────────────────────────────────────────────────────────────────────────────
 Schedule::command('campaigns:tick')->hourly()->name('campaigns-tick')->withoutOverlapping();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Affiliation, chaque jour : les commissions dont le délai de validation est passé
+// deviennent disponibles au retrait (App\Services\AffiliateService::approveDueCommissions).
+// ─────────────────────────────────────────────────────────────────────────────
+Schedule::command('affiliates:approve-commissions')->dailyAt('02:30')->name('affiliates-approve-commissions')->withoutOverlapping();
