@@ -225,9 +225,10 @@ body { background: #F6F9FF; color: #16162A; font-family: 'Plus Jakarta Sans', sy
     @foreach($products as $product)
     @php
         $hasPromo = $product->original_price && $product->original_price > $product->price;
+        $showUrl  = \App\Support\Campaigns\SponsoredPlacements::url(route('client.products.show', $product), $product);
     @endphp
     <div class="p-card">
-        <a href="{{ route('client.products.show', $product) }}" class="p-card-link">
+        <a href="{{ $showUrl }}" class="p-card-link">
             <div class="p-card-img">
                 @if($product->image)
                     <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" loading="lazy" decoding="async" width="400" height="170">
@@ -241,6 +242,7 @@ body { background: #F6F9FF; color: #16162A; font-family: 'Plus Jakarta Sans', sy
                 @endif
             </div>
             <div class="p-card-body">
+                @if($product->sponsored_campaign_id)@include('partials.sponsored-tag', ['style' => 'align-self:flex-start;margin-bottom:2px'])@endif
                 <div class="p-card-name">{{ $product->name }}</div>
                 @if($product->category)
                     <div class="p-card-cat">{{ $product->category }}</div>
@@ -262,7 +264,7 @@ body { background: #F6F9FF; color: #16162A; font-family: 'Plus Jakarta Sans', sy
                     <span class="p-card-orig">{{ number_format($product->original_price, 0, ',', ' ') }}</span>
                 @endif
             </div>
-            <a href="{{ route('client.orders.createFromProduct', $product) }}" class="p-card-cta">Commander</a>
+            <a href="{{ \App\Support\Campaigns\SponsoredPlacements::url(route('client.orders.createFromProduct', $product), $product) }}" class="p-card-cta">Commander</a>
         </div>
     </div>
     @endforeach

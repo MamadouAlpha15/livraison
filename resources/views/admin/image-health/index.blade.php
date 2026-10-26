@@ -5,32 +5,32 @@
 <style>
 *,*::before,*::after{box-sizing:border-box}
 :root{
-    --brand:#7c3aed;--sb:#1e1b4b;--sb-text:rgba(255,255,255,.88);--sb-w:268px;
-    --bg:#f1f5f9;--card:#fff;--bd:rgba(0,0,0,.07);
-    --text:#0f172a;--muted:#64748b;
+    --brand:#1668D8;--sb:#0B1E3D;--sb-text:rgba(255,255,255,.88);--sb-w:268px;
+    --bg:#F6F9FF;--card:#fff;--bd:rgba(0,0,0,.07);
+    --text:#16162A;--muted:#62627C;
     --green:#10b981;--amber:#f59e0b;--red:#ef4444;--blue:#3b82f6;
-    --font:'Segoe UI',system-ui,sans-serif;
+    --font:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
 }
 body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-webkit-font-smoothing:antialiased}
 .sa{display:flex;min-height:100vh}
 .sb{width:var(--sb-w);background:var(--sb);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;overflow-y:auto;overflow-x:hidden;transition:transform .28s cubic-bezier(.4,0,.2,1);scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent}
 .sb::-webkit-scrollbar{width:3px}.sb::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:2px}
 .sb-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.12);display:flex;align-items:center;gap:11px;flex-shrink:0}
-.sb-ico-wrap{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#a78bfa,#7c3aed);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(167,139,250,.45);flex-shrink:0}
+.sb-ico-wrap{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#7DB4FF,#1668D8);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(31,124,246,.45);flex-shrink:0}
 .sb-appname{font-size:14.5px;font-weight:900;color:#fff;letter-spacing:-.2px}
-.sb-apptag{font-size:10px;font-weight:700;color:#c4b5fd;text-transform:uppercase;letter-spacing:.9px;margin-top:2px}
+.sb-apptag{font-size:10px;font-weight:700;color:#8FA6CC;text-transform:uppercase;letter-spacing:.9px;margin-top:2px}
 .sb-close{margin-left:auto;width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.7);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;font-family:var(--font)}
 .sb-close:hover{background:rgba(255,255,255,.22);color:#fff}
 .sb-me{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
-.sb-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#6d28d9);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0}
+.sb-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7DB4FF,#1260C9);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0}
 .sb-name{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sb-badge{font-size:10px;color:#a78bfa;font-weight:600;margin-top:1px}
+.sb-badge{font-size:10px;color:#7DB4FF;font-weight:600;margin-top:1px}
 .sb-nav{padding:10px 0;flex:1}
 .sb-sec{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.3px;padding:14px 18px 5px;color:rgba(255,255,255,.35)}
-.sb-sec.shop{color:#6ee7b7}.sb-sec.livr{color:#93c5fd}.sb-sec.fin{color:#fcd34d}.sb-sec.plat{color:#c4b5fd}
+.sb-sec.shop{color:#6ee7b7}.sb-sec.livr{color:#93c5fd}.sb-sec.fin{color:#fcd34d}.sb-sec.plat{color:#8FA6CC}
 .sb-a{display:flex;align-items:center;gap:10px;padding:10px 18px;color:var(--sb-text);text-decoration:none;font-size:13px;font-weight:600;border-left:3px solid transparent;transition:all .15s}
 .sb-a:hover{background:rgba(255,255,255,.09);color:#fff}
-.sb-a.on{background:rgba(167,139,250,.22);border-left-color:#a78bfa;color:#fff;font-weight:700;box-shadow:inset 0 0 20px rgba(124,58,237,.08)}
+.sb-a.on{background:rgba(31,124,246,.22);border-left-color:#7DB4FF;color:#fff;font-weight:700;box-shadow:inset 0 0 20px rgba(22,104,216,.08)}
 .sb-i{width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:.85}
 .sb-ft-ico{width:16px;height:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:.7}
 .sb-ft{border-top:1px solid rgba(255,255,255,.1);padding:10px 0}
@@ -40,36 +40,36 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .mn{margin-left:var(--sb-w);flex:1;display:flex;flex-direction:column;min-width:0}
 .tb{height:60px;background:var(--card);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:100}
-.ham{width:34px;height:34px;border-radius:8px;background:none;border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);flex-shrink:0;transition:background .15s}.ham:hover{background:#f1f5f9}
+.ham{width:34px;height:34px;border-radius:8px;background:none;border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);flex-shrink:0;transition:background .15s}.ham:hover{background:var(--bg)}
 .tb-bc{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px;flex:1}
 .tb-bc a{color:var(--muted);text-decoration:none}.tb-bc a:hover{color:var(--brand)}
 .tb-ua{display:flex;align-items:center;gap:10px;margin-left:auto}
-.tb-uav{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#6d28d9);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff}
+.tb-uav{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7DB4FF,#1260C9);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff}
 .tb-uname{font-size:13px;font-weight:700;color:var(--text)}.tb-urole{font-size:10.5px;color:var(--muted);font-weight:600}
 .pw{padding:24px;max-width:1300px;margin:0 auto;width:100%}
 
-.hero{background:linear-gradient(135deg,#1e1b4b 0%,#312e81 50%,#4338ca 100%);border-radius:16px;padding:28px 32px;display:flex;align-items:center;gap:24px;margin-bottom:24px;position:relative;overflow:hidden;flex-wrap:wrap}
-.hero::before{content:'';position:absolute;top:-30px;right:-30px;width:200px;height:200px;background:radial-gradient(circle,rgba(167,139,250,.2) 0%,transparent 70%);pointer-events:none}
+.hero{background:linear-gradient(135deg,#0B1E3D 0%,#132B52 50%,#1260C9 100%);border-radius:16px;padding:28px 32px;display:flex;align-items:center;gap:24px;margin-bottom:24px;position:relative;overflow:hidden;flex-wrap:wrap}
+.hero::before{content:'';position:absolute;top:-30px;right:-30px;width:200px;height:200px;background:radial-gradient(circle,rgba(31,124,246,.2) 0%,transparent 70%);pointer-events:none}
 .hero-ico{display:flex;align-items:center;justify-content:center;width:64px;height:64px;background:rgba(255,255,255,.12);border-radius:16px;color:#fff;filter:drop-shadow(0 4px 12px rgba(0,0,0,.3));flex-shrink:0}
 .hero-title{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.3px}
-.hero-sub{font-size:13px;color:#c4b5fd;margin-top:3px}
+.hero-sub{font-size:13px;color:#8FA6CC;margin-top:3px}
 .hero-stats{display:flex;gap:12px;flex-wrap:wrap}
 .hs{background:rgba(255,255,255,.1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:12px 18px;text-align:center;min-width:90px}
 .hs-v{font-size:22px;font-weight:900;color:#fff;line-height:1}
-.hs-l{font-size:10px;font-weight:700;color:#c4b5fd;text-transform:uppercase;letter-spacing:.6px;margin-top:4px}
+.hs-l{font-size:10px;font-weight:700;color:#8FA6CC;text-transform:uppercase;letter-spacing:.6px;margin-top:4px}
 .hero-acts{margin-left:auto}
 .btn-check{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:10px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;font-family:inherit}
 .btn-check:hover{background:rgba(255,255,255,.22)}
 
 .flash{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;margin-bottom:20px;font-size:12.5px;font-weight:600}
-.flash.ok{background:rgba(16,185,129,.1);color:#065f46;border:1px solid rgba(16,185,129,.2)}
-.flash.err{background:rgba(239,68,68,.1);color:#7f1d1d;border:1px solid rgba(239,68,68,.2)}
+.flash.ok{background:rgba(16,185,129,.1);color:var(--ok-ink);border:1px solid rgba(16,185,129,.2)}
+.flash.err{background:rgba(239,68,68,.1);color:var(--err-ink);border:1px solid rgba(239,68,68,.2)}
 
 .card{background:var(--card);border:1px solid var(--bd);border-radius:14px;overflow:hidden}
 .card-h{padding:16px 22px;border-bottom:1px solid var(--bd);font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px}
 
 table{width:100%;border-collapse:collapse}
-th{padding:11px 18px;text-align:left;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);background:#f8fafc;border-bottom:1px solid var(--bd);white-space:nowrap}
+th{padding:11px 18px;text-align:left;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap}
 td{padding:13px 18px;border-bottom:1px solid var(--bd);font-size:13px;vertical-align:middle}
 tr:last-child td{border-bottom:none}
 .muted{color:var(--muted);font-size:12px}
@@ -77,17 +77,17 @@ tr:last-child td{border-bottom:none}
 .prod-cell{display:flex;align-items:center;gap:10px}
 .prod-name{font-weight:700;color:var(--text)}
 .shop-name{font-size:11.5px;color:var(--muted);margin-top:1px}
-.paths-list{font-size:10.5px;color:#94a3b8;font-family:monospace;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.paths-list{font-size:10.5px;color:var(--muted);font-family:monospace;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .status-pill{font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;display:inline-block}
 .status-pill.open{background:rgba(239,68,68,.12);color:#b91c1c}
 .status-pill.notified{background:rgba(245,158,11,.12);color:#b45309}
 .row-acts{display:flex;gap:6px}
 .btn-sm{padding:6px 12px;border-radius:7px;font-size:11.5px;font-weight:700;border:none;cursor:pointer;font-family:inherit;white-space:nowrap}
-.btn-sm.notify{background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff}
+.btn-sm.notify{background:linear-gradient(135deg,#1668D8,#1260C9);color:#fff}
 .btn-sm.notify:hover{opacity:.92}
 .btn-sm.notify:disabled{opacity:.5;cursor:not-allowed}
 .btn-sm.resolve{background:var(--bg);color:var(--muted);border:1px solid var(--bd)}
-.btn-sm.resolve:hover{background:#e2e8f0;color:var(--text)}
+.btn-sm.resolve:hover{background:#E3E8F2;color:var(--text)}
 .empty-state{padding:60px 20px;text-align:center}
 .empty-ico{width:56px;height:56px;border-radius:50%;background:rgba(16,185,129,.1);color:#059669;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
 .empty-title{font-size:15px;font-weight:800;margin-bottom:5px}
@@ -101,6 +101,8 @@ tr:last-child td{border-bottom:none}
     .hero-acts{margin-left:0;width:100%}.btn-check{width:100%;justify-content:center}
 }
 </style>
+@include('admin._partials.shopio-theme')
+@include('admin._partials.dark-mode')
 @endpush
 
 @section('content')
@@ -143,8 +145,8 @@ $meInit = strtoupper(substr($meName,0,1));
 <div class="sa">
 <aside class="sb" id="sb">
     <div class="sb-logo">
-        <div class="sb-ico-wrap" style="color:#fff">{!! $I['brand_lg'] !!}</div>
-        <div><div class="sb-appname">{{ config('app.name','Shopio') }}</div><div class="sb-apptag">Plateforme · Super Admin</div></div>
+        <div class="sb-ico-wrap"><img src="{{ \App\Support\Assets::v('images/shopio-logo-192.png') }}" alt="" width="42" height="42"></div>
+        <div><div class="sb-appname">Shopio</div><div class="sb-apptag">Plateforme · Super Admin</div></div>
         <button class="sb-close" onclick="closeSb()">{!! $I['close'] !!}</button>
     </div>
     <div class="sb-me">
@@ -153,24 +155,26 @@ $meInit = strtoupper(substr($meName,0,1));
     </div>
     <nav class="sb-nav">
         <a href="{{ route('admin.dashboard') }}" class="sb-a"><span class="sb-i">{!! $I['home'] !!}</span><span>Vue d'ensemble</span></a>
-        <div class="sb-sec shop">── SaaS Boutiques</div>
+        <div class="sb-sec shop">SaaS Boutiques</div>
         <a href="{{ route('admin.shops.index') }}" class="sb-a"><span class="sb-i">{!! $I['store'] !!}</span><span>Boutiques</span></a>
         <a href="{{ route('admin.products.index') }}" class="sb-a"><span class="sb-i">{!! $I['bag'] !!}</span><span>Produits</span></a>
         <a href="{{ route('admin.orders.index') }}" class="sb-a"><span class="sb-i">{!! $I['box'] !!}</span><span>Commandes boutiques</span></a>
         <a href="{{ route('admin.vendeurs.index') }}" class="sb-a"><span class="sb-i">{!! $I['brief'] !!}</span><span>Vendeurs &amp; Employés</span></a>
         <a href="{{ route('admin.clients.index') }}" class="sb-a"><span class="sb-i">{!! $I['user'] !!}</span><span>Clients boutiques</span></a>
         <a href="{{ route('admin.image-health.index') }}" class="sb-a on"><span class="sb-i">{!! $I['image'] !!}</span><span>Santé des images</span></a>
-        <div class="sb-sec livr">── SaaS Livraison</div>
+        <div class="sb-sec livr">SaaS Livraison</div>
         <a href="{{ route('admin.entreprises.index') }}" class="sb-a"><span class="sb-i">{!! $I['truck'] !!}</span><span>Entreprises livraison</span></a>
         <a href="{{ route('admin.livreurs.index') }}" class="sb-a"><span class="sb-i">{!! $I['bike'] !!}</span><span>Livreurs</span></a>
         <a href="{{ route('admin.zones.index') }}" class="sb-a"><span class="sb-i">{!! $I['map'] !!}</span><span>Zones de livraison</span></a>
         <a href="{{ route('admin.suivi.index') }}" class="sb-a"><span class="sb-i">{!! $I['pin'] !!}</span><span>Suivi en temps réel</span></a>
-        <div class="sb-sec fin">── Finance</div>
+        <div class="sb-sec fin">Finance</div>
         <a href="{{ route('admin.paiements.index') }}" class="sb-a"><span class="sb-i">{!! $I['card'] !!}</span><span>Paiements</span></a>
         <a href="{{ route('admin.payouts.index') }}" class="sb-a"><span class="sb-i">{!! $I['dollar'] !!}</span><span>Règlements boutiques</span></a>
+        <a href="{{ route('admin.campaigns.index') }}" class="sb-a"><span class="sb-i">{!! \App\Support\IconLibrary::svg('megaphone', '', 17) !!}</span><span>Campagnes</span></a>
+        <a href="{{ route('admin.affiliation.index') }}" class="sb-a"><span class="sb-i">{!! \App\Support\IconLibrary::svg('gift', '', 17) !!}</span><span>Affiliation</span></a>
         <a href="{{ route('admin.commissions.index') }}" class="sb-a"><span class="sb-i">{!! $I['trend'] !!}</span><span>Commissions</span></a>
         <a href="{{ route('admin.revenus.index') }}" class="sb-a"><span class="sb-i">{!! $I['dollar'] !!}</span><span>Revenus plateforme</span></a>
-        <div class="sb-sec plat">── Plateforme</div>
+        <div class="sb-sec plat">Plateforme</div>
         <a href="{{ route('admin.users.index') }}" class="sb-a"><span class="sb-i">{!! $I['users'] !!}</span><span>Tous les utilisateurs</span></a>
         <a href="{{ route('admin.avis.index') }}" class="sb-a"><span class="sb-i">{!! $I['star'] !!}</span><span>Avis &amp; Notation</span></a>
         <a href="{{ route('admin.support.index') }}" class="sb-a"><span class="sb-i">{!! $I['ticket'] !!}</span><span>Support conversations</span></a>
@@ -197,6 +201,7 @@ $meInit = strtoupper(substr($meName,0,1));
         <div class="tb-uav">{{ $meInit }}</div>
         <div><div class="tb-uname">{{ Str::limit($meName,14) }}</div><div class="tb-urole">{{ $me->role === 'superadmin' ? 'Super Admin' : 'Personnel' }}</div></div>
     </div>
+    @include('admin._partials.dark-toggle')
 </header>
 
 <div class="pw">
@@ -261,7 +266,7 @@ $meInit = strtoupper(substr($meName,0,1));
                         </td>
                         <td>
                             @if(in_array('__aucune_photo__', $report->missing_paths ?? []))
-                            <span class="status-pill" style="background:rgba(100,116,139,.12);color:#475569">Aucune photo ajoutée</span>
+                            <span class="status-pill" style="background:rgba(98,98,124,.12);color:var(--text2)">Aucune photo ajoutée</span>
                             @else
                             <div class="paths-list" title="{{ implode(', ', $report->missing_paths ?? []) }}">{{ implode(', ', $report->missing_paths ?? []) }}</div>
                             @endif

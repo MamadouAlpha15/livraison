@@ -20,6 +20,8 @@ class ShopResource extends JsonResource
             'country'     => $this->country,
             'currency'    => $this->currency ?? 'GNF',
             'image_url'   => $this->image ? ImageOptimizer::url($this->image, 'medium') : null,
+            // Boutique « à la une » payée : badge « Sponsorisé », ?c=<id> en ouvrant la boutique
+            'sponsored_campaign_id' => $this->sponsored_campaign_id ? (int) $this->sponsored_campaign_id : null,
         ];
     }
 }

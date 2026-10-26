@@ -152,6 +152,12 @@ class User extends Authenticatable
         return $this->hasMany(User::class, 'referred_by');
     }
 
+    // Compte affilié du programme de parrainage des boutiques (≠ parrainage client ci-dessus)
+    public function affiliate()
+    {
+        return $this->hasOne(Affiliate::class);
+    }
+
     /* =========================
      | Helper: boutique courante
      |=========================*/

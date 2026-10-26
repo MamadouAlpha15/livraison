@@ -33,6 +33,22 @@ class ShopMessage extends Model
         'images'         => 'array',
     ];
 
+    protected static function booted(): void
+    {
+        // Conversation ouverte par un client dans les 7 jours après un clic sur une campagne :
+        // comptée comme « message » de la campagne (une fois par client, voir AdAttribution)
+        static::created(function (ShopMessage $message) {
+            try {
+                $user = auth()->user() ?? auth('sanctum')->user();
+                if ($user && $user->role === 'client' && (int) $user->id === (int) $message->sender_id) {
+                    \App\Support\Campaigns\AdAttribution::noteMessage((int) $message->shop_id, $user);
+                }
+            } catch (\Throwable $e) {
+                report($e); // la statistique ne doit jamais bloquer l'envoi du message
+            }
+        });
+    }
+
     /* ── Relations ── */
     public function shop(): BelongsTo
     {

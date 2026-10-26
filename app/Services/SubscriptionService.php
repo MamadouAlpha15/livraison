@@ -198,6 +198,27 @@ class SubscriptionService
             $this->sendConfirmationEmail($subscription, $subscriber->name, route('company.dashboard'));
             $this->notifySuperadminsOfPayment($subscriber->name, 'Business', (float) $subscription->amount);
         }
+
+        // Programme d'affiliation : commission du parrain (traitée en file d'attente).
+        // Une erreur ici ne doit jamais empêcher l'activation de l'abonnement.
+        try {
+            event(new \App\Events\SubscriptionPaid($subscription));
+        } catch (\Throwable $e) {
+            Log::error('[Subscription] Affiliation non traitée pour le paiement #' . $subscription->id . ' : ' . $e->getMessage());
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Enregistre le remboursement d'un paiement d'abonnement (fait par l'équipe en dehors
+    // de Shopio). Ne change pas le plan de la boutique ; annule la commission d'affiliation liée.
+    // ─────────────────────────────────────────────────────────────────────────
+    public function markRefunded(Subscription $subscription): void
+    {
+        if ($subscription->refunded_at) {
+            return;
+        }
+        $subscription->update(['refunded_at' => now()]);
+        event(new \App\Events\SubscriptionRefunded($subscription));
     }
 
     private function notifySuperadminsOfPayment(string $subscriberName, string $planLabel, float $amount): void

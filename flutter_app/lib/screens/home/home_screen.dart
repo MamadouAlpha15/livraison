@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../models/product.dart';
 import '../../models/home_dashboard.dart';
+import '../../models/shop.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/api_client.dart';
 import '../../services/product_service.dart';
@@ -12,6 +13,8 @@ import '../../models/notification_data.dart';
 import '../../utils/formatters.dart';
 import '../../utils/guest_gate.dart';
 import '../../widgets/product_card.dart';
+import '../../widgets/sponsored_tag.dart';
+import '../shop/shop_detail_screen.dart';
 import '../product/product_detail_screen.dart';
 import '../assistant/assistant_screen.dart';
 import '../notifications/notifications_screen.dart';
@@ -107,7 +110,11 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _openProduct(int id) => Navigator.of(context).push(MaterialPageRoute(builder: (_) => ProductDetailScreen(productId: id)));
+  void _openProduct(int id, {int? campaignId}) =>
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => ProductDetailScreen(productId: id, campaignId: campaignId)));
+
+  void _openShop(Shop s) =>
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => ShopDetailScreen(shopId: s.id, campaignId: s.sponsoredCampaignId)));
 
   @override
   Widget build(BuildContext context) {
@@ -230,6 +237,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     // ── Ventes flash + Populaire par catégorie (masqué pendant une recherche/filtre) ──
                     if (!_isBrowsing) ...[
+                      if (_dashboard.featuredShops.isNotEmpty)
+                        SliverToBoxAdapter(child: _FeaturedShopsSection(shops: _dashboard.featuredShops, onTapShop: _openShop)),
                       if (_dashboard.flashProducts.isNotEmpty)
                         SliverToBoxAdapter(
                           child: _HorizontalSection(
@@ -276,7 +285,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisCount: 2, mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 0.62,
                           ),
                           delegate: SliverChildBuilderDelegate(
-                            (context, i) => ProductCard(product: _products[i], onTap: () => _openProduct(_products[i].id)),
+                            (context, i) => ProductCard(
+                              product: _products[i],
+                              onTap: () => _openProduct(_products[i].id, campaignId: _products[i].sponsoredCampaignId),
+                            ),
                             childCount: _products.length,
                           ),
                         ),
@@ -438,6 +450,88 @@ class _StatItem extends StatelessWidget {
           Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey), textAlign: TextAlign.center),
         ],
       ),
+    );
+  }
+}
+
+/// « Boutiques à la une » : boutiques dont la campagne payée est en cours (rien sinon).
+class _FeaturedShopsSection extends StatelessWidget {
+  final List<Shop> shops;
+  final void Function(Shop) onTapShop;
+
+  const _FeaturedShopsSection({required this.shops, required this.onTapShop});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.fromLTRB(16, 14, 16, 8),
+          child: Text('Boutiques à la une', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900)),
+        ),
+        SizedBox(
+          height: 168,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: shops.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 10),
+            itemBuilder: (context, i) {
+              final s = shops[i];
+              return SizedBox(
+                width: 180,
+                child: Card(
+                  clipBehavior: Clip.antiAlias,
+                  elevation: 1,
+                  margin: EdgeInsets.zero,
+                  child: InkWell(
+                    onTap: () => onTapShop(s),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 92,
+                          width: double.infinity,
+                          child: s.imageUrl != null
+                              ? CachedNetworkImage(
+                                  imageUrl: s.imageUrl!,
+                                  fit: BoxFit.cover,
+                                  placeholder: (_, __) => Container(color: const Color(0xFF0B1E3D)),
+                                  errorWidget: (_, __, ___) => _ShopInitial(name: s.name),
+                                )
+                              : _ShopInitial(name: s.name),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 8, 10, 0),
+                          child: Text(s.name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
+                        ),
+                        const Padding(padding: EdgeInsets.fromLTRB(10, 6, 10, 0), child: SponsoredTag()),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ShopInitial extends StatelessWidget {
+  final String name;
+  const _ShopInitial({required this.name});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: const Color(0xFF0B1E3D),
+      alignment: Alignment.center,
+      child: Text(name.isEmpty ? '?' : name.substring(0, 1).toUpperCase(),
+          style: const TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800)),
     );
   }
 }

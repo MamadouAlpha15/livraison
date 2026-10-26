@@ -287,11 +287,13 @@ Route::get('/dashboard', function () {
     return match($user->role ?? '') {
         'superadmin' => redirect()->route('admin.dashboard'),
         'staff'      => redirect()->route('admin.dashboard'),
+        'marketing'  => redirect()->route('admin.campaigns.index'),
         'admin'      => redirect()->route('boutique.dashboard'),
         'company'    => redirect()->route('company.dashboard'),
         'livreur'    => redirect()->route('livreur.dashboard'),
         'vendeur'    => redirect()->route('vendeur.dashboard'),
         'employe'    => redirect()->route('employe.dashboard'),
+        'affilie'    => redirect()->route('affilie.dashboard'),
         default      => redirect()->route('client.dashboard'),
     };
 })->middleware(['auth'])->name('dashboard');
@@ -513,6 +515,94 @@ Route::middleware('auth')->group(function () {
 
 
 /* ══════════════════════════════════════════════════════════════════════════
+|  Campagnes publicitaires (équipe Shopio)
+|  Requiert : auth + role:superadmin,staff,marketing
+|  Le rôle « marketing » n'a accès qu'à ces pages du panneau admin.
+══════════════════════════════════════════════════════════════════════════ */
+
+Route::middleware(['auth', 'role:superadmin,staff,marketing'])
+    ->prefix('admin/campagnes')
+    ->name('admin.campaigns.')
+    ->controller(\App\Http\Controllers\Admin\AdCampaignController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('formules', 'packages')->name('packages');
+        Route::post('nouveautes/lues', 'readAllNews')->name('news.read-all');
+        Route::get('{campaign}/facture', 'invoice')->whereNumber('campaign')->name('invoice');
+        Route::put('formules/{package}', 'updatePackage')->whereNumber('package')->name('packages.update');
+        Route::get('{campaign}', 'show')->whereNumber('campaign')->name('show');
+        Route::post('{campaign}/refuser', 'refuse')->whereNumber('campaign')->name('refuse');
+        Route::post('{campaign}/payee', 'markPaid')->whereNumber('campaign')->name('mark-paid');
+        Route::post('{campaign}/pause', 'pause')->whereNumber('campaign')->name('pause');
+        Route::post('{campaign}/reprendre', 'resume')->whereNumber('campaign')->name('resume');
+        Route::post('{campaign}/visuels', 'storeCreatives')->whereNumber('campaign')->name('creatives.store');
+        Route::delete('{campaign}/visuels/{creative}', 'destroyCreative')->whereNumber(['campaign', 'creative'])->name('creatives.destroy');
+        Route::post('{campaign}/visuels/envoyer', 'sendCreatives')->whereNumber('campaign')->name('creatives.send');
+        Route::post('{campaign}/lancer', 'launch')->whereNumber('campaign')->name('launch');
+        Route::post('{campaign}/stats', 'storeStats')->whereNumber('campaign')->name('stats.store');
+        Route::post('{campaign}/cloturer', 'close')->whereNumber('campaign')->name('close');
+    });
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+|  Programme d'affiliation (parrainage des boutiques)
+|  /vendeur/parrainage      : propriétaire de boutique (role:admin)
+|  /affilie/tableau-de-bord : affilié externe (role:affilie)
+|  /admin/affiliation       : équipe Shopio (role:superadmin,staff)
+══════════════════════════════════════════════════════════════════════════ */
+
+// Page publique « Devenir affilié » (lien sur l'accueil) : inscription d'une personne externe
+Route::get('devenir-affilie', [\App\Http\Controllers\AffiliateJoinController::class, 'show'])->name('affiliation.join');
+Route::post('devenir-affilie', [\App\Http\Controllers\AffiliateJoinController::class, 'store'])
+    ->middleware(['guest', 'throttle:10,10'])->name('affiliation.join.store');
+
+Route::middleware(['auth', 'role:admin'])
+    ->prefix('vendeur/parrainage')
+    ->name('vendeur.parrainage')
+    ->controller(\App\Http\Controllers\AffiliateDashboardController::class)
+    ->group(function () {
+        Route::get('/', 'index');
+        Route::get('qr-code', 'qr')->name('.qr');
+        Route::get('commissions.csv', 'export')->name('.export');
+        Route::post('retrait', 'payout')->middleware('throttle:5,1')->name('.payout');
+    });
+
+Route::middleware(['auth', 'role:affilie'])
+    ->prefix('affilie')
+    ->name('affilie.')
+    ->controller(\App\Http\Controllers\AffiliateDashboardController::class)
+    ->group(function () {
+        Route::get('tableau-de-bord', 'index')->name('dashboard');
+        Route::get('qr-code', 'qr')->name('qr');
+        Route::get('commissions.csv', 'export')->name('export');
+        Route::post('retrait', 'payout')->middleware('throttle:5,1')->name('payout');
+    });
+
+Route::middleware(['auth', 'role:superadmin,staff'])
+    ->prefix('admin/affiliation')
+    ->name('admin.affiliation.')
+    ->controller(\App\Http\Controllers\Admin\AffiliationController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('affilies', 'storeAffiliate')->name('affiliates.store');
+        Route::put('affilies/{affiliate}', 'updateAffiliate')->whereNumber('affiliate')->name('affiliates.update');
+        Route::post('affilies/{affiliate}/valider', 'approveAffiliate')->whereNumber('affiliate')->name('affiliates.approve');
+        Route::post('affilies/{affiliate}/refuser', 'rejectAffiliate')->whereNumber('affiliate')->name('affiliates.reject');
+        Route::get('filleuls', 'referrals')->name('referrals');
+        Route::post('filleuls/{referral}/verifie', 'clearFlag')->whereNumber('referral')->name('referrals.clear');
+        Route::post('filleuls/{referral}/annuler', 'cancelReferral')->whereNumber('referral')->name('referrals.cancel');
+        Route::get('commissions', 'commissions')->name('commissions');
+        Route::get('commissions.csv', 'exportCommissions')->name('commissions.export');
+        Route::post('commissions/{commission}/rembourse', 'refund')->whereNumber('commission')->name('commissions.refund');
+        Route::get('retraits', 'payouts')->name('payouts');
+        Route::post('retraits/{payout}/paye', 'payPayout')->whereNumber('payout')->name('payouts.pay');
+        Route::post('retraits/{payout}/refuse', 'rejectPayout')->whereNumber('payout')->name('payouts.reject');
+        Route::get('reglages', 'settings')->name('settings');
+        Route::put('reglages', 'updateSettings')->name('settings.update');
+    });
+
+
+/* ══════════════════════════════════════════════════════════════════════════
 |  5. SUPERADMIN
 |  Requiert : auth + role:superadmin
 |  Préfixe : /admin  |  Nom : admin.*
@@ -677,6 +767,26 @@ Route::middleware(['auth', 'role:admin'])
         Route::post('marketing/test-pixel/arreter', [\App\Http\Controllers\Vendeur\MarketingController::class, 'stopPixelTest']) ->name('marketing.pixel-test.stop');
         Route::post('marketing/campagnes',          [\App\Http\Controllers\Vendeur\MarketingController::class, 'storeCampaign']) ->name('marketing.campaigns.store');
         Route::post('marketing/campagnes/{campaign}/archiver', [\App\Http\Controllers\Vendeur\MarketingController::class, 'archiveCampaign'])->name('marketing.campaigns.archive');
+
+        /* Campagnes publicitaires payées : mise en avant Shopio, réseaux sociaux (App\Support\Campaigns) */
+        Route::prefix('campagnes')->name('campaigns.')->controller(\App\Http\Controllers\Vendeur\AdCampaignController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('nouvelle', 'create')->name('create');
+            Route::post('disponibilite', 'availability')->middleware('throttle:60,1')->name('availability');
+            Route::post('/', 'store')->middleware('throttle:10,1')->name('store');
+            Route::get('{campaign}', 'show')->whereNumber('campaign')->name('show');
+            Route::post('{campaign}/payer', 'pay')->whereNumber('campaign')->middleware('throttle:10,1')->name('pay');
+            Route::post('{campaign}/pause', 'pause')->whereNumber('campaign')->name('pause');
+            Route::post('{campaign}/reprendre', 'resume')->whereNumber('campaign')->name('resume');
+            Route::post('{campaign}/annuler', 'cancel')->whereNumber('campaign')->name('cancel');
+            Route::post('nouveautes/lues', 'readAllNews')->name('news.read-all');
+            Route::get('{campaign}/facture', 'invoice')->whereNumber('campaign')->name('invoice');
+            Route::post('{campaign}/visuels/valider', 'approveCreatives')->whereNumber('campaign')->name('creatives.approve');
+            Route::post('{campaign}/visuels/modifier', 'requestCreativeChanges')->whereNumber('campaign')->middleware('throttle:10,1')->name('creatives.changes');
+            Route::get('paiement/{payment}/retour', 'paymentReturn')->whereNumber('payment')->name('payment.return');
+            Route::get('paiement/{payment}/test', 'fakePay')->whereNumber('payment')->name('fake-pay');
+            Route::post('paiement/{payment}/test', 'fakePayConfirm')->whereNumber('payment')->name('fake-pay.confirm');
+        });
 
         /* Modification de la boutique (edit + update) */
         Route::get('shops/{shop}/edit',  [ShopController::class, 'edit'])  ->name('shops.edit');
@@ -1042,6 +1152,11 @@ Route::prefix('client')->name('client.')->group(function () {
 /* Webhook ChapChap Pay : pas d'auth, pas de CSRF (vérifié par signature HMAC) */
 Route::post('/payment/callback', [ChapChapPayController::class, 'callback'])
     ->name('payment.callback')
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+
+/* Webhook ChapChap Pay des paiements de campagnes (même vérification par signature) */
+Route::post('/payment/campaign/callback', [\App\Http\Controllers\Payment\AdCampaignPaymentController::class, 'callback'])
+    ->name('payment.campaign.callback')
     ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
 /* Pages de retour après paiement */

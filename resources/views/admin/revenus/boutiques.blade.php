@@ -5,14 +5,14 @@
 <style>
 *,*::before,*::after{box-sizing:border-box}
 :root{
-    --brand:#7c3aed;--sb:#1e1b4b;--sb-text:rgba(255,255,255,.88);--sb-w:268px;
-    --bg:#f1f5f9;--card:#fff;--bd:rgba(0,0,0,.07);
-    --text:#0f172a;--muted:#64748b;
+    --brand:#1668D8;--sb:#0B1E3D;--sb-text:rgba(255,255,255,.88);--sb-w:268px;
+    --bg:#F6F9FF;--card:#fff;--bd:rgba(0,0,0,.07);
+    --text:#16162A;--muted:#62627C;
     --green:#10b981;--gbg:rgba(16,185,129,.1);
     --amber:#f59e0b;--abg:rgba(245,158,11,.1);
     --blue:#3b82f6;--bbg:rgba(59,130,246,.1);
-    --purple:#7c3aed;--pbg:rgba(124,58,237,.1);
-    --font:'Segoe UI',system-ui,sans-serif;
+    --purple:#1668D8;--pbg:rgba(22,104,216,.1);
+    --font:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
 }
 body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-webkit-font-smoothing:antialiased}
 .sa{display:flex;min-height:100vh}
@@ -23,21 +23,21 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .sb::-webkit-scrollbar{width:3px}
 .sb::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:2px}
 .sb-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.12);display:flex;align-items:center;gap:11px;flex-shrink:0}
-.sb-ico-wrap{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#a78bfa,#7c3aed);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(167,139,250,.45);flex-shrink:0}
+.sb-ico-wrap{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#7DB4FF,#1668D8);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(31,124,246,.45);flex-shrink:0}
 .sb-appname{font-size:14.5px;font-weight:900;color:#fff;letter-spacing:-.2px}
-.sb-apptag{font-size:10px;font-weight:700;color:#c4b5fd;text-transform:uppercase;letter-spacing:.9px;margin-top:2px}
+.sb-apptag{font-size:10px;font-weight:700;color:#8FA6CC;text-transform:uppercase;letter-spacing:.9px;margin-top:2px}
 .sb-close{margin-left:auto;width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.7);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;font-family:var(--font)}
 .sb-close:hover{background:rgba(255,255,255,.22);color:#fff}
 .sb-me{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
-.sb-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#6d28d9);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0}
+.sb-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7DB4FF,#1260C9);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0}
 .sb-name{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sb-badge{font-size:10px;color:#a78bfa;font-weight:600;margin-top:1px}
+.sb-badge{font-size:10px;color:#7DB4FF;font-weight:600;margin-top:1px}
 .sb-nav{padding:10px 0;flex:1}
 .sb-sec{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.3px;padding:14px 18px 5px;color:rgba(255,255,255,.35)}
-.sb-sec.shop{color:#6ee7b7}.sb-sec.livr{color:#93c5fd}.sb-sec.fin{color:#fcd34d}.sb-sec.plat{color:#c4b5fd}
+.sb-sec.shop{color:#6ee7b7}.sb-sec.livr{color:#93c5fd}.sb-sec.fin{color:#fcd34d}.sb-sec.plat{color:#8FA6CC}
 .sb-a{display:flex;align-items:center;gap:10px;padding:10px 18px;color:var(--sb-text);text-decoration:none;font-size:13px;font-weight:600;border-left:3px solid transparent;transition:all .15s}
 .sb-a:hover{background:rgba(255,255,255,.09);color:#fff}
-.sb-a.on{background:rgba(167,139,250,.22);border-left-color:#a78bfa;color:#fff;font-weight:700;box-shadow:inset 0 0 20px rgba(124,58,237,.08)}
+.sb-a.on{background:rgba(31,124,246,.22);border-left-color:#7DB4FF;color:#fff;font-weight:700;box-shadow:inset 0 0 20px rgba(22,104,216,.08)}
 .sb-i{width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:.85}
 .sb-a:hover .sb-i,.sb-a.on .sb-i{opacity:1}
 .sb-ft{border-top:1px solid rgba(255,255,255,.1);padding:10px 0}
@@ -54,7 +54,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .tb-bc{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px;flex:1}
 .tb-bc a{color:var(--muted);text-decoration:none}.tb-bc a:hover{color:var(--brand)}
 .tb-ua{display:flex;align-items:center;gap:10px;margin-left:auto}
-.tb-uav{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#6d28d9);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff}
+.tb-uav{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7DB4FF,#1260C9);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff}
 .tb-uname{font-size:13px;font-weight:700;color:var(--text)}
 .tb-urole{font-size:10.5px;color:var(--muted);font-weight:600}
 .pw{padding:24px;max-width:1300px;margin:0 auto;width:100%}
@@ -73,7 +73,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 
 /* FILTRES */
 .filter-bar{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px 20px;margin-bottom:20px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.period-tabs{display:flex;gap:4px;background:#f1f5f9;border-radius:8px;padding:3px}
+.period-tabs{display:flex;gap:4px;background:var(--bg);border-radius:8px;padding:3px}
 .pt{padding:6px 13px;border-radius:6px;border:none;background:transparent;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit;text-decoration:none;transition:all .15s}
 .pt.on{background:var(--card);color:var(--brand);box-shadow:0 1px 4px rgba(0,0,0,.1)}
 .pt:hover:not(.on){color:var(--text)}
@@ -85,27 +85,27 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);margin:0;-we
 .thead-info{padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:12px}
 .twrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse}
-th{padding:12px 16px;text-align:left;font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);background:#f8fafc;border-bottom:1px solid var(--bd);white-space:nowrap}
+th{padding:12px 16px;text-align:left;font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);background:var(--bg);border-bottom:1px solid var(--bd);white-space:nowrap}
 td{padding:14px 16px;border-bottom:1px solid var(--bd);font-size:13px;vertical-align:middle}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:#fafafa}
+tr:hover td{background:var(--bg)}
 .muted{color:var(--muted);font-size:12px}
 .fw{font-weight:700}
 .shop-name{font-weight:800;font-size:14px;color:var(--text)}
-.shop-ico{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:800;flex-shrink:0}
+.shop-ico{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1668D8,#7DB4FF);display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:800;flex-shrink:0}
 .amt{font-size:13.5px;font-weight:800}
 .amt-green{color:var(--green)}
 .amt-blue{color:var(--blue)}
 .amt-purple{color:var(--purple)}
-.amt-muted{color:#94a3b8}
+.amt-muted{color:var(--muted)}
 .rank{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
 .rank-1{background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#fff}
 .rank-2{background:linear-gradient(135deg,#94a3b8,#cbd5e1);color:#fff}
 .rank-3{background:linear-gradient(135deg,#a16207,#ca8a04);color:#fff}
-.rank-n{background:#f1f5f9;color:var(--muted)}
-.btn-detail{padding:5px 12px;border-radius:8px;background:var(--pbg);border:1px solid rgba(124,58,237,.25);color:var(--purple);font-size:12px;font-weight:700;text-decoration:none;transition:all .15s;white-space:nowrap}
+.rank-n{background:var(--bg);color:var(--muted)}
+.btn-detail{padding:5px 12px;border-radius:8px;background:var(--pbg);border:1px solid rgba(22,104,216,.25);color:var(--purple);font-size:12px;font-weight:700;text-decoration:none;transition:all .15s;white-space:nowrap}
 .btn-detail:hover{background:var(--brand);color:#fff;border-color:var(--brand)}
-.bar-wrap{width:100%;background:#f1f5f9;border-radius:4px;height:5px;margin-top:5px}
+.bar-wrap{width:100%;background:var(--bg);border-radius:4px;height:5px;margin-top:5px}
 .bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#10b981,#34d399)}
 .empty-state{padding:60px 20px;text-align:center}
 .empty-ico{font-size:48px;margin-bottom:12px}
@@ -121,6 +121,8 @@ tr:hover td{background:#fafafa}
     .filter-bar{flex-direction:column;align-items:stretch}
 }
 </style>
+@include('admin._partials.shopio-theme')
+@include('admin._partials.dark-mode')
 @endpush
 
 @section('content')
@@ -190,8 +192,8 @@ tr:hover td{background:#fafafa}
 {{-- SIDEBAR --}}
 <aside class="sb" id="sb">
     <div class="sb-logo">
-        <div class="sb-ico-wrap" style="color:#fff">{!! $I['brand_lg'] !!}</div>
-        <div><div class="sb-appname">{{ config('app.name','Shopio') }}</div><div class="sb-apptag">Plateforme · Super Admin</div></div>
+        <div class="sb-ico-wrap"><img src="{{ \App\Support\Assets::v('images/shopio-logo-192.png') }}" alt="" width="42" height="42"></div>
+        <div><div class="sb-appname">Shopio</div><div class="sb-apptag">Plateforme · Super Admin</div></div>
         <button class="sb-close" onclick="closeSb()" title="Fermer">{!! $I['close'] !!}</button>
     </div>
     <div class="sb-me">
@@ -200,26 +202,28 @@ tr:hover td{background:#fafafa}
     </div>
     <nav class="sb-nav">
         <a href="{{ route('admin.dashboard') }}" class="sb-a"><span class="sb-i">{!! $I['home'] !!}</span><span>Vue d'ensemble</span></a>
-        <div class="sb-sec shop">── SaaS Boutiques</div>
+        <div class="sb-sec shop">SaaS Boutiques</div>
         <a href="{{ route('admin.shops.index') }}" class="sb-a"><span class="sb-i">{!! $I['store'] !!}</span><span>Boutiques</span></a>
         <a href="{{ route('admin.products.index') }}" class="sb-a"><span class="sb-i">{!! $I['bag'] !!}</span><span>Produits</span></a>
         <a href="{{ route('admin.orders.index') }}" class="sb-a"><span class="sb-i">{!! $I['box'] !!}</span><span>Commandes boutiques</span></a>
         <a href="{{ route('admin.vendeurs.index') }}" class="sb-a"><span class="sb-i">{!! $I['brief'] !!}</span><span>Vendeurs &amp; Employés</span></a>
         <a href="{{ route('admin.clients.index') }}" class="sb-a"><span class="sb-i">{!! $I['user'] !!}</span><span>Clients boutiques</span></a>
-        <div class="sb-sec livr">── SaaS Livraison</div>
+        <div class="sb-sec livr">SaaS Livraison</div>
         <a href="{{ route('admin.entreprises.index') }}" class="sb-a"><span class="sb-i">{!! $I['truck'] !!}</span><span>Entreprises livraison</span></a>
         <a href="{{ route('admin.livreurs.index') }}" class="sb-a"><span class="sb-i">{!! $I['bike'] !!}</span><span>Livreurs</span></a>
         <a href="{{ route('admin.zones.index') }}" class="sb-a"><span class="sb-i">{!! $I['map'] !!}</span><span>Zones de livraison</span></a>
         <a href="{{ route('admin.suivi.index') }}" class="sb-a"><span class="sb-i">{!! $I['pin'] !!}</span><span>Suivi en temps réel</span></a>
-        <div class="sb-sec fin">── Finance</div>
+        <div class="sb-sec fin">Finance</div>
         <a href="{{ route('admin.paiements.index') }}" class="sb-a"><span class="sb-i">{!! $I['card'] !!}</span><span>Paiements</span></a>
         <a href="{{ route('admin.payouts.index') }}" class="sb-a"><span class="sb-i">{!! $I['dollar'] !!}</span><span>Règlements boutiques</span></a>
+        <a href="{{ route('admin.campaigns.index') }}" class="sb-a"><span class="sb-i">{!! \App\Support\IconLibrary::svg('megaphone', '', 17) !!}</span><span>Campagnes</span></a>
+        <a href="{{ route('admin.affiliation.index') }}" class="sb-a"><span class="sb-i">{!! \App\Support\IconLibrary::svg('gift', '', 17) !!}</span><span>Affiliation</span></a>
         <a href="{{ route('admin.commissions.index') }}" class="sb-a"><span class="sb-i">{!! $I['trend'] !!}</span><span>Commissions</span></a>
         <a href="{{ route('admin.revenus-boutiques.index') }}" class="sb-a on"><span class="sb-i">{!! $I['store'] !!}</span><span>Revenus boutiques</span></a>
         <a href="{{ route('admin.revenus-entreprises.index') }}" class="sb-a"><span class="sb-i">{!! $I['truck'] !!}</span><span>Revenus entreprises</span></a>
         <a href="{{ route('admin.revenus.index') }}" class="sb-a"><span class="sb-i">{!! $I['dollar'] !!}</span><span>Revenus plateforme</span></a>
         <a href="#" class="sb-a" onclick="nt();return false"><span class="sb-i">{!! $I['receipt'] !!}</span><span>Factures &amp; Exports</span></a>
-        <div class="sb-sec plat">── Plateforme</div>
+        <div class="sb-sec plat">Plateforme</div>
         <a href="{{ route('admin.users.index') }}" class="sb-a"><span class="sb-i">{!! $I['users'] !!}</span><span>Tous les utilisateurs</span></a>
         <a href="{{ route('admin.avis.index') }}" class="sb-a"><span class="sb-i">{!! $I['star'] !!}</span><span>Avis &amp; Notation</span></a>
         <a href="{{ route('admin.support.index') }}" class="sb-a"><span class="sb-i">{!! $I['ticket'] !!}</span><span>Tickets support</span></a>
@@ -246,6 +250,7 @@ tr:hover td{background:#fafafa}
         <div class="tb-uav">{{ $meInit }}</div>
         <div><div class="tb-uname">{{ Str::limit($meName,14) }}</div><div class="tb-urole">Super Admin</div></div>
     </div>
+    @include('admin._partials.dark-toggle')
 </header>
 
 <div class="pw">
@@ -305,7 +310,7 @@ tr:hover td{background:#fafafa}
             </select>
             @if($country)
             <a href="{{ route('admin.revenus-boutiques.index', request()->except('country','page')) }}"
-               style="font-size:12px;color:var(--muted);text-decoration:none;font-weight:700;padding:4px 8px;border-radius:6px;background:#f1f5f9">✕</a>
+               style="font-size:12px;color:var(--muted);text-decoration:none;font-weight:700;padding:4px 8px;border-radius:6px;background:var(--bg)">✕</a>
             @endif
         </form>
     </div>
@@ -328,7 +333,7 @@ tr:hover td{background:#fafafa}
             </button>
             @if($search)
             <a href="{{ route('admin.revenus-boutiques.index', request()->except('search','page')) }}"
-               style="padding:8px 14px;border-radius:8px;background:#f1f5f9;border:1px solid var(--bd);color:var(--muted);font-size:13px;font-weight:600;text-decoration:none">
+               style="padding:8px 14px;border-radius:8px;background:var(--bg);border:1px solid var(--bd);color:var(--muted);font-size:13px;font-weight:600;text-decoration:none">
                 ✕ Effacer
             </a>
             @endif
@@ -343,10 +348,10 @@ tr:hover td{background:#fafafa}
         @if($country)
         <div style="display:flex;align-items:center;gap:8px;margin-top:{{ $search ? '8px' : '0' }};padding-top:{{ $search ? '10px' : '0' }};border-top:{{ $search ? '1px solid var(--bd)' : 'none' }}">
             <span style="font-size:16px">{{ $getFlag($country) }}</span>
-            <span style="font-size:13px;font-weight:700;color:#4f46e5">{{ $country }}</span>
+            <span style="font-size:13px;font-weight:700;color:#1668D8">{{ $country }}</span>
             <span style="font-size:12px;color:var(--muted)">· {{ $globalStats['boutiques'] }} boutique{{ $globalStats['boutiques'] > 1 ? 's' : '' }}</span>
             <a href="{{ route('admin.revenus-boutiques.index', request()->except('country','search','page')) }}"
-               style="margin-left:auto;font-size:12px;color:var(--muted);text-decoration:none;font-weight:600;padding:3px 10px;border-radius:6px;background:#f1f5f9;border:1px solid var(--bd)">✕ Retirer</a>
+               style="margin-left:auto;font-size:12px;color:var(--muted);text-decoration:none;font-weight:600;padding:3px 10px;border-radius:6px;background:var(--bg);border:1px solid var(--bd)">✕ Retirer</a>
         </div>
         @endif
     </div>
@@ -411,7 +416,7 @@ tr:hover td{background:#fafafa}
                         <span class="muted">—</span>
                         @endif
                         <div style="margin-top:4px">
-                            <span style="background:#e0e7ff;color:#4338ca;padding:2px 8px;border-radius:10px;font-size:11.5px;font-weight:800">{{ $devise }}</span>
+                            <span style="background:var(--b50);color:#1260C9;padding:2px 8px;border-radius:10px;font-size:11.5px;font-weight:800">{{ $devise }}</span>
                         </div>
                     </td>
                     <td>

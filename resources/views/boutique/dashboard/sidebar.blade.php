@@ -33,6 +33,8 @@
             <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">{!! $I['tag'] !!}</span> Produits
                 @if(!$isPro)<span class="sb-badge" style="background:{{ $prodClass === 'danger' ? '#ef4444' : ($prodClass === 'warn' ? '#f59e0b' : '#1F7CF6') }};color:#fff;font-size:10px;padding:1px 5px;border-radius:8px;margin-left:auto">{{ $totalProduits }}/{{ $maxProduits }}</span>@endif
             </a>
+            @if(auth()->user()?->role === 'admin')<a href="{{ route('boutique.campaigns.index') }}" class="sb-item"><span class="ico">{!! \App\Support\IconLibrary::svg('star', '', 16) !!}</span> Campagnes</a>@endif
+            @if(auth()->user()?->role === 'admin')<a href="{{ route('vendeur.parrainage') }}" class="sb-item"><span class="ico">{!! \App\Support\IconLibrary::svg('gift', '', 16) !!}</span> Parrainage</a>@endif
             @if($isPro)
             <a href="{{ route('boutique.promo-codes.index') }}" class="sb-item"><span class="ico">{!! $I['promo'] !!}</span> Codes promo</a>
             @else

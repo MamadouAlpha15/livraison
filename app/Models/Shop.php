@@ -36,6 +36,24 @@ public function orders()
     return $this->hasMany(Order::class);
 }
 
+// Parrainage de la boutique (programme d'affiliation) : un seul parrain
+public function referral()
+{
+    return $this->hasOne(Referral::class, 'referred_shop_id');
+}
+
+// Campagnes publicitaires payées (espace vendeur → Campagnes)
+public function adCampaigns()
+{
+    return $this->hasMany(AdCampaign::class);
+}
+
+// Mouvements du Crédit Shopio (solde : App\Support\Campaigns\ShopCredit::balance)
+public function creditEntries()
+{
+    return $this->hasMany(ShopCreditEntry::class);
+}
+
 public function clients()
 {
     return $this->belongsToMany(\App\Models\User::class, 'shop_user')->withTimestamps();  // Une boutique (Shop) peut avoir plusieurs clients (User) abonnés via une table pivot shop_user.

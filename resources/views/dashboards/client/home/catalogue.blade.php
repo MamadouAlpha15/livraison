@@ -54,8 +54,11 @@
     @else
     <div class="prod-grid" id="productsGrid">
         @foreach($products as $p)
-        @php $pHasPromo = $p->original_price && $p->original_price > $p->price; @endphp
-        <a href="{{ route('client.orders.createFromProduct', $p) }}" class="reco-card">
+        @php
+            $pHasPromo = $p->original_price && $p->original_price > $p->price;
+            $pUrl = \App\Support\Campaigns\SponsoredPlacements::url(route('client.orders.createFromProduct', $p), $p);
+        @endphp
+        <a href="{{ $pUrl }}" class="reco-card">
             <div class="reco-card-img">
                 @if($p->image)
                     <img src="{{ \App\Services\ImageOptimizer::url($p->image, 'medium') }}" alt="{{ $p->name }}" loading="lazy">
@@ -75,6 +78,7 @@
                 </button>
             </div>
             <div class="reco-card-body">
+                @if($p->sponsored_campaign_id)@include('partials.sponsored-tag', ['style' => 'align-self:flex-start'])@endif
                 <div class="reco-card-shop">{{ $p->shop->name ?? '' }}</div>
                 <div class="reco-card-name">{{ $p->name }}</div>
                 @php $srP = $shopRatings[$p->shop_id] ?? null; @endphp
@@ -94,7 +98,7 @@
                     {!! $si('cart', 13) !!} Ajouter
                 </button>
                 <div class="reco-card-actions-row">
-                    <button type="button" class="reco-card-order" title="Commander" onclick="event.preventDefault();event.stopPropagation();window.location.href='{{ route('client.orders.createFromProduct', $p) }}'">{!! $si('bag', 12) !!} Commander</button>
+                    <button type="button" class="reco-card-order" title="Commander" onclick="event.preventDefault();event.stopPropagation();window.location.href='{{ $pUrl }}'">{!! $si('bag', 12) !!} Commander</button>
                     <button type="button" class="reco-card-contact" title="Contacter le vendeur" onclick="event.preventDefault();event.stopPropagation();window.location.href='{{ route('client.messages.index', $p) }}'">{!! $si('chat', 12) !!} Contacter</button>
                 </div>
             </div>

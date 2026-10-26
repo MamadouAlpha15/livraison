@@ -78,6 +78,10 @@ class DashboardController extends Controller
 
         $products = $productsQuery->paginate(24)->withQueryString()->fragment('catalogue');
 
+        /* ── Campagnes payées : produits sponsorisés (recherche, catégorie) et boutiques « à la une » ── */
+        \App\Support\Campaigns\SponsoredPlacements::blend($products, request('s'), request('cat'), $user->country);
+        $featuredShops = request()->filled('s') ? collect() : \App\Support\Campaigns\SponsoredPlacements::featuredShops($user->country);
+
         /* ── Populaire par catégorie ("Populaire en Parfums", "Populaire en Montres"…) ──
            Pour chaque grande catégorie, on montre les produits les plus VENDUS
            (quantités des commandes livrées), pas juste les plus récents. Si une
@@ -320,7 +324,7 @@ class DashboardController extends Controller
             'categories', 'topShops', 'allTopShops', 'favoriteIds',
             'recommendedProducts', 'favoriteProductIds', 'flashProducts', 'cartCount',
             'loyaltyPoints', 'loyaltyNextMilestone', 'loyaltyProgressPercent', 'loyaltyReferralBonus',
-            'sort', 'minPrice', 'maxPrice', 'shopRatings'
+            'sort', 'minPrice', 'maxPrice', 'shopRatings', 'featuredShops'
         ));
     }
 }

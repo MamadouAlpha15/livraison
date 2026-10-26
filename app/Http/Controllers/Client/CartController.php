@@ -210,6 +210,7 @@ class CartController extends Controller
                     'client_phone'         => $request->client_phone,
                     'source'               => \App\Support\TrafficSource::forOrder((int) $shopId), // canal d'arrivée du client
                     'campaign_id'          => \App\Support\TrafficSource::campaignForOrder((int) $shopId),
+                    'ad_campaign_id'       => \App\Support\Campaigns\AdAttribution::campaignForOrder((int) $shopId, \Illuminate\Support\Facades\Auth::user()),
                 ]);
 
                 foreach ($group as $item) {

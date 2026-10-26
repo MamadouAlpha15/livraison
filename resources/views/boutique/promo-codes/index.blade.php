@@ -237,6 +237,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
         <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">{!! $I['msg_nav'] !!}</span> Messages</a>
         <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">{!! $I['box_nav'] !!}</span> Commandes</a>
         <a href="{{ route('products.index') }}" class="sb-item"><span class="ico">{!! $I['tag_nav'] !!}</span> Produits</a>
+        @if(auth()->user()?->role === 'admin')<a href="{{ route('boutique.campaigns.index') }}" class="sb-item"><span class="ico">{!! \App\Support\IconLibrary::svg('star', '', 16) !!}</span> Campagnes</a>@endif
         <a href="{{ route('boutique.promo-codes.index') }}" class="sb-item active"><span class="ico">{!! $I['percent_nav'] !!}</span> Codes promo</a>
         <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">{!! $I['users_nav'] !!}</span> Clients</a>
         @if(auth()->user()->role === 'admin')<a href="{{ route('boutique.marketing') }}" class="sb-item"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h3l6 4V6l-6 4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></span> Marketing</a>@endif

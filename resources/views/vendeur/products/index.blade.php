@@ -414,6 +414,8 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
 .action-btn.edit:hover { background: #dbeafe; }
 .action-btn.dupe  { border-color: #d8b4fe; color: #1260C9; background: #EAF2FF; }
 .action-btn.dupe:hover { background: #D6E6FF; }
+.action-btn.boost { border-color: #FCD34D; color: #92400E; background: #FFF7E6; }
+.action-btn.boost:hover { background: #FEF3C7; border-color: #F59E0B; color: #78350F; }
 .action-btn.del   { border-color: #fca5a5; color: #991b1b; background: var(--danger-lt); }
 .action-btn.del:hover { background: #fee2e2; }
 
@@ -721,6 +723,7 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             <span class="ico">{!! $I['tag_nav'] !!}</span> Produits
             @if(!$isPro)<span class="sb-badge" style="background:{{ $_sbProdClr }};color:#fff;font-size:10px;padding:1px 5px;border-radius:8px;margin-left:auto">{{ $totalProducts }}/{{ $_sbProdMax }}</span>@endif
         </a>
+        @if(auth()->user()?->role === 'admin')<a href="{{ route('boutique.campaigns.index') }}" class="sb-item"><span class="ico">{!! \App\Support\IconLibrary::svg('star', '', 16) !!}</span> Campagnes</a>@endif
         @if($isPro)
         <a href="{{ route('boutique.promo-codes.index') }}" class="sb-item"><span class="ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></span> Codes promo</a>
         @else
@@ -1211,6 +1214,10 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             {{-- Footer actions --}}
             <div class="product-footer">
                 <a href="{{ route('products.edit', $product) }}" class="action-btn edit">{!! $I['edit_btn'] !!} <span class="btn-txt">Modifier</span></a>
+
+                @if(auth()->user()->role === 'admin' && $product->is_active && $product->stock > 0)
+                <a href="{{ route('boutique.campaigns.create', ['produit' => $product->id]) }}" class="action-btn boost" title="Mettre ce produit en avant sur Shopio">{!! \App\Support\IconLibrary::svg('zap', '', 14) !!} <span class="btn-txt">Booster</span></a>
+                @endif
 
                 <form action="{{ route('products.duplicate', $product) }}" method="POST">
                     @csrf

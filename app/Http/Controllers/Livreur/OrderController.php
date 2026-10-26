@@ -52,13 +52,15 @@ class OrderController extends Controller
             default      => [Order::STATUS_CONFIRMEE, Order::STATUS_EN_LIVRAISON],
         };
 
-        $query = Order::with(['items.product', 'client', 'shop'])
-            ->where(function ($q) use ($user, $driver) {
-                $q->where('livreur_id', $user->id);
-                if ($driver) {
-                    $q->orWhere('driver_id', $driver->id);
-                }
-            })
+        $mine = function ($q) use ($user, $driver) {
+            $q->where('livreur_id', $user->id);
+            if ($driver) {
+                $q->orWhere('driver_id', $driver->id);
+            }
+        };
+
+        $query = Order::with(['items.product', 'client', 'shop', 'payment'])
+            ->where($mine)
             ->whereIn('status', $statusFilter)
             ->latest();
 
@@ -67,7 +69,14 @@ class OrderController extends Controller
         /* Grouper les commandes par client + destination → 1 trajet */
         $groups = $this->groupOrders($orders->getCollection(), $driver);
 
-        return view('livreur.orders.index', compact('orders', 'groups', 'devise'));
+        /* Nombre de commandes actives par statut, pour les onglets */
+        $counts = Order::where($mine)
+            ->whereIn('status', [Order::STATUS_CONFIRMEE, Order::STATUS_EN_LIVRAISON])
+            ->selectRaw('status, COUNT(*) AS n')
+            ->groupBy('status')
+            ->pluck('n', 'status');
+
+        return view('livreur.orders.index', compact('orders', 'groups', 'devise', 'counts'));
     }
 
     /**

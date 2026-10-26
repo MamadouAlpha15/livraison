@@ -54,6 +54,9 @@ class ProductController extends Controller
 
         $products = $query->latest()->paginate(24)->withQueryString();
 
+        // Campagnes payées : produits sponsorisés dans la recherche et les catégories
+        \App\Support\Campaigns\SponsoredPlacements::blend($products, $request->get('s'), $request->get('cat'), $user->country);
+
         $categories = Product::select('category')
             ->where('is_active', true)
             ->whereNotNull('category')

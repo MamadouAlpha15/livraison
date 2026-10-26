@@ -978,6 +978,39 @@ textarea.field-input { resize: vertical; min-height: 90px; }
                     </div>
                 </div>
 
+                {{-- Programme d'affiliation : code pré-rempli si le vendeur est arrivé par un lien ?ref= --}}
+                <div class="field-group">
+                    <label class="field-label" for="source">Comment as-tu connu Shopio ?</label>
+                    <div class="field-wrap">
+                        <span class="field-icon">💬</span>
+                        <select name="source" id="source" class="field-input">
+                            <option value="">Choisir (facultatif)</option>
+                            @foreach(\App\Models\Referral::SOURCES as $value => $label)
+                            <option value="{{ $value }}" @selected(old('source', ($referralCode ?? null) ? 'ami' : '') === $value)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @error('source')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="referral_code">Code de parrainage</label>
+                    <div class="field-wrap">
+                        <span class="field-icon">🎁</span>
+                        <input type="text" name="referral_code" id="referral_code" maxlength="20" autocomplete="off" autocapitalize="characters"
+                               class="field-input {{ $errors->has('referral_code') ? 'error' : '' }}" style="text-transform:uppercase"
+                               placeholder="Ex : AMINA47" value="{{ old('referral_code', $referralCode ?? '') }}">
+                    </div>
+                    <div class="field-hint">
+                        @if($referralCode ?? null)
+                            Rempli automatiquement depuis le lien qu'on t'a partagé. Tu peux le retirer.
+                        @else
+                            Facultatif. Un vendeur Shopio t'a invité ? Saisis son code.
+                        @endif
+                    </div>
+                    @error('referral_code')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
+                </div>
+
                 {{-- Récapitulatif --}}
                 <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:8px">
                     <div style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px">
