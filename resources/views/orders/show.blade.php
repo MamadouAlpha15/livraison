@@ -8,39 +8,41 @@
 
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css"/>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-    --orange:    #6366f1;
-    --orange-dk: #4f46e5;
-    --orange-lt: #e0e7ff;
-    --orange-bd: #c7d2fe;
-    --orange-2:  #818cf8;
+    --orange:    #1668D8;
+    --orange-dk: #1260C9;
+    --orange-lt: #EAF2FF;
+    --orange-bd: #CFE1FF;
+    --orange-2:  #1F7CF6;
+    --navy:      #0B1E3D;
+    --navy-2:    #132B52;
     --green:     #10b981;
     --green-lt:  #ecfdf5;
     --green-dk:  #065f46;
-    --blue:      #3b82f6;
-    --blue-lt:   #eff6ff;
+    --blue:      #1F7CF6;
+    --blue-lt:   #EAF2FF;
     --yellow:    #f59e0b;
     --yellow-lt: #fffbeb;
     --red:       #ef4444;
     --red-lt:    #fef2f2;
-    --text:      #0f172a;
-    --text-2:    #475569;
-    --muted:     #94a3b8;
-    --border:    #e2e8f0;
+    --text:      #16162A;
+    --text-2:    #45455E;
+    --muted:     #62627C;
+    --border:    #E3E8F2;
     --surface:   #ffffff;
-    --bg:        #f8f9fc;
+    --bg:        #F6F9FF;
     --font:      'Plus Jakarta Sans', system-ui, sans-serif;
-    --mono:      'JetBrains Mono', monospace;
-    --r:         16px;
+    --mono:      var(--font);
+    --r:         22px;
     --r-sm:      10px;
     --r-xs:      7px;
-    --shadow:    0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.07);
-    --shadow-lg: 0 8px 40px rgba(0,0,0,.12);
+    --shadow:    0 1px 2px rgba(11,30,61,.04), 0 12px 28px -22px rgba(11,30,61,.35);
+    --shadow-lg: 0 18px 44px -26px rgba(11,30,61,.45);
 }
 
 html, body {
@@ -56,25 +58,14 @@ html, body {
 
 /* ── Topbar ── */
 .topbar {
-    background: linear-gradient(135deg, var(--orange) 0%, var(--orange-dk) 60%, #3730a3 100%);
+    background: radial-gradient(110% 170% at 100% 0%, rgba(31,124,246,.45), transparent 60%), linear-gradient(135deg, var(--navy), var(--navy-2));
     margin: -24px -16px 24px;
-    padding: 0 20px;
-    height: 64px;
+    border-radius: 0 0 22px 22px;
+    padding: 12px 20px;
+    min-height: 68px;
     display: flex; align-items: center; gap: 14px;
-    box-shadow: 0 4px 20px rgba(99,102,241,.4);
+    box-shadow: 0 14px 30px -20px rgba(11,30,61,.7);
     position: relative; overflow: hidden;
-}
-.topbar::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(circle at 80% 50%, rgba(255,255,255,.09) 0%, transparent 60%);
-    pointer-events: none;
-}
-.topbar::after {
-    content: '';
-    position: absolute; top: -50px; right: -50px;
-    width: 160px; height: 160px; border-radius: 50%;
-    background: rgba(255,255,255,.06); pointer-events: none;
 }
 .btn-back {
     display: inline-flex; align-items: center; gap: 6px;
@@ -89,11 +80,11 @@ html, body {
 .btn-back:hover { background: rgba(255,255,255,.28); border-color: rgba(255,255,255,.55); transform: translateX(-2px); }
 .topbar-info { flex: 1; position: relative; z-index: 1; min-width: 0; }
 .topbar-info h1 { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.topbar-info p  { font-size: 11.5px; color: rgba(255,255,255,.75); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topbar-info p  { font-size: 11.5px; color: #C9D6EA; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .topbar-badge {
     display: inline-flex; align-items: center; gap: 5px;
     padding: 5px 13px; border-radius: 20px;
-    background: rgba(255,255,255,.18); border: 1.5px solid rgba(255,255,255,.32);
+    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22);
     color: #fff; font-size: 12px; font-weight: 700;
     white-space: nowrap; flex-shrink: 0; position: relative; z-index: 1;
 }
@@ -110,7 +101,7 @@ html, body {
 }
 .map-topstrip {
     height: 4px;
-    background: linear-gradient(90deg, var(--orange), var(--orange-2), var(--yellow));
+    background: linear-gradient(90deg, var(--orange-2), #7DB4FF, var(--yellow));
 }
 .map-header {
     padding: 14px 20px;
@@ -147,7 +138,7 @@ html, body {
     bottom: 20px; left: 50%; transform: translateX(-50%);
     background: rgba(255,255,255,.96);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(99,102,241,.2);
+    border: 1px solid rgba(31,124,246,.2);
     border-radius: 40px;
     padding: 8px 18px 8px 10px;
     display: flex; align-items: center; gap: 10px;
@@ -161,7 +152,7 @@ html, body {
     background: linear-gradient(135deg, var(--orange), var(--orange-dk));
     display: flex; align-items: center; justify-content: center;
     font-size: 14px; font-weight: 800; color: #fff; flex-shrink: 0;
-    box-shadow: 0 0 0 2px rgba(99,102,241,.25);
+    box-shadow: 0 0 0 2px rgba(31,124,246,.25);
 }
 .mlo-name { font-size: 13px; font-weight: 800; color: var(--text); }
 .mlo-status { font-size: 11px; color: var(--muted); margin-top: 1px; display: flex; align-items: center; gap: 4px; }
@@ -192,8 +183,9 @@ html, body {
     width: 30px; height: 30px; border-radius: 50%;
     border: 2.5px solid var(--border); background: var(--surface);
     display: flex; align-items: center; justify-content: center;
-    font-size: 13px; transition: all .3s;
+    font-size: 13px; transition: all .3s; color: var(--muted);
 }
+.prog-dot svg { width: 14px; height: 14px; }
 .prog-dot.done {
     background: var(--orange); border-color: var(--orange-dk);
     color: #fff; font-size: 12px;
@@ -207,7 +199,7 @@ html, body {
 }
 @keyframes step-pulse {
     0%,100%{ box-shadow:0 0 0 4px var(--orange-lt); }
-    50%     { box-shadow:0 0 0 8px rgba(99,102,241,.1); }
+    50%     { box-shadow:0 0 0 8px rgba(31,124,246,.1); }
 }
 .prog-lbl { font-size: 10.5px; font-weight: 600; color: var(--muted); text-align: center; }
 .prog-lbl.active { color: var(--orange); font-weight: 700; }
@@ -223,7 +215,7 @@ html, body {
     box-shadow: var(--shadow);
 }
 .ic-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
-.ic-main { font-size: 22px; font-weight: 900; color: var(--text); font-family: var(--mono); letter-spacing: -1px; line-height: 1; }
+.ic-main { font-size: 24px; font-weight: 800; color: var(--text); letter-spacing: -.02em; line-height: 1; font-variant-numeric: tabular-nums; }
 .ic-sub { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
 
 /* ── Livreur card ── */
@@ -237,7 +229,7 @@ html, body {
 }
 .lc-header {
     padding: 14px 20px;
-    background: linear-gradient(135deg, var(--orange-lt), #f5f3ff);
+    background: linear-gradient(135deg, var(--orange-lt), var(--bg));
     border-bottom: 1px solid var(--orange-bd);
     display: flex; align-items: center; gap: 10px;
 }
@@ -248,7 +240,7 @@ html, body {
     background: linear-gradient(135deg, var(--orange), var(--orange-dk));
     display: flex; align-items: center; justify-content: center;
     font-size: 18px; font-weight: 900; color: #fff; flex-shrink: 0;
-    box-shadow: 0 0 0 3px var(--orange-lt), 0 4px 12px rgba(99,102,241,.25);
+    box-shadow: 0 0 0 3px var(--orange-lt), 0 4px 12px rgba(31,124,246,.25);
 }
 .lc-name { font-size: 15px; font-weight: 800; color: var(--text); letter-spacing: -.3px; }
 .lc-info { font-size: 12px; color: var(--muted); margin-top: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
@@ -279,9 +271,43 @@ html, body {
     background: var(--orange-lt);
     border: 1.5px solid var(--orange-bd);
 }
-.sb-ico { font-size: 48px; display: block; margin-bottom: 12px; }
+.sb-ico { width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; background: #fff; color: var(--orange); box-shadow: 0 0 0 6px rgba(31,124,246,.1); }
+.sb-ico svg { width: 30px; height: 30px; }
+.state-banner.delivered .sb-ico { color: #047857; box-shadow: 0 0 0 6px rgba(16,185,129,.12); }
+.state-banner.cancelled .sb-ico { color: #B91C1C; box-shadow: 0 0 0 6px rgba(239,68,68,.12); }
 .sb-title { font-size: 20px; font-weight: 900; margin-bottom: 6px; letter-spacing: -.4px; }
 .sb-sub { font-size: 13.5px; line-height: 1.6; }
+
+/* ── Code de remise ── */
+.code-card { display: flex; align-items: center; gap: 14px; padding: 16px 20px; margin-bottom: 20px; background: var(--surface); border: 1.5px solid var(--orange-bd); border-radius: var(--r); box-shadow: var(--shadow); }
+.code-card-ico { width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--orange-lt); color: var(--orange); }
+.code-card-txt { flex: 1; min-width: 0; }
+.code-card-title { font-size: 14px; font-weight: 800; color: var(--text); }
+.code-card-sub { font-size: 12.5px; color: var(--text-2); margin-top: 2px; line-height: 1.45; }
+.code-card-val { font-size: 30px; font-weight: 800; letter-spacing: .18em; color: var(--navy); font-variant-numeric: tabular-nums; flex-shrink: 0; }
+@media (max-width: 420px) { .code-card { flex-wrap: wrap; } .code-card-val { width: 100%; text-align: center; padding-top: 4px; } }
+
+/* ── Annulation depuis le suivi ── */
+.sb-cancel { margin-top: 14px; text-align: left; max-width: 360px; margin-inline: auto; }
+.sb-cancel summary { cursor: pointer; text-align: center; font-size: 13px; font-weight: 700; color: #B91C1C; list-style: none; min-height: 36px; display: flex; align-items: center; justify-content: center; }
+.sb-cancel summary::-webkit-details-marker { display: none; }
+.sb-cancel-form { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; padding: 14px; background: var(--surface); border-radius: 16px; box-shadow: 0 0 0 1px var(--border); }
+.sb-cancel-legend { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 2px; }
+.sb-cancel-reason { display: flex; align-items: center; gap: 8px; min-height: 36px; font-size: 13.5px; color: var(--text); cursor: pointer; }
+.sb-cancel-reason input { accent-color: var(--orange); }
+.sb-cancel-btn { margin-top: 6px; min-height: 42px; border: none; border-radius: 999px; background: #B91C1C; color: #fff; font: 700 13.5px var(--font); cursor: pointer; }
+
+/* ── Partage du suivi ── */
+.share-card { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 16px 20px; margin-bottom: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); box-shadow: var(--shadow); }
+.share-card-txt { flex: 1; min-width: 200px; }
+.share-card-title { font-size: 14px; font-weight: 800; color: var(--text); }
+.share-card-sub { font-size: 12.5px; color: var(--text-2); margin-top: 2px; }
+.share-card-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.share-wa, .share-copy { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 16px; border-radius: 999px; font: 700 13px var(--font); text-decoration: none; cursor: pointer; border: none; }
+.share-wa { background: #128C4B; color: #fff; }
+.share-wa:hover { background: #0E7A40; color: #fff; }
+.share-copy { background: rgba(22,22,42,.07); color: var(--text); }
+.share-copy:hover { background: rgba(22,22,42,.12); }
 
 /* ── Infos commande ── */
 .order-meta-card {
@@ -298,7 +324,7 @@ html, body {
 .omc-row:last-child { border-bottom: none; }
 .omc-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); min-width: 80px; flex-shrink: 0; padding-top: 1px; }
 .omc-val { font-weight: 600; color: var(--text); flex: 1; word-break: break-word; }
-.omc-val.mono { font-family: var(--mono); }
+.omc-val.mono { font-variant-numeric: tabular-nums; }
 
 /* ── Badge statut ── */
 .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 20px; font-size: 11.5px; font-weight: 700; border: 1.5px solid; }
@@ -315,7 +341,7 @@ html, body {
 /* ── Responsive ── */
 @media (max-width: 640px) {
     .info-grid { grid-template-columns: 1fr; }
-    .topbar { margin: -24px -12px 20px; padding: 0 14px; height: 58px; }
+    .topbar { margin: -20px -12px 20px; padding: 12px 14px; min-height: 62px; border-radius: 0 0 18px 18px; }
     .topbar-info h1 { font-size: 14.5px; }
     .topbar-badge { display: none; }
     .page { padding: 20px 12px 60px; }
@@ -347,7 +373,7 @@ html, body {
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
     padding: 12px 20px;
     border-top: 1px solid var(--border);
-    background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+    background: var(--bg);
 }
 .share-loc-info  { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .share-loc-text  { min-width: 0; }
@@ -356,13 +382,13 @@ html, body {
 .share-loc-btn {
     flex-shrink: 0;
     padding: 8px 18px; border-radius: 30px; border: none; cursor: pointer;
-    background: var(--blue); color: #fff;
-    font-size: 13px; font-weight: 700; font-family: var(--font);
+    background: var(--orange); color: #fff;
+    font-size: 13px; font-weight: 700; font-family: var(--font); min-height: 40px;
     display: inline-flex; align-items: center; gap: 6px;
     transition: background .2s, transform .15s; white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(59,130,246,.35);
+    box-shadow: 0 2px 8px rgba(31,124,246,.35);
 }
-.share-loc-btn:hover  { opacity: .9; transform: scale(1.03); }
+.share-loc-btn:hover  { background: var(--orange-dk); }
 .share-loc-btn.active { background: var(--green); box-shadow: 0 2px 8px rgba(16,185,129,.35); }
 @media (max-width: 600px) {
     .share-loc-strip  { padding: 10px 14px; gap: 8px; }
@@ -396,7 +422,7 @@ html, body {
     font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center;
 }
 .signup-close:hover { background: var(--border); color: var(--text); }
-.signup-ico   { font-size: 40px; margin-bottom: 6px; }
+.signup-ico   { width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; background: var(--orange-lt); color: var(--orange); }
 .signup-title { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
 .signup-text  { font-size: 13.5px; color: var(--text-2); line-height: 1.55; margin-bottom: 20px; }
 .signup-btn {
@@ -406,7 +432,7 @@ html, body {
 }
 .signup-btn-google  { background: var(--surface); border: 1.5px solid var(--border); color: var(--text); }
 .signup-btn-google:hover { background: var(--bg); }
-.signup-btn-primary { background: var(--orange); color: #fff; box-shadow: 0 4px 14px rgba(99,102,241,.35); }
+.signup-btn-primary { background: var(--orange); color: #fff; box-shadow: 0 4px 14px rgba(31,124,246,.35); }
 .signup-btn-primary:hover { background: var(--orange-dk); transform: translateY(-1px); }
 .signup-link  { display: block; font-size: 13px; color: var(--text-2); font-weight: 600; text-decoration: underline; margin-bottom: 14px; }
 .signup-later { display: block; width: 100%; background: none; border: none; color: var(--muted); font-size: 12.5px; font-weight: 600; cursor: pointer; padding: 4px; }
@@ -434,19 +460,19 @@ $hasAnyDriver      = (bool)($order->livreur_id || $order->driver_id);
 $isCompanyDriver   = (bool)$order->driver_id;
 
 $statusMap = [
-    Order::STATUS_EN_ATTENTE   => ['label'=>'En attente',   'ico'=>'⏳', 'badge'=>'badge-attente',  'step'=>0],
-    Order::STATUS_CONFIRMEE    => ['label'=>'Confirmée',    'ico'=>'📦', 'badge'=>'badge-confirm',  'step'=>1],
-    Order::STATUS_EN_LIVRAISON => ['label'=>'En livraison', 'ico'=>'🚴', 'badge'=>'badge-livraison','step'=>2],
-    Order::STATUS_LIVREE       => ['label'=>'Livrée',       'ico'=>'✅', 'badge'=>'badge-livree',   'step'=>3],
-    Order::STATUS_ANNULEE      => ['label'=>'Annulée',      'ico'=>'❌', 'badge'=>'badge-annulee',  'step'=>-1],
+    Order::STATUS_EN_ATTENTE   => ['label'=>'En attente',   'ico'=>'clock', 'badge'=>'badge-attente',  'step'=>0],
+    Order::STATUS_CONFIRMEE    => ['label'=>'Confirmée',    'ico'=>'package', 'badge'=>'badge-confirm',  'step'=>1],
+    Order::STATUS_EN_LIVRAISON => ['label'=>'En livraison', 'ico'=>'truck', 'badge'=>'badge-livraison','step'=>2],
+    Order::STATUS_LIVREE       => ['label'=>'Livrée',       'ico'=>'check', 'badge'=>'badge-livree',   'step'=>3],
+    Order::STATUS_ANNULEE      => ['label'=>'Annulée',      'ico'=>'x', 'badge'=>'badge-annulee',  'step'=>-1],
 ];
 $sInfo      = $statusMap[$s] ?? $statusMap[Order::STATUS_EN_ATTENTE];
 $curStep    = $sInfo['step'];
 $steps      = [
-    ['ico'=>'🕐','lbl'=>'Reçue'],
-    ['ico'=>'📦','lbl'=>'Confirmée'],
-    ['ico'=>'🚴','lbl'=>'En route'],
-    ['ico'=>'🏠','lbl'=>'Livrée'],
+    ['ico'=>'clock','lbl'=>'Reçue'],
+    ['ico'=>'package','lbl'=>'Confirmée'],
+    ['ico'=>'truck','lbl'=>'En route'],
+    ['ico'=>'home','lbl'=>'Livrée'],
 ];
 $fillPct = $curStep >= 0 ? min(($curStep / 3) * 100, 100) : 0;
 
@@ -472,7 +498,7 @@ $init = fn(string $n): string =>
             <p>{{ $order->shop?->name ?? '—' }} · {{ $order->created_at->format('d/m/Y à H:i') }}</p>
             @endif
         </div>
-        <span class="topbar-badge" id="uiBadgeTop">{{ $sInfo['ico'] }} {{ $sInfo['label'] }}</span>
+        <span class="topbar-badge" id="uiBadgeTop">{!! \App\Support\IconLibrary::svg($sInfo['ico'], '', 13) !!} {{ $sInfo['label'] }}</span>
     </div>
 
     {{-- Flash --}}
@@ -480,16 +506,28 @@ $init = fn(string $n): string =>
     <div class="flash flash-success">✓ {{ session('success') }}</div>
     @endif
 
+    {{-- ── Code de remise : visible par le seul client de la commande ── --}}
+    @if(!$isDelivered && !$isCancelled && \App\Support\DeliveryCode::visibleTo($order))
+    <div class="code-card" id="deliveryCodeCard">
+        <span class="code-card-ico">{!! \App\Support\IconLibrary::svg('lock', '', 20) !!}</span>
+        <div class="code-card-txt">
+            <div class="code-card-title">Votre code de remise</div>
+            <div class="code-card-sub">Donnez-le au livreur seulement quand vous avez le colis en main.</div>
+        </div>
+        <div class="code-card-val" aria-label="Code {{ implode(' ', str_split($order->delivery_code)) }}">{{ $order->delivery_code }}</div>
+    </div>
+    @endif
+
     {{-- ── Banners statut (mis à jour automatiquement) ── --}}
     <div id="uiStateBanner">
     @if($isDelivered)
     <div class="state-banner delivered">
-        <span class="sb-ico">🎉</span>
+        <span class="sb-ico">{!! \App\Support\IconLibrary::svg('check', '', 30) !!}</span>
         <div class="sb-title" style="color:var(--green-dk)">Commande livrée !</div>
         <div class="sb-sub" style="color:#047857">Votre colis a bien été remis. Merci de votre confiance.</div>
         @if(!$order->review)
-        <a href="{{ route('client.reviews.create', $order) }}" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:10px 22px;background:var(--orange);color:#fff;border-radius:30px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(99,102,241,.35)">
-            ⭐ Laisser un avis
+        <a href="{{ route('client.reviews.create', $order) }}" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:10px 22px;background:var(--orange);color:#fff;border-radius:30px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(31,124,246,.35)">
+            {!! \App\Support\IconLibrary::svg('star', '', 15) !!} Laisser un avis
         </a>
         @endif
     </div>
@@ -498,11 +536,11 @@ $init = fn(string $n): string =>
     {{-- ── Annulée ── --}}
     @if($isCancelled)
     <div class="state-banner cancelled">
-        <span class="sb-ico">❌</span>
+        <span class="sb-ico">{!! \App\Support\IconLibrary::svg('x', '', 30) !!}</span>
         <div class="sb-title" style="color:#991b1b">Commande annulée</div>
         <div class="sb-sub" style="color:#b91c1c">Cette commande a été annulée. Aucun suivi disponible.</div>
-        <a href="{{ route('client.dashboard') }}" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:10px 22px;background:var(--orange);color:#fff;border-radius:30px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(99,102,241,.35)">
-            🏪 Découvrir les boutiques
+        <a href="{{ route('client.dashboard') }}" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:10px 22px;background:var(--orange);color:#fff;border-radius:30px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(31,124,246,.35)">
+            {!! \App\Support\IconLibrary::svg('store', '', 15) !!} Découvrir les boutiques
         </a>
     </div>
     @else
@@ -510,15 +548,28 @@ $init = fn(string $n): string =>
     {{-- ── En attente d'assignation ── --}}
     @if($s === Order::STATUS_EN_ATTENTE || $s === Order::STATUS_CONFIRMEE)
     <div class="state-banner waiting">
-        <span class="sb-ico">{{ $sInfo['ico'] }}</span>
+        <span class="sb-ico">{!! \App\Support\IconLibrary::svg($sInfo['ico'], '', 30) !!}</span>
         <div class="sb-title" style="color:var(--orange-dk)">{{ $sInfo['label'] }}</div>
-        <div class="sb-sub" style="color:#9a3412">
+        <div class="sb-sub" style="color:var(--text-2)">
             @if($s === Order::STATUS_EN_ATTENTE)
                 Votre commande est en attente de confirmation par la boutique.
             @else
                 Votre commande est confirmée. Un livreur va être assigné.
             @endif
         </div>
+        @if($s === Order::STATUS_EN_ATTENTE && auth()->check() && (int) $order->user_id === (int) auth()->id())
+        <details class="sb-cancel">
+            <summary>Annuler cette commande</summary>
+            <form method="POST" action="{{ route('client.orders.cancel', $order) }}" class="sb-cancel-form">
+                @csrf
+                <div class="sb-cancel-legend">Pourquoi annulez-vous ?</div>
+                @foreach(\App\Http\Controllers\Client\OrderActionController::CANCEL_REASONS as $key => $label)
+                <label class="sb-cancel-reason"><input type="radio" name="reason" value="{{ $key }}" required> {{ $label }}</label>
+                @endforeach
+                <button type="submit" class="sb-cancel-btn">Confirmer l'annulation</button>
+            </form>
+        </details>
+        @endif
     </div>
     @endif
 
@@ -531,7 +582,7 @@ $init = fn(string $n): string =>
                     <span class="live-dot {{ $isDelivered || !$isOngoing ? 'offline' : '' }}" id="liveDot"></span>
                     <span id="liveLabel">{{ $isDelivered ? 'Terminé' : ($isOngoing ? 'En direct' : 'En attente') }}</span>
                 </div>
-                <span class="map-title">📍 Suivi GPS du livreur</span>
+                <span class="map-title" style="display:inline-flex;align-items:center;gap:6px"><span style="display:inline-flex;color:var(--orange)">{!! \App\Support\IconLibrary::svg('map-pin', '', 15) !!}</span> Suivi GPS du livreur</span>
             </div>
             <span class="last-update-txt" id="lastUpdate">
                 @if($hasGPS)
@@ -546,7 +597,7 @@ $init = fn(string $n): string =>
 
         {{-- La carte --}}
         <div style="position:relative">
-            <div id="gpsMap" style="height:440px;width:100%;display:block;background:#e8e0d8"></div>
+            <div id="gpsMap" style="height:440px;width:100%;display:block;background:#E9EEF6"></div>
 
             {{-- Overlay livreur flottant au bas de la carte --}}
             @if($hasAnyDriver && $gpsDriverName)
@@ -558,9 +609,9 @@ $init = fn(string $n): string =>
                         @if($isOngoing)
                             <span class="mlo-dot"></span> En route vers vous
                         @elseif($isDelivered)
-                            ✅ Livraison terminée
+                            Livraison terminée
                         @else
-                            🚴 Prépare la livraison
+                            Prépare la livraison
                         @endif
                     </div>
                 </div>
@@ -573,7 +624,7 @@ $init = fn(string $n): string =>
         @php $hadPosition = !is_null($order->client_lat) && !is_null($order->client_lng); @endphp
         <div class="share-loc-strip" id="shareLocStrip">
             <div class="share-loc-info">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{ $hadPosition ? '#10b981' : '#3b82f6' }}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7z"/></svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{ $hadPosition ? '#10b981' : '#1F7CF6' }}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.134 2 5 5.134 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.866-3.134-7-7-7z"/></svg>
                 <div class="share-loc-text">
                     <div class="share-loc-title">Partager ma position</div>
                     @if($hadPosition)
@@ -602,7 +653,7 @@ $init = fn(string $n): string =>
             @foreach($steps as $i => $step)
             <div class="prog-step">
                 <div class="prog-dot {{ $i < $curStep ? 'done' : ($i === $curStep ? 'current' : '') }}" id="uiDot{{ $i }}">
-                    @if($i < $curStep) ✓ @else {{ $step['ico'] }} @endif
+                    {!! \App\Support\IconLibrary::svg($i < $curStep ? 'check' : $step['ico'], '', 14) !!}
                 </div>
                 <div class="prog-lbl {{ $i === $curStep ? 'active' : ($i < $curStep ? 'done-lbl' : '') }}" id="uiLbl{{ $i }}">{{ $step['lbl'] }}</div>
             </div>
@@ -629,17 +680,49 @@ $init = fn(string $n): string =>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 Statut
             </div>
-            <div style="margin-top:4px"><span class="badge {{ $sInfo['badge'] }}" id="uiBadgeInfo" style="font-size:13px;padding:6px 14px">{{ $sInfo['ico'] }} {{ $sInfo['label'] }}</span></div>
+            <div style="margin-top:4px"><span class="badge {{ $sInfo['badge'] }}" id="uiBadgeInfo" style="font-size:13px;padding:6px 14px">{!! \App\Support\IconLibrary::svg($sInfo['ico'], '', 14) !!} {{ $sInfo['label'] }}</span></div>
             <div class="ic-sub">{{ $order->created_at->format('d/m/Y à H:i') }}</div>
         </div>
     </div>
+
+    {{-- ── Partager le suivi (ex. au proche qui réceptionne le colis) ── --}}
+    @if(!$isCancelled)
+    @php
+        $shareText = 'Suivez ma commande Shopio n°' . str_pad($order->id, 5, '0', STR_PAD_LEFT) . ' : ' . \App\Support\OrderAccess::trackingUrl($order);
+        if (!$isDelivered && \App\Support\DeliveryCode::visibleTo($order)) {
+            $shareText .= "\nCode de remise à donner au livreur : " . $order->delivery_code;
+        }
+    @endphp
+    <div class="share-card">
+        <div class="share-card-txt">
+            <div class="share-card-title">Quelqu'un d'autre réceptionne le colis ?</div>
+            <div class="share-card-sub">Envoyez-lui le suivi{{ str_contains($shareText, 'Code de remise') ? ' avec le code de remise' : '' }}.</div>
+        </div>
+        <div class="share-card-btns">
+            <a class="share-wa" href="https://wa.me/?text={{ rawurlencode($shareText) }}" target="_blank" rel="noopener">
+                {!! \App\Support\IconLibrary::svg('message', '', 16) !!} WhatsApp
+            </a>
+            <button type="button" class="share-copy" id="shareCopyBtn" data-url="{{ \App\Support\OrderAccess::trackingUrl($order) }}">
+                {!! \App\Support\IconLibrary::svg('list', '', 16) !!} <span>Copier le lien</span>
+            </button>
+        </div>
+    </div>
+    <script>
+    document.getElementById('shareCopyBtn')?.addEventListener('click', async function () {
+        const label = this.querySelector('span');
+        try { await navigator.clipboard.writeText(this.dataset.url); label.textContent = 'Lien copié'; }
+        catch (e) { window.prompt('Copiez le lien :', this.dataset.url); }
+        setTimeout(() => { label.textContent = 'Copier le lien'; }, 2500);
+    });
+    </script>
+    @endif
 
     {{-- ── Livreur (mis à jour automatiquement) ── --}}
     <div id="uiLivreurWrap">
     @if($hasAnyDriver && $gpsDriverName)
     <div class="livreur-card">
         <div class="lc-header">
-            <span style="font-size:16px">🛵</span>
+            <span style="display:inline-flex;color:var(--orange-dk)">{!! \App\Support\IconLibrary::svg('truck', '', 16) !!}</span>
             <span class="lc-title">Votre livreur</span>
         </div>
         <div class="lc-body">
@@ -648,10 +731,10 @@ $init = fn(string $n): string =>
                 <div class="lc-name">{{ $gpsDriverName }}</div>
                 <div class="lc-info">
                     @if($gpsDriverPhone)
-                    <a href="tel:{{ $gpsDriverPhone }}" style="color:var(--orange);font-weight:700;text-decoration:none">📞 {{ $gpsDriverPhone }}</a>
+                    <a href="tel:{{ $gpsDriverPhone }}" style="color:var(--orange);font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px">{!! \App\Support\IconLibrary::svg('phone', '', 13) !!} {{ $gpsDriverPhone }}</a>
                     @endif
                     <span class="lc-status">
-                        @if($isDelivered) ✅ Terminé @elseif($isOngoing) 🟢 En route @else 🟡 Assigné @endif
+                        @if($isDelivered) Terminé @elseif($isOngoing) En route @else Assigné @endif
                     </span>
                 </div>
             </div>
@@ -689,12 +772,18 @@ $init = fn(string $n): string =>
         </div>
         <div class="omc-row">
             <span class="omc-lbl">Boutique</span>
-            <span class="omc-val">🏪 {{ $order->shop?->name ?? '—' }}</span>
+            <span class="omc-val">{{ $order->shop?->name ?? '—' }}</span>
         </div>
         @if($order->delivery_destination)
         <div class="omc-row">
             <span class="omc-lbl">Livraison</span>
-            <span class="omc-val">📍 {{ $order->delivery_destination }}</span>
+            <span class="omc-val">{{ $order->delivery_destination }}</span>
+        </div>
+        @endif
+        @if($order->delivery_slot)
+        <div class="omc-row">
+            <span class="omc-lbl">Créneau</span>
+            <span class="omc-val">{{ $order->delivery_slot }}</span>
         </div>
         @endif
         <div class="omc-row">
@@ -726,22 +815,22 @@ $init = fn(string $n): string =>
 @if(!auth()->check() && is_null($order->user_id))
 {{-- ── Modal invitation à créer un compte (commande passée sans compte) ── --}}
 @php
-    $suiviUrl    = route('suivi.show', $order);
+    $suiviUrl    = \App\Support\OrderAccess::trackingUrl($order);
     $registerUrl = route('register', ['redirect' => $suiviUrl, 'order_id' => $order->id, 'role' => 'client']);
     $loginUrl    = route('login',    ['redirect' => $suiviUrl, 'order_id' => $order->id]);
     $googleUrl   = route('google.redirect', ['redirect' => $suiviUrl, 'order_id' => $order->id]);
 @endphp
 <div class="signup-overlay" id="signupOverlay">
     <div class="signup-modal">
-        <button class="signup-close" onclick="dismissSignupModal()">✕</button>
-        <div class="signup-ico">🎉</div>
+        <button class="signup-close" onclick="dismissSignupModal()" aria-label="Fermer">{!! \App\Support\IconLibrary::svg('x', '', 15) !!}</button>
+        <div class="signup-ico">{!! \App\Support\IconLibrary::svg('package', '', 26) !!}</div>
         <h2 class="signup-title">Suivez toutes vos commandes</h2>
         <p class="signup-text">Créez votre compte pour retrouver cette commande, discuter avec le vendeur et commander plus vite la prochaine fois.</p>
         <a href="{{ $googleUrl }}" class="signup-btn signup-btn-google">
             <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.4 29.3 35 24 35c-6.1 0-11-4.9-11-11s4.9-11 11-11c2.8 0 5.3 1 7.3 2.8l6-6C33.7 6.5 29.1 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5 43.5 34.8 43.5 24c0-1.2-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.6 15.9 18.9 13 24 13c2.8 0 5.3 1 7.3 2.8l6-6C33.7 6.5 29.1 4.5 24 4.5c-7.5 0-14 4.2-17.3 10.2z"/><path fill="#4CAF50" d="M24 43.5c5 0 9.6-1.9 13-5.1l-6-4.9C29.1 35.4 26.7 36.2 24 36.2c-5.3 0-9.7-3.4-11.3-8.1l-6.5 5C9.9 39.3 16.4 43.5 24 43.5z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.4l6 4.9c-.4.4 6.3-4.6 6.3-14.3 0-1.2-.1-2.4-.4-3.5z"/></svg>
             Continuer avec Google
         </a>
-        <a href="{{ $registerUrl }}" class="signup-btn signup-btn-primary">✨ Créer mon compte</a>
+        <a href="{{ $registerUrl }}" class="signup-btn signup-btn-primary">Créer mon compte</a>
         <a href="{{ $loginUrl }}" class="signup-link">J'ai déjà un compte</a>
         <button class="signup-later" onclick="dismissSignupModal()">Plus tard</button>
     </div>
@@ -765,16 +854,17 @@ $init = fn(string $n): string =>
 .moto-searching { animation: moto-search 1.6s ease-in-out infinite; }
 .halo-ring {
     position: absolute; inset: -5px; border-radius: 50%;
-    border: 2px solid rgba(99,102,241,.6);
+    border: 2px solid rgba(31,124,246,.6);
     animation: halo-pulse 1.8s ease-out infinite;
 }
 .halo-ring2 {
     position: absolute; inset: -5px; border-radius: 50%;
-    border: 1.5px solid rgba(99,102,241,.35);
+    border: 1.5px solid rgba(31,124,246,.35);
     animation: halo-pulse 1.8s ease-out .6s infinite;
 }
 </style>
 <script>
+window.SIco = {!! json_encode(collect(['clock', 'package', 'truck', 'check', 'x', 'home', 'star', 'phone'])->mapWithKeys(fn ($n) => [$n => \App\Support\IconLibrary::svg($n, '', 16)])) !!};
 (function () {
     @php
         $lat0 = $order->current_lat ?? 9.6412;
@@ -782,7 +872,7 @@ $init = fn(string $n): string =>
     @endphp
 
     /* ── Constantes Blade → JS ── */
-    const DATA_URL     = '{{ route('suivi.data', $order) }}';
+    const DATA_URL     = '{{ \App\Support\OrderAccess::trackingUrl($order, 'suivi.data') }}';
     const IS_DELIVERED = {{ $isDelivered ? 'true' : 'false' }};
     const IS_CANCELLED = {{ $isCancelled ? 'true' : 'false' }};
     const HAS_GPS      = {{ $hasGPS ? 'true' : 'false' }};
@@ -791,6 +881,8 @@ $init = fn(string $n): string =>
     const DEVISE           = {!! json_encode($devise) !!};
     const IS_COMPANY_DRIVER = {{ $isCompanyDriver ? 'true' : 'false' }};
     const IS_ONGOING        = {{ $isOngoing ? 'true' : 'false' }}; // Phase 2 uniquement
+    const STATUS_ICO        = {!! json_encode(collect($statusMap)->map(fn ($v) => $v['ico'])) !!};
+    const statusSvg         = st => SIco[STATUS_ICO[st]] || SIco.clock;
 
     /* ── État mutable ── */
     let lat           = {{ $lat0 }};
@@ -859,11 +951,11 @@ $init = fn(string $n): string =>
                 ${searching ? '<div class="halo-ring"></div><div class="halo-ring2"></div>' : ''}
                 <div class="${searching ? 'moto-searching' : ''}" style="
                     width:32px;height:32px;border-radius:50%;
-                    background:linear-gradient(135deg,#6366f1 0%,#4f46e5 100%);
+                    background:linear-gradient(135deg,#1F7CF6 0%,#1668D8 100%);
                     border:2px solid #fff;
-                    box-shadow:0 2px 10px rgba(99,102,241,.55),0 0 0 3px rgba(99,102,241,.15);
+                    box-shadow:0 2px 10px rgba(31,124,246,.55),0 0 0 3px rgba(31,124,246,.15);
                     display:flex;align-items:center;justify-content:center;
-                    font-size:15px;line-height:1;cursor:pointer">🛵</div>
+                    color:#fff;line-height:1;cursor:pointer">${SIco.truck}</div>
             </div>`,
             iconSize:[32,32], iconAnchor:[16,16], popupAnchor:[0,-18], className:''
         });
@@ -878,7 +970,7 @@ $init = fn(string $n): string =>
         return lname
             ? `<div style="font-family:system-ui;padding:2px 4px;min-width:120px">
                 <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:3px">${lname}</div>
-                <div style="font-size:11px;color:#94a3b8">${gpsFound ? '🟢 En route' : '⏳ En attente du signal…'}</div>
+                <div style="font-size:11px;color:#94a3b8">${gpsFound ? 'En route' : 'En attente du signal…'}</div>
                </div>`
             : '';
     }
@@ -886,7 +978,7 @@ $init = fn(string $n): string =>
     if (lname) marker.openPopup();
 
     const halo = L.circle([lat, lng], {
-        color:'#6366f1', fillColor:'#6366f1',
+        color:'#1F7CF6', fillColor:'#1F7CF6',
         fillOpacity: gpsFound ? .08 : .04,
         radius: gpsFound ? 65 : 200,
         weight: gpsFound ? 1.5 : 1,
@@ -899,14 +991,14 @@ $init = fn(string $n): string =>
     }).addTo(map);
 
     const trail = L.polyline([[lat,lng]], {
-        color:'#6366f1', weight:4.5, opacity:.85, lineCap:'round', lineJoin:'round',
+        color:'#1F7CF6', weight:4.5, opacity:.85, lineCap:'round', lineJoin:'round',
         dashArray: IS_DELIVERED ? null : '1 0'
     }).addTo(map);
 
     let startDot = null;
     if (gpsFound) {
         startDot = L.circleMarker([lat,lng], {
-            radius:7, color:'#fff', weight:2.5, fillColor:'#6366f1', fillOpacity:1
+            radius:7, color:'#fff', weight:2.5, fillColor:'#1F7CF6', fillOpacity:1
         }).addTo(map).bindTooltip('Départ', { permanent:false, direction:'top' });
     }
 
@@ -934,7 +1026,7 @@ $init = fn(string $n): string =>
             : (currentStatus === 'livrée' ? 'Terminé' : 'Hors ligne');
     }
 
-    const STEP_ICOS = ['🕐','📦','🚴','🏠'];
+    const STEP_ICOS = ['clock','package','truck','home'];
     function updateProgress(step) {
         const fill = document.getElementById('uiProgFill');
         if (fill) fill.style.width = (step >= 0 ? Math.min((step / 3) * 100, 100) : 0) + '%';
@@ -943,16 +1035,16 @@ $init = fn(string $n): string =>
             const lbl = document.getElementById('uiLbl' + i);
             if (!dot || !lbl) continue;
             dot.className = 'prog-dot' + (i < step ? ' done' : i === step ? ' current' : '');
-            dot.textContent = i < step ? '✓' : STEP_ICOS[i];
+            dot.innerHTML = SIco[i < step ? 'check' : STEP_ICOS[i]];
             lbl.className  = 'prog-lbl' + (i === step ? ' active' : i < step ? ' done-lbl' : '');
         }
     }
 
-    function updateBadge(ico, label, badge) {
+    function updateBadge(status, label, badge) {
         const bTop  = document.getElementById('uiBadgeTop');
         const bInfo = document.getElementById('uiBadgeInfo');
-        if (bTop)  bTop.textContent = ico + ' ' + label;
-        if (bInfo) { bInfo.textContent = ico + ' ' + label; bInfo.className = 'badge ' + badge; }
+        [bTop, bInfo].forEach(el => { if (el) { el.innerHTML = statusSvg(status) + ' '; el.append(label); } });
+        if (bInfo) bInfo.className = 'badge ' + badge;
     }
 
     function getInitials(name) {
@@ -968,12 +1060,12 @@ $init = fn(string $n): string =>
         lname = livreur.name;
         const ini = getInitials(livreur.name);
         const _esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); // échappe les données saisies par d'autres utilisateurs
-        const statusTxt = d.is_delivered ? '✅ Terminé' : d.is_ongoing ? '🟢 En route' : '🟡 Assigné';
+        const statusTxt = d.is_delivered ? 'Terminé' : d.is_ongoing ? 'En route' : 'Assigné';
 
         wrap.innerHTML = `
         <div class="livreur-card">
             <div class="lc-header">
-                <span style="font-size:16px">🛵</span>
+                <span style="display:inline-flex;color:var(--orange-dk)">${SIco.truck}</span>
                 <span class="lc-title">Votre livreur</span>
             </div>
             <div class="lc-body">
@@ -981,7 +1073,7 @@ $init = fn(string $n): string =>
                 <div style="flex:1;min-width:0">
                     <div class="lc-name">${_esc(livreur.name)}</div>
                     <div class="lc-info">
-                        ${livreur.phone ? `<a href="tel:${_esc(livreur.phone)}" style="color:var(--orange);font-weight:700;text-decoration:none">📞 ${_esc(livreur.phone)}</a>` : ''}
+                        ${livreur.phone ? `<a href="tel:${_esc(livreur.phone)}" style="color:var(--orange);font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px">${SIco.phone} ${_esc(livreur.phone)}</a>` : ''}
                         <span class="lc-status">${statusTxt}</span>
                     </div>
                 </div>
@@ -1004,15 +1096,15 @@ $init = fn(string $n): string =>
             if (a) a.textContent = ini;
             if (s) s.innerHTML = d.is_ongoing
                 ? `<span class="mlo-dot"></span> En route vers vous`
-                : d.is_delivered ? '✅ Livraison terminée' : '🚴 Prépare la livraison';
+                : d.is_delivered ? 'Livraison terminée' : 'Prépare la livraison';
         } else {
             /* Créer l'overlay si le livreur vient d'être assigné */
             const mapPos = document.querySelector('#gpsMap')?.parentElement;
             if (mapPos) {
                 const el = document.createElement('div');
                 el.className = 'map-livreur-overlay'; el.id = 'livreurOverlay';
-                el.innerHTML = `<div class="mlo-av">${ini}</div><div>
-                    <div class="mlo-name">${livreur.name}</div>
+                el.innerHTML = `<div class="mlo-av">${_esc(ini)}</div><div>
+                    <div class="mlo-name">${_esc(livreur.name)}</div>
                     <div class="mlo-status"><span class="mlo-dot"></span> En route vers vous</div>
                 </div>`;
                 mapPos.appendChild(el);
@@ -1025,20 +1117,22 @@ $init = fn(string $n): string =>
         if (!wrap) return;
         /* Supprimer les banners ajoutés par JS lors des rafraîchissements précédents */
         wrap.querySelectorAll('.js-banner').forEach(el => el.remove());
+        /* Colis remis ou commande annulée : le code de remise ne sert plus */
+        if (d.is_delivered || d.is_cancelled) document.getElementById('deliveryCodeCard')?.remove();
 
         if (d.is_delivered) {
             const b = document.createElement('div');
             b.className = 'state-banner delivered js-banner';
-            b.innerHTML = `<span class="sb-ico">🎉</span>
+            b.innerHTML = `<span class="sb-ico">${SIco.check}</span>
                 <div class="sb-title" style="color:var(--green-dk)">Commande livrée !</div>
                 <div class="sb-sub" style="color:#047857">Votre colis a bien été remis. Merci de votre confiance.</div>
-                ${REVIEW_URL ? `<a href="${REVIEW_URL}" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:10px 22px;background:var(--orange);color:#fff;border-radius:30px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(99,102,241,.35)">⭐ Laisser un avis</a>` : ''}`;
+                ${REVIEW_URL ? `<a href="${REVIEW_URL}" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:10px 22px;background:var(--orange);color:#fff;border-radius:30px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(31,124,246,.35)">${SIco.star} Laisser un avis</a>` : ''}`;
             wrap.insertBefore(b, wrap.firstChild);
 
         } else if (d.is_cancelled && !wrap.querySelector('.state-banner.cancelled')) {
             const b = document.createElement('div');
             b.className = 'state-banner cancelled js-banner';
-            b.innerHTML = `<span class="sb-ico">❌</span>
+            b.innerHTML = `<span class="sb-ico">${SIco.x}</span>
                 <div class="sb-title" style="color:#991b1b">Commande annulée</div>
                 <div class="sb-sub" style="color:#b91c1c">Cette commande a été annulée. Aucun suivi disponible.</div>`;
             wrap.insertBefore(b, wrap.firstChild);
@@ -1050,9 +1144,9 @@ $init = fn(string $n): string =>
             };
             const b = document.createElement('div');
             b.className = 'state-banner waiting js-banner';
-            b.innerHTML = `<span class="sb-ico">${d.status_ico}</span>
+            b.innerHTML = `<span class="sb-ico">${statusSvg(d.status)}</span>
                 <div class="sb-title" style="color:var(--orange-dk)">${d.status_label}</div>
-                <div class="sb-sub" style="color:#9a3412">${msgs[d.step] ?? ''}</div>`;
+                <div class="sb-sub" style="color:var(--text-2)">${msgs[d.step] ?? ''}</div>`;
             const mapHero = wrap.querySelector('.map-hero');
             wrap.insertBefore(b, mapHero ?? wrap.firstChild);
         }
@@ -1068,7 +1162,7 @@ $init = fn(string $n): string =>
             /* Changement de statut → mise à jour UI complète */
             if (d.status !== currentStatus) {
                 currentStatus = d.status;
-                updateBadge(d.status_ico, d.status_label, d.status_badge);
+                updateBadge(d.status, d.status_label, d.status_badge);
                 updateProgress(d.step);
                 updateStateBanner(d);
                 if (d.livreur) updateLivreurCard(d.livreur, d);
@@ -1077,11 +1171,11 @@ $init = fn(string $n): string =>
                     clearInterval(pollId); pollId = null;
                     setOnline(false);
                     trail.setStyle({ dashArray: null, opacity: 1 });
-                    if (lastUpdateEl) lastUpdateEl.textContent = d.is_delivered ? '✅ Livraison terminée' : '❌ Annulée';
+                    if (lastUpdateEl) lastUpdateEl.textContent = d.is_delivered ? 'Livraison terminée' : 'Annulée';
                     if (d.is_delivered && d.lat != null && d.lng != null) {
                         L.circleMarker([parseFloat(d.lat), parseFloat(d.lng)], {
                             radius:9, color:'#fff', weight:2.5, fillColor:'#10b981', fillOpacity:1
-                        }).addTo(map).bindTooltip('Arrivée ✅', { permanent:true, direction:'top' });
+                        }).addTo(map).bindTooltip('Arrivée', { permanent:true, direction:'top' });
                     }
                     return;
                 }
@@ -1162,7 +1256,7 @@ $init = fn(string $n): string =>
         _hintWrap.style.cssText = 'position:absolute;inset:0;z-index:600;pointer-events:none;display:flex;align-items:center;justify-content:center';
         const _hintBubble = document.createElement('div');
         _hintBubble.style.cssText = 'background:rgba(0,0,0,.62);color:#fff;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:600;font-family:var(--font);opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none';
-        _hintBubble.textContent = '☝️ 2 doigts pour défiler la page';
+        _hintBubble.textContent = 'Utilisez 2 doigts pour déplacer la carte';
         _hintWrap.appendChild(_hintBubble);
         document.getElementById('gpsMap').parentElement.appendChild(_hintWrap);
         let _hintTimer = null;
@@ -1176,7 +1270,7 @@ $init = fn(string $n): string =>
     /* ── Démarrage ── */
     if (IS_DELIVERED) {
         setOnline(false);
-        if (lastUpdateEl) lastUpdateEl.textContent = '✅ Livraison terminée';
+        if (lastUpdateEl) lastUpdateEl.textContent = 'Livraison terminée';
         trail.setStyle({ dashArray: null });
     } else if (!IS_CANCELLED) {
         pollId = setInterval(refreshAll, 5000);
@@ -1186,7 +1280,7 @@ $init = fn(string $n): string =>
     /* ══════════════════════════════════════════════════════════════════
      *  PARTAGE DE POSITION CLIENT
      * ══════════════════════════════════════════════════════════════════ */
-    const CLIENT_LOC_URL  = '{{ route('suivi.client-location', $order) }}';
+    const CLIENT_LOC_URL  = '{{ \App\Support\OrderAccess::trackingUrl($order, 'suivi.client-location') }}';
     const CSRF_TOKEN      = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
     let clientLat    = {{ $order->client_lat ?? 'null' }};
@@ -1208,8 +1302,8 @@ $init = fn(string $n): string =>
     function makeClientIcon() {
         return L.divIcon({
             html: `<div style="width:20px;height:20px;border-radius:50%;
-                        background:#3b82f6;border:2.5px solid #fff;
-                        box-shadow:0 0 0 3px rgba(59,130,246,.3),0 2px 8px rgba(59,130,246,.45)"></div>`,
+                        background:#1F7CF6;border:2.5px solid #fff;
+                        box-shadow:0 0 0 3px rgba(31,124,246,.3),0 2px 8px rgba(31,124,246,.45)"></div>`,
             iconSize:[20,20], iconAnchor:[10,10], className:''
         });
     }
@@ -1271,7 +1365,7 @@ $init = fn(string $n): string =>
         if (routeShadow) routeShadow.setLatLngs(routeRemaining);
         else routeShadow = L.polyline(routeRemaining, { color:'rgba(0,0,0,.12)', weight:7, lineCap:'round', lineJoin:'round' }).addTo(map);
         if (routeLine)  routeLine.setLatLngs(routeRemaining);
-        else routeLine  = L.polyline(routeRemaining, { color:'#3b82f6', weight:3.5, opacity:.82, lineCap:'round', lineJoin:'round' }).addTo(map);
+        else routeLine  = L.polyline(routeRemaining, { color:'#1F7CF6', weight:3.5, opacity:.82, lineCap:'round', lineJoin:'round' }).addTo(map);
         routeShadow.bringToBack(); routeLine.bringToBack();
         if (trailShadow) trailShadow.bringToFront();
         if (trail) trail.bringToFront();
@@ -1338,7 +1432,7 @@ $init = fn(string $n): string =>
 
         /* Icône pin : verte si position connue, bleue sinon */
         const pinIcon = document.querySelector('#shareLocStrip svg');
-        if (pinIcon) pinIcon.setAttribute('stroke', active || clientLat !== null ? '#10b981' : '#3b82f6');
+        if (pinIcon) pinIcon.setAttribute('stroke', active || clientLat !== null ? '#10b981' : '#1F7CF6');
 
         if (shareSubEl) {
             if (active) {
@@ -1360,7 +1454,7 @@ $init = fn(string $n): string =>
         if (!('geolocation' in navigator)) {
             if (shareSubEl) {
                 shareSubEl.style.color = 'var(--red)';
-                shareSubEl.textContent = '❌ Géolocalisation non disponible sur cet appareil';
+                shareSubEl.textContent = 'Géolocalisation non disponible sur cet appareil';
             }
             return;
         }
@@ -1372,7 +1466,7 @@ $init = fn(string $n): string =>
         }
         if (shareSubEl) {
             shareSubEl.style.color = 'var(--muted)';
-            shareSubEl.textContent = '🔍 Recherche du signal GPS…';
+            shareSubEl.textContent = 'Recherche du signal GPS…';
         }
 
         let _firstFix = true;
@@ -1414,10 +1508,10 @@ $init = fn(string $n): string =>
                     /* Permission refusée : donner des instructions claires selon l'OS */
                     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
                     msg = isIOS
-                        ? '❌ Bloqué — Réglages → Confidentialité → Service de localisation → Safari → Autoriser'
-                        : '❌ Bloqué — Paramètres du navigateur → Autorisations → Localisation → Autoriser ce site';
+                        ? 'Bloqué — Réglages → Confidentialité → Service de localisation → Safari → Autoriser'
+                        : 'Bloqué — Paramètres du navigateur → Autorisations → Localisation → Autoriser ce site';
                 } else {
-                    msg = '❌ Signal GPS indisponible — réessayez en extérieur';
+                    msg = 'Signal GPS indisponible — réessayez en extérieur';
                 }
                 if (shareSubEl) {
                     shareSubEl.style.color = 'var(--red)';

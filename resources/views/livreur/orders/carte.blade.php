@@ -117,6 +117,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',system-u
     <div class="bp-info">
         <div class="bp-client">{{ $clientName }}</div>
         <div class="bp-dest">{{ $dest ?: 'Destination non renseignée' }}</div>
+        @if($order->delivery_slot)<div style="font-size:11.5px;font-weight:700;color:#7DB4FF;margin-top:3px">Créneau : {{ $order->delivery_slot }}</div>@endif
         <div class="bp-gps-status">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
             <span id="clientPosLabel">{{ $hasClient ? 'Position client disponible' : 'En attente de la position client…' }}</span>
@@ -144,6 +145,14 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',system-u
             <div style="font-size:16px;font-weight:800;color:#fff;margin-top:6px;">Preuve de livraison</div>
             <div style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:4px;">Prenez une photo du colis remis — ça évite les litiges</div>
         </div>
+
+        @if(filled($order->delivery_code))
+        <label for="deliveryCodeInput" style="display:block;font-size:12.5px;font-weight:700;color:rgba(255,255,255,.8);margin-bottom:6px;">Code de remise donné par le client</label>
+        <input id="deliveryCodeInput" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="0000"
+               style="width:100%;padding:14px;border-radius:12px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:#fff;font-size:24px;font-weight:800;letter-spacing:.5em;text-align:center;font-family:inherit;margin-bottom:6px;">
+        <div id="deliveryCodeErr" role="alert" style="display:none;color:#fca5a5;font-size:12.5px;font-weight:600;margin-bottom:8px;"></div>
+        <div style="font-size:11.5px;color:rgba(255,255,255,.5);margin-bottom:14px;">Le client le voit dans son suivi de commande.</div>
+        @endif
 
         <div id="proofPreviewWrap" style="display:none;margin-bottom:14px;">
             <img id="proofPreviewImg" style="width:100%;max-height:240px;object-fit:cover;border-radius:12px;display:block;" alt="Aperçu de la photo">
@@ -403,15 +412,29 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',system-u
         fd.append('_token', CSRF);
         fd.append('_method', 'PUT');
         if (proofInput.files[0]) fd.append('proof_photo', proofInput.files[0]);
+        const codeInput = document.getElementById('deliveryCodeInput');
+        const codeErr   = document.getElementById('deliveryCodeErr');
+        if (codeInput) fd.append('delivery_code', codeInput.value);
+        if (codeErr) codeErr.style.display = 'none';
 
-        fetch(COMPLETE_URL, { method: 'POST', body: fd })
-            .then((res) => {
+        const resetBtn = () => {
+            proofConfirmBtn.disabled = false;
+            proofConfirmBtn.textContent = '✅ Confirmer la livraison';
+        };
+        fetch(COMPLETE_URL, { method: 'POST', body: fd, headers: { 'Accept': 'application/json' } })
+            .then(async (res) => {
+                if (res.status === 422) {
+                    const d = await res.json().catch(() => ({}));
+                    resetBtn();
+                    if (codeErr) { codeErr.textContent = d.message || 'Code de remise incorrect.'; codeErr.style.display = 'block'; codeInput?.focus(); }
+                    else alert(d.message || 'Validation impossible.');
+                    return;
+                }
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 window.location.href = '{{ route('livreur.orders.index') }}';
             })
             .catch(() => {
-                proofConfirmBtn.disabled = false;
-                proofConfirmBtn.textContent = '✅ Confirmer la livraison';
+                resetBtn();
                 alert('Erreur réseau, réessayez.');
             });
     });

@@ -39,14 +39,14 @@ $countries = [
 /* ── Stepper ── */
 .ms-stepper{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:28px}
 .ms-step{display:flex;flex-direction:column;align-items:center;gap:5px;position:relative}
-.ms-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;transition:all .3s;border:2px solid #e5e7eb;background:#f9fafb;color:#9ca3af}
-.ms-dot.done{background:#10b981;border-color:#10b981;color:#fff}
-.ms-dot.active{background:#6366f1;border-color:#6366f1;color:#fff;box-shadow:0 0 0 4px rgba(99,102,241,.15)}
-.ms-label{font-size:10.5px;font-weight:600;color:#9ca3af;letter-spacing:.3px;white-space:nowrap}
-.ms-label.active{color:#6366f1}
-.ms-label.done{color:#10b981}
-.ms-line{width:60px;height:2px;background:#e5e7eb;margin:0 4px;margin-bottom:18px;transition:background .3s;flex-shrink:0}
-.ms-line.done{background:#10b981}
+.ms-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;transition:all .3s;border:2px solid #E3E8F2;background:#f9fafb;color:#9AA3B8}
+.ms-dot.done{background:#15803D;border-color:#15803D;color:#fff}
+.ms-dot.active{background:#1F7CF6;border-color:#1F7CF6;color:#fff;box-shadow:0 0 0 4px rgba(31,124,246,.15)}
+.ms-label{font-size:10.5px;font-weight:600;color:#9AA3B8;letter-spacing:.3px;white-space:nowrap}
+.ms-label.active{color:#1F7CF6}
+.ms-label.done{color:#15803D}
+.ms-line{width:60px;height:2px;background:#E3E8F2;margin:0 4px;margin-bottom:18px;transition:background .3s;flex-shrink:0}
+.ms-line.done{background:#15803D}
 
 /* ── Steps ── */
 .reg-step{display:none;animation:fadeSlide .25s ease}
@@ -55,22 +55,22 @@ $countries = [
 
 /* ── Nav buttons ── */
 .step-nav{display:flex;gap:10px;margin-top:6px}
-.btn-back{flex:0 0 auto;padding:0 20px;height:46px;border-radius:10px;border:1.5px solid #e5e7eb;background:#fff;color:#374151;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
-.btn-back:hover{border-color:#6366f1;color:#6366f1}
-.btn-next{flex:1;height:46px;border-radius:10px;border:none;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.2px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
-.btn-next:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(99,102,241,.35)}
+.btn-back{flex:0 0 auto;padding:0 20px;height:52px;border-radius:999px;border:1.5px solid #E3E8F2;background:#fff;color:#16162A;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
+.btn-back:hover{border-color:#1F7CF6;color:#1F7CF6}
+.btn-next{flex:1;width:100%;height:52px;border-radius:999px;border:none;background:#1668D8;color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.2px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-next:hover{background:#1260C9;transform:translateY(-1px);box-shadow:0 12px 24px -10px rgba(22,104,216,.6)}
 .btn-next:disabled{opacity:.75;cursor:not-allowed;transform:none}
-.btn-submit{width:100%;height:46px;border-radius:10px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.2px;margin-top:6px}
-.btn-submit:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(16,185,129,.35)}
+.btn-submit{width:100%;height:52px;border-radius:999px;border:none;background:#1668D8;color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.2px;margin-top:6px}
+.btn-submit:hover{background:#1260C9;transform:translateY(-1px);box-shadow:0 12px 24px -10px rgba(22,104,216,.6)}
 
 /* ── Inline errors ── */
 .f-input-err{border-color:#f87171!important;background:#fff5f5!important}
 .f-inline-err{font-size:11.5px;color:#ef4444;margin-top:4px;display:none}
 .f-inline-err.show{display:block}
-.f-input.valid{border-color:#10b981!important}
+.f-input.valid{border-color:#15803D!important}
 
 /* ── Hint ── */
-.f-hint{font-size:11.5px;color:#9ca3af;margin-top:5px}
+.f-hint{font-size:11.5px;color:#9AA3B8;margin-top:5px}
 
 /* ── Anti-zoom iOS ── */
 @media(max-width:600px){
@@ -79,8 +79,8 @@ $countries = [
 </style>
 
 {{-- Titre --}}
-<div class="ab-title">Créer un compte 🚀</div>
-<p class="ab-sub">Rejoignez des milliers d'utilisateurs sur Shopio</p>
+<h1 class="ab-title">Créer un compte</h1>
+<p class="ab-sub">Deux étapes : votre identité, puis vos coordonnées.</p>
 
 {{-- Erreur serveur globale --}}
 @if ($errors->any())
@@ -196,16 +196,8 @@ $countries = [
 
         <button type="button" class="btn-next" onclick="goStep2()">Suivant →</button>
 
-        {{-- Séparateur Google --}}
-        <div style="display:flex;align-items:center;gap:10px;margin:18px 0 12px;">
-            <div style="flex:1;height:1px;background:#e5e7eb;"></div>
-            <span style="font-size:12px;color:#9ca3af;font-weight:600;">OU</span>
-            <div style="flex:1;height:1px;background:#e5e7eb;"></div>
-        </div>
-        <a href="{{ route('google.redirect') }}" id="googleBtn"
-           style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px 16px;border-radius:10px;border:1.5px solid #e5e7eb;background:#fff;color:#374151;font-size:14px;font-weight:600;text-decoration:none;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.06);"
-           onmouseover="this.style.borderColor='#4285F4';this.style.boxShadow='0 3px 10px rgba(66,133,244,.2)'"
-           onmouseout="this.style.borderColor='#e5e7eb';this.style.boxShadow='0 1px 3px rgba(0,0,0,.06)'">
+        <div class="g-sep" aria-hidden="true">OU</div>
+        <a href="{{ route('google.redirect') }}" id="googleBtn" class="btn-google">
             <svg id="googleBtnIco" width="18" height="18" viewBox="0 0 48 48">
                 <path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 5.1 29.6 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21c10.5 0 20-7.5 20-21 0-1.4-.1-2.7-.5-4z"/>
                 <path fill="#34A853" d="M6.3 14.7l7 5.1C15.1 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 5.1 29.6 3 24 3c-7.7 0-14.4 4.4-17.7 11.7z"/>
@@ -215,7 +207,7 @@ $countries = [
             <span id="googleBtnTxt">S'inscrire avec Google</span>
         </a>
 
-        <p style="text-align:center;margin-top:16px;font-size:13px;color:#6b7280">
+        <p style="text-align:center;margin-top:16px;font-size:13px;color:#45455E">
             Déjà inscrit ? <a href="{{ route('login') }}" class="auth-link">Se connecter</a>
         </p>
     </div>
@@ -282,7 +274,7 @@ $countries = [
             <button type="submit" class="btn-next" id="regSubmitBtn">Créer mon compte ✓</button>
         </div>
 
-        <p style="text-align:center;margin-top:16px;font-size:13px;color:#6b7280">
+        <p style="text-align:center;margin-top:16px;font-size:13px;color:#45455E">
             Déjà inscrit ? <a href="{{ route('login') }}" class="auth-link">Se connecter</a>
         </p>
     </div>

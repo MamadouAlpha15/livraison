@@ -7,24 +7,24 @@
 @php $bodyClass = 'is-dashboard'; @endphp
 
 @push('styles')
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="{{ \App\Support\Assets::v('fonts/dashboard-fonts.css') }}" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 :root {
-    --orange:    #6366f1;
-    --orange-dk: #4f46e5;
-    --navy:      #131921;
-    --navy-2:    #232f3e;
-    --red:       #b12704;
-    --grey:      #f3f3f3;
-    --grey-2:    #eaeded;
+    --orange:    #1668D8;
+    --orange-dk: #1260C9;
+    --navy:      #0B1E3D;
+    --navy-2:    #132B52;
+    --red:       #1260C9;
+    --grey:      #F6F9FF;
+    --grey-2:    #EEF2F8;
     --border:    #ddd;
-    --text:      #0f1111;
+    --text:      #16162A;
     --text-2:    #333;
-    --muted:     #565959;
+    --muted:     #62627C;
     --surface:   #fff;
-    --font:      'Open Sans', sans-serif;
-    --display:   'Nunito', sans-serif;
+    --font:      'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --display:   'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --r:         10px;
     --r-sm:      6px;
     --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
@@ -35,7 +35,8 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 
 .nav { background: var(--navy); height: var(--nav-h); display: flex; align-items: center; padding: 0 16px; gap: 10px; position: sticky; top: 0; z-index: 100; }
 .nav-logo { font-family: var(--display); font-size: 18px; font-weight: 900; color: var(--orange); text-decoration: none; flex-shrink: 0; }
-.nav-logo span { color: #fff; }
+.nav-logo { display: flex; align-items: center; }
+.nav-logo img { height: 40px; width: auto; object-fit: contain; border-radius: 10px; }
 .nav-back { color: rgba(255,255,255,.8); font-size: 12.5px; font-weight: 600; text-decoration: none; padding: 5px 10px; border: 1px solid transparent; border-radius: var(--r-sm); transition: all .15s; white-space: nowrap; }
 .nav-back:hover { border-color: rgba(255,255,255,.4); color: #fff; }
 
@@ -54,7 +55,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .pcard-body { padding: 12px 14px 14px; }
 .pcard-shop { font-size: 10.5px; color: var(--muted); margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pcard-name { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.35; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 35px; }
-.pcard-price { font-size: 15px; font-weight: 800; color: var(--red); font-family: monospace; }
+.pcard-price { font-size: 15px; font-weight: 800; color: var(--red); font-variant-numeric: tabular-nums; }
 .pcard-link { display: block; text-decoration: none; color: inherit; }
 .pcard-out { position: absolute; top: 8px; left: 8px; background: rgba(15,17,17,.82); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
 
@@ -62,7 +63,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 .empty-ico { font-size: 52px; opacity: .3; margin-bottom: 14px; }
 .empty-txt { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
 .empty-sub { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
-.btn-browse { display: inline-flex; align-items: center; gap: 7px; background: var(--orange); color: var(--navy); font-weight: 800; font-size: 13.5px; padding: 11px 22px; border-radius: 50px; text-decoration: none; transition: background .15s; }
+.btn-browse { display: inline-flex; align-items: center; gap: 7px; background: var(--orange); color: #fff; border-radius: 999px; font-weight: 800; font-size: 13.5px; padding: 11px 22px;  text-decoration: none; transition: background .15s; }
 .btn-browse:hover { background: var(--orange-dk); }
 
 .pag-wrap { margin-top: 20px; }
@@ -78,20 +79,20 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
 @section('content')
 
 <nav class="nav">
-    <a href="{{ route('client.dashboard') }}" class="nav-logo">Ma<span>Boutique</span></a>
+    <a href="{{ route('client.dashboard') }}" class="nav-logo"><img src="{{ asset('images/shopio-logo-192.png') }}" alt="Shopio"></a>
     <a href="{{ route('client.dashboard') }}" class="nav-back">← Retour à l'accueil</a>
 </nav>
 
 <div class="page-wrap">
-    <div class="page-title">❤️ Ma liste de souhaits</div>
-    <div class="page-sub">{{ $products->total() }} produit{{ $products->total() > 1 ? 's' : '' }} sauvegardé{{ $products->total() > 1 ? 's' : '' }}</div>
+    <div class="page-title">{!! \App\Support\IconLibrary::svg('heart', '', 16) !!} Ma liste de souhaits</div>
+    <div class="page-sub">{{ $products->total() }} produit{{ $products->total() > 1 ? 's' : '' }} sauvegardé{{ $products->total() > 1 ? 's' : '' }} · vous êtes prévenu quand l'un d'eux baisse de prix</div>
 
     @if($products->isEmpty())
         <div class="empty-wrap">
-            <div class="empty-ico">💔</div>
+            <div class="empty-ico">{!! \App\Support\IconLibrary::svg('heart', '', 44) !!}</div>
             <div class="empty-txt">Votre liste de souhaits est vide</div>
-            <div class="empty-sub">Cliquez sur le cœur d'un produit pour le sauvegarder ici.</div>
-            <a href="{{ route('client.products.index') }}" class="btn-browse">🛍️ Découvrir des produits</a>
+            <div class="empty-sub">Cliquez sur le cœur d'un produit pour le sauvegarder ici. Vous serez prévenu s'il baisse de prix.</div>
+            <a href="{{ route('client.products.index') }}" class="btn-browse">{!! \App\Support\IconLibrary::svg('bag', '', 16) !!} Découvrir des produits</a>
         </div>
     @else
         <div class="grid" id="wishGrid">
@@ -105,7 +106,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                         @if($product->image)
                             <img src="{{ \App\Services\ImageOptimizer::url($product->image, 'medium') ?? asset('storage/'.$product->image) }}" alt="{{ $product->name }}" loading="lazy">
                         @else
-                            <div class="pcard-img-ph">🏷️</div>
+                            <div class="pcard-img-ph">{!! \App\Support\IconLibrary::svg('tag', '', 26) !!}</div>
                         @endif
                     </div>
                 </a>

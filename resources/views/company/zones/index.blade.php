@@ -7,20 +7,20 @@
 @endphp
 
 @push('styles')
-<script>(function(){ var t=localStorage.getItem('cx-theme'); if(t==='light') document.documentElement.classList.add('cx-prelight'); })();</script>
-<style>html.cx-prelight body { background:#F5F7FA !important; }</style>
+<script>(function(){ var t=localStorage.getItem('cx-theme'); if(t!=='dark') document.documentElement.classList.add('cx-prelight'); })();</script>
+<style>html.cx-prelight body { background:#F6F9FF !important; }</style>
 <style>
 *,*::before,*::after { box-sizing:border-box; }
 
 :root {
-    --cx-bg:        #0b0d22;
-    --cx-surface:   #0d1226;
-    --cx-surface2:  #111930;
-    --cx-sb:        #06070f;
+    --cx-bg:        #071630;
+    --cx-surface:   #0B1E3D;
+    --cx-surface2:  #132B52;
+    --cx-sb:        #061226;
     --cx-border:    rgba(255,255,255,.07);
-    --cx-brand:     #7c3aed;
-    --cx-brand2:    #6d28d9;
-    --cx-brand-lt:  #a78bfa;
+    --cx-brand:     #1668D8;
+    --cx-brand2:    #1260C9;
+    --cx-brand-lt:  #7DB4FF;
     --cx-text:      #e2e8f0;
     --cx-text2:     #94a3b8;
     --cx-muted:     #475569;
@@ -33,7 +33,7 @@
     --r-xs:         7px;
 }
 
-html, body { margin:0; font-family:'Segoe UI',system-ui,sans-serif; background:var(--cx-bg) !important; color:var(--cx-text); -webkit-font-smoothing:antialiased; }
+html, body { margin:0; font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif; background:var(--cx-bg) !important; color:var(--cx-text); -webkit-font-smoothing:antialiased; }
 a { text-decoration:none; color:inherit; }
 
 body.cx-dashboard > nav, body.cx-dashboard > header, body.cx-dashboard .navbar,
@@ -46,20 +46,20 @@ body.cx-dashboard > main.app-main { padding:0 !important; margin:0 !important; m
 /* ══ SIDEBAR ══ */
 .cx-sidebar {
     position:fixed; top:0; left:0; bottom:0; width:var(--cx-sb-w);
-    background:linear-gradient(180deg,#0f0f59 0%,#0e0e16 40%,#10103a 100%);
+    background:linear-gradient(180deg,#0B1E3D 0%,#081831 55%,#0B1E3D 100%);
     display:flex; flex-direction:column;
-    border-right:1px solid rgba(99,102,241,.15);
+    border-right:1px solid rgba(31,124,246,.15);
     box-shadow:6px 0 30px rgba(0,0,0,.35);
     z-index:1200; overflow-y:auto;
-    scrollbar-width:thin; scrollbar-color:rgba(124,58,237,.3) transparent;
+    scrollbar-width:thin; scrollbar-color:rgba(31,124,246,.3) transparent;
     transition:transform .25s cubic-bezier(.23,1,.32,1);
 }
 .cx-sidebar::-webkit-scrollbar { width:3px; }
-.cx-sidebar::-webkit-scrollbar-thumb { background:rgba(124,58,237,.3); border-radius:3px; }
+.cx-sidebar::-webkit-scrollbar-thumb { background:rgba(31,124,246,.3); border-radius:3px; }
 .cx-brand-hd { padding:14px 14px 10px; border-bottom:1px solid rgba(255,255,255,.06); flex-shrink:0; }
 .cx-brand-top { display:flex; align-items:center; justify-content:space-between; }
 .cx-logo { display:flex; align-items:center; gap:9px; color:#fff; font-size:16px; font-weight:800; }
-.cx-logo-icon { width:34px; height:34px; border-radius:9px; background:linear-gradient(135deg,#7c3aed,#4f46e5); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.cx-logo-icon { width:34px; height:34px; border-radius:9px; background:linear-gradient(135deg,#1668D8,#1260C9); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
 .cx-sys-badge { display:inline-flex; align-items:center; gap:5px; font-size:10px; font-weight:600; color:var(--cx-green); padding:3px 8px; border-radius:20px; background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.2); margin-top:8px; }
 .cx-sys-dot { width:6px; height:6px; border-radius:50%; background:var(--cx-green); animation:blink 2.2s ease-in-out infinite; flex-shrink:0; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
@@ -75,24 +75,24 @@ body.cx-dashboard > main.app-main { padding:0 !important; margin:0 !important; m
     transition:all .22s cubic-bezier(.23,1,.32,1); position:relative;
     cursor:pointer; margin-bottom:2px; border:1px solid transparent;
 }
-.cx-nav-item:hover { background:rgba(124,58,237,.18); color:#fff; border-color:rgba(124,58,237,.25); box-shadow:0 2px 12px rgba(124,58,237,.2),inset 0 1px 0 rgba(255,255,255,.06); }
-.cx-nav-item:hover .cx-nav-ico { background:rgba(139,92,246,.25); box-shadow:0 0 8px rgba(139,92,246,.3); }
-.cx-nav-item.active { background:linear-gradient(90deg,rgba(124,58,237,.35) 0%,rgba(99,102,241,.2) 100%); color:#fff; font-weight:700; border-color:rgba(139,92,246,.3); box-shadow:0 4px 16px rgba(124,58,237,.25),inset 0 1px 0 rgba(255,255,255,.08); }
-.cx-nav-item.active::before { content:''; position:absolute; left:0; top:50%; transform:translateY(-50%); width:3px; height:22px; background:linear-gradient(180deg,#a78bfa,#7c3aed); border-radius:0 3px 3px 0; box-shadow:2px 0 12px rgba(167,139,250,.7); }
+.cx-nav-item:hover { background:rgba(31,124,246,.18); color:#fff; border-color:rgba(31,124,246,.25); box-shadow:0 2px 12px rgba(31,124,246,.2),inset 0 1px 0 rgba(255,255,255,.06); }
+.cx-nav-item:hover .cx-nav-ico { background:rgba(31,124,246,.25); box-shadow:0 0 8px rgba(31,124,246,.3); }
+.cx-nav-item.active { background:linear-gradient(90deg,rgba(31,124,246,.35) 0%,rgba(31,124,246,.2) 100%); color:#fff; font-weight:700; border-color:rgba(31,124,246,.3); box-shadow:0 4px 16px rgba(31,124,246,.25),inset 0 1px 0 rgba(255,255,255,.08); }
+.cx-nav-item.active::before { content:''; position:absolute; left:0; top:50%; transform:translateY(-50%); width:3px; height:22px; background:linear-gradient(180deg,#7DB4FF,#1668D8); border-radius:0 3px 3px 0; box-shadow:2px 0 12px rgba(125,180,255,.7); }
 .cx-nav-ico { width:26px; height:26px; border-radius:7px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.07); display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; transition:all .22s cubic-bezier(.23,1,.32,1); }
 .cx-nav-ico svg { display:block; }
-.cx-nav-item.active .cx-nav-ico { background:rgba(139,92,246,.3); border-color:rgba(139,92,246,.4); box-shadow:0 0 10px rgba(139,92,246,.4); }
+.cx-nav-item.active .cx-nav-ico { background:rgba(31,124,246,.3); border-color:rgba(31,124,246,.4); box-shadow:0 0 10px rgba(31,124,246,.4); }
 
 .cx-user-foot { padding:10px 10px 12px; border-top:1px solid rgba(255,255,255,.07); flex-shrink:0; }
 .cx-user-row { display:flex; align-items:center; gap:9px; padding:7px 8px; border-radius:var(--r-xs); background:rgba(255,255,255,.04); cursor:pointer; transition:background .15s; margin-bottom:6px; }
 .cx-user-row:hover { background:rgba(255,255,255,.08); }
-.cx-user-av { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#7c3aed,#4338ca); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#fff; flex-shrink:0; }
+.cx-user-av { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#1668D8,#1260C9); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#fff; flex-shrink:0; }
 .cx-user-name { font-size:12px; font-weight:700; color:#fff; line-height:1.2; }
-.cx-user-role { font-size:10px; color:var(--cx-text2); }
+.cx-user-role { font-size:10px; color:rgba(255,255,255,.62); }
 .cx-logout-btn { width:30px; height:30px; border-radius:8px; flex-shrink:0; background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.2); display:flex; align-items:center; justify-content:center; color:#f87171; cursor:pointer; transition:background .15s,color .15s; padding:0; }
 .cx-logout-btn:hover { background:rgba(239,68,68,.22); color:#fff; }
 .cx-dark-row { display:flex; align-items:center; justify-content:space-between; padding:4px 8px; cursor:pointer; }
-.cx-dark-lbl { font-size:11.5px; color:var(--cx-text2); }
+.cx-dark-lbl { font-size:11.5px; color:rgba(255,255,255,.72); }
 .cx-toggle { width:34px; height:18px; background:#475569; border-radius:9px; position:relative; transition:background .25s; flex-shrink:0; }
 .cx-toggle::after { content:''; position:absolute; top:3px; left:3px; width:12px; height:12px; background:#fff; border-radius:50%; transition:left .25s; }
 .cx-toggle.on { background:var(--cx-brand); }
@@ -111,14 +111,14 @@ body.cx-dashboard > main.app-main { padding:0 !important; margin:0 !important; m
 .cx-tb-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
 .cx-tb-user { display:flex; align-items:center; gap:8px; cursor:pointer; padding:5px 10px; border-radius:8px; transition:background .14s; flex-shrink:0; min-width:0; }
 .cx-tb-user:hover { background:rgba(255,255,255,.06); }
-.cx-tb-av { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#7c3aed,#4338ca); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#fff; flex-shrink:0; }
+.cx-tb-av { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#1668D8,#1260C9); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#fff; flex-shrink:0; }
 .cx-tb-uname { font-size:12.5px; font-weight:700; color:var(--cx-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:120px; }
 .cx-tb-urole { font-size:10px; color:var(--cx-muted); }
 
 /* ══ BANNER ══ */
-.page-banner { background:linear-gradient(135deg,#1e1b4b 0%,#2d2470 35%,#3d1fa5 65%,#5b21b6 100%); padding:28px 32px 24px; position:relative; overflow:hidden; }
+.page-banner { background:linear-gradient(135deg,#0B1E3D 0%,#0F2547 35%,#163A6E 65%,#1260C9 100%); padding:28px 32px 24px; position:relative; overflow:hidden; }
 .banner-grid { position:absolute; inset:0; pointer-events:none; background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px); background-size:44px 44px; }
-.banner-glow  { position:absolute; top:-100px; right:-60px; width:400px; height:400px; border-radius:50%; background:radial-gradient(circle,rgba(124,58,237,.2) 0%,transparent 65%); pointer-events:none; }
+.banner-glow  { position:absolute; top:-100px; right:-60px; width:400px; height:400px; border-radius:50%; background:radial-gradient(circle,rgba(31,124,246,.2) 0%,transparent 65%); pointer-events:none; }
 .banner-glow2 { position:absolute; bottom:-80px; left:-40px; width:280px; height:280px; border-radius:50%; background:radial-gradient(circle,rgba(59,130,246,.1) 0%,transparent 65%); pointer-events:none; }
 .banner-inner { max-width:1200px; margin:0 auto; position:relative; z-index:1; }
 .banner-top { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:20px; }
@@ -133,7 +133,7 @@ body.cx-dashboard > main.app-main { padding:0 !important; margin:0 !important; m
 .stats-bar { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
 .stat-pill { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.11); border-radius:var(--r-sm); padding:14px 16px; backdrop-filter:blur(4px); position:relative; overflow:hidden; transition:background .15s; }
 .stat-pill:hover { background:rgba(255,255,255,.1); }
-.stat-pill::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--s-accent,#a78bfa); }
+.stat-pill::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--s-accent,#7DB4FF); }
 .stat-pill-ico { font-size:16px; margin-bottom:5px; }
 .stat-pill-val { font-size:22px; font-weight:900; color:#fff; line-height:1; letter-spacing:-.6px; }
 .stat-pill-lbl { font-size:10px; font-weight:600; color:rgba(255,255,255,.48); text-transform:uppercase; letter-spacing:.5px; margin-top:4px; }
@@ -149,7 +149,7 @@ body.cx-dashboard > main.app-main { padding:0 !important; margin:0 !important; m
 /* Zone grid */
 .zones-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:18px; }
 .zone-card { background:var(--cx-surface); border:1px solid var(--cx-border); border-radius:var(--r); overflow:hidden; transition:border-color .18s,box-shadow .18s,transform .18s; position:relative; }
-.zone-card:hover { border-color:rgba(124,58,237,.35); box-shadow:0 8px 32px rgba(124,58,237,.15),0 2px 8px rgba(0,0,0,.3); transform:translateY(-2px); }
+.zone-card:hover { border-color:rgba(31,124,246,.35); box-shadow:0 8px 32px rgba(31,124,246,.15),0 2px 8px rgba(0,0,0,.3); transform:translateY(-2px); }
 .zone-card.inactive { opacity:.55; }
 .zone-card-accent { height:4px; width:100%; }
 .zone-card-body { padding:18px; }
@@ -165,7 +165,7 @@ body.cx-dashboard > main.app-main { padding:0 !important; margin:0 !important; m
 .zone-meta-val { font-size:17px; font-weight:900; color:var(--cx-text); letter-spacing:-.3px; }
 .zone-actions { display:flex; gap:8px; }
 .dc-action-btn { width:32px; height:32px; border-radius:var(--r-xs); display:flex; align-items:center; justify-content:center; border:1px solid var(--cx-border); background:var(--cx-surface2); color:var(--cx-text2); cursor:pointer; transition:all .14s; font-size:14px; }
-.dc-action-btn:hover { background:rgba(124,58,237,.15); border-color:rgba(124,58,237,.3); color:#c4b5fd; }
+.dc-action-btn:hover { background:rgba(31,124,246,.15); border-color:rgba(31,124,246,.3); color:#1F7CF6; }
 .dc-action-btn.del:hover { background:rgba(239,68,68,.1); border-color:rgba(239,68,68,.3); color:#f87171; }
 .btn-toggle-zone { padding:6px 14px; border-radius:var(--r-xs); font-size:12px; font-weight:700; border:1px solid var(--cx-border); background:var(--cx-surface2); color:var(--cx-text2); cursor:pointer; font-family:inherit; transition:all .14s; }
 .btn-toggle-zone:hover { background:rgba(245,158,11,.12); border-color:rgba(245,158,11,.3); color:#fbbf24; }
@@ -173,7 +173,7 @@ body.cx-dashboard > main.app-main { padding:0 !important; margin:0 !important; m
 
 /* Empty state */
 .empty-state { grid-column:1/-1; text-align:center; padding:64px 24px; display:flex; flex-direction:column; align-items:center; gap:14px; }
-.empty-ico-wrap { width:72px; height:72px; border-radius:20px; background:rgba(124,58,237,.1); border:1px solid rgba(124,58,237,.2); display:flex; align-items:center; justify-content:center; font-size:32px; }
+.empty-ico-wrap { width:72px; height:72px; border-radius:20px; background:rgba(31,124,246,.1); border:1px solid rgba(31,124,246,.2); display:flex; align-items:center; justify-content:center; font-size:32px; }
 .empty-title { font-size:17px; font-weight:800; color:var(--cx-text); }
 .empty-sub { font-size:13px; color:var(--cx-muted); max-width:320px; line-height:1.6; }
 
@@ -184,7 +184,7 @@ body.cx-dashboard > main.app-main { padding:0 !important; margin:0 !important; m
 .modal-overlay.open .modal { transform:translateY(0) scale(1); }
 .modal-hd { padding:20px 24px; border-bottom:1px solid var(--cx-border); display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; background:var(--cx-surface); z-index:1; }
 .modal-title { font-size:15px; font-weight:900; color:var(--cx-text); display:flex; align-items:center; gap:9px; }
-.modal-title-ico { width:30px; height:30px; border-radius:8px; background:rgba(124,58,237,.2); border:1px solid rgba(124,58,237,.3); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+.modal-title-ico { width:30px; height:30px; border-radius:8px; background:rgba(31,124,246,.2); border:1px solid rgba(31,124,246,.3); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
 .modal-close { width:30px; height:30px; border-radius:var(--r-xs); background:var(--cx-surface2); border:1px solid var(--cx-border); display:flex; align-items:center; justify-content:center; color:var(--cx-text2); cursor:pointer; font-size:16px; transition:all .14s; }
 .modal-close:hover { background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.3); color:#f87171; }
 .modal-body { padding:22px 24px; }
@@ -193,10 +193,10 @@ body.cx-dashboard > main.app-main { padding:0 !important; margin:0 !important; m
 .form-group.full { grid-column:1/-1; }
 .form-label { font-size:11.5px; font-weight:700; color:var(--cx-text2); text-transform:uppercase; letter-spacing:.5px; }
 .form-input { padding:11px 14px; background:var(--cx-surface2); border:1.5px solid var(--cx-border); border-radius:var(--r-sm); color:var(--cx-text); font-size:13.5px; font-family:inherit; outline:none; transition:border-color .15s,box-shadow .15s; }
-.form-input:focus { border-color:var(--cx-brand); box-shadow:0 0 0 3px rgba(124,58,237,.15); }
+.form-input:focus { border-color:var(--cx-brand); box-shadow:0 0 0 3px rgba(31,124,246,.15); }
 .form-input::placeholder { color:var(--cx-muted); }
-.btn-submit { width:100%; padding:14px; margin-top:18px; background:linear-gradient(135deg,var(--cx-brand),var(--cx-brand2)); color:#fff; border:none; border-radius:var(--r-sm); font-size:14px; font-weight:800; font-family:inherit; cursor:pointer; box-shadow:0 4px 16px rgba(124,58,237,.4); transition:all .18s; display:flex; align-items:center; justify-content:center; gap:9px; }
-.btn-submit:hover { transform:translateY(-1px); box-shadow:0 6px 22px rgba(124,58,237,.5); }
+.btn-submit { width:100%; padding:14px; margin-top:18px; background:linear-gradient(135deg,var(--cx-brand),var(--cx-brand2)); color:#fff; border:none; border-radius:var(--r-sm); font-size:14px; font-weight:800; font-family:inherit; cursor:pointer; box-shadow:0 4px 16px rgba(31,124,246,.4); transition:all .18s; display:flex; align-items:center; justify-content:center; gap:9px; }
+.btn-submit:hover { transform:translateY(-1px); box-shadow:0 6px 22px rgba(31,124,246,.5); }
 
 /* Delete modal */
 .del-modal .modal-body { text-align:center; padding:28px 24px; }
@@ -216,12 +216,12 @@ body.cx-dashboard > main.app-main { padding:0 !important; margin:0 !important; m
 .toast-error   { background:linear-gradient(135deg,#dc2626,#ef4444); }
 
 /* Mode clair */
-body.cx-light { --cx-bg:#F5F7FA; --cx-surface:#ffffff; --cx-surface2:#eef1f7; --cx-border:rgba(0,0,0,.08); --cx-text:#111827; --cx-text2:#4b5563; --cx-muted:#9ca3af; }
-body.cx-light, html.cx-light, html.cx-light body { background:#F5F7FA !important; }
+body.cx-light { --cx-bg:#F6F9FF; --cx-surface:#ffffff; --cx-surface2:#EEF3FB; --cx-border:rgba(0,0,0,.08); --cx-text:#16162A; --cx-text2:#45455E; --cx-muted:#9ca3af; }
+body.cx-light, html.cx-light, html.cx-light body { background:#F6F9FF !important; }
 body.cx-light .cx-topbar { background:#fff; border-bottom-color:rgba(0,0,0,.07); box-shadow:0 1px 4px rgba(0,0,0,.06); }
 body.cx-light .modal, body.cx-light .modal-hd { background:#fff; border-color:rgba(0,0,0,.08); }
 body.cx-light .zone-card { background:#fff; border-color:rgba(0,0,0,.07); }
-body.cx-light .zone-card:hover { border-color:rgba(124,58,237,.3); }
+body.cx-light .zone-card:hover { border-color:rgba(31,124,246,.3); }
 body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border-color:rgba(0,0,0,.08); }
 
 @media(max-width:900px) {
@@ -274,7 +274,7 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
             @if(!$isBusiness)
                 @php
                     $pctO = $maxOrders > 0 ? $usedOrders / $maxOrders : 0;
-                    $colO = $pctO >= 1 ? '#ef4444' : ($pctO >= 0.7 ? '#f59e0b' : '#7c3aed');
+                    $colO = $pctO >= 1 ? '#ef4444' : ($pctO >= 0.7 ? '#f59e0b' : '#1668D8');
                 @endphp
                 <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:{{ $colO }};color:#fff;">
                     {{ $usedOrders }}/{{ $maxOrders }}
@@ -289,7 +289,7 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
             @if(!$isBusiness)
                 @php
                     $pctD = $maxDrivers > 0 ? $totalDrivers / $maxDrivers : 0;
-                    $colD = $pctD >= 1 ? '#ef4444' : ($pctD >= 0.7 ? '#f59e0b' : '#7c3aed');
+                    $colD = $pctD >= 1 ? '#ef4444' : ($pctD >= 0.7 ? '#f59e0b' : '#1668D8');
                 @endphp
                 <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:{{ $colD }};color:#fff;">
                     {{ $totalDrivers }}/{{ $maxDrivers }}
@@ -309,7 +309,7 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span>
             Carte en direct
             @if(!$isBusiness)
-                <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#f59e0b;color:#1c1917;">🔒</span>
+                <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>
             @endif
         </a>
 
@@ -331,7 +331,7 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
             @if(!$isBusiness)
                 @php
                     $pctZ = $maxZones > 0 ? $totalZones / $maxZones : 0;
-                    $colZ = $pctZ >= 1 ? '#ef4444' : ($pctZ >= 0.7 ? '#f59e0b' : '#7c3aed');
+                    $colZ = $pctZ >= 1 ? '#ef4444' : ($pctZ >= 0.7 ? '#f59e0b' : '#1668D8');
                 @endphp
                 <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:{{ $colZ }};color:#fff;">
                     {{ $totalZones }}/{{ $maxZones }}
@@ -351,7 +351,7 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
             Rapport
             @if(!$isBusiness)
-                <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#f59e0b;color:#1c1917;">🔒</span>
+                <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>
             @endif
         </a>
 
@@ -368,7 +368,7 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
             <span class="cx-nav-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
             Utilisateurs
             @if(!$isBusiness)
-                <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#f59e0b;color:#1c1917;">🔒</span>
+                <span style="margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#f59e0b;color:#1c1917;display:inline-flex;align-items:center" title="Plan Business">{!! \App\Support\IconLibrary::svg('lock', '', 11) !!}</span>
             @endif
         </a>
 
@@ -437,7 +437,7 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
                     @if(!$isBusiness && $totalZones >= $maxZones)
                         <a href="{{ route('company.subscription.upgrade') }}"
                            title="Passer au Plan Business pour ajouter plus de zones"
-                           style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;border:none;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer;">
+                           style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;background:linear-gradient(135deg,#1668D8,#1260C9);color:#fff;border:none;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                             Nouvelle zone
                         </a>
@@ -450,8 +450,8 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
                 </div>
 
                 <div class="stats-bar">
-                    <div class="stat-pill" style="--s-accent:#a78bfa">
-                        <div class="stat-pill-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+                    <div class="stat-pill" style="--s-accent:#7DB4FF">
+                        <div class="stat-pill-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7DB4FF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
                         <div class="stat-pill-val">{{ $zones->count() }}</div>
                         <div class="stat-pill-lbl">Total zones</div>
                     </div>
@@ -478,13 +478,13 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
         <div class="pw">
 
             @if(session('success'))
-                <div class="flash flash-success">✅ {{ session('success') }}</div>
+                <div class="flash flash-success">{!! \App\Support\IconLibrary::svg('check', '', 14) !!} {{ session('success') }}</div>
             @endif
             @if(session('error'))
-                <div class="flash flash-error">❌ {{ session('error') }}</div>
+                <div class="flash flash-error">{!! \App\Support\IconLibrary::svg('x', '', 14) !!} {{ session('error') }}</div>
             @endif
             @if($errors->any())
-                <div class="flash flash-error">❌ {{ $errors->first() }}</div>
+                <div class="flash flash-error">{!! \App\Support\IconLibrary::svg('x', '', 14) !!} {{ $errors->first() }}</div>
             @endif
 
             <div class="zones-grid">
@@ -534,13 +534,13 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
                 </div>
                 @empty
                 <div class="empty-state">
-                    <div class="empty-ico-wrap"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+                    <div class="empty-ico-wrap"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#7DB4FF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
                     <div class="empty-title">Aucune zone configurée</div>
                     <div class="empty-sub">Créez vos zones de livraison pour indiquer aux boutiques où vous livrez et à quel tarif.</div>
                     @if(!$isBusiness && $totalZones >= $maxZones)
                         <a href="{{ route('company.subscription.upgrade') }}"
                            title="Passer au Plan Business pour ajouter plus de zones"
-                           style="display:inline-flex;align-items:center;gap:7px;margin-top:4px;font-size:13px;padding:11px 20px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;font-weight:700;text-decoration:none;cursor:pointer;">
+                           style="display:inline-flex;align-items:center;gap:7px;margin-top:4px;font-size:13px;padding:11px 20px;border-radius:8px;background:linear-gradient(135deg,#1668D8,#1260C9);color:#fff;font-weight:700;text-decoration:none;cursor:pointer;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                             + Créer ma première zone
                         </a>
@@ -593,7 +593,7 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
                     <div class="form-group full">
                         <label class="form-label">Couleur d'identification</label>
                         <div style="display:flex;align-items:center;gap:12px;">
-                            <input type="color" name="color" value="{{ old('color', '#7c3aed') }}" style="width:44px;height:38px;border:1.5px solid var(--cx-border);border-radius:8px;cursor:pointer;background:none;padding:2px;">
+                            <input type="color" name="color" value="{{ old('color', '#1668D8') }}" style="width:44px;height:38px;border:1.5px solid var(--cx-border);border-radius:8px;cursor:pointer;background:none;padding:2px;">
                             <span style="font-size:12px;color:var(--cx-text2);">Couleur affichée sur la carte de zone</span>
                         </div>
                     </div>
@@ -681,12 +681,12 @@ body.cx-light .zone-meta, body.cx-light .form-input { background:#f3f4f6; border
     const sw     = document.getElementById('cxDarkSwitch');
     const lbl    = document.getElementById('cxDarkLbl');
     const toggle = document.getElementById('cxDarkToggle');
-    const saved  = localStorage.getItem('cx-theme') || 'dark';
+    const saved  = localStorage.getItem('cx-theme') || 'light';
     function apply(theme) {
         if (theme === 'light') {
             body.classList.remove('cx-dark'); body.classList.add('cx-light');
             if (sw)  sw.classList.remove('on');
-            if (lbl) lbl.textContent = 'Mode clair';
+            if (lbl) lbl.textContent = 'Mode sombre';
         } else {
             body.classList.remove('cx-light'); body.classList.add('cx-dark');
             if (sw)  sw.classList.add('on');
@@ -751,10 +751,27 @@ function toast(msg, type = 'success') {
     setTimeout(() => el.classList.remove('show'), 4000);
 }
 @if(session('success'))
-    setTimeout(() => toast('✅ {{ session('success') }}', 'success'), 200);
+    setTimeout(() => toast('{{ session('success') }}', 'success'), 200);
 @endif
 @if(session('error'))
-    setTimeout(() => toast('❌ {{ session('error') }}', 'error'), 200);
+    setTimeout(() => toast('{{ session('error') }}', 'error'), 200);
 @endif
+</script>
+<style>.cx-dark-row:focus-visible{outline:2px solid #7DB4FF;outline-offset:2px}</style>
+<script>
+/* Interrupteur « Mode sombre » : même comportement sur toutes les pages (clavier et lecteur d'écran) */
+(function () {
+    var row = document.querySelector('.cx-dark-row'), sw = row && row.querySelector('.cx-toggle');
+    if (!row || !sw) return;
+    row.setAttribute('role', 'switch');
+    row.setAttribute('tabindex', '0');
+    row.setAttribute('aria-label', 'Mode sombre');
+    var sync = function () { row.setAttribute('aria-checked', sw.classList.contains('on') ? 'true' : 'false'); };
+    new MutationObserver(sync).observe(sw, { attributes: true, attributeFilter: ['class'] });
+    row.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); }
+    });
+    sync();
+})();
 </script>
 @endpush

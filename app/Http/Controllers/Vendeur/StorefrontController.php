@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Vendeur;
 
+use App\Http\Controllers\Concerns\ResolvesOwnShop;
 use App\Http\Controllers\Controller;
 use App\Models\PromoCode;
 use App\Models\Shop;
@@ -12,7 +13,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 /**
@@ -23,13 +23,7 @@ use Illuminate\View\View;
  */
 class StorefrontController extends Controller
 {
-    private function shop(): Shop
-    {
-        $user = Auth::user();
-        $shop = $user->shop ?? Shop::where('user_id', $user->id)->first();
-        abort_unless($shop, 404, 'Aucune boutique associée à ce compte.');
-        return $shop;
-    }
+    use ResolvesOwnShop;
 
     private function draftKey(Shop $shop): string
     {

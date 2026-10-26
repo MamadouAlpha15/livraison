@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Company;
 
+use App\Http\Controllers\Concerns\ResolvesCompany;
 use App\Http\Controllers\Controller;
-use App\Models\DeliveryCompany;
 use App\Models\SupportTicket;
 use App\Models\SupportMessage;
 use App\Models\User;
@@ -17,12 +17,7 @@ use Illuminate\Support\Str;
 
 class SupportController extends Controller
 {
-    private function company(): DeliveryCompany
-    {
-        $company = DeliveryCompany::forUser(Auth::user());
-        abort_unless($company, 403);
-        return $company;
-    }
+    use ResolvesCompany;
 
     public function index()
     {

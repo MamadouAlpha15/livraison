@@ -53,7 +53,7 @@ class ProductController extends Controller
     public function topSales()
     {
         $user = Auth::user();
-        $shop = $user->shop ?? $user->assignedShop;
+        $shop = $user->shop;
         abort_unless($shop, 403);
 
         $now = now();

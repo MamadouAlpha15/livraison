@@ -8,10 +8,10 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
-    --orange:    #6366f1;
-    --orange-dk: #4f46e5;
-    --orange-lt: #e0e7ff;
-    --orange-bd: #c7d2fe;
+    --orange:    #1668D8;
+    --orange-dk: #1260C9;
+    --orange-lt: #EAF2FF;
+    --orange-bd: #D6E6FF;
     --green:     #10b981;
     --green-lt:  #ecfdf5;
     --blue:      #3b82f6;
@@ -20,14 +20,14 @@
     --yellow-lt: #fffbeb;
     --red:       #ef4444;
     --red-lt:    #fef2f2;
-    --text:      #0f172a;
-    --text-2:    #475569;
+    --text:      #16162A;
+    --text-2:    #45455E;
     --muted:     #94a3b8;
-    --border:    #e2e8f0;
+    --border:    #E3E8F2;
     --surface:   #ffffff;
-    --bg:        #f8f9fc;
-    --font:      system-ui, -apple-system, 'Segoe UI', sans-serif;
-    --mono:      'JetBrains Mono', 'Fira Code', monospace;
+    --bg:        #F6F9FF;
+    --font:      'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --mono:      'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --r:         14px;
     --r-sm:      9px;
     --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
@@ -53,14 +53,14 @@ html, body {
 
 /* ── Top Bar ── */
 .top-bar {
-    background: linear-gradient(135deg, var(--orange) 0%, var(--orange-dk) 60%, #3730a3 100%);
+    background: radial-gradient(110% 170% at 100% 0%, rgba(31,124,246,.45), transparent 60%), linear-gradient(135deg, #0B1E3D, #132B52);
     margin: -28px -16px 28px;
     padding: 0 20px;
     height: 62px;
     display: flex;
     align-items: center;
     gap: 14px;
-    box-shadow: 0 4px 18px rgba(99,102,241,.35);
+    box-shadow: 0 4px 18px rgba(31,124,246,.35);
     position: relative;
     overflow: hidden;
 }
@@ -206,7 +206,7 @@ html, body {
     background: var(--orange);
     border-color: var(--orange-dk);
     color: #fff;
-    box-shadow: 0 2px 8px rgba(99,102,241,.3);
+    box-shadow: 0 2px 8px rgba(31,124,246,.3);
 }
 .filter-btn .cnt {
     background: rgba(0,0,0,.08);
@@ -235,11 +235,11 @@ html, body {
 }
 .order-card:target {
     border-color: var(--orange);
-    box-shadow: 0 0 0 3px rgba(99,102,241,.18);
+    box-shadow: 0 0 0 3px rgba(31,124,246,.18);
     animation: orderHighlight 1.8s ease forwards;
 }
 @keyframes orderHighlight {
-    0%   { background: rgba(99,102,241,.12); }
+    0%   { background: rgba(31,124,246,.12); }
     100% { background: var(--surface); }
 }
 
@@ -250,7 +250,7 @@ html, body {
 }
 .strip-pending  { background: linear-gradient(90deg, var(--yellow), #fbbf24); }
 .strip-confirm  { background: linear-gradient(90deg, var(--blue), #60a5fa); }
-.strip-delivery { background: linear-gradient(90deg, var(--orange), #818cf8); }
+.strip-delivery { background: linear-gradient(90deg, var(--orange), #7DB4FF); }
 .strip-done     { background: linear-gradient(90deg, var(--green), #34d399); }
 .strip-cancel   { background: linear-gradient(90deg, var(--red), #f87171); }
 
@@ -366,7 +366,7 @@ html, body {
     position: absolute;
     top: 14px; left: 14px;
     height: 2px;
-    background: linear-gradient(90deg, var(--orange), #818cf8);
+    background: linear-gradient(90deg, var(--orange), #7DB4FF);
     z-index: 1;
     transition: width .4s ease;
 }
@@ -402,7 +402,7 @@ html, body {
 }
 @keyframes pulse-dot {
     0%,100% { box-shadow: 0 0 0 3px var(--orange-lt); }
-    50%      { box-shadow: 0 0 0 6px rgba(99,102,241,.15); }
+    50%      { box-shadow: 0 0 0 6px rgba(31,124,246,.15); }
 }
 .prog-lbl {
     font-size: 10px; font-weight: 600;
@@ -501,10 +501,43 @@ html, body {
     background: var(--orange) !important;
     border-color: var(--orange-dk) !important;
     color: #fff !important;
-    box-shadow: 0 2px 8px rgba(99,102,241,.3) !important;
+    box-shadow: 0 2px 8px rgba(31,124,246,.3) !important;
 }
 
+.order-slot { display: flex; align-items: center; gap: 5px; margin-top: 6px; font-size: 12px; font-weight: 600; color: #1260C9; }
+
+/* ── Code de remise ── */
+.handover-code { display: flex; align-items: center; gap: 10px; padding: 10px 20px; border-top: 1px solid var(--border); background: #F6F9FF; flex-wrap: wrap; }
+.handover-code-ico { width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: #EAF2FF; color: #1668D8; flex-shrink: 0; }
+.handover-code-txt { flex: 1; min-width: 180px; font-size: 12.5px; color: #45455E; }
+.handover-code-txt strong { color: #16162A; }
+.handover-code-val { font-size: 20px; font-weight: 800; letter-spacing: .16em; color: #0B1E3D; font-variant-numeric: tabular-nums; }
+
+/* ── Commander à nouveau / Annuler ── */
+.btn-reorder { background: #1668D8; border-color: #1668D8; color: #fff; }
+.btn-reorder:hover { background: #1260C9; border-color: #1260C9; }
+.btn-cancel { background: #fff; border-color: #FECACA; color: #B91C1C; }
+.btn-cancel:hover { background: #FEF2F2; }
+
+/* ── Fenêtre d'annulation ── */
+.cancel-dialog { border: none; border-radius: 22px; padding: 0; width: min(440px, calc(100% - 32px)); box-shadow: 0 24px 60px -20px rgba(11,30,61,.5); }
+.cancel-dialog::backdrop { background: rgba(11,30,61,.5); }
+.cancel-dialog form { padding: 24px; display: flex; flex-direction: column; gap: 14px; font-family: var(--font); }
+.cancel-title { margin: 0; font-size: 18px; font-weight: 800; color: #16162A; text-wrap: balance; }
+.cancel-sub { margin: 0; font-size: 13px; color: #45455E; line-height: 1.5; }
+.cancel-reasons { border: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.cancel-reasons legend { font-size: 12px; font-weight: 800; color: #62627C; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+.cancel-reason { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px; border-radius: 14px; box-shadow: inset 0 0 0 1.5px #E3E8F2; font-size: 14px; color: #16162A; cursor: pointer; }
+.cancel-reason:has(input:checked) { box-shadow: inset 0 0 0 2px #1F7CF6; background: #F6F9FF; }
+.cancel-reason input { accent-color: #1668D8; width: 16px; height: 16px; }
+.cancel-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.cancel-actions button { flex: 1; min-height: 46px; border-radius: 999px; font: 700 14px var(--font); cursor: pointer; border: none; }
+.cancel-keep { background: rgba(22,22,42,.07); color: #16162A; }
+.cancel-confirm { background: #B91C1C; color: #fff; }
+.cancel-confirm:disabled { opacity: .6; }
+
 /* ── Flash ── */
+.flash-warning { background: #FFFBEB; border-color: #FDE68A; color: #92400E; }
 .flash-success {
     display: flex; align-items: center; gap: 10px;
     background: var(--green-lt);
@@ -548,11 +581,11 @@ html, body {
 use App\Models\Order;
 
 $statusConfig = [
-    Order::STATUS_EN_ATTENTE   => ['class'=>'pending',  'strip'=>'strip-pending',  'label'=>'En attente',  'ico'=>'⏳', 'step'=>0],
-    Order::STATUS_CONFIRMEE    => ['class'=>'confirm',  'strip'=>'strip-confirm',  'label'=>'Confirmée',   'ico'=>'📦', 'step'=>1],
-    Order::STATUS_EN_LIVRAISON => ['class'=>'delivery', 'strip'=>'strip-delivery', 'label'=>'En livraison','ico'=>'🚚', 'step'=>2],
-    Order::STATUS_LIVREE       => ['class'=>'done',     'strip'=>'strip-done',     'label'=>'Livrée',      'ico'=>'✅', 'step'=>3],
-    Order::STATUS_ANNULEE      => ['class'=>'cancel',   'strip'=>'strip-cancel',   'label'=>'Annulée',     'ico'=>'❌', 'step'=>-1],
+    Order::STATUS_EN_ATTENTE   => ['class'=>'pending',  'strip'=>'strip-pending',  'label'=>'En attente',  'ico'=>'clock', 'step'=>0],
+    Order::STATUS_CONFIRMEE    => ['class'=>'confirm',  'strip'=>'strip-confirm',  'label'=>'Confirmée',   'ico'=>'package', 'step'=>1],
+    Order::STATUS_EN_LIVRAISON => ['class'=>'delivery', 'strip'=>'strip-delivery', 'label'=>'En livraison','ico'=>'truck', 'step'=>2],
+    Order::STATUS_LIVREE       => ['class'=>'done',     'strip'=>'strip-done',     'label'=>'Livrée',      'ico'=>'check', 'step'=>3],
+    Order::STATUS_ANNULEE      => ['class'=>'cancel',   'strip'=>'strip-cancel',   'label'=>'Annulée',     'ico'=>'x', 'step'=>-1],
 ];
 
 // Compteurs globaux (passés par le contrôleur, indépendants du filtre actif)
@@ -588,6 +621,11 @@ $groups = $orders->getCollection()
             'shops'         => $grp->map(fn($o) => $o->shop)->filter()->unique('id')->values(),
             'all_delivered' => $grp->every(fn($o) => $o->status === Order::STATUS_LIVREE),
             'has_review'    => $grp->every(fn($o) => $o->review !== null),
+            // Annulable par le client tant qu'aucune boutique n'a confirmé
+            'can_cancel'    => $grp->every(fn($o) => $o->status === Order::STATUS_EN_ATTENTE),
+            'is_finished'   => $grp->every(fn($o) => in_array($o->status, [Order::STATUS_LIVREE, Order::STATUS_ANNULEE], true)),
+            'codes'         => $grp->reject(fn($o) => in_array($o->status, [Order::STATUS_LIVREE, Order::STATUS_ANNULEE], true))
+                                   ->map(fn($o) => $o->delivery_code)->filter()->unique()->values(),
         ];
     })->values();
 @endphp
@@ -606,42 +644,48 @@ $groups = $orders->getCollection()
             <h1>Mes commandes</h1>
             <p>Suivez toutes vos commandes en temps réel</p>
         </div>
-        <div class="top-bar-ico">📦</div>
+        <div class="top-bar-ico">{!! \App\Support\IconLibrary::svg('package', '', 26) !!}</div>
     </div>
 
     {{-- ── Flash ── --}}
     @if(session('success'))
     <div class="flash-success">
-        <span style="font-size:18px">✅</span>
+        <span style="font-size:18px">{!! \App\Support\IconLibrary::svg('check', '', 16) !!}</span>
         {{ session('success') }}
+    </div>
+    @endif
+    @if(session('warning') || $errors->any())
+    <div class="flash-success flash-warning" role="alert">
+        {!! \App\Support\IconLibrary::svg('alert', '', 16) !!}
+        {{ session('warning') ?: $errors->first() }}
     </div>
     @endif
 
     {{-- ── Stats ── --}}
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-ico orange">📦</div>
+            <div class="stat-ico orange">{!! \App\Support\IconLibrary::svg('package', '', 26) !!}</div>
             <div>
                 <div class="stat-val">{{ $orders->total() }}</div>
                 <div class="stat-lbl">Total commandes</div>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-ico yellow">⏳</div>
+            <div class="stat-ico yellow">{!! \App\Support\IconLibrary::svg('clock', '', 26) !!}</div>
             <div>
                 <div class="stat-val">{{ $pendingCount }}</div>
                 <div class="stat-lbl">En attente</div>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-ico blue">🚚</div>
+            <div class="stat-ico blue">{!! \App\Support\IconLibrary::svg('truck', '', 26) !!}</div>
             <div>
                 <div class="stat-val">{{ $deliveryCount }}</div>
                 <div class="stat-lbl">En livraison</div>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-ico green">✅</div>
+            <div class="stat-ico green">{!! \App\Support\IconLibrary::svg('check', '', 26) !!}</div>
             <div>
                 <div class="stat-val">{{ $doneCount }}</div>
                 <div class="stat-lbl">Livrées</div>
@@ -657,34 +701,34 @@ $groups = $orders->getCollection()
         </a>
         <a href="{{ request()->fullUrlWithQuery(['status' => Order::STATUS_EN_ATTENTE, 'page' => 1]) }}"
            class="filter-btn {{ $activeFilter === Order::STATUS_EN_ATTENTE ? 'active' : '' }}">
-            ⏳ En attente @if($counts['en_attente'] > 0)<span class="cnt">{{ $counts['en_attente'] }}</span>@endif
+            {!! \App\Support\IconLibrary::svg('clock', '', 16) !!} En attente @if($counts['en_attente'] > 0)<span class="cnt">{{ $counts['en_attente'] }}</span>@endif
         </a>
         <a href="{{ request()->fullUrlWithQuery(['status' => Order::STATUS_CONFIRMEE, 'page' => 1]) }}"
            class="filter-btn {{ $activeFilter === Order::STATUS_CONFIRMEE ? 'active' : '' }}">
-            📦 Confirmées @if($counts['confirmée'] > 0)<span class="cnt">{{ $counts['confirmée'] }}</span>@endif
+            {!! \App\Support\IconLibrary::svg('package', '', 16) !!} Confirmées @if($counts['confirmée'] > 0)<span class="cnt">{{ $counts['confirmée'] }}</span>@endif
         </a>
         <a href="{{ request()->fullUrlWithQuery(['status' => Order::STATUS_EN_LIVRAISON, 'page' => 1]) }}"
            class="filter-btn {{ $activeFilter === Order::STATUS_EN_LIVRAISON ? 'active' : '' }}">
-            🚚 En livraison @if($counts['en_livraison'] > 0)<span class="cnt">{{ $counts['en_livraison'] }}</span>@endif
+            {!! \App\Support\IconLibrary::svg('truck', '', 16) !!} En livraison @if($counts['en_livraison'] > 0)<span class="cnt">{{ $counts['en_livraison'] }}</span>@endif
         </a>
         <a href="{{ request()->fullUrlWithQuery(['status' => Order::STATUS_LIVREE, 'page' => 1]) }}"
            class="filter-btn {{ $activeFilter === Order::STATUS_LIVREE ? 'active' : '' }}">
-            ✅ Livrées @if($counts['livrée'] > 0)<span class="cnt">{{ $counts['livrée'] }}</span>@endif
+            {!! \App\Support\IconLibrary::svg('check', '', 16) !!} Livrées @if($counts['livrée'] > 0)<span class="cnt">{{ $counts['livrée'] }}</span>@endif
         </a>
         <a href="{{ request()->fullUrlWithQuery(['status' => Order::STATUS_ANNULEE, 'page' => 1]) }}"
            class="filter-btn {{ $activeFilter === Order::STATUS_ANNULEE ? 'active' : '' }}">
-            ❌ Annulées @if($counts['annulée'] > 0)<span class="cnt">{{ $counts['annulée'] }}</span>@endif
+            {!! \App\Support\IconLibrary::svg('x', '', 16) !!} Annulées @if($counts['annulée'] > 0)<span class="cnt">{{ $counts['annulée'] }}</span>@endif
         </a>
     </div>
 
     {{-- ── Liste des commandes ── --}}
     @if($orders->isEmpty())
     <div class="empty-state">
-        <div class="empty-ico">🛍️</div>
+        <div class="empty-ico">{!! \App\Support\IconLibrary::svg('bag', '', 44) !!}</div>
         <div class="empty-title">Aucune commande trouvée</div>
         <div class="empty-sub">Vous n'avez pas encore passé de commande.<br>Découvrez nos boutiques et commencez vos achats !</div>
-        <a href="{{ route('client.dashboard') }}" class="btn-back" style="background:linear-gradient(135deg,var(--orange),var(--orange-dk));border-color:transparent;box-shadow:0 4px 14px rgba(99,102,241,.35)">
-            🏪 Découvrir les boutiques
+        <a href="{{ route('client.dashboard') }}" class="btn-back" style="background:linear-gradient(135deg,var(--orange),var(--orange-dk));border-color:transparent;box-shadow:0 4px 14px rgba(31,124,246,.35)">
+            {!! \App\Support\IconLibrary::svg('store', '', 16) !!} Découvrir les boutiques
         </a>
     </div>
     @else
@@ -707,10 +751,10 @@ $groups = $orders->getCollection()
             $totalProds   = $allItems->count();
 
             $steps = [
-                ['ico'=>'🕐','lbl'=>'Reçue'],
-                ['ico'=>'📦','lbl'=>'Confirmée'],
-                ['ico'=>'🚚','lbl'=>'En route'],
-                ['ico'=>'🏠','lbl'=>'Livrée'],
+                ['ico'=>'clock','lbl'=>'Reçue'],
+                ['ico'=>'package','lbl'=>'Confirmée'],
+                ['ico'=>'truck','lbl'=>'En route'],
+                ['ico'=>'home','lbl'=>'Livrée'],
             ];
             $fillPct = $step >= 0 ? min(($step / 3) * 100, 100) : 0;
         @endphp
@@ -730,7 +774,7 @@ $groups = $orders->getCollection()
                          loading="lazy"
                          width="72" height="72">
                 @else
-                    <div class="order-thumb-placeholder">{{ $isBulk ? '📦' : '🛍️' }}</div>
+                    <div class="order-thumb-placeholder">{!! \App\Support\IconLibrary::svg($isBulk ? 'package' : 'bag', '', 26) !!}</div>
                 @endif
 
                 {{-- Infos --}}
@@ -749,7 +793,7 @@ $groups = $orders->getCollection()
                         @endif
                     </div>
                     <div class="order-shop">
-                        🏪 {{ $group['shops']->pluck('name')->implode(' · ') ?: '—' }}
+                        {!! \App\Support\IconLibrary::svg('store', '', 16) !!} {{ $group['shops']->pluck('name')->implode(' · ') ?: '—' }}
                     </div>
                     @if($firstProduct)
                     <div class="order-product">
@@ -760,8 +804,11 @@ $groups = $orders->getCollection()
                     </div>
                     @endif
                     <span class="status-badge status-{{ $cfg['class'] }}">
-                        {{ $cfg['ico'] }} {{ $cfg['label'] }}
+                        {!! \App\Support\IconLibrary::svg($cfg['ico'], '', 14) !!} {{ $cfg['label'] }}
                     </span>
+                    @if($order->delivery_slot && $step >= 0 && $step < 3)
+                    <div class="order-slot">{!! \App\Support\IconLibrary::svg('clock', '', 13) !!} Livraison souhaitée : {{ $order->delivery_slot }}</div>
+                    @endif
                 </div>
 
                 {{-- Total --}}
@@ -782,7 +829,7 @@ $groups = $orders->getCollection()
                     @foreach($steps as $i => $s)
                     <div class="prog-step">
                         <div class="prog-dot {{ $i < $step ? 'done' : ($i === $step ? 'current' : '') }}">
-                            @if($i < $step) ✓ @else {{ $s['ico'] }} @endif
+                            @if($i < $step) ✓ @else {!! \App\Support\IconLibrary::svg($s['ico'], '', 15) !!} @endif
                         </div>
                         <div class="prog-lbl {{ $i === $step ? 'active' : '' }}">{{ $s['lbl'] }}</div>
                     </div>
@@ -790,8 +837,22 @@ $groups = $orders->getCollection()
                 </div>
             </div>
             @else
-            <div style="padding:10px 20px;background:#fef2f2;border-top:1px solid #fecaca;font-size:12px;color:#991b1b;font-weight:600;display:flex;align-items:center;gap:6px">
-                ❌ Cette commande a été annulée
+            <div style="padding:10px 20px;background:#fef2f2;border-top:1px solid #fecaca;font-size:12px;color:#991b1b;font-weight:600;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                {!! \App\Support\IconLibrary::svg('x', '', 16) !!}
+                @if($order->cancelled_by === 'client')
+                    Vous avez annulé cette commande @if($order->cancel_reason)<span style="font-weight:500">· {{ $order->cancel_reason }}</span>@endif
+                @else
+                    Cette commande a été annulée
+                @endif
+            </div>
+            @endif
+
+            {{-- Code de remise : à donner au livreur quand le colis est en main --}}
+            @if($group['codes']->isNotEmpty())
+            <div class="handover-code">
+                <span class="handover-code-ico">{!! \App\Support\IconLibrary::svg('lock', '', 16) !!}</span>
+                <span class="handover-code-txt"><strong>Code de remise</strong> · à donner au livreur quand vous avez le colis en main</span>
+                <span class="handover-code-val">{{ $group['codes']->implode(' · ') }}</span>
             </div>
             @endif
 
@@ -804,21 +865,34 @@ $groups = $orders->getCollection()
                 <div style="display:flex;gap:7px;flex-wrap:wrap">
                     {{-- Suivre : lien vers la 1ère commande du groupe --}}
                     <a href="{{ route('suivi.show', $order) }}" class="btn-action btn-track">
-                        🔍 Suivre
+                        {!! \App\Support\IconLibrary::svg('search', '', 16) !!} Suivre
                     </a>
-                    <a href="{{ route('client.orders.invoice', $order) }}" class="btn-action btn-track" style="background:#f8fafc;border-color:#e2e8f0;color:#475569">
-                        📄 Reçu PDF
+                    <a href="{{ route('client.orders.invoice', $order) }}" class="btn-action btn-track" style="background:#f8fafc;border-color:#E3E8F2;color:#45455E">
+                        {!! \App\Support\IconLibrary::svg('list', '', 16) !!} Reçu PDF
                     </a>
                     @if($order->delivery_proof_photo)
                     <a href="{{ $order->delivery_proof_photo_url }}" target="_blank" rel="noopener" class="btn-action btn-track" style="background:#f0fdf4;border-color:#bbf7d0;color:#15803d">
-                        📸 Preuve de livraison
+                        {!! \App\Support\IconLibrary::svg('image', '', 16) !!} Preuve de livraison
                     </a>
                     @endif
                     {{-- Avis : seulement si toutes les commandes du groupe sont livrées et sans avis --}}
                     @if($group['all_delivered'] && !$group['has_review'])
                     <a href="{{ route('client.reviews.create', $order) }}" class="btn-action btn-review">
-                        ⭐ Laisser un avis
+                        {!! \App\Support\IconLibrary::svg('star', '', 16) !!} Laisser un avis
                     </a>
+                    @endif
+                    @if($group['is_finished'])
+                    <form method="POST" action="{{ route('client.orders.reorder', $order) }}" style="display:contents">
+                        @csrf
+                        <button type="submit" class="btn-action btn-reorder">
+                            {!! \App\Support\IconLibrary::svg('refresh', '', 16) !!} Commander à nouveau
+                        </button>
+                    </form>
+                    @endif
+                    @if($group['can_cancel'])
+                    <button type="button" class="btn-action btn-cancel" data-cancel-url="{{ route('client.orders.cancel', $order) }}" data-cancel-label="{{ $isBulk ? $group['count'] . ' commandes' : 'la commande #' . str_pad($order->id, 5, '0', STR_PAD_LEFT) }}">
+                        {!! \App\Support\IconLibrary::svg('x', '', 16) !!} Annuler
+                    </button>
                     @endif
                 </div>
             </div>
@@ -834,4 +908,42 @@ $groups = $orders->getCollection()
     @endif
 
 </div>
+
+{{-- ── Annulation par le client : choix de la raison ── --}}
+<dialog id="cancelDialog" class="cancel-dialog" aria-labelledby="cancelDialogTitle">
+    <form method="POST" id="cancelForm">
+        @csrf
+        <h2 id="cancelDialogTitle" class="cancel-title">Annuler <span id="cancelLabel">la commande</span> ?</h2>
+        <p class="cancel-sub">La boutique n'a pas encore confirmé : l'annulation est immédiate et la boutique est prévenue.</p>
+        <fieldset class="cancel-reasons">
+            <legend>Pourquoi annulez-vous ?</legend>
+            @foreach(\App\Http\Controllers\Client\OrderActionController::CANCEL_REASONS as $key => $label)
+            <label class="cancel-reason">
+                <input type="radio" name="reason" value="{{ $key }}" required>
+                <span>{{ $label }}</span>
+            </label>
+            @endforeach
+        </fieldset>
+        <div class="cancel-actions">
+            <button type="button" class="cancel-keep" id="cancelKeep">Garder ma commande</button>
+            <button type="submit" class="cancel-confirm">Annuler la commande</button>
+        </div>
+    </form>
+</dialog>
+<script>
+(function () {
+    const dlg = document.getElementById('cancelDialog');
+    const form = document.getElementById('cancelForm');
+    if (!dlg || !form) return;
+    document.querySelectorAll('[data-cancel-url]').forEach(btn => btn.addEventListener('click', () => {
+        form.action = btn.dataset.cancelUrl;
+        document.getElementById('cancelLabel').textContent = btn.dataset.cancelLabel;
+        form.reset();
+        dlg.showModal();
+    }));
+    document.getElementById('cancelKeep').addEventListener('click', () => dlg.close());
+    dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+    form.addEventListener('submit', () => form.querySelector('.cancel-confirm').disabled = true);
+})();
+</script>
 @endsection

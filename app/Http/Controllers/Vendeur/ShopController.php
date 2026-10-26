@@ -32,7 +32,7 @@ class ShopController extends Controller
    public function index()
 {
     $user = \Illuminate\Support\Facades\Auth::user();
-    $shop = $user->shop ?: $user->assignedShop; // ✅
+    $shop = $user->shop; // ✅
 
     return view('vendeur.shop.index', compact('shop'));
 }

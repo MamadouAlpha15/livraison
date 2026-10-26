@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\OtpVerificationMail;
 use App\Models\User;
 use App\Services\PushService;
+use App\Support\OtpAttempts;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -50,13 +51,20 @@ class OtpVerificationController extends Controller
             'code.digits'   => 'Le code doit contenir 6 chiffres.',
         ]);
 
+        if ($blocked = OtpAttempts::blockedMessage($user)) {
+            return back()->withErrors(['code' => $blocked]);
+        }
+
         if (!$user->otp_expires_at || now()->greaterThan($user->otp_expires_at)) {
             return back()->withErrors(['code' => 'Ce code a expiré. Cliquez sur "Renvoyer le code".']);
         }
 
-        if ($request->code !== $user->otp_code) {
+        if (!hash_equals((string) $user->otp_code, $request->code)) {
+            OtpAttempts::failed($user);
             return back()->withErrors(['code' => 'Le code saisi est incorrect.']);
         }
+
+        OtpAttempts::reset($user);
 
         $user->forceFill([
             'email_verified_at' => now(),
@@ -107,6 +115,7 @@ class OtpVerificationController extends Controller
             'otp_code'       => $code,
             'otp_expires_at' => now()->addMinutes(10),
         ])->save();
+        OtpAttempts::reset($user);
 
         Mail::to($user->email)->send(new OtpVerificationMail($user->name, $code));
 

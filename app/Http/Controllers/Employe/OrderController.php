@@ -27,7 +27,7 @@ class OrderController extends Controller
         }
 
         // Vérification limite plan gratuit AVANT de charger quoi que ce soit
-        $shopEarly = Auth::user()->shop ?? Auth::user()->assignedShop;
+        $shopEarly = Auth::user()->shop;
         if ($shopEarly) {
             $isProEarly = $shopEarly->plan === 'pro' && $shopEarly->plan_expires_at?->isFuture();
             if (!$isProEarly) {
@@ -73,7 +73,7 @@ class OrderController extends Controller
         $orders = $q->paginate(15)->withQueryString();
 
         $livreurs          = User::livreurs()->inShop($shopId)->orderBy('name')->get();
-        $shop              = Auth::user()->shop ?? Auth::user()->assignedShop;
+        $shop              = Auth::user()->shop;
         $shopCountry       = $shop?->country ?? Auth::user()->country;
         $deliveryCompanies = DeliveryCompany::where('approved', true)->where('active', true)
             ->when($shopCountry, fn($q) => $q->where('country', $shopCountry))
@@ -106,7 +106,7 @@ class OrderController extends Controller
     {
         $shopId = Auth::user()->currentShopId();
         if (!$shopId) return redirect()->route('employe.orders.index');
-        $shop = Auth::user()->shop ?? Auth::user()->assignedShop;
+        $shop = Auth::user()->shop;
 
         $isPro = $shop && $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
         if (!$isPro) {
@@ -247,7 +247,7 @@ class OrderController extends Controller
         $shopId = Auth::user()->currentShopId();
         if (! $shopId) return response()->json(['success' => false, 'message' => 'Boutique introuvable.'], 403);
 
-        $shop = Auth::user()->shop ?? Auth::user()->assignedShop;
+        $shop = Auth::user()->shop;
         if ($shop && !app(SubscriptionService::class)->canProcessOrder($shop)) {
             return response()->json([
                 'success' => false,
@@ -395,7 +395,7 @@ class OrderController extends Controller
         $shopId = Auth::user()->currentShopId();
         abort_unless($shopId && $order->shop_id === $shopId, 403, 'Commande hors de votre boutique.');
 
-        $shop = Auth::user()->shop ?? Auth::user()->assignedShop;
+        $shop = Auth::user()->shop;
         if ($shop && !app(SubscriptionService::class)->canProcessOrder($shop)) {
             return back()->with('error', 'Limite de 10 traitements/mois atteinte. Passez au Plan Pro pour continuer.');
         }
@@ -446,7 +446,7 @@ class OrderController extends Controller
         $shopId = Auth::user()->currentShopId();
         abort_unless($shopId && $order->shop_id === $shopId, 403, 'Commande hors de votre boutique.');
 
-        $shop = Auth::user()->shop ?? Auth::user()->assignedShop;
+        $shop = Auth::user()->shop;
         if ($shop && !app(SubscriptionService::class)->canProcessOrder($shop)) {
             $msg = 'Limite de 10 traitements/mois atteinte. Passez au Plan Pro pour continuer.';
             if ($request->expectsJson()) {

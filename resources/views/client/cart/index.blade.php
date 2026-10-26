@@ -13,20 +13,20 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
-    --orange:    #6366f1;
-    --orange-dk: #4f46e5;
-    --orange-lt: #e0e7ff;
-    --orange-bd: #c7d2fe;
+    --orange:    #1668D8;
+    --orange-dk: #1260C9;
+    --orange-lt: #EAF2FF;
+    --orange-bd: #D6E6FF;
     --red:       #ef4444;
     --red-lt:    #fef2f2;
-    --text:      #0f172a;
-    --text-2:    #475569;
+    --text:      #16162A;
+    --text-2:    #45455E;
     --muted:     #94a3b8;
-    --border:    #e2e8f0;
+    --border:    #E3E8F2;
     --surface:   #ffffff;
-    --bg:        #f8f9fc;
-    --font:      system-ui, -apple-system, 'Segoe UI', sans-serif;
-    --mono:      'JetBrains Mono', 'Fira Code', monospace;
+    --bg:        #F6F9FF;
+    --font:      'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --mono:      'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --r:         14px;
     --r-sm:      9px;
     --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
@@ -38,9 +38,9 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 .cart-page { max-width: 960px; margin: 0 auto; padding: 28px 16px 100px; }
 
 .top-bar {
-    background: linear-gradient(135deg, var(--orange) 0%, var(--orange-dk) 60%, #3730a3 100%);
+    background: radial-gradient(110% 170% at 100% 0%, rgba(31,124,246,.45), transparent 60%), linear-gradient(135deg, #0B1E3D, #132B52);
     margin: -28px -16px 24px; padding: 0 20px; height: 62px;
-    display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 18px rgba(99,102,241,.35);
+    display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 18px rgba(31,124,246,.35);
 }
 .btn-back { display: flex; align-items: center; gap: 6px; color: #fff; text-decoration: none; font-size: 13px; font-weight: 600; opacity: .9; flex-shrink: 0; }
 .btn-back:hover { opacity: 1; }
@@ -53,6 +53,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 .c-flash { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-radius: var(--r-sm); font-size: 13px; font-weight: 600; margin-bottom: 18px; }
 .c-flash-success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
 .c-flash-error   { background: var(--red-lt); color: #991b1b; border: 1px solid #fecaca; }
+.c-flash-warning { background: #FFFBEB; color: #92400E; border: 1px solid #FDE68A; }
 
 /* ── Vide ── */
 .cart-empty { text-align: center; padding: 70px 20px; background: var(--surface); border-radius: var(--r); border: 1px dashed var(--border); }
@@ -95,13 +96,23 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 .field label { display: block; font-size: 12px; font-weight: 700; color: var(--text-2); margin-bottom: 5px; }
 .field input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 13.5px; font-family: var(--font); outline: none; transition: border-color .15s; }
 .field input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-lt); }
+/* Carnet d'adresses et créneau */
+.addr-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; align-items: center; }
+.addr-chip { display: inline-flex; align-items: center; gap: 5px; min-height: 34px; padding: 0 12px; border-radius: 999px; border: none; background: rgba(22,22,42,.07); color: #45455E; font: 700 12.5px var(--font); cursor: pointer; transition: background-color .15s, color .15s; }
+.addr-chip:hover { background: rgba(22,22,42,.12); color: #16162A; }
+.addr-chip.is-active { background: #1668D8; color: #fff; }
+.addr-manage { font-size: 12px; font-weight: 700; color: #1260C9; margin-left: 4px; }
+.field .addr-save { display: flex; align-items: center; gap: 8px; margin: 8px 0 0; font-size: 12.5px; font-weight: 600; color: #45455E; cursor: pointer; }
+.field .addr-save input { width: 16px; height: 16px; padding: 0; accent-color: #1668D8; }
+.slot-select { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 13.5px; font-family: var(--font); background: #fff; color: #16162A; }
+.slot-select:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-lt); }
 .field .err { color: var(--red); font-size: 11.5px; margin-top: 4px; font-weight: 600; }
 
 .grand-total-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-top: 1px dashed var(--border); margin-top: 6px; }
 .grand-total-lbl { font-size: 14px; font-weight: 700; }
 .grand-total-val { font-size: 20px; font-weight: 900; font-family: var(--mono); color: var(--orange-dk); }
 
-.btn-checkout { width: 100%; padding: 14px; border: none; border-radius: 30px; background: linear-gradient(135deg, var(--orange), var(--orange-dk)); color: #fff; font-size: 14.5px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 20px rgba(99,102,241,.35); transition: transform .15s; }
+.btn-checkout { width: 100%; padding: 14px; border: none; border-radius: 30px; background: linear-gradient(135deg, var(--orange), var(--orange-dk)); color: #fff; font-size: 14.5px; font-weight: 800; cursor: pointer; box-shadow: 0 6px 20px rgba(31,124,246,.35); transition: transform .15s; }
 .btn-checkout:hover { transform: translateY(-1px); }
 .btn-checkout:disabled { opacity: .6; cursor: not-allowed; transform: none; }
 
@@ -125,11 +136,14 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
             <h1>Mon panier</h1>
             <p>{{ $cartCount }} article{{ $cartCount > 1 ? 's' : '' }}</p>
         </div>
-        <div class="top-bar-ico">🛒</div>
+        <div class="top-bar-ico">{!! \App\Support\IconLibrary::svg('cart', '', 26) !!}</div>
     </div>
 
     @if(session('success'))
     <div class="c-flash c-flash-success">✓ {{ session('success') }}</div>
+    @endif
+    @if(session('warning'))
+    <div class="c-flash c-flash-warning">{!! \App\Support\IconLibrary::svg('alert', '', 16) !!} {{ session('warning') }}</div>
     @endif
     @if($errors->any())
     <div class="c-flash c-flash-error">✕ {{ $errors->first() }}</div>
@@ -137,7 +151,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 
     @if($groups->isEmpty())
     <div class="cart-empty">
-        <div class="cart-empty-ico">🛒</div>
+        <div class="cart-empty-ico">{!! \App\Support\IconLibrary::svg('cart', '', 44) !!}</div>
         <div class="cart-empty-title">Votre panier est vide</div>
         <div class="cart-empty-sub">Ajoutez des produits pour les retrouver ici.</div>
         <a href="{{ route('client.dashboard') }}#catalogue" class="cart-empty-btn">Découvrir des produits</a>
@@ -150,14 +164,14 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
         <div id="cartGroups">
         @foreach($groups as $group)
         <div class="shop-group" data-shop-id="{{ $group['shop']->id }}">
-            <div class="shop-group-hd">🏪 {{ $group['shop']->name }}</div>
+            <div class="shop-group-hd">{!! \App\Support\IconLibrary::svg('store', '', 16) !!} {{ $group['shop']->name }}</div>
             @foreach($group['items'] as $item)
             <div class="cart-line" data-item-id="{{ $item->id }}" data-unit-price="{{ $item->unit_price }}">
                 <div class="cart-line-img">
                     @if($item->product->image)
                         <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}">
                     @else
-                        <span class="cart-line-ph">📦</span>
+                        <span class="cart-line-ph">{!! \App\Support\IconLibrary::svg('package', '', 26) !!}</span>
                     @endif
                 </div>
                 <div class="cart-line-info">
@@ -182,11 +196,37 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
         </div>
 
         <div class="checkout-card">
-            <h3>📍 Livraison</h3>
+            <h3>{!! \App\Support\IconLibrary::svg('map-pin', '', 16) !!} Livraison</h3>
+            @php
+                $savedAddresses = \App\Models\ClientAddress::forUser(auth()->id());
+                $defaultAddress = $savedAddresses->firstWhere('is_default', true)?->address;
+            @endphp
             <div class="field">
                 <label for="delivery_destination">Adresse de livraison</label>
-                <input type="text" name="delivery_destination" id="delivery_destination" value="{{ old('delivery_destination', auth()->user()->address ?? '') }}" placeholder="Quartier, rue, point de repère…" required>
+                @if($savedAddresses->isNotEmpty())
+                <div class="addr-chips" role="group" aria-label="Mes adresses">
+                    @foreach($savedAddresses as $addr)
+                    <button type="button" class="addr-chip" data-address="{{ $addr->address }}" title="{{ $addr->address }}">
+                        {!! \App\Support\IconLibrary::svg($addr->is_default ? 'home' : 'map-pin', '', 14) !!} {{ $addr->label }}
+                    </button>
+                    @endforeach
+                    <a href="{{ route('client.addresses.index') }}" class="addr-manage">Gérer</a>
+                </div>
+                @endif
+                <input type="text" name="delivery_destination" id="delivery_destination" value="{{ old('delivery_destination', $defaultAddress ?? auth()->user()->address ?? '') }}" placeholder="Quartier, rue, point de repère…" required>
                 @error('delivery_destination')<div class="err">{{ $message }}</div>@enderror
+                <label class="addr-save">
+                    <input type="checkbox" name="save_address" value="1" {{ $savedAddresses->isEmpty() ? 'checked' : '' }}>
+                    Enregistrer dans mes adresses
+                </label>
+            </div>
+            <div class="field">
+                <label for="delivery_slot">Quand souhaitez-vous être livré ?</label>
+                <select name="delivery_slot" id="delivery_slot" class="slot-select">
+                    @foreach(\App\Support\DeliverySlot::options() as $key => $label)
+                    <option value="{{ $key }}" @selected(old('delivery_slot') === $key)>{{ $label }}</option>
+                    @endforeach
+                </select>
             </div>
             <div class="field">
                 <label for="client_phone">Numéro de téléphone</label>
@@ -207,6 +247,15 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 
 <script>
 const _csrf = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+
+/* Adresse enregistrée : un clic remplit le champ */
+document.querySelectorAll('.addr-chip').forEach(chip => chip.addEventListener('click', () => {
+    const input = document.getElementById('delivery_destination');
+    input.value = chip.dataset.address;
+    document.querySelectorAll('.addr-chip').forEach(c => c.classList.toggle('is-active', c === chip));
+    const save = document.querySelector('input[name="save_address"]');
+    if (save) save.checked = false; // déjà enregistrée
+}));
 const _cartUpdateBase = '{{ url("/client/cart") }}';
 
 function _formatGNF(n) { return Math.round(n).toLocaleString('fr-FR').replace(/,/g, ' '); }

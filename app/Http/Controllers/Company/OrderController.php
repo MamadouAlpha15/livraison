@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Company;
 
+use App\Http\Controllers\Concerns\ResolvesCompany;
 use App\Http\Controllers\Controller;
 use App\Models\DeliveryCompany;
 use App\Models\Driver;
@@ -13,16 +14,7 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    private function company(): DeliveryCompany
-    {
-        $company = DeliveryCompany::forUser(auth()->user());
-
-        if (!$company) {
-            abort(403, "Aucune entreprise de livraison liée à ce compte.");
-        }
-
-        return $company;
-    }
+    use ResolvesCompany;
 
     public function index(Request $request)
     {

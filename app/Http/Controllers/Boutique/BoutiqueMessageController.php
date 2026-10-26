@@ -17,6 +17,7 @@ namespace App\Http\Controllers\Boutique;
 use App\Http\Controllers\Controller;
 
 // Modèles nécessaires
+use App\Models\Shop;
 use App\Models\ShopMessage;      // Messages entre clients et vendeurs
 use App\Models\DeliveryMessage;  // Messages boutique ↔ entreprise de livraison
 use App\Models\User;             // Utilisateurs (clients, vendeurs...)
@@ -38,6 +39,15 @@ use Illuminate\Support\Facades\RateLimiter;
 // ============================================================
 class BoutiqueMessageController extends Controller
 {
+    // Boutique du vendeur connecté (propriétaire ou employé : users.shop_id).
+    // Sans boutique → 403 (accès refusé).
+    private function vendorShop(): Shop
+    {
+        $shop = Auth::user()->shop;
+        abort_unless($shop, 403);
+        return $shop;
+    }
+
     // ============================================================
     // MÉTHODE : reply()
     // ROUTE   : POST /boutique/messages/reply/{client}/{product?}
@@ -56,8 +66,7 @@ class BoutiqueMessageController extends Controller
     public function hub(Request $request)
     {
         $vendeur = Auth::user();
-        $shop    = $vendeur->shop ?? $vendeur->assignedShop;
-        abort_unless($shop, 403);
+        $shop    = $this->vendorShop();
 
         $allMsgs = ShopMessage::where('shop_id', $shop->id)
             ->with(['sender:id,name,role', 'receiver:id,name,role', 'product:id,name,price,image,description,gallery,stock'])
@@ -100,14 +109,8 @@ class BoutiqueMessageController extends Controller
         // On récupère le vendeur connecté
         $vendeur = Auth::user();
 
-        // On récupère la boutique du vendeur
-        // $vendeur->shop = la boutique dont le vendeur est propriétaire (relation directe)
-        // $vendeur->assignedShop = si le vendeur est un employé, la boutique à laquelle il est assigné
-        // "??" = si le premier est null, on prend le second
-        $shop = $vendeur->shop ?? $vendeur->assignedShop;
-
-        // Si le vendeur n'a pas de boutique → erreur 403 (accès refusé)
-        abort_unless($shop, 403);
+        // On récupère la boutique du vendeur (propriétaire ou employé : users.shop_id)
+        $shop = $this->vendorShop();
 
         // On détermine l'ID du produit concerné par la conversation
         // On privilégie product_id du formulaire, sinon le paramètre $product de l'URL
@@ -184,10 +187,7 @@ class BoutiqueMessageController extends Controller
 
         // On récupère le vendeur connecté et sa boutique
         $vendeur = Auth::user();
-        $shop    = $vendeur->shop ?? $vendeur->assignedShop;
-
-        // Sécurité : le vendeur doit avoir une boutique
-        abort_unless($shop, 403);
+        $shop    = $this->vendorShop();
 
         // On charge le produit concerné
         $product = Product::findOrFail($request->product_id);
@@ -267,7 +267,7 @@ class BoutiqueMessageController extends Controller
     {
         // On récupère le vendeur connecté et sa boutique
         $vendeur = Auth::user();
-        $shop    = $vendeur->shop ?? $vendeur->assignedShop;
+        $shop    = $vendeur->shop;
 
         // Vérifications de sécurité (double protection) :
         // 1. Le vendeur doit avoir une boutique ET ce message doit appartenir à CETTE boutique
@@ -321,8 +321,7 @@ class BoutiqueMessageController extends Controller
         ]);
 
         $vendeur = Auth::user();
-        $shop    = $vendeur->shop ?? $vendeur->assignedShop;
-        abort_unless($shop, 403);
+        $shop    = $this->vendorShop();
 
         $original = ShopMessage::findOrFail($request->message_id);
         abort_unless(
@@ -394,7 +393,7 @@ class BoutiqueMessageController extends Controller
 
         // On récupère le vendeur connecté et sa boutique
         $vendeur = Auth::user();
-        $shop    = $vendeur->shop ?? $vendeur->assignedShop;
+        $shop    = $vendeur->shop;
 
         // Si le vendeur n'a pas de boutique, on retourne 0 non lus et pas de rechargement
         if (!$shop) {
@@ -441,10 +440,7 @@ class BoutiqueMessageController extends Controller
 
         // On récupère le vendeur connecté et sa boutique
         $vendeur = Auth::user();
-        $shop    = $vendeur->shop ?? $vendeur->assignedShop;
-
-        // Le vendeur doit avoir une boutique
-        abort_unless($shop, 403);
+        $shop    = $this->vendorShop();
 
         // On prépare la requête de base (sans filtre produit pour l'instant)
         $query = ShopMessage::where('shop_id', $shop->id)
@@ -483,8 +479,7 @@ class BoutiqueMessageController extends Controller
         ]);
 
         $vendeur = Auth::user();
-        $shop    = $vendeur->shop ?? $vendeur->assignedShop;
-        abort_unless($shop, 403);
+        $shop    = $this->vendorShop();
 
         $query = ShopMessage::where('shop_id', $shop->id)
             ->where(function ($q) use ($request, $vendeur) {
@@ -539,8 +534,7 @@ class BoutiqueMessageController extends Controller
         ]);
 
         $vendeur = Auth::user();
-        $shop    = $vendeur->shop ?? $vendeur->assignedShop;
-        abort_unless($shop, 403);
+        $shop    = $this->vendorShop();
 
         $paths = [];
         foreach ($request->file('images') as $file) {
@@ -632,8 +626,7 @@ class BoutiqueMessageController extends Controller
         ]);
 
         $vendeur = Auth::user();
-        $shop    = $vendeur->shop ?? $vendeur->assignedShop;
-        abort_unless($shop, 403);
+        $shop    = $this->vendorShop();
 
         $isPro = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
         if (!$isPro) {
@@ -739,8 +732,7 @@ class BoutiqueMessageController extends Controller
         ]);
 
         $vendeur = Auth::user();
-        $shop    = $vendeur->shop ?? $vendeur->assignedShop;
-        abort_unless($shop, 403);
+        $shop    = $this->vendorShop();
 
         $isPro = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
         if (!$isPro) {
@@ -841,7 +833,7 @@ class BoutiqueMessageController extends Controller
     public function pollAll(Request $request)
     {
         $vendeur = Auth::user();
-        $shop    = $vendeur->shop ?? $vendeur->assignedShop;
+        $shop    = $vendeur->shop;
         if (!$shop) return response()->json(['messages_unread'=>0,'orders_pending'=>0,'livreurs_available'=>0,'total'=>0,'latest_messages'=>[]]);
 
         $unreadQuery = ShopMessage::where('shop_id', $shop->id)

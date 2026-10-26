@@ -206,6 +206,7 @@ class CartController extends Controller
                     'total'                => $total,
                     'status'               => Order::STATUS_EN_ATTENTE,
                     'delivery_destination' => $request->delivery_destination,
+                    'delivery_slot'        => \App\Support\DeliverySlot::labelFor($request->input('delivery_slot')),
                     'client_phone'         => $request->client_phone,
                     'source'               => \App\Support\TrafficSource::forOrder((int) $shopId), // canal d'arrivée du client
                     'campaign_id'          => \App\Support\TrafficSource::campaignForOrder((int) $shopId),
@@ -264,6 +265,11 @@ class CartController extends Controller
         });
 
         $count = count($createdOrders);
+
+        // « Enregistrer dans mes adresses » coché au moment de commander
+        if ($count && $request->boolean('save_address')) {
+            \App\Models\ClientAddress::remember($user, $request->delivery_destination);
+        }
 
         // Pixel Meta des vendeurs concernés : un événement « Purchase » par commande (paiement à la livraison)
         Order::whereIn('id', $createdOrders)->with('shop')->get()->each(fn ($o) => \App\Support\MetaPixel::queuePurchase($o));

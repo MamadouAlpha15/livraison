@@ -255,6 +255,7 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:#0f
             <div>
                 <div class="pickup-modal-dest-name">Livraison chez le client</div>
                 <div class="pickup-modal-dest-addr" id="pickupDestAddr">{{ $destination }}</div>
+                @if($order->delivery_slot)<div style="font-size:12px;font-weight:700;color:#7DB4FF;margin-top:4px">Créneau : {{ $order->delivery_slot }}</div>@endif
             </div>
         </div>
         <div class="pickup-modal-btns">
@@ -272,6 +273,14 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:#0f
         <div class="pickup-modal-ico">📸</div>
         <div class="pickup-modal-title">Preuve de livraison</div>
         <div class="pickup-modal-desc">Prenez une photo du colis remis — ça évite les litiges. (optionnel)</div>
+
+        @if(filled($order->delivery_code))
+        <label for="deliveryCodeInput" style="display:block;text-align:left;font-size:12.5px;font-weight:700;color:rgba(255,255,255,.8);margin:14px 0 6px">Code de remise donné par le client</label>
+        <input id="deliveryCodeInput" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="0000"
+               style="width:100%;padding:13px;border-radius:12px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:#fff;font-size:24px;font-weight:800;letter-spacing:.5em;text-align:center;font-family:inherit">
+        <div id="deliveryCodeErr" role="alert" style="display:none;text-align:left;color:#fca5a5;font-size:12.5px;font-weight:600;margin-top:6px"></div>
+        <div style="text-align:left;font-size:11.5px;color:rgba(255,255,255,.5);margin-top:6px">Le client le voit dans son suivi de commande.</div>
+        @endif
 
         <div id="proofPreviewWrap" style="display:none;margin:12px 0">
             <img id="proofPreviewImg" style="width:100%;max-height:220px;object-fit:cover;border-radius:12px;display:block" alt="Aperçu de la photo">
@@ -673,18 +682,19 @@ function compressImage(file, maxDim = 1600, quality = 0.75) {
 // ─────────────────────────────────────────────
 // ACTIONS STATUT
 // ─────────────────────────────────────────────
-async function postStatus(status, photoFile) {
+async function postStatus(status, photoFile, extra = {}) {
     let opts;
     if (photoFile) {
         const fd = new FormData();
         fd.append('status', status);
         fd.append('proof_photo', photoFile);
+        Object.entries(extra).forEach(([k, v]) => fd.append(k, v));
         opts = { method: 'POST', headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' }, body: fd };
     } else {
         opts = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
-            body: JSON.stringify({ status }),
+            body: JSON.stringify({ status, ...extra }),
         };
     }
     const r = await fetch(STATUS_URL, opts);
@@ -740,7 +750,20 @@ async function confirmDelivered() {
             }
             btn.textContent = '⏳ Envoi en cours…';
         }
-        await postStatus('livrée', photoFile);
+        const codeInput = document.getElementById('deliveryCodeInput');
+        const codeErr   = document.getElementById('deliveryCodeErr');
+        if (codeErr) codeErr.style.display = 'none';
+        try {
+            await postStatus('livrée', photoFile, codeInput ? { delivery_code: codeInput.value } : {});
+        } catch (err) {
+            // Code de remise manquant ou faux : on l'affiche sous le champ plutôt qu'en alerte
+            if (codeErr) {
+                codeErr.textContent = err.message; codeErr.style.display = 'block'; codeInput.focus();
+                btn.disabled = false; btn.textContent = '✅ Confirmer la livraison';
+                return;
+            }
+            throw err;
+        }
         closeProofModal();
         if (gpsWatcher) navigator.geolocation.clearWatch(gpsWatcher);
         if (_aniRAF)    cancelAnimationFrame(_aniRAF);

@@ -154,6 +154,12 @@ class DashboardController extends Controller
         $deliveredCount = Order::where('status', Order::STATUS_LIVREE)->count();
         $clientCount    = User::where('role', 'client')->count();
 
+        // Note moyenne réelle des boutiques (avis de clients livrés), affichée à partir de 3 avis
+        $ratingStats = \App\Models\Review::selectRaw('COUNT(*) as n, AVG(rating) as avg')->first();
+        $siteRating = ($ratingStats->n ?? 0) >= \App\Support\Growth::RATING_MIN
+            ? ['avg' => round((float) $ratingStats->avg, 1), 'count' => (int) $ratingStats->n]
+            : null;
+
         /* ── Catégories de produits avec comptage ──
            Alias `type`/`shop_count` conservés pour rester compatibles avec la vue
            (qui filtrait auparavant les boutiques) : elle affiche maintenant des
@@ -310,7 +316,7 @@ class DashboardController extends Controller
 
         return view('dashboards.client', compact(
             'products', 'categoryGroups', 'recentOrders', 'myMessages', 'myUnread',
-            'shopCount', 'productCount', 'deliveredCount', 'clientCount',
+            'shopCount', 'productCount', 'deliveredCount', 'clientCount', 'siteRating',
             'categories', 'topShops', 'allTopShops', 'favoriteIds',
             'recommendedProducts', 'favoriteProductIds', 'flashProducts', 'cartCount',
             'loyaltyPoints', 'loyaltyNextMilestone', 'loyaltyProgressPercent', 'loyaltyReferralBonus',

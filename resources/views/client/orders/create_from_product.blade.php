@@ -55,7 +55,9 @@
                  'Autres villes' => ['Coyah', 'Dubréka', 'Kindia', 'Boké', 'Kamsar', 'Mamou', 'Labé', 'Faranah', 'Kankan', 'Siguiri', 'Kissidougou', 'Guéckédou', 'N\'Zérékoré']];
 
     $authUser  = auth()->user();
-    $oldDest   = old('delivery_destination', $authUser->address ?? '');
+    // Carnet d'adresses : l'adresse principale pré-remplit le formulaire
+    $savedAddresses = $authUser ? \App\Models\ClientAddress::forUser($authUser->id) : collect();
+    $oldDest   = old('delivery_destination', $savedAddresses->firstWhere('is_default', true)?->address ?? $authUser->address ?? '');
 
     // Aperçu du lien partagé (WhatsApp, Facebook, Messenger) : photo, nom, prix et boutique
     $ogPrice = $fmt($nowPrice) . ' ' . $devise . ($oldPrice ? ' au lieu de ' . $fmt($oldPrice) . ' ' . $devise : '');
@@ -303,6 +305,14 @@ body { background: var(--pp-bg); color: var(--pp-ink); margin: 0; }
 .ck-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .ck-field { display: grid; gap: 7px; }
 .ck-field.is-wide { grid-column: 1 / -1; }
+/* Carnet d'adresses */
+.ck-addr-chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 16px; }
+.ck-addr-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 16px; border: none; border-radius: 999px; background: rgba(22,22,42,.07); color: var(--pp-ink-2, #45455E); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: background-color .18s, color .18s; }
+.ck-addr-chip:hover { background: rgba(22,22,42,.12); }
+.ck-addr-chip.is-active { background: var(--pp-btn, #1668D8); color: #fff; }
+.ck-addr-manage { font-size: 13.5px; font-weight: 700; color: var(--pp-btn, #1668D8); }
+.ck-field .ck-save-addr { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; color: var(--pp-ink-2, #45455E); cursor: pointer; margin-top: 2px; }
+.ck-save-addr input { width: 18px; height: 18px; accent-color: var(--pp-btn, #1668D8); }
 .ck-field label { font-weight: 700; font-size: 14.5px; }
 .ck-input { width: 100%; min-height: 52px; border: 1.5px solid var(--pp-line); border-radius: var(--pp-r-sm); padding: 0 16px; font: inherit; font-size: 16px; color: var(--pp-ink); background: var(--pp-surface); outline: none; transition: border-color .18s, box-shadow .18s; }
 select.ck-input { appearance: auto; }
@@ -757,6 +767,16 @@ select.ck-input { appearance: auto; }
                 <h2 tabindex="-1">Où livrer votre commande ?</h2>
                 @auth
                 <div class="ck-who">{!! Ico::svg('user', '', 18) !!} <span>Commande au nom de <strong>{{ $authUser->name }}</strong></span></div>
+                @if($savedAddresses->isNotEmpty())
+                <div class="ck-addr-chips" role="group" aria-label="Mes adresses">
+                    @foreach($savedAddresses as $addr)
+                    <button type="button" class="ck-addr-chip" data-address="{{ $addr->address }}" title="{{ $addr->address }}">
+                        {!! Ico::svg($addr->is_default ? 'home' : 'map-pin', '', 14) !!} {{ $addr->label }}
+                    </button>
+                    @endforeach
+                    <a href="{{ route('client.addresses.index') }}" class="ck-addr-manage">Gérer mes adresses</a>
+                </div>
+                @endif
                 @endauth
                 <div class="ck-fields">
                     @guest
@@ -792,6 +812,20 @@ select.ck-input { appearance: auto; }
                         <label for="ckQuartier">Quartier et point de repère</label>
                         <input type="text" class="ck-input" id="ckQuartier" value="{{ $oldDest }}" placeholder="Ex. Kipé, près de la pharmacie" autocomplete="street-address">
                         <div class="ck-hint" id="ckQuartier_hint" aria-live="polite"></div>
+                        @auth
+                        <label class="ck-save-addr">
+                            <input type="checkbox" name="save_address" value="1" {{ $savedAddresses->isEmpty() ? 'checked' : '' }}>
+                            Enregistrer dans mes adresses
+                        </label>
+                        @endauth
+                    </div>
+                    <div class="ck-field is-wide">
+                        <label for="ckSlot">Quand souhaitez-vous être livré ?</label>
+                        <select class="ck-input" name="delivery_slot" id="ckSlot">
+                            @foreach(\App\Support\DeliverySlot::options() as $key => $label)
+                            <option value="{{ $key }}" @selected(old('delivery_slot') === $key)>{{ $label }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 <div class="ck-actions">
@@ -855,6 +889,8 @@ select.ck-input { appearance: auto; }
                     @guest<dt>Nom</dt><dd id="rcName"></dd>@endguest
                     <dt>Paiement</dt>
                     <dd><span id="rcPay"></span> <button type="button" class="ck-recap-edit" data-ck-prev="2">Modifier</button></dd>
+                    <dt>Créneau</dt>
+                    <dd><span id="rcSlot"></span> <button type="button" class="ck-recap-edit" data-ck-prev="1">Modifier</button></dd>
                 </dl>
                 <div class="ck-actions">
                     <button type="button" class="pp-btn pp-btn-ghost" data-ck-prev="2">Retour</button>
@@ -1181,6 +1217,16 @@ const IS_GUINEA = {{ $isGuinea ? 'true' : 'false' }};
 $('client_name')?.addEventListener('input', e => e.target.value.trim() ? mark(e.target, validateFullName(e.target.value), 'Parfait') : mark(e.target, null));
 $('client_phone')?.addEventListener('input', e => e.target.value.trim() && IS_GUINEA ? mark(e.target, validateGuineaPhone(e.target.value), 'Numéro valide') : mark(e.target, null));
 
+/* Adresse enregistrée : un clic remplit le quartier (l'adresse complète) et vide la commune */
+document.querySelectorAll('.ck-addr-chip').forEach(chip => chip.addEventListener('click', () => {
+    $('ckCommune').value = '';
+    $('ckQuartier').value = chip.dataset.address;
+    mark($('ckCommune'), null); mark($('ckQuartier'), null);
+    document.querySelectorAll('.ck-addr-chip').forEach(c => c.classList.toggle('is-active', c === chip));
+    const save = document.querySelector('input[name="save_address"]');
+    if (save) save.checked = false; // déjà enregistrée
+}));
+
 /* Adresse envoyée au serveur = commune + quartier (sans répéter la commune si elle y figure déjà) */
 function composeAddress() {
     const c = $('ckCommune').value.trim(), q = $('ckQuartier').value.trim();
@@ -1267,6 +1313,7 @@ function goStep(n) {
 
 function fillRecap() {
     $('rcAddress').textContent = composeAddress();
+    $('rcSlot').textContent = $('ckSlot').selectedOptions[0]?.textContent.trim() || 'Dès que possible';
     $('rcPhone').textContent = $('client_phone').value.trim();
     if ($('rcName')) $('rcName').textContent = $('client_name').value.trim();
     $('rcPay').textContent = $('paymentMethodInput').value === 'online' ? 'Mobile Money, maintenant' : 'À la livraison, en espèces';

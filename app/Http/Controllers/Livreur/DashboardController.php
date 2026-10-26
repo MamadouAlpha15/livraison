@@ -13,13 +13,14 @@ class DashboardController extends Controller
     public function index()
     {
         $livreur = Auth::user();
-        $shop    = $livreur->shop ?? $livreur->assignedShop;
-        $driver  = Driver::where('user_id', $livreur->id)->first();
+        $shop    = $livreur->shop;
+        $driver  = Driver::forUser($livreur);
         $devise  = $shop?->currency ?? $driver?->company?->currency ?? 'GNF';
 
         $data = $this->buildData($livreur, $driver);
 
         $totalCommission = $livreur->courierCommissions()->sum('amount');
+        $todayCommission = $this->todayCommission($livreur);
         $isCompanyDriver = (bool) ($driver && $driver->delivery_company_id);
 
         $gamification   = app(GamificationService::class);
@@ -27,35 +28,45 @@ class DashboardController extends Controller
         $leaderboard    = $gamification->weeklyLeaderboard($livreur, $driver, $shop);
 
         return view('dashboards.livreur', array_merge($data, compact(
-            'livreur', 'devise', 'shop', 'totalCommission', 'dailyProgress', 'leaderboard', 'isCompanyDriver'
+            'livreur', 'devise', 'shop', 'totalCommission', 'todayCommission', 'dailyProgress', 'leaderboard', 'isCompanyDriver'
         )));
+    }
+
+    /** Commissions (ou frais collectés) enregistrées aujourd'hui pour ce livreur. */
+    private function todayCommission($livreur): float
+    {
+        return (float) $livreur->courierCommissions()->whereDate('created_at', today())->sum('amount');
     }
 
     public function data()
     {
         $livreur = Auth::user();
-        $driver  = Driver::where('user_id', $livreur->id)->first();
-        $devise  = ($livreur->shop ?? $livreur->assignedShop)?->currency
+        $driver  = Driver::forUser($livreur);
+        $devise  = ($livreur->shop)?->currency
                    ?? $driver?->company?->currency
                    ?? 'GNF';
 
         $data          = $this->buildData($livreur, $driver);
         $dailyProgress = app(GamificationService::class)->dailyProgress($livreur, $driver);
 
-        $fmt = fn($n) => number_format($n ?? 0, 0, ',', ' ') . ' ' . $devise;
+        $fmt = fn($n) => number_format($n ?? 0, 0, ',', "\u{00A0}") . "\u{00A0}" . $devise;
 
         return response()->json([
             'totalAssigned' => $data['totalAssigned'],
             'enCours'       => $data['enCours'],
             'terminees'     => $data['terminees'],
             'enAttente'     => $data['enAttente'],
+            'earnedToday'   => $fmt($this->todayCommission($livreur)),
+            'nextKey'       => $data['nextOrder'] ? $data['nextOrder']->id . '|' . $data['nextOrder']->status : '',
             'dailyProgress' => $dailyProgress,
             'recentOrders'  => $data['recentOrders']->map(fn($g) => [
                 'order_id' => $g['order']->id,
                 'count'    => $g['count'],
                 'total'    => $fmt($g['total']),
                 'status'   => $g['status'],
-                'client'   => ($g['client'])?->name ?? 'Client',
+                'client'   => ($g['client'])?->name ?? $g['order']->client_name ?? 'Client',
+                'shop'     => $g['order']->shop?->name,
+                'dest'     => $g['order']->delivery_destination,
             ])->values(),
         ]);
     }
@@ -92,6 +103,10 @@ class DashboardController extends Controller
                 ];
             })->values()->take(5);
 
-        return compact('totalAssigned', 'enCours', 'terminees', 'enAttente', 'recentOrders');
+        // Prochaine course : la livraison déjà en route d'abord, sinon le plus ancien colis à récupérer
+        $nextOrder = $orders->where('status', Order::STATUS_EN_LIVRAISON)->sortBy('created_at')->first()
+            ?? $orders->where('status', Order::STATUS_CONFIRMEE)->sortBy('created_at')->first();
+
+        return compact('totalAssigned', 'enCours', 'terminees', 'enAttente', 'recentOrders', 'nextOrder');
     }
 }

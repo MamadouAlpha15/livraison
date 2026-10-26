@@ -16,7 +16,7 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; background: #DCE6F5; color: #16162A; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 .tools { display: flex; justify-content: center; gap: 10px; padding: 16px; }
-.tools button, .tools a { min-height: 44px; padding: 0 20px; border: 0; border-radius: 999px; font: 700 14px inherit; font-family: inherit; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
+.tools button, .tools a { min-height: 44px; padding: 0 20px; border: 0; border-radius: 999px; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
 .tools button { background: #F59E0B; color: #16162A; }
 .tools a { background: #fff; color: #16162A; box-shadow: inset 0 0 0 1.5px #E3E8F2; }
 .sheet { width: 148mm; height: 210mm; margin: 0 auto 24px; background: #fff; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 14mm 12mm 10mm; position: relative; overflow: hidden; box-shadow: 0 30px 60px -30px rgba(11,30,61,.5); }
