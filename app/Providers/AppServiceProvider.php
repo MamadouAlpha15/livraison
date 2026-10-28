@@ -18,6 +18,11 @@ class AppServiceProvider extends ServiceProvider
                 : $app->make(\App\Support\Campaigns\Payment\ChapChapCampaignGateway::class);
         });
 
+        // IA de Shopio (réponses du support…) : Claude si la clé est configurée, sinon une erreur claire
+        $this->app->bind(\App\Support\Ai\TextModel::class, fn () => blank(config('services.anthropic.key'))
+            ? new \App\Support\Ai\UnconfiguredTextModel()
+            : new \App\Support\Ai\ClaudeTextModel((string) config('services.anthropic.key')));
+
         // SMS : aucun fournisseur branché, les messages vont dans le journal (voir App\Support\Sms\SmsSender)
         $this->app->bind(\App\Support\Sms\SmsSender::class, \App\Support\Sms\LogSmsSender::class);
     }

@@ -67,3 +67,9 @@ Schedule::command('campaigns:tick')->hourly()->name('campaigns-tick')->withoutOv
 // deviennent disponibles au retrait (App\Services\AffiliateService::approveDueCommissions).
 // ─────────────────────────────────────────────────────────────────────────────
 Schedule::command('affiliates:approve-commissions')->dailyAt('02:30')->name('affiliates-approve-commissions')->withoutOverlapping();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Relances, chaque jour à 10h (heure de Conakry = UTC) : rappel « Tu nous manques » aux clients
+// et entreprises de livraison inactifs (App\Services\InactivityReminderService, Admin → Relances).
+// ─────────────────────────────────────────────────────────────────────────────
+Schedule::command('reminders:inactive')->dailyAt('10:00')->name('remind-inactive-users')->withoutOverlapping();

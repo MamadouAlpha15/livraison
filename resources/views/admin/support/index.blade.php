@@ -242,6 +242,7 @@ $I = [
         <a href="{{ route('admin.payouts.index') }}" class="sb-a"><span class="sb-i">{!! $I['dollar'] !!}</span><span>Règlements boutiques</span></a>
         <a href="{{ route('admin.campaigns.index') }}" class="sb-a"><span class="sb-i">{!! \App\Support\IconLibrary::svg('megaphone', '', 17) !!}</span><span>Campagnes</span></a>
         <a href="{{ route('admin.affiliation.index') }}" class="sb-a"><span class="sb-i">{!! \App\Support\IconLibrary::svg('gift', '', 17) !!}</span><span>Affiliation</span></a>
+        <a href="{{ route('admin.reminders.index') }}" class="sb-a"><span class="sb-i">{!! \App\Support\IconLibrary::svg('bell', '', 17) !!}</span><span>Relances</span></a>
         <a href="{{ route('admin.commissions.index') }}" class="sb-a"><span class="sb-i">{!! $I['trend'] !!}</span><span>Commissions</span></a>
         <a href="{{ route('admin.revenus-boutiques.index') }}" class="sb-a"><span class="sb-i">{!! $I['store'] !!}</span><span>Revenus boutiques</span></a>
         <a href="{{ route('admin.revenus-entreprises.index') }}" class="sb-a"><span class="sb-i">{!! $I['truck'] !!}</span><span>Revenus entreprises</span></a>
@@ -373,6 +374,7 @@ $I = [
                     <div class="chat-thread" id="chatThread">
                         <div class="chat-loading">Chargement…</div>
                     </div>
+                    @include('admin.support._ai-assist', ['inputId' => 'chatInput', 'ticketJs' => '_activeTicket'])
                     <div class="chat-input-zone">
                         <textarea id="chatInput" placeholder="Votre réponse…" rows="1"
                             onkeydown="onKey(event)" oninput="autoGrow(this)"></textarea>

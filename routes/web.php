@@ -545,6 +545,26 @@ Route::middleware(['auth', 'role:superadmin,staff,marketing'])
 
 
 /* ══════════════════════════════════════════════════════════════════════════
+|  Relances des inactifs (clients et entreprises de livraison)
+|  /relances/desinscription/{user} : lien signé des e-mails, sans connexion
+|  /admin/relances                 : équipe Shopio (role:superadmin,staff)
+══════════════════════════════════════════════════════════════════════════ */
+
+Route::get('relances/desinscription/{user}', \App\Http\Controllers\ReminderUnsubscribeController::class)
+    ->middleware('signed')->whereNumber('user')->name('reminders.unsubscribe');
+
+Route::middleware(['auth', 'role:superadmin,staff'])
+    ->prefix('admin/relances')
+    ->name('admin.reminders.')
+    ->controller(\App\Http\Controllers\Admin\ReminderController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::put('reglages', 'update')->name('update');
+        Route::post('envoyer', 'sendNow')->middleware('throttle:3,1')->name('send');
+    });
+
+
+/* ══════════════════════════════════════════════════════════════════════════
 |  Programme d'affiliation (parrainage des boutiques)
 |  /vendeur/parrainage      : propriétaire de boutique (role:admin)
 |  /affilie/tableau-de-bord : affilié externe (role:affilie)
@@ -691,6 +711,9 @@ Route::middleware(['auth', 'role:superadmin,staff'])
 
         /* Tickets support (vue SuperAdmin) */
         Route::get('/support', [\App\Http\Controllers\Support\SupportTicketController::class, 'index'])->name('support.index');
+        /* IA de Shopio : réponse proposée à l'admin (jamais envoyée sans lui) */
+        Route::post('/support/{ticket}/ia', \App\Http\Controllers\Admin\SupportAiController::class)
+            ->whereNumber('ticket')->middleware('throttle:20,1')->name('support.ai');
 
         /* Validation d'une entreprise de livraison (dashboard) */
         Route::post('/companies/{company}/approve', [DashboardController::class, 'approveCompany'])

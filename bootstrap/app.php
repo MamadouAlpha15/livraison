@@ -31,6 +31,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->appendToGroup('web', \App\Http\Middleware\TrackAdCampaignClick::class);
         // Lien de parrainage d'une boutique ou d'un affilié (?ref=CODE) : cookie 30 jours + clic compté
         $middleware->appendToGroup('web', \App\Http\Middleware\TrackReferralLink::class);
+        // Dernière visite des clients et entreprises de livraison (relance des inactifs), site et application
+        $middleware->appendToGroup('web', \App\Http\Middleware\TrackLastActivity::class);
+        $middleware->appendToGroup('api', \App\Http\Middleware\TrackLastActivity::class);
 
         // Fait confiance aux en-têtes X-Forwarded-* (ngrok, load balancer, etc.)
         // pour que route()/url() détectent correctement le HTTPS du tunnel/proxy,
