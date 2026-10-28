@@ -23,6 +23,11 @@ class AppServiceProvider extends ServiceProvider
             ? new \App\Support\Ai\UnconfiguredTextModel()
             : new \App\Support\Ai\ClaudeTextModel((string) config('services.anthropic.key')));
 
+        // Shopio IA dans la messagerie (outils) : Claude si la clé est configurée, sinon message de secours
+        $this->app->bind(\App\Services\ShopioAI\ChatModel::class, fn () => blank(config('services.anthropic.key'))
+            ? new \App\Services\ShopioAI\UnconfiguredChatModel()
+            : new \App\Services\ShopioAI\ClaudeChatModel((string) config('services.anthropic.key')));
+
         // SMS : aucun fournisseur branché, les messages vont dans le journal (voir App\Support\Sms\SmsSender)
         $this->app->bind(\App\Support\Sms\SmsSender::class, \App\Support\Sms\LogSmsSender::class);
     }
@@ -38,6 +43,17 @@ class AppServiceProvider extends ServiceProvider
         // Programme d'affiliation : un produit ou une commande peut rendre « Active » une boutique parrainée
         \App\Models\Product::observe(\App\Observers\ReferralActivityObserver::class);
         \App\Models\Order::observe(\App\Observers\ReferralActivityObserver::class);
+
+        // Shopio IA : permission de chaque outil (App\Policies\ShopioAiToolPolicy)
+        \Illuminate\Support\Facades\Gate::define('shopio-ai.view-product', [\App\Policies\ShopioAiToolPolicy::class, 'viewProduct']);
+        \Illuminate\Support\Facades\Gate::define('shopio-ai.view-order', [\App\Policies\ShopioAiToolPolicy::class, 'viewOrder']);
+        \Illuminate\Support\Facades\Gate::define('shopio-ai.create-offer', [\App\Policies\ShopioAiToolPolicy::class, 'createOffer']);
+        // Shopio IA répond aux messages des clients ; le vendeur qui écrit lui-même la met en pause
+        \App\Models\ShopMessage::observe(\App\Observers\ShopioAiObserver::class);
+
+        // Relances : un message du client ou une commande arrête les relances en cours
+        \App\Models\ShopMessage::observe(\App\Observers\FollowUpActivityObserver::class);
+        \App\Models\Order::observe(\App\Observers\FollowUpActivityObserver::class);
 
         /* Le CSS compilé par Vite (app.css, boutique-dashboard.css, ...) ne doit pas
            bloquer le premier affichage sur réseau lent : même astuce media="print" que

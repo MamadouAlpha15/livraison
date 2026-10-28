@@ -3,7 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FollowUpRuleRequest;
 use App\Jobs\SendInactivityReminders;
+use App\Models\FollowUp;
+use App\Models\FollowUpRule;
+use App\Services\FollowUp\FollowUpCatalog;
+use App\Services\FollowUpService;
 use App\Models\InactivityReminder;
 use App\Services\InactivityReminderService;
 use Illuminate\Http\Request;
@@ -26,6 +31,9 @@ class ReminderController extends Controller
             'due'      => $this->reminders->preview(),
             'sentToday' => InactivityReminder::where('sent_at', '>=', today())->count(),
             'audience' => $audience,
+            'vendorRule'  => FollowUpRule::resolve(null, FollowUpCatalog::INACTIVE_VENDOR),
+            'vendorSent'  => FollowUp::where('type', FollowUpCatalog::INACTIVE_VENDOR)->where('status', FollowUp::STATUS_SENT)->where('sent_at', '>=', now()->subDays(30))->count(),
+            'shopStats'   => app(FollowUpService::class)->stats(null),
             'recent'   => InactivityReminder::with('user:id,name,email,phone')
                 ->when(isset(InactivityReminder::AUDIENCES[$audience]), fn ($q) => $q->where('audience', $audience))
                 ->latest('sent_at')->paginate(25)->withQueryString(),
@@ -51,6 +59,13 @@ class ReminderController extends Controller
         $this->reminders->settings()->update($data);
         $this->reminders->refreshSettings();
         return back()->with('success', 'Réglages des relances enregistrés.');
+    }
+
+    /** Relance « vendeur inactif » (règle de l'admin, envoyée par FollowUpService) */
+    public function updateVendorRule(FollowUpRuleRequest $request)
+    {
+        FollowUpRule::updateOrCreate(['shop_id' => null, 'type' => FollowUpCatalog::INACTIVE_VENDOR], $request->ruleData());
+        return back()->with('success', 'Relance des vendeurs inactifs enregistrée.');
     }
 
     public function sendNow()

@@ -929,7 +929,7 @@ function buildTextRow(msg) {
     if (msg.mine) {
         row.innerHTML =
             '<div class="msg-content">' +
-                '<div class="msg-bubble">' + escHtml(msg.body) + '</div>' +
+                '<div class="msg-bubble">' + (msg.is_ai ? '<span class="ai-badge">Shopio IA</span>' : '') + escHtml(msg.body) + '</div>' +
                 '<div class="msg-meta"><span class="msg-time">' + escHtml(msg.time) + '</span>' + tick + '</div>' +
             '</div>';
     } else {
@@ -937,7 +937,7 @@ function buildTextRow(msg) {
             '<div class="msg-av">' + escHtml(msg.sender_init || '?') + '</div>' +
             '<div class="msg-content">' +
                 '<div class="msg-sender">' + escHtml(msg.sender) + '</div>' +
-                '<div class="msg-bubble">' + escHtml(msg.body) + '</div>' +
+                '<div class="msg-bubble">' + (msg.is_ai ? '<span class="ai-badge">Shopio IA</span>' : '') + escHtml(msg.body) + '</div>' +
                 '<div class="msg-meta"><span class="msg-time">' + escHtml(msg.time) + '</span></div>' +
             '</div>';
     }

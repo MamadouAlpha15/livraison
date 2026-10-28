@@ -1241,7 +1241,7 @@ function buildTextRow(msg) {
     row.className = 'hub-msg-row ' + (msg.mine ? 'mine' : 'theirs');
     if (msg.id) row.dataset.msgId = msg.id;
     const tick = msg.mine ? `<span class="hub-msg-tick">${msg.read?'✓✓':'✓'}</span>` : '';
-    row.innerHTML = `<div class="hub-msg-bubble">${escHtml(msg.body)}<div class="hub-msg-meta"><span class="hub-msg-time">${escHtml(msg.time||'')}</span>${tick}</div></div>`;
+    row.innerHTML = `<div class="hub-msg-bubble">${msg.is_ai ? '<span class="ai-badge">Shopio IA</span>' : ''}${escHtml(msg.body)}<div class="hub-msg-meta"><span class="hub-msg-time">${escHtml(msg.time||'')}</span>${tick}</div></div>`;
     return row;
 }
 

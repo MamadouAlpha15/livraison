@@ -35,6 +35,8 @@
             </a>
             @if(auth()->user()?->role === 'admin')<a href="{{ route('boutique.campaigns.index') }}" class="sb-item"><span class="ico">{!! \App\Support\IconLibrary::svg('star', '', 16) !!}</span> Campagnes</a>@endif
             @if(auth()->user()?->role === 'admin')<a href="{{ route('vendeur.parrainage') }}" class="sb-item"><span class="ico">{!! \App\Support\IconLibrary::svg('gift', '', 16) !!}</span> Parrainage</a>@endif
+            @if(auth()->user()?->role === 'admin')<a href="{{ route('boutique.followups.index') }}" class="sb-item"><span class="ico">{!! \App\Support\IconLibrary::svg('bell', '', 16) !!}</span> Relances</a>@endif
+            @if(auth()->user()?->role === 'admin')<a href="{{ route('boutique.shopio-ai.index') }}" class="sb-item"><span class="ico">{!! \App\Support\IconLibrary::svg('sparkles', '', 16) !!}</span> Shopio IA</a>@endif
             @if($isPro)
             <a href="{{ route('boutique.promo-codes.index') }}" class="sb-item"><span class="ico">{!! $I['promo'] !!}</span> Codes promo</a>
             @else

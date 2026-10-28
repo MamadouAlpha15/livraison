@@ -18,7 +18,8 @@ class TrackLastActivity
         try {
             // Sur l'API, le jeton n'est pas encore lu à ce stade : on le lit seulement s'il est envoyé
             $user = $request->user() ?? ($request->bearerToken() ? auth('sanctum')->user() : null);
-            if ($user && in_array($user->role, ['client', 'company'], true)) {
+            // Clients et entreprises (rappels « Tu nous manques »), vendeurs (relance « vendeur inactif »)
+            if ($user && in_array($user->role, ['client', 'company', 'admin'], true)) {
                 app(InactivityReminderService::class)->touch($user);
             }
         } catch (\Throwable $e) {

@@ -507,6 +507,7 @@ class BoutiqueMessageController extends Controller
             'proposed_price'      => $m->proposed_price ? (float)$m->proposed_price : null,
             'proposal_status'     => $m->proposal_status,
             'negotiated_order_id' => $m->negotiated_order_id,
+            'is_ai'               => (bool) $m->is_ai, // badge « Shopio IA »
             'images'              => ($m->image_status === 'ready' && $m->images)
                                         ? array_map(fn($p) => ImageOptimizer::url($p, 'medium') ?? asset('storage/'.$p), $m->images)
                                         : [],

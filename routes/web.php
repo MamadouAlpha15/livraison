@@ -553,6 +553,22 @@ Route::middleware(['auth', 'role:superadmin,staff,marketing'])
 Route::get('relances/desinscription/{user}', \App\Http\Controllers\ReminderUnsubscribeController::class)
     ->middleware('signed')->whereNumber('user')->name('reminders.unsubscribe');
 
+/* Relances des boutiques : lien « Ne plus recevoir ces rappels » (signé, ?shop= facultatif) */
+Route::get('relances/stop/{user}', \App\Http\Controllers\FollowUpStopController::class)
+    ->middleware('signed')->whereNumber('user')->name('followups.stop');
+
+Route::middleware(['auth', 'role:superadmin,staff'])
+    ->prefix('admin/shopio-ia')
+    ->name('admin.shopio-ai.')
+    ->controller(\App\Http\Controllers\Admin\ShopioAiController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::put('reglages', 'updateSettings')->name('settings');
+        Route::post('faq', 'storeFaq')->name('faq.store');
+        Route::put('faq/{entry}', 'updateFaq')->whereNumber('entry')->name('faq.update');
+        Route::delete('faq/{entry}', 'destroyFaq')->whereNumber('entry')->name('faq.destroy');
+    });
+
 Route::middleware(['auth', 'role:superadmin,staff'])
     ->prefix('admin/relances')
     ->name('admin.reminders.')
@@ -560,6 +576,7 @@ Route::middleware(['auth', 'role:superadmin,staff'])
     ->group(function () {
         Route::get('/', 'index')->name('index');
         Route::put('reglages', 'update')->name('update');
+        Route::put('vendeurs-inactifs', 'updateVendorRule')->name('vendor-rule');
         Route::post('envoyer', 'sendNow')->middleware('throttle:3,1')->name('send');
     });
 
@@ -756,6 +773,26 @@ Route::middleware(['auth', 'role:admin'])
 
         /* Gestion de la boutique */
         Route::resource('shops', ShopController::class)->only(['create', 'store', 'index']);
+
+        /* Shopio IA dans la messagerie (App\Services\ShopioAI) */
+        Route::prefix('shopio-ia')->name('shopio-ai.')->controller(\App\Http\Controllers\Boutique\ShopioAiController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::put('reglages', 'update')->name('update');
+            Route::post('suggestions/{suggestion}/envoyer', 'sendSuggestion')->whereNumber('suggestion')->name('suggestions.send');
+            Route::post('suggestions/{suggestion}/ignorer', 'dismissSuggestion')->whereNumber('suggestion')->name('suggestions.dismiss');
+            Route::post('conversations/{client}/reprendre', 'takeOver')->whereNumber('client')->name('take-over');
+            Route::post('conversations/{client}/rendre', 'handBack')->whereNumber('client')->name('hand-back');
+        });
+
+        /* Relances automatiques (App\Services\FollowUpService) */
+        Route::prefix('relances')->name('followups.')->controller(\App\Http\Controllers\Boutique\FollowUpController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('{type}', 'edit')->name('edit');
+            Route::put('{type}', 'update')->name('update');
+            Route::post('{type}/activer', 'toggle')->name('toggle');
+            Route::post('{type}/apercu', 'preview')->middleware('throttle:60,1')->name('preview');
+            Route::post('{type}/ia', 'generate')->middleware('throttle:10,1')->name('generate');
+        });
 
         /* Personnaliser la vitrine publique (sections, affichage des produits, bannière, couleur) */
         Route::get('vitrine',               [\App\Http\Controllers\Vendeur\StorefrontController::class, 'edit'])  ->name('storefront.edit');

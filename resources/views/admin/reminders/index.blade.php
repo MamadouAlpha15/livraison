@@ -129,6 +129,49 @@
         <div><button type="submit" class="cp-btn cp-btn-line">Enregistrer les réglages</button></div>
     </form>
 
+    {{-- Relances des boutiques : vendeur inactif (règle de l'équipe) + chiffres de toutes les boutiques --}}
+    @php
+        $vr = $vendorRule;
+        $vrDays = fn ($m) => max(1, (int) round($m / 1440));
+        $vrChannels = old('channels', $vr->channels ?? []);
+    @endphp
+    <form method="POST" action="{{ route('admin.reminders.vendor-rule') }}" class="cp-card rl-form">
+        @csrf @method('PUT')
+        <div>
+            <span class="rl-sec">Vendeurs inactifs</span>
+            <p class="ac-help" style="margin:4px 0 0">Rappel au vendeur dont la boutique n'a aucun produit en ligne, ou qui ne s'est pas connecté depuis le délai.
+                {{ $n($vendorSent) }} rappel(s) envoyé(s) ces 30 derniers jours. Relances des boutiques vers leurs clients sur 30 jours :
+                {{ $n($shopStats['sent']) }} envoyée(s), {{ $shopStats['rate'] !== null ? $shopStats['rate'] . ' %' : '—' }} de réponses,
+                {{ $n($shopStats['orders']) }} commande(s) récupérée(s), {{ \App\Support\Money::gnf($shopStats['amount']) }}.</p>
+        </div>
+        <label class="rl-check rl-switch"><input type="checkbox" name="enabled" value="1" @checked(old('enabled', $vr->enabled))> Rappel des vendeurs inactifs activé</label>
+        <input type="hidden" name="delay_unit" value="jours"><input type="hidden" name="interval_unit" value="jours">
+        <input type="hidden" name="locale" value="fr">
+        <input type="hidden" name="send_from_hour" value="{{ $vr->send_from_hour }}"><input type="hidden" name="send_to_hour" value="{{ $vr->send_to_hour }}">
+        <div class="rl-grid">
+            <div class="ac-field"><label for="vr_delay">Inactif depuis</label>
+                <div class="rl-unit"><input id="vr_delay" name="delay_value" type="number" min="1" class="ac-input" required value="{{ old('delay_value', $vrDays($vr->delay_minutes)) }}"><span>jours</span></div></div>
+            <div class="ac-field"><label for="vr_max">Rappels au plus</label>
+                <div class="rl-unit"><input id="vr_max" name="max_attempts" type="number" min="1" max="5" class="ac-input" required value="{{ old('max_attempts', $vr->max_attempts) }}"><span>rappels</span></div></div>
+            <div class="ac-field"><label for="vr_int">Entre deux rappels</label>
+                <div class="rl-unit"><input id="vr_int" name="interval_value" type="number" min="1" class="ac-input" required value="{{ old('interval_value', $vrDays($vr->interval_minutes)) }}"><span>jours</span></div></div>
+            <div class="ac-field"><label for="vr_tone">Ton</label>
+                <select id="vr_tone" name="tone" class="ac-select">@foreach(\App\Services\FollowUp\FollowUpCatalog::TONES as $k => $l)<option value="{{ $k }}" @selected(old('tone', $vr->tone) === $k)>{{ $l }}</option>@endforeach</select></div>
+        </div>
+        <div class="ac-field">
+            <label for="vr_tpl">Message</label>
+            <textarea id="vr_tpl" name="template" class="ac-textarea" maxlength="1000">{{ old('template', $vr->effectiveTemplate()) }}</textarea>
+            <span class="ac-help">Variables : {prenom_client} (prénom du vendeur), {nom_boutique}, {lien_boutique}.</span>
+            @error('template')<span class="ac-err">{{ $message }}</span>@enderror
+        </div>
+        <div class="rl-checks">
+            <label class="rl-check"><input type="checkbox" name="channels[]" value="in_app" @checked(in_array('in_app', $vrChannels, true))> Notification</label>
+            <label class="rl-check"><input type="checkbox" name="channels[]" value="sms" @checked(in_array('sms', $vrChannels, true))> SMS</label>
+        </div>
+        @error('channels')<span class="ac-err">{{ $message }}</span>@enderror
+        <div><button type="submit" class="cp-btn cp-btn-line">Enregistrer le rappel des vendeurs</button></div>
+    </form>
+
     {{-- Derniers envois --}}
     <section class="cp-card">
         <div class="cp-list-hd">

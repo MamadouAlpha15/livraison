@@ -21,6 +21,7 @@ class MessageResource extends JsonResource
             'type'       => $this->type ?? 'text',
             'proposed_price'  => $this->proposed_price,
             'proposal_status' => $this->proposal_status,
+            'is_ai'           => (bool) $this->is_ai, // écrit par Shopio IA : à afficher avec le badge « Shopio IA »
             'images' => ($this->image_status === 'ready' && $this->images)
                 ? array_map(fn ($p) => ImageOptimizer::url($p, 'medium') ?? asset('storage/'.$p), $this->images)
                 : [],

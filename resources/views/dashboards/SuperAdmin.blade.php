@@ -564,6 +564,7 @@ $I = [
         <a href="{{ route('admin.campaigns.index') }}" class="sb-a"><span class="sb-i">{!! \App\Support\IconLibrary::svg('megaphone', '', 17) !!}</span><span>Campagnes</span></a>
         <a href="{{ route('admin.affiliation.index') }}" class="sb-a"><span class="sb-i">{!! \App\Support\IconLibrary::svg('gift', '', 17) !!}</span><span>Affiliation</span></a>
         <a href="{{ route('admin.reminders.index') }}" class="sb-a"><span class="sb-i">{!! \App\Support\IconLibrary::svg('bell', '', 17) !!}</span><span>Relances</span></a>
+        <a href="{{ route('admin.shopio-ai.index') }}" class="sb-a"><span class="sb-i">{!! \App\Support\IconLibrary::svg('sparkles', '', 17) !!}</span><span>Shopio IA</span></a>
         <a href="{{ route('admin.commissions.index') }}" class="sb-a">
             <span class="sb-i">{!! $I['trend'] !!}</span><span>Commissions</span>
         </a>

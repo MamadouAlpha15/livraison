@@ -73,3 +73,10 @@ Schedule::command('affiliates:approve-commissions')->dailyAt('02:30')->name('aff
 // et entreprises de livraison inactifs (App\Services\InactivityReminderService, Admin → Relances).
 // ─────────────────────────────────────────────────────────────────────────────
 Schedule::command('reminders:inactive')->dailyAt('10:00')->name('remind-inactive-users')->withoutOverlapping();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Relances des boutiques, toutes les 10 minutes : offres et contre-offres sans réponse,
+// conversations abandonnées, commandes à confirmer, fidélité, retour en stock, vendeurs
+// inactifs (App\Services\FollowUpService). Les envois partent en file d'attente.
+// ─────────────────────────────────────────────────────────────────────────────
+Schedule::command('followups:run')->everyTenMinutes()->name('follow-ups')->withoutOverlapping();
