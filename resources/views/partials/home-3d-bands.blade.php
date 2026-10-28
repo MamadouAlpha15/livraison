@@ -133,6 +133,76 @@
     </div>
 </section>
 
+{{-- ═════════════ TARIFS : après l'essai gratuit (chiffres = vrais prix configurés) ═════════════ --}}
+@php
+    $priceTrialDays = \App\Services\SubscriptionService::TRIAL_DAYS;
+    $pricePro = (int) config('chapchappay.plans.pro', 150000);
+    $priceBiz = (int) config('chapchappay.plans.business', 100000);
+@endphp
+<section class="rel3" id="tarifs" aria-labelledby="price3Title">
+    <div class="w3 sec3">
+        <div class="stack3" style="text-align:center;align-items:center;margin-bottom:40px">
+            <h2 class="h2-3" id="price3Title">{{ $priceTrialDays }} jours gratuits. <span class="blue3">Puis un tarif simple.</span></h2>
+            <p class="p3" style="max-width:560px">Aucune carte bancaire demandée pour l'essai. Après les {{ $priceTrialDays }} jours, votre abonnement continue au tarif ci-dessous si vous souhaitez garder le plan Pro ou Business.</p>
+        </div>
+        <div class="g2-3 price3-g">
+            <div class="price3-card rv3">
+                <span class="price3-badge">Boutiques</span>
+                <h3 class="price3-name">Plan Pro</h3>
+                <div class="price3-amt">{{ \App\Support\Money::gnf($pricePro, false) }} <span>GNF / mois</span></div>
+                <span class="price3-note">après {{ $priceTrialDays }} jours d'essai gratuit</span>
+                <ul class="checks3">
+                    <li><span>{!! $I('check', 15) !!}</span>Produits illimités</li>
+                    <li><span>{!! $I('check', 15) !!}</span>Commandes illimitées</li>
+                    <li><span>{!! $I('check', 15) !!}</span>Accès livreurs</li>
+                    <li><span>{!! $I('check', 15) !!}</span>Partenaires</li>
+                    <li><span>{!! $I('check', 15) !!}</span>Rapports complets</li>
+                    <li><span>{!! $I('check', 15) !!}</span>Gestion d'équipe</li>
+                    <li><span>{!! $I('check', 15) !!}</span>Statistiques &amp; analyse par période</li>
+                    <li><span>{!! $I('check', 15) !!}</span>✨ Shopio IA — descriptions générées</li>
+                    <li><span>{!! $I('check', 15) !!}</span>🗺️ Carte GPS — suivi des livreurs en direct</li>
+                    <li><span>{!! $I('check', 15) !!}</span>📊 Assistant de ventes IA</li>
+                </ul>
+                <a class="btn3 btn3-p btn3-lg" href="{{ route('register') }}">Ouvrir ma boutique</a>
+            </div>
+            <div class="price3-card rv3 rv3-2">
+                <span class="price3-badge">Entreprises de livraison</span>
+                <h3 class="price3-name">Plan Business</h3>
+                <div class="price3-amt">{{ \App\Support\Money::gnf($priceBiz, false) }} <span>GNF / mois</span></div>
+                <span class="price3-note">après {{ $priceTrialDays }} jours d'essai gratuit</span>
+                <ul class="checks3">
+                    <li><span>{!! $I('check', 15) !!}</span>Commandes illimitées</li>
+                    <li><span>{!! $I('check', 15) !!}</span>Chauffeurs illimités</li>
+                    <li><span>{!! $I('check', 15) !!}</span>Zones de livraison illimitées</li>
+                    <li><span>{!! $I('check', 15) !!}</span>Cartes en direct</li>
+                    <li><span>{!! $I('check', 15) !!}</span>Rapports complets</li>
+                    <li><span>{!! $I('check', 15) !!}</span>Gestion utilisateurs</li>
+                    <li><span>{!! $I('check', 15) !!}</span>Statistiques &amp; graphiques complets</li>
+                </ul>
+                <a class="btn3 btn3-s btn3-lg" href="{{ route('register') }}">Devenir entreprise partenaire</a>
+            </div>
+        </div>
+    </div>
+</section>
+<style>
+.price3-g { align-items: stretch; }
+.price3-card { background: #fff; border-radius: 24px; padding: 32px; display: flex; flex-direction: column; gap: 10px;
+    box-shadow: 0 1px 0 #E3E8F2, 0 24px 48px -28px rgba(11,30,61,.35); }
+.price3-badge { align-self: flex-start; background: #EAF2FF; color: #1668D8; font-weight: 700; font-size: 12px;
+    padding: 4px 12px; border-radius: 999px; text-transform: uppercase; letter-spacing: .03em; }
+.price3-name { font-size: 20px; font-weight: 800; color: #16162A; margin: 4px 0 0; }
+.price3-amt { font-size: 34px; font-weight: 800; color: #16162A; }
+.price3-amt span { font-size: 15px; font-weight: 600; color: #62627C; }
+.price3-note { font-size: 13px; color: #62627C; margin-bottom: 6px; }
+.price3-card .checks3 { margin: 6px 0 14px; }
+.price3-card .btn3 { margin-top: auto; align-self: flex-start; }
+[data-theme="dark"] .price3-card { background: #10203B; box-shadow: 0 0 0 1px #22355A; }
+[data-theme="dark"] .price3-badge { background: #13284B; color: #7DB4FF; }
+[data-theme="dark"] .price3-name { color: #EAF0FA; }
+[data-theme="dark"] .price3-amt { color: #EAF0FA; }
+[data-theme="dark"] .price3-amt span, [data-theme="dark"] .price3-note { color: #C3CEE0; }
+</style>
+
 {{-- ═════════════ AFFILIATION : faire connaître Shopio (chiffres = réglages réels du programme) ═════════════ --}}
 @php
     $aff3 = \App\Models\AffiliateSetting::current();
