@@ -45,6 +45,7 @@ class StorefrontOrderController extends Controller
             'phone'         => ['required', 'string', 'max:30', new RealisticGuineaPhone],
             'commune'       => ['required', Rule::in(PageModels::COMMUNES)],
             'landmark'      => ['nullable', 'string', 'max:120'],
+            'visitor'       => ['nullable', 'string', 'regex:/^[a-z0-9]{12,40}$/'],
         ], [
             'items.required'   => 'Votre panier est vide.',
             'name.required'    => 'Indiquez votre prénom et votre nom.',
@@ -111,6 +112,14 @@ class StorefrontOrderController extends Controller
         if ($guest) {
             \App\Support\DeliveryCode::rememberGuestOrder($order);
         }
+
+        // Panier abandonné de ce client (même navigateur ou même numéro) : récupéré par cette commande
+        $digits = preg_replace('/\D/', '', (string) $data['phone']);
+        if (strlen($digits) === 12 && str_starts_with($digits, '224')) $digits = substr($digits, 3);
+        \App\Models\AbandonedCart::where('shop_id', $shop->id)->where('state', '!=', 'recupere')
+            ->where('last_activity_at', '>=', now()->subDays(7))
+            ->where(fn ($w) => $w->where('phone', $digits)->when(!empty($data['visitor']), fn ($v) => $v->orWhere('visitor', $data['visitor'])))
+            ->update(['state' => 'recupere', 'order_id' => $order->id, 'updated_at' => now()]);
 
         // Prévenir la boutique (propriétaire et équipe)
         $lines = $order->items()->with('product:id,name')->get();

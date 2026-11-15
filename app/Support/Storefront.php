@@ -59,6 +59,8 @@ class Storefront
             'cover'      => self::coverDefaults(),
             'logo'       => self::logoDefaults(),
             'settings'   => self::settingsDefaults(),
+            'orders'     => OrderBoard::settings([])['orders'],
+            'carts'      => OrderBoard::settings([])['carts'],
         ];
     }
 
@@ -105,6 +107,9 @@ class Storefront
             'cover'      => self::normalizeCover($input['cover'] ?? null),
             'logo'       => self::normalizeLogo($input['logo'] ?? null),
             'settings'   => self::normalizeSettings($input['settings'] ?? null),
+            // Commandes : message WhatsApp de confirmation ; paniers abandonnés (Commandes → Paniers abandonnés)
+            'orders'     => OrderBoard::settings($input)['orders'],
+            'carts'      => OrderBoard::settings($input)['carts'],
         ];
     }
 
