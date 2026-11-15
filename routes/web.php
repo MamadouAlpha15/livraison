@@ -222,6 +222,14 @@ Route::get('/s/{slug}/collection/{collection}', [PublicShopController::class, 'b
     ->where(['slug' => '[a-z0-9]+(?:-[a-z0-9]+)*', 'collection' => 'c[a-z0-9]{3,16}'])
     ->name('public.shops.slug.collection');
 
+/* Page produit publique (modèle Express) : /shops/{id}/p/12-nom-du-produit et /s/{slug}/p/12-nom-du-produit */
+Route::get('/shops/{shop}/p/{produit}', [PublicShopController::class, 'product'])
+    ->where('produit', '[0-9]+(?:-[a-z0-9]+)*')
+    ->name('public.shops.product');
+Route::get('/s/{slug}/p/{produit}', [PublicShopController::class, 'bySlugProduct'])
+    ->where(['slug' => '[a-z0-9]+(?:-[a-z0-9]+)*', 'produit' => '[0-9]+(?:-[a-z0-9]+)*'])
+    ->name('public.shops.slug.product');
+
 /* Lien d'aperçu de la vitrine, valable 48 h, et avis laissés dessus (Faire grandir ma vitrine → Qualité) */
 Route::get('/apercu/{token}', [PublicShopController::class, 'previewLink'])
     ->where('token', '[a-z0-9]{24}')
@@ -821,6 +829,11 @@ Route::middleware(['auth', 'role:vendeur,admin'])->group(function () {
     Route::post('products/ajout-rapide', [ProductController::class, 'quickAddStore'])->name('products.quick-add.store');
 
     Route::resource('products', ProductController::class)->except(['show']);
+
+    /* Page de vente d'un produit (page produit longue du modèle Express : packs, sections, questions) */
+    Route::get('products/{product}/page-de-vente', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'edit'])->name('products.page.edit');
+    Route::put('products/{product}/page-de-vente', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'update'])->name('products.page.update');
+    Route::post('products/{product}/page-de-vente/ia', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'generate'])->middleware('throttle:6,1')->name('products.page.ai');
 
     /* Actions supplémentaires produits */
     Route::post('products/{product}/toggle',    [ProductController::class, 'toggleActive'])->name('products.toggle');

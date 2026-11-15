@@ -409,6 +409,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                 <nav class="pf-crumb" aria-label="Fil d'Ariane"><a href="{{ route('products.index') }}">Produits</a><span aria-hidden="true">/</span><span>{{ $isEdit ? Str::limit($product->name, 40) : 'Nouveau produit' }}</span></nav>
                 <h1 class="pf-title">{{ $isEdit ? 'Modifier le produit' : 'Ajouter un produit' }}</h1>
             </div>
+            @if($isEdit)<a href="{{ route('products.page.edit', $product) }}" class="pf-back" style="background:var(--sv-b50,#EAF2FF);color:var(--sv-btn,#1668D8);box-shadow:none">Page de vente</a>@endif
             <a href="{{ route('products.index') }}" class="pf-back">Retour aux produits</a>
         </div>
 

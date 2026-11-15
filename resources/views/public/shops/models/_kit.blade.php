@@ -7,7 +7,7 @@
       4. Commande : nom, téléphone (9 chiffres commençant par 6), commune, repère ; erreurs sous chaque champ.
       5. Confirmation : vraie commande enregistrée, « Commande #… envoyée ».
     API pour les modèles (window.SM) : products, byId(id), money(n), fav(id), favs(), recent(), cartCount(),
-    cartTotal(), add(id, el), open(id), openCart(), canBuy(p), buyLabel(p), suggest(p), subscribe(fn).
+    cartTotal(), lineTotal(p, qty) (packs compris), add(id, el, qty), open(id), openCart(), canBuy(p), buyLabel(p), suggest(p), subscribe(fn).
     Attributs reconnus partout : data-sm-quick="id", data-sm-add="id", data-sm-fav="id", data-sm-cart,
     data-sm-count (nombre d'articles), data-sm-total (total du panier).
     Variables : $shop, $pm, $previewLink
@@ -101,7 +101,16 @@ window.SM = (function () {
         subs.forEach(fn => { try { fn(); } catch (e) {} });
     }
     const cartCount = () => cart.reduce((a, l) => a + l.qty, 0);
-    const cartTotal = () => cart.reduce((a, l) => a + l.qty * (byId(l.id) || { price: 0 }).price, 0);
+    /* Prix d'une ligne : combinaison la moins chère de packs et d'unités (même calcul que le serveur, ProductPage::lineTotal) */
+    function lineTotal(p, q) {
+        if (!p) return 0;
+        const packs = p.packs || [];
+        if (!packs.length || q < 2) return p.price * q;
+        const best = [0];
+        for (let i = 1; i <= q; i++) { best[i] = best[i - 1] + p.price; packs.forEach(k => { if (k.qty <= i) best[i] = Math.min(best[i], best[i - k.qty] + k.price); }); }
+        return best[q];
+    }
+    const cartTotal = () => cart.reduce((a, l) => a + lineTotal(byId(l.id), l.qty), 0);
     const out = p => p.stock !== null && p.stock !== undefined && p.stock <= 0;
     const canBuy = p => !PM.settings.vacation && !out(p);
     const buyLabel = p => PM.settings.vacation ? 'Indisponible' : out(p) ? 'Rupture' : p.variants ? 'Choisir les options' : 'Ajouter au panier';
@@ -112,18 +121,18 @@ window.SM = (function () {
         document.querySelectorAll('[data-sm-cart]').forEach(el => { el.classList.remove('sm-bounce'); void el.offsetWidth; el.classList.add('sm-bounce'); });
     }
 
-    function add(id, from) {
+    function add(id, from, n) {
         const p = byId(id);
+        n = Math.max(1, Math.min(99, parseInt(n, 10) || 1));
         if (!p) return;
         if (PM.settings.vacation) return toast('La boutique est en pause : les commandes reprendront à son retour.');
         if (out(p)) return toast('« ' + p.name + ' » est en rupture de stock.');
         if (p.variants) { window.location.href = p.url; return; }
         const line = cart.find(l => l.id === p.id);
-        if (line) {
-            if (p.stock !== null && line.qty >= p.stock) return toast('Il ne reste que ' + p.stock + ' « ' + p.name + ' » en stock.');
-            line.qty++;
-        } else cart.push({ id: p.id, qty: 1 });
-        changed(); bounce(); toast('« ' + p.name + ' » ajouté au panier');
+        const have = line ? line.qty : 0;
+        if (p.stock !== null && have + n > p.stock) return toast('Il ne reste que ' + p.stock + ' « ' + p.name + ' » en stock.');
+        if (line) line.qty += n; else cart.push({ id: p.id, qty: n });
+        changed(); bounce(); toast((n > 1 ? n + ' × ' : '') + '« ' + p.name + ' » ajouté au panier');
         if (from) { from.classList.remove('sm-added'); void from.offsetWidth; from.classList.add('sm-added'); }
     }
     function toggleFav(id, el) {
@@ -215,7 +224,7 @@ window.SM = (function () {
             return;
         }
         $('smCartFt').hidden = false;
-        $('smStepCart').innerHTML = cart.map(l => { const p = byId(l.id); return '<div class="sm-line"><i' + (p.thumb ? ' style="background-image:url(\'' + esc(p.thumb) + '\')"' : '') + '></i><div style="min-width:0"><b>' + esc(p.name) + '</b><small>' + esc(money(p.price)) + ' l’unité</small><div><span class="sm-qty"><button type="button" data-q="' + p.id + '" data-d="-1" aria-label="Retirer un ' + esc(p.name) + '"' + (l.qty <= 1 ? ' disabled' : '') + '>−</button><span aria-live="polite">' + l.qty + '</span><button type="button" data-q="' + p.id + '" data-d="1" aria-label="Ajouter un ' + esc(p.name) + '"' + (p.stock !== null && l.qty >= p.stock ? ' disabled' : '') + '>+</button></span></div><button type="button" class="sm-rm" data-rm="' + p.id + '">Retirer</button></div><span class="sm-line-total">' + esc(money(p.price * l.qty)) + '</span></div>'; }).join('');
+        $('smStepCart').innerHTML = cart.map(l => { const p = byId(l.id); return '<div class="sm-line"><i' + (p.thumb ? ' style="background-image:url(\'' + esc(p.thumb) + '\')"' : '') + '></i><div style="min-width:0"><b>' + esc(p.name) + '</b><small>' + esc(money(p.price)) + ' l’unité</small><div><span class="sm-qty"><button type="button" data-q="' + p.id + '" data-d="-1" aria-label="Retirer un ' + esc(p.name) + '"' + (l.qty <= 1 ? ' disabled' : '') + '>−</button><span aria-live="polite">' + l.qty + '</span><button type="button" data-q="' + p.id + '" data-d="1" aria-label="Ajouter un ' + esc(p.name) + '"' + (p.stock !== null && l.qty >= p.stock ? ' disabled' : '') + '>+</button></span></div><button type="button" class="sm-rm" data-rm="' + p.id + '">Retirer</button></div><span class="sm-line-total">' + esc(money(lineTotal(p, l.qty))) + (lineTotal(p, l.qty) < p.price * l.qty ? '<small style="display:block;color:#15803D;font-weight:800">Prix pack</small>' : '') + '</span></div>'; }).join('');
     }
     $('smStepCart').addEventListener('click', e => {
         const q = e.target.closest('[data-q]'), rm = e.target.closest('[data-rm]'), browse = e.target.closest('[data-sm-browse]');
@@ -287,7 +296,7 @@ window.SM = (function () {
     return {
         data: PM, products: PM.products, byId: byId, money: money, esc: esc, reduce: reduce,
         fav: id => favs.includes(+id), favs: () => favs.slice(), recent: () => recent.map(byId).filter(Boolean),
-        cartCount: cartCount, cartTotal: cartTotal, cartLines: () => cart.map(l => ({ p: byId(l.id), qty: l.qty })),
+        cartCount: cartCount, cartTotal: cartTotal, lineTotal: lineTotal, cartLines: () => cart.map(l => ({ p: byId(l.id), qty: l.qty })),
         add: add, open: open, openCart: openCart, toggleFav: toggleFav, canBuy: canBuy, buyLabel: buyLabel, suggest: suggest, toast: toast,
         subscribe: fn => { subs.push(fn); },
     };

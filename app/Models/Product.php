@@ -42,6 +42,7 @@ class Product extends Model
         'tags',              // mots-clés
         'image',             // photo principale
         'gallery',           // JSON : photos supplémentaires
+        'landing',           // JSON : contenu de la page produit longue (voir App\Support\ProductPage)
         'low_stock_threshold', // seuil d'alerte stock faible
         'flash_price',         // prix pendant une vente flash
         'flash_starts_at',     // début de la vente flash
@@ -64,6 +65,7 @@ class Product extends Model
         'is_active'        => 'boolean',
         'is_featured'      => 'boolean',
         'is_available'     => 'boolean',
+        'landing'          => 'array',
         // gallery est décodé manuellement dans les vues avec json_decode()
         // pour garder la flexibilité
     ];

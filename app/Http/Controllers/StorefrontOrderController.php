@@ -11,6 +11,7 @@ use App\Rules\RealisticFullName;
 use App\Rules\RealisticGuineaPhone;
 use App\Services\PushService;
 use App\Support\PageModels;
+use App\Support\ProductPage;
 use App\Support\Storefront;
 use App\Support\TrafficSource;
 use Illuminate\Http\JsonResponse;
@@ -61,6 +62,7 @@ class StorefrontOrderController extends Controller
             $order = DB::transaction(function () use ($shop, $qty, $data, $guest) {
                 $products = Product::where('shop_id', $shop->id)->where('is_active', true)->whereIn('id', array_keys($qty))->lockForUpdate()->get()->keyBy('id');
                 $total = 0;
+                $lineTotals = [];
                 foreach ($qty as $id => $n) {
                     $p = $products->get($id);
                     if (!$p) throw new \RuntimeException('Un produit de votre panier n’est plus en vente. Retirez-le puis réessayez.');
@@ -68,7 +70,9 @@ class StorefrontOrderController extends Controller
                     if ($p->stock !== null && $p->stock < $n) {
                         throw new \RuntimeException($p->stock > 0 ? 'Il ne reste que ' . $p->stock . ' « ' . $p->name . ' » en stock.' : '« ' . $p->name . ' » est en rupture de stock.');
                     }
-                    $total += $p->current_price * $n;
+                    // Packs du produit (2, 3… à prix réduit) appliqués ici, pas seulement à l'affichage
+                    $lineTotals[$id] = ProductPage::lineTotal($p, $n);
+                    $total += $lineTotals[$id];
                 }
 
                 $order = Order::create([
@@ -84,7 +88,7 @@ class StorefrontOrderController extends Controller
                 ]);
                 foreach ($qty as $id => $n) {
                     $p = $products[$id];
-                    OrderItem::create(['order_id' => $order->id, 'product_id' => $p->id, 'quantity' => $n, 'price' => $p->current_price]);
+                    OrderItem::create(['order_id' => $order->id, 'product_id' => $p->id, 'quantity' => $n, 'price' => round($lineTotals[$id] / $n, 2)]);
                     if ($p->stock !== null) $p->decrement('stock', $n);
                 }
                 Payment::create(['order_id' => $order->id, 'method' => Payment::METHOD_CASH, 'amount' => $total, 'status' => 'en_attente']);

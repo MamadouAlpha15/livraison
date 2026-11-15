@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 /**
  * Modèles de page boutique côté client (Faire grandir ma vitrine → Personnalisation, ou la barre
  * « Modèles de boutique Shopio » visible du vendeur sur sa vitrine).
- * « standard » = la vitrine à blocs de l'éditeur. Les 5 autres ont chacun leur style et leur mise
+ * « standard » = la vitrine à blocs de l'éditeur. Les autres ont chacun leur style et leur mise
  * en page, avec le même parcours d'achat : fiche rapide, favoris, vus récemment, panier, commande
  * (payée à la livraison) et confirmation. Toutes les données viennent de la boutique.
  */
@@ -21,6 +21,8 @@ class PageModels
     /** [nom, description courte]. */
     public const MODELS = [
         'standard'  => ['Standard', 'La vitrine à blocs de l’éditeur'],
+        'express'   => ['Express', 'Qui vend : packs, commande en 1 minute, page produit longue'],
+        'signature' => ['Signature', 'Premium clair : ivoire, encre et vert profond'],
         'prestige'  => ['Prestige', 'Nuit et or, élégant, pour les belles pièces'],
         'pop'       => ['Pop', 'Énergique : stories, couleurs, sélection du jour'],
         'epure'     => ['Épuré', 'Minimal, beaucoup d’espace, photos en grand'],
@@ -50,7 +52,7 @@ class PageModels
         $guestChat = fn ($p) => route('register', ['redirect' => route('client.messages.index', $p), 'role' => 'client']);
 
         $products = $shop->products()->where('is_active', true)->orderByDesc('is_featured')->latest()->take(self::PRODUCTS_MAX)->get()
-            ->map(function ($p) use ($set, $isClient, $guestChat) {
+            ->map(function ($p) use ($set, $isClient, $guestChat, $shop) {
                 $old = $set['show_strike'] && $p->original_price && $p->original_price > $p->current_price ? (int) $p->original_price : null;
                 return [
                     'id'       => $p->id,
@@ -66,6 +68,8 @@ class PageModels
                     'featured' => (bool) $p->is_featured,
                     'new'      => $p->created_at && $p->created_at->gte(now()->subDays(7)),
                     'url'      => route('client.orders.createFromProduct', $p),
+                    'page'     => ProductPage::url($shop, $p),   // page produit publique (modèle Express)
+                    'packs'    => ProductPage::packs($p),        // packs à prix réduit, appliqués aussi à la commande
                     'nego'     => $isClient ? route('client.messages.index', $p) : $guestChat($p),
                 ];
             })->values();
