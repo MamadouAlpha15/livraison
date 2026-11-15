@@ -687,7 +687,7 @@ class BoutiqueMessageController extends Controller
                     'x-api-key'         => config('services.anthropic.key'),
                     'anthropic-version' => '2023-06-01',
                     'content-type'      => 'application/json',
-                ])
+                ] + \App\Support\Ai\Anthropic::workspaceHeader())
                 ->post('https://api.anthropic.com/v1/messages', [
                     'model'       => 'claude-haiku-4-5-20251001',
                     'max_tokens'  => 200,
@@ -786,7 +786,7 @@ class BoutiqueMessageController extends Controller
                     'x-api-key'         => config('services.anthropic.key'),
                     'anthropic-version' => '2023-06-01',
                     'content-type'      => 'application/json',
-                ])
+                ] + \App\Support\Ai\Anthropic::workspaceHeader())
                 ->post('https://api.anthropic.com/v1/messages', [
                     'model'       => 'claude-haiku-4-5-20251001',
                     'max_tokens'  => 200,

@@ -20,6 +20,7 @@
         'products' => 'M3 12 12 3h8v8l-9 9zM15.5 8.5h.01',
         'campaigns'=> 'M12 3l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6L3.3 9.2l6.1-.6z',
         'shopio-ai'=> 'm12 3 1.2 3.6L17 8l-3.8 1.4L12 13l-1.2-3.6L7 8l3.8-1.4zM19 14l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z',
+        'product-page' => 'M4 5h16v14H4zM4 9h16M9 13h6M9 16h4',
         'followups'=> 'M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0M20 3l-2 2M4 3l2 2',
         'referral' => 'M4 11h16v9H4zM3 7h18v4H3zM12 7v13M12 7c-1.6-3.2-5-3.4-5-1.2C7 7 9.5 7 12 7zm0 0c1.6-3.2 5-3.4 5-1.2C17 7 14.5 7 12 7z',
         'promos'   => 'M19 5 5 19M7.5 7.5h.01M16.5 16.5h.01',
@@ -68,6 +69,7 @@
         ],
         'Réglages' => [
             ['settings', 'Ma boutique', route('shop.edit', $shop), false],
+            ...($vsUser->role === 'admin' ? [['product-page', 'Pages produit', route('boutique.product-page.edit'), false]] : []),
         ],
         'Aide' => [
             ['support', 'Support', route('support.index'), false],

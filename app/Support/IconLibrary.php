@@ -112,6 +112,12 @@ class IconLibrary
         'jardin' => 'sprout', 'bricolage' => 'wrench', 'outil' => 'wrench', 'électroménager' => 'wind', 'electromenager' => 'wind',
     ];
 
+    /** Noms des icônes disponibles (réglage « icône » du constructeur de page). */
+    public static function names(): array
+    {
+        return array_keys(self::$icons);
+    }
+
     /** Rend une icône SVG inline par son nom. */
     public static function svg(string $name, string $class = '', int $size = 18): string
     {

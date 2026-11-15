@@ -528,6 +528,7 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
                                         <div>
                                             <div class="prod-name">{{ $prod?->name ?? 'Produit supprimé' }}</div>
                                             @if($item->variant_name)<div class="prod-ref" style="color:#1668D8;font-weight:700">🎨 {{ $item->variant_name }}</div>@endif
+                                            @include('vendeur.orders._item-options')
                                             @if($prod?->sku)<div class="prod-ref">REF: {{ $prod->sku }}</div>@endif
                                         </div>
                                     </div>
@@ -639,6 +640,18 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
                             <div class="info-row">
                                 <span class="lbl">Téléphone</span>
                                 <a href="tel:{{ $order->client_phone }}" class="val">📞 {{ $order->client_phone }}</a>
+                            </div>
+                            {{-- Historique de livraison de ce numéro sur Shopio (totaux seulement) --}}
+                            @php
+                                $risk = \App\Support\CustomerRisk::forPhone($order->client_phone, $order->id);
+                                $riskColor = ['new' => '#45455E', 'good' => '#15803D', 'watch' => '#B45309', 'risky' => '#C2410C'][$risk['level']];
+                            @endphp
+                            <div class="info-row" data-customer-risk="{{ $risk['level'] }}">
+                                <span class="lbl">Client</span>
+                                <span class="val" style="text-align:right">
+                                    <strong style="color:{{ $riskColor }}">{{ $risk['label'] }}</strong><br>
+                                    <span style="font-size:12px;color:var(--muted)">{{ $risk['summary'] }}</span>
+                                </span>
                             </div>
                             @endif
                             @if($order->delivery_destination)

@@ -12,6 +12,9 @@ class Product extends Model
 
     protected static function booted(): void
     {
+        // Page construite en cache : à recalculer dès que le produit change (prix, stock, vente flash…)
+        static::updated(fn (Product $product) => \App\PageBuilder\Renderer::forget('product', $product->id));
+
         static::updated(function (Product $product) {
             if ($product->wasChanged('stock')) {
                 app(StockAlertService::class)->checkProduct($product);
@@ -66,6 +69,7 @@ class Product extends Model
     |------------------------------------------------------------------
     */
     protected $casts = [
+        'page'             => 'array',  // réglages de la page produit (App\Support\ProductPage)
         'price'            => 'decimal:2',
         'original_price'   => 'decimal:2',
         'flash_price'      => 'decimal:2',
@@ -99,6 +103,12 @@ class Product extends Model
     }
 
     /** Variantes du produit (taille/couleur/etc.), triées par ordre défini par le vendeur */
+    /** Page construite avec le constructeur de page (sections et blocs) */
+    public function productPage()
+    {
+        return $this->hasOne(ProductPage::class);
+    }
+
     public function variants()
     {
         return $this->hasMany(ProductVariant::class)->orderBy('sort_order');

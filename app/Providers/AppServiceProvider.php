@@ -28,8 +28,10 @@ class AppServiceProvider extends ServiceProvider
             ? new \App\Services\ShopioAI\UnconfiguredChatModel()
             : new \App\Services\ShopioAI\ClaudeChatModel((string) config('services.anthropic.key')));
 
-        // SMS : aucun fournisseur branché, les messages vont dans le journal (voir App\Support\Sms\SmsSender)
-        $this->app->bind(\App\Support\Sms\SmsSender::class, \App\Support\Sms\LogSmsSender::class);
+        // SMS : Nimba SMS si ses identifiants sont dans .env, sinon les messages vont dans le journal
+        $this->app->bind(\App\Support\Sms\SmsSender::class, fn () => \App\Support\Sms\NimbaSmsSender::configured()
+            ? new \App\Support\Sms\NimbaSmsSender((string) config('services.nimba.service_id'), (string) config('services.nimba.secret'), (string) config('services.nimba.sender'))
+            : new \App\Support\Sms\LogSmsSender());
     }
 
     public function boot(): void
@@ -43,6 +45,14 @@ class AppServiceProvider extends ServiceProvider
         // Programme d'affiliation : un produit ou une commande peut rendre « Active » une boutique parrainée
         \App\Models\Product::observe(\App\Observers\ReferralActivityObserver::class);
         \App\Models\Order::observe(\App\Observers\ReferralActivityObserver::class);
+
+        // Éditeur de page : un texte vidé par le vendeur doit rester vide (sinon il reprend sa valeur par défaut)
+        \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::skipWhen(fn ($request) => $request->is('products/*/editeur/*'));
+
+        // Constructeur de page produit (App\Policies\ProductPagePolicy)
+        \Illuminate\Support\Facades\Gate::define('edit-product-page', [\App\Policies\ProductPagePolicy::class, 'edit']);
+        \Illuminate\Support\Facades\Gate::define('use-page-template', [\App\Policies\ProductPagePolicy::class, 'useTemplate']);
+        \Illuminate\Support\Facades\Gate::define('manage-page-template', [\App\Policies\ProductPagePolicy::class, 'manageTemplate']);
 
         // Shopio IA : permission de chaque outil (App\Policies\ShopioAiToolPolicy)
         \Illuminate\Support\Facades\Gate::define('shopio-ai.view-product', [\App\Policies\ShopioAiToolPolicy::class, 'viewProduct']);

@@ -11,6 +11,7 @@
         "bacon/bacon-qr-code": "^3.0",
         "barryvdh/laravel-dompdf": "^3.1",
         "doctrine/dbal": "^4.3",
+        "ezyang/htmlpurifier": "^4.17",
         "intervention/image": "^3.0",
         "kreait/laravel-firebase": "^7.2",
         "laravel/framework": "^12.0",

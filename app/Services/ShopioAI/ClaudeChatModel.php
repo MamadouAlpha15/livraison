@@ -24,7 +24,7 @@ class ClaudeChatModel implements ChatModel
 
     public function run(string $system, array $messages, array $tools, callable $executeTool): ChatResult
     {
-        $client = new Client(apiKey: $this->apiKey);
+        $client = \App\Support\Ai\Anthropic::client($this->apiKey);
         $in = 0;
         $out = 0;
 

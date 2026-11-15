@@ -28,7 +28,7 @@ class VendorAnalyticsAssistantService
 
     public function __construct()
     {
-        $this->client = new Client(apiKey: config('services.anthropic.key'));
+        $this->client = \App\Support\Ai\Anthropic::client();
     }
 
     private function tools(): array

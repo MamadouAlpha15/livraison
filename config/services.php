@@ -55,6 +55,15 @@ return [
 
     'anthropic' => [
         'key' => env('ANTHROPIC_API_KEY'),
+        // Clé « utilisateur » (sk-ant-usr-…) : identifiant de l'espace de travail à envoyer (wrkspc_…)
+        'workspace_id' => env('ANTHROPIC_WORKSPACE_ID'),
+    ],
+
+    // SMS par Nimba SMS (App\Support\Sms\NimbaSmsSender). Vides : les SMS vont dans le journal.
+    'nimba' => [
+        'service_id' => env('NIMBA_SERVICE_ID'),
+        'secret'     => env('NIMBA_SECRET_TOKEN'),
+        'sender'     => env('NIMBA_SENDER_NAME'),
     ],
 
 ];

@@ -18,13 +18,46 @@ class ProductController extends Controller
             \App\Support\TrafficSource::recordProductView($product, $request);
         }
 
+        // Page construite et publiée par le vendeur (constructeur de page) : elle remplace la page produit actuelle
+        $built = $product->productPage;
+        if ($shop && $built?->isLive()) {
+            return response(\App\PageBuilder\Renderer::published($built, new \App\PageBuilder\RenderContext($shop, $product)));
+        }
+
         $isFavorited = auth()->check()
             ? auth()->user()->favoriteProducts()->where('product_id', $product->id)->exists()
             : false;
 
         $variants = $product->activeVariants()->get();
 
-        return view('client.show', compact('product', 'shop', 'isFavorited', 'variants'));
+        // Page produit personnalisée par le vendeur (App\Support\ProductPage)
+        $shopPage = \App\Support\ProductPage::shop($shop);
+        $productPage = \App\Support\ProductPage::product($product);
+        $offers = \App\Support\ProductPage::offers($product);
+
+        // Avis réels : laissés sur des commandes livrées qui contiennent ce produit
+        $reviews = \App\Models\Review::with('client:id,name')
+            ->whereHas('order.items', fn ($q) => $q->where('product_id', $product->id))
+            ->latest()->limit(6)->get();
+
+        return view('client.product-page', [
+            'product'     => $product,
+            'shop'        => $shop,
+            'isFavorited' => $isFavorited,
+            'variants'    => $variants,
+            'shopPage'    => $shopPage,
+            'productPage' => $productPage,
+            'offers'      => $offers,
+            'selected'    => \App\Support\ProductPage::defaultOffer($offers),
+            'faq'         => \App\Support\ProductPage::faq($shop, $product),
+            'showOffer'   => \App\Support\ProductPage::showOfferButton($shop, $product),
+            // Modèle de page : celui du produit ou de la boutique ; ?modele= pour l'aperçu depuis l'espace vendeur
+            'template'    => \App\Support\ProductPage::template($shop, $product, $request->query('modele')),
+            'waUrl'       => \App\Support\ProductPage::whatsappUrl($shop, $product),
+            'reviews'     => $reviews,
+            'reviewAvg'   => $reviews->isNotEmpty() ? round((float) \App\Models\Review::whereHas('order.items', fn ($q) => $q->where('product_id', $product->id))->avg('rating'), 1) : null,
+            'reviewCount' => $reviews->isNotEmpty() ? \App\Models\Review::whereHas('order.items', fn ($q) => $q->where('product_id', $product->id))->count() : 0,
+        ]);
     }
 
     public function index(Request $request)

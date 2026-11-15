@@ -8,6 +8,7 @@ export default defineConfig({
                 'resources/css/app.css',
                 'resources/js/app.js',
                 'resources/js/boutique-dashboard.js',
+                'resources/js/page-builder.js',
             ],
             refresh: true,
         }),

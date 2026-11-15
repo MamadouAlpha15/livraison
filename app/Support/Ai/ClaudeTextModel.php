@@ -16,7 +16,7 @@ class ClaudeTextModel implements TextModel
     public function complete(string $system, array $messages, int $maxTokens = 1500): string
     {
         try {
-            $response = (new Client(apiKey: $this->apiKey))->messages->create(
+            $response = Anthropic::client($this->apiKey)->messages->create(
                 model: self::MODEL,
                 maxTokens: $maxTokens,
                 system: $system,
