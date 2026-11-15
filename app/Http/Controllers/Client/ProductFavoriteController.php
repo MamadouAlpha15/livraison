@@ -24,7 +24,7 @@ class ProductFavoriteController extends Controller
         $user = Auth::user();
 
         $products = $user->favoriteProducts()
-            ->with('shop:id,name,image,country')
+            ->with('shop:id,slug,name,image,country')
             ->orderByDesc('product_favorites.created_at')
             ->paginate(24);
 

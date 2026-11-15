@@ -778,9 +778,6 @@ Route::middleware(['auth', 'role:admin'])
         /* Gestion de la boutique */
         Route::resource('shops', ShopController::class)->only(['create', 'store', 'index']);
 
-        /* Réglages communs des pages produit /client/produit (bandeau, couleur, badges, étapes, FAQ, livraison) */
-        Route::get('page-produit', [\App\Http\Controllers\Vendeur\ProductPageSettingsController::class, 'editShop'])->name('product-page.edit');
-        Route::put('page-produit', [\App\Http\Controllers\Vendeur\ProductPageSettingsController::class, 'updateShop'])->name('product-page.update');
 
         /* Shopio IA dans la messagerie (App\Services\ShopioAI) */
         Route::prefix('shopio-ia')->name('shopio-ai.')->controller(\App\Http\Controllers\Boutique\ShopioAiController::class)->group(function () {
@@ -1004,25 +1001,6 @@ Route::middleware(['auth', 'role:vendeur,admin'])->group(function () {
 
     Route::resource('products', ProductController::class)->except(['show']);
 
-    /* Éditeur de page produit par sections et blocs (App\PageBuilder) */
-    Route::prefix('products/{product}/editeur')->name('products.builder.')->controller(\App\Http\Controllers\Vendeur\PageBuilderController::class)->group(function () {
-        Route::get('/', 'edit')->name('edit');
-        Route::get('apercu', 'frame')->name('frame');
-        Route::post('apercu', 'preview')->middleware('throttle:180,1,pb-preview')->name('preview');
-        Route::put('brouillon', 'save')->middleware('throttle:120,1,pb-save')->name('save');
-        Route::post('publier', 'publish')->middleware('throttle:20,1,pb-publish')->name('publish');
-        Route::put('activation', 'toggle')->middleware('throttle:30,1,pb-toggle')->name('toggle');
-        Route::post('ia', 'aiWrite')->middleware('throttle:6,1,pb-ai')->name('ai');
-        Route::post('image', 'upload')->middleware('throttle:30,1,pb-image')->name('upload');
-        Route::post('video', 'uploadVideo')->middleware('throttle:10,1,pb-video')->name('video');
-        Route::get('versions', 'versions')->name('versions');
-        Route::post('versions/{version}', 'restore')->middleware('throttle:20,1,pb-restore')->name('restore');
-        Route::get('modeles', 'templates')->name('templates');
-        Route::post('modeles', 'storeTemplate')->middleware('throttle:20,1,pb-template')->name('templates.store');
-        Route::post('modeles/{template}/appliquer', 'applyTemplate')->middleware('throttle:20,1,pb-template')->name('templates.apply');
-        Route::delete('modeles/{template}', 'destroyTemplate')->middleware('throttle:20,1,pb-template')->name('templates.destroy');
-    });
-
     /* Page de vente d'un produit (page produit longue du modèle Express : packs, sections, questions) */
     Route::get('products/{product}/page-de-vente', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'edit'])->name('products.page.edit');
     Route::put('products/{product}/page-de-vente', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'update'])->name('products.page.update');
@@ -1220,14 +1198,8 @@ Route::middleware(['auth', 'role:client'])
 |  Seule la messagerie avec le vendeur nécessite une inscription.
 ══════════════════════════════════════════════════════════════════════════ */
 Route::prefix('client')->name('client.')->group(function () {
-    /* Fiche produit (accessible sans compte — lien partagé par le vendeur) */
+    /* Ancienne adresse d'une fiche produit : redirige vers la page produit du thème (/s/{slug}/p/{id-nom}) */
     Route::get('/produit/{product}', [ClientProductController::class, 'show'])->name('products.show');
-    /* Commande depuis le formulaire de la page produit (offre choisie, paiement à la livraison) */
-    Route::post('/produit/{product}/commander', [\App\Http\Controllers\ProductPageOrderController::class, 'store'])
-        ->middleware('throttle:10,1')->name('products.order');
-    /* Commande depuis une page construite (constructeur de page) : prix recalculés par App\PageBuilder\Commerce\Checkout */
-    Route::post('/produit/{product}/commander-page', [\App\Http\Controllers\PageBuilderOrderController::class, 'store'])
-        ->middleware('throttle:10,1,pb-order')->name('products.page-order');
 
     /* Commander depuis un produit spécifique — invité ou client connecté */
     Route::get('/orders/create-from-product/{product}', [ClientOrderController::class, 'createFromProduct'])->name('orders.createFromProduct');

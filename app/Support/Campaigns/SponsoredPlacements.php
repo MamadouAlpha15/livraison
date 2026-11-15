@@ -154,7 +154,7 @@ class SponsoredPlacements
             $memo[$placement] = AdCampaign::query()
                 ->where('status', AdCampaign::STATUS_EN_COURS)
                 ->whereHas('package', fn ($q) => $q->where('placement', $placement))
-                ->with(['shop', 'items.product.variants', 'items.product.shop:id,name,image,country,type,user_id,currency,is_approved'])
+                ->with(['shop', 'items.product.variants', 'items.product.shop:id,slug,name,image,country,type,user_id,currency,is_approved'])
                 ->get();
             self::$running[$request] = $memo;
         }

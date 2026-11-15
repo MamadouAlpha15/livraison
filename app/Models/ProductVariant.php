@@ -17,11 +17,6 @@ class ProductVariant extends Model
 
     protected static function booted(): void
     {
-        // Page construite du produit en cache : à recalculer quand une option change
-        static::created(fn (ProductVariant $variant) => \App\PageBuilder\Renderer::forget('product', $variant->product_id));
-        static::updated(fn (ProductVariant $variant) => \App\PageBuilder\Renderer::forget('product', $variant->product_id));
-        static::deleted(fn (ProductVariant $variant) => \App\PageBuilder\Renderer::forget('product', $variant->product_id));
-
         static::updated(function (ProductVariant $variant) {
             if ($variant->wasChanged('stock')) {
                 app(StockAlertService::class)->checkVariant($variant);

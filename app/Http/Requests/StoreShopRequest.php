@@ -47,6 +47,8 @@ class StoreShopRequest extends FormRequest
             // Mobile Money où reverser les paiements en ligne (ChapChap Pay)
             'payout_wallet_type'   => ['nullable', Rule::in(['paycard', 'orange_money', 'mtn_momo', 'kulu', 'soutra_money', 'akiba'])],
             'payout_wallet_number' => ['nullable', 'string', 'max:30'],
+            // Thème de la vitrine (App\Support\PageModels) : Express si rien n'est choisi
+            'page_model'    => ['nullable', Rule::in(array_keys(\App\Support\PageModels::MODELS))],
             // Programme d'affiliation
             'referral_code' => ['nullable', 'string', 'max:20'],
             'source'        => ['nullable', Rule::in(array_keys(Referral::SOURCES))],
@@ -74,6 +76,6 @@ class StoreShopRequest extends FormRequest
 
     public function attributes(): array
     {
-        return ['referral_code' => 'code de parrainage', 'source' => 'réponse « Comment as-tu connu Shopio ? »'];
+        return ['referral_code' => 'code de parrainage', 'source' => 'réponse « Comment as-tu connu Shopio ? »', 'page_model' => 'thème de la boutique'];
     }
 }

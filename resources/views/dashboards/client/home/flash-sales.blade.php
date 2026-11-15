@@ -14,7 +14,7 @@
         <div class="flash-row {{ $flashLoop ? 'flash-auto' : '' }}" id="flashRow">
             @for ($fpass = 0; $fpass < $flashPasses; $fpass++)
                 @foreach($flashProducts as $fp)
-                <a href="{{ route('client.products.show', $fp) }}" class="flash-card" @if($fpass > 0) aria-hidden="true" tabindex="-1" @endif>
+                <a href="{{ $fp->publicUrl() }}" class="flash-card" @if($fpass > 0) aria-hidden="true" tabindex="-1" @endif>
                     <div class="flash-card-img">
                         @if($fp->image)
                             <img src="{{ \App\Services\ImageOptimizer::url($fp->image, 'medium') }}" alt="{{ $fp->name }}" loading="lazy">

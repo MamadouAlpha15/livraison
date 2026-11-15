@@ -46,14 +46,6 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\Product::observe(\App\Observers\ReferralActivityObserver::class);
         \App\Models\Order::observe(\App\Observers\ReferralActivityObserver::class);
 
-        // Éditeur de page : un texte vidé par le vendeur doit rester vide (sinon il reprend sa valeur par défaut)
-        \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::skipWhen(fn ($request) => $request->is('products/*/editeur/*'));
-
-        // Constructeur de page produit (App\Policies\ProductPagePolicy)
-        \Illuminate\Support\Facades\Gate::define('edit-product-page', [\App\Policies\ProductPagePolicy::class, 'edit']);
-        \Illuminate\Support\Facades\Gate::define('use-page-template', [\App\Policies\ProductPagePolicy::class, 'useTemplate']);
-        \Illuminate\Support\Facades\Gate::define('manage-page-template', [\App\Policies\ProductPagePolicy::class, 'manageTemplate']);
-
         // Shopio IA : permission de chaque outil (App\Policies\ShopioAiToolPolicy)
         \Illuminate\Support\Facades\Gate::define('shopio-ai.view-product', [\App\Policies\ShopioAiToolPolicy::class, 'viewProduct']);
         \Illuminate\Support\Facades\Gate::define('shopio-ai.view-order', [\App\Policies\ShopioAiToolPolicy::class, 'viewOrder']);

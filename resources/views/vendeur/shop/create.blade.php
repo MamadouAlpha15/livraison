@@ -278,6 +278,31 @@ html, body {
 
 textarea.field-input { resize: vertical; min-height: 90px; }
 
+/* ── Choix du thème de la vitrine (Express ou Signature) ── */
+.theme-pick { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.theme-card { position: relative; display: block; cursor: pointer; }
+.theme-card input { position: absolute; opacity: 0; pointer-events: none; }
+.theme-card-body {
+    height: 100%; border: 1.5px solid var(--border); border-radius: var(--r); background: var(--surface);
+    padding: 12px; transition: border-color .15s, box-shadow .15s;
+}
+.theme-card:hover .theme-card-body { border-color: var(--border-dk); }
+.theme-card input:checked + .theme-card-body { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(99,102,241,.14); }
+.theme-card input:focus-visible + .theme-card-body { outline: 2px solid var(--brand); outline-offset: 2px; }
+.theme-mini { border-radius: 8px; overflow: hidden; border: 1px solid rgba(0,0,0,.08); margin-bottom: 10px; }
+.theme-mini-bar { height: 14px; }
+.theme-mini-body { padding: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.theme-mini-tile { height: 34px; border-radius: 5px; }
+.theme-mini-btn { grid-column: 1 / -1; height: 10px; border-radius: 99px; }
+.theme-name { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 14px; font-weight: 700; color: var(--text); }
+.theme-check {
+    width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--border-dk); flex-shrink: 0;
+    display: grid; place-items: center; font-size: 11px; color: #fff;
+}
+.theme-card input:checked + .theme-card-body .theme-check { background: var(--brand); border-color: var(--brand); }
+.theme-desc { font-size: 12px; color: var(--text-2); margin-top: 4px; line-height: 1.45; }
+@media (max-width: 420px) { .theme-pick { grid-template-columns: 1fr; } }
+
 /* ── Select devise spécial ── */
 .currency-wrap { position: relative; }
 .currency-search-box {
@@ -656,7 +681,7 @@ textarea.field-input { resize: vertical; min-height: 90px; }
             </div>
             <div class="step-row" data-step="4">
                 <div class="step-dot">4</div>
-                <span class="step-txt">Image & finalisation</span>
+                <span class="step-txt">Thème & finalisation</span>
             </div>
         </div>
 
@@ -724,7 +749,7 @@ textarea.field-input { resize: vertical; min-height: 90px; }
                 <span class="tab-num">3</span> Devise
             </div>
             <div class="step-tab" data-tab="4">
-                <span class="tab-num">4</span> Image
+                <span class="tab-num">4</span> Thème
             </div>
         </div>
 
@@ -955,11 +980,46 @@ textarea.field-input { resize: vertical; min-height: 90px; }
                 </div>
             </div>
 
-            {{-- ══ ÉTAPE 4 : Image & Finalisation ══ --}}
+            {{-- ══ ÉTAPE 4 : Thème, image & finalisation ══ --}}
             <div class="form-section" id="section-4">
                 <div class="section-hd">
-                    <h2>🖼️ Image & Finalisation</h2>
-                    <p>Ajoutez un logo ou une photo pour votre boutique.</p>
+                    <h2>🎨 Thème & finalisation</h2>
+                    <p>Choisissez l'apparence de votre boutique et ajoutez votre logo.</p>
+                </div>
+
+                {{-- Thème de la vitrine (App\Support\PageModels) : modifiable ensuite dans « Ma vitrine » --}}
+                @php
+                    $themeChoice = old('page_model', \App\Support\PageModels::DEFAULT);
+                    // Aperçu : [haut de page, fond, cases produit, bouton] — couleurs réelles des deux thèmes
+                    $themeSwatches = [
+                        'express'   => ['#111111', '#FFFFFF', '#F5F5F3', '#2F5D1E'],
+                        'signature' => ['#1F3B2D', '#F6F2EA', '#FFFDF8', '#B8893B'],
+                    ];
+                @endphp
+                <div class="field-group">
+                    <span class="field-label" id="themeLabel">Thème de la boutique</span>
+                    <div class="theme-pick" role="radiogroup" aria-labelledby="themeLabel">
+                        @foreach(\App\Support\PageModels::MODELS as $key => [$label, $desc])
+                        @php [$top, $bg, $tile, $btn] = $themeSwatches[$key] ?? $themeSwatches['express']; @endphp
+                        <label class="theme-card">
+                            <input type="radio" name="page_model" value="{{ $key }}" @checked($themeChoice === $key)>
+                            <span class="theme-card-body">
+                                <span class="theme-mini" aria-hidden="true" style="display:block;background:{{ $bg }}">
+                                    <span class="theme-mini-bar" style="display:block;background:{{ $top }}"></span>
+                                    <span class="theme-mini-body">
+                                        <span class="theme-mini-tile" style="background:{{ $tile }};border:1px solid rgba(0,0,0,.06)"></span>
+                                        <span class="theme-mini-tile" style="background:{{ $tile }};border:1px solid rgba(0,0,0,.06)"></span>
+                                        <span class="theme-mini-btn" style="background:{{ $btn }}"></span>
+                                    </span>
+                                </span>
+                                <span class="theme-name">{{ $label }} <span class="theme-check" aria-hidden="true">✓</span></span>
+                                <span class="theme-desc" style="display:block">{{ $desc }}</span>
+                            </span>
+                        </label>
+                        @endforeach
+                    </div>
+                    <div class="field-hint">Vous pourrez changer de thème à tout moment dans « Ma vitrine ».</div>
+                    @error('page_model')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="field-group">
@@ -1022,6 +1082,7 @@ textarea.field-input { resize: vertical; min-height: 90px; }
                         <div><strong style="color:var(--text)">Email :</strong> <span id="recapEmail">—</span></div>
                         <div><strong style="color:var(--text)">Téléphone :</strong> <span id="recapPhone">—</span></div>
                         <div><strong style="color:var(--text)">Devise :</strong> <span id="recapCurrency">GNF</span></div>
+                        <div><strong style="color:var(--text)">Thème :</strong> <span id="recapTheme">—</span></div>
                     </div>
                 </div>
 
@@ -1132,7 +1193,7 @@ function goToStep(step) {
     document.getElementById('progressBar').style.width = (step / totalSteps * 100) + '%';
 
     /* Mettre à jour le bandeau mobile */
-    const stepLabels = ['Informations générales','Contact & localisation','Devise','Image & finalisation'];
+    const stepLabels = ['Informations générales','Contact & localisation','Devise','Thème & finalisation'];
     const mNum = document.getElementById('mobileStepNum');
     const mTxt = document.getElementById('mobileStepTxt');
     const mSub = document.getElementById('mobileStepSub');
@@ -1386,7 +1447,10 @@ function updateRecap() {
     document.getElementById('recapEmail').textContent      = document.getElementById('email').value || '—';
     document.getElementById('recapPhone').textContent      = document.getElementById('phone').value || '—';
     document.getElementById('recapCurrency').textContent   = document.getElementById('currency_hidden').value || 'GNF';
+    const theme = document.querySelector('input[name="page_model"]:checked');
+    document.getElementById('recapTheme').textContent      = theme ? theme.closest('.theme-card').querySelector('.theme-name').firstChild.textContent.trim() : '—';
 }
+document.querySelectorAll('input[name="page_model"]').forEach(r => r.addEventListener('change', updateRecap));
 
 /* ════════════════════════════════════════════════════════════════
    PAYS — liste complète de tous les pays du monde

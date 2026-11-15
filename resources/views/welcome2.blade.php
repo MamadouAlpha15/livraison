@@ -434,7 +434,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     <div class="flash-row-outer">
         <div class="flash-row">
             @foreach($flashProducts as $product)
-            <a href="{{ route('client.products.show', $product) }}" class="flash-card">
+            <a href="{{ $product->publicUrl() }}" class="flash-card">
                 <div class="flash-card-img">
                     @if($product->image)
                         <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" loading="lazy" width="168" height="112">
@@ -468,7 +468,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
     <div class="reco-row">
         @foreach($recommendedProducts as $product)
         @php $hasPromo = $product->original_price && $product->original_price > $product->price; @endphp
-        <a href="{{ route('client.products.show', $product) }}" class="reco-card">
+        <a href="{{ $product->publicUrl() }}" class="reco-card">
             <div class="reco-card-img">
                 @if($product->image)
                     <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" loading="lazy" width="190" height="130">
@@ -561,7 +561,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
         $stockOut = $product->stock !== null && $product->stock <= 0;
     @endphp
     <div class="prod-card">
-        <a href="{{ route('client.products.show', $product) }}" style="text-decoration:none;color:inherit">
+        <a href="{{ $product->publicUrl() }}" style="text-decoration:none;color:inherit">
             <div class="prod-card-img">
                 @if($product->image)
                     <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" loading="lazy" decoding="async" width="190" height="150">

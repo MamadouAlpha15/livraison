@@ -225,7 +225,7 @@ body { background: #F6F9FF; color: #16162A; font-family: 'Plus Jakarta Sans', sy
     @foreach($products as $product)
     @php
         $hasPromo = $product->original_price && $product->original_price > $product->price;
-        $showUrl  = \App\Support\Campaigns\SponsoredPlacements::url(route('client.products.show', $product), $product);
+        $showUrl  = \App\Support\Campaigns\SponsoredPlacements::url($product->publicUrl(), $product);
     @endphp
     <div class="p-card">
         <a href="{{ $showUrl }}" class="p-card-link">

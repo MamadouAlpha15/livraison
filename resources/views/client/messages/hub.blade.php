@@ -540,7 +540,7 @@ a, button, [onclick], .hub-conv-item {
             $devise    = $shop?->currency ?? 'GNF';
             $prodPrice = $product ? number_format($product->price,0,',',' ').' '.$devise : '';
             $prodPriceRaw = $product?->price ?? 0;
-            $prodUrl   = $product ? route('client.products.show', $product) : '#';
+            $prodUrl   = $product ? $product->publicUrl() : '#';
         @endphp
         <div class="hub-conv-item"
              data-product-id="{{ $conv->productId }}"

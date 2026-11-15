@@ -57,7 +57,9 @@ class ShopController extends Controller
      */
     public function store(StoreShopRequest $request, AffiliateService $affiliates)
     {
-        $validated = $request->safe()->except(['referral_code', 'source']);
+        $validated = $request->safe()->except(['referral_code', 'source', 'page_model']);
+        // Thème choisi à la création (Express ou Signature), modifiable ensuite dans « Ma vitrine »
+        $validated['storefront'] = \App\Support\Storefront::normalize(['page_model' => $request->validated('page_model')]);
         $userEmail = Auth::user()->email;
 
                 // Si email vide → utilise l'email d'inscription automatiquement

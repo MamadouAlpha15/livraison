@@ -8,56 +8,19 @@ use App\Models\Product;
 
 class ProductController extends Controller
 {
+    /**
+     * Ancienne adresse d'une fiche produit (/client/produit/{id}) : liens déjà partagés, SMS, notifications.
+     * Elle mène à la page produit du thème de la boutique (/s/{slug}/p/{id-nom}), qui compte elle-même
+     * la visite. Les paramètres de suivi (utm_source…) sont gardés.
+     */
     public function show(Product $product, Request $request)
     {
         $shop = $product->shop;
+        abort_unless($shop, 404);
 
-        // Visite et vue du produit, une fois par jour, hors vendeur et robots
-        if ($shop) {
-            \App\Support\TrafficSource::recordLanding($shop, $request);
-            \App\Support\TrafficSource::recordProductView($product, $request);
-        }
-
-        // Page construite et publiée par le vendeur (constructeur de page) : elle remplace la page produit actuelle
-        $built = $product->productPage;
-        if ($shop && $built?->isLive()) {
-            return response(\App\PageBuilder\Renderer::published($built, new \App\PageBuilder\RenderContext($shop, $product)));
-        }
-
-        $isFavorited = auth()->check()
-            ? auth()->user()->favoriteProducts()->where('product_id', $product->id)->exists()
-            : false;
-
-        $variants = $product->activeVariants()->get();
-
-        // Page produit personnalisée par le vendeur (App\Support\ProductPageSettings)
-        $shopPage = \App\Support\ProductPageSettings::shop($shop);
-        $productPage = \App\Support\ProductPageSettings::product($product);
-        $offers = \App\Support\ProductPageSettings::offers($product);
-
-        // Avis réels : laissés sur des commandes livrées qui contiennent ce produit
-        $reviews = \App\Models\Review::with('client:id,name')
-            ->whereHas('order.items', fn ($q) => $q->where('product_id', $product->id))
-            ->latest()->limit(6)->get();
-
-        return view('client.product-page', [
-            'product'     => $product,
-            'shop'        => $shop,
-            'isFavorited' => $isFavorited,
-            'variants'    => $variants,
-            'shopPage'    => $shopPage,
-            'productPage' => $productPage,
-            'offers'      => $offers,
-            'selected'    => \App\Support\ProductPageSettings::defaultOffer($offers),
-            'faq'         => \App\Support\ProductPageSettings::faq($shop, $product),
-            'showOffer'   => \App\Support\ProductPageSettings::showOfferButton($shop, $product),
-            // Modèle de page : celui du produit ou de la boutique ; ?modele= pour l'aperçu depuis l'espace vendeur
-            'template'    => \App\Support\ProductPageSettings::template($shop, $product, $request->query('modele')),
-            'waUrl'       => \App\Support\ProductPageSettings::whatsappUrl($shop, $product),
-            'reviews'     => $reviews,
-            'reviewAvg'   => $reviews->isNotEmpty() ? round((float) \App\Models\Review::whereHas('order.items', fn ($q) => $q->where('product_id', $product->id))->avg('rating'), 1) : null,
-            'reviewCount' => $reviews->isNotEmpty() ? \App\Models\Review::whereHas('order.items', fn ($q) => $q->where('product_id', $product->id))->count() : 0,
-        ]);
+        $url = \App\Support\ProductPage::url($shop, $product);
+        $query = $request->query();
+        return redirect()->to($query ? $url . '?' . http_build_query($query) : $url, 301);
     }
 
     public function index(Request $request)
@@ -71,7 +34,7 @@ class ProductController extends Controller
                     $q->where('country', $user->country);
                 }
             })
-            ->with(['shop:id,name,image,country,type']);
+            ->with(['shop:id,slug,name,image,country,type']);
 
         if ($s = $request->get('s')) {
             $query->where(function ($q) use ($s) {

@@ -9,12 +9,6 @@ class Shop extends Model
 {
     use HasFactory;
 
-    protected static function booted(): void
-    {
-        // Pages construites de la boutique en cache : à recalculer (nom, couleurs, frais de livraison…)
-        static::updated(fn (Shop $shop) => \App\PageBuilder\Renderer::forget('shop', $shop->id));
-    }
-
     protected $fillable = [
         'user_id', 'name', 'type', 'description', 'address', 'phone', 'image', 'is_approved', 'email', 'status', 'commission_rate', 'currency', 'country',
         'plan', 'plan_expires_at',   // Plan d'abonnement (free/pro) + date d'expiration
@@ -42,17 +36,6 @@ public function orders()
     return $this->hasMany(Order::class);
 }
 
-// Constructeur de page produit : pages des produits et modèles enregistrés par la boutique
-public function productPages()
-{
-    return $this->hasMany(ProductPage::class);
-}
-
-public function pageTemplates()
-{
-    return $this->hasMany(PageTemplate::class);
-}
-
 // Parrainage de la boutique (programme d'affiliation) : un seul parrain
 public function referral()
 {
@@ -76,7 +59,6 @@ public function clients()
     return $this->belongsToMany(\App\Models\User::class, 'shop_user')->withTimestamps();  // Une boutique (Shop) peut avoir plusieurs clients (User) abonnés via une table pivot shop_user.
 }
 protected $casts = [
-    'product_page'     => 'array',  // réglages communs des pages produit (App\Support\ProductPageSettings)
     'commission_rate'  => 'float',
     'is_approved'      => 'boolean',
     'plan_expires_at'  => 'datetime',  // Cast auto en Carbon pour isFuture() / isPast()

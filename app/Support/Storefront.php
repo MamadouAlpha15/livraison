@@ -3,62 +3,28 @@
 namespace App\Support;
 
 use App\Models\Shop;
-use Carbon\Carbon;
 
 /**
  * Réglages de la vitrine publique d'une boutique (« Ma vitrine »).
  *
- * La vitrine s'affiche toujours avec un thème (PageModels : Express ou Signature). Les blocs, le style
- * et les collections de l'ancienne vitrine à blocs restent lus et normalisés pour les données déjà
- * enregistrées, mais ne sont plus affichés ni modifiables.
+ * La vitrine s'affiche toujours avec un des deux thèmes de Shopio (PageModels : Express ou Signature).
+ * L'ancienne apparence (blocs, polices, fonds, mises en page Luxe/Mode…, thèmes Tabaski/Ramadan,
+ * collections) n'existe plus : ces anciennes clés sont ignorées et disparaissent au prochain enregistrement.
  *
  * Stockée en JSON dans shops.storefront. Toute entrée (publication, aperçu, base) passe par
  * normalize() : seules les clés, types et valeurs connus sont gardés, les textes sont nettoyés
- * et bornés, le reste retombe sur les valeurs par défaut. Les anciennes vitrines (liste de
- * « sections ») sont converties automatiquement en blocs.
+ * et bornés, le reste retombe sur les valeurs par défaut.
  *
- *  - blocks   : la page, dans l'ordre. Blocs « de base » (un exemplaire chacun, masquables)
- *               et blocs ajoutés par le vendeur (texte, image, vidéo, galerie…).
- *  - style    : police, taille du texte, forme et remplissage des boutons, fond de page.
- *               La couleur principale reste dans shops.accent_color.
- *  - settings : texte des boutons, options des fiches, mode vacances, message de bienvenue.
- *  - themes   : apparences enregistrées par le vendeur (activables d'un clic).
+ *  - page_model : thème de la vitrine (express ou signature).
+ *  - home       : sections de la page d'accueil, une liste par thème (Boutique → Sections).
+ *  - form       : formulaire de commande de la page produit (éditeur produit → Formulaire).
+ *  - cover      : couverture (diapos, hauteur, voile, slogan) ; logo : forme, position, taille.
+ *  - settings   : texte des boutons, options des fiches, mode vacances, preuves de confiance.
+ *  La couleur principale reste dans shops.accent_color.
  */
 class Storefront
 {
-    /**
-     * Types de blocs : [libellé, description, exemplaire unique, toujours affiché].
-     * « Toujours affiché » = bloc de confiance commun à toutes les boutiques : déplaçable,
-     * mais ni masquable ni supprimable.
-     */
-    public const BLOCKS = [
-        'announcement' => ["Bandeau d'annonce", 'Une phrase en haut de la page', true, false],
-        'categories'   => ['Catégories', 'Filtres par catégorie de produits', true, false],
-        'featured'     => ['Produit à la une', 'Jusqu’à 3 produits mis en grand', true, false],
-        'products'     => ['Tous les produits', 'Le catalogue complet de la boutique', true, false],
-        'reviews'      => ['Avis clients', 'Les avis écrits par de vrais clients', true, true],
-        'delivery'     => ['Paiement et livraison', 'Paiement à la livraison, suivi, contact', true, true],
-        'contact'      => ['Bloc contact', 'Téléphone, WhatsApp, adresse', true, false],
-        'text'         => ['Texte libre', 'Un titre et un paragraphe', false, false],
-        'imgtext'      => ['Image et texte', 'Une photo à côté d’un texte', false, false],
-        'video'        => ['Vidéo', 'Un lien YouTube ou TikTok', false, false],
-        'gallery'      => ['Galerie photos', 'Jusqu’à 8 photos', false, false],
-        'countdown'    => ['Compte à rebours', 'Pour une promotion limitée', false, false],
-        'faq'          => ['Questions fréquentes', 'Les questions de vos clients', false, false],
-        'story'        => ['Notre histoire', 'Présentez la boutique', false, false],
-        'hours'        => ['Adresse et horaires', 'Où vous trouver, quand vous êtes ouvert', false, false],
-        'social'       => ['Réseaux sociaux', 'Liens WhatsApp, Facebook, TikTok, Instagram', false, false],
-        'selection'    => ['Sélection de produits', 'Une catégorie mise en avant', false, false],
-        // Gérés depuis « Faire grandir ma vitrine » (collections, sections automatiques)
-        'collections'  => ['Collections', 'Vos collections de produits', true, false],
-        'trending'     => ['Les plus vus', 'Les plus vus de la semaine · automatique', true, false],
-        'lowstock'     => ['Bientôt en rupture', '2 unités ou moins en stock · automatique', true, false],
-    ];
-
-    /** Blocs ajoutés et retirés depuis « Faire grandir ma vitrine » (pas dans la bibliothèque de l'éditeur). */
-    public const MANAGED = ['collections', 'trending', 'lowstock'];
-
-    // ─────────────────── Couverture et logo (Faire grandir ma vitrine → Couverture et logo)
+    // ─────────────────── Couverture et logo (menu Boutique → Couverture et logo)
     public const COVER_SOURCES = ['default' => 'Bannière actuelle', 'product' => 'Photo produit', 'night' => 'Dégradé nuit', 'gold' => 'Dégradé or', 'blue' => 'Dégradé bleu', 'photo' => 'Ma photo'];
     public const COVER_GRADIENTS = [
         'default' => 'radial-gradient(120% 140% at 100% 0%, rgba(31,124,246,.35), transparent 55%), linear-gradient(135deg, #0B1E3D, #132B52)',
@@ -73,117 +39,31 @@ class Storefront
     /** Couleurs proposées à côté du nom (onglet Couverture et logo). */
     public const IDENTITY_COLORS = ['#1F7CF6' => 'Bleu Shopio', '#0B1E3D' => 'Bleu nuit', '#F59E0B' => 'Ambre', '#15803D' => 'Vert'];
 
-    // ─────────────────── Collections (onglet Personnalisation)
-    public const COLLECTION_KINDS = ['manual' => 'Choisie à la main', 'under' => 'Prix maximum (automatique)', 'new' => 'Nouveautés de la semaine (automatique)'];
-    public const COLLECTIONS_MAX = 6;
-    public const COLLECTION_ITEMS_MAX = 12;
-
-    /** Blocs de base, dans l'ordre par défaut. */
-    public const CORE = ['announcement', 'categories', 'featured', 'products', 'reviews', 'delivery', 'contact'];
-
-    public const MAX_BLOCKS = 30;
-    public const FEATURED_MAX = 3;
-    public const ANNOUNCEMENT_MAX = 140;
-    public const GALLERY_MAX = 8;
-    public const FAQ_MAX = 6;
-    public const THEMES_MAX = 8;
+    /** Dernières publications gardées (shops.storefront_history). */
     public const HISTORY_MAX = 10;
-
-    public const LAYOUTS = ['grid' => 'Grille', 'list' => 'Liste', 'carousel' => 'Carrousel'];
-    public const COLUMNS = [2, 3, 4];
-    public const SORTS   = ['featured' => 'Mis en avant', 'recent' => 'Plus récents', 'price_asc' => 'Prix croissant', 'price_desc' => 'Prix décroissant'];
-    public const CARDS   = ['rounded' => 'Arrondies', 'square' => 'Droites'];
-    public const BANNERS = ['large' => 'Grande', 'compact' => 'Compacte', 'none' => 'Sans'];
-
-    /** Polices : [libellé, pile CSS, paramètre Google Fonts (null = déjà chargée par le site)]. */
-    public const FONTS = [
-        'moderne'   => ['Moderne', "'Plus Jakarta Sans', system-ui, sans-serif", null],
-        'elegante'  => ['Élégante', "'Playfair Display', Georgia, serif", 'Playfair+Display:wght@600;700;800'],
-        'ronde'     => ['Ronde', "'Nunito', system-ui, sans-serif", 'Nunito:wght@500;700;800'],
-        'classique' => ['Classique', "'Lora', Georgia, serif", 'Lora:wght@500;600;700'],
-    ];
-    public const SIZES  = ['s' => 'Petit', 'm' => 'Normal', 'l' => 'Grand'];
-    public const BTN_SHAPES = ['pill' => 'Arrondis', 'square' => 'Carrés'];
-    public const BTN_FILLS  = ['solid' => 'Pleins', 'outline' => 'Contour'];
-    public const BACKGROUNDS = ['white' => 'Blanc', 'soft' => 'Doux', 'texture' => 'Texture', 'dark' => 'Sombre'];
-
-    /** Couleurs proposées (la couleur libre reste possible). */
-    public const COLOR_PRESETS = ['#1F7CF6' => 'Bleu Shopio', '#0B1E3D' => 'Bleu nuit', '#F59E0B' => 'Ambre', '#15803D' => 'Vert', '#9D174D' => 'Bordeaux', '#D4A017' => 'Or'];
-
-    /** Thèmes proposés par Shopio (apparence complète, activable d'un clic). */
-    public const THEMES = [
-        'standard' => ['name' => 'Standard', 'desc' => 'Bleu Shopio, moderne', 'style' => ['color' => '#1F7CF6', 'font' => 'moderne', 'size' => 'm', 'btn' => 'pill', 'fill' => 'solid', 'bg' => 'soft']],
-        'tabaski'  => ['name' => 'Tabaski', 'desc' => 'Vert et or, élégant', 'style' => ['color' => '#15803D', 'font' => 'elegante', 'size' => 'm', 'btn' => 'pill', 'fill' => 'solid', 'bg' => 'soft']],
-        'ramadan'  => ['name' => 'Ramadan', 'desc' => 'Nuit et or, classique', 'style' => ['color' => '#D4A017', 'font' => 'classique', 'size' => 'm', 'btn' => 'pill', 'fill' => 'solid', 'bg' => 'dark']],
-        'fin'      => ['name' => 'Fin d’année', 'desc' => 'Rouge festif, rond', 'style' => ['color' => '#C2410C', 'font' => 'ronde', 'size' => 'm', 'btn' => 'square', 'fill' => 'solid', 'bg' => 'texture']],
-    ];
-
-    /** Mises en page de départ selon le type de boutique (ordre des blocs de base + affichage). */
-    public const TEMPLATES = [
-        'luxe' => [
-            'label' => 'Luxe', 'hint' => 'Grandes photos, peu de texte, prix élevés d’abord',
-            'order' => ['featured', 'categories', 'products', 'reviews', 'delivery', 'contact', 'announcement'],
-            'off' => ['announcement'], 'layout' => 'grid', 'columns' => 3, 'sort' => 'price_desc', 'cards' => 'square', 'banner' => 'large', 'accent' => '#0B1E3D',
-        ],
-        'mode' => [
-            'label' => 'Mode', 'hint' => 'Photos en grand, nouveautés d’abord',
-            'order' => ['announcement', 'featured', 'categories', 'products', 'reviews', 'delivery', 'contact'],
-            'off' => [], 'layout' => 'grid', 'columns' => 3, 'sort' => 'recent', 'cards' => 'square', 'banner' => 'large', 'accent' => '#0B1E3D',
-        ],
-        'electronique' => [
-            'label' => 'Électronique', 'hint' => 'Catalogue complet, prix visibles',
-            'order' => ['featured', 'categories', 'products', 'delivery', 'reviews', 'contact', 'announcement'],
-            'off' => ['announcement'], 'layout' => 'grid', 'columns' => 4, 'sort' => 'featured', 'cards' => 'rounded', 'banner' => 'compact', 'accent' => '#1F7CF6',
-        ],
-        'epicerie' => [
-            'label' => 'Épicerie', 'hint' => 'Liste rapide, petits prix d’abord',
-            'order' => ['announcement', 'categories', 'products', 'delivery', 'contact', 'featured', 'reviews'],
-            'off' => ['featured'], 'layout' => 'list', 'columns' => 4, 'sort' => 'price_asc', 'cards' => 'rounded', 'banner' => 'compact', 'accent' => '#15803D',
-        ],
-        'restaurant' => [
-            'label' => 'Restaurant', 'hint' => 'Plat du jour, menu en carrousel',
-            'order' => ['announcement', 'featured', 'products', 'delivery', 'contact', 'reviews', 'categories'],
-            'off' => ['categories'], 'layout' => 'carousel', 'columns' => 3, 'sort' => 'featured', 'cards' => 'rounded', 'banner' => 'large', 'accent' => '#F59E0B',
-        ],
-    ];
-
-    public const BTN_SUGGESTIONS = ['Commander', 'Je le veux', 'Acheter', 'Réserver'];
 
     /** Adresses réservées (pages du site ou noms trompeurs). */
     public const RESERVED_SLUGS = ['admin', 'shopio', 'boutique', 'boutiques', 'shop', 'shops', 'support', 'api', 'login', 'register', 'client', 'vendeur', 'livreur', 'produit', 'produits', 'products', 'aide', 'help', 'contact', 'compte', 'panier', 'cart', 'suivi', 'marketing', 'www', 'app'];
 
-    private const IMG_PATH = '#^storefront/medium/[A-Za-z0-9]{20}\.webp$#';
     /** Couvertures importées (avec une variante « large » de 1600 px). */
     public const COVER_PATH = '#^covers/medium/[A-Za-z0-9]{20}\.webp$#';
-    private const TIME = '/^([01]\d|2[0-3]):[0-5]\d$/';
 
     // ─────────────────────────────────────────────────────────────── Valeurs par défaut
 
     public static function defaults(): array
     {
         return [
-            'blocks'       => array_map(fn ($t) => ['id' => $t, 'type' => $t, 'on' => true, 'd' => self::blockDefaults($t)], self::CORE),
-            'layout'       => 'grid',
-            'columns'      => 4,
-            'sort'         => 'featured',
-            'cards'        => 'rounded',
-            'banner'       => 'large',
-            'featured_ids' => [],
-            'style'        => self::styleDefaults(),
-            'settings'     => self::settingsDefaults(),
-            'themes'       => [],
-            'cover'        => self::coverDefaults(),
-            'logo'         => self::logoDefaults(),
-            'collections'  => [],
-            'template'     => '',
-            'page_model'   => 'express',
-            'home'         => HomeSections::normalizeAll(null),
-            'form'         => ProductDesign::formDefaults(),
+            'page_model' => PageModels::DEFAULT,
+            'home'       => HomeSections::normalizeAll(null),
+            'form'       => ProductDesign::formDefaults(),
+            'cover'      => self::coverDefaults(),
+            'logo'       => self::logoDefaults(),
+            'settings'   => self::settingsDefaults(),
         ];
     }
 
     /**
-     * Couverture : « on » = réglée dans Faire grandir ma vitrine (sinon l'en-tête d'origine est gardé).
+     * Couverture : « on » = réglée dans le menu Boutique (sinon l'en-tête d'origine est gardé).
      * slides : 1 à 4 diapos [src, img (photo importée), pid (produit dont on montre la photo)].
      */
     public static function coverDefaults(): array
@@ -194,11 +74,6 @@ class Storefront
     public static function logoDefaults(): array
     {
         return ['src' => 'current', 'shape' => 'round', 'pos' => 'left', 'size' => 104];
-    }
-
-    public static function styleDefaults(): array
-    {
-        return ['font' => 'moderne', 'size' => 'm', 'btn' => 'pill', 'fill' => 'solid', 'bg' => 'soft'];
     }
 
     public static function settingsDefaults(): array
@@ -212,76 +87,24 @@ class Storefront
         ];
     }
 
-    /** Contenu de départ d'un bloc ajouté (textes entre crochets = à remplacer par le vendeur). */
-    public static function blockDefaults(string $type): array
-    {
-        return match ($type) {
-            'announcement' => ['text' => ''],
-            'text'      => ['title' => 'Bienvenue', 'body' => ''],
-            'imgtext'   => ['title' => 'Titre de la section', 'body' => '', 'img' => null, 'side' => 'left'],
-            'video'     => ['title' => 'Nos produits en vidéo', 'url' => ''],
-            'gallery'   => ['title' => 'Galerie', 'imgs' => []],
-            'countdown' => ['title' => 'Promotion', 'sub' => '', 'end' => now()->addDays(7)->setTime(20, 0)->format('Y-m-d\TH:i')],
-            'faq'       => ['title' => 'Questions fréquentes', 'items' => [
-                ['q' => 'Comment payer ?', 'a' => 'En espèces, au livreur, à la réception de la commande.'],
-                ['q' => 'Quel est le délai de livraison ?', 'a' => ''],
-            ]],
-            'story'     => ['title' => 'Notre histoire', 'body' => ''],
-            'hours'     => ['addr' => '', 'days' => 'Lundi – samedi', 'open' => '09:00', 'close' => '20:00'],
-            'social'    => ['wa' => '', 'fb' => '', 'tt' => '', 'ig' => ''],
-            'selection' => ['title' => 'Notre sélection', 'category' => '', 'limit' => 4],
-            'collections' => ['title' => 'Nos collections'],
-            'trending'  => ['title' => 'Les plus vus cette semaine'],
-            'lowstock'  => ['title' => 'Bientôt en rupture'],
-            default     => [],
-        };
-    }
-
     // ─────────────────────────────────────────────────────────────── Nettoyage
 
     /** Nettoie une configuration quelconque (base, publication, aperçu). */
     public static function normalize($input): array
     {
-        $d = self::defaults();
-        if (!is_array($input)) return $d;
-
-        $pick = fn ($value, array $allowed, $default) => in_array($value, $allowed, true) ? $value : $default;
-
-        // Ancien format (liste de sections + texte d'annonce) → blocs
-        if (!isset($input['blocks']) && isset($input['sections'])) {
-            $input['blocks'] = array_map(fn ($s) => [
-                'id' => $s['key'] ?? '', 'type' => $s['key'] ?? '', 'on' => $s['on'] ?? true,
-                'd' => ($s['key'] ?? '') === 'announcement' ? ['text' => $input['announcement'] ?? ''] : [],
-            ], array_filter((array) $input['sections'], 'is_array'));
-        }
+        if (!is_array($input)) return self::defaults();
 
         return [
-            'blocks'       => self::normalizeBlocks($input['blocks'] ?? null),
-            'layout'       => $pick($input['layout'] ?? null, array_keys(self::LAYOUTS), $d['layout']),
-            'columns'      => $pick((int) ($input['columns'] ?? 0), self::COLUMNS, $d['columns']),
-            'sort'         => $pick($input['sort'] ?? null, array_keys(self::SORTS), $d['sort']),
-            'cards'        => $pick($input['cards'] ?? null, array_keys(self::CARDS), $d['cards']),
-            'banner'       => $pick($input['banner'] ?? null, array_keys(self::BANNERS), $d['banner']),
-            // Produits à la une : entiers > 0, sans doublon, 3 max. L'appartenance à la boutique
-            // est vérifiée à l'affichage (requête limitée à la boutique) et à la publication.
-            'featured_ids' => array_slice(array_values(array_unique(array_filter(
-                array_map('intval', (array) ($input['featured_ids'] ?? [])),
-                fn ($id) => $id > 0
-            ))), 0, self::FEATURED_MAX),
-            'style'        => self::normalizeStyle($input['style'] ?? null),
-            'settings'     => self::normalizeSettings($input['settings'] ?? null),
-            'themes'       => self::normalizeThemes($input['themes'] ?? null),
-            'cover'        => self::normalizeCover($input['cover'] ?? null),
-            'logo'         => self::normalizeLogo($input['logo'] ?? null),
-            'collections'  => self::normalizeCollections($input['collections'] ?? null),
-            'template'     => $pick($input['template'] ?? null, array_keys(self::TEMPLATES), ''),
             // Thème de la vitrine (voir App\Support\PageModels) : Express par défaut, ou Signature.
             // Un ancien modèle supprimé (Standard, Prestige, Pop…) revient à Express.
-            'page_model'   => $pick($input['page_model'] ?? null, array_keys(PageModels::MODELS), PageModels::DEFAULT),
+            'page_model' => in_array($input['page_model'] ?? null, array_keys(PageModels::MODELS), true) ? $input['page_model'] : PageModels::DEFAULT,
             // Sections de la page d'accueil, une liste par thème (Boutique → Sections)
-            'home'         => HomeSections::normalizeAll($input['home'] ?? null),
+            'home'       => HomeSections::normalizeAll($input['home'] ?? null),
             // Formulaire de commande de la page produit, pour toute la boutique (éditeur produit → Formulaire)
-            'form'         => ProductDesign::normalizeForm($input['form'] ?? null),
+            'form'       => ProductDesign::normalizeForm($input['form'] ?? null),
+            'cover'      => self::normalizeCover($input['cover'] ?? null),
+            'logo'       => self::normalizeLogo($input['logo'] ?? null),
+            'settings'   => self::normalizeSettings($input['settings'] ?? null),
         ];
     }
 
@@ -322,172 +145,6 @@ class Storefront
         ];
     }
 
-    /** Collections : [id, nom, type (à la main, prix maximum, nouveautés), produits choisis, prix maximum, affichée]. */
-    public static function normalizeCollections($cols): array
-    {
-        $out = [];
-        $seen = [];
-        foreach (is_array($cols) ? $cols : [] as $c) {
-            if (!is_array($c) || count($out) >= self::COLLECTIONS_MAX) continue;
-            $name = self::line($c['name'] ?? '', 40);
-            $kind = in_array($c['kind'] ?? null, array_keys(self::COLLECTION_KINDS), true) ? $c['kind'] : null;
-            if ($name === '' || !$kind) continue;
-            $id = is_string($c['id'] ?? null) && preg_match('/^c[a-z0-9]{3,16}$/', $c['id']) ? $c['id'] : 'c' . substr(self::newId(), 1);
-            while (isset($seen[$id])) $id = 'c' . substr(self::newId(), 1);
-            $seen[$id] = true;
-            $out[] = [
-                'id'   => $id,
-                'name' => $name,
-                'kind' => $kind,
-                'ids'  => $kind === 'manual' ? array_slice(array_values(array_unique(array_filter(array_map('intval', (array) ($c['ids'] ?? [])), fn ($v) => $v > 0))), 0, self::COLLECTION_ITEMS_MAX) : [],
-                'max'  => $kind === 'under' ? max(1, min(1_000_000_000, (int) ($c['max'] ?? 0))) : null,
-                'on'   => filter_var($c['on'] ?? true, FILTER_VALIDATE_BOOLEAN),
-            ];
-        }
-        return $out;
-    }
-
-    private static function normalizeBlocks($blocks): array
-    {
-        $out = [];
-        $seenCore = [];
-        $seenIds = [];
-        foreach (is_array($blocks) ? $blocks : [] as $b) {
-            if (!is_array($b) || count($out) >= self::MAX_BLOCKS) continue;
-            $type = $b['type'] ?? null;
-            if (!is_string($type) || !isset(self::BLOCKS[$type])) continue;
-            $core = in_array($type, self::CORE, true);
-            $single = self::BLOCKS[$type][2]; // un seul exemplaire : identifiant = son type
-            if ($single && isset($seenCore[$type])) continue;
-
-            $id = $single ? $type : (is_string($b['id'] ?? null) && preg_match('/^b[a-z0-9]{3,16}$/', $b['id']) ? $b['id'] : self::newId());
-            while (isset($seenIds[$id])) $id = self::newId();
-            $seenIds[$id] = true;
-            if ($single) $seenCore[$type] = true;
-
-            $trust = self::BLOCKS[$type][3];
-            $out[] = [
-                'id'   => $id,
-                'type' => $type,
-                'on'   => $trust ? true : filter_var($b['on'] ?? true, FILTER_VALIDATE_BOOLEAN),
-                'd'    => self::normalizeBlockData($type, is_array($b['d'] ?? null) ? $b['d'] : []),
-            ];
-        }
-        // Les blocs de base ne disparaissent jamais (masqués au pire) : on rajoute ceux qui manquent.
-        foreach (self::CORE as $type) {
-            if (!isset($seenCore[$type])) {
-                $out[] = ['id' => $type, 'type' => $type, 'on' => self::BLOCKS[$type][3], 'd' => self::blockDefaults($type)];
-            }
-        }
-        return $out;
-    }
-
-    private static function text($v, int $max): string
-    {
-        $v = str_replace(["\r\n", "\r"], "\n", strip_tags((string) $v));
-        $v = preg_replace("/[ \t]+/u", ' ', $v);
-        $v = preg_replace("/\n{3,}/", "\n\n", $v);
-        return mb_substr(trim($v), 0, $max);
-    }
-
-    private static function line($v, int $max): string
-    {
-        return mb_substr(trim(preg_replace('/\s+/u', ' ', strip_tags((string) $v))), 0, $max);
-    }
-
-    private static function img($v): ?string
-    {
-        return is_string($v) && preg_match(self::IMG_PATH, $v) ? $v : null;
-    }
-
-    public static function normalizeBlockData(string $type, array $d): array
-    {
-        return match ($type) {
-            'announcement' => ['text' => self::line($d['text'] ?? '', self::ANNOUNCEMENT_MAX)],
-            'text', 'story' => ['title' => self::line($d['title'] ?? '', 80), 'body' => self::text($d['body'] ?? '', 1500)],
-            'imgtext' => [
-                'title' => self::line($d['title'] ?? '', 80),
-                'body'  => self::text($d['body'] ?? '', 1200),
-                'img'   => self::img($d['img'] ?? null),
-                'side'  => ($d['side'] ?? '') === 'right' ? 'right' : 'left',
-            ],
-            'video' => ['title' => self::line($d['title'] ?? '', 80), 'url' => self::videoUrl($d['url'] ?? '')],
-            'gallery' => [
-                'title' => self::line($d['title'] ?? '', 80),
-                'imgs'  => array_slice(array_values(array_unique(array_filter(array_map(fn ($v) => self::img($v), (array) ($d['imgs'] ?? []))))), 0, self::GALLERY_MAX),
-            ],
-            'countdown' => [
-                'title' => self::line($d['title'] ?? '', 80),
-                'sub'   => self::line($d['sub'] ?? '', 140),
-                'end'   => self::dateTime($d['end'] ?? '') ?? now()->addDays(7)->setTime(20, 0)->format('Y-m-d\TH:i'),
-            ],
-            'faq' => [
-                'title' => self::line($d['title'] ?? '', 80),
-                'items' => array_slice(array_values(array_filter(array_map(fn ($it) => [
-                    'q' => self::line(is_array($it) ? ($it['q'] ?? '') : '', 140),
-                    'a' => self::text(is_array($it) ? ($it['a'] ?? '') : '', 600),
-                ], (array) ($d['items'] ?? [])), fn ($it) => $it['q'] !== '' || $it['a'] !== '')), 0, self::FAQ_MAX),
-            ],
-            'hours' => [
-                'addr'  => self::line($d['addr'] ?? '', 160),
-                'days'  => self::line($d['days'] ?? '', 60),
-                'open'  => preg_match(self::TIME, (string) ($d['open'] ?? '')) ? $d['open'] : '09:00',
-                'close' => preg_match(self::TIME, (string) ($d['close'] ?? '')) ? $d['close'] : '20:00',
-            ],
-            'social' => [
-                'wa' => mb_substr(preg_replace('/[^\d+]/', '', (string) ($d['wa'] ?? '')), 0, 20),
-                'fb' => self::handle($d['fb'] ?? ''),
-                'tt' => self::handle($d['tt'] ?? ''),
-                'ig' => self::handle($d['ig'] ?? ''),
-            ],
-            'selection' => [
-                'title'    => self::line($d['title'] ?? '', 80),
-                'category' => self::line($d['category'] ?? '', 80),
-                'limit'    => in_array((int) ($d['limit'] ?? 4), [4, 8], true) ? (int) $d['limit'] : 4,
-            ],
-            'collections', 'trending', 'lowstock' => ['title' => self::line($d['title'] ?? '', 80) ?: self::blockDefaults($type)['title']],
-            default => [],
-        };
-    }
-
-    private static function handle($v): string
-    {
-        return mb_substr(preg_replace('/\s+/', '', strip_tags((string) $v)), 0, 120);
-    }
-
-    private static function dateTime($v): ?string
-    {
-        if (!is_string($v) || !preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/', $v)) return null;
-        try { return Carbon::createFromFormat('Y-m-d\TH:i', $v)->format('Y-m-d\TH:i'); } catch (\Throwable $e) { return null; }
-    }
-
-    /** Lien vidéo accepté : YouTube, TikTok ou Facebook, en https. */
-    private static function videoUrl($v): string
-    {
-        $v = trim((string) $v);
-        if ($v === '' || mb_strlen($v) > 300) return '';
-        if (!preg_match('#^https?://#i', $v)) $v = 'https://' . $v;
-        $host = strtolower((string) parse_url($v, PHP_URL_HOST));
-        foreach (['youtube.com', 'youtu.be', 'tiktok.com', 'facebook.com', 'fb.watch'] as $ok) {
-            if ($host === $ok || str_ends_with($host, '.' . $ok)) return preg_replace('#^http://#i', 'https://', $v);
-        }
-        return '';
-    }
-
-    public static function normalizeStyle($s): array
-    {
-        $d = self::styleDefaults();
-        $s = is_array($s) ? $s : [];
-        $pick = fn ($k, array $allowed) => in_array($s[$k] ?? null, $allowed, true) ? $s[$k] : $d[$k];
-        return [
-            'font' => $pick('font', array_keys(self::FONTS)),
-            'size' => $pick('size', array_keys(self::SIZES)),
-            'btn'  => $pick('btn', array_keys(self::BTN_SHAPES)),
-            'fill' => $pick('fill', array_keys(self::BTN_FILLS)),
-            'bg'   => $pick('bg', array_keys(self::BACKGROUNDS)),
-        ];
-    }
-
     public static function normalizeSettings($s): array
     {
         $d = self::settingsDefaults();
@@ -510,26 +167,9 @@ class Storefront
         ];
     }
 
-    private static function normalizeThemes($themes): array
+    private static function line($v, int $max): string
     {
-        $out = [];
-        foreach (is_array($themes) ? $themes : [] as $t) {
-            if (!is_array($t) || count($out) >= self::THEMES_MAX) continue;
-            $name = self::line($t['name'] ?? '', 40);
-            $color = $t['style']['color'] ?? null;
-            if ($name === '' || !self::isHex($color)) continue;
-            $out[] = [
-                'id'    => is_string($t['id'] ?? null) && preg_match('/^t[a-z0-9]{3,16}$/', $t['id']) ? $t['id'] : 't' . substr(self::newId(), 1),
-                'name'  => $name,
-                'style' => ['color' => strtoupper($color)] + self::normalizeStyle($t['style'] ?? []),
-            ];
-        }
-        return $out;
-    }
-
-    public static function newId(): string
-    {
-        return 'b' . substr(base_convert(bin2hex(random_bytes(6)), 16, 36), 0, 10);
+        return mb_substr(trim(preg_replace('/\s+/u', ' ', strip_tags((string) $v))), 0, $max);
     }
 
     // ─────────────────────────────────────────────────────────────── Accès
@@ -555,17 +195,6 @@ class Storefront
     {
         $msg = self::normalizeSettings($shop->storefront['settings'] ?? null)['vacation_msg'];
         return 'La boutique ' . $shop->name . ' est en pause' . ($msg !== '' ? ' : ' . $msg : '') . '. Les commandes reprendront à son retour.';
-    }
-
-    public static function block(array $config, string $id): ?array
-    {
-        foreach ($config['blocks'] as $b) if ($b['id'] === $id) return $b;
-        return null;
-    }
-
-    public static function visibleCount(array $config): int
-    {
-        return count(array_filter($config['blocks'], fn ($b) => $b['on']));
     }
 
     // ─────────────────────────────────────────────────────────────── Couleurs
@@ -594,24 +223,6 @@ class Storefront
     {
         // Blanc dès qu'il reste lisible en gras (3:1), comme le bleu Shopio ; texte sombre sur les couleurs claires (jaune, ambre…)
         return self::contrast($hex, '#FFFFFF') >= 3 ? '#FFFFFF' : '#16162A';
-    }
-
-    /** Fond de page : [fond, encre, encre secondaire, ligne, surface, surface douce]. */
-    public static function background(string $bg): array
-    {
-        return match ($bg) {
-            'white'   => ['#FFFFFF', '#16162A', '#45455E', '#E3E8F2', '#FFFFFF', '#F1F5FB'],
-            'texture' => ['#FBF8F3', '#16162A', '#45455E', '#E9E1D3', '#FFFFFF', '#F3ECE0'],
-            'dark'    => ['#0B1E3D', '#FFFFFF', '#C9D6EA', '#24406E', '#132B52', '#132B52'],
-            default   => ['#F6F9FF', '#16162A', '#45455E', '#E3E8F2', '#FFFFFF', '#EAF2FF'],
-        };
-    }
-
-    /** Couleur des titres : la couleur principale si elle est lisible sur le fond, sinon l'encre. */
-    public static function titleColor(string $accent, string $bg): string
-    {
-        $b = self::background($bg);
-        return self::contrast($accent, $b[0]) >= 3 ? $accent : $b[1];
     }
 
     // ─────────────────────────────────────────────────────────────── Adresse de la boutique
@@ -680,76 +291,5 @@ class Storefront
         $host = strtolower((string) parse_url($url, PHP_URL_HOST));
         $site = str_contains($host, 'tiktok') ? 'TikTok' : (str_contains($host, 'youtu') ? 'YouTube' : 'Facebook');
         return ['kind' => 'link', 'url' => $url, 'site' => $site];
-    }
-
-    /** Liens des réseaux renseignés : [[libellé, url, couleur]]. */
-    public static function socialLinks(array $d): array
-    {
-        $url = fn ($v, $base) => preg_match('#^https?://#i', $v) ? $v : $base . ltrim($v, '@/');
-        $links = [];
-        if (($d['wa'] ?? '') !== '' && strlen(preg_replace('/\D/', '', $d['wa'])) >= 8) $links[] = ['WhatsApp', 'https://wa.me/' . preg_replace('/\D/', '', $d['wa']), '#15803D'];
-        if (($d['fb'] ?? '') !== '') $links[] = ['Facebook', $url($d['fb'], 'https://facebook.com/'), '#1668D8'];
-        if (($d['tt'] ?? '') !== '') $links[] = ['TikTok', $url($d['tt'], 'https://www.tiktok.com/@'), '#16162A'];
-        if (($d['ig'] ?? '') !== '') $links[] = ['Instagram', $url($d['ig'], 'https://instagram.com/'), '#9D174D'];
-        return $links;
-    }
-
-    /** La boutique est-elle ouverte maintenant (heure du site) ? */
-    public static function isOpenNow(array $d): bool
-    {
-        $now = now('Africa/Conakry')->format('H:i');
-        return $d['open'] < $d['close'] ? ($now >= $d['open'] && $now < $d['close']) : ($now >= $d['open'] || $now < $d['close']);
-    }
-
-    /**
-     * Statut affiché en pastille dans l'en-tête de la vitrine : [texte, état open|closed|pause],
-     * calculé à partir des horaires du premier bloc « Adresse et horaires » affiché (heure de Conakry).
-     * null si la boutique n'a pas indiqué ses horaires.
-     */
-    public static function openStatus(array $config): ?array
-    {
-        if ($config['settings']['vacation'] ?? false) return ['En pause', 'pause'];
-        $hours = collect($config['blocks'] ?? [])->first(fn ($b) => $b['type'] === 'hours' && $b['on']);
-        if (!$hours) return null;
-        return self::isOpenNow($hours['d'])
-            ? ['Ouvert maintenant', 'open']
-            : ['Fermé · ouvre à ' . $hours['d']['open'], 'closed'];
-    }
-
-    /**
-     * Produits de la section « à la une » : ceux choisis par le vendeur (dans l'ordre choisi,
-     * uniquement s'ils appartiennent à la boutique et sont en ligne), sinon le dernier produit
-     * marqué « mis en avant ».
-     */
-    public static function featuredProducts(Shop $shop, array $config)
-    {
-        $ids = $config['featured_ids'] ?? [];
-        if ($ids) {
-            $found = $shop->products()->where('is_active', true)->whereIn('id', $ids)->get()->keyBy('id');
-            $picked = collect($ids)->map(fn ($id) => $found->get($id))->filter()->values();
-            if ($picked->isNotEmpty()) return $picked;
-        }
-        return $shop->products()->where('is_active', true)->where('is_featured', true)->latest()->take(1)->get();
-    }
-
-    /**
-     * Indicateur de qualité de la vitrine : points vérifiables, chacun avec le lien pour le corriger.
-     * « live » = point que l'éditeur peut mettre à jour sans recharger (choix du produit à la une).
-     */
-    public static function checklist(Shop $shop, array $config, int $activeProducts): array
-    {
-        $edit = fn (int $step) => route('shop.edit', $shop) . '?etape=' . $step;
-        $hasFlagged = $shop->products()->where('is_active', true)->where('is_featured', true)->exists();
-
-        return [
-            ['key' => 'description', 'label' => 'Une description de la boutique',      'done' => mb_strlen(trim((string) $shop->description)) >= 30, 'url' => $edit(3), 'cta' => 'Écrire'],
-            ['key' => 'image',       'label' => 'Un logo ou une photo de la boutique', 'done' => (bool) $shop->image,                                  'url' => $edit(4), 'cta' => 'Ajouter'],
-            ['key' => 'phone',       'label' => 'Un téléphone de contact',             'done' => (bool) $shop->phone,                                  'url' => $edit(2), 'cta' => 'Ajouter'],
-            ['key' => 'address',     'label' => 'Une adresse ou un point de repère',   'done' => (bool) $shop->address,                                'url' => $edit(2), 'cta' => 'Ajouter'],
-            ['key' => 'products',    'label' => 'Au moins 4 produits en ligne',        'done' => $activeProducts >= 4,                                 'url' => route('products.create'), 'cta' => 'Ajouter un produit'],
-            ['key' => 'featured',    'label' => 'Un produit à la une',                 'done' => !empty($config['featured_ids']) || $hasFlagged,       'url' => '#bloc-featured', 'cta' => 'Choisir', 'live' => true, 'flagged' => $hasFlagged],
-            ['key' => 'slug',        'label' => 'Une adresse courte pour la boutique', 'done' => (bool) $shop->slug,                                   'url' => '#reglages', 'cta' => 'Choisir'],
-            ['key' => 'payout',      'label' => 'Le paiement en ligne (Mobile Money)', 'done' => $shop->payout_wallet_type && $shop->payout_wallet_number, 'url' => $edit(2), 'cta' => 'Activer'],
-        ];
     }
 }

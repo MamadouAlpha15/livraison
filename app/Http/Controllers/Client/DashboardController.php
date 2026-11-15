@@ -27,7 +27,7 @@ class DashboardController extends Controller
                 $q->where('is_approved', true);
                 if ($user->country) $q->where('country', $user->country);
             })
-            ->with(['shop:id,name,image,country,type,currency']);
+            ->with(['shop:id,slug,name,image,country,type,currency']);
 
         if ($s = request('s')) {
             $productsQuery->where(function ($q) use ($s) {
@@ -121,7 +121,7 @@ class DashboardController extends Controller
                             $q->where('is_approved', true);
                             if ($user->country) $q->where('country', $user->country);
                         })
-                        ->with('shop:id,name,image,user_id,currency')
+                        ->with('shop:id,slug,name,image,user_id,currency')
                         ->get()
                         ->sortByDesc(fn ($p) => $soldInCat[$p->id])
                         ->values();
@@ -133,7 +133,7 @@ class DashboardController extends Controller
                             $q->where('is_approved', true);
                             if ($user->country) $q->where('country', $user->country);
                         })
-                        ->with('shop:id,name,image,user_id,currency')
+                        ->with('shop:id,slug,name,image,user_id,currency')
                         ->latest()
                         ->limit(6)
                         ->get();
@@ -222,7 +222,7 @@ class DashboardController extends Controller
                 $q->where('is_approved', true);
                 if ($user->country) $q->where('country', $user->country);
             })
-            ->with(['shop:id,name,currency,country', 'activeVariants:id,product_id,stock']);
+            ->with(['shop:id,slug,name,currency,country', 'activeVariants:id,product_id,stock']);
 
         if (!empty($purchasedCategories) || !empty($favoriteProductIds)) {
             $recoQuery->where(function ($q) use ($purchasedCategories, $favoriteProductIds) {
@@ -263,7 +263,7 @@ class DashboardController extends Controller
                 $q->where('is_approved', true);
                 if ($user->country) $q->where('country', $user->country);
             })
-            ->with(['shop:id,name,currency,country', 'activeVariants:id,product_id,stock'])
+            ->with(['shop:id,slug,name,currency,country', 'activeVariants:id,product_id,stock'])
             ->orderBy('flash_ends_at')
             ->limit(20)
             ->get()
