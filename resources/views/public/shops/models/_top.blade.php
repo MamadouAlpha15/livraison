@@ -1,5 +1,5 @@
 {{--
-    Haut de page commun aux modèles : barre « Modèles de boutique Shopio » (le vendeur seul la voit),
+    Haut de page commun aux thèmes : barre « Thèmes Shopio » (le vendeur seul la voit),
     bandeau du lien d'aperçu, bandeau du mode vacances.
     Variables : $shop, $pm, $model, $isOwner, $publishedModel, $previewLink
 --}}

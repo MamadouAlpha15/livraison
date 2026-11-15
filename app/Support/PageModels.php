@@ -11,25 +11,21 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 /**
- * Modèles de page boutique côté client (Faire grandir ma vitrine → Personnalisation, ou la barre
- * « Modèles de boutique Shopio » visible du vendeur sur sa vitrine).
- * « standard » = la vitrine à blocs de l'éditeur. Les autres ont chacun leur style et leur mise
- * en page, avec le même parcours d'achat : fiche rapide, favoris, vus récemment, panier, commande
- * (payée à la livraison) et confirmation. Toutes les données viennent de la boutique.
+ * Thèmes de la vitrine côté client, choisis dans « Ma vitrine » (ou la barre « Thèmes Shopio »
+ * visible du vendeur sur sa vitrine) : Express (par défaut) et Signature. Chacun a son style et sa
+ * mise en page, avec le même parcours d'achat : fiche rapide, favoris, vus récemment, panier,
+ * commande (payée à la livraison) et confirmation. Toutes les données viennent de la boutique.
  */
 class PageModels
 {
     /** [nom, description courte]. */
     public const MODELS = [
-        'standard'  => ['Standard', 'La vitrine à blocs de l’éditeur'],
         'express'   => ['Express', 'Qui vend : packs, commande en 1 minute, page produit longue'],
         'signature' => ['Signature', 'Premium clair : ivoire, encre et vert profond'],
-        'prestige'  => ['Prestige', 'Nuit et or, élégant, pour les belles pièces'],
-        'pop'       => ['Pop', 'Énergique : stories, couleurs, sélection du jour'],
-        'epure'     => ['Épuré', 'Minimal, beaucoup d’espace, photos en grand'],
-        'editorial' => ['Éditorial', 'Façon magazine : lookbook, guide budget, index'],
-        'fil'       => ['Fil', 'Façon réseaux sociaux : un produit par écran'],
     ];
+
+    /** Thème d'une boutique qui n'en a pas choisi (ou dont l'ancien modèle a été retiré). */
+    public const DEFAULT = 'express';
 
     /** Communes proposées à la commande. */
     public const COMMUNES = ['Kaloum', 'Dixinn', 'Matam', 'Ratoma', 'Matoto', 'Hors Conakry'];
@@ -38,7 +34,7 @@ class PageModels
 
     public static function isModel(?string $m): bool
     {
-        return is_string($m) && $m !== 'standard' && isset(self::MODELS[$m]);
+        return is_string($m) && isset(self::MODELS[$m]);
     }
 
     /** Données d'un produit pour les modèles de page et la page produit (aussi un brouillon vu par son vendeur). */

@@ -17,11 +17,6 @@
         'products' => $products,
         'reviews' => ['count' => $reviewCount, 'avg' => $reviewAvg, 'min' => \App\Support\Growth::RATING_MIN],
         'delivered' => $delivered,
-        'working' => ['template' => $working['template'], 'slides' => $working['cover']['slides'], 'collections' => $collections, 'pageModel' => $working['page_model']],
-        'models' => \App\Support\PageModels::MODELS,
-        'templates' => collect(['luxe', 'mode', 'electronique', 'epicerie'])->mapWithKeys(fn ($k) => [$k => \App\Support\Storefront::TEMPLATES[$k]]),
-        'kinds' => \App\Support\Storefront::COLLECTION_KINDS,
-        'limits' => ['slides' => \App\Support\Storefront::SLIDES_MAX, 'collections' => \App\Support\Storefront::COLLECTIONS_MAX, 'items' => \App\Support\Storefront::COLLECTION_ITEMS_MAX],
         'currency' => $shop->currency ?? 'GNF',
         'urls' => [
             'coverUpload' => route('boutique.grow.cover-upload'), 'logoUpload' => route('boutique.grow.logo-upload'),
@@ -56,7 +51,6 @@
         });
         history.replaceState(null, '', G.urls.grow + '?onglet=' + k);
         if (k === 'couverture') renderPreview();
-        if (k === 'personnalisation') renderCarousel();
     }
     tabs.forEach((t, i) => {
         t.addEventListener('click', e => { e.preventDefault(); openTab(t.dataset.tab); });
@@ -345,155 +339,7 @@
         if (!ok) { e.preventDefault(); ($('gwCaPct').getAttribute('aria-invalid') ? $('gwCaPct') : $('gwCaEnd')).focus(); }
     });
 
-    /* ═════════════ 3. Personnalisation ═════════════ */
-    const P = { pageModel: G.working.pageModel, template: G.working.template, slides: G.working.slides.map(s => Object.assign({}, s)), collections: G.working.collections.map(c => Object.assign({}, c)) };
-    function renderTemplates() {
-        const mini = k => {
-            const t = G.templates[k], cols = Math.min(4, t.columns), list = t.layout === 'list';
-            const cells = list ? '<i style="height:10px"></i><i style="height:10px"></i><i style="height:10px"></i>' : Array.from({ length: cols * 2 }, () => '<i></i>').join('');
-            return '<span class="gw-tpl-mini" aria-hidden="true"><i style="background:' + (k === 'luxe' ? 'linear-gradient(135deg,#061226,#D4A017)' : t.accent) + '"></i><div style="grid-template-columns:' + (list ? '1fr' : 'repeat(' + cols + ',1fr)') + '">' + cells + '</div></span>';
-        };
-        $('gwTpls').innerHTML = Object.entries(G.templates).map(([k, t]) => '<button type="button" class="gw-tpl" aria-pressed="' + (P.template === k) + '" data-tpl="' + k + '">' + mini(k) + '<b>' + esc(t.label) + '</b><small>' + esc(t.hint) + '</small>' + (P.template === k ? '<span class="gw-pill gw-pill-blue">Choisi</span>' : '') + '</button>').join('');
-    }
-    /* Modèle de page côté client : mini aperçu de chaque style, essai sur la vraie vitrine */
-    const PM_SW = { standard: 'linear-gradient(135deg,#0B1E3D,#1F7CF6)', express: 'linear-gradient(135deg,#fff 0 45%,#2F5D1E 45% 78%,#111 78%)', signature: 'linear-gradient(135deg,#F6F2EA 0 50%,#1F3B2D 50% 82%,#B8893B 82%)', prestige: 'linear-gradient(135deg,#070F1F 55%,#D4A017)', pop: 'linear-gradient(135deg,#1668D8 0 45%,#F59E0B 45% 70%,#FFE9D6 70%)', epure: 'linear-gradient(90deg,#fff 0 60%,#F3F3F5 60%)', editorial: 'radial-gradient(rgba(26,23,20,.12) 1px, transparent 1px) 0 0/6px 6px,#FBF8F3', fil: 'radial-gradient(60% 60% at 50% 40%,rgba(31,124,246,.6),transparent),#061226' };
-    function renderModels() {
-        $('gwPms').innerHTML = Object.entries(G.models).map(([k, m]) => '<div class="gw-pm" aria-current="' + (P.pageModel === k) + '"><button type="button" data-pm="' + k + '" aria-pressed="' + (P.pageModel === k) + '"><span class="gw-pm-sw" style="background:' + PM_SW[k] + '"></span><b>' + esc(m[0]) + '</b><small>' + esc(m[1]) + '</small></button>' + (P.pageModel === k ? '<span class="gw-pill gw-pill-blue">Choisi</span>' : '') + '<a href="' + esc(G.shop.publicUrl) + '?modele=' + k + '" target="_blank" rel="noopener">Essayer sur ma vitrine ↗</a></div>').join('');
-    }
-    $('gwPms').addEventListener('click', e => { const b = e.target.closest('[data-pm]'); if (!b) return; P.pageModel = b.dataset.pm; renderModels(); toast('Modèle « ' + G.models[P.pageModel][0] + ' » choisi (publiez pour l’appliquer)'); });
-    renderModels();
-
-    $('gwTpls').addEventListener('click', e => { const b = e.target.closest('[data-tpl]'); if (!b) return; P.template = P.template === b.dataset.tpl ? '' : b.dataset.tpl; renderTemplates(); toast(P.template ? 'Modèle « ' + G.templates[P.template].label + ' » choisi (publiez pour l’appliquer)' : 'Modèle retiré'); });
-
-    let carIdx = 0, carTimer = null;
-    function renderCarousel() {
-        const slides = P.slides.map(resolveSlide);
-        carIdx = Math.min(carIdx, slides.length - 1);
-        const st = Object.assign({}, C, { logoUrl: C.logoSrc === 'initials' ? null : C.logoUrl, height: 'm' });
-        $('gwCarousel').innerHTML = coverHTML({ state: st, phone: false, slides: slides, current: carIdx });
-        clearInterval(carTimer);
-        if (slides.length > 1 && !reduce) carTimer = setInterval(() => { if (!document.hidden && !$('tab-personnalisation').hidden) showSlide(carIdx + 1); }, 3800);
-    }
-    function showSlide(i) {
-        const n = P.slides.length; carIdx = (i + n) % n;
-        $('gwCarousel').querySelectorAll('.sf-cover-slide').forEach((s, k) => s.classList.toggle('is-on', k === carIdx));
-        $('gwCarousel').querySelectorAll('[data-cdot]').forEach((d, k) => { if (k === carIdx) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current'); });
-    }
-    $('gwCarousel').addEventListener('click', e => { const d = e.target.closest('[data-cdot]'); if (d) showSlide(+d.dataset.cdot); });
-    const slideLabel = s => s.src === 'product' ? 'Photo produit' + (s.pid ? ' · ' + ((G.products.find(p => p.id === s.pid) || {}).name || '') : '') : G.sources[s.src];
-    function renderSlides() {
-        $('gwSlides').innerHTML = P.slides.map((s, i) => { const r = resolveSlide(s); return '<div class="gw-slide"><span class="gw-slide-th"' + (r.url ? '' : ' style="background:' + (G.gradients[s.src] || G.gradients.default) + '"') + '>' + (r.url ? '<img src="' + esc(r.url) + '" alt="">' : '') + '</span><b>' + (i + 1) + '. ' + esc(slideLabel(s)) + '</b><button type="button" class="gw-btn gw-btn-line gw-btn-sm" data-slide-see="' + i + '">Voir</button><button type="button" class="gw-btn gw-btn-danger gw-btn-sm" data-slide-del="' + i + '"' + (P.slides.length <= 1 ? ' disabled title="Il faut au moins une diapo"' : '') + '>Retirer</button></div>'; }).join('');
-        $('gwAddSlide').disabled = P.slides.length >= G.limits.slides;
-        $('gwAddSlide').textContent = P.slides.length >= G.limits.slides ? 'Maximum ' + G.limits.slides + ' diapos' : '+ Ajouter une diapo';
-        renderCarousel();
-    }
-    $('gwSlides').addEventListener('click', e => {
-        const see = e.target.closest('[data-slide-see]'), del = e.target.closest('[data-slide-del]');
-        if (see) showSlide(+see.dataset.slideSee);
-        if (del && !del.disabled && P.slides.length > 1) { P.slides.splice(+del.dataset.slideDel, 1); renderSlides(); toast('Diapo retirée'); }
-    });
-    let addKind = $('gwAddProductSel').options.length ? 'product' : 'gradient', addPhoto = null;
-    const showAdd = v => { addKind = v; $('gwAddProduct').hidden = v !== 'product'; $('gwAddGradient').hidden = v !== 'gradient'; $('gwAddPhoto').hidden = v !== 'photo'; };
-    seg('slidekind', addKind, showAdd);
-    if (addKind === 'gradient') document.querySelector('[data-seg="slidekind"] [data-v="product"]').disabled = true;
-    showAdd(addKind);
-    $('gwAddSlide').addEventListener('click', () => { $('gwSlideAdder').hidden = false; $('gwAddSlide').hidden = true; });
-    $('gwSlideCancel').addEventListener('click', () => { $('gwSlideAdder').hidden = true; $('gwAddSlide').hidden = false; });
-    $('gwSlideFile').addEventListener('change', async e => {
-        const f = e.target.files[0]; e.target.value = '';
-        if (!f) return;
-        const j = await uploadImage(f, G.urls.coverUpload, 5, $('gwSlideMsg'), COVER_TYPES, 'JPG, PNG ou WebP');
-        if (!j) return;
-        addPhoto = j; G.coverUrls[j.path] = j.url;
-        $('gwSlideMsg').className = j.width && j.width < 1200 ? 'gw-warn' : 'gw-okmsg';
-        $('gwSlideMsg').textContent = j.width && j.width < 1200 ? 'Image de ' + j.width + ' px : elle risque d’être floue, visez 1600 px.' : 'Photo prête : cliquez sur « Ajouter ».';
-    });
-    $('gwSlideOk').addEventListener('click', () => {
-        if (P.slides.length >= G.limits.slides) return;
-        let s;
-        if (addKind === 'product') s = { src: 'product', img: null, pid: +$('gwAddProductSel').value };
-        else if (addKind === 'gradient') s = { src: $('gwAddGradSel').value, img: null, pid: null };
-        else { if (!addPhoto) { $('gwSlideMsg').className = 'gw-err'; $('gwSlideMsg').textContent = 'Choisissez d’abord une photo.'; return; } s = { src: 'photo', img: addPhoto.path, pid: null }; addPhoto = null; $('gwSlideMsg').textContent = ''; }
-        P.slides.push(s); carIdx = P.slides.length - 1;
-        $('gwSlideAdder').hidden = true; $('gwAddSlide').hidden = false;
-        renderSlides(); toast('Diapo ajoutée');
-    });
-
-    /* Collections : produits calculés comme sur la vitrine (à la main, prix maximum, nouveautés de 7 jours) */
-    const colProducts = c => c.kind === 'manual' ? c.ids.map(id => G.products.find(p => p.id === id)).filter(Boolean)
-        : c.kind === 'under' ? G.products.filter(p => p.price <= (c.max || 0)).sort((a, b) => b.price - a.price) : G.products.filter(p => p.new);
-    let openCol = null;
-    function renderCols() {
-        if (!P.collections.length) { $('gwCols').innerHTML = '<div class="gw-empty">Aucune collection pour l’instant. Regroupez des produits (« Idées cadeaux », « Petits prix »…) : chaque collection a son lien.</div>'; return; }
-        $('gwCols').innerHTML = P.collections.map((c, i) => {
-            const items = colProducts(c), th = items.slice(0, 3);
-            return '<div class="gw-col"><div class="gw-col-hd"><span class="gw-stack3" aria-hidden="true">' + [0, 1, 2].map(k => '<i' + (th[k] && th[k].thumb ? ' style="background-image:url(\'' + esc(th[k].thumb) + '\')"' : '') + '></i>').join('') + '</span>' +
-                '<div class="gw-row-txt"><b>' + esc(c.name) + (c.kind !== 'manual' ? ' <span class="gw-pill gw-pill-auto">AUTO</span>' : '') + '</b><span>' + esc(c.kind === 'under' ? 'Moins de ' + money(c.max || 0) : G.kinds[c.kind]) + ' · ' + items.length + ' produit' + (items.length > 1 ? 's' : '') + '</span></div>' +
-                '<button type="button" class="gw-sw" role="switch" aria-checked="' + c.on + '" data-col-on="' + i + '" aria-label="Afficher « ' + esc(c.name) + ' » sur la vitrine"><span></span></button></div>' +
-                '<div class="gw-actions">' + (c.url ? '<button type="button" class="gw-btn gw-btn-line gw-btn-sm" data-col-copy="' + i + '">Copier le lien</button>' : '<span class="gw-pill gw-pill-grey">Lien actif après publication</span>') +
-                (c.kind !== 'new' ? '<button type="button" class="gw-btn gw-btn-line gw-btn-sm" data-col-edit="' + i + '" aria-expanded="' + (openCol === i) + '">' + (c.kind === 'manual' ? 'Choisir les produits' : 'Modifier le prix') + '</button>' : '') +
-                '<button type="button" class="gw-btn gw-btn-danger gw-btn-sm" data-col-del="' + i + '">Supprimer</button></div>' +
-                (openCol === i ? (c.kind === 'manual'
-                    ? '<div class="gw-col-body"><span class="gw-hint">' + c.ids.length + ' / ' + G.limits.items + ' produits choisis</span><div class="gw-checklist">' + G.products.map(p => '<label class="gw-check"><input type="checkbox" data-col-item="' + i + '" value="' + p.id + '"' + (c.ids.includes(p.id) ? ' checked' : '') + '>' + (p.thumb ? '<img src="' + esc(p.thumb) + '" alt="">' : '') + '<span>' + esc(p.name) + '</span></label>').join('') + '</div></div>'
-                    : '<div class="gw-col-body"><label class="gw-lbl" for="gwColMax' + i + '">Prix maximum (' + G.currency + ')</label><input class="gw-input" type="number" min="1" id="gwColMax' + i + '" data-col-max="' + i + '" value="' + (c.max || '') + '"></div>') : '') + '</div>';
-        }).join('');
-    }
-    $('gwCols').addEventListener('click', async e => {
-        const t = e.target.closest('[data-col-on],[data-col-copy],[data-col-edit],[data-col-del]');
-        if (!t) return;
-        const i = +(t.dataset.colOn ?? t.dataset.colCopy ?? t.dataset.colEdit ?? t.dataset.colDel), c = P.collections[i];
-        if (t.dataset.colOn !== undefined) { c.on = !c.on; renderCols(); }
-        else if (t.dataset.colCopy !== undefined) { try { await navigator.clipboard.writeText(c.url); } catch (x) { window.prompt('Copiez ce lien :', c.url); } toast('Lien de la collection copié'); }
-        else if (t.dataset.colEdit !== undefined) { openCol = openCol === i ? null : i; renderCols(); }
-        else if (confirm('Supprimer la collection « ' + c.name + ' » ?')) { P.collections.splice(i, 1); openCol = null; renderCols(); toast('Collection supprimée : publiez pour la retirer de la vitrine'); }
-    });
-    $('gwCols').addEventListener('change', e => {
-        const box = e.target.closest('[data-col-item]'), max = e.target.closest('[data-col-max]');
-        if (box) {
-            const c = P.collections[+box.dataset.colItem], id = +box.value;
-            if (box.checked) { if (c.ids.length >= G.limits.items) { box.checked = false; toast('Maximum ' + G.limits.items + ' produits par collection'); return; } c.ids.push(id); }
-            else c.ids = c.ids.filter(x => x !== id);
-            renderCols();
-        }
-        if (max) { P.collections[+max.dataset.colMax].max = Math.max(1, Math.round(+max.value) || 1); renderCols(); }
-    });
-    $('gwColKind').addEventListener('change', e => { $('gwColMaxF').hidden = e.target.value !== 'under'; });
-    document.querySelectorAll('[data-col-idea]').forEach(b => b.addEventListener('click', () => {
-        $('gwColName').value = b.dataset.colName; $('gwColKind').value = b.dataset.colIdea; $('gwColMaxF').hidden = b.dataset.colIdea !== 'under';
-        (b.dataset.colIdea === 'under' ? $('gwColMax') : $('gwColName')).focus();
-    }));
-    $('gwColAdd').addEventListener('click', () => {
-        const name = $('gwColName').value.trim(), kind = $('gwColKind').value, err = $('gwColErr');
-        err.textContent = ''; $('gwColName').removeAttribute('aria-invalid');
-        if (!name) { err.textContent = 'Donnez un nom à la collection.'; $('gwColName').setAttribute('aria-invalid', 'true'); $('gwColName').focus(); return; }
-        if (P.collections.some(c => c.name.toLowerCase() === name.toLowerCase())) { err.textContent = 'Une collection porte déjà ce nom.'; $('gwColName').setAttribute('aria-invalid', 'true'); $('gwColName').focus(); return; }
-        if (P.collections.length >= G.limits.collections) { err.textContent = 'Maximum ' + G.limits.collections + ' collections.'; return; }
-        const max = Math.round(Number($('gwColMax').value));
-        if (kind === 'under' && !(max > 0)) { err.textContent = 'Indiquez le prix maximum.'; $('gwColMax').focus(); return; }
-        P.collections.push({ id: 'c' + Math.random().toString(36).slice(2, 10), name: name, kind: kind, ids: [], max: kind === 'under' ? max : null, on: true });
-        openCol = kind === 'manual' ? P.collections.length - 1 : null;
-        $('gwColName').value = ''; $('gwColMax').value = '';
-        renderCols(); toast('Collection « ' + name + ' » créée : publiez pour la mettre en ligne');
-    });
-    /* Publier maintenant / garder en brouillon / programmer */
-    const modeLabels = { now: 'Publier maintenant', draft: 'Enregistrer le brouillon', schedule: 'Programmer la publication' };
-    const modeInputs = [...document.querySelectorAll('input[name="mode"]')];
-    const curMode = () => (modeInputs.find(i => i.checked) || modeInputs[0]).value;
-    const paintMode = () => { $('gwPerSubmit').textContent = modeLabels[curMode()]; $('gwWhenF').hidden = curMode() !== 'schedule'; };
-    modeInputs.forEach(i => i.addEventListener('change', paintMode));
-    paintMode();
-    $('gwPerForm').addEventListener('submit', e => {
-        $('gwWhenErr').textContent = ''; $('gwWhen').removeAttribute('aria-invalid');
-        if (curMode() === 'schedule' && (!$('gwWhen').value || $('gwWhen').value < $('gwWhen').min)) {
-            e.preventDefault(); $('gwWhen').setAttribute('aria-invalid', 'true');
-            $('gwWhenErr').textContent = !$('gwWhen').value ? 'Choisissez la date et l’heure de publication.' : 'Choisissez une heure dans au moins 5 minutes.';
-            $('gwWhen').focus(); return;
-        }
-        $('gwPerPayload').value = JSON.stringify({ page_model: P.pageModel, template: P.template, slides: P.slides.map(s => ({ src: s.src, img: s.img || null, pid: s.pid || null })), collections: P.collections.map(c => ({ id: c.id, name: c.name, kind: c.kind, ids: c.ids, max: c.max, on: c.on })) });
-    });
-    renderTemplates(); renderSlides(); renderCols();
-
-    /* ═════════════ 4. Conversion ═════════════ */
+    /* ═════════════ 3. Conversion ═════════════ */
     const conv = {};
     document.querySelectorAll('[data-conv]').forEach(el => { const k = el.dataset.conv; conv[k] = el.getAttribute('aria-checked') === 'true'; sw(el, conv[k], v => { conv[k] = v; $('c_' + k).value = v ? 1 : 0; paintPhone(); }); });
     function paintPhone() {

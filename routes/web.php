@@ -206,7 +206,7 @@ Route::get('/shops/{shop}/products/c/{categorie}', [PublicShopController::class,
     ->where('categorie', '[a-z0-9]+(?:-[a-z0-9]+)*')
     ->name('public.shops.category');
 
-/* Adresse courte d'une boutique (choisie dans l'éditeur de boutique → Réglages), et de ses catégories */
+/* Adresse courte d'une boutique (choisie dans « Ma vitrine »), et de ses catégories */
 Route::get('/s/{slug}', [PublicShopController::class, 'bySlug'])
     ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
     ->name('public.shops.slug');
@@ -214,7 +214,7 @@ Route::get('/s/{slug}/{categorie}', [PublicShopController::class, 'bySlugCategor
     ->where(['slug' => '[a-z0-9]+(?:-[a-z0-9]+)*', 'categorie' => '[a-z0-9]+(?:-[a-z0-9]+)*'])
     ->name('public.shops.slug.category');
 
-/* Collections d'une boutique (Faire grandir ma vitrine → Personnalisation) */
+/* Anciens liens de collections (outil retiré) : redirigés vers la boutique */
 Route::get('/shops/{shop}/products/collection/{collection}', [PublicShopController::class, 'collection'])
     ->where('collection', 'c[a-z0-9]{3,16}')
     ->name('public.shops.collection');
@@ -249,10 +249,6 @@ Route::post('/shops/{shop}/vue/{product}', [PublicShopController::class, 'produc
     ->middleware('throttle:60,1')
     ->name('public.shops.view');
 
-/* Clic dans une section de la vitrine (statistiques « clics par section ») */
-Route::post('/shops/{shop}/clic', [PublicShopController::class, 'click'])
-    ->middleware('throttle:120,1')
-    ->name('public.shops.click');
 
 /* Catalogue produits d'une boutique pour Facebook / Instagram (lu par Meta Commerce Manager) */
 Route::get('/shops/{shop}/catalogue-meta.csv', [\App\Http\Controllers\CatalogFeedController::class, 'meta'])
@@ -649,16 +645,13 @@ Route::middleware(['auth', 'role:admin'])
         /* Gestion de la boutique */
         Route::resource('shops', ShopController::class)->only(['create', 'store', 'index']);
 
-        /* Personnaliser la vitrine publique (sections, affichage des produits, bannière, couleur) */
+        /* Ma vitrine : thème (Express ou Signature), couleur, adresse, fiches produit, mode vacances */
         Route::get('vitrine',               [\App\Http\Controllers\Vendeur\StorefrontController::class, 'edit'])  ->name('storefront.edit');
         Route::put('vitrine',               [\App\Http\Controllers\Vendeur\StorefrontController::class, 'update'])->name('storefront.update');
-        Route::post('vitrine/reinitialiser', [\App\Http\Controllers\Vendeur\StorefrontController::class, 'reset']) ->name('storefront.reset');
         Route::get('vitrine/qr-code',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'qr'])    ->name('storefront.qr');
-        Route::post('vitrine/apercu',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'draft'])       ->name('storefront.draft');
-        Route::post('vitrine/image',        [\App\Http\Controllers\Vendeur\StorefrontController::class, 'uploadImage']) ->name('storefront.image');
         Route::get('vitrine/adresse',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'slugCheck'])   ->name('storefront.slug');
 
-        /* Faire grandir ma vitrine : couverture et logo, partage, personnalisation, conversion, qualité */
+        /* Faire grandir ma vitrine : couverture et logo, partage, conversion, qualité */
         Route::prefix('vitrine/grandir')->name('grow')->controller(\App\Http\Controllers\Vendeur\GrowController::class)->group(function () {
             Route::get('/', 'index');
             Route::post('couverture/photo', 'uploadCover')->name('.cover-upload');
@@ -668,8 +661,6 @@ Route::middleware(['auth', 'role:admin'])
             Route::post('campagne/{campaign}/arreter', 'stopCampaign')->name('.campaign.stop');
             Route::get('qr-code', 'qr')->name('.qr');
             Route::get('affiche', 'poster')->name('.poster');
-            Route::put('personnalisation', 'savePersonalize')->name('.personalize');
-            Route::delete('brouillon', 'discardDraft')->name('.draft.discard');
             Route::put('conversion', 'saveConversion')->name('.conversion');
             Route::post('modele', 'useModel')->name('.model');
             Route::post('apercu', 'createPreview')->name('.preview');
