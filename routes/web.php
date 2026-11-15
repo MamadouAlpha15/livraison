@@ -244,6 +244,11 @@ Route::post('/shops/{shop}/commande', [\App\Http\Controllers\StorefrontOrderCont
     ->middleware('throttle:10,1')
     ->name('public.shops.order');
 
+/* Paniers abandonnés : ce que le client a déjà rempli dans le formulaire de commande */
+Route::post('/shops/{shop}/panier-abandonne', [\App\Http\Controllers\StorefrontCartController::class, 'capture'])
+    ->middleware('throttle:30,1')
+    ->name('public.shops.cart');
+
 /* Vue d'un produit en fiche rapide (modèles de page boutique) : comptée comme une vue de sa fiche */
 Route::post('/shops/{shop}/vue/{product}', [PublicShopController::class, 'productView'])
     ->middleware('throttle:60,1')
@@ -682,9 +687,21 @@ Route::middleware(['auth', 'role:admin'])
         
         /* ── Routes accessibles en Plan Gratuit ────────────────────────── */
 
-        /* Commandes */
-        Route::get('orders', [EmployeOrderController::class, 'index'])                 ->name('orders.index');
+        /* Commandes (façon Sellio) : étapes, fiche, notes, nouvelle commande ; l'ancienne page (livreurs,
+           entreprises de livraison) reste à « Livraisons » */
+        Route::get('orders', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'index'])->name('orders.index');
+        Route::get('orders/livraisons', [EmployeOrderController::class, 'index'])        ->name('orders.livraisons');
+        Route::post('orders/nouvelle', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'store'])->middleware('throttle:30,1')->name('orders.store');
+        Route::put('orders/reglages', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'settings'])->name('orders.settings');
+        Route::post('orders/{order}/etape', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'stage'])->name('orders.stage');
+        Route::post('orders/{order}/note', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'note'])->name('orders.note');
         Route::put('orders/{order}/assign', [EmployeOrderController::class, 'assign']) ->name('orders.assign');
+
+        /* Paniers abandonnés */
+        Route::get('paniers-abandonnes', [\App\Http\Controllers\Boutique\AbandonedCartController::class, 'index'])->name('carts.index');
+        Route::get('paniers-abandonnes/reglages', [\App\Http\Controllers\Boutique\AbandonedCartController::class, 'editSettings'])->name('carts.settings');
+        Route::put('paniers-abandonnes/reglages', [\App\Http\Controllers\Boutique\AbandonedCartController::class, 'updateSettings'])->name('carts.settings.update');
+        Route::post('paniers-abandonnes/{cart}/etat', [\App\Http\Controllers\Boutique\AbandonedCartController::class, 'state'])->name('carts.state');
 
         /* Paiements */
         Route::get('payments', [VendeurPaymentController::class, 'index'])->name('payments.index');
@@ -889,6 +906,10 @@ Route::middleware(['auth', 'role:employe,superadmin,admin,vendeur', 'orders.only
         Route::post('orders/{order}/rate-company',        [EmployeOrderController::class, 'rateCompany'])   ->name('orders.rate-company');
         Route::post('orders/{order}/vendor-location',     [EmployeOrderController::class, 'shareVendorLocation'])->name('orders.vendor-location');
         Route::get('orders/{order}/invoice',              [EmployeOrderController::class, 'downloadInvoice'])->name('orders.invoice');
+
+        /* Paniers abandonnés (si la boutique ouvre la page à ses closers) */
+        Route::get('paniers-abandonnes',              [\App\Http\Controllers\Boutique\AbandonedCartController::class, 'index'])->name('carts.index');
+        Route::post('paniers-abandonnes/{cart}/etat', [\App\Http\Controllers\Boutique\AbandonedCartController::class, 'state'])->name('carts.state');
 
         /* Chat boutique ↔ entreprise de livraison */
         Route::post('companies/{company}/chat/send',     [\App\Http\Controllers\DeliveryChatController::class, 'send'])    ->name('delivery.chat.send');

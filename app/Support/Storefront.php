@@ -179,6 +179,8 @@ class Storefront
             'page_model'   => 'express',
             'home'         => HomeSections::normalizeAll(null),
             'form'         => ProductDesign::formDefaults(),
+            'orders'       => OrderBoard::settings([])['orders'],
+            'carts'        => OrderBoard::settings([])['carts'],
         ];
     }
 
@@ -282,6 +284,9 @@ class Storefront
             'home'         => HomeSections::normalizeAll($input['home'] ?? null),
             // Formulaire de commande de la page produit, pour toute la boutique (éditeur produit → Formulaire)
             'form'         => ProductDesign::normalizeForm($input['form'] ?? null),
+            // Commandes : message WhatsApp de confirmation ; paniers abandonnés (Commandes → Paniers abandonnés)
+            'orders'       => OrderBoard::settings($input)['orders'],
+            'carts'        => OrderBoard::settings($input)['carts'],
         ];
     }
 

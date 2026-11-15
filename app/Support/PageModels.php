@@ -98,6 +98,8 @@ class PageModels
             'settings'   => [
                 'vacation' => $set['vacation'], 'vacationMsg' => $set['vacation_msg'], 'nego' => $set['show_nego'],
                 'stock' => $set['show_stock'], 'wa' => $set['wa_mode'] && $shop->phone,
+                // Paniers abandonnés : le formulaire envoie ce que le client a rempli (Commandes → Paniers abandonnés)
+                'carts' => OrderBoard::settings($sf)['carts']['enabled'],
             ],
             // Sections de la page d'accueil, une liste par thème (Boutique → Sections)
             'home'       => $sf['home'],
@@ -105,6 +107,7 @@ class PageModels
             'user'       => $user ? ['name' => $user->name, 'phone' => (string) ($user->phone ?? '')] : null,
             'urls'       => [
                 'order'  => route('public.shops.order', $shop),
+                'cart'   => route('public.shops.cart', $shop),
                 'view'   => route('public.shops.view', [$shop, 0]), // « 0 » remplacé par l'identifiant du produit
                 'login'  => route('login', ['redirect' => Storefront::publicUrl($shop)]),
                 'follow' => $isClient ? route('client.favorites.toggle', $shop) : route('register', ['redirect' => Storefront::publicUrl($shop), 'role' => 'client']),

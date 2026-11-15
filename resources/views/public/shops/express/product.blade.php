@@ -562,7 +562,7 @@ body { padding-bottom: 86px; }
                 '<div class="ex-recap"><small>Récapitulatif</small><div><span id="exRecapName"></span><span id="exRecapLine"></span></div><div class="is-total"><span>Total à payer</span><span id="exTotal"></span></div></div>' +
                 '<div class="ex-general" id="exGeneral" role="alert"></div>' +
                 '<div class="ex-field"><label for="exName">Nom complet ' + (D.user ? '<small>(facultatif)</small>' : '<b aria-hidden="true">*</b>') + '</label><input id="exName" autocomplete="name" maxlength="80" placeholder="Votre prénom et nom" value="' + esc(D.user ? D.user.name : '') + '" aria-describedby="exNameErr"><p class="ex-err" id="exNameErr"></p></div>' +
-                '<div class="ex-field"><label for="exPhone">Téléphone <b aria-hidden="true">*</b></label><div class="ex-tel"><span>+224</span><input id="exPhone" type="tel" inputmode="tel" autocomplete="tel-national" maxlength="16" placeholder="622 12 34 56" value="' + esc(D.user ? D.user.phone : '') + '" aria-describedby="exPhoneErr"></div><p class="ex-err" id="exPhoneErr"></p></div>' +
+                '<div class="ex-field"><label for="exPhone">Téléphone <b aria-hidden="true">*</b></label><div class="ex-tel"><span>+224</span><input id="exPhone" type="tel" inputmode="tel" autocomplete="tel-national" maxlength="16" placeholder="622 12 34 56" value="' + esc(D.user ? D.user.phone : '') + '" aria-describedby="exPhoneErr"></div><p class="ex-err" id="exPhoneErr"></p>' + (D.settings.carts ? '<small style="color:var(--ink-3);font-size:12px">Votre numéro sert seulement à la boutique pour finaliser votre commande.</small>' : '') + '</div>' +
                 '<div class="ex-field"><label for="exCommune">Commune <b aria-hidden="true">*</b></label><select id="exCommune" aria-describedby="exCommuneErr"><option value="">Choisir…</option>' + D.communes.map(c => '<option>' + esc(c) + '</option>').join('') + '</select><p class="ex-err" id="exCommuneErr"></p></div>' +
                 (FM.address ? '<div class="ex-field"><label for="exLandmark">Adresse ' + (FM.address_req ? '<b aria-hidden="true">*</b>' : '<small>(quartier, rue, repère)</small>') + '</label><input id="exLandmark" maxlength="120" placeholder="Ex. Kipé, près de la pharmacie" aria-describedby="exLandmarkErr"><p class="ex-err" id="exLandmarkErr"></p></div>' : '') +
                 '<button type="submit" class="ex-btn is-acc' + anim + '" id="exSend">' + esc(FM.button) + '</button>' +
@@ -589,6 +589,8 @@ body { padding-bottom: 86px; }
         if ($('exCheckout')) {
         const F = { name: 'exName', phone: 'exPhone', commune: 'exCommune' };
         if ($('exLandmark')) F.landmark = 'exLandmark';
+        // Ce que le client remplit est gardé pour la boutique (paniers abandonnés), jusqu'à sa commande
+        if (S.capture) $('exCheckout').addEventListener('input', () => S.capture(() => ({ items: [{ id: P.id, qty: qty }], name: $('exName').value.trim(), phone: $('exPhone').value, commune: $('exCommune').value, landmark: $('exLandmark') ? $('exLandmark').value.trim() : '' })));
         const setErr = (k, m) => { const el = $(F[k]); $(F[k] + 'Err').textContent = m || ''; if (m) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid'); };
         Object.keys(F).forEach(k => $(F[k]).addEventListener('input', () => setErr(k, '')));
         const CSRF = document.querySelector('meta[name="csrf-token"]').content;
@@ -606,7 +608,7 @@ body { padding-bottom: 86px; }
             const btn = $('exSend'); btn.disabled = true; btn.textContent = 'Envoi…';
             try {
                 const r = await fetch(D.urls.order, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF },
-                    body: JSON.stringify({ items: [{ id: P.id, qty: qty }], name: name, phone: d, commune: $('exCommune').value, landmark: $('exLandmark') ? $('exLandmark').value.trim() : '' }) });
+                    body: JSON.stringify({ visitor: S.visitor, items: [{ id: P.id, qty: qty }], name: name, phone: d, commune: $('exCommune').value, landmark: $('exLandmark') ? $('exLandmark').value.trim() : '' }) });
                 const j = await r.json().catch(() => ({}));
                 if (r.status === 201) {
                     $('exCheckout').innerHTML = '<div class="ex-done" role="status"><svg class="sm-check" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44"/><path d="M30 52l14 14 26-30"/></svg><h3>Commande n° ' + j.id + ' envoyée</h3><p>' + esc(D.shop.name) + ' vous appelle au ' + esc(d.replace(/(\d{3})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4')) + ' pour confirmer.</p><p><strong>Total : ' + esc(money(j.total)) + '</strong> · à payer à la livraison</p>' +

@@ -47,7 +47,7 @@
     <form class="sm-cart-body sm-form" id="smStepForm" hidden novalidate>
         <div class="sm-general" id="smGeneral" role="alert"></div>
         <div class="sm-field"><label for="smName">Nom complet @if($pm['user'])<small>(facultatif)</small>@endif</label><input id="smName" name="name" autocomplete="name" maxlength="80" value="{{ $pm['user']['name'] ?? '' }}" aria-describedby="smNameErr"><p class="sm-err" id="smNameErr"></p></div>
-        <div class="sm-field"><label for="smPhone">Téléphone</label><input id="smPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="16" placeholder="622 00 00 00" value="{{ $pm['user']['phone'] ?? '' }}" aria-describedby="smPhoneErr"><p class="sm-err" id="smPhoneErr"></p></div>
+        <div class="sm-field"><label for="smPhone">Téléphone</label><input id="smPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="16" placeholder="622 00 00 00" value="{{ $pm['user']['phone'] ?? '' }}" aria-describedby="smPhoneErr"><p class="sm-err" id="smPhoneErr"></p>@if($pm['settings']['carts'] ?? false)<small style="display:block;margin-top:4px;color:var(--m-ink2);font-size:12px">Votre numéro sert seulement à la boutique pour finaliser votre commande.</small>@endif</div>
         <div class="sm-field"><label for="smCommune">Commune</label><select id="smCommune" name="commune" aria-describedby="smCommuneErr"><option value="">Choisir…</option>@foreach($pm['communes'] as $c)<option>{{ $c }}</option>@endforeach</select><p class="sm-err" id="smCommuneErr"></p></div>
         <div class="sm-field"><label for="smLandmark">Repère <small>(facultatif)</small></label><input id="smLandmark" name="landmark" maxlength="120" placeholder="Ex. près de la pharmacie, 2e rue à gauche"></div>
         <div class="sm-cod"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 7h20v10H2zM12 9.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5"/></svg><span><strong>Paiement à la livraison</strong>, en espèces, au livreur. Rien à payer avant.</span></div>
@@ -87,6 +87,21 @@ window.SM = (function () {
     const K = k => 'shopio_pm_' + k + '_' + PM.shop.id;
     const load = (k, d) => { try { return JSON.parse(localStorage.getItem(K(k))) || d; } catch (e) { return d; } };
     const save = (k, v) => { try { localStorage.setItem(K(k), JSON.stringify(v)); } catch (e) {} };
+    /* Paniers abandonnés : identifiant aléatoire du navigateur (aucune donnée personnelle), envoi 1,5 s après la saisie */
+    const VISITOR = (() => {
+        let v = load('visitor', '');
+        if (!/^[a-z0-9]{12,40}$/.test(v)) { v = ''; const a = new Uint8Array(16); (window.crypto || window.msCrypto).getRandomValues(a); a.forEach(b => { v += (b % 36).toString(36); }); save('visitor', v); }
+        return v;
+    })();
+    let capT = null;
+    function capture(get) {
+        if (!PM.settings.carts || !PM.urls.cart) return;
+        clearTimeout(capT);
+        capT = setTimeout(() => {
+            const d = get(); if (!d || !d.items || !d.items.length) return;
+            fetch(PM.urls.cart, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }, body: JSON.stringify(Object.assign({ visitor: VISITOR }, d)) }).catch(() => {});
+        }, 1500);
+    }
     // Panier, favoris et vus récemment : seulement des produits encore en vente
     let cart = load('cart', []).filter(l => byId(l.id) && !byId(l.id).variants);
     let favs = load('fav', []).filter(id => byId(id));
@@ -255,13 +270,15 @@ window.SM = (function () {
         if (!$('smCommune').value) { setErr('commune', 'Choisissez votre commune.'); ok = false; }
         return ok;
     }
+    // Ce que le client remplit est gardé pour la boutique (paniers abandonnés), jusqu'à sa commande
+    $('smStepForm').addEventListener('input', () => capture(() => ({ items: cart.map(l => ({ id: l.id, qty: l.qty })), name: $('smName').value.trim(), phone: $('smPhone').value, commune: $('smCommune').value, landmark: $('smLandmark').value.trim() })));
     $('smStepForm').addEventListener('submit', async e => {
         e.preventDefault();
         $('smGeneral').textContent = '';
         if (!check()) { const bad = $('smStepForm').querySelector('[aria-invalid="true"]'); if (bad) bad.focus(); return; }
         const btn = $('smSend'); btn.disabled = true; btn.textContent = 'Envoi…';
         try {
-            const r = await fetch(PM.urls.order, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }, body: JSON.stringify({ items: cart.map(l => ({ id: l.id, qty: l.qty })), name: $('smName').value.trim(), phone: $('smPhone').value.trim(), commune: $('smCommune').value, landmark: $('smLandmark').value.trim() }) });
+            const r = await fetch(PM.urls.order, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }, body: JSON.stringify({ visitor: VISITOR, items: cart.map(l => ({ id: l.id, qty: l.qty })), name: $('smName').value.trim(), phone: $('smPhone').value.trim(), commune: $('smCommune').value, landmark: $('smLandmark').value.trim() }) });
             const j = await r.json().catch(() => ({}));
             if (r.status === 201) return done(j);
             if (j.errors) { Object.entries(j.errors).forEach(([k, v]) => { if (fields[k]) setErr(k, v[0]); else $('smGeneral').textContent = v[0]; }); }
@@ -298,6 +315,7 @@ window.SM = (function () {
         fav: id => favs.includes(+id), favs: () => favs.slice(), recent: () => recent.map(byId).filter(Boolean),
         cartCount: cartCount, cartTotal: cartTotal, lineTotal: lineTotal, cartLines: () => cart.map(l => ({ p: byId(l.id), qty: l.qty })),
         add: add, open: open, openCart: openCart, toggleFav: toggleFav, canBuy: canBuy, buyLabel: buyLabel, suggest: suggest, toast: toast,
+        capture: capture, visitor: VISITOR,
         subscribe: fn => { subs.push(fn); },
     };
 })();
