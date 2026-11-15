@@ -24,19 +24,19 @@ use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 /**
- * « Faire grandir ma vitrine » : 5 onglets.
+ * « Boutique » (menu vendeur, autrefois « Faire grandir ma vitrine ») : 4 onglets.
  *  1. Couverture et logo — enregistrés et publiés tout de suite.
  *  2. Partage — liens et QR codes (boutique, catégorie, produit), affiche A5, liens suivis, lien de campagne.
- *  3. Personnalisation — modèle, diapos de la couverture, collections ; publier, garder en brouillon ou programmer.
- *  4. Conversion — preuves de confiance, mode WhatsApp, sections automatiques.
- *  5. Qualité — visites, clics par section, catégories, score de vitrine, lien d'aperçu 48 h.
+ *  3. Conversion — preuves de confiance, mode WhatsApp.
+ *  4. Qualité — visites, catégories, score de vitrine, lien d'aperçu 48 h.
+ * Le thème (Express ou Signature) se choisit dans « Ma vitrine » (StorefrontController).
  * Agit toujours sur la boutique de l'utilisateur connecté.
  */
 class GrowController extends Controller
 {
     use ResolvesOwnShop;
 
-    public const TABS = ['couverture', 'partage', 'personnalisation', 'conversion', 'qualite'];
+    public const TABS = ['couverture', 'partage', 'conversion', 'qualite'];
 
 
     private function isPro(Shop $shop): bool
@@ -62,7 +62,7 @@ class GrowController extends Controller
 
         $tab = in_array($request->query('onglet'), self::TABS, true) ? $request->query('onglet') : 'couverture';
         $published = Storefront::forShop($shop);
-        [$working, $workingAccent] = Growth::working($shop);
+        [$working] = Growth::working($shop);
         $publicUrl = Storefront::publicUrl($shop);
 
         $products = $shop->products()->where('is_active', true)->orderByDesc('is_featured')->latest()
@@ -97,8 +97,6 @@ class GrowController extends Controller
             'published'   => $published,
             'working'     => $working,
             'accent'      => Growth::accent($shop),
-            'workingAccent' => $workingAccent,
-            'status'      => Growth::status($shop),
             'publicUrl'   => $publicUrl,
             'products'    => $products,
             'productPhoto' => Growth::productPhoto($shop),
@@ -113,15 +111,7 @@ class GrowController extends Controller
             'tracked'     => $this->tracked($shop),
             'campaigns'   => $this->campaignLinks($shop, $categoryLinks),
             'isPro'       => $this->isPro($shop),
-            'collections' => collect($working['collections'])->map(fn ($c) => $c + [
-                'url'   => Growth::collectionUrl($shop, $c),
-                'count' => Growth::collectionProducts($shop, $c, null)->count(),
-                'thumbs' => Growth::collectionProducts($shop, $c, 3)->map(fn ($p) => $p->image ? ImageOptimizer::url($p->image, 'thumb') : null)->values(),
-            ])->values(),
-            'trendingCount' => Growth::trending($shop)->count(),
-            'lowStockCount' => Growth::lowStock($shop)->count(),
             'visits'      => Growth::visits($shop),
-            'sectionClicks' => Growth::sectionClicks($shop),
             'categoryRanking' => Growth::categoryRanking($shop),
             'seenNeverOrdered' => Growth::seenNeverOrdered($shop),
             'quality'     => Growth::quality($shop, $published),
@@ -369,102 +359,20 @@ class GrowController extends Controller
         ]);
     }
 
-    // ─────────────────────────────────────────────────────────── 3. Personnalisation
+    // ─────────────────────────────────────────────────────────── Thème
 
-    public function savePersonalize(Request $request): RedirectResponse
-    {
-        $shop = $this->shop();
-        $payload = json_decode((string) $request->input('payload'), true);
-        if (!is_array($payload)) return $this->back('personnalisation')->withErrors(['payload' => 'Réglages illisibles, rechargez la page.']);
-        $mode = $request->input('mode');
-        if (!in_array($mode, ['now', 'draft', 'schedule'], true)) $mode = 'draft';
-
-        $at = null;
-        if ($mode === 'schedule') {
-            try { $at = Carbon::createFromFormat('Y-m-d\TH:i', (string) $request->input('publish_at'), 'Africa/Conakry'); } catch (\Throwable $e) { $at = null; }
-            if (!$at) return $this->back('personnalisation')->withErrors(['publish_at' => 'Choisissez la date et l’heure de publication.'])->withInput();
-            if ($at->lte(now()->addMinutes(4))) return $this->back('personnalisation')->withErrors(['publish_at' => 'Choisissez une heure dans au moins 5 minutes.'])->withInput();
-            if ($at->gt(now()->addDays(60))) return $this->back('personnalisation')->withErrors(['publish_at' => 'Programmez dans les 60 prochains jours.'])->withInput();
-        }
-
-        [$config, $accent] = Growth::working($shop);
-        // Modèle de départ : ordre des blocs de base et affichage des produits
-        $tpl = $payload['template'] ?? '';
-        if ($tpl !== $config['template'] && isset(Storefront::TEMPLATES[$tpl])) {
-            $t = Storefront::TEMPLATES[$tpl];
-            $slots = array_keys(array_filter($config['blocks'], fn ($b) => in_array($b['type'], Storefront::CORE, true)));
-            $ordered = array_values(array_filter(array_map(fn ($k) => collect($config['blocks'])->firstWhere('type', $k), $t['order'])));
-            foreach ($slots as $n => $slot) if (isset($ordered[$n])) $config['blocks'][$slot] = $ordered[$n];
-            foreach ($config['blocks'] as &$b) {
-                if (in_array($b['type'], Storefront::CORE, true) && !Storefront::BLOCKS[$b['type']][3]) $b['on'] = !in_array($b['type'], $t['off'], true);
-            }
-            unset($b);
-            $config = array_merge($config, array_intersect_key($t, array_flip(['layout', 'columns', 'sort', 'cards', 'banner'])), ['template' => $tpl]);
-            $accent = $t['accent'];
-        }
-
-        // Modèle de page côté client
-        if (isset(\App\Support\PageModels::MODELS[$payload['page_model'] ?? ''])) $config['page_model'] = $payload['page_model'];
-
-        // Diapos de la couverture (1 à 4) : produits et photos vérifiés
-        $slides = Storefront::normalizeCover(['slides' => $payload['slides'] ?? []])['slides'];
-        $own = $shop->products()->pluck('id')->all();
-        foreach ($slides as &$s) if ($s['pid'] && !in_array($s['pid'], $own, true)) $s['pid'] = null;
-        unset($s);
-        $config['cover']['slides'] = $slides;
-        if (count($slides) > 1 || $slides[0]['src'] !== 'default') $config['cover']['on'] = true;
-
-        // Collections : uniquement des produits de la boutique ; le bloc « Collections » suit
-        $cols = Storefront::normalizeCollections($payload['collections'] ?? []);
-        foreach ($cols as &$c) $c['ids'] = array_values(array_intersect($c['ids'], $own));
-        unset($c);
-        $config['collections'] = $cols;
-        $config = $this->ensureBlock($config, 'collections', collect($cols)->contains('on', true), 'categories');
-
-        $config = Storefront::normalize($config);
-        if ($mode === 'now') {
-            Growth::publish($shop, $config, $accent);
-            return $this->back('personnalisation')->with('success', 'Vitrine publiée. Vos clients voient maintenant ces changements.');
-        }
-        $shop->update(['storefront_draft' => ['config' => $config, 'accent' => $accent], 'storefront_publish_at' => $at?->copy()->utc()]);
-        return $this->back('personnalisation')->with('success', $mode === 'schedule'
-            ? 'Publication programmée le ' . $at->translatedFormat('j F à H:i') . ' (heure de Conakry).'
-            : 'Brouillon enregistré : rien ne change pour vos clients tant que vous ne publiez pas.');
-    }
-
-    /** Supprime le brouillon en attente (et sa programmation). */
-    public function discardDraft(): RedirectResponse
-    {
-        $shop = $this->shop();
-        $shop->update(['storefront_draft' => null, 'storefront_publish_at' => null]);
-        return $this->back('personnalisation')->with('success', 'Brouillon supprimé : la version publiée reste en ligne.');
-    }
-
-    /** Ajoute (affiché) ou masque un bloc géré ici. Ajouté après $after s'il n'existe pas encore. */
-    private function ensureBlock(array $config, string $type, bool $on, string $after): array
-    {
-        foreach ($config['blocks'] as &$b) {
-            if ($b['type'] === $type) { $b['on'] = $on; return $config; }
-        }
-        unset($b);
-        if (!$on) return $config;
-        $i = collect($config['blocks'])->search(fn ($b) => $b['type'] === $after);
-        array_splice($config['blocks'], $i === false ? count($config['blocks']) : $i + 1, 0, [['id' => $type, 'type' => $type, 'on' => true, 'd' => Storefront::blockDefaults($type)]]);
-        return $config;
-    }
-
-    /** Adopter un modèle de page (barre « Modèles de boutique Shopio » de la vitrine) : publié tout de suite. */
+    /** Adopter un thème (barre « Thèmes Shopio » de la vitrine) : publié tout de suite. */
     public function useModel(Request $request): RedirectResponse
     {
         $shop = $this->shop();
-        $model = $request->validate(['model' => ['required', Rule::in(array_keys(\App\Support\PageModels::MODELS))]], ['model.in' => 'Modèle inconnu.'])['model'];
+        $model = $request->validate(['model' => ['required', Rule::in(array_keys(\App\Support\PageModels::MODELS))]], ['model.in' => 'Thème inconnu.'])['model'];
         $apply = function (array $c) use ($model) { $c['page_model'] = $model; return $c; };
         Growth::applyEverywhere($shop, $apply);
         $this->syncDraft($shop->fresh(), $apply);
         return redirect()->to(Storefront::publicUrl($shop))->with('model_used', \App\Support\PageModels::MODELS[$model][0]);
     }
 
-    // ─────────────────────────────────────────────────────────── 4. Conversion
+    // ─────────────────────────────────────────────────────────── 3. Conversion
 
     public function saveConversion(Request $request): RedirectResponse
     {
@@ -477,15 +385,14 @@ class GrowController extends Controller
             $c['settings']['wa_mode'] = $on('wa_mode');
             $c['settings']['proof_delivered'] = $on('proof_delivered');
             $c['settings']['proof_response'] = $on('proof_response');
-            $c = $this->ensureBlock($c, 'trending', $on('trending'), 'featured');
-            return $this->ensureBlock($c, 'lowstock', $on('lowstock'), 'trending');
+            return $c;
         };
         Growth::applyEverywhere($shop, $apply);
         $this->syncDraft($shop->fresh(), $apply);
         return $this->back('conversion')->with('success', 'Réglages de conversion publiés.');
     }
 
-    // ─────────────────────────────────────────────────────────── 5. Qualité : lien d'aperçu
+    // ─────────────────────────────────────────────────────────── 4. Qualité : lien d'aperçu
 
     public function createPreview(): RedirectResponse
     {

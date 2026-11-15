@@ -4,7 +4,7 @@ namespace App\PageBuilder\Sections;
 
 use App\PageBuilder\SectionType;
 use App\PageBuilder\Settings\Text;
-use App\Support\ProductPage;
+use App\Support\ProductPageSettings;
 
 /** Questions fréquentes : une question par bloc, réponses repliables */
 class Faq extends SectionType
@@ -37,7 +37,7 @@ class Faq extends SectionType
     /** Préréglage : les réponses vraies sur Shopio (paiement à la livraison, confirmation par la boutique) */
     public function presets(): array
     {
-        $faq = array_slice(ProductPage::shopDefaults()['faq'], 0, 2);
+        $faq = array_slice(ProductPageSettings::shopDefaults()['faq'], 0, 2);
         return [[
             'name'     => 'Questions fréquentes',
             'settings' => [],

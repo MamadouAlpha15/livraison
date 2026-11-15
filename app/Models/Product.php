@@ -57,6 +57,7 @@ class Product extends Model
         'tags',              // mots-clés
         'image',             // photo principale
         'gallery',           // JSON : photos supplémentaires
+        'landing',           // JSON : contenu de la page produit longue (voir App\Support\ProductPage)
         'low_stock_threshold', // seuil d'alerte stock faible
         'flash_price',         // prix pendant une vente flash
         'flash_starts_at',     // début de la vente flash
@@ -69,7 +70,7 @@ class Product extends Model
     |------------------------------------------------------------------
     */
     protected $casts = [
-        'page'             => 'array',  // réglages de la page produit (App\Support\ProductPage)
+        'page'             => 'array',  // réglages de la page produit (App\Support\ProductPageSettings)
         'price'            => 'decimal:2',
         'original_price'   => 'decimal:2',
         'flash_price'      => 'decimal:2',
@@ -80,6 +81,7 @@ class Product extends Model
         'is_active'        => 'boolean',
         'is_featured'      => 'boolean',
         'is_available'     => 'boolean',
+        'landing'          => 'array',
         // gallery est décodé manuellement dans les vues avec json_decode()
         // pour garder la flexibilité
     ];

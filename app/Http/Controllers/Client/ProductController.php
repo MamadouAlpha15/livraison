@@ -30,10 +30,10 @@ class ProductController extends Controller
 
         $variants = $product->activeVariants()->get();
 
-        // Page produit personnalisée par le vendeur (App\Support\ProductPage)
-        $shopPage = \App\Support\ProductPage::shop($shop);
-        $productPage = \App\Support\ProductPage::product($product);
-        $offers = \App\Support\ProductPage::offers($product);
+        // Page produit personnalisée par le vendeur (App\Support\ProductPageSettings)
+        $shopPage = \App\Support\ProductPageSettings::shop($shop);
+        $productPage = \App\Support\ProductPageSettings::product($product);
+        $offers = \App\Support\ProductPageSettings::offers($product);
 
         // Avis réels : laissés sur des commandes livrées qui contiennent ce produit
         $reviews = \App\Models\Review::with('client:id,name')
@@ -48,12 +48,12 @@ class ProductController extends Controller
             'shopPage'    => $shopPage,
             'productPage' => $productPage,
             'offers'      => $offers,
-            'selected'    => \App\Support\ProductPage::defaultOffer($offers),
-            'faq'         => \App\Support\ProductPage::faq($shop, $product),
-            'showOffer'   => \App\Support\ProductPage::showOfferButton($shop, $product),
+            'selected'    => \App\Support\ProductPageSettings::defaultOffer($offers),
+            'faq'         => \App\Support\ProductPageSettings::faq($shop, $product),
+            'showOffer'   => \App\Support\ProductPageSettings::showOfferButton($shop, $product),
             // Modèle de page : celui du produit ou de la boutique ; ?modele= pour l'aperçu depuis l'espace vendeur
-            'template'    => \App\Support\ProductPage::template($shop, $product, $request->query('modele')),
-            'waUrl'       => \App\Support\ProductPage::whatsappUrl($shop, $product),
+            'template'    => \App\Support\ProductPageSettings::template($shop, $product, $request->query('modele')),
+            'waUrl'       => \App\Support\ProductPageSettings::whatsappUrl($shop, $product),
             'reviews'     => $reviews,
             'reviewAvg'   => $reviews->isNotEmpty() ? round((float) \App\Models\Review::whereHas('order.items', fn ($q) => $q->where('product_id', $product->id))->avg('rating'), 1) : null,
             'reviewCount' => $reviews->isNotEmpty() ? \App\Models\Review::whereHas('order.items', fn ($q) => $q->where('product_id', $product->id))->count() : 0,

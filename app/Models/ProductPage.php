@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * Page d'un produit construite avec le constructeur (sections et blocs).
  * « draft » est ce que le vendeur modifie ; « published » ce que voient les clients.
  * Les clients ne la voient que publiée ET activée (« is_enabled », désactivée par défaut) ; sinon le produit
- * garde la page produit actuelle (App\Support\ProductPage).
+ * garde la page produit actuelle (App\Support\ProductPageSettings).
  */
 class ProductPage extends Model
 {

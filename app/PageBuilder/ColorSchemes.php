@@ -3,7 +3,7 @@
 namespace App\PageBuilder;
 
 use App\Models\Shop;
-use App\Support\ProductPage;
+use App\Support\ProductPageSettings;
 
 /**
  * Jeux de couleurs d'une section, tirés des couleurs de la boutique (couleur d'accent des pages produit).
@@ -21,15 +21,15 @@ class ColorSchemes
     /** Variables CSS de chaque jeu pour une boutique */
     public static function for(Shop $shop): array
     {
-        $accent = ProductPage::shop($shop)['accent'];
-        $onAccent = ProductPage::onAccent($accent);
-        $accentNight = ProductPage::accentOnNight($accent);
+        $accent = ProductPageSettings::shop($shop)['accent'];
+        $onAccent = ProductPageSettings::onAccent($accent);
+        $accentNight = ProductPageSettings::accentOnNight($accent);
 
         return [
             'clair'  => ['bg' => '#FFFFFF', 'text' => '#16162A', 'muted' => '#45455E', 'line' => '#E3E8F2', 'button' => $accent, 'on_button' => $onAccent],
             'doux'   => ['bg' => '#F6F9FF', 'text' => '#16162A', 'muted' => '#45455E', 'line' => '#E3E8F2', 'button' => $accent, 'on_button' => $onAccent],
             'accent' => ['bg' => $accent, 'text' => $onAccent, 'muted' => $onAccent, 'line' => 'rgba(255,255,255,.25)', 'button' => $onAccent === '#FFFFFF' ? '#FFFFFF' : '#16162A', 'on_button' => $onAccent === '#FFFFFF' ? $accent : '#FFFFFF'],
-            'nuit'   => ['bg' => '#0B1E3D', 'text' => '#FFFFFF', 'muted' => '#9FB3D3', 'line' => '#1C3560', 'button' => $accentNight, 'on_button' => ProductPage::onAccent($accentNight)],
+            'nuit'   => ['bg' => '#0B1E3D', 'text' => '#FFFFFF', 'muted' => '#9FB3D3', 'line' => '#1C3560', 'button' => $accentNight, 'on_button' => ProductPageSettings::onAccent($accentNight)],
         ];
     }
 

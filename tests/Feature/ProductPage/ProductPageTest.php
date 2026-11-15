@@ -5,7 +5,7 @@ use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
 use App\Services\PushService;
-use App\Support\ProductPage;
+use App\Support\ProductPageSettings;
 use Tests\Support\CampaignFixtures as F;
 
 beforeEach(function () {
@@ -128,7 +128,7 @@ test('le vendeur règle les pages de sa boutique : couleur, frais par commune, b
         'template' => 'confiance', 'guarantee' => 'Échange sous 3 jours', 'whatsapp' => '1',
     ])->assertSessionHasNoErrors();
 
-    $page = ProductPage::shop($this->shop->fresh());
+    $page = ProductPageSettings::shop($this->shop->fresh());
     expect($page['accent'])->toBe('#F59E0B')->and($page['delivery_fees'])->toBe(['Ratoma' => 20000])
         ->and($page['steps'])->toBe(['Tu commandes', 'Tu paies à la réception'])->and($page['badges'])->toBe(['cod', 'verified'])
         ->and($page['template'])->toBe('confiance')->and($page['guarantee'])->toBe('Échange sous 3 jours');
@@ -197,7 +197,7 @@ test('modèle propre au produit, garantie et WhatsApp de la boutique', function 
 
     // Le vendeur choisit le modèle d'un produit
     $this->product->forceFill(['page' => ['template' => 'express']])->save();
-    expect(ProductPage::template($this->shop->fresh(), $this->product->fresh()))->toBe('express');
+    expect(ProductPageSettings::template($this->shop->fresh(), $this->product->fresh()))->toBe('express');
 });
 
 test('un client n\'a pas accès aux réglages des pages produit', function () {
@@ -205,11 +205,11 @@ test('un client n\'a pas accès aux réglages des pages produit', function () {
 });
 
 test('texte du bouton lisible sur la couleur choisie', function () {
-    expect(ProductPage::onAccent('#C8F135'))->toBe('#16162A')
-        ->and(ProductPage::onAccent('#1F7CF6'))->toBe('#FFFFFF')
-        ->and(ProductPage::onAccent('#16162A'))->toBe('#FFFFFF')
+    expect(ProductPageSettings::onAccent('#C8F135'))->toBe('#16162A')
+        ->and(ProductPageSettings::onAccent('#1F7CF6'))->toBe('#FFFFFF')
+        ->and(ProductPageSettings::onAccent('#16162A'))->toBe('#FFFFFF')
         // Sur la carte bleu nuit, le bleu Shopio est éclairci pour rester lisible ; une couleur claire reste telle quelle
-        ->and(ProductPage::accentOnNight('#1F7CF6'))->not->toBe('#1F7CF6')
-        ->and(ProductPage::accentOnNight('#C8F135'))->toBe('#C8F135')
-        ->and(ProductPage::shopDefaults()['accent'])->toBe('#1F7CF6');
+        ->and(ProductPageSettings::accentOnNight('#1F7CF6'))->not->toBe('#1F7CF6')
+        ->and(ProductPageSettings::accentOnNight('#C8F135'))->toBe('#C8F135')
+        ->and(ProductPageSettings::shopDefaults()['accent'])->toBe('#1F7CF6');
 });

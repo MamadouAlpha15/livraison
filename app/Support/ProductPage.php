@@ -4,259 +4,131 @@ namespace App\Support;
 
 use App\Models\Product;
 use App\Models\Shop;
+use App\Services\ImageOptimizer;
+use Illuminate\Support\Str;
 
 /**
- * Page produit personnalisable par le vendeur.
- *   - Réglages de la boutique (shops.product_page) : bandeau, couleur du bouton, badges de confiance,
- *     étapes « Comment ça se passe », questions fréquentes, frais de livraison par commune.
- *   - Réglages du produit (products.page) : offres groupées, texte et points forts, urgence de stock,
- *     bouton « Faire une offre », questions du produit.
- * Les prix des offres sont lus ici, côté serveur, au moment de la commande : jamais repris du navigateur.
+ * Page produit longue (modèle « Express ») : adresse publique, photos, contenu, packs.
+ *
+ * Contenu (colonne products.landing, JSON) — rempli par le vendeur ou par Shopio IA, tout est facultatif :
+ *   hook       Accroche sous le titre (220 car.)
+ *   benefits   Avantages courts, une ligne chacun (8 max)
+ *   promise    Promesse de délai réelle de la boutique, ex. « Commandez avant 18 h, livré aujourd'hui à Conakry »
+ *   packs      [{qty: 2, price: 450000, label: "Populaire"}, …] (3 max). Prix TOTAL du pack, forcément
+ *              moins cher que qty × prix unitaire. Appliqués aussi par le serveur à la commande (lineTotal).
+ *   usage, details, shipping   Textes des volets « Comment l'utiliser ? », « Description détaillée », « Livraison et garantie »
+ *   highlight  {title, text, cta}                        Bloc mis en avant avec photos inclinées
+ *   story      {title, kicker, text}                     Photo + texte (ex. « Avant / Après »)
+ *   audience   {title, kicker, text}                     « C'est pour qui ? »
+ *   love       {title, kicker, items: [{title, text}]}   « Pourquoi vous allez l'adorer » (6 max)
+ *   compare    {title, rows: ["Qualité garantie", …]}    Tableau « Notre produit / Autres » (8 max)
+ *   faq        [{q, a}]                                  Questions sur le produit (10 max)
+ *
+ * Les avis et les chiffres (« clients satisfaits »…) ne viennent jamais de ce contenu : ils sont calculés
+ * sur les vrais avis et les vraies commandes de la boutique.
  */
 class ProductPage
 {
-    public const MAX_OFFERS = 4;
-    public const MAX_POINTS = 6;
-    public const MAX_FAQ = 6;
+    public const PACKS_MAX = 3;
 
-    /** Couleurs proposées pour le bouton « Commander » (bleu Shopio par défaut) */
-    public const ACCENTS = ['#1F7CF6' => 'Bleu Shopio', '#F59E0B' => 'Ambre', '#C8F135' => 'Citron', '#16A34A' => 'Vert', '#E11D48' => 'Framboise', '#0B1E3D' => 'Bleu nuit'];
+    /** Paramètre d'adresse « 12-sac-a-dos-urbain » : identifiant puis nom lisible. */
+    public static function param(Product $p): string
+    {
+        $slug = Str::limit(Str::slug($p->name), 60, '');
+        return $p->id . ($slug !== '' ? '-' . rtrim($slug, '-') : '');
+    }
+
+    public static function idFrom(string $param): int
+    {
+        return preg_match('/^(\d+)/', $param, $m) ? (int) $m[1] : 0;
+    }
+
+    public static function url(Shop $shop, Product $p): string
+    {
+        return $shop->slug
+            ? route('public.shops.slug.product', [$shop->slug, self::param($p)])
+            : route('public.shops.product', [$shop, self::param($p)]);
+    }
+
+    /** Photo principale puis galerie, en taille moyenne. */
+    public static function photos(Product $p): array
+    {
+        $paths = array_values(array_filter(array_merge([$p->image], $p->gallery_array), fn ($x) => is_string($x) && $x !== ''));
+        return array_values(array_unique(array_map(fn ($x) => ImageOptimizer::url($x, 'medium') ?? asset('storage/' . $x), $paths)));
+    }
+
+    private static function txt($v, int $max): string
+    {
+        return Str::limit(trim(preg_replace('/[ \t]+/', ' ', strip_tags(mb_scrub((string) $v, 'UTF-8')))), $max, '…');
+    }
+
+    private static function block($v, array $keys): array
+    {
+        $v = is_array($v) ? $v : [];
+        $out = [];
+        foreach ($keys as $k => $max) $out[$k] = self::txt($v[$k] ?? '', $max);
+        return $out;
+    }
+
+    /** Packs valides pour ce produit : quantité 2 à 10, prix total plus bas que l'achat à l'unité. */
+    public static function packs(Product $p): array
+    {
+        $unit = (int) round($p->current_price);
+        $raw = is_array($p->landing['packs'] ?? null) ? $p->landing['packs'] : [];
+        $packs = [];
+        foreach ($raw as $k) {
+            $qty = (int) ($k['qty'] ?? 0);
+            $price = (int) round((float) ($k['price'] ?? 0));
+            if ($qty < 2 || $qty > 10 || $price <= 0 || $price >= $qty * $unit || isset($packs[$qty])) continue;
+            $packs[$qty] = ['qty' => $qty, 'price' => $price, 'label' => self::txt($k['label'] ?? '', 20)];
+        }
+        ksort($packs);
+        return array_slice(array_values($packs), 0, self::PACKS_MAX);
+    }
 
     /**
-     * Modèles de page prêts à l'emploi : ordre des sections, ce qui est mis en avant et style.
-     * Inspirés des pages de vente à la livraison qui convertissent le mieux. Aucun n'invente d'urgence :
-     * le compte à rebours n'apparaît que pendant une vraie vente flash, le stock affiché est le vrai.
+     * Prix d'une ligne de commande : la combinaison la moins chère de packs et d'unités.
+     * Même calcul côté navigateur (_kit, page produit) pour que le total affiché soit celui payé.
      */
-    public const TEMPLATES = [
-        'classique' => [
-            'name'     => 'Classique',
-            'for'      => 'La plupart des produits',
-            'pitch'    => 'Offres groupées, puis le formulaire de commande juste en dessous. Le modèle de départ.',
-            'sections' => ['variants', 'offers', 'order', 'trust', 'why', 'steps', 'reviews', 'faq', 'guarantee', 'whatsapp'],
-        ],
-        'express' => [
-            'name'     => 'Express',
-            'for'      => 'Pubs Facebook et TikTok, petits prix',
-            'pitch'    => 'Le formulaire arrive tout de suite sous le prix : le client commande en 20 secondes, sans défiler.',
-            'sections' => ['offers', 'variants', 'order', 'trust', 'why', 'faq', 'whatsapp'],
-        ],
-        'confiance' => [
-            'name'     => 'Confiance',
-            'for'      => 'Produits chers : téléphones, montres, parfums',
-            'pitch'    => 'Garanties, avis et réponses aux doutes d\'abord, la commande ensuite : rassure avant de vendre.',
-            'sections' => ['trust', 'guarantee', 'reviews', 'why', 'variants', 'offers', 'order', 'steps', 'faq', 'whatsapp'],
-        ],
-        'promo' => [
-            'name'     => 'Promo',
-            'for'      => 'Ventes flash, déstockage, prix barrés',
-            'pitch'    => 'L\'économie en grand, le vrai compte à rebours de la vente flash et les lots mis en avant.',
-            'sections' => ['countdown', 'offers', 'variants', 'order', 'trust', 'why', 'faq', 'whatsapp'],
-        ],
-        'histoire' => [
-            'name'     => 'Histoire',
-            'for'      => 'Beauté, bien-être, produits à expliquer',
-            'pitch'    => 'Le texte et les bienfaits racontés en grand, puis les étapes et les avis, et la commande pour finir.',
-            'sections' => ['why', 'steps', 'reviews', 'variants', 'offers', 'order', 'trust', 'faq', 'guarantee', 'whatsapp'],
-        ],
-    ];
-
-    public const BADGES = [
-        'cod'      => ['label' => 'Paiement à la livraison', 'icon' => 'wallet'],
-        'tracking' => ['label' => 'Livraison suivie en direct', 'icon' => 'map-pin'],
-        'verified' => ['label' => 'Boutique vérifiée', 'icon' => 'shield'],
-    ];
-
-    /** Réglages de départ de la boutique (uniquement des faits vrais sur Shopio) */
-    public static function shopDefaults(): array
+    public static function lineTotal(Product $p, int $qty, ?array $packs = null): int
     {
+        $unit = (int) round($p->current_price);
+        $packs ??= self::packs($p);
+        if (!$packs || $qty < 2) return $unit * max(0, $qty);
+        $best = [0];
+        for ($q = 1; $q <= $qty; $q++) {
+            $best[$q] = $best[$q - 1] + $unit;
+            foreach ($packs as $k) if ($k['qty'] <= $q) $best[$q] = min($best[$q], $best[$q - $k['qty']] + $k['price']);
+        }
+        return $best[$qty];
+    }
+
+    /** Contenu nettoyé, prêt pour la vue. Repli sur la description du produit quand rien n'est rempli. */
+    public static function content(Product $p): array
+    {
+        $l = is_array($p->landing) ? $p->landing : [];
+        $desc = trim(strip_tags((string) $p->description));
+        $list = fn ($v, int $n, int $max) => array_values(array_filter(array_map(fn ($x) => self::txt($x, $max), array_slice(is_array($v) ? $v : [], 0, $n)), fn ($x) => $x !== ''));
+
+        $love = self::block($l['love'] ?? [], ['title' => 80, 'kicker' => 120]);
+        $love['items'] = array_values(array_filter(array_map(fn ($i) => self::block($i, ['title' => 60, 'text' => 160]), array_slice(is_array($l['love']['items'] ?? null) ? $l['love']['items'] : [], 0, 6)), fn ($i) => $i['title'] !== ''));
+        $compare = self::block($l['compare'] ?? [], ['title' => 80]);
+        $compare['rows'] = $list($l['compare']['rows'] ?? [], 8, 60);
+        $faq = array_values(array_filter(array_map(fn ($f) => self::block($f, ['q' => 140, 'a' => 600]), array_slice(is_array($l['faq'] ?? null) ? $l['faq'] : [], 0, 10)), fn ($f) => $f['q'] !== '' && $f['a'] !== ''));
+
         return [
-            'banner'        => 'Paiement à la livraison · Commande en 30 secondes',
-            'accent'        => '#1F7CF6',
-            'badges'        => ['cod', 'tracking', 'verified'],
-            'steps'         => [
-                'Tu remplis le formulaire en 30 secondes',
-                'La boutique te confirme par appel ou WhatsApp',
-                'Tu suis le livreur sur la carte',
-                'Tu paies à la réception, en main propre',
-            ],
-            'faq'           => [
-                ['q' => 'Quand vais-je recevoir ma commande ?', 'a' => 'La boutique t\'appelle ou t\'écrit sur WhatsApp juste après ta commande pour confirmer le jour de livraison.'],
-                ['q' => 'Dois-je payer avant la livraison ?', 'a' => 'Non. Tu paies en espèces au livreur, à la réception du colis.'],
-                ['q' => 'Puis-je négocier le prix ?', 'a' => 'Oui : touche « Faire une offre au vendeur » et propose ton prix. Le vendeur accepte, refuse ou te fait une contre-offre.'],
-            ],
-            'delivery_fees' => [],   // commune => prix en GNF (vide : « à confirmer par la boutique »)
-            'show_offer_button' => true,
-            'template'      => 'classique',
-            'guarantee'     => null,  // ex. « Échange sous 3 jours si le produit ne te convient pas » (vide : pas affiché)
-            'whatsapp'      => false, // bouton « Une question ? WhatsApp » vers le téléphone de la boutique
+            'hook'      => self::txt(($l['hook'] ?? '') !== '' ? $l['hook'] : Str::before($desc, "\n"), 220),
+            'benefits'  => $list($l['benefits'] ?? [], 8, 90),
+            'promise'   => self::txt($l['promise'] ?? '', 90),
+            'usage'     => self::txt($l['usage'] ?? '', 1500),
+            'details'   => self::txt(($l['details'] ?? '') !== '' ? $l['details'] : $desc, 3000),
+            'shipping'  => self::txt($l['shipping'] ?? '', 1500),
+            'highlight' => self::block($l['highlight'] ?? [], ['title' => 70, 'text' => 600, 'cta' => 24]),
+            'story'     => self::block($l['story'] ?? [], ['title' => 80, 'kicker' => 140, 'text' => 1200]),
+            'audience'  => self::block($l['audience'] ?? [], ['title' => 60, 'kicker' => 80, 'text' => 1200]),
+            'love'      => $love,
+            'compare'   => $compare,
+            'faq'       => $faq,
         ];
-    }
-
-    public static function productDefaults(): array
-    {
-        return [
-            'offers'          => [],  // [{key, label, subtitle, qty, price, badge}]
-            'intro'           => null, // vide : description du produit
-            'points'          => [],
-            'urgency'         => true,
-            'urgency_under'   => 10,
-            'faq'             => [],
-            'show_offer_button' => null, // null : réglage de la boutique
-            'template'        => null, // null : modèle de la boutique
-        ];
-    }
-
-    public static function shop(Shop $shop): array
-    {
-        $saved = is_array($shop->product_page) ? $shop->product_page : (json_decode((string) $shop->product_page, true) ?: []);
-        return array_replace(self::shopDefaults(), array_intersect_key($saved, self::shopDefaults()));
-    }
-
-    public static function product(Product $product): array
-    {
-        $saved = is_array($product->page) ? $product->page : (json_decode((string) $product->page, true) ?: []);
-        return array_replace(self::productDefaults(), array_intersect_key($saved, self::productDefaults()));
-    }
-
-    /**
-     * Offres affichées : celles du vendeur, sinon une seule offre « 1 article » au prix actuel.
-     * Chaque offre : key, label, subtitle, qty, price (total en GNF), badge, savings (économie réelle).
-     */
-    public static function offers(Product $product): array
-    {
-        $unit = (float) $product->current_price;
-        $offers = self::product($product)['offers'];
-        if ($offers === []) {
-            $offers = [['key' => 'un', 'label' => '1 ' . ($product->unit ?: 'article'), 'subtitle' => $product->name, 'qty' => 1, 'price' => (int) round($unit), 'badge' => null]];
-        }
-        return array_map(function ($o) use ($unit) {
-            $qty = max(1, (int) $o['qty']);
-            $price = max(0, (int) $o['price']);
-            return [
-                'key'      => (string) $o['key'],
-                'label'    => (string) $o['label'],
-                'subtitle' => $o['subtitle'] ?? null,
-                'qty'      => $qty,
-                'price'    => $price,
-                'badge'    => $o['badge'] ?? null,
-                'savings'  => max(0, (int) round($unit * $qty) - $price),
-            ];
-        }, array_values($offers));
-    }
-
-    public static function findOffer(Product $product, ?string $key): ?array
-    {
-        foreach (self::offers($product) as $o) {
-            if ($o['key'] === $key) {
-                return $o;
-            }
-        }
-        return null;
-    }
-
-    /** Offre mise en avant : celle qui a un badge, sinon la première */
-    public static function defaultOffer(array $offers): array
-    {
-        foreach ($offers as $o) {
-            if (filled($o['badge'])) {
-                return $o;
-            }
-        }
-        return $offers[0];
-    }
-
-    /** Frais de livraison d'une commune (null : à confirmer par la boutique) */
-    public static function deliveryFee(Shop $shop, ?string $commune): ?int
-    {
-        $fees = self::shop($shop)['delivery_fees'];
-        return $commune !== null && isset($fees[$commune]) && $fees[$commune] !== '' && $fees[$commune] !== null ? (int) $fees[$commune] : null;
-    }
-
-    /** Modèle utilisé : aperçu demandé (?modele=), sinon celui du produit, sinon celui de la boutique */
-    public static function template(Shop $shop, Product $product, ?string $preview = null): string
-    {
-        foreach ([$preview, self::product($product)['template'], self::shop($shop)['template']] as $key) {
-            if ($key !== null && isset(self::TEMPLATES[$key])) {
-                return $key;
-            }
-        }
-        return 'classique';
-    }
-
-    /** Lien WhatsApp de la boutique (null si pas de téléphone ou bouton désactivé) */
-    public static function whatsappUrl(Shop $shop, Product $product): ?string
-    {
-        return self::shop($shop)['whatsapp'] ? self::whatsappLink($shop, $product) : null;
-    }
-
-    /** Lien WhatsApp vers le téléphone de la boutique avec un message sur le produit (null sans téléphone) */
-    public static function whatsappLink(Shop $shop, Product $product): ?string
-    {
-        if (blank($shop->phone)) {
-            return null;
-        }
-        $phone = preg_replace('/\D/', '', $shop->phone);
-        if (strlen($phone) === 9) {
-            $phone = '224' . $phone;
-        }
-        return 'https://wa.me/' . $phone . '?text=' . rawurlencode('Bonjour ' . $shop->name . ', j\'ai une question sur « ' . $product->name . ' » : ' . route('client.products.show', $product));
-    }
-
-    public static function showOfferButton(Shop $shop, Product $product): bool
-    {
-        $own = self::product($product)['show_offer_button'];
-        return $own === null ? (bool) self::shop($shop)['show_offer_button'] : (bool) $own;
-    }
-
-    /** Questions fréquentes : celles du produit d'abord, puis celles de la boutique */
-    public static function faq(Shop $shop, Product $product): array
-    {
-        return array_values(array_filter(array_merge(self::product($product)['faq'], self::shop($shop)['faq']),
-            fn ($f) => filled($f['q'] ?? null) && filled($f['a'] ?? null)));
-    }
-
-    /**
-     * Couleur d'accent lisible sur le bleu nuit de la carte de commande (#0B1E3D) : la couleur du vendeur,
-     * éclaircie vers le blanc jusqu'à un contraste d'au moins 4,5:1 (ex. bleu Shopio → bleu ciel).
-     */
-    public static function accentOnNight(string $hex): string
-    {
-        $hex = ltrim($hex, '#');
-        if (strlen($hex) !== 6) {
-            return '#7DB4FF';
-        }
-        $rgb = array_map('hexdec', str_split($hex, 2));
-        for ($mix = 0; $mix <= 100; $mix += 5) {
-            $c = array_map(fn ($v) => (int) round($v + (255 - $v) * $mix / 100), $rgb);
-            if (self::contrast($c, [11, 30, 61]) >= 4.5) {
-                return sprintf('#%02X%02X%02X', ...$c);
-            }
-        }
-        return '#FFFFFF';
-    }
-
-    private static function luminance(array $rgb): float
-    {
-        $lin = fn ($c) => ($c /= 255) <= 0.03928 ? $c / 12.92 : (($c + 0.055) / 1.055) ** 2.4;
-        return 0.2126 * $lin($rgb[0]) + 0.7152 * $lin($rgb[1]) + 0.0722 * $lin($rgb[2]);
-    }
-
-    private static function contrast(array $a, array $b): float
-    {
-        [$l1, $l2] = [self::luminance($a), self::luminance($b)];
-        return (max($l1, $l2) + 0.05) / (min($l1, $l2) + 0.05);
-    }
-
-    /** Texte lisible sur la couleur du bouton (noir sur couleur claire, blanc sur couleur foncée) */
-    public static function onAccent(string $hex): string
-    {
-        $hex = ltrim($hex, '#');
-        if (strlen($hex) !== 6) {
-            return '#16162A';
-        }
-        [$r, $g, $b] = array_map(fn ($c) => hexdec($c) / 255, str_split($hex, 2));
-        $lin = fn ($c) => $c <= 0.03928 ? $c / 12.92 : (($c + 0.055) / 1.055) ** 2.4;
-        $lum = 0.2126 * $lin($r) + 0.7152 * $lin($g) + 0.0722 * $lin($b);
-        return $lum > 0.35 ? '#16162A' : '#FFFFFF';
     }
 }

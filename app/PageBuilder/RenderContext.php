@@ -9,7 +9,7 @@ use App\Models\Shop;
 use App\Models\User;
 use App\PageBuilder\Commerce\Checkout;
 use App\Services\ImageOptimizer;
-use App\Support\ProductPage;
+use App\Support\ProductPageSettings;
 use Illuminate\Support\Collection;
 
 /**
@@ -115,7 +115,7 @@ class RenderContext
     /** Frais de livraison par commune indiqués par la boutique (commune => montant ; absente : à confirmer) */
     public function deliveryFees(): array
     {
-        return array_filter(ProductPage::shop($this->shop)['delivery_fees'], fn ($v) => $v !== null && $v !== '');
+        return array_filter(ProductPageSettings::shop($this->shop)['delivery_fees'], fn ($v) => $v !== null && $v !== '');
     }
 
     public function user(): ?User

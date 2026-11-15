@@ -206,7 +206,7 @@ Route::get('/shops/{shop}/products/c/{categorie}', [PublicShopController::class,
     ->where('categorie', '[a-z0-9]+(?:-[a-z0-9]+)*')
     ->name('public.shops.category');
 
-/* Adresse courte d'une boutique (choisie dans l'éditeur de boutique → Réglages), et de ses catégories */
+/* Adresse courte d'une boutique (choisie dans « Ma vitrine »), et de ses catégories */
 Route::get('/s/{slug}', [PublicShopController::class, 'bySlug'])
     ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
     ->name('public.shops.slug');
@@ -214,13 +214,21 @@ Route::get('/s/{slug}/{categorie}', [PublicShopController::class, 'bySlugCategor
     ->where(['slug' => '[a-z0-9]+(?:-[a-z0-9]+)*', 'categorie' => '[a-z0-9]+(?:-[a-z0-9]+)*'])
     ->name('public.shops.slug.category');
 
-/* Collections d'une boutique (Faire grandir ma vitrine → Personnalisation) */
+/* Anciens liens de collections (outil retiré) : redirigés vers la boutique */
 Route::get('/shops/{shop}/products/collection/{collection}', [PublicShopController::class, 'collection'])
     ->where('collection', 'c[a-z0-9]{3,16}')
     ->name('public.shops.collection');
 Route::get('/s/{slug}/collection/{collection}', [PublicShopController::class, 'bySlugCollection'])
     ->where(['slug' => '[a-z0-9]+(?:-[a-z0-9]+)*', 'collection' => 'c[a-z0-9]{3,16}'])
     ->name('public.shops.slug.collection');
+
+/* Page produit publique (modèle Express) : /shops/{id}/p/12-nom-du-produit et /s/{slug}/p/12-nom-du-produit */
+Route::get('/shops/{shop}/p/{produit}', [PublicShopController::class, 'product'])
+    ->where('produit', '[0-9]+(?:-[a-z0-9]+)*')
+    ->name('public.shops.product');
+Route::get('/s/{slug}/p/{produit}', [PublicShopController::class, 'bySlugProduct'])
+    ->where(['slug' => '[a-z0-9]+(?:-[a-z0-9]+)*', 'produit' => '[0-9]+(?:-[a-z0-9]+)*'])
+    ->name('public.shops.slug.product');
 
 /* Lien d'aperçu de la vitrine, valable 48 h, et avis laissés dessus (Faire grandir ma vitrine → Qualité) */
 Route::get('/apercu/{token}', [PublicShopController::class, 'previewLink'])
@@ -241,10 +249,6 @@ Route::post('/shops/{shop}/vue/{product}', [PublicShopController::class, 'produc
     ->middleware('throttle:60,1')
     ->name('public.shops.view');
 
-/* Clic dans une section de la vitrine (statistiques « clics par section ») */
-Route::post('/shops/{shop}/clic', [PublicShopController::class, 'click'])
-    ->middleware('throttle:120,1')
-    ->name('public.shops.click');
 
 /* Catalogue produits d'une boutique pour Facebook / Instagram (lu par Meta Commerce Manager) */
 Route::get('/shops/{shop}/catalogue-meta.csv', [\App\Http\Controllers\CatalogFeedController::class, 'meta'])
@@ -774,9 +778,9 @@ Route::middleware(['auth', 'role:admin'])
         /* Gestion de la boutique */
         Route::resource('shops', ShopController::class)->only(['create', 'store', 'index']);
 
-        /* Réglages communs des pages produit (bandeau, couleur, badges, étapes, FAQ, livraison) */
-        Route::get('page-produit', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'editShop'])->name('product-page.edit');
-        Route::put('page-produit', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'updateShop'])->name('product-page.update');
+        /* Réglages communs des pages produit /client/produit (bandeau, couleur, badges, étapes, FAQ, livraison) */
+        Route::get('page-produit', [\App\Http\Controllers\Vendeur\ProductPageSettingsController::class, 'editShop'])->name('product-page.edit');
+        Route::put('page-produit', [\App\Http\Controllers\Vendeur\ProductPageSettingsController::class, 'updateShop'])->name('product-page.update');
 
         /* Shopio IA dans la messagerie (App\Services\ShopioAI) */
         Route::prefix('shopio-ia')->name('shopio-ai.')->controller(\App\Http\Controllers\Boutique\ShopioAiController::class)->group(function () {
@@ -798,16 +802,15 @@ Route::middleware(['auth', 'role:admin'])
             Route::post('{type}/ia', 'generate')->middleware('throttle:10,1')->name('generate');
         });
 
-        /* Personnaliser la vitrine publique (sections, affichage des produits, bannière, couleur) */
+        /* Ma vitrine : thème (Express ou Signature), couleur, adresse, fiches produit, mode vacances */
         Route::get('vitrine',               [\App\Http\Controllers\Vendeur\StorefrontController::class, 'edit'])  ->name('storefront.edit');
         Route::put('vitrine',               [\App\Http\Controllers\Vendeur\StorefrontController::class, 'update'])->name('storefront.update');
-        Route::post('vitrine/reinitialiser', [\App\Http\Controllers\Vendeur\StorefrontController::class, 'reset']) ->name('storefront.reset');
+        Route::get('vitrine/sections',      [\App\Http\Controllers\Vendeur\StorefrontController::class, 'sections'])     ->name('storefront.sections');
+        Route::put('vitrine/sections',      [\App\Http\Controllers\Vendeur\StorefrontController::class, 'saveSections']) ->name('storefront.sections.update');
         Route::get('vitrine/qr-code',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'qr'])    ->name('storefront.qr');
-        Route::post('vitrine/apercu',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'draft'])       ->name('storefront.draft');
-        Route::post('vitrine/image',        [\App\Http\Controllers\Vendeur\StorefrontController::class, 'uploadImage']) ->name('storefront.image');
         Route::get('vitrine/adresse',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'slugCheck'])   ->name('storefront.slug');
 
-        /* Faire grandir ma vitrine : couverture et logo, partage, personnalisation, conversion, qualité */
+        /* Boutique (menu vendeur) : couverture et logo, partage, conversion, qualité */
         Route::prefix('vitrine/grandir')->name('grow')->controller(\App\Http\Controllers\Vendeur\GrowController::class)->group(function () {
             Route::get('/', 'index');
             Route::post('couverture/photo', 'uploadCover')->name('.cover-upload');
@@ -817,8 +820,6 @@ Route::middleware(['auth', 'role:admin'])
             Route::post('campagne/{campaign}/arreter', 'stopCampaign')->name('.campaign.stop');
             Route::get('qr-code', 'qr')->name('.qr');
             Route::get('affiche', 'poster')->name('.poster');
-            Route::put('personnalisation', 'savePersonalize')->name('.personalize');
-            Route::delete('brouillon', 'discardDraft')->name('.draft.discard');
             Route::put('conversion', 'saveConversion')->name('.conversion');
             Route::post('modele', 'useModel')->name('.model');
             Route::post('apercu', 'createPreview')->name('.preview');
@@ -997,6 +998,10 @@ Route::middleware(['auth', 'role:vendeur,admin'])->group(function () {
     Route::get('products/ajout-rapide',  [ProductController::class, 'quickAdd'])     ->name('products.quick-add');
     Route::post('products/ajout-rapide', [ProductController::class, 'quickAddStore'])->name('products.quick-add.store');
 
+    /* Créer un produit avec Shopio IA : photos → prix et détails → création (brouillon) → page de vente */
+    Route::get('products/creer-avec-ia', [\App\Http\Controllers\Vendeur\ProductWizardController::class, 'create'])->name('products.wizard');
+    Route::post('products/creer-avec-ia', [\App\Http\Controllers\Vendeur\ProductWizardController::class, 'store'])->middleware('throttle:10,1')->name('products.wizard.store');
+
     Route::resource('products', ProductController::class)->except(['show']);
 
     /* Éditeur de page produit par sections et blocs (App\PageBuilder) */
@@ -1017,6 +1022,11 @@ Route::middleware(['auth', 'role:vendeur,admin'])->group(function () {
         Route::post('modeles/{template}/appliquer', 'applyTemplate')->middleware('throttle:20,1,pb-template')->name('templates.apply');
         Route::delete('modeles/{template}', 'destroyTemplate')->middleware('throttle:20,1,pb-template')->name('templates.destroy');
     });
+
+    /* Page de vente d'un produit (page produit longue du modèle Express : packs, sections, questions) */
+    Route::get('products/{product}/page-de-vente', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'edit'])->name('products.page.edit');
+    Route::put('products/{product}/page-de-vente', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'update'])->name('products.page.update');
+    Route::post('products/{product}/page-de-vente/ia', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'generate'])->middleware('throttle:6,1')->name('products.page.ai');
 
     /* Actions supplémentaires produits */
     Route::post('products/{product}/toggle',    [ProductController::class, 'toggleActive'])->name('products.toggle');

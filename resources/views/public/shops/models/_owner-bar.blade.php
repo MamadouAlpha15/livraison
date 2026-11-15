@@ -1,9 +1,9 @@
 {{--
-    Barre « Modèles de boutique Shopio » : visible du seul vendeur, sur sa propre vitrine.
-    Passer d'un modèle à l'autre (essai, rien n'est publié), adopter le modèle affiché, rejoindre l'éditeur.
-    Variables : $current (modèle affiché), $publishedModel (modèle en ligne)
+    Barre « Thèmes Shopio » : visible du seul vendeur, sur sa propre vitrine.
+    Passer d'un thème à l'autre (essai, rien n'est publié), adopter le thème affiché, rejoindre « Ma vitrine ».
+    Variables : $current (thème affiché), $publishedModel (thème en ligne)
 --}}
-<div class="pmb" role="region" aria-label="Modèles de boutique Shopio">
+<div class="pmb" role="region" aria-label="Thèmes Shopio">
     <style>
     .pmb { position: relative; z-index: 800; display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; padding: 10px max(16px, env(safe-area-inset-left, 0px)); background: #EAF2FF; color: #0B1E3D; font: 600 13.5px 'Plus Jakarta Sans', system-ui, sans-serif; box-shadow: 0 1px 0 #D6E6FF; }
     .pmb-t { display: flex; flex-direction: column; line-height: 1.25; margin-right: 4px; }
@@ -19,16 +19,17 @@
     .pmb .pmb-ok { padding: 6px 12px; border-radius: 999px; background: #E7F6EC; color: #15803D; font-weight: 800; }
     .pmb :focus-visible { outline: 3px solid #1F7CF6; outline-offset: 2px; }
     </style>
-    <span class="pmb-t"><b>Modèles de boutique Shopio</b><small>Visible par vous seul · essayez sans rien publier</small></span>
-    <nav class="pmb-list" aria-label="Modèles">
+    <span class="pmb-t"><b>Thèmes Shopio</b><small>Visible par vous seul · essayez sans rien publier</small></span>
+    <nav class="pmb-list" aria-label="Thèmes">
         @foreach(\App\Support\PageModels::MODELS as $k => [$label])
         <a href="{{ request()->url() }}?modele={{ $k }}" @if($k === $current) aria-current="page" @endif>{{ $label }}@if($k === $publishedModel)<i>en ligne</i>@endif</a>
         @endforeach
     </nav>
-    @if(session('model_used'))<span class="pmb-ok" role="status">Modèle « {{ session('model_used') }} » en ligne</span>@endif
+    @if(session('model_used'))<span class="pmb-ok" role="status">Thème « {{ session('model_used') }} » en ligne</span>@endif
     @if($current !== $publishedModel)
-    <form method="POST" action="{{ route('boutique.grow.model') }}">@csrf<input type="hidden" name="model" value="{{ $current }}"><button type="submit" class="pmb-use">Utiliser ce modèle</button></form>
+    <form method="POST" action="{{ route('boutique.grow.model') }}">@csrf<input type="hidden" name="model" value="{{ $current }}"><button type="submit" class="pmb-use">Utiliser ce thème</button></form>
     @endif
-    <a href="{{ route('boutique.storefront.edit') }}">Éditeur</a>
-    <a href="{{ route('boutique.grow', ['onglet' => 'personnalisation']) }}">Faire grandir</a>
+    <a href="{{ route('boutique.storefront.sections', ['theme' => $current]) }}">Sections</a>
+    <a href="{{ route('boutique.storefront.edit') }}">Ma vitrine</a>
+    <a href="{{ route('boutique.grow') }}">Boutique</a>
 </div>

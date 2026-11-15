@@ -1,20 +1,19 @@
 {{--
     resources/views/vendeur/shop/grow.blade.php
     Route     : GET /boutique/vitrine/grandir?onglet=… → Vendeur\GrowController@index → name('boutique.grow')
-    Rôle      : « Faire grandir ma vitrine » — 5 onglets :
+    Rôle      : « Boutique » (menu vendeur) — 4 onglets :
                 1. Couverture et logo (publiés tout de suite)   2. Partage (liens, QR, affiche, liens suivis, campagne)
-                3. Personnalisation (modèle, diapos, collections ; publier / brouillon / programmer)
-                4. Conversion (preuves de confiance, mode WhatsApp, sections automatiques)   5. Qualité (statistiques, score, lien d'aperçu)
+                3. Conversion (preuves de confiance, mode WhatsApp)   4. Qualité (statistiques, score, lien d'aperçu)
+                Le thème de la vitrine (Express ou Signature) se choisit dans « Ma vitrine ».
                 Toutes les valeurs affichées viennent de la boutique : aucun chiffre n'est inventé.
 --}}
 @extends('layouts.app')
-@section('title', 'Faire grandir ma vitrine · ' . $shop->name)
+@section('title', 'Boutique · ' . $shop->name)
 @php
     $bodyClass = 'is-dashboard';
     use App\Support\Storefront as SF;
-    $tabs = ['couverture' => 'Couverture et logo', 'partage' => 'Partage', 'personnalisation' => 'Personnalisation', 'conversion' => 'Conversion', 'qualite' => 'Qualité'];
+    $tabs = ['couverture' => 'Couverture et logo', 'partage' => 'Partage', 'conversion' => 'Conversion', 'qualite' => 'Qualité'];
     $set = $published['settings'];
-    $has = fn ($t) => collect($published['blocks'])->contains(fn ($b) => $b['type'] === $t && $b['on']);
     $ink = SF::inkFor($accent);
     $host = preg_replace('#^https?://#', '', $publicUrl);
     $q = $quality;
@@ -24,7 +23,7 @@
 @push('styles')
 <link href="{{ \App\Support\Assets::v('fonts/dashboard-fonts.css') }}" rel="stylesheet">
 <style>
-/* Faire grandir ma vitrine : en-tête bleu nuit à onglets, panneaux arrondis, aperçus en grand */
+/* Boutique : en-tête bleu nuit à onglets, panneaux arrondis, aperçus en grand */
 :root {
     --gw-blue: #1F7CF6; --gw-btn: #1668D8; --gw-btn-h: #1260C9; --gw-b50: #EAF2FF; --gw-b100: #D6E6FF;
     --gw-night: #0B1E3D; --gw-night2: #132B52; --gw-amber: #F59E0B; --gw-amb50: #FEF3E0; --gw-ambi: #92400E;
@@ -214,52 +213,6 @@ textarea.gw-input { padding: 10px 12px; min-height: 96px; resize: vertical; line
 .gw-code { font: 800 14px var(--gw-font); letter-spacing: .06em; padding: 4px 10px; border-radius: 10px; background: var(--gw-surf); box-shadow: inset 0 0 0 1.5px var(--gw-line); }
 .gw-lock { display: flex; gap: 12px; align-items: flex-start; padding: 14px; border-radius: 18px; background: var(--gw-amb50); color: var(--gw-ambi); }
 
-/* ── Onglet 3 : personnalisation ── */
-.gw-tpls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-.gw-tpl { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 10px; border: 0; border-radius: 20px; background: var(--gw-bg); text-align: left; cursor: pointer; font-family: var(--gw-font); color: var(--gw-ink); box-shadow: inset 0 0 0 1.5px var(--gw-line); transition: transform 260ms var(--gw-out), box-shadow 180ms; }
-.gw-tpl:hover { transform: perspective(700px) rotateX(4deg) translateY(-3px); }
-.gw-tpl[aria-pressed="true"] { box-shadow: inset 0 0 0 2.5px var(--gw-blue); }
-.gw-tpl-mini { height: 96px; border-radius: 12px; overflow: hidden; display: grid; grid-template-rows: 30px 1fr; background: #fff; }
-.gw-tpl-mini > i { display: block; }
-.gw-tpl-mini > div { display: grid; gap: 4px; padding: 6px; }
-.gw-tpl-mini > div i { display: block; border-radius: 4px; background: #E3E8F2; }
-.gw-tpl b { font-size: 14px; }
-.gw-pms { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
-.gw-pm { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: 18px; background: var(--gw-bg); box-shadow: inset 0 0 0 1.5px var(--gw-line); }
-.gw-pm[aria-current="true"] { box-shadow: inset 0 0 0 2.5px var(--gw-blue); background: var(--gw-b50); }
-.gw-pm-sw { height: 64px; border-radius: 12px; position: relative; overflow: hidden; }
-.gw-pm button { border: 0; background: none; padding: 0; text-align: left; cursor: pointer; color: var(--gw-ink); font-family: var(--gw-font); display: flex; flex-direction: column; gap: 6px; }
-.gw-pm b { font-size: 14px; } .gw-pm small { font-size: 11.5px; color: var(--gw-ink3); line-height: 1.35; }
-.gw-pm a { font-size: 12.5px; font-weight: 800; color: var(--gw-btn); }
-.gw-pm .gw-pill { position: absolute; top: 14px; right: 14px; }
-@media (max-width: 1180px) { .gw-pms { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (max-width: 760px) { .gw-pms { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.gw-tpl small { font-size: 12px; color: var(--gw-ink3); line-height: 1.35; }
-.gw-tpl .gw-pill { position: absolute; top: 16px; right: 16px; }
-.gw-slides { display: flex; flex-direction: column; gap: 8px; }
-.gw-slide { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 16px; background: var(--gw-bg); }
-.gw-slide-th { width: 86px; height: 46px; border-radius: 10px; overflow: hidden; flex-shrink: 0; background: #0B1E3D center / cover; }
-.gw-slide-th img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.gw-slide b { flex: 1; min-width: 0; font-size: 13.5px; }
-.gw-adder { display: flex; flex-direction: column; gap: 10px; padding: 12px; border-radius: 18px; background: var(--gw-b50); }
-.gw-cols { display: flex; flex-direction: column; gap: 10px; }
-.gw-col { display: flex; flex-direction: column; gap: 10px; padding: 12px; border-radius: 18px; background: var(--gw-bg); }
-.gw-col-hd { display: flex; align-items: center; gap: 12px; }
-.gw-stack3 { position: relative; width: 64px; height: 52px; flex-shrink: 0; }
-.gw-stack3 i { position: absolute; top: 0; width: 44px; height: 52px; border-radius: 10px; border: 2px solid var(--gw-surf); background: var(--gw-b100) center / cover; box-shadow: 0 4px 10px rgba(11,30,61,.18); }
-.gw-stack3 i:nth-child(1) { left: 0; transform: rotate(-8deg); } .gw-stack3 i:nth-child(2) { left: 10px; transform: rotate(-2deg); } .gw-stack3 i:nth-child(3) { left: 20px; transform: rotate(5deg); }
-.gw-col-body { display: grid; gap: 8px; }
-.gw-checklist { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; max-height: 240px; overflow-y: auto; padding: 2px; }
-.gw-check { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 12px; background: var(--gw-surf); font-size: 12.5px; cursor: pointer; box-shadow: inset 0 0 0 1px var(--gw-line); }
-.gw-check input { accent-color: var(--gw-btn); width: 18px; height: 18px; flex-shrink: 0; }
-.gw-check img { width: 28px; height: 28px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
-.gw-check span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.gw-modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.gw-mode { display: flex; flex-direction: column; gap: 2px; padding: 12px; border-radius: 16px; background: var(--gw-bg); cursor: pointer; box-shadow: inset 0 0 0 1.5px var(--gw-line); }
-.gw-mode:has(input:checked) { box-shadow: inset 0 0 0 2px var(--gw-blue); background: var(--gw-b50); }
-.gw-mode input { position: absolute; opacity: 0; pointer-events: none; }
-.gw-mode b { font-size: 14px; }
-.gw-mode span { font-size: 12px; color: var(--gw-ink3); }
 .gw-mode:focus-within { outline: 3px solid var(--gw-blue); outline-offset: 2px; }
 
 /* ── Onglet 4 : conversion ── */
@@ -341,13 +294,12 @@ textarea.gw-input { padding: 10px 12px; min-height: 96px; resize: vertical; line
 @media (max-width: 1180px) {
     .gw-split, .gw-conv { grid-template-columns: minmax(0, 1fr); }
     .gw-sticky { position: static; }
-    .gw-tpls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .gw-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 760px) {
     .gw-top { grid-template-columns: minmax(0, 1fr); }
     .gw-links { justify-content: flex-start; }
-    .gw-grid2, .gw-two, .gw-modes { grid-template-columns: minmax(0, 1fr); }
+    .gw-grid2, .gw-two { grid-template-columns: minmax(0, 1fr); }
     .gw-picks { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .gw-prods { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 14px; }
     .gw-stage { padding: 10px; }
@@ -368,13 +320,14 @@ textarea.gw-input { padding: 10px 12px; min-height: 96px; resize: vertical; line
         <div class="gw-brand">
             <img src="{{ \App\Support\Assets::v('images/shopio-logo-192.png') }}" alt="" width="40" height="40">
             <div style="min-width:0">
-                <h1>Faire grandir ma vitrine</h1>
-                <p>{{ $shop->name }} · partage, personnalisation, conversion et qualité</p>
+                <h1>Boutique</h1>
+                <p>{{ $shop->name }} · couverture, partage, conversion et qualité</p>
             </div>
         </div>
         <nav class="gw-links" aria-label="Autres pages">
             <a class="gw-btn gw-btn-night gw-btn-sm" href="{{ $publicUrl }}" target="_blank" rel="noopener">Vitrine</a>
-            <a class="gw-btn gw-btn-night gw-btn-sm" href="{{ route('boutique.storefront.edit') }}">Éditeur</a>
+            <a class="gw-btn gw-btn-amber gw-btn-sm" href="{{ route('boutique.storefront.sections') }}">Modifier les sections</a>
+            <a class="gw-btn gw-btn-night gw-btn-sm" href="{{ route('boutique.storefront.edit') }}">Ma vitrine</a>
             <a class="gw-btn gw-btn-night gw-btn-sm" href="{{ route('boutique.dashboard') }}">Tableau de bord</a>
         </nav>
         <div class="gw-tabs" role="tablist" aria-label="Outils">
@@ -560,81 +513,7 @@ textarea.gw-input { padding: 10px 12px; min-height: 96px; resize: vertical; line
         </section>
     </section>
 
-    {{-- ═══════════════════════ 3. PERSONNALISATION ═══════════════════════ --}}
-    <section class="gw-tabpanel" id="tab-personnalisation" role="tabpanel" aria-labelledby="t-personnalisation" @if($tab !== 'personnalisation') hidden @endif>
-        <form method="POST" action="{{ route('boutique.grow.personalize') }}" id="gwPerForm" class="gw-stack" novalidate>
-            @csrf @method('PUT')
-            <input type="hidden" name="payload" id="gwPerPayload">
-            <section class="gw-card" aria-labelledby="gwPmH">
-                <div class="gw-card-hd"><h2 id="gwPmH">Modèle de page</h2><span class="gw-hint">Même parcours d’achat, styles différents · à essayer sur votre vitrine sans rien publier</span></div>
-                <div class="gw-pms" id="gwPms"></div>
-            </section>
-            <section class="gw-card" aria-labelledby="gwTplH">
-                <div class="gw-card-hd"><h2 id="gwTplH">Modèles</h2><span class="gw-hint">Ordre des blocs, affichage des produits et couleur</span></div>
-                <div class="gw-tpls" id="gwTpls"></div>
-            </section>
-            <div class="gw-grid2">
-                <section class="gw-card" aria-labelledby="gwSlH">
-                    <div class="gw-card-hd"><h2 id="gwSlH">Bannière en carrousel</h2><span class="gw-hint">1 à 4 diapos · une toutes les 3,8 s</span></div>
-                    <div class="gw-page" style="border-radius:18px;overflow:hidden;--sf-accent:{{ $workingAccent }}" id="gwCarousel"></div>
-                    <div class="gw-slides" id="gwSlides"></div>
-                    <button type="button" class="gw-btn gw-btn-line" id="gwAddSlide">+ Ajouter une diapo</button>
-                    <div class="gw-adder" id="gwSlideAdder" hidden>
-                        <span class="gw-lbl" style="margin:0">Nouvelle diapo</span>
-                        <div class="gw-seg" role="group" aria-label="Type de diapo" data-seg="slidekind"><button type="button" data-v="product">Photo produit</button><button type="button" data-v="gradient">Dégradé</button><button type="button" data-v="photo">Ma photo</button></div>
-                        <div id="gwAddProduct"><label class="gw-sr" for="gwAddProductSel">Produit</label><select class="gw-select" id="gwAddProductSel">@foreach($products->whereNotNull('photo') as $p)<option value="{{ $p['id'] }}">{{ $p['name'] }}</option>@endforeach</select></div>
-                        <div id="gwAddGradient" hidden><label class="gw-sr" for="gwAddGradSel">Dégradé</label><select class="gw-select" id="gwAddGradSel"><option value="night">Dégradé nuit</option><option value="gold">Dégradé or</option><option value="blue">Dégradé bleu</option></select></div>
-                        <div id="gwAddPhoto" hidden><label class="gw-btn gw-btn-line" style="width:100%" for="gwSlideFile">Choisir une photo (5 Mo max)</label><input type="file" id="gwSlideFile" accept="image/jpeg,image/png,image/webp" class="gw-sr"><p class="gw-hint" id="gwSlideMsg" aria-live="polite"></p></div>
-                        <div class="gw-actions"><button type="button" class="gw-btn gw-btn-blue gw-btn-sm" id="gwSlideOk">Ajouter</button><button type="button" class="gw-btn gw-btn-line gw-btn-sm" id="gwSlideCancel">Annuler</button></div>
-                    </div>
-                </section>
-                <section class="gw-card" aria-labelledby="gwColH">
-                    <div class="gw-card-hd"><h2 id="gwColH">Collections</h2><span class="gw-hint">{{ SF::COLLECTIONS_MAX }} au maximum</span></div>
-                    <div class="gw-cols" id="gwCols"></div>
-                    <div class="gw-adder">
-                        <span class="gw-lbl" style="margin:0">Créer une collection</span>
-                        <div style="display:flex;gap:6px;flex-wrap:wrap" aria-label="Idées">
-                            <button type="button" class="gw-btn gw-btn-line gw-btn-sm" data-col-idea="manual" data-col-name="Idées cadeaux">Idées cadeaux</button>
-                            <button type="button" class="gw-btn gw-btn-line gw-btn-sm" data-col-idea="under" data-col-name="Petits prix">Petits prix</button>
-                            <button type="button" class="gw-btn gw-btn-line gw-btn-sm" data-col-idea="new" data-col-name="Nouveautés de la semaine">Nouveautés</button>
-                        </div>
-                        <div class="gw-field"><label class="gw-sr" for="gwColName">Nom de la collection</label><input class="gw-input" id="gwColName" maxlength="40" placeholder="Nom de la collection" aria-describedby="gwColErr"></div>
-                        <div class="gw-field"><label class="gw-sr" for="gwColKind">Type</label><select class="gw-select" id="gwColKind">@foreach(SF::COLLECTION_KINDS as $k => $l)<option value="{{ $k }}">{{ $l }}</option>@endforeach</select></div>
-                        <div class="gw-field" id="gwColMaxF" hidden><label class="gw-lbl" for="gwColMax">Prix maximum ({{ $shop->currency ?? 'GNF' }})</label><input class="gw-input" id="gwColMax" type="number" min="1" inputmode="numeric"></div>
-                        <p class="gw-err" id="gwColErr" role="alert"></p>
-                        <button type="button" class="gw-btn gw-btn-blue gw-btn-sm" id="gwColAdd" style="align-self:flex-start">Créer la collection</button>
-                    </div>
-                </section>
-            </div>
-            <section class="gw-card" aria-labelledby="gwPubH">
-                <div class="gw-card-hd">
-                    <h2 id="gwPubH">Brouillon et programmation</h2>
-                    <span class="gw-pill {{ ['published' => 'gw-pill-ok', 'draft' => 'gw-pill-grey', 'scheduled' => 'gw-pill-amber'][$status[0]] }}">{{ $status[1] }}</span>
-                </div>
-                <p class="gw-hint">{{ $status[2] }}</p>
-                <div class="gw-modes" role="radiogroup" aria-label="Quand publier">
-                    <label class="gw-mode"><input type="radio" name="mode" value="now" @checked(old('mode', 'now') === 'now')><b>Publier maintenant</b><span>Vos clients voient les changements tout de suite</span></label>
-                    <label class="gw-mode"><input type="radio" name="mode" value="draft" @checked(old('mode') === 'draft')><b>Garder en brouillon</b><span>Rien ne change pour vos clients</span></label>
-                    <label class="gw-mode"><input type="radio" name="mode" value="schedule" @checked(old('mode') === 'schedule')><b>Programmer</b><span>Publication automatique à l’heure choisie</span></label>
-                </div>
-                <div class="gw-field" id="gwWhenF" @if(old('mode') !== 'schedule') hidden @endif>
-                    <label class="gw-lbl" for="gwWhen">Date et heure (heure de Conakry)</label>
-                    <input class="gw-input" type="datetime-local" id="gwWhen" name="publish_at" value="{{ old('publish_at', $shop->storefront_publish_at?->timezone('Africa/Conakry')->format('Y-m-d\TH:i')) }}" min="{{ now('Africa/Conakry')->addMinutes(5)->format('Y-m-d\TH:i') }}" aria-describedby="gwWhenErr" style="max-width:320px" @error('publish_at') aria-invalid="true" @enderror>
-                    <p class="gw-err" id="gwWhenErr" role="alert">@error('publish_at'){{ $message }}@enderror</p>
-                </div>
-                <div class="gw-actions">
-                    <button type="submit" class="gw-btn gw-btn-amber" id="gwPerSubmit">Publier maintenant</button>
-                    @if($status[0] !== 'published')
-                    <button type="submit" form="gwDiscard" class="gw-btn gw-btn-danger">Supprimer le brouillon</button>
-                    @endif
-                    <a class="gw-btn gw-btn-line" href="{{ route('boutique.grow', ['onglet' => 'qualite']) }}#apercu">Faire relire avec un lien d’aperçu</a>
-                </div>
-            </section>
-        </form>
-        <form method="POST" action="{{ route('boutique.grow.draft.discard') }}" id="gwDiscard" onsubmit="return confirm('Supprimer le brouillon ? La version publiée reste en ligne.')">@csrf @method('DELETE')</form>
-    </section>
-
-    {{-- ═══════════════════════ 4. CONVERSION ═══════════════════════ --}}
+    {{-- ═══════════════════════ 3. CONVERSION ═══════════════════════ --}}
     <section class="gw-tabpanel" id="tab-conversion" role="tabpanel" aria-labelledby="t-conversion" @if($tab !== 'conversion') hidden @endif>
         @php
             $demo = $products->first(fn ($p) => $p['photo']) ?? $products->first();
@@ -643,7 +522,7 @@ textarea.gw-input { padding: 10px 12px; min-height: 96px; resize: vertical; line
         @endphp
         <form method="POST" action="{{ route('boutique.grow.conversion') }}" class="gw-conv" id="gwConvForm">
             @csrf @method('PUT')
-            @foreach(['wa_mode' => $set['wa_mode'], 'proof_delivered' => $set['proof_delivered'], 'proof_response' => $set['proof_response'], 'trending' => $has('trending'), 'lowstock' => $has('lowstock')] as $k => $v)
+            @foreach(['wa_mode' => $set['wa_mode'], 'proof_delivered' => $set['proof_delivered'], 'proof_response' => $set['proof_response']] as $k => $v)
             <input type="hidden" name="{{ $k }}" value="{{ $v ? 1 : 0 }}" id="c_{{ $k }}">
             @endforeach
             <div class="gw-tilt" aria-label="Aperçu d’une fiche produit sur téléphone">
@@ -677,17 +556,12 @@ textarea.gw-input { padding: 10px 12px; min-height: 96px; resize: vertical; line
                     @if(!$shop->phone)<p class="gw-warn">Ajoutez d’abord le numéro WhatsApp de la boutique dans <a href="{{ route('shop.edit', $shop) }}?etape=2">Ma boutique</a>.</p>@endif
                     <div class="gw-wa"><div class="gw-wa-bubble"><div class="gw-wa-msg">Bonjour {{ $shop->name }}, je viens de commander sur Shopio : {{ $demo['name'] ?? '[Produit]' }} ({{ $demo['priceLabel'] ?? '[prix]' }}). Commande n° [n]. {{ $demo['url'] ?? $publicUrl }}</div><span class="gw-wa-time">Message envoyé par le client</span></div></div>
                 </section>
-                <section class="gw-card" aria-labelledby="gwDynH">
-                    <h2 id="gwDynH">Sections dynamiques</h2>
-                    <div class="gw-row"><div class="gw-row-txt"><b>Les plus vus cette semaine <span class="gw-pill gw-pill-auto">AUTO</span></b><span>{{ $trendingCount ? $trendingCount . ' produit' . ($trendingCount > 1 ? 's' : '') . ' vu' . ($trendingCount > 1 ? 's' : '') . ' cette semaine' : 'Aucune vue cette semaine : la section reste cachée jusqu’aux premières visites' }}</span></div><button type="button" class="gw-sw" role="switch" data-conv="trending" aria-checked="{{ $has('trending') ? 'true' : 'false' }}" aria-label="Afficher les plus vus"><span></span></button></div>
-                    <div class="gw-row"><div class="gw-row-txt"><b>Bientôt en rupture <span class="gw-pill gw-pill-auto">AUTO</span></b><span>{{ $lowStockCount ? $lowStockCount . ' produit' . ($lowStockCount > 1 ? 's' : '') . ' à 2 unités ou moins (stock réel)' : 'Aucun produit à 2 unités ou moins : la section reste cachée' }}</span></div><button type="button" class="gw-sw" role="switch" data-conv="lowstock" aria-checked="{{ $has('lowstock') ? 'true' : 'false' }}" aria-label="Afficher bientôt en rupture"><span></span></button></div>
-                </section>
                 <button type="submit" class="gw-btn gw-btn-amber" style="align-self:flex-start">Enregistrer et publier</button>
             </div>
         </form>
     </section>
 
-    {{-- ═══════════════════════ 5. QUALITÉ ═══════════════════════ --}}
+    {{-- ═══════════════════════ 4. QUALITÉ ═══════════════════════ --}}
     <section class="gw-tabpanel" id="tab-qualite" role="tabpanel" aria-labelledby="t-qualite" @if($tab !== 'qualite') hidden @endif>
         <div class="gw-stack">
             <div class="gw-tiles">
@@ -696,16 +570,6 @@ textarea.gw-input { padding: 10px 12px; min-height: 96px; resize: vertical; line
                 <div class="gw-tile"><b>{{ number_format($visits['month'], 0, ',', ' ') }}</b><span>Sur 30 jours</span></div>
                 <div class="gw-tile is-night"><b>{{ number_format($visits['total'], 0, ',', ' ') }}</b><span>Au total</span></div>
             </div>
-            <div class="gw-grid2">
-                <section class="gw-card" aria-labelledby="gwClH">
-                    <div class="gw-card-hd"><h2 id="gwClH">Clics par section</h2><span class="gw-pill gw-pill-grey">30 jours</span></div>
-                    @if(count($sectionClicks))
-                    @php $maxC = max(array_column($sectionClicks, 'clicks')); @endphp
-                    <div class="gw-bars">@foreach($sectionClicks as $c)<div class="gw-barrow"><span>{{ $c['label'] }}</span><div class="gw-track" role="img" aria-label="{{ $c['clicks'] }} clics"><i style="width:{{ max(3, round($c['clicks'] / $maxC * 100)) }}%"></i></div><b>{{ number_format($c['clicks'], 0, ',', ' ') }}</b></div>@endforeach</div>
-                    @else
-                    <div class="gw-empty">Pas encore de clics enregistrés. Ils sont comptés à chaque clic d’un client dans une section de la vitrine.</div>
-                    @endif
-                </section>
                 <section class="gw-card" aria-labelledby="gwRkH">
                     <div class="gw-card-hd"><h2 id="gwRkH">Classement des catégories</h2><span class="gw-pill gw-pill-grey">30 jours</span></div>
                     @if(count($categoryRanking))
@@ -714,7 +578,6 @@ textarea.gw-input { padding: 10px 12px; min-height: 96px; resize: vertical; line
                     <div class="gw-empty">Pas encore de vues de fiches produit sur 30 jours.</div>
                     @endif
                 </section>
-            </div>
             @if(count($seenNeverOrdered))
             <section class="gw-amberbox" aria-labelledby="gwSeenH">
                 <h3 id="gwSeenH">Vus mais jamais commandés</h3>
@@ -741,7 +604,7 @@ textarea.gw-input { padding: 10px 12px; min-height: 96px; resize: vertical; line
                 </section>
                 <section class="gw-card" id="apercu" aria-labelledby="gwApH">
                     <h2 id="gwApH">Aperçu partageable</h2>
-                    <p class="gw-hint">Faites relire votre vitrine avant de la publier : le lien montre la version en préparation (brouillon s’il y en a un), pendant 48 h, à qui le reçoit.</p>
+                    <p class="gw-hint">Faites relire votre vitrine : le lien la montre pendant 48 h à qui le reçoit, avec un formulaire pour vous laisser un avis.</p>
                     @if($previewUrl)
                     <div class="gw-link"><input id="gwApLink" value="{{ $previewUrl }}" readonly aria-label="Lien d’aperçu"><button type="button" class="gw-btn gw-btn-blue gw-btn-sm" data-copy="#gwApLink">Copier</button></div>
                     <p class="gw-hint">Valable jusqu’au {{ $shop->preview_expires_at->timezone('Africa/Conakry')->translatedFormat('j F à H:i') }}.</p>

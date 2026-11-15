@@ -4,7 +4,7 @@
     Données : $ctx (App\PageBuilder\RenderContext)
 --}}
 @php
-    $shopPage = \App\Support\ProductPage::shop($ctx->shop);
+    $shopPage = \App\Support\ProductPageSettings::shop($ctx->shop);
     $accent = $shopPage['accent'];
 @endphp
 <!doctype html>
@@ -36,7 +36,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root { color-scheme: light; --accent: {{ $accent }}; --on-accent: {{ \App\Support\ProductPage::onAccent($accent) }};
+:root { color-scheme: light; --accent: {{ $accent }}; --on-accent: {{ \App\Support\ProductPageSettings::onAccent($accent) }};
         --ink: #16162A; --ink2: #45455E; --muted: #62627C; --line: #E3E8F2; --soft: #F6F9FF;
         --font: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; }
 *, *::before, *::after { box-sizing: border-box; }

@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Page produit personnalisable (App\Support\ProductPage) :
+ * Page produit personnalisable (App\Support\ProductPageSettings) :
  * shops.product_page = réglages communs (bandeau, couleur, badges, étapes, FAQ, livraison par commune) ;
  * products.page      = réglages du produit (offres groupées, points forts, urgence, FAQ du produit).
  */

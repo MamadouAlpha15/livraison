@@ -10,15 +10,14 @@ use App\Models\Review;
 use App\Models\Shop;
 use App\Models\ShopMessage;
 use App\Models\ShopVisit;
-use App\Models\StorefrontClick;
 use App\Models\User;
 use App\Services\ImageOptimizer;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * « Faire grandir ma vitrine » : couverture et logo, collections, sections automatiques,
- * brouillon et publication programmée, statistiques et score de qualité.
+ * « Faire grandir ma vitrine » : couverture et logo, preuves de confiance, publication,
+ * statistiques et score de qualité.
  * Toutes les données viennent de la boutique : aucun chiffre n'est inventé.
  */
 class Growth
@@ -62,16 +61,6 @@ class Growth
     public static function accent(Shop $shop): string
     {
         return Storefront::isHex($shop->accent_color) ? strtoupper($shop->accent_color) : '#1F7CF6';
-    }
-
-    /** État de la vitrine : publiée, brouillon en attente, ou brouillon programmé. */
-    public static function status(Shop $shop): array
-    {
-        if ($shop->storefront_draft && $shop->storefront_publish_at) {
-            return ['scheduled', 'Programmée', 'Publication le ' . $shop->storefront_publish_at->timezone('Africa/Conakry')->translatedFormat('j F à H:i')];
-        }
-        if ($shop->storefront_draft) return ['draft', 'Brouillon', 'Vos changements ne sont pas encore visibles des clients.'];
-        return ['published', 'Publiée', 'Les clients voient la version actuelle.'];
     }
 
     /** Publie le brouillon programmé dont l'heure est passée (appelé à l'affichage et chaque minute). */
@@ -141,57 +130,6 @@ class Growth
         return $shop->image ? (ImageOptimizer::url($shop->image, 'medium') ?? asset('storage/' . $shop->image)) : null;
     }
 
-    // ─────────────────────────────────────────────────────────── Collections et sections automatiques
-
-    public static function collection(array $config, string $id): ?array
-    {
-        foreach ($config['collections'] as $c) if ($c['id'] === $id) return $c;
-        return null;
-    }
-
-    /** Produits d'une collection (en ligne, de la boutique). $limit = null : tous. */
-    public static function collectionProducts(Shop $shop, array $c, ?int $limit = 8): Collection
-    {
-        $q = $shop->products()->where('is_active', true);
-        if ($c['kind'] === 'manual') {
-            if (!$c['ids']) return collect();
-            $found = $q->whereIn('id', $c['ids'])->get()->keyBy('id');
-            $list = collect($c['ids'])->map(fn ($id) => $found->get($id))->filter()->values();
-            return $limit ? $list->take($limit) : $list;
-        }
-        if ($c['kind'] === 'under') {
-            // Prix actuel (promo flash comprise) sous le maximum : filtré après lecture, le prix courant est calculé
-            $list = $q->orderByDesc('price')->get()->filter(fn ($p) => $p->current_price <= $c['max'])->sortByDesc('current_price')->values();
-            return $limit ? $list->take($limit) : $list;
-        }
-        $q->where('created_at', '>=', now()->subDays(7))->latest();
-        return $limit ? $q->take($limit)->get() : $q->get();
-    }
-
-    public static function collectionUrl(Shop $shop, array $c): string
-    {
-        return $shop->slug
-            ? route('public.shops.slug.collection', [$shop->slug, $c['id']])
-            : route('public.shops.collection', [$shop, $c['id']]);
-    }
-
-    /** « Les plus vus cette semaine » : vues réelles des fiches produit sur 7 jours. */
-    public static function trending(Shop $shop, int $limit = 4): Collection
-    {
-        $views = ProductView::where('shop_id', $shop->id)->where('day', '>=', now()->subDays(6)->toDateString())
-            ->selectRaw('product_id, SUM(views) as v')->groupBy('product_id')->orderByDesc('v')->take(20)->pluck('v', 'product_id');
-        if ($views->isEmpty()) return collect();
-        $products = $shop->products()->where('is_active', true)->whereIn('id', $views->keys())->get()->keyBy('id');
-        return $views->keys()->map(fn ($id) => $products->get($id))->filter()->take($limit)->values();
-    }
-
-    /** « Bientôt en rupture » : stock réel de 1 ou 2 unités. */
-    public static function lowStock(Shop $shop, int $limit = 8): Collection
-    {
-        return $shop->products()->where('is_active', true)->whereNotNull('stock')->whereBetween('stock', [1, 2])
-            ->orderBy('stock')->latest()->take($limit)->get();
-    }
-
     // ─────────────────────────────────────────────────────────── Preuves de confiance
 
     /**
@@ -247,15 +185,6 @@ class Growth
         return ['today' => (int) ($r->today ?? 0), 'week' => (int) ($r->week ?? 0), 'month' => (int) ($r->month ?? 0), 'total' => (int) ($r->total ?? 0)];
     }
 
-    /** Clics par section de la vitrine, 30 derniers jours : [libellé, clics], du plus cliqué au moins cliqué. */
-    public static function sectionClicks(Shop $shop): array
-    {
-        return StorefrontClick::where('shop_id', $shop->id)->where('day', '>=', today()->subDays(29)->toDateString())
-            ->selectRaw('block, SUM(clicks) as n')->groupBy('block')->orderByDesc('n')->get()
-            ->map(fn ($r) => ['label' => $r->block === '__banner' ? 'En-tête' : (Storefront::BLOCKS[$r->block][0] ?? $r->block), 'clicks' => (int) $r->n])
-            ->all();
-    }
-
     /** Catégories classées par vues des fiches (30 jours), avec les commandes. */
     public static function categoryRanking(Shop $shop): array
     {
@@ -304,16 +233,13 @@ class Growth
         $noDesc = (clone $active)->where(fn ($q) => $q->whereNull('description')->orWhereRaw('CHAR_LENGTH(TRIM(description)) < 30'))->count();
         $cats = count(Storefront::categoryLinks($shop));
         $reviews = Review::where('vendeur_id', $shop->user_id)->count();
-        $hours = collect($config['blocks'])->contains(fn ($b) => $b['type'] === 'hours' && $b['on']);
         $grow = fn ($tab) => route('boutique.grow', ['onglet' => $tab]);
 
         $tips = [
-            ['cover', 'Une couverture pour la boutique', 'La première chose que voit le client.', $config['cover']['on'] && collect($config['cover']['slides'])->contains(fn ($s) => $s['src'] !== 'default'), $grow('couverture'), 'Choisir'],
             ['logo', 'Un logo', 'Il apparaît sur la vitrine, dans la recherche et sur WhatsApp.', (bool) $shop->image, $grow('couverture'), 'Ajouter'],
             ['catlinks', 'Des liens de catégories', 'Au moins 2 catégories : chacune a son lien à partager.', $cats >= 2, route('products.index'), 'Ranger mes produits'],
             ['photos', $noPhoto ? $noPhoto . ' produit' . ($noPhoto > 1 ? 's' : '') . ' sans photo' : 'Tous les produits ont une photo', 'Un produit sans photo est rarement commandé.', $total > 0 && $noPhoto === 0, route('products.index'), 'Ajouter les photos'],
             ['desc', $noDesc ? $noDesc . ' produit' . ($noDesc > 1 ? 's' : '') . ' sans vraie description' : 'Chaque produit a une description', 'Référence, taille, état, garantie : ce que le client demanderait au téléphone.', $total > 0 && $noDesc === 0, route('products.index'), 'Compléter'],
-            ['hours', 'Votre adresse et vos horaires', 'Affiche « Ouvert maintenant » ou « Fermé » en haut de la vitrine.', $hours, route('boutique.storefront.edit'), 'Ajouter le bloc'],
             ['reviews', $reviews >= self::RATING_MIN ? 'Au moins ' . self::RATING_MIN . ' avis clients' : ($reviews ? $reviews . ' avis client' . ($reviews > 1 ? 's' : '') . ' sur ' . self::RATING_MIN : 'Aucun avis client pour l’instant'), 'La note s’affiche à partir de ' . self::RATING_MIN . ' avis de clients livrés.', $reviews >= self::RATING_MIN, route('boutique.orders.index'), 'Voir mes commandes'],
         ];
         $rows = array_map(fn ($t) => array_combine(['key', 'title', 'hint', 'done', 'url', 'cta'], $t), $tips);

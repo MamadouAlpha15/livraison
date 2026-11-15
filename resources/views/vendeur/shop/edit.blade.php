@@ -766,7 +766,7 @@ select.field-input { appearance: auto; }
             </div>
             <div class="se-top-actions">
                 <a href="{{ \App\Support\Storefront::publicUrl($shop) }}" class="se-btn se-btn-line" target="_blank" rel="noopener">Voir ma boutique</a>
-                <a href="{{ route('boutique.storefront.edit') }}" class="se-btn se-btn-amber">Éditeur avancé</a>
+                <a href="{{ route('boutique.storefront.edit') }}" class="se-btn se-btn-amber">Ma vitrine</a>
                 <a href="{{ route('boutique.grow', ['onglet' => 'partage']) }}" class="se-btn se-btn-blue">Partage, stats et qualité</a>
                 <a href="{{ route('boutique.dashboard') }}" class="se-btn se-btn-line se-hide-m">Tableau de bord</a>
             </div>
@@ -1037,15 +1037,15 @@ select.field-input { appearance: auto; }
                                     @error('meta_pixel_id')<div class="field-error" style="display:block">{{ $message }}</div>@enderror
                                 </div>
 
-                                {{-- Réglages avancés de la page publique (sections, affichage, bannière) --}}
+                                {{-- Thème de la page publique (Express ou Signature), couverture et logo --}}
                                 <div class="se-asset" style="flex-wrap:wrap">
                                     <div style="flex:1 1 200px;min-width:0">
                                         <strong>Vitrine de la boutique</strong>
-                                        <div class="field-hint" style="margin:2px 0 0">Ordre des sections, affichage des produits, bannière, avec un aperçu en direct. Enregistrez d'abord cette page si vous l'avez modifiée.</div>
+                                        <div class="field-hint" style="margin:2px 0 0">Thème Express ou Signature, couleur, adresse courte et mode vacances. Enregistrez d'abord cette page si vous l'avez modifiée.</div>
                                     </div>
                                     <div style="display:flex;gap:8px;flex-wrap:wrap">
                                         <a href="{{ route('boutique.grow', ['onglet' => 'couverture']) }}" class="se-btn se-btn-blue">Changer la couverture et le logo</a>
-                                        <a href="{{ route('boutique.storefront.edit') }}" class="se-btn se-btn-line">Personnaliser la vitrine en détail</a>
+                                        <a href="{{ route('boutique.storefront.edit') }}" class="se-btn se-btn-line">Choisir le thème de ma vitrine</a>
                                     </div>
                                 </div>
                             </div>

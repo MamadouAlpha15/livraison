@@ -1,7 +1,7 @@
 {{--
     Espace vendeur → Ma boutique → « Pages produit » : réglages communs à toutes les pages produit
     (bandeau, couleur du bouton, badges, étapes, questions fréquentes, frais de livraison par commune).
-    Données : Vendeur\ProductPageController@editShop
+    Données : Vendeur\ProductPageSettingsController@editShop
 --}}
 @extends('layouts.app')
 
@@ -11,7 +11,7 @@
     $bodyClass = 'is-dashboard';
     use App\Support\IconLibrary as Ico;
     use App\Support\PageModels;
-    use App\Support\ProductPage;
+    use App\Support\ProductPageSettings;
     $steps = old('steps', $page['steps']);
     $faq = old('faq', $page['faq']);
     $fees = old('delivery_fees', $page['delivery_fees']);
@@ -74,7 +74,7 @@
                     <h2 id="psTpl" class="fu-h2">Modèle de page</h2>
                     <p class="fu-help" style="margin:0">Chaque modèle change l'ordre et la mise en avant des sections. Tu peux en choisir un autre pour un produit précis, depuis la page de ce produit.</p>
                     <div class="ps-tpls">
-                        @foreach(ProductPage::TEMPLATES as $key => $t)
+                        @foreach(ProductPageSettings::TEMPLATES as $key => $t)
                         <label class="ps-tpl">
                             <input type="radio" name="template" value="{{ $key }}" @checked($tpl === $key)>
                             <strong>{{ $t['name'] }} @if($tpl === $key)<span class="ps-check">✓ Choisi</span>@endif</strong>
@@ -96,7 +96,7 @@
                     <div class="fu-field">
                         <span class="fu-label">Couleur du bouton « Commander »</span>
                         <div class="ps-swatches">
-                            @foreach(ProductPage::ACCENTS as $hex => $name)
+                            @foreach(ProductPageSettings::ACCENTS as $hex => $name)
                             <label class="ps-sw"><input type="radio" name="accent" value="{{ $hex }}" @checked(strtoupper($accent) === $hex)><i style="background:{{ $hex }}"></i>{{ $name }}</label>
                             @endforeach
                         </div>
@@ -104,7 +104,7 @@
                     <div class="fu-field">
                         <span class="fu-label">Badges de confiance</span>
                         <div class="fu-checks">
-                            @foreach(ProductPage::BADGES as $key => $b)
+                            @foreach(ProductPageSettings::BADGES as $key => $b)
                             <label class="fu-pill"><input type="checkbox" name="badges[]" value="{{ $key }}" @checked(in_array($key, $badges, true))><span>{{ $b['label'] }}</span></label>
                             @endforeach
                         </div>
@@ -141,7 +141,7 @@
 
                 <section class="cp-card fu-sec" aria-labelledby="psFaq">
                     <h2 id="psFaq" class="fu-h2">Questions fréquentes de la boutique</h2>
-                    @for($i = 0; $i < ProductPage::MAX_FAQ; $i++)
+                    @for($i = 0; $i < ProductPageSettings::MAX_FAQ; $i++)
                     <div class="ps-qa">
                         <label class="sr-only" for="sq{{ $i }}">Question {{ $i + 1 }}</label>
                         <input id="sq{{ $i }}" name="faq[{{ $i }}][q]" class="fu-input" maxlength="160" placeholder="Question" value="{{ $faq[$i]['q'] ?? '' }}">

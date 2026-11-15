@@ -1,7 +1,7 @@
 {{--
     Page produit (lien partagé par le vendeur, accessible sans compte) : galerie, prix, offres groupées,
     formulaire « Commande maintenant » payé à la livraison, badges, points forts, étapes, avis réels, FAQ.
-    Tout le contenu est personnalisable par le vendeur (App\Support\ProductPage).
+    Tout le contenu est personnalisable par le vendeur (App\Support\ProductPageSettings).
     Données : Client\ProductController@show
 --}}
 @extends('layouts.app')
@@ -24,13 +24,13 @@
     $unavailable = !$product->is_active || $product->is_available === false || ($product->stock !== null && $product->stock <= 0 && $variants->isEmpty());
     $lowStock = $productPage['urgency'] && $product->stock !== null && $product->stock > 0 && $product->stock <= (int) $productPage['urgency_under'];
     $accent = $shopPage['accent'];
-    $onAccent = \App\Support\ProductPage::onAccent($accent);
-    $accentNight = \App\Support\ProductPage::accentOnNight($accent);
+    $onAccent = \App\Support\ProductPageSettings::onAccent($accent);
+    $accentNight = \App\Support\ProductPageSettings::accentOnNight($accent);
     $fees = $shopPage['delivery_fees'];
     $user = auth()->user();
     $intro = $productPage['intro'] ?: $product->description;
     $points = array_values(array_filter($productPage['points']));
-    $badges = array_intersect_key(\App\Support\ProductPage::BADGES, array_flip($shopPage['badges']));
+    $badges = array_intersect_key(\App\Support\ProductPageSettings::BADGES, array_flip($shopPage['badges']));
     if (!$shop->is_approved) unset($badges['verified']);
     $initials = mb_strtoupper(mb_substr($shop->name, 0, 1) . mb_substr(\Illuminate\Support\Str::after($shop->name, ' ') ?: $shop->name, 0, 1));
 @endphp
@@ -269,8 +269,8 @@ body { background: #FFFFFF !important; }
                 </div>
                 @endif
 
-                {{-- Sections dans l'ordre du modèle choisi (App\Support\ProductPage::TEMPLATES) --}}
-                @foreach(\App\Support\ProductPage::TEMPLATES[$template]['sections'] as $section)
+                {{-- Sections dans l'ordre du modèle choisi (App\Support\ProductPageSettings::TEMPLATES) --}}
+                @foreach(\App\Support\ProductPageSettings::TEMPLATES[$template]['sections'] as $section)
                     @include('client.product-page._' . $section)
                 @endforeach
 

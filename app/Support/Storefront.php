@@ -6,7 +6,11 @@ use App\Models\Shop;
 use Carbon\Carbon;
 
 /**
- * Vitrine publique d'une boutique (« Éditeur de ma boutique »).
+ * Réglages de la vitrine publique d'une boutique (« Ma vitrine »).
+ *
+ * La vitrine s'affiche toujours avec un thème (PageModels : Express ou Signature). Les blocs, le style
+ * et les collections de l'ancienne vitrine à blocs restent lus et normalisés pour les données déjà
+ * enregistrées, mais ne sont plus affichés ni modifiables.
  *
  * Stockée en JSON dans shops.storefront. Toute entrée (publication, aperçu, base) passe par
  * normalize() : seules les clés, types et valeurs connus sont gardés, les textes sont nettoyés
@@ -172,7 +176,9 @@ class Storefront
             'logo'         => self::logoDefaults(),
             'collections'  => [],
             'template'     => '',
-            'page_model'   => 'standard',
+            'page_model'   => 'express',
+            'home'         => HomeSections::normalizeAll(null),
+            'form'         => ProductDesign::formDefaults(),
         ];
     }
 
@@ -269,8 +275,13 @@ class Storefront
             'logo'         => self::normalizeLogo($input['logo'] ?? null),
             'collections'  => self::normalizeCollections($input['collections'] ?? null),
             'template'     => $pick($input['template'] ?? null, array_keys(self::TEMPLATES), ''),
-            // Modèle de page côté client (voir App\Support\PageModels) : « standard » = la vitrine à blocs
-            'page_model'   => $pick($input['page_model'] ?? null, array_keys(PageModels::MODELS), 'standard'),
+            // Thème de la vitrine (voir App\Support\PageModels) : Express par défaut, ou Signature.
+            // Un ancien modèle supprimé (Standard, Prestige, Pop…) revient à Express.
+            'page_model'   => $pick($input['page_model'] ?? null, array_keys(PageModels::MODELS), PageModels::DEFAULT),
+            // Sections de la page d'accueil, une liste par thème (Boutique → Sections)
+            'home'         => HomeSections::normalizeAll($input['home'] ?? null),
+            // Formulaire de commande de la page produit, pour toute la boutique (éditeur produit → Formulaire)
+            'form'         => ProductDesign::normalizeForm($input['form'] ?? null),
         ];
     }
 

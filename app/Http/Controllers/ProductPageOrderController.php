@@ -10,7 +10,7 @@ use App\Rules\RealisticFullName;
 use App\Rules\RealisticGuineaPhone;
 use App\Services\PushService;
 use App\Support\PageModels;
-use App\Support\ProductPage;
+use App\Support\ProductPageSettings;
 use App\Support\Storefront;
 use App\Support\TrafficSource;
 use Illuminate\Http\JsonResponse;
@@ -51,11 +51,11 @@ class ProductPageOrderController extends Controller
             'commune.in'       => 'Choisis ta commune dans la liste.',
         ]);
 
-        $offer = ProductPage::findOffer($product, $data['offer']);
+        $offer = ProductPageSettings::findOffer($product, $data['offer']);
         if (!$offer) {
             return response()->json(['message' => 'Cette offre n\'existe plus : recharge la page.'], 422);
         }
-        $fee = ProductPage::deliveryFee($shop, $data['commune']);
+        $fee = ProductPageSettings::deliveryFee($shop, $data['commune']);
 
         // Commande en double (même numéro, même produit, il y a moins de 30 min) : le client confirme d'abord
         $duplicate = \App\Support\DuplicateOrders::recent($shop->id, $data['phone'], $product->id);

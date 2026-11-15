@@ -177,6 +177,7 @@ body{background:var(--bg);margin:0;color:var(--text);-webkit-font-smoothing:anti
             @if(auth()->user()?->role === 'admin')<a href="{{ route('boutique.campaigns.index') }}" class="sb-item"><span class="ico">{!! \App\Support\IconLibrary::svg('star', '', 16) !!}</span> Campagnes</a>@endif
             <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">👥</span> Clients</a>
             @if(auth()->user()->role === 'admin')<a href="{{ route('boutique.marketing') }}" class="sb-item"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h3l6 4V6l-6 4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></span> Marketing</a>@endif
+            @if(auth()->user()->role === 'admin')<a href="{{ route('boutique.grow') }}" class="sb-item {{ request()->routeIs('boutique.grow') ? 'active' : '' }}"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1 13H7zM9 7a3 3 0 0 1 6 0"/></svg></span> Boutique</a>@endif
             <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">🧑‍💼</span> Équipe</a>
             <div class="sb-section">Livraison</div>
             <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">🚴</span> Livreurs</a>

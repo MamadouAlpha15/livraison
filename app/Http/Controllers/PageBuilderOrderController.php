@@ -14,7 +14,7 @@ use App\Services\PushService;
 use App\Support\DuplicateOrders;
 use App\Support\OrderPhoneVerification;
 use App\Support\PageModels;
-use App\Support\ProductPage;
+use App\Support\ProductPageSettings;
 use App\Support\Storefront;
 use App\Support\TrafficSource;
 use Illuminate\Http\JsonResponse;
@@ -80,7 +80,7 @@ class PageBuilderOrderController extends Controller
             'fields.*.in'         => 'Choisis une réponse dans la liste pour :attribute.',
         ], $labels);
 
-        $fee = ProductPage::deliveryFee($shop, $data['commune']);
+        $fee = ProductPageSettings::deliveryFee($shop, $data['commune']);
         $answers = collect($checkout->customFields())
             ->map(fn ($f, $id) => ['label' => $f['label'], 'value' => trim((string) ($data['fields'][$id] ?? ''))])
             ->filter(fn ($a) => $a['value'] !== '')->values()->all();

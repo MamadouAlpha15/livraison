@@ -3,7 +3,7 @@
     use App\Support\IconLibrary as Ico;
     $user = $ctx->user();
     $fees = $ctx->deliveryFees();
-    $wa = $settings['show_whatsapp'] ? \App\Support\ProductPage::whatsappLink($ctx->shop, $ctx->product) : null;
+    $wa = $settings['show_whatsapp'] ? \App\Support\ProductPageSettings::whatsappLink($ctx->shop, $ctx->product) : null;
     $uid = $block['id'];
     $alerted = $user && $user->role === 'client' && $ctx->unavailable()
         ? \App\Models\StockAlert::where('user_id', $user->id)->where('product_id', $ctx->product->id)->exists() : false;

@@ -76,7 +76,7 @@ public function clients()
     return $this->belongsToMany(\App\Models\User::class, 'shop_user')->withTimestamps();  // Une boutique (Shop) peut avoir plusieurs clients (User) abonnés via une table pivot shop_user.
 }
 protected $casts = [
-    'product_page'     => 'array',  // réglages communs des pages produit (App\Support\ProductPage)
+    'product_page'     => 'array',  // réglages communs des pages produit (App\Support\ProductPageSettings)
     'commission_rate'  => 'float',
     'is_approved'      => 'boolean',
     'plan_expires_at'  => 'datetime',  // Cast auto en Carbon pour isFuture() / isPast()
