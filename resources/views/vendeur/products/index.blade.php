@@ -870,8 +870,11 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
                 <a href="{{ route('products.quick-add') }}" class="filter-btn" style="font-size:13px;padding:10px 18px;background:#EAF2FF;border-color:#D6E6FF;color:#1260C9;display:inline-flex;align-items:center;gap:7px">
                     ⚡ Ajout rapide
                 </a>
-                <a href="{{ route('products.create') }}" class="filter-btn filter-btn-primary" style="font-size:13px;padding:10px 20px">
-                    {!! $I['plus_pg'] !!} Ajouter un produit
+                <a href="{{ route('products.create') }}" class="filter-btn" style="font-size:13px;padding:10px 18px">
+                    {!! $I['plus_pg'] !!} Créer manuellement
+                </a>
+                <a href="{{ route('products.wizard') }}" class="filter-btn" style="font-size:13px;padding:10px 20px;background:linear-gradient(135deg,#1668D8,#7C3AED);border-color:transparent;color:#fff;display:inline-flex;align-items:center;gap:7px">
+                    ✨ Créer avec Shopio IA
                 </a>
             @endif
         </div>
@@ -1224,20 +1227,24 @@ body { background: var(--bg); margin: 0; color: var(--text); -webkit-font-smooth
             </div>
         </div>
         @empty
+        @if(request()->hasAny(['search','category','status']))
         <div class="empty-state">
             <span class="empty-ico">{!! $I['empty_icon'] !!}</span>
             <div class="empty-title">Aucun produit trouvé</div>
-            <p class="empty-sub">
-                @if(request()->hasAny(['search','category','status']))
-                    Aucun produit ne correspond à vos filtres.
-                @else
-                    Ajoutez votre premier produit pour commencer à vendre.
-                @endif
-            </p>
-            <a href="{{ route('products.create') }}" class="filter-btn filter-btn-primary" style="display:inline-flex;align-items:center;gap:5px">
-                {!! $I['plus_pg'] !!} Ajouter un produit
-            </a>
+            <p class="empty-sub">Aucun produit ne correspond à vos filtres.</p>
         </div>
+        @else
+        {{-- Boutique sans produit : créer le premier produit à partir d'une photo --}}
+        <div class="empty-state">
+            <span class="empty-ico" style="font-size:40px">📸</span>
+            <div class="empty-title" style="font-size:22px">Votre premier produit, en une photo</div>
+            <p class="empty-sub" style="max-width:46ch;margin-inline:auto">Ajoutez une photo et votre prix : Shopio IA écrit le nom, la description et toute la page de vente. Vous relisez, puis vous publiez.</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+                <a href="{{ route('products.wizard') }}" class="filter-btn" style="display:inline-flex;align-items:center;gap:6px;padding:12px 22px;font-size:14px;background:linear-gradient(135deg,#1668D8,#7C3AED);border-color:transparent;color:#fff">✨ Créer avec Shopio IA</a>
+                <a href="{{ route('products.create') }}" class="filter-btn" style="display:inline-flex;align-items:center;gap:5px;padding:12px 20px;font-size:14px">{!! $I['plus_pg'] !!} Créer manuellement</a>
+            </div>
+        </div>
+        @endif
         @endforelse
 
     </div>

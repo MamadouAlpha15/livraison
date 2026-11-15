@@ -105,14 +105,17 @@ class PublicShopController extends Controller
     {
         abort_unless($shop->is_approved, 404);
         if (Growth::applyScheduled($shop)) $shop->refresh();
-        $product = $shop->products()->where('is_active', true)->findOrFail(ProductPage::idFrom($produit));
+        $isOwner = Auth::check() && ((int) Auth::id() === (int) $shop->user_id || (int) Auth::user()->shop_id === (int) $shop->id);
+        // Un brouillon n'est visible que de sa boutique (aperçu de l'écran « Page de vente »)
+        $product = $shop->products()->when(!$isOwner, fn ($q) => $q->where('is_active', true))->findOrFail(ProductPage::idFrom($produit));
         // Adresse canonique (nom du produit changé, lien ancien) : une seule adresse par produit
         if ($produit !== ProductPage::param($product)) return redirect()->to(ProductPage::url($shop, $product), 301);
 
         $sf = Storefront::forShop($shop);
-        $isOwner = Auth::check() && ((int) Auth::id() === (int) $shop->user_id || (int) Auth::user()->shop_id === (int) $shop->id);
-        TrafficSource::recordLanding($shop, $request, false);
-        TrafficSource::recordProductView($product, $request);
+        if ($product->is_active) {
+            TrafficSource::recordLanding($shop, $request, false);
+            TrafficSource::recordProductView($product, $request);
+        }
 
         $reviewStats = Review::where('vendeur_id', $shop->user_id)->selectRaw('COUNT(*) as cnt, AVG(rating) as avg_rating, SUM(CASE WHEN rating >= 4 THEN 1 ELSE 0 END) as happy')->first();
         $reviewCount = (int) ($reviewStats->cnt ?? 0);
@@ -121,12 +124,17 @@ class PublicShopController extends Controller
         $proofs = Growth::proofs($shop, $sf['settings'], $deliveredCount, $reviewCount);
         $pm = PageModels::data($shop, $sf, $deliveredCount, $reviewAvg, $reviewCount, $proofs);
         $photos = ProductPage::photos($product);
+        $productData = collect($pm['products'])->firstWhere('id', $product->id);
+        if (!$productData) { // brouillon : absent de la liste des produits en ligne
+            $productData = PageModels::product($product, $shop, $sf['settings']);
+            $pm['products'] = collect($pm['products'])->push($productData)->values();
+        }
 
         return view('public.shops.express.product', [
             'shop' => $shop, 'pm' => $pm, 'model' => 'express', 'isOwner' => false, 'publishedModel' => $sf['page_model'],
             'activeCategory' => null, 'previewLink' => null, 'shareImage' => $photos[0] ?? null,
             'pageTitle' => $product->name . ' · ' . $shop->name,
-            'product' => collect($pm['products'])->firstWhere('id', $product->id),
+            'product' => $productData, 'draft' => !$product->is_active,
             'photos' => $photos, 'content' => ProductPage::content($product), 'ownerEdit' => $isOwner,
             // Chiffres réels (jamais saisis) : part d'avis à 4 ou 5 étoiles, seulement à partir de 5 avis
             'happy' => $reviewCount >= 5 ? (int) round(100 * (int) $reviewStats->happy / $reviewCount) : null,

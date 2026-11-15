@@ -192,7 +192,10 @@ body { padding-bottom: 86px; }
 <main>
     <div class="ex-wrap">
         <nav class="ex-crumb" aria-label="Fil d’Ariane"><a href="{{ $s['url'] }}">Accueil</a><span aria-hidden="true">›</span><a href="{{ $s['url'] }}?vue=produits">Produits</a>@if($p['cat'])<span aria-hidden="true">›</span><span>{{ $p['cat'] }}</span>@endif</nav>
-        @if($ownerEdit)
+        @if(!empty($draft))
+        <p class="ex-sub" role="note" style="margin-top:12px;padding:10px 14px;border-radius:10px;background:#FEF3C7;color:#78350F;font-size:13.5px"><b>Brouillon :</b> cette page n’est visible que par vous. Les clients la verront quand vous publierez le produit.</p>
+        @endif
+        @if($ownerEdit && !request()->boolean('apercu'))
         <p class="ex-sub" role="note" style="margin-top:12px;padding:10px 14px;border-radius:10px;background:#EAF2FF;color:#0B1E3D;font-size:13.5px"><b>Visible par vous seul :</b> @if(!$hasLong)les sections de vente (packs, « Pour qui ? », « Pourquoi vous allez l’adorer », comparatif…) apparaissent dès que la page de vente est remplie. @endif<a href="{{ route('products.page.edit', $product['id']) }}" style="color:#1668D8;font-weight:700">Modifier la page de vente</a></p>
         @endif
 

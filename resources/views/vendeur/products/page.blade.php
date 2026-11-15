@@ -70,6 +70,28 @@
 .pg-faq { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 10px; }
 .pg-bar { position: fixed; z-index: 40; left: 0; right: 0; bottom: 0; display: flex; justify-content: flex-end; gap: 10px; padding: 12px max(20px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)); background: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(10px); box-shadow: 0 -1px 0 var(--border); }
 @media (min-width: 901px) { .pg-bar { left: 264px; } }
+.pg-status { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 12px; border-radius: 999px; background: var(--sv-amb50, #FEF3C7); color: var(--sv-amb-ink, #78350F); font: 800 12.5px var(--font); }
+.pg-status::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.pg-status.is-on { background: var(--sv-ok50, #E7F6EC); color: var(--sv-ok, #15803D); }
+.pg-welcome { display: flex; flex-direction: column; gap: 6px; margin: 0 0 18px; padding: 16px 18px; border-radius: 18px; background: var(--sv-ok50, #E7F6EC); color: var(--text); font-size: 14px; line-height: 1.5; }
+.pg-welcome a { color: var(--sv-btn, #1668D8); font-weight: 800; }
+.pg-welcome-warn { color: var(--sv-amb-ink, #78350F); font-weight: 700; }
+.pg-layout { display: block; }
+.pg-preview { display: none; }
+@media (min-width: 1280px) {
+    .pg-layout { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 8px; align-items: start; max-width: 1400px; }
+    .pg-layout .pg-wrap { max-width: none; }
+    .pg-preview { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 88px; padding: 24px 28px 120px 0; font-family: var(--font); color: var(--text); }
+}
+.pg-preview-bar { display: flex; align-items: center; gap: 8px; }
+.pg-preview-bar b { margin-right: auto; font-size: 14px; }
+.pg-preview-bar button { min-height: 34px; padding: 0 12px; border: 0; border-radius: 999px; background: var(--surface); color: var(--text-2); box-shadow: inset 0 0 0 1px var(--border); font: 700 12.5px var(--font); cursor: pointer; }
+.pg-preview-bar button[aria-pressed="true"] { background: var(--sv-btn, #1668D8); color: #fff; box-shadow: none; }
+.pg-frame { position: relative; height: calc(100vh - 230px); min-height: 520px; border-radius: 28px; overflow: hidden; background: #fff; box-shadow: 0 0 0 8px #0F172A, 0 30px 60px -30px rgba(15,23,42,.6); }
+.pg-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+/* Ordinateur : la page en 1280 px de large, réduite pour tenir dans le cadre */
+.pg-frame.is-desktop { border-radius: 14px; box-shadow: 0 0 0 1px var(--border), 0 30px 60px -30px rgba(15,23,42,.45); }
+.pg-frame.is-desktop iframe { position: absolute; left: 0; top: 0; width: 1280px; transform-origin: 0 0; }
 @media (max-width: 900px) { .pg-top { padding: 12px 16px !important; } .pg-wrap { padding: 18px 16px 120px; } }
 @media (max-width: 600px) { .pg-pack, .pg-faq { grid-template-columns: minmax(0, 1fr); } .pg-top .pg-pill:not(.is-main) { display: none; } }
 </style>
@@ -86,11 +108,21 @@
                 <nav class="pg-crumb" aria-label="Fil d'Ariane"><a href="{{ route('products.index') }}">Produits</a><span aria-hidden="true">/</span><a href="{{ route('products.edit', $product) }}">{{ \Illuminate\Support\Str::limit($product->name, 34) }}</a><span aria-hidden="true">/</span><span>Page de vente</span></nav>
                 <h1 class="pg-title">Page de vente</h1>
             </div>
+            <span class="pg-status {{ $product->is_active ? 'is-on' : '' }}" id="pgStatus" role="status">{{ $product->is_active ? 'Publié' : 'Brouillon' }}</span>
+            <button type="button" class="pg-pill {{ $product->is_active ? '' : 'is-main' }}" id="pgPublish" data-active="{{ $product->is_active ? 1 : 0 }}">{{ $product->is_active ? 'Repasser en brouillon' : 'Publier le produit' }}</button>
             @if($publicUrl)<a class="pg-pill" href="{{ $publicUrl }}" target="_blank" rel="noopener">Voir la page ↗</a>@endif
         </div>
 
+        <div class="pg-layout">
         <form class="pg-wrap" method="POST" action="{{ route('products.page.update', $product) }}" id="pgForm" novalidate>
             @csrf @method('PUT')
+            @if(request()->boolean('nouveau'))
+            <div class="pg-welcome" role="status">
+                <b>🎉 « {{ $product->name }} » est créé, en brouillon.</b>
+                <span>Relisez le nom, les textes et les packs (l’aperçu se met à jour à chaque enregistrement), puis touchez « Publier le produit ». <a href="{{ route('products.edit', $product) }}">Modifier le nom, le prix, le stock ou les photos</a></span>
+                <span class="pg-welcome-warn" id="pgWarn" hidden></span>
+            </div>
+            @endif
             @if(session('success'))<p class="pg-flash is-ok" role="status">{{ session('success') }}</p>@endif
             @if($errors->any())<p class="pg-flash is-err" role="alert">Certains champs sont à corriger : ils sont signalés en rouge plus bas.</p>@endif
             <p class="pg-intro">Ces textes remplissent la page produit longue de « {{ $product->name }} » : accroche, packs, « Pour qui ? », comparatif, questions… <b>Tout est facultatif</b> : une section vide n’apparaît pas. Shopio IA peut aussi les remplir pour vous. Les avis et les chiffres de la page viennent toujours de vos vraies commandes.</p>
@@ -190,6 +222,19 @@
                 <button type="submit" class="pg-pill is-main">Enregistrer la page</button>
             </div>
         </form>
+        @if($publicUrl)
+        {{-- Aperçu en direct de la page produit (brouillon compris, visible du seul vendeur) --}}
+        <aside class="pg-preview" aria-label="Aperçu de la page produit">
+            <div class="pg-preview-bar">
+                <b>Aperçu en direct</b>
+                <div role="group" aria-label="Format de l’aperçu"><button type="button" data-size="mobile" aria-pressed="true">Mobile</button><button type="button" data-size="desktop" aria-pressed="false">Ordinateur</button></div>
+                <button type="button" id="pgReload" aria-label="Recharger l’aperçu">↻</button>
+            </div>
+            <div class="pg-frame" id="pgFrame"><iframe id="pgIframe" data-src="{{ $publicUrl }}?apercu=1" title="Aperçu de la page produit"></iframe></div>
+            <p class="pg-help">L’aperçu montre la dernière version enregistrée.</p>
+        </aside>
+        @endif
+        </div>
     </main>
 </div>
 @endsection
@@ -212,6 +257,44 @@
         }
         q.addEventListener('change', upd); p.addEventListener('input', upd); upd();
     });
+
+    /* Aperçu en direct : mobile ou ordinateur (page en 1280 px réduite), rechargement à la demande */
+    const frame = document.getElementById('pgFrame'), iframe = document.getElementById('pgIframe');
+    if (frame) {
+        // Chargé après la page : l'écran s'affiche sans attendre l'aperçu (seulement s'il est visible à l'écran)
+        const start = () => { if (!iframe.getAttribute('src') && window.matchMedia('(min-width: 1280px)').matches) iframe.src = iframe.dataset.src; };
+        if (document.readyState === 'complete') setTimeout(start, 50); else window.addEventListener('load', () => setTimeout(start, 50));
+        window.addEventListener('resize', start);
+        const fit = () => {
+            if (!frame.classList.contains('is-desktop')) { iframe.style.transform = ''; iframe.style.height = ''; return; }
+            const k = frame.clientWidth / 1280;
+            iframe.style.transform = 'scale(' + k + ')'; iframe.style.height = (frame.clientHeight / k) + 'px';
+        };
+        document.querySelectorAll('[data-size]').forEach(b => b.addEventListener('click', () => {
+            document.querySelectorAll('[data-size]').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+            frame.classList.toggle('is-desktop', b.dataset.size === 'desktop'); fit();
+        }));
+        window.addEventListener('resize', fit);
+        document.getElementById('pgReload').addEventListener('click', () => { iframe.src = iframe.dataset.src + '&t=' + Date.now(); });
+    }
+
+    /* Publier / repasser en brouillon (même action que la liste des produits) */
+    const pub = document.getElementById('pgPublish'), status = document.getElementById('pgStatus');
+    pub.addEventListener('click', async () => {
+        pub.disabled = true;
+        try {
+            const r = await fetch(@json(route('products.toggle', $product)), { method: 'POST', headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content } });
+            const j = await r.json();
+            if (!r.ok) throw new Error();
+            status.textContent = j.active ? 'Publié' : 'Brouillon'; status.classList.toggle('is-on', j.active);
+            pub.textContent = j.active ? 'Repasser en brouillon' : 'Publier le produit'; pub.classList.toggle('is-main', !j.active);
+            if (iframe && iframe.src) iframe.src = iframe.dataset.src + '&t=' + Date.now();
+        } catch (e) { alert('Le statut n’a pas pu être changé. Réessayez.'); }
+        pub.disabled = false;
+    });
+
+    /* Après « Créer avec Shopio IA » : avertissement éventuel (IA indisponible…) */
+    try { const w = sessionStorage.getItem('wzWarning'); if (w && document.getElementById('pgWarn')) { const el = document.getElementById('pgWarn'); el.textContent = w; el.hidden = false; } sessionStorage.removeItem('wzWarning'); } catch (e) {}
 
     /* « Remplir avec Shopio IA » : remplit le formulaire, rien n'est enregistré avant « Enregistrer la page » */
     const form = document.getElementById('pgForm'), btn = document.getElementById('pgAi'), msg = document.getElementById('pgAiMsg');

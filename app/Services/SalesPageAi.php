@@ -56,11 +56,13 @@ Longueurs attendues :
   Pour le paiement : « à la livraison, en espèces, au livreur ». Pour le délai : « la boutique vous appelle pour le confirmer ».
 TXT;
 
-    private static function schema(): array
+    private static function schema(bool $identify = false): array
     {
         $str = ['type' => 'string'];
         $obj = fn (array $props) => ['type' => 'object', 'properties' => $props, 'required' => array_keys($props), 'additionalProperties' => false];
-        return $obj([
+        // Création depuis des photos : l'IA propose aussi le nom et la description du produit
+        $identity = $identify ? ['name' => $str, 'description' => $str] : [];
+        return $obj($identity + [
             'hook' => $str,
             'benefits' => ['type' => 'array', 'items' => $str],
             'usage' => $str,
@@ -75,24 +77,32 @@ TXT;
     }
 
     /**
-     * Rédige le contenu. Retourne ['landing' => [...], 'packs' => [...suggestion]].
+     * Rédige le contenu. Retourne ['landing' => [...], 'packs' => [...suggestion]]
+     * et, avec $identify (création depuis des photos), 'name' et 'description'.
+     * $instructions : consignes de ton et de style du vendeur (jamais au-dessus des règles d'honnêteté).
      * @throws \RuntimeException avec un message prêt à montrer au vendeur
      */
-    public function generate(Product $product, Shop $shop): array
+    public function generate(Product $product, Shop $shop, bool $identify = false, string $instructions = ''): array
     {
         $key = (string) config('services.anthropic.key');
         if ($key === '') throw new \RuntimeException('Shopio IA n’est pas configuré sur ce serveur (clé manquante).');
 
         $unit = (int) round($product->current_price);
+        $instructions = Str::limit(trim(strip_tags($instructions)), 500, '');
         $facts = "Boutique : {$shop->name}\n"
-            . "Produit : {$product->name}\n"
+            . ($identify
+                ? ((string) $product->name !== '' ? "Nom proposé par le vendeur : {$product->name} (garde-le, corrige seulement l'orthographe)\n" : "Nom du produit : à trouver d'après les photos\n")
+                : "Produit : {$product->name}\n")
             . ($product->category ? "Catégorie : {$product->category}\n" : '')
             . 'Prix à l’unité : ' . number_format($unit, 0, ',', ' ') . ' ' . ($shop->currency ?? 'GNF') . " (ne l'écris pas)\n"
             . 'Description du vendeur : ' . (trim(strip_tags((string) $product->description)) ?: '(aucune)') . "\n\n"
-            . 'Rédige la page de vente de ce produit.';
+            . ($instructions !== '' ? "Consignes de style du vendeur (à suivre tant qu'elles respectent les règles) : {$instructions}\n" : '')
+            . ($identify
+                ? "\nIdentifie le produit sur les photos. name : nom vendeur et précis (moins de 70 caractères, sans prix ni emoji). "
+                  . "description : 3 à 5 phrases sur ce que l'on voit et à quoi sert le produit. Puis rédige la page de vente."
+                : "\nRédige la page de vente de ce produit.");
 
-        $content = [];
-        if ($img = $this->image($product)) $content[] = $img;
+        $content = $this->images($product, $identify ? 4 : 1);
         $content[] = ['type' => 'text', 'text' => $facts];
 
         try {
@@ -102,7 +112,7 @@ TXT;
                 maxTokens: 16000,
                 system: [['type' => 'text', 'text' => self::SYSTEM, 'cacheControl' => ['type' => 'ephemeral']]],
                 messages: [['role' => 'user', 'content' => $content]],
-                outputConfig: ['effort' => 'medium', 'format' => ['type' => 'json_schema', 'schema' => self::schema()]],
+                outputConfig: ['effort' => 'medium', 'format' => ['type' => 'json_schema', 'schema' => self::schema($identify)]],
                 // Si le modèle refuse pour une raison de sécurité, l'API réessaie seule sur le modèle de repli prévu
                 fallbacks: 'default',
                 betas: ['server-side-fallback-2026-07-01'],
@@ -130,23 +140,32 @@ TXT;
             throw new \RuntimeException('Shopio IA a renvoyé une réponse illisible. Réessayez.');
         }
 
-        return ['landing' => $this->clean($data), 'packs' => self::suggestPacks($unit)];
+        $out = ['landing' => $this->clean($data), 'packs' => self::suggestPacks($unit)];
+        if ($identify) {
+            $str = fn ($v, int $max) => Str::limit(trim(strip_tags(is_scalar($v) ? (string) $v : '')), $max, '');
+            $out['name'] = $str($data['name'] ?? '', 120);
+            $out['description'] = $str($data['description'] ?? '', 2000);
+        }
+        return $out;
     }
 
-    /** Photo principale en pièce jointe, si elle est stockée localement et raisonnable (≤ 4 Mo). */
-    private function image(Product $product): ?array
+    /** Photos en pièces jointes (principale puis galerie, $max au plus), stockées localement, ≤ 4 Mo chacune. */
+    private function images(Product $product, int $max): array
     {
-        $path = $product->image;
-        if (!$path) return null;
-        try {
-            $disk = Storage::disk('public');
-            if (!$disk->exists($path) || $disk->size($path) > 4 * 1024 * 1024) return null;
-            $mime = $disk->mimeType($path);
-            if (!in_array($mime, ['image/jpeg', 'image/png', 'image/webp', 'image/gif'], true)) return null;
-            return ['type' => 'image', 'source' => ['type' => 'base64', 'mediaType' => $mime, 'data' => base64_encode($disk->get($path))]];
-        } catch (\Throwable $e) {
-            return null;
+        $out = [];
+        $paths = array_slice(array_values(array_filter(array_merge([$product->image], $product->gallery_array), 'is_string')), 0, $max);
+        foreach ($paths as $path) {
+            try {
+                $disk = Storage::disk('public');
+                if (!$disk->exists($path) || $disk->size($path) > 4 * 1024 * 1024) continue;
+                $mime = $disk->mimeType($path);
+                if (!in_array($mime, ['image/jpeg', 'image/png', 'image/webp', 'image/gif'], true)) continue;
+                $out[] = ['type' => 'image', 'source' => ['type' => 'base64', 'mediaType' => $mime, 'data' => base64_encode($disk->get($path))]];
+            } catch (\Throwable $e) {
+                continue;
+            }
         }
+        return $out;
     }
 
     /** Limites du formulaire (mêmes que ProductPage / ProductPageController). */

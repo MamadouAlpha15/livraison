@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\Review;
 use App\Models\Shop;
 use App\Services\ImageOptimizer;
@@ -40,6 +41,31 @@ class PageModels
         return is_string($m) && $m !== 'standard' && isset(self::MODELS[$m]);
     }
 
+    /** Données d'un produit pour les modèles de page et la page produit (aussi un brouillon vu par son vendeur). */
+    public static function product(Product $p, Shop $shop, array $set): array
+    {
+        $isClient = Auth::check() && Auth::user()->role === 'client';
+        $old = $set['show_strike'] && $p->original_price && $p->original_price > $p->current_price ? (int) $p->original_price : null;
+        return [
+            'id'       => $p->id,
+            'name'     => $p->name,
+            'cat'      => (string) $p->category,
+            'price'    => (int) $p->current_price,
+            'old'      => $old,
+            'photo'    => $p->image ? (ImageOptimizer::url($p->image, 'medium') ?? asset('storage/' . $p->image)) : null,
+            'thumb'    => $p->image ? (ImageOptimizer::url($p->image, 'thumb') ?? asset('storage/' . $p->image)) : null,
+            'desc'     => Str::limit(trim(strip_tags((string) $p->description)), 600),
+            'stock'    => $p->has_variants ? null : $p->stock,
+            'variants' => (bool) $p->has_variants,
+            'featured' => (bool) $p->is_featured,
+            'new'      => $p->created_at && $p->created_at->gte(now()->subDays(7)),
+            'url'      => route('client.orders.createFromProduct', $p),
+            'page'     => ProductPage::url($shop, $p),   // page produit publique (modèle Express)
+            'packs'    => ProductPage::packs($p),        // packs à prix réduit, appliqués aussi à la commande
+            'nego'     => $isClient ? route('client.messages.index', $p) : route('register', ['redirect' => route('client.messages.index', $p), 'role' => 'client']),
+        ];
+    }
+
     /**
      * Données d'une page modèle : boutique, produits en ligne, catégories, avis réels, réglages utiles.
      * $sf : réglages de la vitrine (publiés ou aperçu).
@@ -49,30 +75,9 @@ class PageModels
         $set = $sf['settings'];
         $devise = $shop->currency ?? 'GNF';
         $isClient = Auth::check() && Auth::user()->role === 'client';
-        $guestChat = fn ($p) => route('register', ['redirect' => route('client.messages.index', $p), 'role' => 'client']);
 
         $products = $shop->products()->where('is_active', true)->orderByDesc('is_featured')->latest()->take(self::PRODUCTS_MAX)->get()
-            ->map(function ($p) use ($set, $isClient, $guestChat, $shop) {
-                $old = $set['show_strike'] && $p->original_price && $p->original_price > $p->current_price ? (int) $p->original_price : null;
-                return [
-                    'id'       => $p->id,
-                    'name'     => $p->name,
-                    'cat'      => (string) $p->category,
-                    'price'    => (int) $p->current_price,
-                    'old'      => $old,
-                    'photo'    => $p->image ? (ImageOptimizer::url($p->image, 'medium') ?? asset('storage/' . $p->image)) : null,
-                    'thumb'    => $p->image ? (ImageOptimizer::url($p->image, 'thumb') ?? asset('storage/' . $p->image)) : null,
-                    'desc'     => Str::limit(trim(strip_tags((string) $p->description)), 600),
-                    'stock'    => $p->has_variants ? null : $p->stock,
-                    'variants' => (bool) $p->has_variants,
-                    'featured' => (bool) $p->is_featured,
-                    'new'      => $p->created_at && $p->created_at->gte(now()->subDays(7)),
-                    'url'      => route('client.orders.createFromProduct', $p),
-                    'page'     => ProductPage::url($shop, $p),   // page produit publique (modèle Express)
-                    'packs'    => ProductPage::packs($p),        // packs à prix réduit, appliqués aussi à la commande
-                    'nego'     => $isClient ? route('client.messages.index', $p) : $guestChat($p),
-                ];
-            })->values();
+            ->map(fn ($p) => self::product($p, $shop, $set))->values();
 
         $reviews = Review::where('vendeur_id', $shop->user_id)->whereNotNull('comment')->where('comment', '!=', '')
             ->with('client:id,name')->latest()->take(6)->get()

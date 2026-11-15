@@ -828,6 +828,10 @@ Route::middleware(['auth', 'role:vendeur,admin'])->group(function () {
     Route::get('products/ajout-rapide',  [ProductController::class, 'quickAdd'])     ->name('products.quick-add');
     Route::post('products/ajout-rapide', [ProductController::class, 'quickAddStore'])->name('products.quick-add.store');
 
+    /* Créer un produit avec Shopio IA : photos → prix et détails → création (brouillon) → page de vente */
+    Route::get('products/creer-avec-ia', [\App\Http\Controllers\Vendeur\ProductWizardController::class, 'create'])->name('products.wizard');
+    Route::post('products/creer-avec-ia', [\App\Http\Controllers\Vendeur\ProductWizardController::class, 'store'])->middleware('throttle:10,1')->name('products.wizard.store');
+
     Route::resource('products', ProductController::class)->except(['show']);
 
     /* Page de vente d'un produit (page produit longue du modèle Express : packs, sections, questions) */
