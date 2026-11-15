@@ -6,11 +6,24 @@
       « Avant / Après » · « Pour qui ? » · résultats réels · « Pourquoi vous allez l'adorer » · comparatif ·
       questions · produits proches · barre « Commander » fixe.
     Les sections longues n'apparaissent que si leur contenu est rempli (products.landing, voir ProductPage).
+    Sous le haut de page (fixe), l'ordre, l'affichage et les sections ajoutées viennent de Boutique → Sections
+    → Page produit (App\Support\HomeSections, liste « product »), pour tous les produits de la boutique.
     Variables : $shop, $pm, $product (données PageModels), $photos, $content, $happy, $ownerEdit
 --}}
 @php
+    use App\Support\HomeSections as HS;
     $s = $pm['shop'];
     $c = $content;
+    // Réglages du produit (éditeur produit : Sections, Couleurs, Formulaire, Offres) ; repli sur ceux de la boutique
+    $dz = $design ?? \App\Support\ProductDesign::for(new \App\Models\Product(), ['home' => $pm['home'], 'form' => null]);
+    $ppSections = $dz['page'];
+    $fm = $dz['form'];
+    $col = $dz['colors'];
+    $mention = $dz['rating']['mention'] !== '' ? $dz['rating']['mention'] : ($pm['rating'] && $pm['rating']['avg'] >= 4.5 ? 'Excellent' : ($pm['rating'] && $pm['rating']['avg'] >= 4 ? 'Très bien' : 'Bien'));
+    // Accroche : **mot** en gras
+    $hookHtml = preg_replace('/\*\*(.+?)\*\*/u', '<b>$1</b>', e($c['hook']));
+    $sp = fn ($x) => ($x['sp'][0] ?? 0) || ($x['sp'][1] ?? 0) ? ' style="margin-top:' . (int) $x['sp'][0] . 'px;margin-bottom:' . (int) $x['sp'][1] . 'px"' : '';
+    $fonts = array_values(array_filter(array_unique([$col['font_title'], $col['font_body']])));
     $p = $product;
     $ph = fn ($i) => $photos[$i] ?? ($photos[0] ?? null);
     $pct = $p['old'] ? (int) round((1 - $p['price'] / $p['old']) * 100) : 0;
@@ -183,6 +196,50 @@ body { padding-bottom: 86px; }
     .ex-related { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .ex-results div { grid-template-columns: 90px minmax(0, 1fr); }
 }
+/* Bouton de commande animé (éditeur produit → Formulaire) */
+.ex-anim-shake { animation: exShake 3s ease-in-out infinite; }
+.ex-anim-bounce { animation: exBounce 2.4s ease-in-out infinite; }
+.ex-anim-slide { position: relative; overflow: hidden; }
+.ex-anim-slide::after { content: ''; position: absolute; top: 0; bottom: 0; left: -60%; width: 45%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.45), transparent); transform: skewX(-18deg); animation: exSlide 2.8s ease-in-out infinite; }
+@keyframes exShake { 0%, 84%, 100% { transform: translateX(0); } 86% { transform: translateX(calc(var(--amp) * -1)); } 89% { transform: translateX(var(--amp)); } 92% { transform: translateX(calc(var(--amp) * -1)); } 95% { transform: translateX(var(--amp)); } }
+@keyframes exBounce { 0%, 70%, 100% { transform: translateY(0); } 80% { transform: translateY(calc(var(--amp) * -1.6)); } 90% { transform: translateY(calc(var(--amp) * -.5)); } }
+@keyframes exSlide { 0%, 55% { left: -60%; } 100% { left: 130%; } }
+.ex-co { background: var(--fm-bg, #fff); box-shadow: 0 0 0 1.5px var(--fm-border, var(--ink)), 0 18px 40px -26px rgba(0,0,0,.5); }
+.ex-co h2 { color: var(--fm-title, inherit); border-bottom-color: var(--fm-border, var(--ink)); }
+.ex-co .ex-field label { color: var(--fm-label, inherit); }
+.ex-pack[aria-checked="true"] { box-shadow: inset 0 0 0 2px var(--pack-c, var(--acc)); }
+.ex-pack.no-img { grid-template-columns: minmax(0, 1fr) auto; }
+.ex-pack-unit { display: block; color: var(--ink-3); font-size: 11.5px; font-weight: 600; }
+.ex-pack span:last-child { white-space: nowrap; }
+.ex-pack strong { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 2px 0; }
+.ex-trust-pay { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.ex-trust-pay span { padding: 3px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 800; }
+.ex-info { padding-bottom: clamp(30px, 5vw, 56px); }
+.ex-info .ex-acc-list { margin-top: 0; }
+@media (prefers-reduced-motion: reduce) { .ex-anim-shake, .ex-anim-bounce, .ex-anim-slide::after { animation: none; } }
+</style>
+@if(count($fonts))<link href="https://fonts.googleapis.com/css2?{{ implode('&', array_map(fn ($f) => 'family=' . str_replace(' ', '+', $f) . ':wght@400;600;700;800', $fonts)) }}&display=swap" rel="stylesheet">@endif
+<style>
+:root {
+@if($col['accent'])
+    @php $ak = $col['accent']; @endphp
+    --acc: {{ $ak }}; --acc-ink: {{ \App\Support\ProductDesign::ink($ak) }}; --acc-soft: color-mix(in srgb, {{ $ak }} 12%, #fff); --acc-dark: color-mix(in srgb, {{ $ak }} 82%, #000);
+@endif
+@if($col['font_title'])    --m-title: '{{ $col['font_title'] }}', system-ui, sans-serif;@endif
+@if($col['font_body'])    --m-body: '{{ $col['font_body'] }}', system-ui, sans-serif;@endif
+@if($fm['bg'])    --fm-bg: {{ $fm['bg'] }};@endif
+@if($fm['border'])    --fm-border: {{ $fm['border'] }};@endif
+@if($fm['title_c'])    --fm-title: {{ $fm['title_c'] }};@endif
+@if($fm['label_c'])    --fm-label: {{ $fm['label_c'] }};@endif
+@if($dz['offer']['frame'])    --pack-c: {{ $dz['offer']['frame'] }};@endif
+    --amp: {{ ['soft' => '2px', 'medium' => '4px', 'strong' => '7px'][$fm['intensity']] }};
+}
+@if($col['font_body']) body { font-family: var(--m-body); } @endif
+@if($col['bg']) body, main { background: {{ $col['bg'] }}; } @endif
+@if($col['foot_bg'] || $col['foot_ink'])
+.ex-foot { @if($col['foot_bg'])background: {{ $col['foot_bg'] }};@endif @if($col['foot_ink'])color: {{ $col['foot_ink'] }};@endif }
+@if($col['foot_ink']) .ex-foot p, .ex-foot ul, .ex-foot h3, .ex-foot-bottom { color: {{ $col['foot_ink'] }}; } @endif
+@endif
 </style>
 </head>
 <body>
@@ -219,17 +276,30 @@ body { padding-bottom: 86px; }
             </div>
 
             <div>
+                @foreach($dz['buy'] as $bk)
+                @continue(!$bk['on'])
+                @switch($bk['type'])
+                @case('rating')
                 @if($pm['rating'])
-                <p class="ex-rate" style="margin:0"><span class="ex-stars" aria-hidden="true">★★★★★</span><b>{{ $pm['rating']['avg'] >= 4.5 ? 'Excellent' : ($pm['rating']['avg'] >= 4 ? 'Très bien' : 'Bien') }}</b><span>Note {{ number_format($pm['rating']['avg'], 1, ',', ' ') }}/5 · {{ $pm['rating']['count'] }} avis clients de la boutique</span></p>
+                <p class="ex-rate"{!! $sp($bk) ?: ' style="margin:0"' !!}><span class="ex-stars" aria-hidden="true">★★★★★</span><b>{{ $mention }}</b><span>Note {{ number_format($pm['rating']['avg'], 1, ',', ' ') }}/5 · {{ $pm['rating']['count'] }} avis clients de la boutique</span></p>
                 @endif
-                <h1 id="exPName">{{ $p['name'] }}</h1>
-                @if($c['hook'] !== '')<p class="ex-hook">{{ $c['hook'] }}</p>@endif
-                <p class="ex-pp-price" style="margin-bottom:0"><span>{{ number_format($p['price'], 0, ',', ' ') }} {{ $s['currency'] }}</span>@if($p['old'])<s>{{ number_format($p['old'], 0, ',', ' ') }} {{ $s['currency'] }}</s>@if($pct >= 5)<em>−{{ $pct }} %</em>@endif @endif</p>
+                @break
+                @case('title')
+                <h1 id="exPName"{!! $sp($bk) !!}>{{ $p['name'] }}</h1>
+                @break
+                @case('hook')
+                @if($c['hook'] !== '')<p class="ex-hook"{!! $sp($bk) !!}>{!! $hookHtml !!}</p>@endif
+                @break
+                @case('price')
+                <p class="ex-pp-price"{!! $sp($bk) ?: ' style="margin-bottom:0"' !!}><span>{{ number_format($p['price'], 0, ',', ' ') }} {{ $s['currency'] }}</span>@if($p['old'] && !$dz['offer']['hide_strike'])<s>{{ number_format($p['old'], 0, ',', ' ') }} {{ $s['currency'] }}</s>@if($pct >= 5)<em>−{{ $pct }} %</em>@endif @endif</p>
+                @break
+                @case('benefits')
                 @if(count($c['benefits']))
-                <ul class="ex-benefits">@foreach($c['benefits'] as $b)<li>{{ $b }}</li>@endforeach</ul>
+                <ul class="ex-benefits"{!! $sp($bk) !!}>@foreach($c['benefits'] as $b)<li>{{ $b }}</li>@endforeach</ul>
                 @endif
-
-                <div class="ex-steps">
+                @break
+                @case('delivery')
+                <div class="ex-steps"{!! $sp($bk) !!}>
                     @if($c['promise'] !== '')<p>{{ $c['promise'] }}</p>@endif
                     <ol>
                         <li><i><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1 13H7zM9 7a3 3 0 0 1 6 0"/></svg></i>Commandé<small>Aujourd’hui</small></li>
@@ -237,20 +307,52 @@ body { padding-bottom: 86px; }
                         <li><i><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></svg></i>Livré<small>Payé à la réception</small></li>
                     </ol>
                 </div>
-
-                <div id="exBuy"></div>
-
-                <p class="ex-trust"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5z"/></svg>Commandez en toute confiance — paiement à la réception</p>
-
-                <div class="ex-acc-list">
-                    @if($c['usage'] !== '')<details><summary>Comment l’utiliser ?</summary><p>{{ $c['usage'] }}</p></details>@endif
-                    @if($c['details'] !== '')<details><summary>Description détaillée</summary><p>{{ $c['details'] }}</p></details>@endif
-                    <details><summary>Livraison et garantie</summary><p>{{ $c['shipping'] !== '' ? $c['shipping'] : 'Après votre commande, la boutique vous appelle pour confirmer le délai et les frais de livraison. Vous payez en espèces au livreur, à la réception du colis, et vous suivez votre commande sur Shopio.' }}</p></details>
+                @break
+                @case('offer')
+                @if($dz['offer']['show'])<div id="exOffer"{!! $sp($bk) !!}></div>@endif
+                @break
+                @case('qty')
+                <div id="exQtyBox"{!! $sp($bk) !!}></div>
+                @break
+                @case('addcart')
+                <div id="exAddBox"{!! $sp($bk) !!}></div>
+                @break
+                @case('form')
+                <div id="exFormBox"{!! $sp($bk) !!}></div>
+                @break
+                @case('trust')
+                <div{!! $sp($bk) !!}>
+                    <p class="ex-trust"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5z"/></svg>{{ $dz['trust']['text'] !== '' ? $dz['trust']['text'] : 'Commandez en toute confiance — paiement à la réception' }}</p>
+                    @if($dz['trust']['cash'] || $dz['trust']['om'] || $dz['trust']['momo'])
+                    <div class="ex-trust-pay">@if($dz['trust']['cash'])<span style="background:#E7F6EC;color:#15803D">Espèces à la livraison</span>@endif @if($dz['trust']['om'])<span style="background:#FF7900;color:#fff">Orange Money</span>@endif @if($dz['trust']['momo'])<span style="background:#FFCC00;color:#111">MTN MoMo</span>@endif</div>
+                    @endif
                 </div>
+                @break
+                @endswitch
+                @endforeach
+                <div id="exBuy"></div>
             </div>
         </section>
     </div>
 
+    {{-- Sections sous le haut de page, dans l'ordre choisi par le vendeur (Boutique → Sections → Page produit) --}}
+    @foreach($ppSections as $sec)
+    @continue(!$sec['on'])
+    @if(($sec['sp'][0] ?? 0) || ($sec['sp'][1] ?? 0))<div style="padding-top:{{ (int) $sec['sp'][0] }}px;padding-bottom:{{ (int) $sec['sp'][1] }}px">@endif
+    @switch($sec['type'])
+    @case('p_info')
+    <section class="ex-info"@if($sec['sp'][0] ?? 0) style="padding-top:{{ (int) $sec['sp'][0] }}px"@endif>
+        <div class="ex-wrap ex-narrow">
+            <div class="ex-acc-list">
+                @if($c['usage'] !== '')<details><summary>Comment l’utiliser ?</summary><p>{{ $c['usage'] }}</p></details>@endif
+                @if($c['details'] !== '')<details><summary>Description détaillée</summary><p>{{ $c['details'] }}</p></details>@endif
+                <details><summary>Livraison et garantie</summary><p>{{ $c['shipping'] !== '' ? $c['shipping'] : 'Après votre commande, la boutique vous appelle pour confirmer le délai et les frais de livraison. Vous payez en espèces au livreur, à la réception du colis, et vous suivez votre commande sur Shopio.' }}</p></details>
+            </div>
+        </div>
+    </section>
+    @break
+
+    @case('p_highlight')
     @if($c['highlight']['title'] !== '')
     <section style="padding:0 0 clamp(48px,7vw,84px)">
         <div class="ex-wrap ex-narrow">
@@ -267,11 +369,13 @@ body { padding-bottom: 86px; }
         </div>
     </section>
     @endif
+    @break
 
+    @case('p_reviews')
     @if(count($pm['reviews']))
     <section class="ex-sec ex-tested" aria-labelledby="exTestedH" style="padding-top:0">
         <div class="ex-wrap">
-            <div data-rv style="text-align:center"><h2 class="ex-h2" id="exTestedH">Testé et approuvé par <span class="ex-serif">des clients de la boutique</span></h2><p class="ex-sub">Avis laissés par de vrais acheteurs après leur livraison.</p></div>
+            <div data-rv style="text-align:center"><h2 class="ex-h2" id="exTestedH">@if($sec['d']['title'] !== ''){{ $sec['d']['title'] }}@else Testé et approuvé par <span class="ex-serif">des clients de la boutique</span>@endif</h2><p class="ex-sub">Avis laissés par de vrais acheteurs après leur livraison.</p></div>
             <div class="ex-reviews">
                 @foreach($pm['reviews']->take(3) as $i => $rv)
                 <article class="ex-review" data-rv style="--d:{{ min($i, 5) * 70 }}ms">
@@ -284,12 +388,14 @@ body { padding-bottom: 86px; }
         </div>
     </section>
     @endif
+    @break
 
-    @if($hasLong)
-    <div class="ex-band" aria-hidden="true"><div class="ex-track">@for($i = 0; $i < 16; $i++)<span>{{ $s['name'] }}</span>@endfor</div></div>
-    @endif
+    @case('p_band')
+    <div class="ex-band" aria-hidden="true" style="@if($dz['band']['bg'])background:{{ $dz['band']['bg'] }};@endif @if($dz['band']['ink'])color:{{ $dz['band']['ink'] }};@endif"><div class="ex-track">@for($i = 0; $i < 16; $i++)<span>{{ $dz['band']['text'] !== '' ? $dz['band']['text'] : $s['name'] }}</span>@endfor</div></div>
+    @break
 
-    @if($c['story']['title'] !== '' || $c['audience']['title'] !== '')
+    @case('p_story')
+    @if($c['story']['title'] !== '')
     <section class="ex-sec" style="padding-bottom:0">
         <div class="ex-wrap ex-narrow" style="display:grid;gap:clamp(30px,5vw,56px)">
             @if($c['story']['title'] !== '')
@@ -298,6 +404,15 @@ body { padding-bottom: 86px; }
                 <div><h2>{{ $c['story']['title'] }}</h2>@if($c['story']['kicker'] !== '')<p class="ex-caps">{{ $c['story']['kicker'] }}</p>@endif @if($c['story']['text'] !== '')<p class="ex-text">{{ $c['story']['text'] }}</p>@endif</div>
             </div>
             @endif
+        </div>
+    </section>
+    @endif
+    @break
+
+    @case('p_audience')
+    @if($c['audience']['title'] !== '')
+    <section class="ex-sec" style="padding-bottom:0">
+        <div class="ex-wrap ex-narrow" style="display:grid;gap:clamp(30px,5vw,56px)">
             @if($c['audience']['title'] !== '')
             <div class="ex-panel ex-split is-flip" data-rv>
                 <div><h2>{{ $c['audience']['title'] }}</h2>@if($c['audience']['kicker'] !== '')<p class="ex-caps">{{ $c['audience']['kicker'] }}</p>@endif @if($c['audience']['text'] !== '')<p class="ex-text">{{ $c['audience']['text'] }}</p>@endif</div>
@@ -307,11 +422,13 @@ body { padding-bottom: 86px; }
         </div>
     </section>
     @endif
+    @break
 
+    @case('p_results')
     @if($happy !== null || $pm['rating'] || $pm['delivered'])
     <section class="ex-sec" aria-labelledby="exResH" style="padding-bottom:0">
         <div class="ex-wrap ex-narrow" data-rv style="text-align:center">
-            <h2 class="ex-h2" id="exResH">Des résultats <span class="ex-acc">prouvés</span></h2>
+            <h2 class="ex-h2" id="exResH">@if($sec['d']['title'] !== ''){{ $sec['d']['title'] }}@else Des résultats <span class="ex-acc">prouvés</span>@endif</h2>
             <div class="ex-results" style="text-align:left">
                 @if($happy !== null)<div><b>{{ $happy }} %</b><span>des avis clients donnent 4 ou 5 étoiles</span></div>@endif
                 @if($pm['rating'])<div><b>{{ number_format($pm['rating']['avg'], 1, ',', ' ') }}/5</b><span>note moyenne sur {{ $pm['rating']['count'] }} avis</span></div>@endif
@@ -321,7 +438,9 @@ body { padding-bottom: 86px; }
         </div>
     </section>
     @endif
+    @break
 
+    @case('p_love')
     @if(count($c['love']['items']))
     <section class="ex-sec ex-love" aria-labelledby="exLoveH" style="padding-bottom:0">
         <div class="ex-wrap ex-narrow">
@@ -336,7 +455,9 @@ body { padding-bottom: 86px; }
         </div>
     </section>
     @endif
+    @break
 
+    @case('p_compare')
     @if(count($c['compare']['rows']))
     <section class="ex-sec" aria-labelledby="exCmpH" style="padding-bottom:0">
         <div class="ex-wrap ex-narrow">
@@ -352,17 +473,30 @@ body { padding-bottom: 86px; }
         </div>
     </section>
     @endif
+    @break
 
+    @case('p_related')
     <section class="ex-sec" id="exRelatedSec" aria-labelledby="exRelH">
         <div class="ex-wrap">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap" data-rv><h2 class="ex-h2" id="exRelH">Vous aimerez aussi</h2><a href="{{ $s['url'] }}?vue=produits" style="font-weight:700;color:var(--acc-dark)">Voir tous les produits</a></div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap" data-rv><h2 class="ex-h2" id="exRelH">{{ HS::txt('product', $sec, 'title') }}</h2><a href="{{ $s['url'] }}?vue=produits" style="font-weight:700;color:var(--acc-dark)">Voir tous les produits</a></div>
             <div class="ex-related" id="exRelated"></div>
         </div>
     </section>
-</main>
-@include('public.shops.express._footer', ['faq' => $c['faq'], 'faqBg' => 'var(--sage)'])
+    @break
 
-<div class="ex-sticky is-hidden" id="exSticky" aria-hidden="true"><b id="exStickyPrice"></b><a class="ex-btn is-acc" href="#exCheckout" data-ex-order tabindex="-1"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1 13H7zM9 7a3 3 0 0 1 6 0"/></svg>Commander</a></div>
+    @case('p_faq')
+    @include('public.shops.express._faq', ['faq' => $c['faq'], 'faqBg' => 'var(--sage)', 'faqTitle' => $sec['d']['title']])
+    @break
+
+    @default
+    @include('public.shops.models._section', ['sec' => $sec, 'theme' => 'express'])
+    @endswitch
+    @if(($sec['sp'][0] ?? 0) || ($sec['sp'][1] ?? 0))</div>@endif
+    @endforeach
+</main>
+@include('public.shops.express._footer', ['noFaq' => true])
+
+@if($dz['sticky'])<div class="ex-sticky is-hidden" id="exSticky" aria-hidden="true"><b id="exStickyPrice"></b><a class="ex-btn is-acc @if($fm['anim'] !== 'none') ex-anim-{{ $fm['anim'] }} @endif" href="#exCheckout" data-ex-order tabindex="-1"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1 13H7zM9 7a3 3 0 0 1 6 0"/></svg>Commander</a></div>@endif
 <div class="ex-zoom" id="exZoom" hidden role="dialog" aria-modal="true" aria-label="Photo agrandie"><img alt=""></div>
 
 @include('public.shops.models._kit')
@@ -375,8 +509,8 @@ body { padding-bottom: 86px; }
 
     /* ── Produits proches : même catégorie et prix proche d'abord ── */
     const rel = P ? S.suggest(P, 4) : [];
-    if (rel.length) $('exRelated').innerHTML = rel.map(x => '<article class="ex-card"><a class="ex-card-img" href="' + esc(x.page) + '">' + (x.photo ? '<img src="' + esc(x.photo) + '" alt="" loading="lazy">' : '<span class="ex-noimg">' + esc(x.name) + '</span>') + '</a><div class="ex-card-body"><h3><a href="' + esc(x.page) + '">' + esc(x.name) + '</a></h3><p class="ex-price" style="margin:0 0 10px">' + esc(S.money(x.price)) + (x.old ? '<s>' + esc(S.money(x.old)) + '</s>' : '') + '</p><a class="ex-btn" href="' + esc(x.page) + '">Commander</a></div></article>').join('');
-    else $('exRelatedSec').hidden = true;
+    if (rel.length && $('exRelated')) $('exRelated').innerHTML = rel.map(x => '<article class="ex-card"><a class="ex-card-img" href="' + esc(x.page) + '">' + (x.photo ? '<img src="' + esc(x.photo) + '" alt="" loading="lazy">' : '<span class="ex-noimg">' + esc(x.name) + '</span>') + '</a><div class="ex-card-body"><h3><a href="' + esc(x.page) + '">' + esc(x.name) + '</a></h3><p class="ex-price" style="margin:0 0 10px">' + esc(S.money(x.price)) + (x.old ? '<s>' + esc(S.money(x.old)) + '</s>' : '') + '</p><a class="ex-btn" href="' + esc(x.page) + '">Commander</a></div></article>').join('');
+    else if ($('exRelatedSec')) $('exRelatedSec').hidden = true;
 
     /* ── Galerie : flèches, miniatures, glisser au doigt, zoom ── */
     const imgs = [...$('exGal').querySelectorAll('img')];
@@ -397,59 +531,64 @@ body { padding-bottom: 86px; }
     zoom.addEventListener('click', () => { zoom.hidden = true; });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !zoom.hidden) zoom.hidden = true; });
 
-    /* ── Achat : packs, quantité, panier, commande sur la page ── */
+    /* ── Achat : chaque élément dans son emplacement (ordre et affichage réglés dans l'éditeur produit) ── */
     const money = S.money;
-    const box = $('exBuy');
-    if (!P) { box.hidden = true; return; }
+    const FM = @json($fm), OF = @json($dz['offer']);
+    const slot = id => $(id);
+    const anim = FM.anim !== 'none' ? ' ex-anim-' + FM.anim : '';
+    if (!P) { return; }
     const maxQ = P.stock !== null && P.stock !== undefined ? Math.max(0, Math.min(99, P.stock)) : 99;
-    let qty = 1;
     const options = [{ qty: 1, price: P.price, label: '' }].concat(P.packs || []).filter(o => o.qty <= Math.max(1, maxQ));
+    let qty = options.some(o => o.qty === OF.preselect) ? OF.preselect : 1;
     const thumb = P.thumb ? ' style="background-image:url(\'' + esc(P.thumb) + '\')"' : '';
 
     if (P.variants || !S.canBuy(P)) {
-        box.innerHTML = '<div style="margin-top:24px">' + (P.variants
+        const first = ['exOffer', 'exQtyBox', 'exAddBox', 'exFormBox', 'exBuy'].map(slot).find(Boolean);
+        first.innerHTML = '<div style="margin-top:24px">' + (P.variants
             ? '<a class="ex-btn is-acc" style="width:100%" href="' + esc(P.url) + '">Choisir les options et commander</a><p class="ex-co-cod">Ce produit a des options (taille, couleur…).</p>'
             : '<button type="button" class="ex-btn" style="width:100%" disabled>' + esc(S.buyLabel(P)) + '</button>') + '</div>';
     } else {
-        box.innerHTML =
-            (options.length > 1 ? '<div class="ex-packs" role="radiogroup" aria-labelledby="exPackH"><div class="ex-packs-h" id="exPackH">Pack et économie</div><p>Plus vous achetez, plus vous économisez</p>' +
-                options.map(o => { const full = P.price * o.qty, save = full - o.price, pc = Math.round(save / full * 100);
-                    return '<button type="button" class="ex-pack" role="radio" data-q="' + o.qty + '" aria-checked="false">' + (o.label ? '<span class="ex-flag">' + esc(o.label) + '</span>' : '') +
-                        '<i' + thumb + '><b>×' + o.qty + '</b></i><span><strong>' + o.qty + ' produit' + (o.qty > 1 ? 's' : '') + (pc > 0 ? '<em>−' + pc + ' %</em>' : '') + '</strong>' + (save > 0 ? '<small>Vous économisez ' + esc(money(save)) + '</small>' : '') + '</span>' +
-                        '<span>' + esc(money(o.price)) + (save > 0 ? '<s>' + esc(money(full)) + '</s>' : '') + '</span></button>'; }).join('') + '</div>' : '') +
-            '<div class="ex-qty-row"><span>Quantité</span><div class="ex-qty"><button type="button" id="exMinus" aria-label="Retirer un">−</button><output id="exQty" aria-live="polite">1</output><button type="button" id="exPlus" aria-label="Ajouter un">+</button></div></div>' +
-            '<button type="button" class="ex-btn is-line ex-add" id="exAdd"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.4 11h11L21 7H6.2"/><circle cx="9" cy="19.5" r="1"/><circle cx="18" cy="19.5" r="1"/></svg>Ajouter au panier</button>' +
-            '<form class="ex-co" id="exCheckout" novalidate aria-labelledby="exCoH"><h2 id="exCoH">Finaliser la commande</h2>' +
+        if (slot('exOffer') && options.length > 1) slot('exOffer').innerHTML = '<div class="ex-packs" role="radiogroup" aria-labelledby="exPackH"><div class="ex-packs-h" id="exPackH">' + esc(OF.title || 'Pack et économie') + '</div>' + (OF.subtitle ? '<p>' + esc(OF.subtitle) + '</p>' : '') +
+            options.map(o => { const full = P.price * o.qty, save = full - o.price, pc = Math.round(save / full * 100);
+                return '<button type="button" class="ex-pack' + (OF.image ? '' : ' no-img') + '" role="radio" data-q="' + o.qty + '" aria-checked="false">' + (o.label ? '<span class="ex-flag">' + esc(o.label) + '</span>' : '') +
+                    (OF.image ? '<i' + thumb + '><b>×' + o.qty + '</b></i>' : '') + '<span><strong>' + o.qty + ' produit' + (o.qty > 1 ? 's' : '') + (pc > 0 ? '<em>−' + pc + ' %</em>' : '') + '</strong>' + (save > 0 ? '<small>Vous économisez ' + esc(money(save)) + '</small>' : '') + (OF.unit && o.qty > 1 ? '<span class="ex-pack-unit">soit ' + esc(money(o.price / o.qty)) + ' / unité</span>' : '') + '</span>' +
+                    '<span>' + esc(money(o.price)) + (save > 0 && !OF.hide_strike ? '<s>' + esc(money(full)) + '</s>' : '') + '</span></button>'; }).join('') + '</div>';
+        if (slot('exQtyBox')) slot('exQtyBox').innerHTML = '<div class="ex-qty-row"><span>Quantité</span><div class="ex-qty"><button type="button" id="exMinus" aria-label="Retirer un">−</button><output id="exQty" aria-live="polite">1</output><button type="button" id="exPlus" aria-label="Ajouter un">+</button></div></div>';
+        if (slot('exAddBox')) slot('exAddBox').innerHTML = '<button type="button" class="ex-btn is-line ex-add" id="exAdd"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.4 11h11L21 7H6.2"/><circle cx="9" cy="19.5" r="1"/><circle cx="18" cy="19.5" r="1"/></svg>Ajouter au panier</button>';
+        // Formulaire intégré à la page, ou bouton qui ouvre le panier (formulaire de commande du panier)
+        const formSlot = slot('exFormBox') || (FM.integrated ? null : slot('exAddBox'));
+        if (formSlot && FM.integrated) formSlot.innerHTML =
+            '<form class="ex-co" id="exCheckout" novalidate aria-labelledby="exCoH"><h2 id="exCoH">' + esc(FM.title) + '</h2>' +
                 '<div class="ex-recap"><small>Récapitulatif</small><div><span id="exRecapName"></span><span id="exRecapLine"></span></div><div class="is-total"><span>Total à payer</span><span id="exTotal"></span></div></div>' +
                 '<div class="ex-general" id="exGeneral" role="alert"></div>' +
                 '<div class="ex-field"><label for="exName">Nom complet ' + (D.user ? '<small>(facultatif)</small>' : '<b aria-hidden="true">*</b>') + '</label><input id="exName" autocomplete="name" maxlength="80" placeholder="Votre prénom et nom" value="' + esc(D.user ? D.user.name : '') + '" aria-describedby="exNameErr"><p class="ex-err" id="exNameErr"></p></div>' +
                 '<div class="ex-field"><label for="exPhone">Téléphone <b aria-hidden="true">*</b></label><div class="ex-tel"><span>+224</span><input id="exPhone" type="tel" inputmode="tel" autocomplete="tel-national" maxlength="16" placeholder="622 12 34 56" value="' + esc(D.user ? D.user.phone : '') + '" aria-describedby="exPhoneErr"></div><p class="ex-err" id="exPhoneErr"></p></div>' +
                 '<div class="ex-field"><label for="exCommune">Commune <b aria-hidden="true">*</b></label><select id="exCommune" aria-describedby="exCommuneErr"><option value="">Choisir…</option>' + D.communes.map(c => '<option>' + esc(c) + '</option>').join('') + '</select><p class="ex-err" id="exCommuneErr"></p></div>' +
-                '<div class="ex-field"><label for="exLandmark">Adresse <small>(quartier, rue, repère)</small></label><input id="exLandmark" maxlength="120" placeholder="Ex. Kipé, près de la pharmacie"></div>' +
-                '<button type="submit" class="ex-btn is-acc" id="exSend">Confirmer la commande</button>' +
-                '<p class="ex-co-cod">💵 Paiement à la livraison, en espèces, au livreur</p>' +
+                (FM.address ? '<div class="ex-field"><label for="exLandmark">Adresse ' + (FM.address_req ? '<b aria-hidden="true">*</b>' : '<small>(quartier, rue, repère)</small>') + '</label><input id="exLandmark" maxlength="120" placeholder="Ex. Kipé, près de la pharmacie" aria-describedby="exLandmarkErr"><p class="ex-err" id="exLandmarkErr"></p></div>' : '') +
+                '<button type="submit" class="ex-btn is-acc' + anim + '" id="exSend">' + esc(FM.button) + '</button>' +
+                (FM.note ? '<p class="ex-co-cod">' + esc(FM.note) + '</p>' : '') +
             '</form>';
+        else if (formSlot) formSlot.insertAdjacentHTML('beforeend', '<button type="button" class="ex-btn is-acc' + anim + '" id="exOrderCart" style="width:100%;margin-top:12px">' + esc(FM.button) + '</button>' + (FM.note ? '<p class="ex-co-cod">' + esc(FM.note) + '</p>' : ''));
 
         function render() {
             const total = S.lineTotal(P, qty);
-            $('exQty').textContent = qty;
-            $('exMinus').disabled = qty <= 1; $('exPlus').disabled = qty >= maxQ;
-            box.querySelectorAll('.ex-pack').forEach(b => b.setAttribute('aria-checked', +b.dataset.q === qty ? 'true' : 'false'));
-            $('exRecapName').textContent = P.name; $('exRecapLine').textContent = '× ' + qty;
-            $('exTotal').textContent = money(total);
-            $('exStickyPrice').textContent = money(total);
+            if ($('exQty')) { $('exQty').textContent = qty; $('exMinus').disabled = qty <= 1; $('exPlus').disabled = qty >= maxQ; }
+            document.querySelectorAll('.ex-pack').forEach(b => b.setAttribute('aria-checked', +b.dataset.q === qty ? 'true' : 'false'));
+            if ($('exRecapName')) { $('exRecapName').textContent = P.name; $('exRecapLine').textContent = '× ' + qty; $('exTotal').textContent = money(total); }
+            if ($('exStickyPrice')) $('exStickyPrice').textContent = money(total);
         }
-        box.addEventListener('click', e => {
-            const k = e.target.closest('.ex-pack');
-            if (k) { qty = +k.dataset.q; render(); }
-        });
-        $('exMinus').addEventListener('click', () => { qty = Math.max(1, qty - 1); render(); });
-        $('exPlus').addEventListener('click', () => { qty = Math.min(maxQ, qty + 1); render(); });
-        $('exAdd').addEventListener('click', () => S.add(P.id, $('exAdd'), qty));
+        document.addEventListener('click', e => { const k = e.target.closest('.ex-pack'); if (k) { qty = +k.dataset.q; render(); } });
+        if ($('exMinus')) { $('exMinus').addEventListener('click', () => { qty = Math.max(1, qty - 1); render(); }); $('exPlus').addEventListener('click', () => { qty = Math.min(maxQ, qty + 1); render(); }); }
+        if ($('exAdd')) $('exAdd').addEventListener('click', () => S.add(P.id, $('exAdd'), qty));
+        // Sans formulaire sur la page : le produit va au panier, qui s'ouvre sur sa propre commande
+        const toCart = el => { S.add(P.id, el, qty); setTimeout(() => S.openCart(), 250); };
+        if ($('exOrderCart')) $('exOrderCart').addEventListener('click', () => toCart($('exOrderCart')));
         render();
 
         /* Contrôles sous chaque champ, puis vraie commande (même adresse que le panier) */
+        if ($('exCheckout')) {
         const F = { name: 'exName', phone: 'exPhone', commune: 'exCommune' };
+        if ($('exLandmark')) F.landmark = 'exLandmark';
         const setErr = (k, m) => { const el = $(F[k]); $(F[k] + 'Err').textContent = m || ''; if (m) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid'); };
         Object.keys(F).forEach(k => $(F[k]).addEventListener('input', () => setErr(k, '')));
         const CSRF = document.querySelector('meta[name="csrf-token"]').content;
@@ -462,39 +601,45 @@ body { padding-bottom: 86px; }
             let d = $('exPhone').value.replace(/\D/g, ''); if (d.length === 12 && d.startsWith('224')) d = d.slice(3);
             if (!/^6\d{8}$/.test(d)) { setErr('phone', d ? 'Le numéro doit avoir 9 chiffres et commencer par 6.' : 'Indiquez votre numéro de téléphone.'); ok = false; }
             if (!$('exCommune').value) { setErr('commune', 'Choisissez votre commune.'); ok = false; }
+            if (FM.address && FM.address_req && !$('exLandmark').value.trim()) { setErr('landmark', 'Indiquez votre adresse (quartier, rue, repère).'); ok = false; }
             if (!ok) { const bad = $('exCheckout').querySelector('[aria-invalid="true"]'); if (bad) bad.focus(); return; }
             const btn = $('exSend'); btn.disabled = true; btn.textContent = 'Envoi…';
             try {
                 const r = await fetch(D.urls.order, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF },
-                    body: JSON.stringify({ items: [{ id: P.id, qty: qty }], name: name, phone: d, commune: $('exCommune').value, landmark: $('exLandmark').value.trim() }) });
+                    body: JSON.stringify({ items: [{ id: P.id, qty: qty }], name: name, phone: d, commune: $('exCommune').value, landmark: $('exLandmark') ? $('exLandmark').value.trim() : '' }) });
                 const j = await r.json().catch(() => ({}));
                 if (r.status === 201) {
                     $('exCheckout').innerHTML = '<div class="ex-done" role="status"><svg class="sm-check" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44"/><path d="M30 52l14 14 26-30"/></svg><h3>Commande n° ' + j.id + ' envoyée</h3><p>' + esc(D.shop.name) + ' vous appelle au ' + esc(d.replace(/(\d{3})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4')) + ' pour confirmer.</p><p><strong>Total : ' + esc(money(j.total)) + '</strong> · à payer à la livraison</p>' +
                         (j.wa ? '<a class="ex-btn is-acc" href="' + esc(j.wa) + '" target="_blank" rel="noopener">Envoyer aussi sur WhatsApp</a>' : '') + '<a class="ex-btn is-line" href="' + esc(j.tracking) + '">Suivre ma commande</a></div>';
-                    $('exSticky').remove();
+                    if ($('exSticky')) $('exSticky').remove();
                     $('exCheckout').scrollIntoView({ behavior: S.reduce ? 'auto' : 'smooth', block: 'center' });
                     return;
                 }
                 if (j.errors) Object.entries(j.errors).forEach(([k, v]) => { if (F[k]) setErr(k, v[0]); else $('exGeneral').textContent = v[0]; });
                 else $('exGeneral').textContent = j.message || (r.status === 429 ? 'Trop d’essais : patientez une minute puis réessayez.' : 'La commande n’a pas pu être envoyée. Réessayez.');
             } catch (x) { $('exGeneral').textContent = 'Connexion impossible : vérifiez votre internet puis réessayez.'; }
-            btn.disabled = false; btn.textContent = 'Confirmer la commande';
+            btn.disabled = false; btn.textContent = FM.button;
         });
+        }
     }
 
-    /* ── Barre « Commander » fixe : cachée quand le formulaire est à l'écran ── */
+    /* ── Barre « Commander » flottante : vers le formulaire, sinon vers le panier ── */
     const sticky = $('exSticky');
-    if (!$('exCheckout')) { sticky.remove(); }
-    else {
-        const toggle = hide => { sticky.classList.toggle('is-hidden', hide); sticky.setAttribute('aria-hidden', hide ? 'true' : 'false'); sticky.querySelector('a').tabIndex = hide ? -1 : 0; };
-        let formSeen = false, pastTop = false;
-        const upd = () => toggle(formSeen || !pastTop);
-        new IntersectionObserver(([e]) => { formSeen = e.isIntersecting; upd(); }).observe($('exCheckout'));
-        window.addEventListener('scroll', () => { pastTop = window.scrollY > 500; upd(); }, { passive: true });
+    if (sticky) {
+        const target = $('exCheckout') || $('exOrderCart');
+        if (!target || P.variants || !S.canBuy(P)) { sticky.remove(); }
+        else {
+            const toggle = hide => { sticky.classList.toggle('is-hidden', hide); sticky.setAttribute('aria-hidden', hide ? 'true' : 'false'); sticky.querySelector('a').tabIndex = hide ? -1 : 0; };
+            let seen = false, pastTop = false;
+            const upd = () => toggle(seen || !pastTop);
+            new IntersectionObserver(([e]) => { seen = e.isIntersecting; upd(); }).observe(target);
+            window.addEventListener('scroll', () => { pastTop = window.scrollY > 500; upd(); }, { passive: true });
+        }
     }
     document.addEventListener('click', e => {
         const a = e.target.closest('[data-ex-order]');
-        if (!a || !$('exCheckout')) return;
+        if (!a) return;
+        if (!$('exCheckout')) { if ($('exOrderCart')) { e.preventDefault(); $('exOrderCart').click(); } return; }
         e.preventDefault();
         $('exCheckout').scrollIntoView({ behavior: S.reduce ? 'auto' : 'smooth', block: 'center' });
         setTimeout(() => { const f = $('exName'); if (f && !f.value) f.focus({ preventScroll: true }); }, S.reduce ? 0 : 500);

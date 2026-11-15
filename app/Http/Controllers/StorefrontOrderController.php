@@ -58,6 +58,14 @@ class StorefrontOrderController extends Controller
         $qty = [];
         foreach ($data['items'] as $it) $qty[(int) $it['id']] = ($qty[(int) $it['id']] ?? 0) + (int) $it['qty'];
 
+        // Adresse obligatoire si le formulaire d'un des produits l'exige (éditeur produit → Formulaire)
+        if (trim((string) ($data['landmark'] ?? '')) === '') {
+            $sf = Storefront::forShop($shop);
+            $needs = Product::where('shop_id', $shop->id)->whereIn('id', array_keys($qty))->get()
+                ->contains(fn ($p) => \App\Support\ProductDesign::for($p, $sf)['form']['address_req']);
+            if ($needs) return response()->json(['message' => 'Indiquez votre adresse (quartier, rue, repère).', 'errors' => ['landmark' => ['Indiquez votre adresse (quartier, rue, repère).']]], 422);
+        }
+
         try {
             $order = DB::transaction(function () use ($shop, $qty, $data, $guest) {
                 $products = Product::where('shop_id', $shop->id)->where('is_active', true)->whereIn('id', array_keys($qty))->lockForUpdate()->get()->keyBy('id');

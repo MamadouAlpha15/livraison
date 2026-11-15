@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Vendeur;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Services\SalesPageAi;
+use App\Support\HomeSections;
+use App\Support\ProductDesign;
 use App\Support\ProductPage;
+use App\Support\Storefront;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -28,12 +31,36 @@ class ProductPageController extends Controller
     {
         $this->own($product);
         $shop = Auth::user()->shop;
+        $sf = Storefront::forShop($shop);
+        $l = is_array($product->landing) ? $product->landing : [];
+        $design = ProductDesign::normalize($l['design'] ?? null);
+        $ownPage = $design['page'] !== null;
+        if (!$ownPage) $design['page'] = $sf['home']['product'];
+        $ownForm = $design['form_own'];
+        if (!$ownForm) $design['form'] = $sf['form'];
+        unset($l['design']);
+
+        $products = $shop->products()->latest()->take(80)->get(['id', 'name', 'is_active'])
+            ->map(fn ($p) => ['id' => $p->id, 'name' => $p->name, 'active' => (bool) $p->is_active, 'url' => route('products.page.edit', $p)])->values();
+
         return view('vendeur.products.page', [
             'shop' => $shop, 'product' => $product, 'devise' => $shop->currency ?? 'GNF',
-            'l' => is_array($product->landing) ? $product->landing : [],
+            'l' => $l, 'design' => $design, 'ownPage' => $ownPage, 'ownForm' => $ownForm,
             'unit' => (int) round($product->current_price),
+            'photos' => ProductPage::photos($product),
+            'products' => $products,
+            'images' => HomeSections::images(['p' => $design['page']]),
+            'categories' => collect(Storefront::categoryLinks($shop))->pluck('name')->values(),
+            'rating' => $this->rating($shop),
             'publicUrl' => $shop->is_approved ? ProductPage::url($shop, $product) : null,
         ]);
+    }
+
+    /** Vraie note de la boutique (bandeau note) : jamais saisie. */
+    private function rating($shop): ?array
+    {
+        $r = \App\Models\Review::where('vendeur_id', $shop->user_id)->selectRaw('COUNT(*) as n, AVG(rating) as avg')->first();
+        return ($r->n ?? 0) > 0 ? ['avg' => round((float) $r->avg, 1), 'count' => (int) $r->n] : null;
     }
 
     /**
@@ -60,72 +87,82 @@ class ProductPageController extends Controller
         }
     }
 
+    /**
+     * Éditeur produit (JSON) : contenu de la page de vente, mise en page (bloc d'achat, sections), couleurs,
+     * formulaire (de ce produit ou de toute la boutique) et offres. Les packs sont vérifiés ici.
+     */
     public function update(Request $request, Product $product)
     {
         $this->own($product);
-        $t = fn (int $max) => ['nullable', 'string', 'max:' . $max];
+        $shop = Auth::user()->shop;
         $request->validate([
-            'hook' => $t(220), 'benefits' => $t(1000), 'promise' => $t(90),
-            'packs' => ['nullable', 'array', 'max:' . ProductPage::PACKS_MAX],
-            'packs.*.qty' => ['nullable', 'integer', 'min:2', 'max:10'],
-            'packs.*.price' => ['nullable', 'integer', 'min:1'],
-            'packs.*.label' => $t(20),
-            'usage' => $t(1500), 'details' => $t(3000), 'shipping' => $t(1500),
-            'highlight.title' => $t(70), 'highlight.text' => $t(600), 'highlight.cta' => $t(24),
-            'story.title' => $t(80), 'story.kicker' => $t(140), 'story.text' => $t(1200),
-            'audience.title' => $t(60), 'audience.kicker' => $t(80), 'audience.text' => $t(1200),
-            'love.title' => $t(80), 'love.kicker' => $t(120), 'love_items' => $t(1500),
-            'compare.title' => $t(80), 'compare_rows' => $t(800),
-            'faq' => ['nullable', 'array', 'max:10'], 'faq.*.q' => $t(140), 'faq.*.a' => $t(600),
-        ], [
-            'packs.*.qty.min' => 'Un pack contient au moins 2 produits.',
-            'packs.*.qty.max' => 'Un pack contient au plus 10 produits.',
-            'packs.*.price.integer' => 'Le prix du pack doit être un nombre entier.',
-            '*.max' => 'Ce texte est trop long.',
-        ], [
-            'hook' => 'accroche', 'promise' => 'promesse de délai',
+            'content' => ['required', 'array'],
+            'design' => ['required', 'array'],
+            'form_scope' => ['required', 'in:shop,product'],
+            'page_scope' => ['required', 'in:shop,product,all'],
+            'content.packs' => ['nullable', 'array', 'max:' . ProductPage::PACKS_MAX],
+            'content.faq' => ['nullable', 'array', 'max:10'],
         ]);
-
-        $lines = fn ($v) => array_values(array_filter(array_map('trim', preg_split('/\R/u', (string) $v)), fn ($x) => $x !== ''));
-        $s = fn ($v) => trim((string) $v);
+        $c = (array) $request->input('content');
+        $s = fn ($v, int $max) => mb_substr(trim(strip_tags((string) (is_scalar($v) ? $v : ''))), 0, $max);
+        $list = fn ($v, int $n, int $max) => array_slice(array_values(array_filter(array_map(fn ($x) => $s($x, $max), is_array($v) ? $v : []), fn ($x) => $x !== '')), 0, $n);
+        $block = function ($v, array $keys) use ($s) {
+            $out = [];
+            foreach ($keys as $k => $max) $out[$k] = $s(is_array($v) ? ($v[$k] ?? '') : '', $max);
+            return $out;
+        };
 
         // Packs : quantité et prix remplis ensemble, toujours moins cher que l'achat à l'unité, une quantité par pack
         $unit = (int) round($product->current_price);
-        $devise = Auth::user()->shop->currency ?? 'GNF';
+        $devise = $shop->currency ?? 'GNF';
         $packs = []; $errors = [];
-        foreach ((array) $request->input('packs', []) as $i => $k) {
-            $qty = (int) ($k['qty'] ?? 0); $price = (int) ($k['price'] ?? 0);
+        foreach (array_values((array) ($c['packs'] ?? [])) as $i => $k) {
+            $qty = (int) ($k['qty'] ?? 0); $price = (int) preg_replace('/\D/', '', (string) ($k['price'] ?? ''));
             if (!$qty && !$price) continue;
-            if (!$qty || !$price) { $errors["packs.$i.price"] = 'Indiquez la quantité et le prix du pack ' . ($i + 1) . '.'; continue; }
-            if ($price >= $qty * $unit) { $errors["packs.$i.price"] = 'Le pack de ' . $qty . ' doit coûter moins de ' . number_format($qty * $unit, 0, ',', ' ') . ' ' . $devise . ' (' . $qty . ' × le prix à l’unité).'; continue; }
-            if (isset($packs[$qty])) { $errors["packs.$i.qty"] = 'Il y a déjà un pack de ' . $qty . ' produits.'; continue; }
-            $packs[$qty] = ['qty' => $qty, 'price' => $price, 'label' => $s($k['label'] ?? '')];
+            if ($qty < 2 || $qty > 10) { $errors["packs.$i"] = 'Un pack contient de 2 à 10 produits.'; continue; }
+            if (!$price) { $errors["packs.$i"] = 'Indiquez le prix total du pack de ' . $qty . '.'; continue; }
+            if ($price >= $qty * $unit) { $errors["packs.$i"] = 'Le pack de ' . $qty . ' doit coûter moins de ' . number_format($qty * $unit, 0, ',', ' ') . ' ' . $devise . ' (' . $qty . ' × le prix à l’unité).'; continue; }
+            if (isset($packs[$qty])) { $errors["packs.$i"] = 'Il y a déjà un pack de ' . $qty . ' produits.'; continue; }
+            $packs[$qty] = ['qty' => $qty, 'price' => $price, 'label' => $s($k['label'] ?? '', 20)];
         }
         if ($errors) throw ValidationException::withMessages($errors);
         ksort($packs);
 
-        $loveItems = array_map(function ($line) {
-            [$title, $text] = array_pad(preg_split('/\s*:\s*/u', $line, 2), 2, '');
-            return ['title' => trim($title), 'text' => trim($text)];
-        }, array_slice($lines($request->input('love_items')), 0, 6));
-        $faq = array_values(array_filter(array_map(fn ($f) => ['q' => $s($f['q'] ?? ''), 'a' => $s($f['a'] ?? '')], (array) $request->input('faq', [])), fn ($f) => $f['q'] !== '' && $f['a'] !== ''));
+        $love = is_array($c['love'] ?? null) ? $c['love'] : [];
+        $compare = is_array($c['compare'] ?? null) ? $c['compare'] : [];
+        $faq = array_slice(array_values(array_filter(array_map(fn ($f) => ['q' => $s($f['q'] ?? '', 140), 'a' => $s($f['a'] ?? '', 600)], is_array($c['faq'] ?? null) ? $c['faq'] : []), fn ($f) => $f['q'] !== '' && $f['a'] !== '')), 0, 10);
 
-        $block = fn (string $k, array $keys) => array_combine($keys, array_map(fn ($f) => $s($request->input("$k.$f")), $keys));
+        $design = ProductDesign::normalize($request->input('design'));
+        // Formulaire : pour toute la boutique, ou propre à ce produit
+        $sf = Storefront::forShop($shop);
+        if ($request->input('form_scope') === 'shop') {
+            $sf['form'] = $design['form'];
+            $design['form_own'] = false;
+        } else {
+            $design['form_own'] = true;
+        }
+        // Sections de la page : propres à ce produit, celles de la boutique, ou appliquées à tous les produits
+        $scope = $request->input('page_scope');
+        if ($scope === 'all' && $design['page']) $sf['home']['product'] = $design['page'];
+        if ($scope !== 'product') $design['page'] = null;
+        $shop->update(['storefront' => Storefront::normalize($sf)]);
+
         $product->landing = [
-            'hook' => $s($request->input('hook')),
-            'benefits' => array_slice($lines($request->input('benefits')), 0, 8),
-            'promise' => $s($request->input('promise')),
+            'hook' => $s($c['hook'] ?? '', 220),
+            'benefits' => $list($c['benefits'] ?? [], 8, 90),
+            'promise' => $s($c['promise'] ?? '', 90),
             'packs' => array_values($packs),
-            'usage' => $s($request->input('usage')), 'details' => $s($request->input('details')), 'shipping' => $s($request->input('shipping')),
-            'highlight' => $block('highlight', ['title', 'text', 'cta']),
-            'story' => $block('story', ['title', 'kicker', 'text']),
-            'audience' => $block('audience', ['title', 'kicker', 'text']),
-            'love' => $block('love', ['title', 'kicker']) + ['items' => $loveItems],
-            'compare' => $block('compare', ['title']) + ['rows' => array_slice($lines($request->input('compare_rows')), 0, 8)],
-            'faq' => array_slice($faq, 0, 10),
+            'usage' => $s($c['usage'] ?? '', 1500), 'details' => $s($c['details'] ?? '', 3000), 'shipping' => $s($c['shipping'] ?? '', 1500),
+            'highlight' => $block($c['highlight'] ?? [], ['title' => 70, 'text' => 600, 'cta' => 24]),
+            'story' => $block($c['story'] ?? [], ['title' => 80, 'kicker' => 140, 'text' => 1200]),
+            'audience' => $block($c['audience'] ?? [], ['title' => 60, 'kicker' => 80, 'text' => 1200]),
+            'love' => $block($love, ['title' => 80, 'kicker' => 120]) + ['items' => array_slice(array_values(array_filter(array_map(fn ($i) => ['title' => $s($i['title'] ?? '', 60), 'text' => $s($i['text'] ?? '', 160)], is_array($love['items'] ?? null) ? $love['items'] : []), fn ($i) => $i['title'] !== '')), 0, 6)],
+            'compare' => $block($compare, ['title' => 80]) + ['rows' => $list($compare['rows'] ?? [], 8, 60)],
+            'faq' => $faq,
+            'design' => $design,
         ];
         $product->save();
 
-        return redirect()->route('products.page.edit', $product)->with('success', 'Page de vente enregistrée.');
+        return response()->json(['ok' => true, 'packs' => array_values($packs)]);
     }
 }

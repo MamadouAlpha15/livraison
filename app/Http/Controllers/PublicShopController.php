@@ -135,6 +135,8 @@ class PublicShopController extends Controller
             'activeCategory' => null, 'previewLink' => null, 'shareImage' => $photos[0] ?? null,
             'pageTitle' => $product->name . ' · ' . $shop->name,
             'product' => $productData, 'draft' => !$product->is_active,
+            // Réglages du produit (éditeur produit : sections, couleurs, formulaire, offres)
+            'design' => \App\Support\ProductDesign::for($product, $sf),
             'photos' => $photos, 'content' => ProductPage::content($product), 'ownerEdit' => $isOwner,
             // Chiffres réels (jamais saisis) : part d'avis à 4 ou 5 étoiles, seulement à partir de 5 avis
             'happy' => $reviewCount >= 5 ? (int) round(100 * (int) $reviewStats->happy / $reviewCount) : null,

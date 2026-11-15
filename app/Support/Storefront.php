@@ -178,6 +178,7 @@ class Storefront
             'template'     => '',
             'page_model'   => 'express',
             'home'         => HomeSections::normalizeAll(null),
+            'form'         => ProductDesign::formDefaults(),
         ];
     }
 
@@ -279,6 +280,8 @@ class Storefront
             'page_model'   => $pick($input['page_model'] ?? null, array_keys(PageModels::MODELS), PageModels::DEFAULT),
             // Sections de la page d'accueil, une liste par thème (Boutique → Sections)
             'home'         => HomeSections::normalizeAll($input['home'] ?? null),
+            // Formulaire de commande de la page produit, pour toute la boutique (éditeur produit → Formulaire)
+            'form'         => ProductDesign::normalizeForm($input['form'] ?? null),
         ];
     }
 

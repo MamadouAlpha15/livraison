@@ -98,18 +98,24 @@ class StorefrontController extends Controller
     {
         $shop = $this->shop();
         $config = Storefront::forShop($shop);
-        $theme = PageModels::isModel($request->query('theme')) ? $request->query('theme') : $config['page_model'];
+        // Page modifiée : l'accueil d'un thème (Express, Signature) ou la page produit
+        $theme = isset(HomeSections::PAGES[$request->query('theme')]) ? $request->query('theme') : $config['page_model'];
         $defaults = HomeSections::DEFAULTS;
         // Titre d'accueil prévu : le slogan de la boutique, sinon son nom (Signature) ou la phrase du thème
         $slogan = (string) $config['cover']['slogan'];
         if ($slogan !== '') $defaults['express']['hero']['title'] = $defaults['signature']['hero']['title'] = $slogan;
         if ($defaults['signature']['hero']['title'] === '') $defaults['signature']['hero']['title'] = $shop->name;
 
-        $images = collect($config['home'])->flatten(1)->pluck('d.img')->filter()->unique()
-            ->mapWithKeys(fn ($p) => [$p => HomeSections::imgUrl($p)])->all();
+        $images = HomeSections::images($config['home']);
+
+        // Produits proposés pour l'aperçu de la page produit (brouillons compris : vus par leur seul vendeur)
+        $previewProducts = $shop->products()->orderByDesc('is_active')->orderByDesc('is_featured')->latest()->take(60)->get(['id', 'name', 'is_active'])
+            ->map(fn ($p) => ['id' => $p->id, 'name' => $p->name . ($p->is_active ? '' : ' (brouillon)'), 'url' => \App\Support\ProductPage::url($shop, $p)])->values();
 
         return view('vendeur.shop.sections', [
             'shop'       => $shop,
+            'pages'      => HomeSections::PAGES,
+            'previewProducts' => $previewProducts,
             'theme'      => $theme,
             'published'  => $config['page_model'],
             'home'       => $config['home'],
@@ -126,7 +132,7 @@ class StorefrontController extends Controller
     {
         $shop = $this->shop();
         $data = $request->validate([
-            'theme'    => ['required', Rule::in(array_keys(PageModels::MODELS))],
+            'theme'    => ['required', Rule::in(array_keys(HomeSections::PAGES))],
             'sections' => ['required', 'array', 'max:' . (count(HomeSections::BUILTIN['signature']) + HomeSections::CUSTOM_MAX)],
         ], ['theme.in' => 'Thème inconnu.', 'sections.max' => 'Trop de sections : ' . HomeSections::CUSTOM_MAX . ' sections ajoutées au maximum.']);
 
