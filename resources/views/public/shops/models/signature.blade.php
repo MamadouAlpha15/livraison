@@ -8,11 +8,10 @@
     les chiffres, avis et remises n'apparaissent que s'ils existent dans la boutique.
 --}}
 @php
+    use App\Support\HomeSections as HS;
     $s = $pm['shop'];
-    $heroTitle = $s['slogan'] ?: $s['name'];
-    $words = preg_split('/\s+/u', trim($heroTitle));
-    $last = array_pop($words);
-    $heroHead = count($words) ? implode(' ', $words) . ' ' : '';
+    // Sections de l'accueil, dans l'ordre choisi par le vendeur (Boutique → Sections)
+    $home = $pm['home']['signature'] ?? HS::defaults('signature');
 @endphp
 <!doctype html>
 <html lang="fr">
@@ -276,12 +275,23 @@ a { color: inherit; }
 <header class="sg-head" id="sgHead">
     <div class="sg-wrap">
         <a class="sg-brand" href="{{ $s['url'] }}"><i>@if($s['logo'])<img src="{{ $s['logo'] }}" alt="">@else{{ $s['initials'] }}@endif</i><b>{{ $s['name'] }}</b>@if($s['verified'])<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" role="img" aria-label="Boutique vérifiée"><path d="M12 1.5l2.6 2 3.3-.2.9 3.2 2.8 1.8-1.2 3.1 1.2 3.1-2.8 1.8-.9 3.2-3.3-.2-2.6 2-2.6-2-3.3.2-.9-3.2-2.8-1.8 1.2-3.1-1.2-3.1 2.8-1.8.9-3.2 3.3.2z"/><path d="M8 12.2l2.6 2.6L16.2 9" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>@endif</a>
-        <nav class="sg-nav" aria-label="Sections"><a href="#collection">La collection</a><a href="#commander">Commander</a>@if(count($pm['reviews']))<a href="#avis">Avis</a>@endif<a href="#questions">Questions</a></nav>
+        <nav class="sg-nav" aria-label="Sections">@if(HS::shows($home, 'products'))<a href="#collection">La collection</a>@endif @if(HS::shows($home, 'how'))<a href="#commander">Commander</a>@endif @if(count($pm['reviews']) && HS::shows($home, 'reviews'))<a href="#avis">Avis</a>@endif @if(HS::shows($home, 'faq'))<a href="#questions">Questions</a>@endif</nav>
         <button type="button" class="sg-cart" data-sm-cart aria-label="Ouvrir le panier"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1 13H7zM9 7a3 3 0 0 1 6 0"/></svg><span class="sg-cart-l">Panier</span><span data-sm-count></span></button>
     </div>
 </header>
 
 <main>
+@foreach($home as $sec)
+@continue(!$sec['on'])
+@switch($sec['type'])
+    @case('hero')
+    @php
+        $heroTitle = $sec['d']['title'] !== '' ? $sec['d']['title'] : ($s['slogan'] ?: $s['name']);
+        $words = preg_split('/\s+/u', trim($heroTitle));
+        $last = array_pop($words);
+        $heroHead = count($words) ? implode(' ', $words) . ' ' : '';
+        $heroImg = HS::imgUrl($sec['d']['img']);
+    @endphp
     <section class="sg-hero" aria-labelledby="sgTitle">
         <div class="sg-wrap">
             <div>
@@ -290,10 +300,10 @@ a { color: inherit; }
                     <span class="sg-chip">Paiement à la livraison</span>
                 </div>
                 <h1 id="sgTitle" data-rv style="--d:80ms">{{ $heroHead }}<em>{{ $last }}</em></h1>
-                <p class="sg-lead" data-rv style="--d:160ms">{{ $s['slogan'] !== '' && $s['slogan'] !== $s['name'] ? $s['name'] . ' · ' : '' }}Choisissez, commandez en une minute, payez quand le livreur arrive chez vous.</p>
+                <p class="sg-lead" data-rv style="--d:160ms">@if($sec['d']['text'] !== ''){{ $sec['d']['text'] }}@else{{ $s['slogan'] !== '' && $s['slogan'] !== $s['name'] ? $s['name'] . ' · ' : '' }}{{ HS::txt('signature', $sec, 'text') }}@endif</p>
                 <div class="sg-ctas" data-rv style="--d:240ms">
-                    <a class="sg-btn" href="#collection">Découvrir la collection <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-                    <a class="sg-btn is-ghost" href="#commander">Comment commander</a>
+                    <a class="sg-btn" href="{{ HS::shows($home, 'products') ? '#collection' : $s['url'] . '?vue=produits' }}">{{ HS::txt('signature', $sec, 'button') }} <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    @if(HS::shows($home, 'how'))<a class="sg-btn is-ghost" href="#commander">Comment commander</a>@endif
                 </div>
                 @if($pm['rating'] || $pm['delivered'])
                 <div class="sg-proof" data-rv style="--d:320ms">
@@ -302,32 +312,44 @@ a { color: inherit; }
                 </div>
                 @endif
             </div>
-            <div class="sg-visual" id="sgVisual" data-rv style="--d:120ms"></div>
+            <div class="sg-visual" id="sgVisual" data-rv style="--d:120ms" @if($heroImg) data-img="{{ $heroImg }}" @endif></div>
         </div>
     </section>
+    @break
 
+    @case('promise')
+    @php $pIcons = [
+        '<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/>',
+        '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
+        '<path d="M1 6h13v10H1zM14 9h4l4 4v3h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>',
+    ]; @endphp
     <section class="sg-promise" aria-label="Nos engagements">
         <div class="sg-wrap">
-            <div data-rv><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/></svg><p style="margin:0"><b>Paiement à la livraison</b><span>En espèces, au livreur. Rien à payer avant.</span></p></div>
-            <div data-rv style="--d:80ms"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg><p style="margin:0"><b>Appel de confirmation</b><span>La boutique vous appelle avant de livrer.</span></p></div>
-            <div data-rv style="--d:160ms"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 6h13v10H1zM14 9h4l4 4v3h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg><p style="margin:0"><b>Suivi de commande</b><span>Vous suivez votre colis sur Shopio.</span></p></div>
+            @foreach($pIcons as $i => $path)
+            @php $it = HS::item('signature', $sec, $i); @endphp
+            <div data-rv style="--d:{{ $i * 80 }}ms"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $path !!}</svg><p style="margin:0"><b>{{ $it['title'] }}</b><span>{{ $it['text'] }}</span></p></div>
+            @endforeach
             <div data-rv style="--d:240ms"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><p style="margin:0">@if($s['verified'])<b>Boutique vérifiée</b><span>Contrôlée par Shopio avant d’ouvrir.</span>@else<b>Commande via Shopio</b><span>Votre commande est enregistrée et suivie.</span>@endif</p></div>
         </div>
     </section>
+    @break
 
+    @case('categories')
     @if(count($pm['categories']) > 1)
     <section class="sg-sec" aria-labelledby="sgCatH" style="padding-bottom:0">
         <div class="sg-wrap">
-            <div data-rv><p class="sg-kicker">Explorer</p><h2 class="sg-h2" id="sgCatH">Par <em>univers</em></h2></div>
+            <div data-rv><p class="sg-kicker">Explorer</p><h2 class="sg-h2" id="sgCatH">@if($sec['d']['title'] !== ''){{ $sec['d']['title'] }}@else Par <em>univers</em>@endif</h2></div>
             <div class="sg-cats" id="sgCats"></div>
         </div>
     </section>
     @endif
+    @break
 
+    @case('products')
     <section class="sg-sec" id="collection" aria-labelledby="sgColH">
         <div class="sg-wrap">
             <div class="sg-tools" data-rv>
-                <div><p class="sg-kicker">La collection</p><h2 class="sg-h2" id="sgColH">Pensé pour <em>durer</em></h2></div>
+                <div><p class="sg-kicker">La collection</p><h2 class="sg-h2" id="sgColH">@if($sec['d']['title'] !== ''){{ $sec['d']['title'] }}@else Pensé pour <em>durer</em>@endif</h2>@if($sec['d']['text'] !== '')<p class="sg-lead" style="margin-top:10px">{{ $sec['d']['text'] }}</p>@endif</div>
                 <p class="sg-lead" id="sgCount" style="margin:0" aria-live="polite"></p>
             </div>
             <div class="sg-filters">
@@ -338,14 +360,18 @@ a { color: inherit; }
             <div class="sg-more"><button type="button" class="sg-btn is-ghost" id="sgMore" hidden>Voir plus de produits</button></div>
         </div>
     </section>
+    @break
 
+    @case('spotlight')
     <section class="sg-sec" id="signature" aria-labelledby="sgSpotH" style="background:var(--paper);border-block:1px solid var(--m-line)">
         <div class="sg-wrap" id="sgSpot"></div>
     </section>
+    @break
 
+    @case('how')
     <section class="sg-sec sg-how" id="commander" aria-labelledby="sgHowH">
         <div class="sg-wrap">
-            <div data-rv style="text-align:center;display:flex;flex-direction:column;align-items:center"><p class="sg-kicker">Simple et sûr</p><h2 class="sg-h2" id="sgHowH">Commander en <em>une minute</em></h2><p class="sg-lead">Pas de carte bancaire, pas de compte obligatoire. Vous payez seulement quand vous avez le produit en main.</p></div>
+            <div data-rv style="text-align:center;display:flex;flex-direction:column;align-items:center"><p class="sg-kicker">Simple et sûr</p><h2 class="sg-h2" id="sgHowH">@if($sec['d']['title'] !== ''){{ $sec['d']['title'] }}@else Commander en <em>une minute</em>@endif</h2><p class="sg-lead">{{ HS::txt('signature', $sec, 'text') }}</p></div>
             <ol class="sg-steps" style="list-style:none;padding:0">
                 <li class="sg-step" data-rv><i><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1 13H7zM9 7a3 3 0 0 1 6 0"/></svg></i><b>Vous commandez</b><span>Votre nom, votre téléphone et votre commune. C’est tout.</span></li>
                 <li class="sg-step" data-rv style="--d:120ms"><i><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></i><b>On vous appelle</b><span>La boutique confirme la commande, le délai et les frais de livraison.</span></li>
@@ -354,11 +380,13 @@ a { color: inherit; }
             <div style="display:flex;justify-content:center;margin-top:44px" data-rv><button type="button" class="sg-btn" style="background:#F6F2EA;color:var(--forest)" data-sm-cart>Voir mon panier</button></div>
         </div>
     </section>
+    @break
 
+    @case('reviews')
     @if($pm['rating'] || $pm['delivered'] || count($pm['reviews']))
     <section class="sg-sec" id="avis" aria-labelledby="sgRevH">
         <div class="sg-wrap">
-            <div data-rv><p class="sg-kicker">Ils ont commandé</p><h2 class="sg-h2" id="sgRevH">Ce qu’en disent <em>nos clients</em></h2></div>
+            <div data-rv><p class="sg-kicker">Ils ont commandé</p><h2 class="sg-h2" id="sgRevH">@if($sec['d']['title'] !== ''){{ $sec['d']['title'] }}@else Ce qu’en disent <em>nos clients</em>@endif</h2></div>
             @if($pm['rating'] || $pm['delivered'])
             <div class="sg-numbers" data-rv>
                 @if($pm['delivered'])<div><b data-sg-count="{{ $pm['delivered'] }}">{{ number_format($pm['delivered'], 0, ',', ' ') }}</b><span>commandes livrées</span></div>@endif
@@ -380,20 +408,34 @@ a { color: inherit; }
         </div>
     </section>
     @endif
+    @break
 
+    @case('faq')
+    @php
+        $faqItems = collect($sec['d']['items'])->filter(fn ($q) => $q['q'] !== '')->values();
+        if ($faqItems->isEmpty()) $faqItems = collect(array_values(array_filter([
+            ['q' => 'Comment passer commande ?', 'a' => 'Ajoutez vos produits au panier, puis indiquez votre nom, votre téléphone et votre commune. Cela prend moins d’une minute.'],
+            ['q' => 'Quand est-ce que je paie ?', 'a' => 'À la livraison, en espèces, au livreur. Vous ne payez rien avant d’avoir le produit en main.'],
+            ['q' => 'Comment savoir si ma commande est confirmée ?', 'a' => 'La boutique vous appelle au numéro indiqué pour confirmer la commande, le délai et les frais de livraison.'],
+            ['q' => 'Puis-je commander plusieurs produits ?', 'a' => 'Oui. Ajoutez-les tous au panier : ils partent dans une seule commande.'],
+            ['q' => 'Comment suivre ma commande ?', 'a' => 'Après l’envoi, un lien « Suivre ma commande » s’affiche. Vous suivez chaque étape sur Shopio.'],
+            $pm['settings']['nego'] ? ['q' => 'Puis-je négocier le prix ?', 'a' => 'Oui. Ouvrez un produit puis touchez « Négocier le prix avec la boutique ».'] : null,
+        ])));
+    @endphp
     <section class="sg-sec" id="questions" aria-labelledby="sgFaqH" style="background:var(--paper);border-top:1px solid var(--m-line)">
         <div class="sg-wrap sg-faq">
-            <div data-rv><p class="sg-kicker">Questions</p><h2 class="sg-h2" id="sgFaqH">Les réponses à vos <em>questions</em></h2><p class="sg-lead">Une autre question ? La boutique vous répond quand elle vous appelle pour confirmer.</p></div>
+            <div data-rv><p class="sg-kicker">Questions</p><h2 class="sg-h2" id="sgFaqH">@if($sec['d']['title'] !== ''){{ $sec['d']['title'] }}@else Les réponses à vos <em>questions</em>@endif</h2><p class="sg-lead">Une autre question ? La boutique vous répond quand elle vous appelle pour confirmer.</p></div>
             <div data-rv style="--d:100ms">
-                <details open><summary>Comment passer commande ?</summary><p>Ajoutez vos produits au panier, puis indiquez votre nom, votre téléphone et votre commune. Cela prend moins d’une minute.</p></details>
-                <details><summary>Quand est-ce que je paie ?</summary><p>À la livraison, en espèces, au livreur. Vous ne payez rien avant d’avoir le produit en main.</p></details>
-                <details><summary>Comment savoir si ma commande est confirmée ?</summary><p>La boutique vous appelle au numéro indiqué pour confirmer la commande, le délai et les frais de livraison.</p></details>
-                <details><summary>Puis-je commander plusieurs produits ?</summary><p>Oui. Ajoutez-les tous au panier : ils partent dans une seule commande.</p></details>
-                <details><summary>Comment suivre ma commande ?</summary><p>Après l’envoi, un lien « Suivre ma commande » s’affiche. Vous suivez chaque étape sur Shopio.</p></details>
-                @if($pm['settings']['nego'])<details><summary>Puis-je négocier le prix ?</summary><p>Oui. Ouvrez un produit puis touchez « Négocier le prix avec la boutique ».</p></details>@endif
+                @foreach($faqItems as $i => $f)<details @if($i === 0) open @endif><summary>{{ $f['q'] }}</summary>@if($f['a'] !== '')<p style="white-space:pre-line">{{ $f['a'] }}</p>@endif</details>@endforeach
             </div>
         </div>
     </section>
+    @break
+
+    @default
+    @include('public.shops.models._section', ['sec' => $sec, 'theme' => 'signature'])
+@endswitch
+@endforeach
 
     <section class="sg-sec" id="favoris" aria-labelledby="sgFavH">
         <div class="sg-wrap">
@@ -409,8 +451,8 @@ a { color: inherit; }
     <div class="sg-wrap">
         <div class="sg-foot-top">
             <div class="sg-foot-brand"><b>{{ $s['name'] }}</b><p>{{ $s['slogan'] !== '' ? $s['slogan'] : 'Commandez en ligne, payez à la livraison.' }}</p></div>
-            <div><h3>Boutique</h3><ul><li><a href="#collection">La collection</a></li>@if(count($pm['reviews']))<li><a href="#avis">Avis clients</a></li>@endif<li><a href="#favoris">Mes favoris</a></li></ul></div>
-            <div><h3>Aide</h3><ul><li><a href="#commander">Comment commander</a></li><li><a href="#questions">Questions fréquentes</a></li>@if($s['address'] !== '')<li>{{ \Illuminate\Support\Str::limit($s['address'], 50) }}</li>@endif</ul></div>
+            <div><h3>Boutique</h3><ul>@if(HS::shows($home, 'products'))<li><a href="#collection">La collection</a></li>@endif @if(count($pm['reviews']) && HS::shows($home, 'reviews'))<li><a href="#avis">Avis clients</a></li>@endif<li><a href="#favoris">Mes favoris</a></li></ul></div>
+            <div><h3>Aide</h3><ul>@if(HS::shows($home, 'how'))<li><a href="#commander">Comment commander</a></li>@endif @if(HS::shows($home, 'faq'))<li><a href="#questions">Questions fréquentes</a></li>@endif @if($s['address'] !== '')<li>{{ \Illuminate\Support\Str::limit($s['address'], 50) }}</li>@endif</ul></div>
         </div>
         <div class="sg-foot-bottom"><span>© {{ date('Y') }} {{ $s['name'] }}</span><span>Paiement à la livraison · Boutique sur Shopio</span></div>
     </div>
@@ -440,35 +482,39 @@ a { color: inherit; }
     /* ── Accueil : photo principale, photo secondaire, carte produit flottante, sceau tournant ── */
     const hero = S.products.find(p => p.featured && p.photo) || withPhoto[0] || S.products[0];
     const alt = hero ? withPhoto.find(p => p.id !== hero.id) : null;
-    if (hero) {
-        $('sgVisual').innerHTML =
-            '<div class="sg-visual-main">' + (hero.photo ? '<img src="' + esc(hero.photo) + '" alt="' + esc(hero.name) + '" fetchpriority="high">' : '<span class="sg-mono">' + esc(D.shop.initials) + '</span>') + '</div>' +
+    const vis = $('sgVisual'), ownImg = vis && vis.dataset.img;
+    if (vis && (hero || ownImg)) {
+        vis.innerHTML =
+            '<div class="sg-visual-main">' + (ownImg ? '<img src="' + esc(ownImg) + '" alt="" fetchpriority="high">' : hero.photo ? '<img src="' + esc(hero.photo) + '" alt="' + esc(hero.name) + '" fetchpriority="high">' : '<span class="sg-mono">' + esc(D.shop.initials) + '</span>') + '</div>' +
             (alt ? '<div class="sg-visual-alt" id="sgAlt"><img src="' + esc(alt.photo) + '" alt="' + esc(alt.name) + '"></div>' : '') +
             '<div class="sg-seal" aria-hidden="true"><svg viewBox="0 0 112 112"><defs><path id="sgCirc" d="M56 56m-42 0a42 42 0 1 1 84 0a42 42 0 1 1-84 0"/></defs><text><textPath href="#sgCirc" textLength="258" lengthAdjust="spacingAndGlyphs">Paiement à la livraison · Rien à payer avant ·</textPath></text></svg><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:static;animation:none"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/></svg></div>' +
-            '<div class="sg-float"><i' + (hero.thumb ? ' style="background-image:url(\'' + esc(hero.thumb) + '\')"' : '') + '></i><div style="min-width:0"><b>' + esc(hero.name) + '</b><span>' + esc(S.money(hero.price)) + '</span></div><button type="button" data-sm-add="' + hero.id + '" aria-label="' + esc(S.buyLabel(hero)) + ' : ' + esc(hero.name) + '"' + (S.canBuy(hero) ? '' : ' disabled') + '>' + plus + '</button></div>';
+            (hero ? '<div class="sg-float"><i' + (hero.thumb ? ' style="background-image:url(\'' + esc(hero.thumb) + '\')"' : '') + '></i><div style="min-width:0"><b>' + esc(hero.name) + '</b><span>' + esc(S.money(hero.price)) + '</span></div><button type="button" data-sm-add="' + hero.id + '" aria-label="' + esc(S.buyLabel(hero)) + ' : ' + esc(hero.name) + '"' + (S.canBuy(hero) ? '' : ' disabled') + '>' + plus + '</button></div>' : '');
         const altEl = $('sgAlt');
         if (altEl && !S.reduce) {
             let tick = false;
             window.addEventListener('scroll', () => { if (tick) return; tick = true; requestAnimationFrame(() => { altEl.style.transform = 'translateY(' + Math.min(80, window.scrollY * .08) + 'px)'; tick = false; }); }, { passive: true });
         }
-    } else { $('sgVisual').hidden = true; }
+    } else if (vis) { vis.hidden = true; }
 
     /* ── Catégories en tuiles photo : cliquer filtre la collection ── */
     let cat = @json($activeCategory['name'] ?? ''), sort = '', shown = 12;
     const PAGE = 12;
     if ($('sgCats')) {
         $('sgCats').innerHTML = D.categories.map(c => { const p = withPhoto.find(x => x.cat === c.name); return '<button type="button" class="sg-cat" data-cat="' + esc(c.name) + '">' + (p ? '<img src="' + esc(p.photo) + '" alt="" loading="lazy">' : '') + '<span><b>' + esc(c.name) + '</b><small>' + c.count + ' produit' + (c.count > 1 ? 's' : '') + '</small></span></button>'; }).join('');
-        $('sgCats').addEventListener('click', e => { const b = e.target.closest('[data-cat]'); if (!b) return; cat = b.dataset.cat; shown = PAGE; renderTabs(); renderGrid(); $('collection').scrollIntoView({ behavior: S.reduce ? 'auto' : 'smooth' }); });
+        $('sgCats').addEventListener('click', e => { const b = e.target.closest('[data-cat]'); if (!b) return; cat = b.dataset.cat; shown = PAGE; renderTabs(); renderGrid(); if ($('collection')) $('collection').scrollIntoView({ behavior: S.reduce ? 'auto' : 'smooth' }); else location.href = D.shop.url + '?vue=produits'; });
     }
 
     /* ── La collection : onglets, tri, grille, « voir plus » ── */
     function renderTabs() {
+        if (!$('sgTabs')) return;
         const tabs = [['', 'Tout', S.products.length]].concat(D.categories.map(c => [c.name, c.name, c.count]));
         $('sgTabs').innerHTML = tabs.map(([v, l, c]) => '<button type="button" data-cat="' + esc(v) + '" aria-pressed="' + (cat === v) + '">' + esc(l) + '<small>' + c + '</small></button>').join('');
     }
-    $('sgTabs').addEventListener('click', e => { const b = e.target.closest('[data-cat]'); if (b) { cat = b.dataset.cat; shown = PAGE; renderTabs(); renderGrid(); } });
-    $('sgSort').addEventListener('change', e => { sort = e.target.value; shown = PAGE; renderGrid(); });
-    $('sgMore').addEventListener('click', () => { const from = shown; shown += PAGE; renderGrid(from); });
+    if ($('sgGrid')) {
+        $('sgTabs').addEventListener('click', e => { const b = e.target.closest('[data-cat]'); if (b) { cat = b.dataset.cat; shown = PAGE; renderTabs(); renderGrid(); } });
+        $('sgSort').addEventListener('change', e => { sort = e.target.value; shown = PAGE; renderGrid(); });
+        $('sgMore').addEventListener('click', () => { const from = shown; shown += PAGE; renderGrid(from); });
+    }
     const card = (p, i) => {
         const pct = off(p), badges = (pct >= 5 ? '<span class="sg-badge is-sale">−' + pct + ' %</span>' : '') + (p.new ? '<span class="sg-badge is-new">Nouveau</span>' : '') + (D.settings.stock && p.stock !== null && p.stock > 0 && p.stock <= 5 ? '<span class="sg-badge">Plus que ' + p.stock + '</span>' : '');
         return '<article class="sg-card" style="--i:' + Math.min(i, 8) + '"><div class="sg-card-media">' +
@@ -486,6 +532,7 @@ a { color: inherit; }
         return l;
     }
     function renderGrid(from) {
+        if (!$('sgGrid')) return;
         const l = list(), page = l.slice(0, shown);
         $('sgCount').textContent = l.length + ' produit' + (l.length > 1 ? 's' : '') + (cat ? ' · ' + cat : '');
         if (!l.length) $('sgGrid').innerHTML = '<div class="sg-empty">Aucun produit dans cette catégorie pour l’instant.</div>';
@@ -497,7 +544,7 @@ a { color: inherit; }
 
     /* ── Pièce signature ── */
     const spot = S.products.find(p => p.featured && p.photo && (!hero || p.id !== hero.id)) || hero;
-    if (spot) {
+    if (spot && $('sgSpot')) {
         const pct = off(spot);
         $('sgSpot').innerHTML = '<div class="sg-spot"><div class="sg-spot-media" data-rv>' + (spot.photo ? '<img src="' + esc(spot.photo) + '" alt="' + esc(spot.name) + '" loading="lazy">' : '<span class="sg-mono" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:italic 500 90px var(--m-title);color:var(--forest)">' + esc(D.shop.initials) + '</span>') + '<span class="sg-spot-price">' + esc(S.money(spot.price)) + '</span></div>' +
             '<div data-rv style="--d:120ms"><p class="sg-kicker">' + esc(spot.cat || 'La pièce signature') + '</p><h2 class="sg-h2" id="sgSpotH">' + esc(spot.name) + '</h2>' +
@@ -505,7 +552,7 @@ a { color: inherit; }
             (spot.desc ? '<p class="sg-spot-desc">' + esc(spot.desc) + '</p>' : '') +
             '<ul class="sg-ticks"><li>Paiement à la livraison, en espèces</li><li>Appel de confirmation avant l’envoi</li><li>Suivi de la commande sur Shopio</li></ul>' +
             '<div class="sg-ctas"><button type="button" class="sg-btn" data-sm-add="' + spot.id + '"' + (S.canBuy(spot) ? '' : ' disabled') + '>' + esc(S.buyLabel(spot)) + '</button><button type="button" class="sg-btn is-ghost" data-sm-quick="' + spot.id + '">Voir le détail</button></div></div></div>';
-    } else { $('signature').hidden = true; }
+    } else if ($('signature')) { $('signature').hidden = true; }
 
     /* ── Chiffres qui montent une fois visibles ── */
     document.querySelectorAll('[data-sg-count]').forEach(el => {

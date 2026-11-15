@@ -1,18 +1,22 @@
 {{--
     Modèle de page « Express » : la boutique qui vend, sur le schéma des boutiques à paiement à la livraison.
-      Accueil   : bandeau défilant, en-tête centré, accueil (badges, titre, 3 engagements, bouton, note réelle,
-                  produit sur socle), vague, 3 engagements illustrés, produits phares en carrousel, résultats
-                  réels en cercles, avis réels, questions fréquentes (menthe), pied de page.
+      Accueil   : sections dans l'ordre choisi par le vendeur (Boutique → Sections, App\Support\HomeSections) :
+                  accueil (badges, titre, engagements, bouton, note réelle, produit sur socle), 3 engagements
+                  illustrés, produits phares en carrousel, résultats réels en cercles, avis réels, questions
+                  fréquentes, et les sections ajoutées (texte, image et texte, bannière, catégorie, questions).
       Catalogue : ?vue=produits, une catégorie (/s/{slug}/{categorie}) ou une recherche (?q=) — fil d'Ariane,
                   catégories, tri, grille « Ajouter au panier ».
     Chaque produit ouvre sa page longue (public.shops.express.product). Données : PageModels::data().
 --}}
 @php
+    use App\Support\HomeSections as HS;
     $s = $pm['shop'];
     $q = trim((string) request('q', ''));
     $isCatalog = request('vue') === 'produits' || $activeCategory || $q !== '';
     $hero = collect($pm['products'])->first(fn ($p) => $p['featured'] && $p['photo']) ?? collect($pm['products'])->first(fn ($p) => $p['photo']);
     $ratingPct = $pm['rating'] ? (int) round($pm['rating']['avg'] * 20) : null;
+    // Sections de l'accueil, dans l'ordre choisi par le vendeur (Boutique → Sections)
+    $home = $pm['home']['express'] ?? HS::defaults('express');
 @endphp
 <!doctype html>
 <html lang="fr">
@@ -99,18 +103,23 @@
 
 <main>
 @if(!$isCatalog)
+@foreach($home as $sec)
+@continue(!$sec['on'])
+@switch($sec['type'])
+    @case('hero')
+    @php $heroImg = HS::imgUrl($sec['d']['img']) ?? ($hero['photo'] ?? null); @endphp
     <section class="ex-hero" aria-labelledby="exTitle">
         <div class="ex-wrap">
             <div>
                 <div class="ex-pills" data-rv><span>💵 Paiement à la livraison</span><span>⚡ Commande en 1 minute</span></div>
-                <h1 id="exTitle" data-rv style="--d:80ms">{{ $s['slogan'] !== '' ? $s['slogan'] : 'Nos meilleurs produits, livrés chez vous.' }}</h1>
-                <p class="ex-lead" data-rv style="--d:140ms">Découvrez {{ $s['name'] }} : des produits choisis avec soin. Commandez en toute confiance et payez seulement à la livraison.</p>
+                <h1 id="exTitle" data-rv style="--d:80ms">{{ $sec['d']['title'] !== '' ? $sec['d']['title'] : ($s['slogan'] !== '' ? $s['slogan'] : HS::txt('express', $sec, 'title')) }}</h1>
+                <p class="ex-lead" data-rv style="--d:140ms">{{ $sec['d']['text'] !== '' ? $sec['d']['text'] : 'Découvrez ' . $s['name'] . ' : ' . lcfirst(HS::txt('express', $sec, 'text')) }}</p>
                 <ul class="ex-points" data-rv style="--d:200ms">
                     <li><i style="background:#16A34A" aria-hidden="true">✓</i>Paiement à la livraison</li>
                     <li><i style="background:#2563EB" aria-hidden="true">☎</i>Appel de confirmation avant l’envoi</li>
                     <li><i style="background:#F59E0B" aria-hidden="true">★</i>{{ $s['verified'] ? 'Boutique vérifiée par Shopio' : 'Suivi de commande sur Shopio' }}</li>
                 </ul>
-                <a class="ex-btn" href="{{ $s['url'] }}?vue=produits" data-rv style="--d:260ms">Voir la boutique <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a class="ex-btn" href="{{ $s['url'] }}?vue=produits" data-rv style="--d:260ms">{{ HS::txt('express', $sec, 'button') }} <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
                 @if($pm['rating'] || $pm['delivered'])
                 <p class="ex-proof" data-rv style="--d:320ms">@if($pm['rating'])<span class="ex-stars" aria-hidden="true">★★★★★</span><b>{{ number_format($pm['rating']['avg'], 1, ',', ' ') }}/5</b><span>sur {{ $pm['rating']['count'] }} avis clients</span>@endif @if($pm['delivered'])<span>· Déjà <b>{{ number_format($pm['delivered'], 0, ',', ' ') }} commandes</b> livrées</span>@endif</p>
                 @endif
@@ -119,37 +128,49 @@
                 <svg class="ex-spark" style="left:16%;top:12%" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/></svg>
                 <svg class="ex-spark" style="right:18%;top:24%;animation-delay:1s" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/></svg>
                 <svg class="ex-spark" style="left:26%;bottom:34%;animation-delay:2s" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/></svg>
-                <div class="ex-stage-item">@if($hero)<img src="{{ $hero['photo'] }}" alt="" fetchpriority="high">@else<span class="ex-noimg">{{ $s['initials'] }}</span>@endif</div>
+                <div class="ex-stage-item">@if($heroImg)<img src="{{ $heroImg }}" alt="" fetchpriority="high">@else<span class="ex-noimg">{{ $s['initials'] }}</span>@endif</div>
                 <div class="ex-podium"></div>
             </div>
         </div>
         <svg class="ex-wave" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40 C 320 90, 620 0, 900 34 S 1300 70, 1440 20 V90 H0z" fill="#C9C9C9" opacity=".45"/><path d="M0 60 C 360 100, 700 20, 1000 50 S 1340 80, 1440 46 V90 H0z" fill="#fff"/></svg>
     </section>
+    @break
 
+    @case('promise')
+    @php $pIcons = [
+        ['linear-gradient(135deg,#F97316,#DC2626)', '<path d="M1 6h13v10H1zM14 9h4l4 4v3h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>'],
+        ['linear-gradient(135deg,#22C55E,#15803D)', '<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/>'],
+        ['linear-gradient(135deg,#38BDF8,#2563EB)', '<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>'],
+    ]; @endphp
     <section style="padding:34px 0 10px" aria-label="Nos engagements">
         <div class="ex-wrap">
             <div class="ex-feats">
-                <div class="ex-feat" data-rv><i style="background:linear-gradient(135deg,#F97316,#DC2626)"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 6h13v10H1zM14 9h4l4 4v3h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg></i><b>Livraison à domicile</b><span>Délai confirmé par téléphone</span></div>
-                <div class="ex-feat" data-rv style="--d:80ms"><i style="background:linear-gradient(135deg,#22C55E,#15803D)"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/></svg></i><b>Paiement à la livraison</b><span>En espèces, à la réception</span></div>
-                <div class="ex-feat" data-rv style="--d:160ms"><i style="background:linear-gradient(135deg,#38BDF8,#2563EB)"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></i><b>Suivi de commande</b><span>Chaque étape sur Shopio</span></div>
+                @foreach($pIcons as $i => [$bg, $path])
+                @php $it = HS::item('express', $sec, $i); @endphp
+                <div class="ex-feat" data-rv style="--d:{{ $i * 80 }}ms"><i style="background:{{ $bg }}"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $path !!}</svg></i><b>{{ $it['title'] }}</b><span>{{ $it['text'] }}</span></div>
+                @endforeach
             </div>
         </div>
     </section>
+    @break
 
+    @case('products')
     <section class="ex-sec" aria-labelledby="exFeatH">
         <div class="ex-wrap">
             <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap" data-rv>
-                <div><h2 class="ex-h2" id="exFeatH">Nos produits phares</h2><p class="ex-sub">Les préférés de la boutique, prêts à être livrés.</p></div>
+                <div><h2 class="ex-h2" id="exFeatH">{{ HS::txt('express', $sec, 'title') }}</h2>@if(HS::txt('express', $sec, 'text') !== '')<p class="ex-sub">{{ HS::txt('express', $sec, 'text') }}</p>@endif</div>
                 <div class="ex-row-nav"><button type="button" data-row="-1" aria-label="Produits précédents">‹</button><button type="button" data-row="1" aria-label="Produits suivants">›</button></div>
             </div>
             <div class="ex-row" id="exRow" style="margin-top:20px"></div>
         </div>
     </section>
+    @break
 
+    @case('results')
     @if($pm['rating'] || $pm['delivered'])
     <section class="ex-sec" aria-labelledby="exResH" style="padding-top:0;text-align:center">
         <div class="ex-wrap">
-            <h2 class="ex-h2" id="exResH" data-rv>Des résultats qui <span class="ex-acc">parlent</span></h2>
+            <h2 class="ex-h2" id="exResH" data-rv>@if($sec['d']['title'] !== ''){{ $sec['d']['title'] }}@else Des résultats qui <span class="ex-acc">parlent</span>@endif</h2>
             <div class="ex-rings">
                 @if($pm['rating'])<div class="ex-ring" data-ring style="--off:{{ 264 - round(264 * $ratingPct / 100) }}"><div><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="bg" cx="50" cy="50" r="42"/><circle class="fg" cx="50" cy="50" r="42"/></svg><b>{{ number_format($pm['rating']['avg'], 1, ',', ' ') }}</b></div><p>Note moyenne sur 5, d’après {{ $pm['rating']['count'] }} avis</p></div>@endif
                 @if($pm['delivered'])<div class="ex-ring" data-ring style="--off:0"><div><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="bg" cx="50" cy="50" r="42"/><circle class="fg" cx="50" cy="50" r="42"/></svg><b style="font-size:{{ strlen((string) $pm['delivered']) > 4 ? 15 : 20 }}px">{{ number_format($pm['delivered'], 0, ',', ' ') }}</b></div><p>Commandes livrées à nos clients</p></div>@endif
@@ -159,11 +180,13 @@
         </div>
     </section>
     @endif
+    @break
 
+    @case('reviews')
     @if(count($pm['reviews']))
     <section class="ex-sec" aria-labelledby="exRevH" style="padding-top:0">
         <div class="ex-wrap">
-            <h2 class="ex-h2" id="exRevH" style="text-align:center" data-rv>Avis clients</h2>
+            <h2 class="ex-h2" id="exRevH" style="text-align:center" data-rv>{{ HS::txt('express', $sec, 'title') }}</h2>
             <div class="ex-reviews">
                 @foreach($pm['reviews']->take(3) as $i => $rv)
                 <article class="ex-review" data-rv style="--d:{{ $i * 80 }}ms">
@@ -176,6 +199,16 @@
         </div>
     </section>
     @endif
+    @break
+
+    @case('faq')
+    @include('public.shops.express._faq', ['faq' => $sec['d']['items'], 'faqTitle' => $sec['d']['title']])
+    @break
+
+    @default
+    @include('public.shops.models._section', ['sec' => $sec, 'theme' => 'express'])
+@endswitch
+@endforeach
 @else
     <div class="ex-wrap" style="padding-bottom:clamp(48px,7vw,84px)">
         <nav class="ex-crumb" aria-label="Fil d’Ariane"><a href="{{ $s['url'] }}">Accueil</a><span aria-hidden="true">›</span>@if($activeCategory)<a href="{{ $s['url'] }}?vue=produits">Produits</a><span aria-hidden="true">›</span><span>{{ $activeCategory['name'] }}</span>@else<span>Produits</span>@endif</nav>
@@ -193,7 +226,7 @@
 @endif
 </main>
 
-@include('public.shops.express._footer', ['faq' => []])
+@include('public.shops.express._footer', ['faq' => [], 'noFaq' => !$isCatalog])
 
 @include('public.shops.models._kit')
 <script>

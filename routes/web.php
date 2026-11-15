@@ -648,10 +648,12 @@ Route::middleware(['auth', 'role:admin'])
         /* Ma vitrine : thème (Express ou Signature), couleur, adresse, fiches produit, mode vacances */
         Route::get('vitrine',               [\App\Http\Controllers\Vendeur\StorefrontController::class, 'edit'])  ->name('storefront.edit');
         Route::put('vitrine',               [\App\Http\Controllers\Vendeur\StorefrontController::class, 'update'])->name('storefront.update');
+        Route::get('vitrine/sections',      [\App\Http\Controllers\Vendeur\StorefrontController::class, 'sections'])     ->name('storefront.sections');
+        Route::put('vitrine/sections',      [\App\Http\Controllers\Vendeur\StorefrontController::class, 'saveSections']) ->name('storefront.sections.update');
         Route::get('vitrine/qr-code',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'qr'])    ->name('storefront.qr');
         Route::get('vitrine/adresse',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'slugCheck'])   ->name('storefront.slug');
 
-        /* Faire grandir ma vitrine : couverture et logo, partage, conversion, qualité */
+        /* Boutique (menu vendeur) : couverture et logo, partage, conversion, qualité */
         Route::prefix('vitrine/grandir')->name('grow')->controller(\App\Http\Controllers\Vendeur\GrowController::class)->group(function () {
             Route::get('/', 'index');
             Route::post('couverture/photo', 'uploadCover')->name('.cover-upload');

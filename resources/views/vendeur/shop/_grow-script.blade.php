@@ -1,4 +1,4 @@
-{{-- Script de « Faire grandir ma vitrine » (inclus par vendeur/shop/grow.blade.php, mêmes variables). --}}
+{{-- Script de « Boutique » (inclus par vendeur/shop/grow.blade.php, mêmes variables). --}}
 @php
     $gwData = [
         'shop' => [

@@ -3,7 +3,7 @@
     bandeau du lien d'aperçu, bandeau du mode vacances.
     Variables : $shop, $pm, $model, $isOwner, $publishedModel, $previewLink
 --}}
-@if($isOwner && !$previewLink)
+@if($isOwner && !$previewLink && !request()->boolean('apercu'))
 @include('public.shops.models._owner-bar', ['current' => $model])
 @endif
 @if($previewLink)

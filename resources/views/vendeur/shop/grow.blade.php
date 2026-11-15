@@ -1,14 +1,14 @@
 {{--
     resources/views/vendeur/shop/grow.blade.php
     Route     : GET /boutique/vitrine/grandir?onglet=… → Vendeur\GrowController@index → name('boutique.grow')
-    Rôle      : « Faire grandir ma vitrine » — 4 onglets :
+    Rôle      : « Boutique » (menu vendeur) — 4 onglets :
                 1. Couverture et logo (publiés tout de suite)   2. Partage (liens, QR, affiche, liens suivis, campagne)
                 3. Conversion (preuves de confiance, mode WhatsApp)   4. Qualité (statistiques, score, lien d'aperçu)
                 Le thème de la vitrine (Express ou Signature) se choisit dans « Ma vitrine ».
                 Toutes les valeurs affichées viennent de la boutique : aucun chiffre n'est inventé.
 --}}
 @extends('layouts.app')
-@section('title', 'Faire grandir ma vitrine · ' . $shop->name)
+@section('title', 'Boutique · ' . $shop->name)
 @php
     $bodyClass = 'is-dashboard';
     use App\Support\Storefront as SF;
@@ -23,7 +23,7 @@
 @push('styles')
 <link href="{{ \App\Support\Assets::v('fonts/dashboard-fonts.css') }}" rel="stylesheet">
 <style>
-/* Faire grandir ma vitrine : en-tête bleu nuit à onglets, panneaux arrondis, aperçus en grand */
+/* Boutique : en-tête bleu nuit à onglets, panneaux arrondis, aperçus en grand */
 :root {
     --gw-blue: #1F7CF6; --gw-btn: #1668D8; --gw-btn-h: #1260C9; --gw-b50: #EAF2FF; --gw-b100: #D6E6FF;
     --gw-night: #0B1E3D; --gw-night2: #132B52; --gw-amber: #F59E0B; --gw-amb50: #FEF3E0; --gw-ambi: #92400E;
@@ -320,12 +320,13 @@ textarea.gw-input { padding: 10px 12px; min-height: 96px; resize: vertical; line
         <div class="gw-brand">
             <img src="{{ \App\Support\Assets::v('images/shopio-logo-192.png') }}" alt="" width="40" height="40">
             <div style="min-width:0">
-                <h1>Faire grandir ma vitrine</h1>
+                <h1>Boutique</h1>
                 <p>{{ $shop->name }} · couverture, partage, conversion et qualité</p>
             </div>
         </div>
         <nav class="gw-links" aria-label="Autres pages">
             <a class="gw-btn gw-btn-night gw-btn-sm" href="{{ $publicUrl }}" target="_blank" rel="noopener">Vitrine</a>
+            <a class="gw-btn gw-btn-amber gw-btn-sm" href="{{ route('boutique.storefront.sections') }}">Modifier les sections</a>
             <a class="gw-btn gw-btn-night gw-btn-sm" href="{{ route('boutique.storefront.edit') }}">Ma vitrine</a>
             <a class="gw-btn gw-btn-night gw-btn-sm" href="{{ route('boutique.dashboard') }}">Tableau de bord</a>
         </nav>

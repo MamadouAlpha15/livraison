@@ -177,6 +177,7 @@ class Storefront
             'collections'  => [],
             'template'     => '',
             'page_model'   => 'express',
+            'home'         => HomeSections::normalizeAll(null),
         ];
     }
 
@@ -276,6 +277,8 @@ class Storefront
             // Thème de la vitrine (voir App\Support\PageModels) : Express par défaut, ou Signature.
             // Un ancien modèle supprimé (Standard, Prestige, Pop…) revient à Express.
             'page_model'   => $pick($input['page_model'] ?? null, array_keys(PageModels::MODELS), PageModels::DEFAULT),
+            // Sections de la page d'accueil, une liste par thème (Boutique → Sections)
+            'home'         => HomeSections::normalizeAll($input['home'] ?? null),
         ];
     }
 

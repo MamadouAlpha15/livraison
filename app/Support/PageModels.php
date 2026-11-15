@@ -99,6 +99,8 @@ class PageModels
                 'vacation' => $set['vacation'], 'vacationMsg' => $set['vacation_msg'], 'nego' => $set['show_nego'],
                 'stock' => $set['show_stock'], 'wa' => $set['wa_mode'] && $shop->phone,
             ],
+            // Sections de la page d'accueil, une liste par thème (Boutique → Sections)
+            'home'       => $sf['home'],
             'communes'   => self::COMMUNES,
             'user'       => $user ? ['name' => $user->name, 'phone' => (string) ($user->phone ?? '')] : null,
             'urls'       => [

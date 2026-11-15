@@ -24,7 +24,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 /**
- * « Faire grandir ma vitrine » : 4 onglets.
+ * « Boutique » (menu vendeur, autrefois « Faire grandir ma vitrine ») : 4 onglets.
  *  1. Couverture et logo — enregistrés et publiés tout de suite.
  *  2. Partage — liens et QR codes (boutique, catégorie, produit), affiche A5, liens suivis, lien de campagne.
  *  3. Conversion — preuves de confiance, mode WhatsApp.

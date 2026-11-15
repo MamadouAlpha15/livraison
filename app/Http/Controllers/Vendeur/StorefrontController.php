@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Vendeur;
 use App\Http\Controllers\Controller;
 use App\Models\Shop;
 use App\Support\Growth;
+use App\Support\HomeSections;
 use App\Support\PageModels;
 use App\Support\Storefront;
 use App\Support\TrafficSource;
@@ -88,6 +89,52 @@ class StorefrontController extends Controller
         return redirect()->route('boutique.storefront.edit')->with('success', $config['settings']['vacation']
             ? 'Vitrine enregistrée. Mode vacances actif : les commandes sont en pause.'
             : 'Vitrine enregistrée. Vos clients voient maintenant ces réglages.');
+    }
+
+    // ─────────────────────────────────────────────────────────── Sections de l'accueil
+
+    /** « Boutique → Sections » : sections de la page d'accueil, une liste par thème, avec aperçu en direct. */
+    public function sections(Request $request): View
+    {
+        $shop = $this->shop();
+        $config = Storefront::forShop($shop);
+        $theme = PageModels::isModel($request->query('theme')) ? $request->query('theme') : $config['page_model'];
+        $defaults = HomeSections::DEFAULTS;
+        // Titre d'accueil prévu : le slogan de la boutique, sinon son nom (Signature) ou la phrase du thème
+        $slogan = (string) $config['cover']['slogan'];
+        if ($slogan !== '') $defaults['express']['hero']['title'] = $defaults['signature']['hero']['title'] = $slogan;
+        if ($defaults['signature']['hero']['title'] === '') $defaults['signature']['hero']['title'] = $shop->name;
+
+        $images = collect($config['home'])->flatten(1)->pluck('d.img')->filter()->unique()
+            ->mapWithKeys(fn ($p) => [$p => HomeSections::imgUrl($p)])->all();
+
+        return view('vendeur.shop.sections', [
+            'shop'       => $shop,
+            'theme'      => $theme,
+            'published'  => $config['page_model'],
+            'home'       => $config['home'],
+            'models'     => PageModels::MODELS,
+            'defaults'   => $defaults,
+            'images'     => $images,
+            'categories' => collect(Storefront::categoryLinks($shop))->pluck('name')->values(),
+            'publicUrl'  => Storefront::publicUrl($shop),
+        ]);
+    }
+
+    /** Enregistre et publie les sections d'un thème (JSON). */
+    public function saveSections(Request $request): JsonResponse
+    {
+        $shop = $this->shop();
+        $data = $request->validate([
+            'theme'    => ['required', Rule::in(array_keys(PageModels::MODELS))],
+            'sections' => ['required', 'array', 'max:' . (count(HomeSections::BUILTIN['signature']) + HomeSections::CUSTOM_MAX)],
+        ], ['theme.in' => 'Thème inconnu.', 'sections.max' => 'Trop de sections : ' . HomeSections::CUSTOM_MAX . ' sections ajoutées au maximum.']);
+
+        $config = Storefront::forShop($shop);
+        $config['home'][$data['theme']] = HomeSections::normalize($data['theme'], $data['sections']);
+        $shop->update(['storefront' => Storefront::normalize($config)]);
+
+        return response()->json(['ok' => true, 'sections' => Storefront::forShop($shop->fresh())['home'][$data['theme']]]);
     }
 
     /** Disponibilité d'une adresse de boutique (/s/…). */
