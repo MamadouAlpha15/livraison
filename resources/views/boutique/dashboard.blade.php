@@ -1364,6 +1364,38 @@ body { font-variant-numeric: tabular-nums; }
     .kpi:hover, .sv-row-3 .quick-btn:hover, .sv-pcol:hover, .sb-nav .sb-item:hover { transform: none !important; }
     .sv-stage { transition: none; }
 }
+
+/* ── Tableau de bord sobre : une couleur d'accent (l'action principale), le reste blanc et gris ── */
+.db-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.db-act { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 14px; border: 0; border-radius: 10px; background: var(--surface); color: var(--text); box-shadow: inset 0 0 0 1px var(--border); font: 700 13px var(--font); text-decoration: none; cursor: pointer; transition: box-shadow .15s, background-color .15s, transform .1s; }
+.db-act svg { color: var(--text-2); flex-shrink: 0; }
+.db-act:hover { box-shadow: inset 0 0 0 1px var(--text-2); color: var(--text); }
+.db-act:active { transform: scale(.98); }
+.db-act.is-main { background: var(--sv-btn, #1F7CF6); color: #fff; box-shadow: none; }
+.db-act.is-main svg { color: #fff; }
+.db-act.is-main:hover { background: var(--sv-btn-h, #1667D6); color: #fff; }
+.db-act b { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: rgba(255,255,255,.22); font-size: 11.5px; }
+.sv-hello { background: var(--surface) !important; color: var(--text) !important; box-shadow: inset 0 0 0 1px var(--border) !important; grid-template-columns: 1fr !important; padding: 24px !important; border-radius: 18px !important; }
+.sv-hello::before, .sv-hello::after, .sv-scene { display: none !important; }
+.sv-hello-title { color: var(--text) !important; font-size: 26px !important; }
+.sv-hello-title span { color: var(--text-2) !important; }
+.sv-hello-sub { color: var(--text-2) !important; }
+.sv-chip { background: var(--bg) !important; color: var(--text-2) !important; box-shadow: inset 0 0 0 1px var(--border) !important; }
+.sv-tone-b, .sv-tone-a, .sv-tone-g, .sv-tone-n { background: var(--bg) !important; }
+.sv-visit .sv-visit-val { color: var(--text) !important; }
+.kpi { border-top: 1px solid var(--border) !important; }
+.kpi::before { display: none !important; }
+.kpi-grid .kpi .kpi-icon, .kpi-grid .kpi:nth-child(n):not(.db-x) .kpi-icon, .today-grid .today-card .today-icon { background: var(--bg) !important; border: 1px solid var(--border) !important; box-shadow: none !important; }
+.kpi-icon svg, .today-icon svg { stroke: var(--text-2) !important; color: var(--text-2) !important; }
+.kpi-icon svg [fill]:not([fill="none"]), .today-icon svg [fill]:not([fill="none"]) { fill: var(--text-2) !important; }
+.today-grid .today-card, .today-grid .today-card + .today-card { background: var(--surface) !important; border: 1px solid var(--border) !important; box-shadow: none !important; }
+.today-card::before, .today-card::after { display: none !important; }
+.today-lbl, .today-unit { color: var(--muted) !important; }
+.today-val { color: var(--text) !important; text-shadow: none !important; }
+.today-delta.up, .today-delta.flat { background: var(--bg) !important; color: var(--text-2) !important; border: 1px solid var(--border) !important; }
+.today-wave { opacity: .35; filter: grayscale(1); }
+.quick-btn { --q-bg: var(--bg) !important; --q-border: var(--border) !important; --q-color: var(--text-2) !important; }
+.quick-btn-ico { color: var(--text-2) !important; background: var(--bg) !important; border-color: var(--border) !important; filter: none !important; }
 </style>
 @endpush
 
@@ -1934,7 +1966,7 @@ $I = [
                 </div>
 
                 {{-- Nouvelle commande --}}
-                <a href="{{ route('boutique.orders.index') }}" class="btn btn-primary btn-sm">
+                <a href="{{ route('boutique.orders.index', ['nouvelle' => 1]) }}" class="btn btn-primary btn-sm">
                     + <span class="btn-commande-label">Commande</span>
                 </a>
             </div>
@@ -2030,9 +2062,13 @@ $I = [
                                 Assignez un livreur aux commandes en attente pour les débloquer.
                             @endif
                         </p>
-                        <div class="sv-hello-cta">
-                            <a href="{{ route('boutique.orders.index', ['status' => 'en_attente']) }}" class="sv-btn sv-btn-amber">Traiter les commandes</a>
-                            <button type="button" class="sv-btn sv-btn-line" data-share-shop="{{ $shopPublicUrl }}" data-share-name="{{ $shop->name }}">Partager ma boutique</button>
+                        {{-- Actions regroupées (façon Sellio) : une seule couleur pour l'action principale --}}
+                        <div class="db-acts" role="group" aria-label="Actions rapides">
+                            <a href="{{ route('boutique.orders.index', ['etape' => 'nouvelle']) }}" class="db-act is-main"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 7v10l8 4 8-4V7zM4 7l8 4 8-4M12 11v10"/></svg>Traiter les commandes @if($pendingCount > 0)<b>{{ $pendingCount }}</b>@endif</a>
+                            <a href="{{ route('boutique.orders.index', ['nouvelle' => 1]) }}" class="db-act"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Nouvelle commande</a>
+                            <a href="{{ $isPro || $totalProduits < $maxProduits ? route('products.create') : route('boutique.subscription.upgrade') }}" class="db-act"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12 12 3h8v8l-9 9zM15.5 8.5h.01"/></svg>Ajouter un produit</a>
+                            <a href="{{ route('boutique.storefront.edit') }}" class="db-act"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Personnaliser ma boutique</a>
+                            <button type="button" class="db-act" data-share-shop="{{ $shopPublicUrl }}" data-share-name="{{ $shop->name }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13"/></svg>Partager ma boutique</button>
                         </div>
                     </div>
                     {{-- Scène 3D décorative : sphère bleue, carte « Visites ce mois », pièce GNF --}}

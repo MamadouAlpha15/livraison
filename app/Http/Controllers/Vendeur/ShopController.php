@@ -42,7 +42,8 @@ class ShopController extends Controller
      */
     public function create()
     {
-        return view('vendeur.shop.create');
+        // Parcours en 8 étapes, une question par écran (l'ancien formulaire vendeur/shop/create reste pour store())
+        return app(ShopOnboardingController::class)->create();
     }
 
     /**
@@ -259,6 +260,7 @@ $clientMessages = ShopMessage::where('shop_id', $shop->id)
         $recentPayment = \App\Models\Subscription::where('subscriber_type', \App\Models\Shop::class)
             ->where('subscriber_id', $shop->id)
             ->where('status', 'active')
+            ->where('payment_method', '!=', 'essai_gratuit') // l'essai offert à la création n'est pas un paiement
             ->where('updated_at', '>=', now()->subMinutes(10))
             ->exists();
 

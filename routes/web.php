@@ -829,6 +829,9 @@ Route::middleware(['auth', 'role:vendeur,admin'])->group(function () {
     Route::get('/vendeur/dashboard', [VendeurDashboard::class, 'index'])->name('vendeur.dashboard');
 
     /* ── Boutique / Shop ── */
+    /* Création de la boutique en 8 étapes (le formulaire est servi par shop.create / boutique.shops.create) */
+    Route::post('shop/demarrer', [\App\Http\Controllers\Vendeur\ShopOnboardingController::class, 'store'])
+        ->middleware('throttle:10,1')->name('shop.onboard');
     Route::resource('shop', ShopController::class);
 
     /* ── Produits ── */
