@@ -95,6 +95,10 @@ class ShopOnboardingController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        // Déjà une boutique (double clic, retour arrière…) : on n'en crée pas une deuxième
+        if (Auth::user()->shop) {
+            return response()->json(['redirect' => route('boutique.dashboard')]);
+        }
         $data = $request->validate([
             'name'       => ['required', 'string', 'min:2', 'max:60'],
             'experience' => ['required', Rule::in(array_keys(self::EXPERIENCE))],

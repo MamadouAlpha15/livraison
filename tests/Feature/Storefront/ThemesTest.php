@@ -11,11 +11,8 @@ use Tests\Support\CampaignFixtures as F;
  * ancienne apparence ignorée, anciennes fiches produit redirigées vers la page du thème.
  */
 
-test('le vendeur choisit Signature à la création de sa boutique', function () {
+test('l’ancien formulaire accepte encore le thème Signature (la création en 8 étapes démarre en Express)', function () {
     $owner = User::factory()->create(['role' => 'admin', 'country' => 'GN']);
-
-    $this->actingAs($owner)->get(route('shop.create'))->assertOk()
-        ->assertSee('Thème de la boutique')->assertSee('Express')->assertSee('Signature');
 
     $this->actingAs($owner)
         ->post(route('shop.store'), ['name' => 'Chez Mariama', 'phone' => '625 11 22 33', 'currency' => 'GNF', 'page_model' => 'signature'])
