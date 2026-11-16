@@ -60,7 +60,7 @@
                 </div>
 
                 {{-- Nouvelle commande --}}
-                <a href="{{ route('boutique.orders.index') }}" class="btn btn-primary btn-sm">
+                <a href="{{ route('boutique.orders.index', ['nouvelle' => 1]) }}" class="btn btn-primary btn-sm">
                     + <span class="btn-commande-label">Commande</span>
                 </a>
             </div>
