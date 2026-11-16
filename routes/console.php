@@ -50,6 +50,14 @@ Schedule::call(function () {
 Schedule::command('shops:daily-summary')->dailyAt('20:00')->name('shop-daily-summary')->withoutOverlapping();
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Vue en direct : les visiteurs vus il y a plus d'un jour sont effacés chaque nuit ;
+// la base des pays (DB-IP Lite, nouvelle version chaque mois) est mise à jour le 3 du mois.
+// ─────────────────────────────────────────────────────────────────────────────
+Schedule::call(fn () => \App\Models\LiveVisitor::where('last_seen_at', '<', now()->subDay())->delete())
+    ->dailyAt('04:00')->name('prune-live-visitors')->withoutOverlapping();
+Schedule::command('shopio:geoip-update')->monthlyOn(3, '05:00')->name('geoip-update')->withoutOverlapping();
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Campagnes sponsorisées : compteurs d'affichages, clics et messages (tenus en cache)
 // recopiés dans les statistiques par jour, que le vendeur voit sur sa page Campagnes.
 // ─────────────────────────────────────────────────────────────────────────────

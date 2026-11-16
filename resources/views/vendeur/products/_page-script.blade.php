@@ -9,7 +9,7 @@
     const { esc, svg, IC } = X;
     let C = JSON.parse(JSON.stringify(G.content)), Z = JSON.parse(JSON.stringify(G.design));
     let pageScope = G.ownPage ? 'product' : 'all', formScope = G.ownForm ? 'product' : 'shop';
-    let dirty = false, saving = false, tab = 'sections', infoTab = 'galerie', openBuy = null, openSec = null, libTab = 'all', libQuery = '', packErr = {};
+    let dirty = false, saving = false, tab = 'sections', infoTab = 'galerie', openBuy = null, openSec = null, libTab = 'all', libQuery = '', packErr = {}, aiNote = '';
     const money = n => Math.round(Number(n) || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ' + G.currency;
     const P = G.product;
 
@@ -47,11 +47,49 @@
     function paneInfos() {
         const sub = { galerie: 'Galerie', infos: 'Infos', variantes: 'Variantes', options: 'Options' };
         let body = '';
-        if (infoTab === 'galerie') body = '<div class="pe-card"><h3>Images du produit</h3>' + (G.photos.length ? '<div class="pe-gal">' + G.photos.map(u => '<i style="background-image:url(\'' + esc(u) + '\')"></i>').join('') + '</div>' : '<p class="sx-hint">Pas encore de photo.</p>') + '<p class="sx-hint">La première image est la photo principale. Ajoutez, retirez ou changez l’ordre dans la fiche du produit.</p><a class="sx-btn sx-btn-sm" style="justify-self:start" href="' + esc(G.urls.edit) + '">Gérer les photos</a></div>';
+        if (infoTab === 'galerie') body = '<div class="pe-card"><h3>Images du produit</h3>' + (G.photos.length ? '<div class="pe-gal">' + G.photos.map(u => '<i style="background-image:url(\'' + esc(u) + '\')"></i>').join('') + '</div>' : '<p class="sx-hint">Pas encore de photo.</p>') + '<p class="sx-hint">La première image est la photo principale. Ajoutez, retirez ou changez l’ordre dans la fiche du produit.</p><a class="sx-btn sx-btn-sm" style="justify-self:start" href="' + esc(G.urls.edit) + '">Gérer les photos</a></div>' + photoPro();
         if (infoTab === 'infos') body = '<div class="pe-card"><h3>Infos du produit</h3><dl class="pe-kv"><dt>Nom</dt><dd>' + esc(P.name) + '</dd><dt>Prix</dt><dd>' + esc(money(P.price)) + (P.old ? ' <s style="color:var(--sx-ink3);font-weight:500">' + esc(money(P.old)) + '</s>' : '') + '</dd><dt>Stock</dt><dd>' + (P.stock === null ? 'Non suivi' : P.stock) + '</dd><dt>Catégorie</dt><dd>' + esc(P.category || '—') + '</dd></dl><a class="sx-btn sx-btn-sm" style="justify-self:start" href="' + esc(G.urls.edit) + '">Modifier le nom, le prix, le stock</a></div>';
         if (infoTab === 'variantes') body = '<div class="pe-card"><h3>Variantes du produit</h3><p class="sx-hint">' + (P.variants ? 'Ce produit a des variantes (taille, couleur…). Le client les choisit avant de commander.' : 'Pas de variante : le produit se vend tel quel.') + ' Taille, couleur, matière : les variantes se règlent dans la fiche du produit.</p><a class="sx-btn sx-btn-sm" style="justify-self:start" href="' + esc(G.urls.edit) + '">Gérer les variantes</a></div>';
         if (infoTab === 'options') body = '<div class="pe-card"><h3>Options et suppléments</h3><p class="sx-hint">Les suppléments payants (gravure, emballage cadeau, garantie…) ne sont pas encore disponibles sur Shopio. Le prix payé reste celui du produit et de ses packs.</p></div>';
         return '<div class="pe-sub" role="group" aria-label="Infos">' + Object.entries(sub).map(([k, l]) => '<button type="button" data-info="' + k + '" aria-pressed="' + (infoTab === k) + '">' + l + '</button>').join('') + '</div>' + body;
+    }
+
+    /* ───── Galerie → Photos pro (Shopio IA) : la vraie photo du produit, fond blanc studio ou mise en scène ───── */
+    let ph = { style: 'studio', wish: '', busy: false, result: null, msg: '', cls: '' };
+    function photoPro() {
+        if (!G.urls.photoAi) return '';
+        const styles = { studio: 'Fond blanc studio', scene: 'Mise en scène' };
+        return '<div class="pe-card sx-aimg" style="margin-top:12px"><h3 style="margin:0">✨ Photos pro avec Shopio IA</h3>' +
+            '<p class="sx-hint" style="margin:0">À partir de la vraie photo principale : le produit reste le même, Shopio IA soigne le fond et la lumière. Vous choisissez ensuite de l’ajouter ou non.</p>' +
+            (!G.photos.length ? '<p class="sx-hint">Ajoutez d’abord une vraie photo du produit.</p>' :
+            '<div class="sx-seg" role="group" aria-label="Style de la photo">' + Object.entries(styles).map(([k, l]) => '<button type="button" data-pstyle="' + k + '" aria-pressed="' + (ph.style === k) + '">' + l + '</button>').join('') + '</div>' +
+            '<input class="sx-input" id="pePhWish" maxlength="300" value="' + esc(ph.wish) + '" placeholder="' + (ph.style === 'studio' ? 'Précision (facultatif) : ex. vue de face, ombre très légère' : 'Décor souhaité (facultatif) : ex. salon moderne, tissu wax, plage') + '" aria-label="Précision pour la photo">' +
+            '<button type="button" class="sx-btn sx-btn-sm sx-ai-btn' + (ph.busy ? ' is-busy' : '') + '" id="pePhGo" style="justify-self:start"' + (ph.busy ? ' disabled' : '') + '>' + (ph.busy ? 'Création en cours…' : '✨ Créer la photo') + '</button>' +
+            (ph.result ? '<div style="display:grid;gap:8px"><img src="' + esc(ph.result.url) + '" alt="Photo créée par Shopio IA" style="width:100%;max-width:320px;aspect-ratio:1;object-fit:cover;border-radius:14px;box-shadow:0 0 0 1px var(--sx-line)">' +
+                '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="sx-btn sx-btn-sm" data-ph-add="1">★ Mettre en photo principale</button><button type="button" class="sx-btn sx-btn-sm" data-ph-add="0">+ Ajouter à la galerie</button><button type="button" class="sx-btn sx-btn-sm sx-btn-danger" data-ph-drop>Ne pas garder</button></div></div>' : '')) +
+            '<span class="sx-msg ' + ph.cls + '" aria-live="polite">' + esc(ph.msg || (G.aiPro ? 'Environ 30 secondes à 1 minute. Vérifiez toujours que le produit est fidèle à l’original.' : 'Réservé au plan Pro.')) + '</span></div>';
+    }
+    async function phPost(url, body) {
+        let r, j = {};
+        try { r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }, body: JSON.stringify(body) }); j = await r.json().catch(() => ({})); }
+        catch (x) { throw new Error('Connexion impossible : vérifiez votre internet puis réessayez.'); }
+        if (!r.ok) throw new Error(j.error || (j.errors && Object.values(j.errors)[0][0]) || (r.status === 429 ? 'Trop d’essais : patientez une minute.' : 'La photo n’a pas pu être créée. Réessayez.'));
+        return j;
+    }
+    async function phMake() {
+        if (!G.aiPro) { ph.msg = 'Les photos Shopio IA sont réservées au plan Pro.'; ph.cls = 'is-err'; render(); return; }
+        ph.busy = true; ph.result = null; ph.msg = 'Shopio IA regarde votre photo et crée la nouvelle… (30 secondes à 1 minute)'; ph.cls = ''; render();
+        try { ph.result = await phPost(G.urls.photoAi, { style: ph.style, wish: ph.wish.trim() }); ph.msg = 'Photo créée : vérifiez que le produit est bien fidèle à l’original, puis choisissez.'; ph.cls = 'is-ok'; }
+        catch (e) { ph.msg = e.message; ph.cls = 'is-err'; }
+        ph.busy = false; render();
+    }
+    async function phAttach(main) {
+        try {
+            const j = await phPost(G.urls.photoAttach, { path: ph.result.path, main: main });
+            G.photos = j.photos; ph.result = null; ph.msg = main ? 'Photo principale changée : c’est fait, rien d’autre à sauvegarder.' : 'Photo ajoutée à la galerie : c’est fait, rien d’autre à sauvegarder.'; ph.cls = 'is-ok';
+            load();
+        } catch (e) { ph.msg = e.message; ph.cls = 'is-err'; }
+        render();
     }
 
     /* ═════════════ Onglet Sections ═════════════ */
@@ -81,7 +119,7 @@
         else if (t === 'p_compare') h = txt('C.compare.title', 'Titre', 80, 'Pourquoi nous choisir ?') + listEd('C.compare.rows', 'Points garantis', 8, 60, 'Ex. Qualité premium garantie') + '<p class="sx-hint">Seulement ce que vous garantissez vraiment à chaque commande.</p>';
         else if (t === 'p_faq') h = title(G.defaults.product.p_faq.title) + pairEd('C.faq', 'Questions', 10, ['q', 'a'], ['Question', 'Réponse'], [140, 600], ['Ex. Quel est le délai de livraison ?', 'Votre réponse']) + '<p class="sx-hint">Vide : les questions habituelles (commande, paiement, livraison).</p>';
         else if (t === 'p_related') h = title(G.defaults.product.p_related.title);
-        else h = (G.fields[t] || []).map(f => X.field(s, i, f)).join('');
+        else h = (X.aiWritable(t) ? X.aiRow() : '') + (G.fields[t] || []).map(f => X.field(s, i, f)).join('');
         return '<div class="sx-body">' + h + space('Z.page.' + i + '.sp') + (X.isBuiltin(t) ? '' : '<button type="button" class="sx-btn sx-btn-sm sx-btn-danger" data-sdel style="justify-self:start">' + svg(IC.trash, 15) + ' Supprimer la section</button>') + '</div>';
     }
     function paneSections() {
@@ -95,7 +133,8 @@
             return '<li class="sx-item' + (o ? ' is-open' : '') + (s.on ? '' : ' is-off') + '" data-i="' + i + '" draggable="true">' + itemHd(name, X.isBuiltin(s.type) ? '' : 'ajoutée', i, Z.page.length, sw('Z.page.' + i + '.on', 'Afficher « ' + name + ' »'), 'page', o) + (o ? secBody(s, i) : '') + '</li>';
         }).join('');
         const custom = Z.page.filter(s => !X.isBuiltin(s.type)).length;
-        return '<div class="pe-ai"><p id="peAiMsg">Shopio IA rédige toute la page (accroche, bénéfices, sections, questions) d’après le nom, la description et les photos. Vous relisez, puis vous sauvegardez.</p><button type="button" class="sx-btn sx-btn-sm" id="peAi">✨ Régénérer avec Shopio IA</button></div>' +
+        return '<div class="pe-ai"><p id="peAiMsg">Shopio IA rédige toute la page (accroche, bénéfices, sections, questions) et les sections que vous avez ajoutées, d’après le nom, la description et les photos. Vous relisez, puis vous sauvegardez.</p><button type="button" class="sx-btn sx-btn-sm" id="peAi">✨ Régénérer avec Shopio IA</button>' +
+                '<input class="sx-input" id="peAiNote" maxlength="500" style="flex:1 1 100%" placeholder="Consigne (facultatif) : ex. plus court, parlez de la Tabaski, ton plus luxe…" value="' + esc(aiNote) + '" aria-label="Consigne pour Shopio IA"></div>' +
             '<div class="pe-card"><h3>Réglages</h3>' + line('Panier flottant', 'La barre « Commander » qui suit le client en bas de l’écran', sw('Z.sticky', 'Panier flottant')) + '</div>' +
             '<div class="pe-card"><h3>Bloc d’achat</h3><p class="sx-hint">À droite des photos sur ordinateur, sous les photos sur mobile. Glissez pour changer l’ordre.</p><ol class="sx-list" id="peBuy">' + buy + '</ol></div>' +
             '<div class="pe-card"><h3>Sections de la page</h3><p class="sx-hint">Pleine largeur, sous le bloc d’achat.</p>' +
@@ -225,6 +264,10 @@
         const t = e.target;
         const g = t.closest('[data-goto]'); if (g) { showTab(g.dataset.goto); return; }
         const inf = t.closest('[data-info]'); if (inf) { infoTab = inf.dataset.info; render(); return; }
+        const pst = t.closest('[data-pstyle]'); if (pst) { ph.style = pst.dataset.pstyle; render(); return; }
+        if (t.closest('#pePhGo')) { if (!ph.busy) phMake(); return; }
+        const pha = t.closest('[data-ph-add]'); if (pha && ph.result) { phAttach(pha.dataset.phAdd === '1'); return; }
+        if (t.closest('[data-ph-drop]')) { ph.result = null; ph.msg = 'Photo écartée.'; ph.cls = ''; render(); return; }
         const rs = t.closest('[data-reset]'); if (rs) { setp(rs.dataset.reset, null); touch(); render(); return; }
         const pk = t.closest('[data-pick]'); if (pk) { setp(pk.dataset.pick, pk.dataset.v); touch(); render(); return; }
         const ps = t.closest('[data-pscope]'); if (ps) { pageScope = ps.dataset.pscope; touch(); render(); return; }
@@ -235,6 +278,8 @@
         if (ld) { const arr = getp(ld.dataset.ldel); arr.splice(+ld.dataset.n, 1); if (ld.dataset.ldel === 'C.packs') packErr = {}; touch(); render(); return; }
         const lt = t.closest('[data-lib]'); if (lt) { libTab = lt.dataset.lib; render(); return; }
         if (t.id === 'peAi' || t.closest('#peAi')) { aiFill(); return; }
+        const sai = t.closest('[data-sai]');
+        if (sai) { const sli = sai.closest('[data-i]'); if (sli) aiSection(+sli.dataset.i, sai); return; }
         const add = t.closest('[data-add]');
         if (add) {
             const s = { id: 's' + Math.random().toString(36).slice(2, 10).padEnd(8, '0'), type: add.dataset.add, on: true, sp: [0, 0], d: X.blank(add.dataset.add) };
@@ -263,10 +308,11 @@
         const dl = t.closest('[data-list-del]'); if (dl) { d[dl.dataset.listDel].splice(+dl.dataset.n, 1); touch(); render(); return; }
         const ic = t.closest('[data-icon]'); if (ic) { d.items[+ic.dataset.n].icon = ic.dataset.icon; touch(); render(); return; }
         const rt = t.closest('[data-rating]'); if (rt) { d.items[+rt.dataset.n].rating = +rt.dataset.rating; touch(); render(); return; }
+        const aim = t.closest('[data-aimg]'); if (aim) { X.aiPhoto(s, aim, () => { openSec = s.id; touch(); render(); }); return; }
         const up = t.closest('[data-upload]'); if (up) { uploadFor = { s: s, mode: up.dataset.upload, k: up.dataset.lk, n: up.dataset.n === undefined ? null : +up.dataset.n }; $('peFile').click(); return; }
         if (t.closest('[data-img-del]')) { d.img = null; touch(); render(); }
     });
-    panes.addEventListener('input', e => { if (e.target.id === 'peSearch') { libQuery = e.target.value.trim(); if (libQuery) libTab = 'all'; const g = $('peLib'); if (g) g.innerHTML = libGrid(Z.page.filter(s => !X.isBuiltin(s.type)).length); } });
+    panes.addEventListener('input', e => { if (e.target.id === 'peAiNote') { aiNote = e.target.value; return; } if (e.target.id === 'pePhWish') { ph.wish = e.target.value; return; } if (e.target.id === 'peSearch') { libQuery = e.target.value.trim(); if (libQuery) libTab = 'all'; const g = $('peLib'); if (g) g.innerHTML = libGrid(Z.page.filter(s => !X.isBuiltin(s.type)).length); } });
 
     /* Glisser-déposer (bloc d'achat et sections) */
     let drag = null;
@@ -304,7 +350,7 @@
         if (filled && !confirm('Shopio IA va remplacer les textes de la page (les packs déjà remplis sont gardés). Continuer ?')) return;
         btn.disabled = true; say('Shopio IA rédige votre page… (environ 30 secondes)');
         try {
-            const r = await fetch(G.urls.ai, { method: 'POST', headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF } });
+            const r = await fetch(G.urls.ai, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }, body: JSON.stringify({ instructions: aiNote }) });
             const j = await r.json().catch(() => ({}));
             if (!r.ok || !j.landing) { say(j.error || (r.status === 429 ? 'Trop d’essais : patientez une minute.' : 'Shopio IA n’a pas pu rédiger la page. Réessayez.'), 'is-err'); return; }
             const L = j.landing;
@@ -317,9 +363,37 @@
             const packsEmpty = !C.packs.some(k => k.qty);
             if (packsEmpty && (j.packs || []).length) C.packs = j.packs.map(k => ({ qty: k.qty, price: k.price, label: k.label || '' }));
             touch(); render();
-            const m = $('peAiMsg'); if (m) { m.textContent = 'Page rédigée : relisez, corrigez si besoin, puis touchez « Sauvegarder ».'; m.className = 'is-ok'; }
+            // Puis les sections ajoutées à la page : à chaque régénération, l'IA les rédige aussi
+            const added = Z.page.filter(s => !X.isBuiltin(s.type) && X.aiWritable(s.type));
+            let note = '';
+            if (added.length) {
+                const m1 = $('peAiMsg'); if (m1) { m1.textContent = 'Page rédigée. Shopio IA rédige maintenant vos ' + added.length + ' section' + (added.length > 1 ? 's' : '') + ' ajoutée' + (added.length > 1 ? 's' : '') + '…'; m1.className = ''; }
+                try { applySections(await X.aiWrite(G.urls.sectionsAi, added, { instructions: aiNote })); render(); }
+                catch (err) { note = ' Sections ajoutées non rédigées : ' + err.message; }
+            }
+            const m = $('peAiMsg'); if (m) { m.textContent = 'Page rédigée : relisez, corrigez si besoin, puis touchez « Sauvegarder ».' + note; m.className = note ? 'is-err' : 'is-ok'; }
         } catch (x) { say('Connexion impossible : vérifiez votre internet puis réessayez.', 'is-err'); }
         finally { const b = $('peAi'); if (b) b.disabled = false; }
+    }
+
+    /** Contenu rédigé par Shopio IA posé dans les sections (photos, liens et réglages déjà gardés par le serveur). */
+    function applySections(map) {
+        Object.entries(map || {}).forEach(([id, d]) => { const s = Z.page.find(x => x.id === id); if (s && d && typeof d === 'object') s.d = d; });
+        touch();
+    }
+    /** « ✨ Rédiger avec Shopio IA » dans une section. */
+    async function aiSection(i, btn) {
+        const s = Z.page[i]; if (!s) return;
+        const msg = btn.parentNode.querySelector('[data-sai-msg]');
+        const say = (t, c) => { if (msg) { msg.textContent = t; msg.className = 'sx-msg ' + (c || ''); } };
+        if (!G.aiPro) { say('Shopio IA est réservé au plan Pro.', 'is-err'); return; }
+        btn.disabled = true; btn.classList.add('is-busy'); say('Shopio IA rédige cette section… (environ 15 secondes)');
+        try {
+            applySections(await X.aiWrite(G.urls.sectionsAi, [s], { instructions: aiNote }));
+            openSec = s.id; render();
+            const li = document.querySelector('#pePage .is-open [data-sai-msg]');
+            if (li) { li.textContent = 'Section rédigée : relisez, puis touchez « Sauvegarder ».'; li.className = 'sx-msg is-ok'; }
+        } catch (err) { say(err.message, 'is-err'); btn.disabled = false; btn.classList.remove('is-busy'); }
     }
 
     /* ───────── Sauvegarder ───────── */

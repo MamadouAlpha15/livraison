@@ -38,8 +38,13 @@
         'icons' => HS::ICONS, 'testimonial' => HS::TESTIMONIAL_TYPES, 'images' => (object) $images, 'categories' => $categories,
         'limits' => ['custom' => HS::CUSTOM_MAX, 'list' => HS::LIST_MAX, 'packs' => \App\Support\ProductPage::PACKS_MAX],
         'isNew' => request()->boolean('nouveau'),
+        // Shopio IA : sortes de sections dont l'IA sait écrire les textes (App\Services\SectionAi), plan Pro
+        'aiTypes' => \App\Services\SectionAi::writableTypes(), 'aiPro' => $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture(),
+        // Photos Shopio IA : sections avec photo, produits à mettre en scène (ce produit en premier)
+        'aiImageTypes' => array_keys(\App\Services\SectionImageAi::TYPES), 'aiShots' => \App\Services\SectionImageAi::choices($shop, $product),
         'urls' => [
-            'save' => route('products.page.update', $product), 'ai' => route('products.page.ai', $product), 'toggle' => route('products.toggle', $product),
+            'save' => route('products.page.update', $product), 'ai' => route('products.page.ai', $product), 'sectionsAi' => route('products.page.sections-ai', $product), 'aiImage' => route('products.page.section-image', $product),
+            'photoAi' => route('products.photos.ai', $product), 'photoAttach' => route('products.photos.attach', $product), 'toggle' => route('products.toggle', $product),
             'upload' => route('boutique.grow.cover-upload'), 'preview' => $publicUrl, 'edit' => route('products.edit', $product),
         ],
     ];

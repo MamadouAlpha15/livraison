@@ -7,7 +7,7 @@
     const CSRF = document.querySelector('meta[name="csrf-token"]').content;
     const $ = id => document.getElementById(id);
     const theme = G.theme;
-    const { esc, svg, IC, DEF, isBuiltin, MAX, summary, field, newItem, kindOf, blank } = window.SXFields(G, theme);
+    const { esc, svg, IC, DEF, isBuiltin, MAX, summary, field, newItem, kindOf, blank, aiWritable, aiRow, aiWrite, aiPhoto } = window.SXFields(G, theme);
     let list = JSON.parse(JSON.stringify(G.home[theme] || []));
     let open = null, dirty = false, saving = false, tab = 'all', query = '';
 
@@ -28,7 +28,7 @@
                 '<button type="button" class="sx-icon" data-move="-1" aria-label="Monter « ' + esc(t[0]) + ' »"' + (i === 0 ? ' disabled' : '') + '>' + svg(IC.up, 16) + '</button>' +
                 '<button type="button" class="sx-icon" data-move="1" aria-label="Descendre « ' + esc(t[0]) + ' »"' + (i === list.length - 1 ? ' disabled' : '') + '>' + svg(IC.down, 16) + '</button>' +
                 '<button type="button" class="sx-icon" data-toggle aria-pressed="' + !s.on + '" aria-label="' + (s.on ? 'Masquer' : 'Afficher') + ' « ' + esc(t[0]) + ' »" title="' + (s.on ? 'Masquer' : 'Afficher') + '">' + svg(s.on ? IC.eye : IC.eyeOff, 17) + '</button></div>' +
-                (o ? '<div class="sx-body">' + (fields.length ? fields.map(f => field(s, i, f)).join('') : '<p class="sx-hint">' + esc(t[1]) + (G.isProduct ? '.' : '. Rien à écrire : elle se remplit avec vos produits.') + '</p>') +
+                (o ? '<div class="sx-body">' + (aiWritable(s.type) ? aiRow() : '') + (fields.length ? fields.map(f => field(s, i, f)).join('') : '<p class="sx-hint">' + esc(t[1]) + (G.isProduct ? '.' : '. Rien à écrire : elle se remplit avec vos produits.') + '</p>') +
                     (s.type === 'stats' ? '<p class="sx-hint">Les chiffres viennent de votre boutique (avis, commandes livrées, produits) : ils ne peuvent pas être modifiés.</p>' : '') +
                     (isBuiltin(s.type) && G.isProduct ? '<p class="sx-hint">Le contenu de cette section vient de la « Page de vente » de chaque produit.</p>' : '') +
                     (isBuiltin(s.type) && !G.isProduct ? '<p class="sx-hint">Un champ laissé vide garde le texte prévu par le thème (affiché en gris).</p>' : isBuiltin(s.type) ? '' : '<button type="button" class="sx-btn sx-btn-sm sx-btn-danger" data-del style="justify-self:start">' + svg(IC.trash, 15) + ' Supprimer la section</button>') + '</div>' : '') + '</li>';
@@ -55,6 +55,10 @@
         const li = e.target.closest('[data-i]'); if (!li) return;
         const i = +li.dataset.i, s = list[i], d = s.d;
         if (e.target.closest('[data-open]')) { open = open === s.id ? null : s.id; render(); return; }
+        const sai = e.target.closest('[data-sai]');
+        if (sai) { aiOne(s, sai); return; }
+        const aim = e.target.closest('[data-aimg]');
+        if (aim) { aiPhoto(s, aim, () => { open = s.id; touch(); render(); }); return; }
         const mv = e.target.closest('[data-move]');
         if (mv && !mv.disabled) { const j = i + +mv.dataset.move; [list[i], list[j]] = [list[j], list[i]]; touch(); render(); $('sxList').querySelector('[data-i="' + j + '"] [data-move="' + mv.dataset.move + '"]')?.focus(); return; }
         if (e.target.closest('[data-toggle]')) { s.on = !s.on; touch(); render(); return; }
@@ -107,6 +111,43 @@
         open = s.id; touch(); render();
         setState('Section « ' + G.types[s.type][0] + ' » ajoutée : remplissez-la puis enregistrez.', 'is-dirty');
         const li = $('sxList').querySelector('.is-open'); if (li) { li.scrollIntoView({ block: 'center', behavior: 'smooth' }); li.querySelector('input,textarea,select,button[data-upload]')?.focus({ preventScroll: true }); }
+    });
+
+    /* ───────── Shopio IA : rédige les textes des sections, y compris celles ajoutées ───────── */
+    const aiNote = () => ($('sxAiNote') ? $('sxAiNote').value.trim() : '');
+    // Le serveur garde déjà photos, liens et réglages : on remplace simplement le contenu de chaque section reçue
+    function applyAi(map) {
+        let n = 0;
+        Object.entries(map || {}).forEach(([id, d]) => { const s = list.find(x => x.id === id); if (s && d && typeof d === 'object') { s.d = d; n++; } });
+        if (n) touch();
+        return n;
+    }
+    async function aiOne(s, btn) {
+        const msg = btn.parentNode.querySelector('[data-sai-msg]');
+        const say = (t, c) => { if (msg) { msg.textContent = t; msg.className = 'sx-msg ' + (c || ''); } };
+        if (!G.aiPro) { say('Shopio IA est réservé au plan Pro.', 'is-err'); return; }
+        btn.disabled = true; btn.classList.add('is-busy'); say('Shopio IA rédige cette section… (environ 15 secondes)');
+        try {
+            applyAi(await aiWrite(G.urls.ai, [s], { theme: theme, instructions: aiNote() }));
+            open = s.id; render();
+            const m = $('sxList').querySelector('.is-open [data-sai-msg]');
+            if (m) { m.textContent = 'Section rédigée : relisez, puis touchez « Enregistrer et publier ».'; m.className = 'sx-msg is-ok'; }
+        } catch (err) { say(err.message, 'is-err'); btn.disabled = false; btn.classList.remove('is-busy'); }
+    }
+    $('sxAiAll').addEventListener('click', async () => {
+        const b = $('sxAiAll'), m = $('sxAiMsg');
+        const say = (t, c) => { m.textContent = t; m.className = c || ''; };
+        if (!G.aiPro) { say('Shopio IA est réservé au plan Pro : passez au plan Pro pour rédiger vos sections en un clic.', 'is-err'); return; }
+        const todo = list.filter(s => aiWritable(s.type));
+        if (!todo.length) { say('Aucune section avec du texte à rédiger sur cette page.', 'is-err'); return; }
+        if (!confirm('Shopio IA va réécrire les textes de ' + todo.length + ' section' + (todo.length > 1 ? 's' : '') + '. Vos photos, liens et réglages sont gardés. Continuer ?')) return;
+        b.disabled = true; b.classList.add('is-busy'); say('Shopio IA rédige vos ' + todo.length + ' sections… (30 secondes à 1 minute)');
+        try {
+            const n = applyAi(await aiWrite(G.urls.ai, todo, { theme: theme, instructions: aiNote() }));
+            render();
+            say(n + ' section' + (n > 1 ? 's' : '') + ' rédigée' + (n > 1 ? 's' : '') + ' : relisez, corrigez si besoin, puis touchez « Enregistrer et publier ».', 'is-ok');
+        } catch (err) { say(err.message, 'is-err'); }
+        finally { b.disabled = false; b.classList.remove('is-busy'); }
     });
 
     /* Photos : envoyées tout de suite, gardées dans la section */

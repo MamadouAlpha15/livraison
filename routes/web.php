@@ -249,6 +249,11 @@ Route::post('/shops/{shop}/panier-abandonne', [\App\Http\Controllers\StorefrontC
     ->middleware('throttle:30,1')
     ->name('public.shops.cart');
 
+/* Vue en direct : signal « je suis sur la boutique » envoyé par la vitrine toutes les 20 s (aucune IP enregistrée) */
+Route::post('/shops/{shop}/en-direct', [\App\Http\Controllers\StorefrontLiveController::class, 'ping'])
+    ->middleware('throttle:120,1')
+    ->name('public.shops.live');
+
 /* Vue d'un produit en fiche rapide (modèles de page boutique) : comptée comme une vue de sa fiche */
 Route::post('/shops/{shop}/vue/{product}', [PublicShopController::class, 'productView'])
     ->middleware('throttle:60,1')
@@ -780,6 +785,10 @@ Route::middleware(['auth', 'role:admin'])
         /* Tableau de bord boutique */
         Route::get('/dashboard', [ShopController::class, 'admin'])->name('dashboard');
 
+        /* Vue en direct : visiteurs présents, ventes du jour, carte (mise à jour toutes les 10 s) */
+        Route::get('en-direct', [\App\Http\Controllers\Boutique\LiveController::class, 'index'])->name('live');
+        Route::get('en-direct/donnees', [\App\Http\Controllers\Boutique\LiveController::class, 'data'])->middleware('throttle:60,1')->name('live.data');
+
         /* Gestion de la boutique */
         Route::resource('shops', ShopController::class)->only(['create', 'store', 'index']);
 
@@ -809,6 +818,8 @@ Route::middleware(['auth', 'role:admin'])
         Route::put('vitrine',               [\App\Http\Controllers\Vendeur\StorefrontController::class, 'update'])->name('storefront.update');
         Route::get('vitrine/sections',      [\App\Http\Controllers\Vendeur\StorefrontController::class, 'sections'])     ->name('storefront.sections');
         Route::put('vitrine/sections',      [\App\Http\Controllers\Vendeur\StorefrontController::class, 'saveSections']) ->name('storefront.sections.update');
+        Route::post('vitrine/sections/ia',  [\App\Http\Controllers\Vendeur\StorefrontController::class, 'sectionsAi'])   ->middleware('throttle:10,1')->name('storefront.sections.ai');
+        Route::post('vitrine/sections/photo-ia', [\App\Http\Controllers\Vendeur\StorefrontController::class, 'sectionImage']) ->middleware('throttle:6,1')->name('storefront.sections.image');
         Route::get('vitrine/qr-code',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'qr'])    ->name('storefront.qr');
         Route::get('vitrine/adresse',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'slugCheck'])   ->name('storefront.slug');
 
@@ -864,7 +875,9 @@ Route::middleware(['auth', 'role:admin'])
         /* Commandes (façon Sellio) : étapes, fiche, notes, nouvelle commande ; l'ancienne page (livreurs,
            entreprises de livraison) reste à « Livraisons » */
         Route::get('orders', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'index'])->name('orders.index');
-        Route::get('orders/livraisons', [EmployeOrderController::class, 'index'])        ->name('orders.livraisons');
+        // Ancienne page « Livraisons » : renvoie vers Commandes (la livraison se règle dans la fiche de la commande)
+        Route::get('orders/livraisons', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'livraisons'])->name('orders.livraisons');
+        Route::post('orders/{order}/livraison', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'delivery'])->middleware('throttle:30,1')->name('orders.delivery');
         Route::post('orders/nouvelle', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'store'])->middleware('throttle:30,1')->name('orders.store');
         Route::put('orders/reglages', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'settings'])->name('orders.settings');
         Route::post('orders/{order}/etape', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'stage'])->name('orders.stage');
@@ -1015,6 +1028,11 @@ Route::middleware(['auth', 'role:vendeur,admin'])->group(function () {
     /* Créer un produit avec Shopio IA : photos → prix et détails → création (brouillon) → page de vente */
     Route::get('products/creer-avec-ia', [\App\Http\Controllers\Vendeur\ProductWizardController::class, 'create'])->name('products.wizard');
     Route::post('products/creer-avec-ia', [\App\Http\Controllers\Vendeur\ProductWizardController::class, 'store'])->middleware('throttle:10,1')->name('products.wizard.store');
+    // Importateur Produit Shopio : un produit à partir d'un lien (Alibaba, AliExpress, Shopify…)
+    Route::get('products/importer', [\App\Http\Controllers\Vendeur\ProductImportController::class, 'show'])->name('products.import');
+    Route::post('products/importer/analyser', [\App\Http\Controllers\Vendeur\ProductImportController::class, 'analyze'])->middleware('throttle:6,1')->name('products.import.analyze');
+    Route::post('products/importer/creer', [\App\Http\Controllers\Vendeur\ProductImportController::class, 'create'])->middleware('throttle:10,1')->name('products.import.create');
+    Route::post('products/creer-avec-ia/photo-ia', [\App\Http\Controllers\Vendeur\ProductWizardController::class, 'photo'])->middleware('throttle:6,1')->name('products.wizard.photo');
 
     Route::resource('products', ProductController::class)->except(['show']);
 
@@ -1022,6 +1040,10 @@ Route::middleware(['auth', 'role:vendeur,admin'])->group(function () {
     Route::get('products/{product}/page-de-vente', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'edit'])->name('products.page.edit');
     Route::put('products/{product}/page-de-vente', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'update'])->name('products.page.update');
     Route::post('products/{product}/page-de-vente/ia', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'generate'])->middleware('throttle:6,1')->name('products.page.ai');
+    Route::post('products/{product}/page-de-vente/sections-ia', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'sectionsAi'])->middleware('throttle:10,1')->name('products.page.sections-ai');
+    Route::post('products/{product}/page-de-vente/photo-ia', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'sectionImage'])->middleware('throttle:6,1')->name('products.page.section-image');
+    Route::post('products/{product}/photos-ia', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'photoAi'])->middleware('throttle:6,1')->name('products.photos.ai');
+    Route::post('products/{product}/photos-ia/ajouter', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'photoAttach'])->name('products.photos.attach');
 
     /* Actions supplémentaires produits */
     Route::post('products/{product}/toggle',    [ProductController::class, 'toggleActive'])->name('products.toggle');

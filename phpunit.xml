@@ -19,6 +19,9 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <!-- Jamais d'appel payant aux IA pendant les tests (les tests simulent Claude et OpenAI) -->
+        <env name="ANTHROPIC_API_KEY" value="" force="true"/>
+        <env name="OPENAI_API_KEY" value="" force="true"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>

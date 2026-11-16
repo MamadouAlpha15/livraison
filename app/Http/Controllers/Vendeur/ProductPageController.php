@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Vendeur;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Services\SalesPageAi;
+use App\Services\SectionAi;
 use App\Support\HomeSections;
 use App\Support\ProductDesign;
 use App\Support\ProductPage;
@@ -67,13 +68,15 @@ class ProductPageController extends Controller
      * « Remplir avec Shopio IA » : rédige la page et la renvoie au formulaire (rien n'est enregistré :
      * le vendeur relit, corrige, puis enregistre). Réservé au plan Pro, comme les autres outils Shopio IA.
      */
-    public function generate(Product $product, SalesPageAi $ai)
+    public function generate(Request $request, Product $product, SalesPageAi $ai)
     {
         $this->own($product);
         $shop = Auth::user()->shop;
         if (!($shop->plan === 'pro' && $shop->plan_expires_at?->isFuture())) {
             return response()->json(['error' => 'Shopio IA est réservé au plan Pro. Passez au plan Pro pour remplir la page en un clic.'], 403);
         }
+        // Consigne facultative du vendeur (ton, occasion…), jamais au-dessus des règles d'honnêteté
+        $instructions = $request->validate(['instructions' => ['nullable', 'string', 'max:500']])['instructions'] ?? '';
         $key = 'ai-page:' . Auth::id();
         if (RateLimiter::tooManyAttempts($key, 10)) {
             return response()->json(['error' => 'Limite atteinte (10 pages par heure). Réessayez plus tard.'], 429);
@@ -81,10 +84,99 @@ class ProductPageController extends Controller
         RateLimiter::hit($key, 3600);
 
         try {
-            return response()->json($ai->generate($product, $shop));
+            return response()->json($ai->generate($product, $shop, false, (string) $instructions));
         } catch (\RuntimeException $e) {
             return response()->json(['error' => $e->getMessage()], 502);
         }
+    }
+
+    /**
+     * « Rédiger avec Shopio IA » pour les sections de la page (une section, ou toutes les sections ajoutées) :
+     * renvoie leur contenu rédigé ; rien n'est enregistré avant « Sauvegarder ». Plan Pro, 30 rédactions par heure.
+     */
+    public function sectionsAi(Request $request, Product $product, SectionAi $ai)
+    {
+        $this->own($product);
+        $shop = Auth::user()->shop;
+        if (!($shop->plan === 'pro' && $shop->plan_expires_at?->isFuture())) {
+            return response()->json(['error' => 'Shopio IA est réservé au plan Pro. Passez au plan Pro pour rédiger vos sections en un clic.'], 403);
+        }
+        $data = $request->validate([
+            'sections' => ['required', 'array', 'min:1', 'max:40'],
+            'sections.*.id' => ['required', 'string', 'max:24'],
+            'sections.*.type' => ['required', 'string', 'max:24'],
+            'instructions' => ['nullable', 'string', 'max:500'],
+        ]);
+        $key = 'ai-sections:' . Auth::id();
+        if (RateLimiter::tooManyAttempts($key, 30)) {
+            return response()->json(['error' => 'Limite atteinte (30 rédactions par heure). Réessayez plus tard.'], 429);
+        }
+        RateLimiter::hit($key, 3600);
+
+        try {
+            return response()->json(['sections' => (object) $ai->write($shop, 'product', $request->input('sections'), $product, (string) ($data['instructions'] ?? ''))]);
+        } catch (\RuntimeException $e) {
+            return response()->json(['error' => $e->getMessage()], 502);
+        }
+    }
+
+    /**
+     * Galerie → « Photos pro » : Shopio IA crée une photo du produit (fond blanc studio ou mise en scène) à partir
+     * de sa vraie photo. Elle n'est ajoutée au produit qu'après accord du vendeur (photoAttach).
+     */
+    public function photoAi(Request $request, Product $product, \App\Services\SectionImageAi $ai)
+    {
+        $this->own($product);
+        $shop = Auth::user()->shop;
+        if (!($shop->plan === 'pro' && $shop->plan_expires_at?->isFuture())) {
+            return response()->json(['error' => 'Les photos Shopio IA sont réservées au plan Pro.'], 403);
+        }
+        $data = $request->validate([
+            'style' => ['required', \Illuminate\Validation\Rule::in(array_keys(\App\Services\SectionImageAi::STYLES))],
+            'wish'  => ['nullable', 'string', 'max:300'],
+        ]);
+        $key = 'ai-images:' . Auth::id();
+        if (RateLimiter::tooManyAttempts($key, \App\Services\SectionImageAi::DAILY)) {
+            return response()->json(['error' => 'Limite atteinte (' . \App\Services\SectionImageAi::DAILY . ' photos par jour). Réessayez demain.'], 429);
+        }
+        RateLimiter::hit($key, 86400);
+        try {
+            $r = $ai->make($shop, 'product', $product, (string) ($data['wish'] ?? ''), $data['style'], null, 'products/gallery');
+        } catch (\RuntimeException $e) {
+            return response()->json(['error' => $e->getMessage()], 502);
+        }
+        // Seules les photos créées ici, pour ce produit, pourront être ajoutées
+        $made = array_slice(array_merge($request->session()->get('ai_product_photos.' . $product->id, []), [$r['path']]), -20);
+        $request->session()->put('ai_product_photos.' . $product->id, $made);
+        return response()->json($r);
+    }
+
+    /** Ajoute une photo créée par Shopio IA à la galerie du produit, ou en fait la photo principale. */
+    public function photoAttach(Request $request, Product $product)
+    {
+        $this->own($product);
+        $data = $request->validate(['path' => ['required', 'string', 'regex:' . \App\Support\ProductPhotos::PATH], 'main' => ['boolean']]);
+        if (!in_array($data['path'], $request->session()->get('ai_product_photos.' . $product->id, []), true)) {
+            return response()->json(['error' => 'Photo inconnue : créez-la de nouveau.'], 422);
+        }
+        $gallery = array_values(array_filter($product->gallery_array, fn ($p) => $p !== $data['path']));
+        if (count($gallery) >= 20) return response()->json(['error' => 'Galerie pleine (20 photos) : retirez-en une dans la fiche du produit.'], 422);
+        if (!empty($data['main'])) {
+            if ($product->image) array_unshift($gallery, $product->image);
+            $product->image = $data['path'];
+        } else {
+            $gallery[] = $data['path'];
+        }
+        $product->gallery = $gallery ? json_encode(array_values($gallery)) : null;
+        $product->save();
+        return response()->json(['photos' => ProductPage::photos($product->fresh())]);
+    }
+
+    /** « Créer la photo avec Shopio IA » dans une section de la page produit (voir App\Services\SectionImageAi). */
+    public function sectionImage(Request $request, Product $product, \App\Services\SectionImageAi $ai)
+    {
+        $this->own($product);
+        return $ai->respond($request, Auth::user()->shop);
     }
 
     /**

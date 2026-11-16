@@ -48,7 +48,7 @@ window.SXFields = function (G, theme) {
             case 'line': case 'code': return '<div>' + lbl + input('id="' + id + '" data-k="' + k + '"' + (kind === 'code' ? ' style="text-transform:uppercase;letter-spacing:.06em"' : ''), d[k], kind === 'code' ? 'Ex. BIENVENUE10' : ph, max) + count + (kind === 'code' ? '<span class="sx-hint">Créez d’abord ce code dans « Codes promo », sinon il ne marchera pas à la commande.</span>' : '') + '</div>';
             case 'link': return '<div>' + lbl + input('id="' + id + '" data-k="' + k + '" type="url" inputmode="url"', d[k], 'https://…', 300) + '</div>';
             case 'text': return '<div>' + lbl + '<textarea class="sx-area" id="' + id + '" data-k="' + k + '" maxlength="' + max + '" placeholder="' + esc(ph || '') + '">' + esc(d[k]) + '</textarea>' + count + '</div>';
-            case 'img': { const url = d.img ? G.images[d.img] : null; return '<div><span class="sx-lbl">' + esc(label) + '</span><div class="sx-img"><i' + (url ? ' style="background-image:url(\'' + esc(url) + '\')"' : '') + '></i><button type="button" class="sx-btn sx-btn-sm" data-upload="img">' + (d.img ? 'Changer la photo' : 'Choisir une photo') + '</button>' + (d.img ? '<button type="button" class="sx-btn sx-btn-sm sx-btn-danger" data-img-del>Retirer</button>' : '') + '</div><span class="sx-msg" data-img-msg>JPG, PNG ou WebP · 5 Mo max</span></div>'; }
+            case 'img': { const url = d.img ? G.images[d.img] : null; return '<div><span class="sx-lbl">' + esc(label) + '</span><div class="sx-img"><i' + (url ? ' style="background-image:url(\'' + esc(url) + '\')"' : '') + '></i><button type="button" class="sx-btn sx-btn-sm" data-upload="img">' + (d.img ? 'Changer la photo' : 'Choisir une photo') + '</button>' + (d.img ? '<button type="button" class="sx-btn sx-btn-sm sx-btn-danger" data-img-del>Retirer</button>' : '') + '</div><span class="sx-msg" data-img-msg>JPG, PNG ou WebP · 5 Mo max</span>' + aimgRow(s.type, 'img', k) + '</div>'; }
             case 'bool': return '<label class="sx-check"><input type="checkbox" data-bool="' + k + '"' + (d[k] ? ' checked' : '') + '> ' + esc(label) + '</label>';
             case 'side': return seg(k, label, { left: 'Gauche', right: 'Droite' }, d[k]);
             case 'align': return seg(k, label, { left: 'À gauche', center: 'Centré' }, d[k]);
@@ -78,7 +78,7 @@ window.SXFields = function (G, theme) {
             case 'slides':
                 return '<div style="display:grid;gap:8px"><span class="sx-lbl" style="margin:0">' + esc(label) + '</span>' + d.items.map((sl, n) => '<div class="sx-pair"><span class="sx-pair-hd">Diapositive ' + (n + 1) + delBtn(k, n, 'Supprimer la diapositive ' + (n + 1)) + '</span>' + imgBox(sl.img, 'data-upload="item" data-lk="' + k + '" data-n="' + n + '"') +
                     input(lf(k, n, 'title') + ' aria-label="Titre"', sl.title, 'Titre (facultatif)', 80) + input(lf(k, n, 'text') + ' aria-label="Texte"', sl.text, 'Texte (facultatif)', 160) + input(lf(k, n, 'button') + ' aria-label="Bouton"', sl.button, 'Texte du bouton (facultatif)', 30) + input(lf(k, n, 'link') + ' type="url" aria-label="Lien"', sl.link, 'Lien (vide = vos produits)', 300) + '</div>').join('') +
-                    (d.items.length < MAX ? '<button type="button" class="sx-btn sx-btn-sm" data-upload="new" data-lk="' + k + '" style="justify-self:start">+ Ajouter une photo</button>' : '') + '<span class="sx-msg" data-img-msg>JPG, PNG ou WebP · 5 Mo max · idéal 1600 px de large</span></div>';
+                    (d.items.length < MAX ? '<button type="button" class="sx-btn sx-btn-sm" data-upload="new" data-lk="' + k + '" style="justify-self:start">+ Ajouter une photo</button>' : '') + '<span class="sx-msg" data-img-msg>JPG, PNG ou WebP · 5 Mo max · idéal 1600 px de large</span>' + (d.items.length < MAX ? aimgRow(s.type, 'new', k) : '') + '</div>';
             case 'videos':
                 return '<div style="display:grid;gap:8px"><span class="sx-lbl" style="margin:0">' + esc(label) + '</span><span class="sx-hint">Collez le lien d’une vidéo YouTube, TikTok ou Facebook.</span>' + d.items.map((u, n) => '<div class="sx-row">' + input('data-lk="' + k + '" data-n="' + n + '" data-f="" type="url" aria-label="Lien de la vidéo ' + (n + 1) + '"', u, 'https://youtube.com/shorts/…', 300) + delBtn(k, n, 'Supprimer la vidéo ' + (n + 1)) + '</div>').join('') + addBtn(k, d.items.length, 'Ajouter une vidéo') + '</div>';
             case 'lines':
@@ -102,6 +102,59 @@ window.SXFields = function (G, theme) {
         if (t === 'icons') d.items = [{ icon: 'truck', title: '', text: '' }, { icon: 'cash', title: '', text: '' }, { icon: 'return', title: '', text: '' }];
         return d;
     };
-    return { esc, svg, IC, DEF, isBuiltin, MAX, summary, field, newItem, kindOf, blank };
+    /* ───────── Shopio IA : rédiger les textes d'une section (App\Services\SectionAi) ───────── */
+    const aiWritable = t => (G.aiTypes || []).includes(t);
+    const aiRow = () => '<div class="sx-ai"><button type="button" class="sx-btn sx-btn-sm sx-ai-btn" data-sai>✨ Rédiger avec Shopio IA</button><span class="sx-msg" data-sai-msg aria-live="polite">' +
+        (G.aiPro ? 'L’IA écrit les textes de cette section. Photos, liens et réglages restent les vôtres.' : 'Réservé au plan Pro.') + '</span></div>';
+    /** Envoie des sections à rédiger ; renvoie { id: contenu } ou lève une erreur avec un message pour le vendeur. */
+    async function aiWrite(url, sections, extra) {
+        const csrf = document.querySelector('meta[name="csrf-token"]').content;
+        const body = Object.assign({ sections: sections.map(s => ({ id: s.id, type: s.type, d: s.d })) }, extra || {});
+        let r;
+        try { r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf }, body: JSON.stringify(body) }); }
+        catch (x) { throw new Error('Connexion impossible : vérifiez votre internet puis réessayez.'); }
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok || !j.sections) throw new Error(j.error || (j.errors && Object.values(j.errors)[0][0]) || (r.status === 429 ? 'Trop d’essais : patientez une minute.' : 'Shopio IA n’a pas pu rédiger. Réessayez.'));
+        return j.sections;
+    }
+    /* ───────── Shopio IA : créer une photo de section (App\Services\SectionImageAi) ─────────
+       La vraie photo d'un produit est mise en scène (seul le décor change), ou un décor seul, sans produit. */
+    function aimgRow(type, mode, k) {
+        if (!G.urls || !G.urls.aiImage || !(G.aiImageTypes || []).includes(type)) return '';
+        const shots = G.aiShots || [];
+        return '<div class="sx-aimg" data-aimg-box><b>✨ Ou créez la photo avec Shopio IA</b>' +
+            '<select class="sx-select" data-aimg-product aria-label="Ce que montre la photo">' +
+            shots.map((p, n) => '<option value="' + p.id + '"' + (n === 0 ? ' selected' : '') + '>Mettre en scène : ' + esc(p.name) + '</option>').join('') +
+            '<option value=""' + (shots.length ? '' : ' selected') + '>Décor seul, sans produit</option></select>' +
+            '<input class="sx-input" data-aimg-wish maxlength="300" placeholder="Décor souhaité (facultatif) : ex. table en bois, lumière du matin, ambiance de fête…" aria-label="Décor souhaité">' +
+            '<button type="button" class="sx-btn sx-btn-sm sx-ai-btn" data-aimg="' + mode + '" data-lk="' + k + '" style="justify-self:start">✨ Créer la photo</button>' +
+            '<span class="sx-msg" data-aimg-msg aria-live="polite">' + (G.aiPro ? 'Votre vraie photo est gardée : l’IA change seulement le décor. Vérifiez que le produit est fidèle avant d’enregistrer.' : 'Réservé au plan Pro.') + '</span></div>';
+    }
+    /** Crée la photo puis la pose dans la section (comme une photo importée) ; done() redessine l'éditeur. */
+    async function aiPhoto(s, btn, done) {
+        const box = btn.closest('[data-aimg-box]'), msg = box.querySelector('[data-aimg-msg]');
+        const say = (t, c) => { msg.textContent = t; msg.className = 'sx-msg ' + (c || ''); };
+        if (!G.aiPro) { say('Les photos Shopio IA sont réservées au plan Pro.', 'is-err'); return; }
+        const pid = box.querySelector('[data-aimg-product]').value;
+        btn.disabled = true; btn.classList.add('is-busy'); say('Shopio IA crée votre photo… (30 secondes à 1 minute)');
+        const csrf = document.querySelector('meta[name="csrf-token"]').content;
+        let r, j = {};
+        try {
+            r = await fetch(G.urls.aiImage, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf },
+                body: JSON.stringify({ type: s.type, product_id: pid ? +pid : null, wish: box.querySelector('[data-aimg-wish]').value.trim() }) });
+            j = await r.json().catch(() => ({}));
+        } catch (x) { r = null; }
+        if (!r || !r.ok || !j.path) {
+            say(!r ? 'Connexion impossible : vérifiez votre internet puis réessayez.' : j.error || (j.errors && Object.values(j.errors)[0][0]) || (r.status === 429 ? 'Trop d’essais : patientez une minute.' : 'La photo n’a pas pu être créée. Réessayez.'), 'is-err');
+            btn.disabled = false; btn.classList.remove('is-busy'); return;
+        }
+        G.images[j.path] = j.url;
+        const k = btn.dataset.lk;
+        if (btn.dataset.aimg === 'new') s.d[k].push({ img: j.path, title: '', text: '', button: '', link: '' }); else s.d[k] = j.path;
+        done();
+        const m = document.querySelector('.is-open [data-aimg-msg]');
+        if (m) { m.textContent = 'Photo créée' + (pid ? ' : vérifiez que le produit est bien fidèle à l’original,' : ',') + ' puis enregistrez.'; m.className = 'sx-msg is-ok'; }
+    }
+    return { esc, svg, IC, DEF, isBuiltin, MAX, summary, field, newItem, kindOf, blank, aiWritable, aiRow, aiWrite, aiPhoto };
 };
 </script>

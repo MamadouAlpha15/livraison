@@ -506,6 +506,7 @@ body { padding-bottom: 86px; }
     const S = window.SM, D = S.data, esc = S.esc, $ = id => document.getElementById(id);
     const P = S.byId(@json($p['id']));
     const photos = @json($photos);
+    if (S.liveProduct) S.liveProduct(@json($p['id'])); // vue en direct du vendeur : produit regardé
 
     /* ── Produits proches : même catégorie et prix proche d'abord ── */
     const rel = P ? S.suggest(P, 4) : [];

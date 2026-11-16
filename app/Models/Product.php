@@ -43,6 +43,7 @@ class Product extends Model
         'description',
         'price',
         'original_price',    // prix barré (promo)
+        'min_price',         // prix minimum PRIVÉ (négociation dans le chat), jamais montré aux clients
         'category',          // catégorie du produit
         'stock',             // quantité en stock
         'unit',              // unité : pièce, kg, litre…
@@ -66,9 +67,13 @@ class Product extends Model
     | Casts automatiques
     |------------------------------------------------------------------
     */
+    /** Jamais envoyé dans une réponse JSON (API, application, pages publiques) : prix minimum privé du vendeur. */
+    protected $hidden = ['min_price'];
+
     protected $casts = [
         'price'            => 'decimal:2',
         'original_price'   => 'decimal:2',
+        'min_price'        => 'decimal:2',
         'flash_price'      => 'decimal:2',
         'flash_starts_at'  => 'datetime',
         'flash_ends_at'    => 'datetime',

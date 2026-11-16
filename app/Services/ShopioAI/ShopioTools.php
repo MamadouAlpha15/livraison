@@ -267,8 +267,10 @@ class ShopioTools
 
         $owner = $ctx->shop->user_id;
         $pct = $ctx->settings->max_discount_percent;
+        // Prix minimum privé du produit (prix de revient) : jamais d'offre automatique en dessous, pour ne pas vendre à perte
+        $floor = (int) ceil((float) ($p->min_price ?? 0));
         // Le vendeur a fixé une remise maximale : un prix au-dessus du minimum devient une offre à confirmer
-        if ($pct !== null && $price >= (int) ceil($current * (100 - $pct) / 100)) {
+        if ($pct !== null && $price >= (int) ceil($current * (100 - $pct) / 100) && $price >= $floor) {
             ShopMessage::create([
                 'shop_id' => $ctx->shop->id, 'product_id' => $p->id, 'sender_id' => $owner, 'receiver_id' => $ctx->client->id,
                 'type' => ShopMessage::TYPE_PRICE_OFFER, 'proposed_price' => $price, 'proposal_status' => ShopMessage::STATUS_PENDING, 'is_ai' => true,

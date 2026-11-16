@@ -235,3 +235,15 @@ test('creer_offre : dans la limite de remise fixée par le vendeur, une offre à
     expect($offer->only(['sender_id', 'receiver_id', 'is_ai']))->toBe(['sender_id' => $this->vendor->id, 'receiver_id' => $this->client->id, 'is_ai' => true])
         ->and((int) $offer->proposed_price)->toBe(135000);
 });
+
+test('creer_offre : jamais d\'offre automatique sous le prix minimum privé (prix de revient)', function () {
+    $this->settings->update(['max_discount_percent' => 20]);
+    $this->product->update(['min_price' => 138000]);
+
+    $below = app(ShopioTools::class)->execute('creer_offre', ['produit_id' => $this->product->id, 'prix' => 135000], ctx($this));
+    $above = app(ShopioTools::class)->execute('creer_offre', ['produit_id' => $this->product->id, 'prix' => 140000], ctx($this));
+
+    expect($below['resultat'])->toBe('proposition_transmise')->and($above['resultat'])->toBe('offre_envoyee')
+        ->and($below)->not->toHaveKey('min_price');
+    expect($this->product->fresh()->toArray())->not->toHaveKey('min_price'); // jamais dans une réponse JSON
+});

@@ -15,6 +15,7 @@
     $vsIni    = mb_strtoupper(mb_substr($vsParts[0], 0, 1) . mb_substr($vsParts[1] ?? $vsParts[0], isset($vsParts[1]) ? 0 : 1, 1));
     $vsIco = [
         'dash'     => 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+        'live'     => 'M3 12h4l3-8 4 16 3-8h4',
         'messages' => 'M4 5h16v11H9l-5 4zM8 9h8M8 12h5',
         'orders'   => 'M12 3 4 7v10l8 4 8-4V7zM4 7l8 4 8-4M12 11v10',
         'products' => 'M3 12 12 3h8v8l-9 9zM15.5 8.5h.01',
@@ -41,6 +42,7 @@
     $vsNav = [
         'Boutique' => [
             ['dash', 'Tableau de bord', route('boutique.dashboard'), false],
+            ['live', 'En direct', route('boutique.live'), false],
             ['messages', 'Messages', route('boutique.messages.hub'), false],
             ['orders', 'Commandes', route('boutique.orders.index'), false],
             ['products', 'Produits', route('products.index'), false],

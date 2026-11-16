@@ -12,6 +12,9 @@
             <div><dt>Heure</dt><dd>{{ $c['time'] }}</dd></div>
             @if($c['followupLabel'] && $c['stage'] === 'programmee')<div><dt>Prévue</dt><dd>{{ $c['followupLabel'] }}</dd></div>@endif
             @if($c['source'])<div><dt>Source</dt><dd>{{ $c['source'] }}</dd></div>@endif
+            @if($c['delivery'])
+            <div><dt>Livraison</dt><dd class="ob-chip-dv">{{ $c['delivery']['kind'] === 'rider' ? '🛵' : '🏢' }} {{ $c['delivery']['name'] }}@if($c['delivery']['kind'] === 'company' && !$c['delivery']['driver']) <span title="En attente d’acceptation">⏳</span>@endif</dd></div>
+            @endif
         </dl>
         <small class="ob-ref">#{{ $c['id'] }} · {{ $c['dateShort'] }}@if($c['note'] !== '') · 📝 note @endif</small>
     </div>

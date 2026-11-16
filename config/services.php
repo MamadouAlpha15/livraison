@@ -47,6 +47,8 @@ return [
 
     'openai' => [
         'key' => env('OPENAI_API_KEY'),
+        // Photos des sections (App\Services\SectionImageAi)
+        'image_model' => env('OPENAI_IMAGE_MODEL', 'gpt-image-2'),
     ],
 
     'gemini' => [

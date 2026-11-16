@@ -21,6 +21,7 @@
         </div>
         <nav class="sb-nav">
             <a href="{{ route('boutique.dashboard') }}" class="sb-item active" style="margin-bottom:4px"><span class="ico">{!! $I['grid'] !!}</span> Tableau de bord</a>
+            <a href="{{ route('boutique.live') }}" class="sb-item" style="margin-bottom:4px"><span class="ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></span> En direct <span class="sb-badge" style="background:#22C55E;color:#0B1E3D;font-size:10px">LIVE</span></a>
             <div class="sb-section">Boutique</div>
             <a href="{{ route('boutique.messages.hub') }}" class="sb-item"><span class="ico">{!! $I['msg'] !!}</span> Messages <span class="sb-badge" id="sbMsgBadge" style="display:none"></span></a>
             <a href="{{ route('boutique.orders.index') }}" class="sb-item"><span class="ico">{!! $I['box'] !!}</span> Commandes

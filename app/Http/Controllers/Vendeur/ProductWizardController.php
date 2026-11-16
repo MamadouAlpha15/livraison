@@ -47,7 +47,37 @@ class ProductWizardController extends Controller
 
         return view('vendeur.products.wizard', [
             'shop' => $shop, 'devise' => $shop->currency ?? 'GNF', 'categories' => $categories, 'aiReady' => self::aiReady($shop),
+            // Photos pro : plan Pro et service de photos configuré
+            'photoAi' => $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture() && (string) config('services.openai.key') !== '',
         ]);
+    }
+
+    /** « Photo pro » : à partir d'une vraie photo envoyée, Shopio IA crée une photo studio ou mise en scène. */
+    public function photo(Request $request, \App\Services\SectionImageAi $ai)
+    {
+        $shop = Auth::user()->shop;
+        abort_if(!$shop || !$shop->is_approved, 403);
+        if (!($shop->plan === 'pro' && $shop->plan_expires_at?->isFuture())) {
+            return response()->json(['error' => 'Les photos Shopio IA sont réservées au plan Pro.'], 403);
+        }
+        $data = $request->validate([
+            'source' => ['required', 'string', 'regex:' . \App\Support\ProductPhotos::PATH],
+            'style'  => ['required', \Illuminate\Validation\Rule::in(array_keys(\App\Services\SectionImageAi::STYLES))],
+            'wish'   => ['nullable', 'string', 'max:300'],
+        ], ['source.regex' => 'Envoyez d’abord une vraie photo du produit.']);
+        if (!Storage::disk('public')->exists($data['source'])) {
+            return response()->json(['error' => 'Photo introuvable : ajoutez-la de nouveau.'], 422);
+        }
+        $key = 'ai-images:' . Auth::id();
+        if (RateLimiter::tooManyAttempts($key, \App\Services\SectionImageAi::DAILY)) {
+            return response()->json(['error' => 'Limite atteinte (' . \App\Services\SectionImageAi::DAILY . ' photos par jour). Réessayez demain.'], 429);
+        }
+        RateLimiter::hit($key, 86400);
+        try {
+            return response()->json($ai->make($shop, 'product', null, (string) ($data['wish'] ?? ''), $data['style'], $data['source'], 'products'));
+        } catch (\RuntimeException $e) {
+            return response()->json(['error' => $e->getMessage()], 502);
+        }
     }
 
     public function store(Request $request, SalesPageAi $ai)

@@ -119,5 +119,17 @@ html, body { background: var(--sx-bg); }
     .sx-bar-in p { font-size: 12.5px; }
     .sx-stage { padding: 8px; height: 560px; }
 }
+/* Shopio IA : rédiger une section, ou toutes les sections */
+.sx-ai { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 12px; border-radius: 12px; background: linear-gradient(135deg, #EAF2FF, #F3E8FF); }
+.sx-ai .sx-msg { flex: 1 1 180px; line-height: 1.45; }
+.sx-ai-btn { background: linear-gradient(135deg, #1668D8, #7C3AED); border: 0; color: #fff; }
+.sx-ai-btn:hover { filter: brightness(1.06); }
+.sx-ai-btn.is-busy { opacity: .7; cursor: progress; }
+.sx-aibox { display: grid; gap: 8px; padding: 12px; border-radius: 14px; background: linear-gradient(135deg, #EAF2FF, #F3E8FF); }
+.sx-aibox p { margin: 0; font-size: 12.5px; color: var(--sx-ink2); line-height: 1.45; }
+.sx-aibox p.is-err { color: var(--sx-err); font-weight: 700; } .sx-aibox p.is-ok { color: var(--sx-ok); font-weight: 700; }
+.sx-aimg { display: grid; gap: 8px; margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: linear-gradient(135deg, #EAF2FF, #F3E8FF); }
+.sx-aimg > b { font-size: 12.5px; }
+[data-theme="dark"] .sx-ai, [data-theme="dark"] .sx-aibox, [data-theme="dark"] .sx-aimg { background: linear-gradient(135deg, #13284B, #2A1B4A); }
 @media (prefers-reduced-motion: reduce) { .sx *, .sx *::after { transition-duration: 1ms !important; } }
 </style>

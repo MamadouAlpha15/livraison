@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Boutique;
 
 use App\Http\Controllers\Controller;
 use App\Models\AbandonedCart;
+use App\Models\DeliveryCompany;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Shop;
+use App\Models\User;
+use App\Notifications\OrderStatusNotification;
 use App\Services\ImageOptimizer;
 use App\Services\PushService;
 use App\Services\SubscriptionService;
@@ -28,8 +31,8 @@ use Illuminate\Validation\Rule;
 /**
  * Commandes → « Toutes les commandes » (façon Sellio) : étapes avec compteurs, recherche, filtres,
  * commandes groupées par jour, fiche en fenêtre (articles, client, Appeler / WhatsApp / SMS, copier,
- * actions de suivi, notes), nouvelle commande saisie à la main. Mise à jour en direct (toutes les 30 s).
- * L'ancienne page (livreurs, entreprises de livraison) reste à « Commandes → Livraisons ».
+ * actions de suivi, livraison (livreur de la boutique ou entreprise de livraison), notes), nouvelle commande
+ * saisie à la main. Mise à jour en direct (toutes les 30 s). L'ancienne page « Livraisons » renvoie ici.
  */
 class OrderBoardController extends Controller
 {
@@ -64,7 +67,8 @@ class OrderBoardController extends Controller
 
         $stage = array_key_exists($request->query('etape'), OrderBoard::STAGES) ? $request->query('etape') : 'tous';
         $period = array_key_exists($request->query('periode'), self::PERIODS) ? $request->query('periode') : 'all';
-        $search = trim((string) $request->query('q', ''));
+        // « search » : ancien paramètre (liens du tableau de bord, ancienne page Livraisons)
+        $search = trim((string) $request->query('q', $request->query('search', '')));
         $source = (string) $request->query('source', '');
         $productId = (int) $request->query('produit', 0);
 
@@ -95,7 +99,7 @@ class OrderBoardController extends Controller
         $counts = ['tous' => $base()->count()];
         foreach (array_keys(OrderBoard::STAGES) as $k) $counts[$k] = OrderBoard::scope($base(), $k)->count();
 
-        $q = $base()->with(['client:id,name,phone', 'items.product:id,name,image', 'livreur:id,name', 'deliveryCompany:id,name'])->latest();
+        $q = $base()->with(['client:id,name,phone', 'items.product:id,name,image', 'livreur:id,name', 'deliveryCompany:id,name', 'driver:id,name'])->latest();
         if ($stage !== 'tous') OrderBoard::scope($q, $stage);
         $page = $q->paginate(self::PER_PAGE)->withQueryString();
 
@@ -123,7 +127,104 @@ class OrderBoardController extends Controller
         return view('boutique.orders.board', $view + [
             'sources' => $sources, 'products' => $products, 'communes' => PageModels::COMMUNES,
             'cartsWaiting' => $this->cartsWaiting($shop),
+            'delivery' => $this->deliveryChoices($shop),
         ]);
+    }
+
+    /** Ancienne page « Livraisons » : tout se fait maintenant dans la fiche de la commande. */
+    public function livraisons(Request $request)
+    {
+        $q = trim((string) $request->query('search', ''));
+        return redirect()->route('boutique.orders.index', $q !== '' ? ['q' => $q] : []);
+    }
+
+    /**
+     * Livreurs de la boutique et entreprises de livraison (validées, actives, du même pays) avec leurs zones,
+     * pour la section « Livraison » de la fiche.
+     */
+    private function deliveryChoices(Shop $shop): array
+    {
+        $riders = User::livreurs()->inShop($shop->id)->orderBy('name')->get(['id', 'name', 'is_available'])
+            ->map(fn ($u) => ['id' => $u->id, 'name' => $u->name, 'available' => (bool) $u->is_available])->values();
+        $companies = DeliveryCompany::where('approved', true)->where('active', true)
+            ->when($shop->country, fn ($q) => $q->where('country', $shop->country))
+            ->with(['zones' => fn ($z) => $z->where('active', true)->orderBy('price')])
+            ->orderBy('name')->get()
+            ->map(fn ($c) => [
+                'id' => $c->id, 'name' => $c->name,
+                'zones' => $c->zones->map(fn ($z) => ['id' => $z->id, 'name' => $z->name, 'price' => (int) $z->price])->values(),
+            ])->values();
+        return ['riders' => $riders, 'companies' => $companies, 'ridersUrl' => route('boutique.livreurs.index')];
+    }
+
+    /**
+     * Livraison d'une commande (JSON), depuis sa fiche : à un livreur de la boutique, ou confiée à une
+     * entreprise de livraison. Mêmes règles et mêmes notifications que l'ancienne page Livraisons
+     * (Employe\OrderController@assign et @sendToCompany).
+     */
+    public function delivery(Request $request, Order $order): JsonResponse
+    {
+        $shop = $this->own($order);
+        if (in_array($order->status, [Order::STATUS_LIVREE, Order::STATUS_ANNULEE], true)) {
+            return response()->json(['message' => $order->status === Order::STATUS_LIVREE ? 'Cette commande est déjà livrée.' : 'Cette commande est annulée : remettez-la « Non traitée » avant de l’assigner.'], 422);
+        }
+        if (!app(SubscriptionService::class)->canProcessOrder($shop)) {
+            return response()->json(['message' => 'Limite de 10 commandes traitées ce mois-ci avec le Plan Gratuit. Passez au Plan Pro pour continuer.', 'upgrade' => route('boutique.subscription.upgrade')], 403);
+        }
+        $data = $request->validate([
+            'kind'       => ['required', Rule::in(['rider', 'company'])],
+            'rider_id'   => ['required_if:kind,rider', 'nullable', 'integer'],
+            'company_id' => ['required_if:kind,company', 'nullable', 'integer'],
+            'zone_id'    => ['nullable', 'integer'],
+        ], [
+            'rider_id.required_if'   => 'Choisissez un livreur.',
+            'company_id.required_if' => 'Choisissez une entreprise de livraison.',
+        ]);
+        $cur = $shop->currency ?? 'GNF';
+        $push = app(PushService::class);
+
+        if ($data['kind'] === 'rider') {
+            $rider = User::livreurs()->inShop($shop->id)->find($data['rider_id']);
+            if (!$rider) return response()->json(['message' => 'Ce livreur ne fait pas partie de votre boutique.', 'errors' => ['rider_id' => ['Choisissez un livreur de votre boutique.']]], 422);
+
+            $order->livreur_id = $rider->id;
+            $order->delivery_company_id = null;
+            $order->driver_id = null;
+            if ($order->status === Order::STATUS_EN_ATTENTE) {
+                $order->status = Order::STATUS_CONFIRMEE;
+                $order->forceFill(['followup' => null, 'followup_at' => null]);
+            }
+            $order->save();
+
+            try { $rider->notify(new OrderStatusNotification($order, 'Une nouvelle commande vous a été assignée.')); } catch (\Throwable $e) {}
+            try { $push->sendToUser($rider, 'Nouvelle commande assignée 📦', 'Commande #' . str_pad($order->id, 4, '0', STR_PAD_LEFT) . ' · ' . number_format($order->total, 0, ',', ' ') . ' ' . $cur, 1, '/livreur/orders'); } catch (\Throwable $e) {}
+            if ($order->user) {
+                try { $push->sendToUser($order->user, 'Commande confirmée ✅', 'Votre commande a été confirmée et un livreur a été assigné.', 1, '/client/orders'); } catch (\Throwable $e) {}
+            }
+            $done = '🛵 Commande #' . $order->id . ' assignée à ' . $rider->name;
+        } else {
+            $company = DeliveryCompany::where('approved', true)->where('active', true)->find($data['company_id']);
+            if (!$company) return response()->json(['message' => 'Cette entreprise de livraison n’est plus disponible.', 'errors' => ['company_id' => ['Choisissez une autre entreprise.']]], 422);
+            $zone = !empty($data['zone_id']) ? $company->zones()->where('active', true)->find($data['zone_id']) : null;
+
+            // Comme l'ancienne page : la commande attend que l'entreprise l'accepte
+            $order->fill([
+                'delivery_company_id' => $company->id,
+                'delivery_zone_id'    => $zone?->id,
+                'delivery_fee'        => $zone?->price ?? $order->delivery_fee,
+                'livreur_id'          => null,
+                'driver_id'           => null,
+                'status'              => Order::STATUS_EN_ATTENTE,
+            ]);
+            $order->forceFill(['followup' => null, 'followup_at' => null])->save();
+            if ($company->user) {
+                try { $push->sendToUser($company->user, 'Nouvelle commande à livrer 📦', 'La boutique vous a confié une commande de ' . number_format($order->total, 0, ',', ' ') . ' ' . $cur . '.', 1, '/company/orders'); } catch (\Throwable $e) {}
+            }
+            $done = '🏢 Commande #' . $order->id . ' confiée à ' . $company->name;
+        }
+
+        $order->load(['client:id,name,phone', 'items.product:id,name,image', 'livreur:id,name', 'deliveryCompany:id,name', 'driver:id,name']);
+        return response()->json(['message' => $done, 'order' => $this->card($order, $shop, OrderBoard::settings(Storefront::forShop($shop)))]);
     }
 
     /** Paniers abandonnés à rappeler (pastille de l'onglet). */
@@ -169,12 +270,18 @@ class OrderBoardController extends Controller
             'followupAt' => $fa?->format('Y-m-d\TH:i'),
             'followupLabel' => $fa?->translatedFormat('j F à H:i'),
             'livreur' => $o->livreur->name ?? ($o->deliveryCompany->name ?? null),
+            // Qui livre : livreur de la boutique, ou entreprise de livraison (avec son chauffeur une fois acceptée)
+            'delivery' => $o->livreur_id
+                ? ['kind' => 'rider', 'id' => $o->livreur_id, 'name' => $o->livreur->name ?? 'Livreur']
+                : ($o->delivery_company_id
+                    ? ['kind' => 'company', 'id' => $o->delivery_company_id, 'name' => $o->deliveryCompany->name ?? 'Entreprise de livraison', 'driver' => $o->driver_id ? ($o->driver->name ?? null) : null, 'zone' => $o->delivery_zone_id]
+                    : null),
             'tel' => $intl ? 'tel:+' . $intl : null,
             'wa' => $intl ? 'https://wa.me/' . $intl . '?text=' . rawurlencode($wa) : null,
             'sms' => $intl ? 'sms:+' . $intl . '?body=' . rawurlencode($wa) : null,
             'copy' => 'Commande n° ' . $o->id . ' — ' . $at->format('d/m/Y H:i') . "\n" . $name . ($phone ? ' · ' . $phone : '') . "\n" . ($o->delivery_destination ? 'Adresse : ' . $o->delivery_destination . "\n" : '')
                 . $o->items->map(fn ($i) => '• ' . ($i->product->name ?? 'Produit') . ' × ' . $i->quantity . ' = ' . $money($i->price * $i->quantity))->implode("\n") . "\nTotal : " . $money($o->total) . ' (paiement à la livraison)',
-            'urls' => ['stage' => route('boutique.orders.stage', $o), 'note' => route('boutique.orders.note', $o), 'logistics' => route('boutique.orders.livraisons', ['search' => $o->id])],
+            'urls' => ['stage' => route('boutique.orders.stage', $o), 'note' => route('boutique.orders.note', $o), 'delivery' => route('boutique.orders.delivery', $o)],
         ];
     }
 
@@ -204,7 +311,7 @@ class OrderBoardController extends Controller
             } catch (\Throwable $e) {}
         }
 
-        $order->load(['client:id,name,phone', 'items.product:id,name,image', 'livreur:id,name', 'deliveryCompany:id,name']);
+        $order->load(['client:id,name,phone', 'items.product:id,name,image', 'livreur:id,name', 'deliveryCompany:id,name', 'driver:id,name']);
         return response()->json(['order' => $this->card($order, $shop, OrderBoard::settings(Storefront::forShop($shop)))]);
     }
 

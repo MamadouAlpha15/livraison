@@ -46,6 +46,19 @@
 .wz-rm { top: 6px; right: 6px; width: 28px; height: 28px; border-radius: 50%; background: rgba(15,23,42,.75); color: #fff; font-size: 16px !important; line-height: 1; }
 .wz-mk { left: 6px; top: 6px; padding: 4px 8px; border-radius: 999px; background: rgba(255,255,255,.92); color: var(--text); }
 .wz-add { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; aspect-ratio: 1; border-radius: 16px; border: 2px dashed var(--border); background: transparent; color: var(--muted); font: 700 13px var(--font); cursor: pointer; }
+.wz-imp { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 16px; background: linear-gradient(135deg, #EAF2FF, #F3E8FF); color: var(--text); text-decoration: none; }
+.wz-imp > span:first-child { font-size: 26px; } .wz-imp span:nth-child(2) { display: grid; gap: 2px; flex: 1; } .wz-imp b { font-size: 15px; } .wz-imp small { color: var(--muted); font-size: 12.5px; line-height: 1.4; }
+.wz-imp i { font-style: normal; font-weight: 800; color: var(--sv-btn, #1668D8); } .wz-imp:hover { filter: brightness(.98); }
+.wz-pro input { flex: 1; min-width: 0; min-height: 46px; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 14px; background: var(--bg); color: var(--text); font: 500 15px var(--font); }
+.wz-pro input:focus { outline: 0; border-color: var(--sv-blue, #1F7CF6); box-shadow: 0 0 0 3px var(--sv-b50, #EAF2FF); }
+.wz-or { display: flex; align-items: center; gap: 12px; margin: 16px 0; color: var(--muted); font-size: 12.5px; font-weight: 700; }
+.wz-or::before, .wz-or::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.wz-pro { display: grid; gap: 8px; margin-top: 16px; padding: 14px; border-radius: 16px; background: linear-gradient(135deg, #EAF2FF, #F3E8FF); }
+.wz-pro small { color: var(--muted); font-size: 13px; }
+.wz-pro-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.wz-pro-row .wz-btn { min-height: 42px; }
+.wz-help.is-err { color: var(--sv-err, #DC2626); font-weight: 700; } .wz-help.is-ok { color: var(--sv-ok, #059669); font-weight: 700; }
+[data-theme="dark"] .wz-pro { background: linear-gradient(135deg, #13284B, #2A1B4A); }
 .wz-count { margin: 12px 0 0; text-align: center; color: var(--muted); font-size: 13px; }
 @keyframes wzSpin { to { transform: rotate(360deg); } }
 /* Étape 2 : prix et détails */
@@ -103,6 +116,8 @@
                 <h1 id="wzH1">Ajoutez les photos du produit</h1>
                 <p class="wz-sub">Glissez-déposez, collez (Ctrl+V) ou touchez pour choisir. La première photo est la photo principale.</p>
                 <div class="wz-card">
+                    <a class="wz-imp" href="{{ route('products.import') }}"><span aria-hidden="true">🔗</span><span><b>Importer depuis un lien</b><small>Alibaba, AliExpress, 1688, Amazon, Jumia, Shopify… : Shopio IA prépare la page et calcule ton prix en GNF.</small></span><i aria-hidden="true">→</i></a>
+                    <div class="wz-or" aria-hidden="true"><span>ou ajoutez vos photos</span></div>
                     <div class="wz-drop" id="wzDrop" role="button" tabindex="0" aria-describedby="wzDropHelp">
                         <span aria-hidden="true" style="font-size:34px">📷</span>
                         <b>Glissez vos photos ici</b>
@@ -113,6 +128,15 @@
                     <div class="wz-thumbs" id="wzThumbs" aria-live="polite"></div>
                     <p class="wz-count" id="wzCount">Aucune photo pour l’instant.</p>
                     <p class="wz-err" id="wzPhotoErr" role="alert" style="text-align:center;margin-top:8px"></p>
+                    @if($photoAi)
+                    <div class="wz-pro" id="wzPro" hidden>
+                        <b>✨ Photos pro avec Shopio IA</b>
+                        <small>À partir de la photo principale : votre vrai produit, avec un fond et une lumière de professionnel.</small>
+                        <div class="wz-pro-row"><button type="button" class="wz-btn" data-pro="studio">Fond blanc studio</button><button type="button" class="wz-btn" data-pro="scene">Mise en scène</button></div>
+                        <input id="wzWish" maxlength="300" placeholder="Décor ou précision (facultatif) : ex. salon moderne, tissu wax…" aria-label="Décor ou précision pour la photo">
+                        <p class="wz-help" id="wzProMsg" aria-live="polite">Environ 30 secondes à 1 minute par photo. Vérifiez toujours que le produit est fidèle à l’original.</p>
+                    </div>
+                    @endif
                 </div>
                 <div class="wz-actions"><a class="wz-btn" href="{{ route('products.create') }}">Créer sans l’IA</a><button type="button" class="wz-btn is-main" id="wzNext1" disabled>Continuer →</button></div>
             </section>
@@ -165,6 +189,7 @@
     const CSRF = document.querySelector('meta[name="csrf-token"]').content;
     const AI = @json($aiReady), MAX = 4;
     const UPLOAD = @json(route('products.upload.image')), STORE = @json(route('products.wizard.store'));
+    const PHOTO = @json(route('products.wizard.photo'));
     let photos = []; // { key, url, path, busy, err }
 
     /* ── Navigation entre les étapes ── */
@@ -186,7 +211,36 @@
         $('wzCount').textContent = photos.length ? ready + ' photo' + (ready > 1 ? 's' : '') + ' prête' + (ready > 1 ? 's' : '') + ' sur ' + MAX + ' au maximum' + (busy ? ' · envoi en cours…' : '') : 'Aucune photo pour l’instant.';
         $('wzNext1').disabled = !ready || busy;
         $('wzDrop').hidden = photos.length > 0;
+        if ($('wzPro')) $('wzPro').hidden = !ready;
     }
+
+    /* ── Importer depuis un lien : nom, description et photos d'une autre boutique ── */
+    async function postJson(url, body) {
+        let r, j = {};
+        try { r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }, body: JSON.stringify(body) }); j = await r.json().catch(() => ({})); }
+        catch (x) { throw new Error('Connexion impossible : vérifiez votre internet puis réessayez.'); }
+        if (!r.ok) throw new Error(j.error || (j.errors && Object.values(j.errors)[0][0]) || (r.status === 429 ? 'Trop d’essais : patientez une minute.' : 'Une erreur est survenue. Réessayez.'));
+        return j;
+    }
+    const say = (id, t, c) => { $(id).textContent = t; $(id).className = 'wz-help' + (c ? ' ' + c : ''); };
+    /* ── Photos pro : Shopio IA part de la photo principale (vraie photo) ── */
+    if ($('wzPro')) $('wzPro').addEventListener('click', async e => {
+        const b = e.target.closest('[data-pro]'); if (!b) return;
+        const main = photos.find(p => p.path && !p.err);
+        if (!main) return;
+        if (photos.length >= MAX) { say('wzProMsg', '4 photos au maximum : retirez-en une pour en créer une nouvelle.', 'is-err'); return; }
+        const p = { url: main.url, path: null, busy: true, err: false };
+        photos.push(p); render();
+        $('wzPro').querySelectorAll('[data-pro]').forEach(x => x.disabled = true);
+        say('wzProMsg', 'Shopio IA regarde votre photo et crée la nouvelle… (30 secondes à 1 minute)');
+        try {
+            const j = await postJson(PHOTO, { source: main.path, style: b.dataset.pro, wish: $('wzWish').value.trim() });
+            p.url = j.url; p.path = j.path;
+            say('wzProMsg', 'Photo créée : vérifiez que le produit est fidèle. Touchez « ★ Principale » pour en faire la photo principale, ou × pour la retirer.', 'is-ok');
+        } catch (err) { photos.splice(photos.indexOf(p), 1); say('wzProMsg', err.message, 'is-err'); }
+        p.busy = false; render();
+        $('wzPro').querySelectorAll('[data-pro]').forEach(x => x.disabled = false);
+    });
     async function upload(file) {
         if (photos.length >= MAX) { $('wzPhotoErr').textContent = '4 photos au maximum.'; return; }
         if (!/^image\/(jpeg|png|webp|gif)$/.test(file.type)) { $('wzPhotoErr').textContent = '« ' + file.name + ' » n’est pas une photo (JPG, PNG ou WebP).'; return; }

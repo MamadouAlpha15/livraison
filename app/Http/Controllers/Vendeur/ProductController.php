@@ -112,8 +112,13 @@ class ProductController extends Controller
         if ($request->filled('status') && \Illuminate\Support\Facades\Schema::hasColumn('products', 'is_active')) {
             $query->where('is_active', $request->status === 'active');
         }
+        // Filtre de stock (bouton « Filtres ») : presque en rupture (1 à 5) ou en rupture
+        if ($request->query('stock') === 'low') $query->whereBetween('stock', [1, 5]);
+        if ($request->query('stock') === 'out') $query->where('stock', '<=', 0);
 
-        $products      = $query->paginate(12)->withQueryString();
+        // Nombre de produits par page (grille de 4 colonnes) : 12, 24 ou 48
+        $perPage  = in_array((int) $request->query('par_page'), [12, 24, 48], true) ? (int) $request->query('par_page') : 12;
+        $products = $query->paginate($perPage)->withQueryString();
 
         /* Catégories prédéfinies + catégories personnalisées saisies manuellement */
         $customCats = $this->customCategoriesFor($shop);
@@ -127,13 +132,14 @@ class ProductController extends Controller
         $hasStock       = \Illuminate\Support\Facades\Schema::hasColumn('products', 'stock');
         $activeProducts = $hasIsActive ? $shop->products()->where('is_active', true)->count() : $totalProducts;
         $outOfStock     = $hasStock    ? $shop->products()->where('stock', '<=', 0)->count()   : 0;
+        $lowStock       = $hasStock    ? $shop->products()->whereBetween('stock', [1, 5])->count() : 0;
 
         $isPro          = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
         $processedCount = app(SubscriptionService::class)->processedOrdersThisMonth($shop);
 
         return view('vendeur.products.index', compact(
             'products', 'categories', 'customCats', 'devise',
-            'totalProducts', 'activeProducts', 'outOfStock',
+            'totalProducts', 'activeProducts', 'outOfStock', 'lowStock', 'perPage',
             'isPro', 'processedCount', 'shop'
         ));
     }

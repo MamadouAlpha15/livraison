@@ -108,6 +108,7 @@ class PageModels
             'urls'       => [
                 'order'  => route('public.shops.order', $shop),
                 'cart'   => route('public.shops.cart', $shop),
+                'live'   => route('public.shops.live', $shop), // vue en direct du vendeur (signal toutes les 20 s)
                 'view'   => route('public.shops.view', [$shop, 0]), // « 0 » remplacé par l'identifiant du produit
                 'login'  => route('login', ['redirect' => Storefront::publicUrl($shop)]),
                 'follow' => $isClient ? route('client.favorites.toggle', $shop) : route('register', ['redirect' => Storefront::publicUrl($shop), 'role' => 'client']),

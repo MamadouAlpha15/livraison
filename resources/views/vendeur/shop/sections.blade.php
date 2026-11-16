@@ -19,8 +19,12 @@
         'defaults' => $defaults, 'tones' => HS::TONES, 'styles' => HS::STYLES, 'formats' => HS::FORMATS, 'images' => (object) $images, 'categories' => $categories,
         'library' => HS::CATEGORIES, 'icons' => HS::ICONS, 'testimonial' => HS::TESTIMONIAL_TYPES,
         'limits' => ['custom' => HS::CUSTOM_MAX, 'list' => HS::LIST_MAX],
+        // Shopio IA : sortes de sections dont l'IA sait écrire les textes (App\Services\SectionAi), plan Pro
+        'aiTypes' => \App\Services\SectionAi::writableTypes(), 'aiPro' => $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture(),
+        // Photos Shopio IA : sections avec photo, produits à mettre en scène
+        'aiImageTypes' => array_keys(\App\Services\SectionImageAi::TYPES), 'aiShots' => \App\Services\SectionImageAi::choices($shop),
         'urls' => [
-            'save' => route('boutique.storefront.sections.update'), 'upload' => route('boutique.grow.cover-upload'),
+            'save' => route('boutique.storefront.sections.update'), 'upload' => route('boutique.grow.cover-upload'), 'ai' => route('boutique.storefront.sections.ai'), 'aiImage' => route('boutique.storefront.sections.image'),
             'preview' => $publicUrl, 'self' => route('boutique.storefront.sections'),
         ],
     ];
@@ -57,6 +61,11 @@
             @elseif($theme !== $published)
             <p class="sx-hint" style="padding:10px 12px;border-radius:12px;background:#FEF3E0;color:#92400E">Vous modifiez le thème {{ $models[$theme][0] }}, qui n’est pas en ligne. Vos clients verront ces sections quand vous choisirez ce thème dans <a href="{{ route('boutique.storefront.edit') }}" style="color:inherit">Ma vitrine</a>.</p>
             @endif
+            <div class="sx-aibox">
+                <p id="sxAiMsg">{{ $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture() ? 'Shopio IA rédige les textes de toutes vos sections, y compris celles que vous ajoutez. Photos, liens et réglages restent les vôtres. Vous relisez, puis vous enregistrez.' : 'Shopio IA (plan Pro) peut rédiger les textes de toutes vos sections en un clic.' }}</p>
+                <input class="sx-input" id="sxAiNote" maxlength="500" placeholder="Consigne (facultatif) : ex. plus court, parlez de la Tabaski, ton plus luxe…" aria-label="Consigne pour Shopio IA">
+                <button type="button" class="sx-btn sx-btn-sm sx-ai-btn" id="sxAiAll" style="justify-self:start">✨ Rédiger toutes les sections avec Shopio IA</button>
+            </div>
             <ol class="sx-list" id="sxList" aria-label="Sections, dans l’ordre de la page"></ol>
             <div class="sx-add" id="sxAdd">
                 <b style="font-size:14px">Ajouter une section</b>

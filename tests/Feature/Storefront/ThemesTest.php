@@ -44,7 +44,7 @@ test('l\'ancienne apparence de la vitrine est ignorée', function () {
         'settings' => ['vacation' => true],
     ]);
 
-    expect(array_keys($config))->toEqualCanonicalizing(['page_model', 'home', 'form', 'cover', 'logo', 'settings'])
+    expect(array_keys($config))->toEqualCanonicalizing(['page_model', 'home', 'form', 'cover', 'logo', 'settings', 'orders', 'carts'])
         ->and($config['page_model'])->toBe('express')
         ->and($config['settings']['vacation'])->toBeTrue();
 });

@@ -6,7 +6,8 @@
                 Appeler / WhatsApp / SMS, copier, actions, notes), nouvelle commande, réglages du message WhatsApp.
                 Données en direct : la liste et les compteurs se mettent à jour toutes les 30 s.
     Variables : $shop, $groups, $page, $counts, $stage, $period, $search, $source, $productId, $settings, $devise,
-                $sources, $products, $communes, $cartsWaiting
+                $sources, $products, $communes, $cartsWaiting, $delivery (livreurs, entreprises de livraison et zones)
+    Livraison : section « 🚚 Livraison » de la fiche → POST boutique.orders.delivery (l'ancienne page Livraisons renvoie ici)
 --}}
 @extends('layouts.app')
 @section('title', 'Commandes · ' . $shop->name)
@@ -22,6 +23,7 @@
         'live' => request()->fullUrlWithQuery(['partial' => 1, 'page' => 1]),
         'wa' => $settings['orders']['wa'],
         'urls' => ['store' => route('boutique.orders.store'), 'settings' => route('boutique.orders.settings')],
+        'delivery' => $delivery,
     ];
 @endphp
 
@@ -137,6 +139,24 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 .ob-msg.is-err { color: #B91C1C; } .ob-msg.is-ok { color: #15803D; }
 .ob-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .ob-line { display: grid; grid-template-columns: minmax(0, 1fr) 80px auto; gap: 8px; align-items: center; }
+/* Livraison (fiche) : qui livre, puis livreur de la boutique ou entreprise de livraison */
+.ob-dv { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 14px; background: var(--bg); box-shadow: inset 0 0 0 1px var(--border); }
+.ob-dv.is-on { background: linear-gradient(135deg, rgba(34,197,94,.10), rgba(34,197,94,.02)); box-shadow: inset 0 0 0 1px rgba(34,197,94,.35); }
+.ob-dv.is-wait { background: linear-gradient(135deg, rgba(245,158,11,.12), rgba(245,158,11,.02)); box-shadow: inset 0 0 0 1px rgba(245,158,11,.38); }
+.ob-dv-ico { width: 46px; height: 46px; flex-shrink: 0; display: grid; place-items: center; border-radius: 13px; font-size: 23px; line-height: 1; background: var(--surface); box-shadow: inset 0 0 0 1px var(--border), 0 6px 14px -8px rgba(11,30,61,.35); }
+.ob-dv-txt { flex: 1; min-width: 0; }
+.ob-dv-txt b { display: block; font-size: 14.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ob-dv-txt small { display: block; margin-top: 2px; font-size: 12px; color: var(--text-2); }
+.ob-dv-tag { flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px; min-height: 26px; padding: 0 10px; border-radius: 999px; font-size: 11.5px; font-weight: 800; }
+.ob-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 12px; background: var(--bg); box-shadow: inset 0 0 0 1px var(--border); }
+.ob-seg button { min-height: 40px; border: 0; border-radius: 9px; background: none; color: var(--text-2); font: 700 13px var(--font); cursor: pointer; transition: background-color 150ms, color 150ms; }
+.ob-seg button[aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,.08), inset 0 0 0 1px var(--border); }
+.ob-seg button:focus-visible { outline: 2px solid var(--sv-blue); outline-offset: 1px; }
+.ob-dv-pane { display: grid; gap: 10px; }
+.ob-dv-pane[hidden] { display: none; }
+.ob-dv-empty { padding: 12px; border-radius: 12px; background: var(--bg); font-size: 13px; color: var(--text-2); line-height: 1.5; }
+.ob-dv-empty a { color: var(--sv-btn); font-weight: 700; }
+.ob-chip-dv { display: inline-flex; align-items: center; gap: 5px; }
 .ob-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 1300; padding: 10px 16px; border-radius: 10px; background: #0B1E3D; color: #fff; font-weight: 700; font-size: 13.5px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
 @media (max-width: 900px) { .ob { padding: 14px 14px 80px; } .ob-top { padding: 10px 14px !important; } }
 @media (max-width: 560px) {
@@ -171,7 +191,6 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                 <h1>Commandes</h1>
                 <span class="ob-live" title="La liste se met à jour toute seule"><i aria-hidden="true"></i>Données en direct</span>
                 <div class="ob-head-actions">
-                    <a class="ob-btn" href="{{ route('boutique.orders.livraisons') }}" title="Assigner un livreur ou une entreprise de livraison">🛵 Livraisons</a>
                     <button type="button" class="ob-btn" id="obSettingsBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Réglages</button>
                     <button type="button" class="ob-btn ob-btn-main" id="obNewBtn">+ Nouvelle commande</button>
                 </div>
@@ -293,17 +312,74 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                 '<div class="ob-total"><span>Total</span><span>' + esc(o.total) + '</span></div></div>' +
             '<div class="ob-sec"><div class="ob-client"><div class="ob-client-hd"><i aria-hidden="true">' + esc(o.name.charAt(0).toUpperCase()) + '</i><div><b>' + esc(o.name) + '</b>' + (o.phone ? '<br><a href="' + esc(o.tel) + '">' + esc(o.phoneShow) + '</a>' : '') + '</div></div>' +
                 (o.address ? '<div class="ob-kv"><small>Adresse</small><span>' + esc(o.address) + '</span></div>' : '') +
-                (o.livreur ? '<div class="ob-kv"><small>Livraison</small><span>' + esc(o.livreur) + '</span></div>' : '') +
                 (o.followupLabel && o.stage === 'programmee' ? '<div class="ob-kv"><small>Prévue le</small><span>' + esc(o.followupLabel) + '</span></div>' : '') + '</div>' +
                 (o.tel ? '<div class="ob-contact"><a class="ob-btn ob-call" href="' + esc(o.tel) + '">📞 Appeler</a><a class="ob-btn ob-wa" href="' + esc(o.wa) + '" target="_blank" rel="noopener">WhatsApp</a><a class="ob-btn" href="' + esc(o.sms) + '">💬 SMS</a><button type="button" class="ob-btn ob-copy" data-copy-order>📋 Copier la commande</button></div>' : '<button type="button" class="ob-btn ob-copy" data-copy-order>📋 Copier la commande</button>') + '</div>' +
             '<div class="ob-sec"><h3>Actions</h3><div class="ob-actions">' + G.actions.map(k => '<button type="button" class="is-' + G.stages[k].color + '" data-stage="' + k + '" aria-pressed="' + (o.stage === k) + '">' + esc(G.stages[k].label) + '</button>').join('') +
                 '<button type="button" class="is-' + G.stages.retournee.color + '" data-stage="retournee" aria-pressed="' + (o.stage === 'retournee') + '">' + esc(G.stages.retournee.label) + '</button><button type="button" class="is-' + G.stages.nouvelle.color + '" data-stage="nouvelle" aria-pressed="' + (o.stage === 'nouvelle') + '">Remettre « Non traitée »</button></div>' +
                 '<div class="ob-sched" id="obSched" hidden><div style="flex:1;min-width:180px"><label class="ob-lbl" for="obSchedAt">Date et heure prévues</label><input class="ob-input" type="datetime-local" id="obSchedAt" value="' + esc(o.followupAt || '') + '"></div><button type="button" class="ob-btn ob-btn-main" id="obSchedOk">Programmer</button></div>' +
-                '<p class="ob-msg" id="obStageMsg" role="alert"></p>' +
-                '<a class="ob-btn" href="' + esc(o.urls.logistics) + '" style="justify-self:start">🛵 Assigner un livreur</a></div>' +
+                '<p class="ob-msg" id="obStageMsg" role="alert"></p></div>' +
+            deliveryHtml(o) +
             '<div class="ob-sec"><h3>Notes</h3><textarea class="ob-area" id="obNote" maxlength="2000" placeholder="Ajouter une note… (visible par la boutique seulement)">' + esc(o.note) + '</textarea><p class="ob-msg" id="obNoteMsg" aria-live="polite"></p></div>';
     }
-    function openOrder(o) { renderOrder(o); openModal('obOrder'); }
+    /* ───────── Livraison : livreur de la boutique ou entreprise de livraison ───────── */
+    const DV = G.delivery;
+    let dvTab = null;
+    function deliveryStatus(o) {
+        const d = o.delivery;
+        if (d && d.kind === 'rider') return '<div class="ob-dv is-on"><span class="ob-dv-ico" aria-hidden="true">🛵</span><div class="ob-dv-txt"><b>' + esc(d.name) + '</b><small>Livreur de la boutique · prévenu sur son téléphone</small></div><span class="ob-dv-tag is-green">✅ Assignée</span></div>';
+        if (d && d.kind === 'company') return d.driver
+            ? '<div class="ob-dv is-on"><span class="ob-dv-ico" aria-hidden="true">🏢</span><div class="ob-dv-txt"><b>' + esc(d.name) + '</b><small>Chauffeur : ' + esc(d.driver) + '</small></div><span class="ob-dv-tag is-green">✅ Acceptée</span></div>'
+            : '<div class="ob-dv is-wait"><span class="ob-dv-ico" aria-hidden="true">🏢</span><div class="ob-dv-txt"><b>' + esc(d.name) + '</b><small>L’entreprise doit accepter la commande</small></div><span class="ob-dv-tag is-amber">⏳ En attente</span></div>';
+        return '<div class="ob-dv"><span class="ob-dv-ico" aria-hidden="true">📦</span><div class="ob-dv-txt"><b>Pas encore de livreur</b><small>Choisissez qui livre cette commande.</small></div></div>';
+    }
+    function zoneOptions(companyId, selected) {
+        const c = DV.companies.find(x => x.id === +companyId);
+        if (!c || !c.zones.length) return '<option value="">' + (c ? 'Aucune zone indiquée par l’entreprise' : 'Choisissez d’abord l’entreprise') + '</option>';
+        return '<option value="">Zone de livraison (facultatif)</option>' + c.zones.map(z => '<option value="' + z.id + '"' + (+selected === z.id ? ' selected' : '') + '>📍 ' + esc(z.name) + ' · ' + esc(money(z.price)) + '</option>').join('');
+    }
+    function deliveryHtml(o) {
+        const d = o.delivery;
+        let h = '<div class="ob-sec" id="obDeliv"><h3>🚚 Livraison</h3>' + deliveryStatus(o);
+        if (['livree', 'rejetee', 'retournee'].includes(o.stage)) return h + '<p class="ob-sub" style="margin:0">' + (o.stage === 'livree' ? '🎉 Commande livrée.' : 'Commande annulée : remettez-la « Non traitée » pour la livrer.') + '</p></div>';
+        const tab = dvTab || (d && d.kind === 'company' ? 'company' : 'rider');
+        h += '<div class="ob-seg" role="tablist" aria-label="Qui livre ?"><button type="button" role="tab" data-dv-tab="rider" aria-selected="' + (tab === 'rider') + '">🛵 Mon livreur</button><button type="button" role="tab" data-dv-tab="company" aria-selected="' + (tab === 'company') + '">🏢 Entreprise de livraison</button></div>';
+        // Livreurs de la boutique
+        h += '<div class="ob-dv-pane" data-dv-pane="rider"' + (tab === 'rider' ? '' : ' hidden') + '>' + (DV.riders.length
+            ? '<div><label class="ob-lbl" for="obRider">Livreur</label><select class="ob-input" id="obRider"><option value="">Choisir un livreur…</option>' + DV.riders.map(r => '<option value="' + r.id + '"' + (d && d.kind === 'rider' && d.id === r.id ? ' selected' : '') + '>' + (r.available ? '🟢 ' : '🟡 ') + esc(r.name) + (r.available ? ' — disponible' : ' — occupé') + '</option>').join('') + '</select></div>' +
+              '<button type="button" class="ob-btn ob-btn-main" data-dv-send="rider">' + (d && d.kind === 'rider' ? '🔁 Changer de livreur' : '🛵 Assigner ce livreur') + '</button>'
+            : '<p class="ob-dv-empty">🛵 Vous n’avez pas encore de livreur dans votre équipe.<br><a href="' + esc(DV.ridersUrl) + '">➕ Ajouter un livreur</a></p>') + '</div>';
+        // Entreprises de livraison
+        const cid = d && d.kind === 'company' ? d.id : '';
+        h += '<div class="ob-dv-pane" data-dv-pane="company"' + (tab === 'company' ? '' : ' hidden') + '>' + (DV.companies.length
+            ? '<div><label class="ob-lbl" for="obCompany">Entreprise</label><select class="ob-input" id="obCompany"><option value="">Choisir une entreprise…</option>' + DV.companies.map(c => '<option value="' + c.id + '"' + (+cid === c.id ? ' selected' : '') + '>🏢 ' + esc(c.name) + '</option>').join('') + '</select></div>' +
+              '<div><label class="ob-lbl" for="obZone">Zone et prix de livraison</label><select class="ob-input" id="obZone">' + zoneOptions(cid, d && d.zone) + '</select></div>' +
+              '<p class="ob-sub" style="margin:0">L’entreprise reçoit la commande sur son téléphone et choisit son chauffeur.</p>' +
+              '<button type="button" class="ob-btn ob-btn-main" data-dv-send="company">' + (d && d.kind === 'company' ? '🔁 Confier à une autre entreprise' : '🏢 Confier la livraison') + '</button>'
+            : '<p class="ob-dv-empty">🏢 Aucune entreprise de livraison disponible dans votre pays pour l’instant.</p>') + '</div>';
+        return h + '<p class="ob-msg" id="obDvMsg" role="alert"></p></div>';
+    }
+    async function sendDelivery(btn) {
+        const kind = btn.dataset.dvSend, msg = $('obDvMsg');
+        const body = { kind: kind };
+        if (kind === 'rider') { body.rider_id = +$('obRider').value || null; if (!body.rider_id) { msg.textContent = 'Choisissez un livreur.'; msg.className = 'ob-msg is-err'; $('obRider').focus(); return; } }
+        else { body.company_id = +$('obCompany').value || null; body.zone_id = +$('obZone').value || null; if (!body.company_id) { msg.textContent = 'Choisissez une entreprise de livraison.'; msg.className = 'ob-msg is-err'; $('obCompany').focus(); return; } }
+        const label = btn.textContent; btn.disabled = true; btn.textContent = 'Envoi…';
+        const r = await post(cur.urls.delivery, body);
+        btn.disabled = false; btn.textContent = label;
+        if (!r.ok) {
+            msg.className = 'ob-msg is-err';
+            msg.innerHTML = esc((r.j.errors && Object.values(r.j.errors)[0][0]) || r.j.message || 'La livraison n’a pas pu être enregistrée.') + (r.j.upgrade ? ' <a href="' + esc(r.j.upgrade) + '">Passer au Plan Pro</a>' : '');
+            return;
+        }
+        const n = r.j.order;
+        const card = document.querySelector('.ob-card[data-id="' + n.id + '"]');
+        if (card) card.dataset.order = JSON.stringify(n);
+        dvTab = null; renderOrder(n); toast(r.j.message); refresh();
+    }
+    function openOrder(o, focusDelivery) {
+        dvTab = null; renderOrder(o); openModal('obOrder');
+        if (focusDelivery) setTimeout(() => { const s = $('obDeliv'); if (s) { s.scrollIntoView({ behavior: 'smooth', block: 'start' }); const f = s.querySelector('select'); if (f) f.focus({ preventScroll: true }); } }, 60);
+    }
     $('obList').addEventListener('click', e => {
         if (e.target.closest('[data-stage-menu]')) { openStageMenu(e.target.closest('[data-stage-menu]')); return; }
         if (e.target.closest('[data-kebab]')) { openKebab(e.target.closest('[data-kebab]')); return; }
@@ -322,6 +398,16 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
         return { order: n };
     }
     $('obOrderSheet').addEventListener('click', async e => {
+        const tabBtn = e.target.closest('[data-dv-tab]');
+        if (tabBtn) {
+            dvTab = tabBtn.dataset.dvTab;
+            document.querySelectorAll('[data-dv-tab]').forEach(t => t.setAttribute('aria-selected', String(t === tabBtn)));
+            document.querySelectorAll('[data-dv-pane]').forEach(p => { p.hidden = p.dataset.dvPane !== dvTab; });
+            $('obDvMsg').textContent = '';
+            return;
+        }
+        const dvBtn = e.target.closest('[data-dv-send]');
+        if (dvBtn && cur) { sendDelivery(dvBtn); return; }
         const b = e.target.closest('[data-stage]');
         if (b && cur) {
             if (b.dataset.stage === 'programmee') { $('obSched').hidden = false; $('obSchedAt').focus(); return; }
@@ -339,6 +425,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
         }
         if (e.target.closest('[data-copy-order]') && cur) copy(cur.copy);
     });
+    $('obOrderSheet').addEventListener('change', e => { if (e.target.id === 'obCompany') $('obZone').innerHTML = zoneOptions(e.target.value, null); });
     async function copy(t) { try { await navigator.clipboard.writeText(t); toast('Commande copiée'); } catch (x) { window.prompt('Copiez la commande :', t); } }
     // Notes : enregistrées toutes seules
     let noteT;
@@ -377,8 +464,8 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
         closeMenu();
         const o = cardData(btn), m = document.createElement('div');
         m.className = 'ob-menu'; m.setAttribute('role', 'menu');
-        m.innerHTML = '<button type="button" role="menuitem" data-k="open">Ouvrir la commande</button>' + (o.tel ? '<a role="menuitem" href="' + esc(o.tel) + '">📞 Appeler</a><a role="menuitem" href="' + esc(o.wa) + '" target="_blank" rel="noopener">WhatsApp</a>' : '') + '<button type="button" role="menuitem" data-k="copy">📋 Copier la commande</button><a role="menuitem" href="' + esc(o.urls.logistics) + '">🛵 Assigner un livreur</a>';
-        m.addEventListener('click', e => { const k = e.target.closest('[data-k]'); if (!k) { closeMenu(); return; } closeMenu(); if (k.dataset.k === 'open') openOrder(o); if (k.dataset.k === 'copy') copy(o.copy); });
+        m.innerHTML = '<button type="button" role="menuitem" data-k="open">Ouvrir la commande</button>' + (o.tel ? '<a role="menuitem" href="' + esc(o.tel) + '">📞 Appeler</a><a role="menuitem" href="' + esc(o.wa) + '" target="_blank" rel="noopener">WhatsApp</a>' : '') + '<button type="button" role="menuitem" data-k="copy">📋 Copier la commande</button><button type="button" role="menuitem" data-k="deliv">🛵 ' + (o.delivery ? 'Changer la livraison' : 'Assigner un livreur') + '</button>';
+        m.addEventListener('click', e => { const k = e.target.closest('[data-k]'); if (!k) { closeMenu(); return; } closeMenu(); if (k.dataset.k === 'open') openOrder(o); if (k.dataset.k === 'copy') copy(o.copy); if (k.dataset.k === 'deliv') openOrder(o, true); });
         place(m, btn);
     }
     document.addEventListener('click', e => { if (menu && !menu.contains(e.target) && !e.target.closest('[data-stage-menu],[data-kebab]')) closeMenu(); });

@@ -310,12 +310,39 @@ window.SM = (function () {
     window.addEventListener('storage', e => { if (e.key && e.key.indexOf('shopio_pm_') === 0) { cart = load('cart', []).filter(l => byId(l.id)); favs = load('fav', []).filter(id => byId(id)); recent = load('recent', []).filter(id => byId(id)); changed(); } });
     setTimeout(changed, 0);
 
+    /* ── Vue en direct du vendeur : signal toutes les 20 s tant que la page est visible ──
+       Envoie l'identifiant aléatoire du navigateur, l'étape (parcourt, regarde un produit, panier, formulaire),
+       le produit regardé et le nombre d'articles du panier. Jamais sur un lien d'aperçu. */
+    let liveProduct = null, formAt = 0;
+    const ORDER_FORMS = '#smStepForm, #exCheckout, [data-sm-order]';
+    ['focusin', 'input'].forEach(t => document.addEventListener(t, e => { if (e.target.closest && e.target.closest(ORDER_FORMS)) formAt = Date.now(); }));
+    function liveStage() {
+        if (Date.now() - formAt < 90000 || (openEl === $('smCart') && !$('smStepForm').hidden)) return 'form';
+        if (liveProduct || (openEl === $('smQuick') && quickId)) return 'product';
+        if (cart.length) return 'cart';
+        return 'browse';
+    }
+    let liveT = null;
+    function ping() {
+        if (!COUNT_VIEWS || !PM.urls.live || document.hidden) return;
+        const stage = liveStage();
+        try {
+            fetch(PM.urls.live, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF },
+                body: JSON.stringify({ visitor: VISITOR, stage: stage, product_id: stage === 'product' || stage === 'form' ? (liveProduct || (openEl === $('smQuick') ? quickId : null)) : null, cart_items: cartCount() }) }).catch(() => {});
+        } catch (e) {}
+    }
+    function liveStart() { clearInterval(liveT); ping(); liveT = setInterval(ping, 20000); }
+    document.addEventListener('visibilitychange', () => { if (document.hidden) clearInterval(liveT); else liveStart(); });
+    subs.push(() => { clearTimeout(ping.t); ping.t = setTimeout(ping, 800); }); // panier ou fiche changés : signal rapide
+    setTimeout(liveStart, 600);
+
     return {
         data: PM, products: PM.products, byId: byId, money: money, esc: esc, reduce: reduce,
         fav: id => favs.includes(+id), favs: () => favs.slice(), recent: () => recent.map(byId).filter(Boolean),
         cartCount: cartCount, cartTotal: cartTotal, lineTotal: lineTotal, cartLines: () => cart.map(l => ({ p: byId(l.id), qty: l.qty })),
         add: add, open: open, openCart: openCart, toggleFav: toggleFav, canBuy: canBuy, buyLabel: buyLabel, suggest: suggest, toast: toast,
         capture: capture, visitor: VISITOR,
+        liveProduct: id => { liveProduct = id ? +id : null; ping(); }, // page produit : le produit regardé
         subscribe: fn => { subs.push(fn); },
     };
 })();

@@ -137,6 +137,42 @@ class StorefrontController extends Controller
         return response()->json(['ok' => true, 'sections' => Storefront::forShop($shop->fresh())['home'][$data['theme']]]);
     }
 
+    /**
+     * « Rédiger avec Shopio IA » dans Boutique → Sections (une section, ou toutes) : renvoie leur contenu rédigé,
+     * rien n'est enregistré avant « Enregistrer et publier ». Plan Pro, 30 rédactions par heure.
+     */
+    public function sectionsAi(Request $request, \App\Services\SectionAi $ai): JsonResponse
+    {
+        $shop = $this->shop();
+        if (!($shop->plan === 'pro' && $shop->plan_expires_at?->isFuture())) {
+            return response()->json(['error' => 'Shopio IA est réservé au plan Pro. Passez au plan Pro pour rédiger vos sections en un clic.'], 403);
+        }
+        $data = $request->validate([
+            'theme'    => ['required', Rule::in(array_keys(HomeSections::PAGES))],
+            'sections' => ['required', 'array', 'min:1', 'max:40'],
+            'sections.*.id' => ['required', 'string', 'max:24'],
+            'sections.*.type' => ['required', 'string', 'max:24'],
+            'instructions' => ['nullable', 'string', 'max:500'],
+        ]);
+        $key = 'ai-sections:' . \Illuminate\Support\Facades\Auth::id();
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 30)) {
+            return response()->json(['error' => 'Limite atteinte (30 rédactions par heure). Réessayez plus tard.'], 429);
+        }
+        \Illuminate\Support\Facades\RateLimiter::hit($key, 3600);
+
+        try {
+            return response()->json(['sections' => (object) $ai->write($shop, $data['theme'], $request->input('sections'), null, (string) ($data['instructions'] ?? ''))]);
+        } catch (\RuntimeException $e) {
+            return response()->json(['error' => $e->getMessage()], 502);
+        }
+    }
+
+    /** « Créer la photo avec Shopio IA » dans Boutique → Sections (voir App\Services\SectionImageAi). */
+    public function sectionImage(Request $request, \App\Services\SectionImageAi $ai): JsonResponse
+    {
+        return $ai->respond($request, $this->shop());
+    }
+
     /** Disponibilité d'une adresse de boutique (/s/…). */
     public function slugCheck(Request $request): JsonResponse
     {
