@@ -17,7 +17,7 @@
     ]));
 @endphp
 <div class="ex-marquee" role="note" aria-label="{{ implode(' · ', $band) }}"><div class="ex-track" aria-hidden="true">@for($i = 0; $i < 4; $i++)@foreach($band as $t)<span>{{ $t }}</span>@endforeach @endfor</div></div>
-<header class="ex-head" id="exHead">
+<header class="ex-head" id="exHead" @if(!empty($editFrame)) data-sx="header" data-sx-name="En-tête" @endif>
     <div class="ex-wrap">
         <div style="display:flex;align-items:center">
             <button type="button" class="ex-icon ex-menu" id="exMenuBtn" aria-expanded="false" aria-controls="exNav" aria-label="Menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>

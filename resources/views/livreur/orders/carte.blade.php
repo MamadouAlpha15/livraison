@@ -175,7 +175,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',system-u
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
 <script>
 (function () {
-    const DATA_URL      = '{{ route('suivi.data', $order) }}';
+    const DATA_URL      = '{{ \App\Support\OrderAccess::trackingUrl($order, 'suivi.data') }}';
     const GPS_URL       = '/orders/{{ $order->id }}/position';
     const COMPLETE_URL  = '{{ route('livreur.orders.complete', $order) }}';
     const CSRF          = document.querySelector('meta[name="csrf-token"]').content;

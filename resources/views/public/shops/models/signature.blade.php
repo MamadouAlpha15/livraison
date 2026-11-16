@@ -268,11 +268,12 @@ a { color: inherit; }
     .sg-float, .sg-seal svg { animation: none; }
 }
 </style>
+@include('public.shops.models._colors', ['theme' => 'signature'])
 </head>
 <body>
 @include('public.shops.models._top')
 <div class="sg-band" role="note"><div class="sg-wrap">@if($s['verified'])<span>Boutique vérifiée par Shopio</span>@endif<span>Paiement à la livraison</span><span>Confirmation par téléphone</span>@if($s['address'] !== '')<span>{{ \Illuminate\Support\Str::limit($s['address'], 40) }}</span>@endif</div></div>
-<header class="sg-head" id="sgHead">
+<header class="sg-head" id="sgHead" @if(!empty($editFrame)) data-sx="header" data-sx-name="En-tête" @endif>
     <div class="sg-wrap">
         <a class="sg-brand" href="{{ $s['url'] }}"><i>@if($s['logo'])<img src="{{ $s['logo'] }}" alt="">@else{{ $s['initials'] }}@endif</i><b>{{ $s['name'] }}</b>@if($s['verified'])<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" role="img" aria-label="Boutique vérifiée"><path d="M12 1.5l2.6 2 3.3-.2.9 3.2 2.8 1.8-1.2 3.1 1.2 3.1-2.8 1.8-.9 3.2-3.3-.2-2.6 2-2.6-2-3.3.2-.9-3.2-2.8-1.8 1.2-3.1-1.2-3.1 2.8-1.8.9-3.2 3.3.2z"/><path d="M8 12.2l2.6 2.6L16.2 9" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>@endif</a>
         <nav class="sg-nav" aria-label="Sections">@if(HS::shows($home, 'products'))<a href="#collection">La collection</a>@endif @if(HS::shows($home, 'how'))<a href="#commander">Commander</a>@endif @if(count($pm['reviews']) && HS::shows($home, 'reviews'))<a href="#avis">Avis</a>@endif @if(HS::shows($home, 'faq'))<a href="#questions">Questions</a>@endif</nav>
@@ -282,7 +283,9 @@ a { color: inherit; }
 
 <main>
 @foreach($home as $sec)
-@continue(!$sec['on'])
+@continue(!$sec['on'] && empty($editFrame))
+@if(!empty($editFrame))<div class="sxe-sec" data-sx="{{ $sec['id'] }}" data-sx-type="{{ $sec['type'] }}" data-sx-on="{{ $sec['on'] ? 1 : 0 }}" data-sx-name="{{ HS::TYPES[$sec['type']][0] ?? $sec['type'] }}" data-sx-builtin="{{ in_array($sec['type'], HS::BUILTIN['signature'], true) ? 1 : 0 }}">@endif
+@if($sec['on'])
 @switch($sec['type'])
     @case('hero')
     @php
@@ -435,6 +438,8 @@ a { color: inherit; }
     @default
     @include('public.shops.models._section', ['sec' => $sec, 'theme' => 'signature'])
 @endswitch
+@endif
+@if(!empty($editFrame))</div>@endif
 @endforeach
 
     <section class="sg-sec" id="favoris" aria-labelledby="sgFavH">
@@ -461,6 +466,7 @@ a { color: inherit; }
 <div class="sg-dock" id="sgDock" aria-hidden="true"><div><small><span data-sm-count></span> article(s)</small><b data-sm-total></b></div><button type="button" data-sm-cart tabindex="-1">Commander</button></div>
 
 @include('public.shops.models._kit')
+@if(!empty($editFrame))@include('public.shops.models._edit-frame')@endif
 <script>
 (function () {
     'use strict';

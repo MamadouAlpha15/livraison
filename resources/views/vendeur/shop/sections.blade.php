@@ -24,7 +24,7 @@
         // Photos Shopio IA : sections avec photo, produits à mettre en scène
         'aiImageTypes' => array_keys(\App\Services\SectionImageAi::TYPES), 'aiShots' => \App\Services\SectionImageAi::choices($shop),
         'urls' => [
-            'save' => route('boutique.storefront.sections.update'), 'upload' => route('boutique.grow.cover-upload'), 'ai' => route('boutique.storefront.sections.ai'), 'aiImage' => route('boutique.storefront.sections.image'),
+            'save' => route('boutique.storefront.sections.update'), 'upload' => route('boutique.storefront.cover-upload'), 'ai' => route('boutique.storefront.sections.ai'), 'aiImage' => route('boutique.storefront.sections.image'),
             'preview' => $publicUrl, 'self' => route('boutique.storefront.sections'),
         ],
     ];
@@ -45,7 +45,7 @@
         <nav class="sx-links" aria-label="Autres pages">
             <a class="sx-btn sx-btn-sm" href="{{ $publicUrl }}" target="_blank" rel="noopener">Voir ma vitrine ↗</a>
             <a class="sx-btn sx-btn-sm" href="{{ route('boutique.storefront.edit') }}">Ma vitrine</a>
-            <a class="sx-btn sx-btn-sm" href="{{ route('boutique.grow') }}">Boutique</a>
+            <a class="sx-btn sx-btn-sm" href="{{ route('boutique.storefront.live') }}">Modifier la page en direct</a>
         </nav>
     </div></header>
 

@@ -264,22 +264,32 @@ Route::post('/shops/{shop}/vue/{product}', [PublicShopController::class, 'produc
 Route::get('/shops/{shop}/catalogue-meta.csv', [\App\Http\Controllers\CatalogFeedController::class, 'meta'])
     ->name('public.shops.catalog');
 
-/* Suivi de commande : client, personnel concerné, ou lien signé partagé (voir App\Support\OrderAccess) */
-Route::get('/suivi/{order}', [SuiviController::class, 'show'])
+/* Suivi de commande : /suivi/{tracking_token}, lien court de 20 lettres et chiffres, impossible à deviner et sans
+   le numéro de la commande (App\Support\OrderAccess). Les anciens liens /suivi/{numéro}?signature=… déjà envoyés
+   restent valables : le numéro seul ne suffit pas (signature, client ou personnel concerné), et la page mène au lien court. */
+Route::bind('suivi', fn (string $v) => ctype_digit($v) && strlen($v) <= 12
+    ? \App\Models\Order::findOrFail((int) $v)
+    : \App\Models\Order::where('tracking_token', $v)->firstOrFail());
+
+Route::get('/suivi/{suivi}', [SuiviController::class, 'show'])
+    ->where('suivi', '[0-9]{1,12}|[a-z0-9]{20}')
     ->name('suivi.show');
 
 /* Position GPS pour le suivi */
-Route::get('/suivi/{order}/position', [SuiviController::class, 'position'])
+Route::get('/suivi/{suivi}/position', [SuiviController::class, 'position'])
+    ->where('suivi', '[0-9]{1,12}|[a-z0-9]{20}')
     ->middleware('throttle:60,1')
     ->name('suivi.position');
 
 /* Données complètes pour le rafraîchissement auto (statut + GPS + livreur) */
-Route::get('/suivi/{order}/data', [SuiviController::class, 'data'])
+Route::get('/suivi/{suivi}/data', [SuiviController::class, 'data'])
+    ->where('suivi', '[0-9]{1,12}|[a-z0-9]{20}')
     ->middleware('throttle:60,1')
     ->name('suivi.data');
 
 /* Position GPS du client, envoyée depuis la page de suivi */
-Route::post('/suivi/{order}/client-location', [SuiviController::class, 'updateClientLocation'])
+Route::post('/suivi/{suivi}/client-location', [SuiviController::class, 'updateClientLocation'])
+    ->where('suivi', '[0-9]{1,12}|[a-z0-9]{20}')
     ->middleware('throttle:30,1')
     ->name('suivi.client-location');
 
@@ -823,24 +833,29 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('vitrine/qr-code',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'qr'])    ->name('storefront.qr');
         Route::get('vitrine/adresse',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'slugCheck'])   ->name('storefront.slug');
 
-        /* Boutique (menu vendeur) : couverture et logo, partage, conversion, qualité */
-        Route::prefix('vitrine/grandir')->name('grow')->controller(\App\Http\Controllers\Vendeur\GrowController::class)->group(function () {
-            Route::get('/', 'index');
-            Route::post('couverture/photo', 'uploadCover')->name('.cover-upload');
-            Route::post('logo', 'uploadLogo')->name('.logo-upload');
-            Route::put('identite', 'saveIdentity')->name('.identity');
-            Route::post('campagne', 'createCampaign')->name('.campaign');
-            Route::post('campagne/{campaign}/arreter', 'stopCampaign')->name('.campaign.stop');
-            Route::get('qr-code', 'qr')->name('.qr');
-            Route::get('affiche', 'poster')->name('.poster');
-            Route::put('conversion', 'saveConversion')->name('.conversion');
-            Route::post('modele', 'useModel')->name('.model');
-            Route::post('apercu', 'createPreview')->name('.preview');
-            Route::delete('apercu', 'disablePreview')->name('.preview.disable');
+        /* Modifier la page, directement sur la vitrine en ligne (/s/{slug}?edition=1, propriétaire seulement) */
+        Route::controller(\App\Http\Controllers\Vendeur\StorefrontController::class)->group(function () {
+            Route::get('vitrine/en-direct', 'live')->name('storefront.live');
+            Route::post('vitrine/edition/rendu', 'renderDraft')->middleware('throttle:120,1')->name('storefront.edit.render');
+            Route::put('vitrine/edition/brouillon', 'saveDraft')->name('storefront.edit.draft');
+            Route::delete('vitrine/edition/brouillon', 'discardDraft')->name('storefront.edit.discard');
+            Route::post('vitrine/edition/publier', 'publishDraft')->name('storefront.edit.publish');
+            Route::post('vitrine/photo', 'uploadCover')->name('storefront.cover-upload');
+            Route::post('vitrine/logo', 'uploadLogo')->name('storefront.logo-upload');
+            Route::post('vitrine/theme', 'useModel')->name('storefront.use-model');
+            Route::post('vitrine/apercu', 'createPreview')->name('storefront.preview');
+            Route::delete('vitrine/apercu', 'disablePreview')->name('storefront.preview.disable');
+            // Ancienne page « Boutique » (supprimée) : ses adresses mènent à la bonne nouvelle place
+            Route::get('vitrine/grandir', 'legacyGrow');
         });
 
-        /* Marketing : provenance des visites et commandes, liens de suivi, catalogue Facebook, test du pixel */
+        /* Marketing : provenance des visites et commandes, liens de suivi, catalogue Facebook, test du pixel,
+           Partage (lien produit, QR code, affiche, lien de campagne) et Qualité de la vitrine */
         Route::get('marketing',                     [\App\Http\Controllers\Vendeur\MarketingController::class, 'index'])         ->name('marketing');
+        Route::get('marketing/qr-code',             [\App\Http\Controllers\Vendeur\MarketingController::class, 'qr'])            ->name('marketing.qr');
+        Route::get('marketing/affiche',             [\App\Http\Controllers\Vendeur\MarketingController::class, 'poster'])        ->name('marketing.poster');
+        Route::post('marketing/lien-campagne',      [\App\Http\Controllers\Vendeur\MarketingController::class, 'createPromoLink'])->name('marketing.promo-link');
+        Route::post('marketing/lien-campagne/{campaign}/arreter', [\App\Http\Controllers\Vendeur\MarketingController::class, 'stopPromoLink'])->name('marketing.promo-link.stop');
         Route::post('marketing/test-pixel',         [\App\Http\Controllers\Vendeur\MarketingController::class, 'startPixelTest'])->name('marketing.pixel-test');
         Route::post('marketing/test-pixel/arreter', [\App\Http\Controllers\Vendeur\MarketingController::class, 'stopPixelTest']) ->name('marketing.pixel-test.stop');
         Route::post('marketing/campagnes',          [\App\Http\Controllers\Vendeur\MarketingController::class, 'storeCampaign']) ->name('marketing.campaigns.store');

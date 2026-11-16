@@ -54,6 +54,9 @@ class ProductPageController extends Controller
             'categories' => collect(Storefront::categoryLinks($shop))->pluck('name')->values(),
             'rating' => $this->rating($shop),
             'publicUrl' => $shop->is_approved ? ProductPage::url($shop, $product) : null,
+            // Ouvert depuis « Modifier la page » (sélecteur → Produits) : sans son propre en-tête, la barre de
+            // l'éditeur de la vitrine le pilote (Sauvegarder, Publier, Voir)
+            'embedded' => request()->boolean('integre'),
         ]);
     }
 

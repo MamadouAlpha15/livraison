@@ -39,7 +39,7 @@ html, body { margin: 0; background: #DCE6F5; color: #16162A; font-family: 'Plus 
 </style>
 </head>
 <body>
-<div class="tools"><button type="button" onclick="window.print()">Imprimer l’affiche (A5)</button><a href="{{ route('boutique.grow', ['onglet' => 'partage']) }}">Retour</a></div>
+<div class="tools"><button type="button" onclick="window.print()">Imprimer l’affiche (A5)</button><a href="{{ route('boutique.marketing', ['onglet' => 'partage']) }}">Retour</a></div>
 <main class="sheet">
     <div class="logo">@if($logoUrl)<img src="{{ $logoUrl }}" alt="">@else<span>{{ $initials }}</span>@endif</div>
     @if($title !== $shop->name)<p class="shop">{{ $shop->name }}</p>@endif

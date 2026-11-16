@@ -45,7 +45,7 @@
             @endif
             <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">{!! $I['users'] !!}</span> Clients</a>
             <a href="{{ route('boutique.marketing') }}" class="sb-item"><span class="ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h3l6 4V6l-6 4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></span> Marketing</a>
-            <a href="{{ route('boutique.grow') }}" class="sb-item {{ request()->routeIs('boutique.grow') ? 'active' : '' }}"><span class="ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1 13H7zM9 7a3 3 0 0 1 6 0"/></svg></span> Boutique</a>
+            @if((int) $shop->user_id === (int) auth()->id())<a href="{{ route('boutique.storefront.live') }}" class="sb-item"><span class="ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1 13H7zM9 7a3 3 0 0 1 6 0"/></svg></span> Ma vitrine en direct</a>@endif
             @if($isPro)
             <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">{!! $I['briefcase'] !!}</span> Équipe</a>
             @else

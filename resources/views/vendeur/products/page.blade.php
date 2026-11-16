@@ -45,7 +45,7 @@
         'urls' => [
             'save' => route('products.page.update', $product), 'ai' => route('products.page.ai', $product), 'sectionsAi' => route('products.page.sections-ai', $product), 'aiImage' => route('products.page.section-image', $product),
             'photoAi' => route('products.photos.ai', $product), 'photoAttach' => route('products.photos.attach', $product), 'toggle' => route('products.toggle', $product),
-            'upload' => route('boutique.grow.cover-upload'), 'preview' => $publicUrl, 'edit' => route('products.edit', $product),
+            'upload' => route('boutique.storefront.cover-upload'), 'preview' => $publicUrl, 'edit' => route('products.edit', $product),
         ],
     ];
 @endphp
@@ -137,8 +137,14 @@
 .pe-frame.is-desk iframe { width: 1280px; transform-origin: 0 0; }
 .pe-loading { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(255,255,255,.7); font-weight: 700; color: var(--sx-ink2); opacity: 0; pointer-events: none; transition: opacity 200ms; }
 .pe-frame.is-loading .pe-loading { opacity: 1; }
+/* Intégré dans « Modifier la page » : la barre de l'éditeur de la vitrine remplace l'en-tête */
+.pe.is-embedded .pe-top { display: none; }
+.pe.is-embedded .pe-layout { max-width: none; padding: 12px; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); }
+.pe.is-embedded .pe-tabs { top: 0; }
+.pe.is-embedded .pe-preview { top: 12px; }
+.pe.is-embedded .pe-stage { height: calc(100vh - 82px); }
 @media (max-width: 1100px) {
-    .pe-layout { grid-template-columns: minmax(0, 1fr); }
+    .pe-layout, .pe.is-embedded .pe-layout { grid-template-columns: minmax(0, 1fr); }
     .pe-preview { position: static; }
     .pe-stage { height: 680px; }
 }
@@ -153,7 +159,7 @@
 @endpush
 
 @section('content')
-<div class="pe" id="pe">
+<div class="pe{{ !empty($embedded) ? ' is-embedded' : '' }}" id="pe">
     <header class="pe-top"><div class="pe-top-in">
         <a class="pe-back" href="{{ route('products.index') }}">← Produits</a>
         <div class="pe-switch">

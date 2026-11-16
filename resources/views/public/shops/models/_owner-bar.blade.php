@@ -16,6 +16,7 @@
     .pmb a[aria-current="page"] i { background: rgba(255,255,255,.22); color: #fff; }
     .pmb form { margin: 0; }
     .pmb .pmb-use { background: #F59E0B; color: #16162A; box-shadow: none; }
+    .pmb .pmb-edit { background: #1668D8; color: #fff; box-shadow: none; } .pmb .pmb-edit:hover { background: #1260C9; }
     .pmb .pmb-ok { padding: 6px 12px; border-radius: 999px; background: #E7F6EC; color: #15803D; font-weight: 800; }
     .pmb :focus-visible { outline: 3px solid #1F7CF6; outline-offset: 2px; }
     </style>
@@ -26,10 +27,13 @@
         @endforeach
     </nav>
     @if(session('model_used'))<span class="pmb-ok" role="status">Thème « {{ session('model_used') }} » en ligne</span>@endif
-    @if($current !== $publishedModel)
-    <form method="POST" action="{{ route('boutique.grow.model') }}">@csrf<input type="hidden" name="model" value="{{ $current }}"><button type="submit" class="pmb-use">Utiliser ce thème</button></form>
+    @php $pmbOwner = \App\Support\StorefrontEditor::isOwner($shop, auth()->user()); @endphp
+    @if($current !== $publishedModel && $pmbOwner)
+    <form method="POST" action="{{ route('boutique.storefront.use-model') }}">@csrf<input type="hidden" name="model" value="{{ $current }}"><button type="submit" class="pmb-use">Utiliser ce thème</button></form>
+    @endif
+    @if($pmbOwner)
+    <a href="{{ \App\Support\StorefrontEditor::editUrl($shop) }}&amp;modele={{ $current }}" class="pmb-edit">✎ Modifier la page</a>
     @endif
     <a href="{{ route('boutique.storefront.sections', ['theme' => $current]) }}">Sections</a>
     <a href="{{ route('boutique.storefront.edit') }}">Ma vitrine</a>
-    <a href="{{ route('boutique.grow') }}">Boutique</a>
 </div>

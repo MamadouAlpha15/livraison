@@ -767,7 +767,7 @@ select.field-input { appearance: auto; }
             <div class="se-top-actions">
                 <a href="{{ \App\Support\Storefront::publicUrl($shop) }}" class="se-btn se-btn-line" target="_blank" rel="noopener">Voir ma boutique</a>
                 <a href="{{ route('boutique.storefront.edit') }}" class="se-btn se-btn-amber">Ma vitrine</a>
-                <a href="{{ route('boutique.grow', ['onglet' => 'partage']) }}" class="se-btn se-btn-blue">Partage, stats et qualité</a>
+                <a href="{{ route('boutique.marketing', ['onglet' => 'partage']) }}" class="se-btn se-btn-blue">Partage et qualité de la vitrine</a>
                 <a href="{{ route('boutique.dashboard') }}" class="se-btn se-btn-line se-hide-m">Tableau de bord</a>
             </div>
         </div>
@@ -1044,7 +1044,7 @@ select.field-input { appearance: auto; }
                                         <div class="field-hint" style="margin:2px 0 0">Thème Express ou Signature, couleur, adresse courte et mode vacances. Enregistrez d'abord cette page si vous l'avez modifiée.</div>
                                     </div>
                                     <div style="display:flex;gap:8px;flex-wrap:wrap">
-                                        <a href="{{ route('boutique.grow', ['onglet' => 'couverture']) }}" class="se-btn se-btn-blue">Changer la couverture et le logo</a>
+                                        <a href="{{ route('boutique.storefront.live', ['ouvrir' => 'entete']) }}" class="se-btn se-btn-blue">Changer le logo, le nom et la couleur</a>
                                         <a href="{{ route('boutique.storefront.edit') }}" class="se-btn se-btn-line">Choisir le thème de ma vitrine</a>
                                     </div>
                                 </div>

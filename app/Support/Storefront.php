@@ -61,7 +61,24 @@ class Storefront
             'settings'   => self::settingsDefaults(),
             'orders'     => OrderBoard::settings([])['orders'],
             'carts'      => OrderBoard::settings([])['carts'],
+            'colors'     => self::normalizeColors(null),
         ];
+    }
+
+    /** Couleurs de la page, par thème (Modifier la page → Couleurs). Vide = couleurs prévues par le thème. */
+    public const COLOR_KEYS = ['accent' => 'Couleur principale', 'bg' => 'Fond de la page', 'ink' => 'Texte'];
+
+    public static function normalizeColors($c): array
+    {
+        $c = is_array($c) ? $c : [];
+        $out = [];
+        foreach (array_keys(PageModels::MODELS) as $theme) {
+            foreach (array_keys(self::COLOR_KEYS) as $k) {
+                $v = $c[$theme][$k] ?? null;
+                $out[$theme][$k] = self::isHex($v) ? strtoupper($v) : null;
+            }
+        }
+        return $out;
     }
 
     /**
@@ -110,6 +127,8 @@ class Storefront
             // Commandes : message WhatsApp de confirmation ; paniers abandonnés (Commandes → Paniers abandonnés)
             'orders'     => OrderBoard::settings($input)['orders'],
             'carts'      => OrderBoard::settings($input)['carts'],
+            // Couleurs de la page, par thème (Modifier la page → Couleurs) ; vide = celles du thème
+            'colors'     => self::normalizeColors($input['colors'] ?? null),
         ];
     }
 

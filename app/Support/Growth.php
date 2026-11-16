@@ -230,13 +230,13 @@ class Growth
         $active = $shop->products()->where('is_active', true);
         $total = (clone $active)->count();
         $noPhoto = (clone $active)->where(fn ($q) => $q->whereNull('image')->orWhere('image', ''))->count();
-        $noDesc = (clone $active)->where(fn ($q) => $q->whereNull('description')->orWhereRaw('CHAR_LENGTH(TRIM(description)) < 30'))->count();
+        // Longueur en caractères (CHAR_LENGTH en MySQL ; LENGTH compte déjà les caractères en SQLite)
+        $len = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'sqlite' ? 'LENGTH' : 'CHAR_LENGTH';
+        $noDesc = (clone $active)->where(fn ($q) => $q->whereNull('description')->orWhereRaw($len . '(TRIM(description)) < 30'))->count();
         $cats = count(Storefront::categoryLinks($shop));
         $reviews = Review::where('vendeur_id', $shop->user_id)->count();
-        $grow = fn ($tab) => route('boutique.grow', ['onglet' => $tab]);
-
         $tips = [
-            ['logo', 'Un logo', 'Il apparaît sur la vitrine, dans la recherche et sur WhatsApp.', (bool) $shop->image, $grow('couverture'), 'Ajouter'],
+            ['logo', 'Un logo', 'Il apparaît sur la vitrine, dans la recherche et sur WhatsApp.', (bool) $shop->image, route('boutique.storefront.live', ['ouvrir' => 'entete']), 'Ajouter'],
             ['catlinks', 'Des liens de catégories', 'Au moins 2 catégories : chacune a son lien à partager.', $cats >= 2, route('products.index'), 'Ranger mes produits'],
             ['photos', $noPhoto ? $noPhoto . ' produit' . ($noPhoto > 1 ? 's' : '') . ' sans photo' : 'Tous les produits ont une photo', 'Un produit sans photo est rarement commandé.', $total > 0 && $noPhoto === 0, route('products.index'), 'Ajouter les photos'],
             ['desc', $noDesc ? $noDesc . ' produit' . ($noDesc > 1 ? 's' : '') . ' sans vraie description' : 'Chaque produit a une description', 'Référence, taille, état, garantie : ce que le client demanderait au téléphone.', $total > 0 && $noDesc === 0, route('products.index'), 'Compléter'],

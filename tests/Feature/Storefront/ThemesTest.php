@@ -41,7 +41,9 @@ test('l\'ancienne apparence de la vitrine est ignorée', function () {
         'settings' => ['vacation' => true],
     ]);
 
-    expect(array_keys($config))->toEqualCanonicalizing(['page_model', 'home', 'form', 'cover', 'logo', 'settings', 'orders', 'carts'])
+    expect(array_keys($config))->toEqualCanonicalizing(['page_model', 'home', 'form', 'cover', 'logo', 'settings', 'orders', 'carts', 'colors'])
+        // Les couleurs de la page (Modifier la page → Couleurs) démarrent vides : chaque thème garde les siennes
+        ->and(collect($config['colors'])->flatten()->filter()->all())->toBe([])
         ->and($config['page_model'])->toBe('express')
         ->and($config['settings']['vacation'])->toBeTrue();
 });

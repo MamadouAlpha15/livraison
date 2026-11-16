@@ -68,7 +68,7 @@ class StorefrontOrderController extends Controller
         }
 
         try {
-            $order = DB::transaction(function () use ($shop, $qty, $data, $guest) {
+            $order = DB::transaction(function () use ($shop, $qty, $data, $guest, $request) {
                 $products = Product::where('shop_id', $shop->id)->where('is_active', true)->whereIn('id', array_keys($qty))->lockForUpdate()->get()->keyBy('id');
                 $total = 0;
                 $lineTotals = [];

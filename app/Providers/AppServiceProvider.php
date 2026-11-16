@@ -46,6 +46,11 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\Product::observe(\App\Observers\ReferralActivityObserver::class);
         \App\Models\Order::observe(\App\Observers\ReferralActivityObserver::class);
 
+        // Lien de suivi : chaque nouvelle commande reçoit son jeton (/suivi/{tracking_token}), sans toucher à Order.php
+        \App\Models\Order::creating(function (\App\Models\Order $order) {
+            if (empty($order->tracking_token)) $order->tracking_token = \App\Support\OrderAccess::newToken();
+        });
+
         // Shopio IA : permission de chaque outil (App\Policies\ShopioAiToolPolicy)
         \Illuminate\Support\Facades\Gate::define('shopio-ai.view-product', [\App\Policies\ShopioAiToolPolicy::class, 'viewProduct']);
         \Illuminate\Support\Facades\Gate::define('shopio-ai.view-order', [\App\Policies\ShopioAiToolPolicy::class, 'viewOrder']);

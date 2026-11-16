@@ -17,6 +17,10 @@ class SuiviController extends Controller
     public function show(Request $request, Order $order)
     {
         $this->authorizeTracking($order, $request);
+        // Ancienne adresse /suivi/{id} (lien signé, ou client et personnel) : on passe au lien court par jeton
+        if (OrderAccess::viaNumber($request)) {
+            return redirect()->to(OrderAccess::trackingUrl($order));
+        }
         $order->load(['livreur', 'shop', 'items.product', 'review']);
 
         // Trouver les commandes du même groupe (batch_id commun = bulk-assignées ensemble)
@@ -107,7 +111,7 @@ class SuiviController extends Controller
     public function updateClientLocation(Request $request, Order $order)
     {
         // Le client, ou la personne à qui il a partagé le lien (celle qui réceptionne le colis)
-        abort_unless($request->hasValidRelativeSignature() || OrderAccess::isOwner($order), 404);
+        abort_unless(OrderAccess::viaToken($order, $request) || $request->hasValidRelativeSignature() || OrderAccess::isOwner($order), 404);
         abort_if(in_array($order->status, [Order::STATUS_LIVREE, Order::STATUS_ANNULEE], true), 422);
 
         $request->validate([

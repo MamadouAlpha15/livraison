@@ -96,6 +96,7 @@
     .ex-ring svg { width: 80px; height: 80px; }
 }
 </style>
+@include('public.shops.models._colors', ['theme' => 'express'])
 </head>
 <body>
 @include('public.shops.models._top')
@@ -104,7 +105,9 @@
 <main>
 @if(!$isCatalog)
 @foreach($home as $sec)
-@continue(!$sec['on'])
+@continue(!$sec['on'] && empty($editFrame))
+@if(!empty($editFrame))<div class="sxe-sec" data-sx="{{ $sec['id'] }}" data-sx-type="{{ $sec['type'] }}" data-sx-on="{{ $sec['on'] ? 1 : 0 }}" data-sx-name="{{ HS::TYPES[$sec['type']][0] ?? $sec['type'] }}" data-sx-builtin="{{ in_array($sec['type'], HS::BUILTIN['express'], true) ? 1 : 0 }}">@endif
+@if($sec['on'])
 @switch($sec['type'])
     @case('hero')
     @php $heroImg = HS::imgUrl($sec['d']['img']) ?? ($hero['photo'] ?? null); @endphp
@@ -208,6 +211,8 @@
     @default
     @include('public.shops.models._section', ['sec' => $sec, 'theme' => 'express'])
 @endswitch
+@endif
+@if(!empty($editFrame))</div>@endif
 @endforeach
 @else
     <div class="ex-wrap" style="padding-bottom:clamp(48px,7vw,84px)">
@@ -229,6 +234,7 @@
 @include('public.shops.express._footer', ['faq' => [], 'noFaq' => !$isCatalog])
 
 @include('public.shops.models._kit')
+@if(!empty($editFrame))@include('public.shops.models._edit-frame')@endif
 <script>
 (function () {
     'use strict';

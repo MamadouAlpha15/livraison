@@ -26,6 +26,8 @@
     function setState(t, cls) { const s = $('peState'); s.textContent = t; s.className = 'pe-state' + (cls ? ' ' + cls : ''); }
     function touch() { dirty = true; setState('Modifications non sauvegardées', 'is-dirty'); }
     window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+    // Pour « Modifier la page » (éditeur intégré) : savoir s'il reste des changements, et quitter sans alerte
+    window.PE = { dirty: () => dirty, leave() { dirty = false; } };
 
     /* ───────── Petits composants ───────── */
     const sw = (path, label, disabled) => '<label class="pe-sw" title="' + esc(label) + '"><input type="checkbox" data-b="' + path + '"' + (getp(path) ? ' checked' : '') + (disabled ? ' disabled' : '') + ' aria-label="' + esc(label) + '"><span></span></label>';

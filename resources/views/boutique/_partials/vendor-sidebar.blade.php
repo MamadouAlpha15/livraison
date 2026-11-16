@@ -56,7 +56,8 @@
             ['promos', 'Codes promo', route('boutique.promo-codes.index'), true],
             ['clients', 'Clients', route('boutique.clients.index'), false],
             ['marketing', 'Marketing', route('boutique.marketing'), false],
-            ['grow', 'Boutique', route('boutique.grow'), false],
+            // Modifier la vitrine directement sur la vitrine en ligne : réservé au propriétaire
+            ...((int) ($shop->user_id ?? 0) === (int) $vsUser->id ? [['grow', 'Ma vitrine en direct', route('boutique.storefront.live'), false]] : []),
             ['team', 'Équipe', route('boutique.employees.index'), true],
         ],
         'Livraison' => [

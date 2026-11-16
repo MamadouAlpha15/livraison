@@ -864,7 +864,7 @@ $groups = $orders->getCollection()
                 </div>
                 <div style="display:flex;gap:7px;flex-wrap:wrap">
                     {{-- Suivre : lien vers la 1ère commande du groupe --}}
-                    <a href="{{ route('suivi.show', $order) }}" class="btn-action btn-track">
+                    <a href="{{ \App\Support\OrderAccess::trackingUrl($order) }}" class="btn-action btn-track">
                         {!! \App\Support\IconLibrary::svg('search', '', 16) !!} Suivre
                     </a>
                     <a href="{{ route('client.orders.invoice', $order) }}" class="btn-action btn-track" style="background:#f8fafc;border-color:#E3E8F2;color:#45455E">

@@ -177,7 +177,7 @@ html, body { background: var(--mv-bg); }
         <nav class="mv-links" aria-label="Autres pages">
             <a class="mv-btn mv-btn-sm" href="{{ route('boutique.storefront.sections') }}" style="background:#F59E0B;border-color:#F59E0B;color:#16162A">Modifier les sections</a>
             <a class="mv-btn mv-btn-sm" href="{{ $publicUrl }}" target="_blank" rel="noopener">Voir ma vitrine ↗</a>
-            <a class="mv-btn mv-btn-sm" href="{{ route('boutique.grow') }}">Boutique</a>
+            <a class="mv-btn mv-btn-sm" href="{{ route('boutique.storefront.live') }}">Modifier la page en direct</a>
         </nav>
     </div></header>
 
@@ -282,7 +282,7 @@ html, body { background: var(--mv-bg); }
             <div class="mv-qr" role="img" aria-label="QR code de la vitrine">{!! $qrSvg !!}</div>
             <a class="mv-btn mv-btn-sm" href="{{ route('boutique.storefront.qr') }}">Télécharger le QR code</a>
             @endif
-            <p class="mv-hint">Couverture, logo, liens suivis et statistiques : <a href="{{ route('boutique.grow') }}">Boutique</a>.</p>
+            <p class="mv-hint">Logo, nom, couleur et sections : <a href="{{ route('boutique.storefront.live') }}">Modifier la page en direct</a>. Liens à partager et qualité : <a href="{{ route('boutique.marketing', ['onglet' => 'partage']) }}">Marketing</a>.</p>
         </aside>
 
         <div class="mv-bar">

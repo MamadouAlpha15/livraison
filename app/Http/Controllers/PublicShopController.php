@@ -9,9 +9,11 @@ use App\Support\Growth;
 use App\Support\PageModels;
 use App\Support\ProductPage;
 use App\Support\Storefront;
+use App\Support\StorefrontEditor;
 use App\Support\TrafficSource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class PublicShopController extends Controller
 {
@@ -150,8 +152,10 @@ class PublicShopController extends Controller
         if (!$shop || !Growth::previewActive($shop)) {
             return response()->view('public.shops.preview-expired', [], 410);
         }
-        [$config, $accent] = Growth::working($shop);
-        return $this->products($shop, $request, null, null, ['config' => $config, 'accent' => $accent, 'token' => $token, 'expires' => $shop->preview_expires_at]);
+        // Le brouillon : sa vitrine, et son nom et son logo (posés en mémoire, rien n'est enregistré)
+        $state = StorefrontEditor::working($shop);
+        StorefrontEditor::dress($shop, $state);
+        return $this->products($shop, $request, null, null, ['config' => $state['config'], 'accent' => $state['accent'], 'token' => $token, 'expires' => $shop->preview_expires_at]);
     }
 
     /** Avis laissé sur un lien d'aperçu (visible du vendeur dans l'onglet Qualité). */
@@ -214,9 +218,25 @@ class PublicShopController extends Controller
         $sf = $previewLink ? $previewLink['config'] : Storefront::forShop($shop);
         $isOwner = Auth::check() && ((int) Auth::id() === (int) $shop->user_id || (int) Auth::user()->shop_id === (int) $shop->id);
 
+        // Mode « Modifier la page » (?edition=1) : réservé au propriétaire, vérifié ici (jamais un employé,
+        // un client ni un visiteur, même avec ?edition=1 dans l'adresse). La page est l'éditeur ; la vitrine
+        // s'y affiche dans un cadre (?cadre=1), rendue avec le brouillon ou la version en cours de saisie.
+        $editFrame = false;
+        if ($request->boolean('edition') && !$previewLink && $categorySlug === null && StorefrontEditor::isOwner($shop, Auth::user())) {
+            if (!$request->boolean('cadre')) {
+                return app(\App\Http\Controllers\Vendeur\StorefrontController::class)->editor($shop, $request);
+            }
+            $token = (string) $request->query('rendu', '');
+            $state = preg_match('/^[A-Za-z0-9]{20}$/', $token) ? Cache::get('sxe:' . $shop->id . ':' . $token) : null;
+            $state ??= StorefrontEditor::working($shop);
+            StorefrontEditor::dress($shop, $state);
+            $sf = $state['config'];
+            $editFrame = true;
+        }
+
         // Visite (une par visiteur et par jour, hors vendeur et robots) et sa provenance
         // (Facebook, Instagram, WhatsApp…) : tableau de bord + page Marketing
-        TrafficSource::recordLanding($shop, $request, (bool) $previewLink);
+        if (!$editFrame) TrafficSource::recordLanding($shop, $request, (bool) $previewLink);
 
         // Avis réels, commandes livrées et preuves de confiance (jamais inventés)
         $reviewStats = Review::where('vendeur_id', $shop->user_id)->selectRaw('COUNT(*) as cnt, AVG(rating) as avg_rating')->first();
@@ -233,6 +253,7 @@ class PublicShopController extends Controller
             'model' => $pageModel, 'isOwner' => $isOwner, 'publishedModel' => $sf['page_model'],
             'activeCategory' => $activeCategory, 'previewLink' => $previewLink, 'shareImage' => Growth::shareImage($shop, $sf),
             'pageTitle' => $activeCategory ? $activeCategory['name'] . ' · ' . $shop->name : $shop->name . ' — Boutique en ligne',
+            'editFrame' => $editFrame,
         ]);
     }
 }

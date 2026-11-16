@@ -103,6 +103,8 @@ class PageModels
             ],
             // Sections de la page d'accueil, une liste par thème (Boutique → Sections)
             'home'       => $sf['home'],
+            // Couleurs choisies par le vendeur pour chaque thème (vide = celles du thème)
+            'colors'     => $sf['colors'] ?? Storefront::normalizeColors(null),
             'communes'   => self::COMMUNES,
             'user'       => $user ? ['name' => $user->name, 'phone' => (string) ($user->phone ?? '')] : null,
             'urls'       => [
