@@ -81,14 +81,18 @@ test('un visiteur hors d’Afrique est nommé et placé sur la carte du monde', 
         ->assertJsonFragment(['place' => 'France']);
 });
 
-test('la page Vue en direct affiche les cartes Afrique et Monde et un JavaScript valide', function () {
+test('la page Vue en direct affiche le globe (vues Afrique et Monde) et un JavaScript valide', function () {
     $html = $this->actingAs($this->owner)->get(route('boutique.live'))->assertOk()
         ->assertSee('Vue en direct')->assertSee('Visiteurs en direct')->assertSee('Comportement des clients')
-        ->assertSee('data-map="africa"', false)->assertSee('data-map="world"', false)
+        ->assertSee('id="lvGlobe"', false)->assertSee('data-tab="africa"', false)->assertSee('data-tab="world"', false)
         ->assertSee('data-iso="GN"', false)->assertSee('data-iso="ZA"', false)->assertSee('data-iso="FR"', false)->assertSee('data-iso="BR"', false)
         ->getContent();
-    // Guinée présente sur les deux cartes ; noms en français
-    expect(substr_count($html, 'data-iso="GN"'))->toBe(2)->and($html)->toContain('data-name="États-Unis"');
+    // Un seul globe : chaque pays une fois, noms en français, petits pays en points (Seychelles)
+    expect(substr_count($html, 'data-iso="GN"'))->toBe(1)->and($html)->toContain('data-name="États-Unis"')
+        ->and($html)->toMatch('#<circle class="lv-isle[^"]*" data-iso="SC"#');
+    // Les contours sont en longitude / latitude (la Guinée est autour de -11°, 10°)
+    $gn = collect(\App\Support\LiveMaps::globe()['countries'])->firstWhere('iso', 'GN');
+    expect($gn['c'][0])->toBeGreaterThan(-16)->toBeLessThan(-7)->and($gn['c'][1])->toBeGreaterThan(7)->toBeLessThan(13);
 
     preg_match_all('#<script>(.*?)</script>#s', $html, $m);
     $js = collect($m[1])->first(fn ($s) => str_contains($s, 'URL_DATA'));

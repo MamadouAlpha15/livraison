@@ -1,15 +1,14 @@
 <?php
 
 use App\Models\Product;
-use App\Services\ProductImportAi;
 use App\Services\ProductImporter;
 use App\Support\ProductPhotos;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Tests\Support\CampaignFixtures as F;
 
-/* Importateur Produit Shopio : lecture des pages (Shopify, JSON-LD, AliExpress, sécurité), calcul du prix en GNF,
-   analyse par Shopio IA (simulée) et création du produit. Aucun appel réseau ni IA réel. */
+/* « Importer les photos d'un produit » : lecture des pages (Shopify, JSON-LD, AliExpress, sécurité), photos trouvées,
+   photos choisies ajoutées à la fiche produit habituelle. Aucun appel réseau réel, aucune IA. */
 
 function impPng(int $w = 400): string
 {
@@ -29,41 +28,8 @@ function impReader(array $ips = []): ProductImporter
     return $r;
 }
 
-/** Shopio IA simulée : renvoie $answer et garde ce qu'elle a reçu. */
-function impAi(array $answer): ArrayObject
-{
-    $seen = new ArrayObject();
-    app()->instance(ProductImportAi::class, new class ($answer, $seen) extends ProductImportAi {
-        public function __construct(private array $answer, private ArrayObject $seen) {}
-        protected function ask(string $key, array $content, bool $useFetch): array
-        {
-            $this->seen['content'] = $content; $this->seen['fetch'] = $useFetch;
-            return $this->answer;
-        }
-    });
-    return $seen;
-}
-
-function impAnswer(array $over = []): array
-{
-    return $over + [
-        'statut' => 'ok', 'message' => '',
-        'source' => ['titre_origine' => '2024 Hot Sale Wireless Headphones', 'prix_fournisseur' => 12.5, 'devise' => 'USD', 'moq' => 2, 'fournisseur' => 'Shenzhen Audio'],
-        'titre' => 'Casque Bluetooth sans fil', 'accroche' => 'Ta musique partout, sans fil.',
-        'avantages_produit' => ['🎧 Bluetooth 5.3', '🔋 Batterie [À COMPLÉTER]', 'en trop'],
-        'description' => 'Un casque sans fil pour écouter ta musique.',
-        'caracteristiques' => [['nom' => 'Bluetooth', 'valeur' => '5.3'], ['nom' => 'Poids', 'valeur' => '[À COMPLÉTER]']],
-        'variantes' => [['type' => 'Couleur', 'options' => ['Noir', 'Blanc']]],
-        'contenu_colis' => ['1 casque', '1 câble USB-C'],
-        'faq' => [['question' => 'Je paie quand ?', 'reponse' => 'À la livraison, en espèces.'], ['question' => 'Quel délai ?', 'reponse' => '[DÉLAI À COMPLÉTER]']],
-        'categorie' => 'Électronique & Téléphones', 'conseil_photo' => 'Prends tes propres photos du produit reçu.',
-        'photos' => ['https://ae01.alicdn.com/kf/a.jpg', 'https://ae01.alicdn.com/kf/b.jpg'], 'a_completer' => ['Le poids du casque'],
-    ];
-}
-
 beforeEach(function () {
     Storage::fake('public');
-    config(['services.anthropic.key' => 'sk-test']);
     $this->shop = F::shop();
     $this->owner = $this->shop->owner;
     $this->owner->forceFill(['shop_id' => $this->shop->id, 'role_in_shop' => 'admin'])->save();
@@ -109,99 +75,55 @@ test('lecture : adresses internes refusées (aussi après redirection), site qui
     expect($photos)->toHaveCount(1)->and($photos[0]['path'])->toMatch(ProductPhotos::PATH);
 });
 
-/* ── Prix en GNF : calculé par Shopio, jamais par l'IA ── */
+/* ── Photos ── */
 
-test('prix : revient, vente arrondie aux 5 000 supérieurs, minimum privé aux 1 000 supérieurs', function () {
-    $p = ProductImportAi::pricing(12.5, 'USD', 9000, 15000, 20, 40);
-    expect($p['revient'])->toBe(150000)->and($p['vente'])->toBe(210000)->and($p['minimum'])->toBe(150000)->and($p['lignes'])->toHaveCount(3);
-    $q = ProductImportAi::pricing(10, 'USD', 8650, 7000, 15, 35); // revient 106 475 ; vente 143 741,25
-    expect($q['revient'])->toBe(106475)->and($q['vente'])->toBe(145000)->and($q['minimum'])->toBe(107000);
-    // Taux absent : rien n'est deviné
-    $m = ProductImportAi::pricing(12.5, 'USD', null, 15000, 20, 40);
-    expect($m['vente'])->toBeNull()->and(implode(' ', $m['manque']))->toContain('[TAUX À COMPLÉTER]');
-});
-
-/* ── Analyse ── */
-
-test('analyse : réservée au plan Pro ; page lue par Shopio puis envoyée à Shopio IA', function () {
-    $url = route('products.import.analyze');
-    $this->actingAs($this->owner)->postJson($url, ['url' => 'https://store.youcan.shop/casque'])->assertForbidden();
-    ($this->pro)();
-    Http::fake(['store.youcan.shop/*' => Http::response('<html><head><meta property="og:title" content="Wireless headphones"></head><body>' . str_repeat('Bluetooth 5.3 headphones. ', 20) . '</body></html>')]);
-    $seen = impAi(impAnswer());
-    $j = $this->actingAs($this->owner)->postJson($url, ['url' => 'https://store.youcan.shop/casque', 'ville' => 'Conakry'])->assertOk()->json();
-    expect($j['statut'])->toBe('ok')->and($j['lecture'])->toBe('shopio')->and($j['token'])->toBeString()
-        ->and($j['source']['prix_fournisseur'])->toEqual(12.5)->and($j['source']['moq'])->toBe(2)
-        ->and($j['page']['avantages_produit'])->toHaveCount(2)->and($j['page']['titre'])->toBe('Casque Bluetooth sans fil')
-        ->and($seen['fetch'])->toBeFalse();
-    expect(end($seen['content'])['text'])->toContain('Page lue par Shopio')->toContain('Bluetooth 5.3 headphones')->toContain('Ville de livraison du vendeur : Conakry');
-});
-
-test('analyse : site qui bloque Shopio → Claude ouvre le lien lui-même ; texte copié et captures acceptés', function () {
-    ($this->pro)();
-    Http::fake(['www.alibaba.com/*' => Http::response('denied', 403)]);
-    $seen = impAi(impAnswer());
-    $this->actingAs($this->owner)->postJson(route('products.import.analyze'), ['url' => 'https://www.alibaba.com/product-detail/x.html'])->assertOk();
-    expect($seen['fetch'])->toBeTrue()->and(end($seen['content'])['text'])->toContain('web_fetch');
-
-    $shot = \Illuminate\Http\UploadedFile::fake()->image('capture.png', 400, 800);
-    $j = $this->actingAs($this->owner)->post(route('products.import.analyze'), ['url' => 'https://www.alibaba.com/product-detail/x.html', 'text' => 'Wireless headphones US $12.50', 'shots' => [$shot]], ['Accept' => 'application/json'])
-        ->assertOk()->json();
-    expect($j['lecture'])->toBe('captures')->and($seen['fetch'])->toBeFalse()
-        ->and($seen['content'][0]['type'])->toBe('image')->and(end($seen['content'])['text'])->toContain('Wireless headphones US $12.50');
-});
-
-test('analyse : produit refusé, page illisible ou pas un produit → message clair et aucune création possible', function () {
-    ($this->pro)();
-    Http::fake(['shop.example/*' => Http::response('<html><head><meta property="og:title" content="Sac"></head><body>' . str_repeat('x ', 200) . '</body></html>')]);
-    impAi(['statut' => 'refuse', 'message' => 'C’est une réplique de marque : je ne peux pas créer cette page.']);
-    $j = $this->actingAs($this->owner)->postJson(route('products.import.analyze'), ['url' => 'https://shop.example/sac'])->assertOk()->json();
-    expect($j['statut'])->toBe('refuse')->and($j['message'])->toContain('réplique');
-    $this->actingAs($this->owner)->postJson(route('products.import.create'), ['token' => $j['token'], 'droits' => true, 'titre' => 'Sac', 'prix' => 100000, 'stock' => 3])
-        ->assertStatus(422);
-    impAi(['statut' => 'illisible']);
-    expect($this->actingAs($this->owner)->postJson(route('products.import.analyze'), ['url' => 'https://shop.example/sac'])->json('message'))
-        ->toBe('Je n’arrive pas à lire cette page. Copie-colle le titre, la description et le prix, ou envoie des captures d’écran.');
-});
-
-/* ── Création ── */
-
-test('création : prix recalculé, minimum privé, droits confirmés, rien « À COMPLÉTER » chez le client', function () {
-    ($this->pro)();
+test('photos : le lien donne les photos de la page, sans texte ni prix ; ouvert à tous les plans', function () {
     Http::fake([
-        'shop.example/*' => Http::response('<html><head><meta property="og:title" content="Casque"></head><body>' . str_repeat('casque ', 100) . '</body></html>'),
-        'ae01.alicdn.com/*' => Http::response(impPng()),
+        'shop.example/*' => Http::response('<html><head><meta property="og:title" content="Casque"><meta property="og:image" content="https://cdn.example.com/a.png"><meta name="twitter:image" content="https://cdn.example.com/b.png"></head><body></body></html>'),
+        'cdn.example.com/*' => Http::response(impPng()),
     ]);
-    impAi(impAnswer());
-    $token = $this->actingAs($this->owner)->postJson(route('products.import.analyze'), ['url' => 'https://shop.example/casque'])->json('token');
-    $create = route('products.import.create');
-    $body = ['token' => $token, 'titre' => 'Casque Bluetooth sans fil', 'prix' => 210000, 'stock' => 5, 'ville' => 'Conakry',
-        'taux' => 9000, 'transport' => 15000, 'douane' => 20, 'marge' => 40, 'photos' => ['https://ae01.alicdn.com/kf/a.jpg', 'https://evil.example/x.jpg']];
-
-    $this->actingAs($this->owner)->postJson($create, $body)->assertStatus(422)->assertJsonValidationErrors('droits');
-    $this->actingAs($this->owner)->postJson($create, ['droits' => true] + array_diff_key($body, ['stock' => 1]))->assertJsonValidationErrors('stock');
-
-    $j = $this->actingAs($this->owner)->postJson($create, $body + ['droits' => true])->assertCreated()->json();
-    $p = Product::find($j['id']);
-    expect($p->is_active)->toBeFalse()->and((int) $p->price)->toBe(210000)->and((int) $p->min_price)->toBe(150000)
-        ->and($p->category)->toBe('Électronique & Téléphones')->and($p->image)->toMatch(ProductPhotos::PATH)->and($p->gallery_array)->toBe([])
-        ->and($p->landing['benefits'])->toBe(['🎧 Bluetooth 5.3', '🚚 Livraison à Conakry', ProductImportAi::PAYMENT_BENEFIT])
-        ->and($p->landing['details'])->toContain('Bluetooth : 5.3')->toContain('Couleur : Noir, Blanc')->toContain('1 câble USB-C')->not->toContain('COMPLÉTER')
-        ->and($p->landing['faq'])->toBe([['q' => 'Je paie quand ?', 'a' => 'À la livraison, en espèces.']])
-        ->and($p->landing['source']['prix_fournisseur'])->toEqual(12.5)->and($p->landing['source']['droits_confirmes'])->toBeTrue()
-        ->and($j['redirect'])->toContain('page-de-vente');
-    Http::assertNotSent(fn ($q) => str_contains($q->url(), 'evil.example'));
-    // Analyse utilisée une seule fois
-    $this->actingAs($this->owner)->postJson($create, $body + ['droits' => true])->assertStatus(410);
+    $j = $this->actingAs($this->owner)->postJson(route('products.import.photos'), ['url' => 'https://shop.example/casque'])->assertOk()->json();
+    expect($j['token'])->toBeString()->and($j['photos'])->toHaveCount(2)->and($j['photos'][0]['path'])->toMatch(ProductPhotos::PATH)
+        ->and($j)->not->toHaveKey('page')->not->toHaveKey('source');
 });
 
-test('écran : bouton d’import dans les produits, importateur avec le bouton des favoris', function () {
-    ($this->pro)();
+test('photos : site qui bloque → message clair ; photos lues par le bouton des favoris acceptées, adresses internes ignorées', function () {
+    impReader(['intranet.local' => ['10.0.0.5']]);
+    Http::fake(['www.alibaba.com/*' => Http::response('denied', 403), 'ae01.alicdn.com/*' => Http::response(impPng())]);
+    $url = route('products.import.photos');
+    $this->actingAs($this->owner)->postJson($url, ['url' => 'https://www.alibaba.com/product-detail/x.html'])->assertStatus(422)->assertJson(['blocked' => true]);
+    $j = $this->actingAs($this->owner)->postJson($url, ['url' => 'https://www.alibaba.com/product-detail/x.html',
+        'images' => ['https://ae01.alicdn.com/kf/a.jpg', 'http://intranet.local/x.png', 'javascript:alert(1)']])->assertOk()->json();
+    expect($j['photos'])->toHaveCount(1);
+    Http::assertNotSent(fn ($q) => str_contains($q->url(), 'intranet.local'));
+});
+
+test('utiliser : droits confirmés, seules les photos trouvées ; la fiche produit s’ouvre avec elles, les autres sont effacées', function () {
+    Http::fake(['shop.example/*' => Http::response('<html><head><meta property="og:image" content="https://cdn.example.com/a.png"><meta property="og:image" content="https://cdn.example.com/b.png"><meta name="twitter:image" content="https://cdn.example.com/c.png"></head></html>'),
+        'cdn.example.com/*' => Http::response(impPng())]);
+    $f = $this->actingAs($this->owner)->postJson(route('products.import.photos'), ['url' => 'https://shop.example/p'])->json();
+    [$a, $b, $c] = array_column($f['photos'], 'path');
+    $use = route('products.import.use');
+    $this->actingAs($this->owner)->postJson($use, ['token' => $f['token'], 'photos' => [$b]])->assertJsonValidationErrors('droits');
+    $j = $this->actingAs($this->owner)->postJson($use, ['token' => $f['token'], 'droits' => true, 'photos' => [$b, 'products/medium/AAAAAAAAAAAAAAAAAAAA.webp', $a]])->assertOk()->json();
+    expect($j['redirect'])->toBe(route('products.create'))->and($j['photos'])->toBe(2);
+    Storage::disk('public')->assertMissing($c);
+    // Jeton utilisé une seule fois
+    $this->actingAs($this->owner)->postJson($use, ['token' => $f['token'], 'droits' => true, 'photos' => [$a]])->assertStatus(410);
+    // La fiche produit habituelle : $b en photo principale, $a dans la galerie ; rien n'est créé avant « Enregistrer »
+    $html = $this->actingAs($this->owner)->get(route('products.create'))->assertOk()->assertSee('2 photos importées depuis le lien')->getContent();
+    expect($html)->toContain(str_replace('/', '\/', $b))->toContain(str_replace('/', '\/', $a))->and(Product::count())->toBe(0);
+    // Une seule fois : en revenant sur la fiche, plus de photos préremplies
+    $this->actingAs($this->owner)->get(route('products.create'))->assertOk()->assertDontSee('photos importées depuis le lien');
+});
+
+test('écran : bouton d’import dans les produits, page sans IA ni prix, avec le bouton des favoris', function () {
     $this->actingAs($this->owner)->get(route('products.index'))->assertOk()->assertSee(route('products.import'));
     $html = $this->actingAs($this->owner)->get(route('products.import'))->assertOk()
-        ->assertSee('Importer un produit depuis un lien')->assertSee('📥 Importer dans Shopio')->getContent();
+        ->assertSee('Importer les photos d’un produit', false)->assertSee('Trouver les photos')->getContent();
+    $page = substr($html, strpos($html, '<div class="ip">'), strpos($html, '</main>') - strpos($html, '<div class="ip">'));
+    expect($page)->not->toContain('Shopio IA')->not->toContain('GNF')->not->toContain('Analyser');
     preg_match('#class="ip-bm" href="(javascript:[^"]+)"#', $html, $m);
     $js = rawurldecode(html_entity_decode(substr($m[1], strlen('javascript:'))));
-    expect($js)->toContain(json_encode(route('products.import'), JSON_UNESCAPED_SLASHES))->toContain('innerText')->not->toContain("\n");
-    $this->actingAs($this->owner)->get(route('products.wizard'))->assertOk()->assertSee(route('products.import'));
+    expect($js)->toContain(json_encode(route('products.import'), JSON_UNESCAPED_SLASHES))->not->toContain("\n");
 });

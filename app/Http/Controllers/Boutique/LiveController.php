@@ -27,7 +27,7 @@ class LiveController extends Controller
     public function index(): View
     {
         $shop = $this->shop();
-        return view('boutique.live.index', ['shop' => $shop, 'stats' => LiveStats::for($shop), 'maps' => ['africa' => LiveMaps::get('africa'), 'world' => LiveMaps::get('world')]]);
+        return view('boutique.live.index', ['shop' => $shop, 'stats' => LiveStats::for($shop), 'globe' => LiveMaps::globe()]);
     }
 
     public function data(): JsonResponse

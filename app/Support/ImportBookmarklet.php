@@ -5,9 +5,9 @@ namespace App\Support;
 /**
  * Bouton « Importer dans Shopio » à glisser dans les favoris du navigateur (ordinateur).
  * Sur la page d'un produit (AliExpress, Alibaba, Jumia, Shopify…), un clic lit la page TELLE QUE LE VENDEUR LA VOIT
- * (nom, description, prix affiché, grandes photos, texte visible) et ouvre l'Importateur Produit Shopio avec ces
- * informations dans l'ancre de l'adresse (#import=…, jamais envoyée au serveur par le navigateur). L'importateur les
- * envoie ensuite à l'analyse (products.import.analyze), qui télécharge les photos avec les contrôles habituels.
+ * (nom, description, prix affiché, grandes photos, texte visible) et ouvre « Importer les photos d'un produit » avec ces
+ * informations dans l'ancre de l'adresse (#import=…, jamais envoyée au serveur par le navigateur). La page n'utilise que
+ * les photos : elle les envoie à products.import.photos, qui les télécharge avec les contrôles habituels.
  */
 class ImportBookmarklet
 {

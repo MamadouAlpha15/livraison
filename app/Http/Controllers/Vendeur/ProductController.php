@@ -179,7 +179,11 @@ class ProductController extends Controller
         $devise     = $shop->currency ?? 'GNF';
         $isPro      = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
 
-        return view('vendeur.products.create', compact('shop', 'categories', 'customCats', 'devise', 'isPro'));
+        // Photos choisies dans « Importer les photos d'un produit » (une seule fois) : déjà ajoutées au formulaire
+        $imported = array_values(array_filter((array) session()->pull('import_photos', []),
+            fn ($p) => is_array($p) && preg_match(\App\Support\ProductPhotos::PATH, (string) ($p['path'] ?? '')) && is_string($p['url'] ?? null)));
+
+        return view('vendeur.products.create', compact('shop', 'categories', 'customCats', 'devise', 'isPro', 'imported'));
     }
 
     /* ─────────────────────────────────────────────

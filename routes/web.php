@@ -1048,8 +1048,8 @@ Route::middleware(['auth', 'role:vendeur,admin'])->group(function () {
     Route::post('products/creer-avec-ia', [\App\Http\Controllers\Vendeur\ProductWizardController::class, 'store'])->middleware('throttle:10,1')->name('products.wizard.store');
     // Importateur Produit Shopio : un produit à partir d'un lien (Alibaba, AliExpress, Shopify…)
     Route::get('products/importer', [\App\Http\Controllers\Vendeur\ProductImportController::class, 'show'])->name('products.import');
-    Route::post('products/importer/analyser', [\App\Http\Controllers\Vendeur\ProductImportController::class, 'analyze'])->middleware('throttle:6,1')->name('products.import.analyze');
-    Route::post('products/importer/creer', [\App\Http\Controllers\Vendeur\ProductImportController::class, 'create'])->middleware('throttle:10,1')->name('products.import.create');
+    Route::post('products/importer/photos', [\App\Http\Controllers\Vendeur\ProductImportController::class, 'photos'])->middleware('throttle:10,1')->name('products.import.photos');
+    Route::post('products/importer/utiliser', [\App\Http\Controllers\Vendeur\ProductImportController::class, 'use'])->middleware('throttle:10,1')->name('products.import.use');
     Route::post('products/creer-avec-ia/photo-ia', [\App\Http\Controllers\Vendeur\ProductWizardController::class, 'photo'])->middleware('throttle:6,1')->name('products.wizard.photo');
 
     Route::resource('products', ProductController::class)->except(['show']);
