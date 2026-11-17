@@ -179,7 +179,11 @@ Route::get('/.well-known/assetlinks.json', function () {
 })->name('assetlinks');
 
 /* Page d'accueil */
-Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
+/* Accueil Shopio : présentation des fonctionnalités avec démos animées (pour les vendeurs) */
+Route::get('/', [\App\Http\Controllers\LandingController::class, 'index'])->name('landing');
+
+/* Marché Shopio : produits et boutiques pour les clients (ancien accueil, même nom de route « welcome ») */
+Route::get('/marche', [WelcomeController::class, 'index'])->name('welcome');
 
 /* Suggestions de recherche (autocomplétion) — accessible sans compte, comme le catalogue */
 Route::get('/search-suggestions', [WelcomeController::class, 'suggestions'])->name('search.suggestions');

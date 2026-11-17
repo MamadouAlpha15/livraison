@@ -278,7 +278,7 @@ body{background:#f0f2f5 !important;font-family:-apple-system,BlinkMacSystemFont,
         Retour
     </button>
     <div class="bc">
-        <a href="{{ auth()->check() ? route('client.dashboard') : url('/') }}">Accueil</a>
+        <a href="{{ auth()->check() ? route('client.dashboard') : route('welcome') }}">Accueil</a>
         <span class="bc-sep">›</span>
         <a href="{{ auth()->check() ? route('client.products.index') : route('shops.index') }}">Produits</a>
         <span class="bc-sep">›</span>

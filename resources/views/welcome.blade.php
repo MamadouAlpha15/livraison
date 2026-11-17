@@ -1391,16 +1391,16 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
 
 {{-- ══ NAVBAR ══ --}}
 <nav class="nav">
-    <a href="{{ url('/') }}" class="nav-logo">
+    <a href="{{ route('welcome') }}" class="nav-logo">
         <img src="/images/shopio-logo-192.png" alt="{{ config('app.name', 'Shopio') }}">
         <span><span class="brand-part">Shop</span><span class="brand-accent">io</span></span>
     </a>
     <div class="nav-links">
-        <a href="{{ url('/') }}" class="nav-link active">{!! \App\Support\IconLibrary::svg('home') !!} Accueil</a>
+        <a href="{{ route('welcome') }}" class="nav-link active">{!! \App\Support\IconLibrary::svg('home') !!} Accueil</a>
         <a href="{{ route('shops.index') }}" class="nav-link">{!! \App\Support\IconLibrary::svg('store') !!} Boutiques</a>
     </div>
     <div class="search-wrap">
-        <form method="GET" action="{{ url('/') }}" class="nav-search" data-ajax>
+        <form method="GET" action="{{ route('welcome') }}" class="nav-search" data-ajax>
             <input type="text" name="s" value="{{ request('s') }}" placeholder="Que recherchez-vous ?" autocomplete="off">
             <button class="nav-search-btn" type="submit" aria-label="Rechercher">{!! \App\Support\IconLibrary::svg('search', '', 16) !!}</button>
         </form>
@@ -1427,7 +1427,7 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
 {{-- ══ BARRE MOBILE (recherche) ══ --}}
 <div class="mobile-bar">
     <div class="search-wrap">
-        <form method="GET" action="{{ url('/') }}" class="nav-search" data-ajax>
+        <form method="GET" action="{{ route('welcome') }}" class="nav-search" data-ajax>
             <input type="text" name="s" value="{{ request('s') }}" placeholder="Rechercher un produit…" autocomplete="off">
             <button class="nav-search-btn" type="submit" aria-label="Rechercher">{!! \App\Support\IconLibrary::svg('search', '', 16) !!}</button>
         </form>
@@ -1437,7 +1437,7 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
 
 {{-- ══ MENU MOBILE (liens + catégories) ══ --}}
 <div class="nav-mobile-menu" id="navMobileMenu">
-    <a href="{{ url('/') }}" class="nav-mobile-link">{!! \App\Support\IconLibrary::svg('home') !!} Accueil</a>
+    <a href="{{ route('welcome') }}" class="nav-mobile-link">{!! \App\Support\IconLibrary::svg('home') !!} Accueil</a>
     <a href="{{ route('shops.index') }}" class="nav-mobile-link">{!! \App\Support\IconLibrary::svg('store') !!} Boutiques</a>
     <div class="nav-mobile-divider"></div>
     @guest
@@ -1455,7 +1455,7 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
     <div class="nav-mobile-divider"></div>
     <div class="nav-mobile-cats">
         @foreach($categories as $cat)
-        <a href="{{ url('/') }}?{{ http_build_query(array_filter(['cat' => $cat, 's' => request('s')])) }}#catalogue" class="nav-mobile-link">{!! \App\Support\IconLibrary::categorySvg($cat) !!} {{ $cat }}</a>
+        <a href="{{ route('welcome') }}?{{ http_build_query(array_filter(['cat' => $cat, 's' => request('s')])) }}#catalogue" class="nav-mobile-link">{!! \App\Support\IconLibrary::categorySvg($cat) !!} {{ $cat }}</a>
         @endforeach
     </div>
     @endif
@@ -1493,7 +1493,7 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
 <footer class="w-footer">
     <div class="w-footer-inner">
         <div class="w-footer-brand">
-            <a href="{{ url('/') }}" class="w-footer-logo">
+            <a href="{{ route('welcome') }}" class="w-footer-logo">
                 <img src="/images/shopio-logo-192.png" alt="{{ config('app.name', 'Shopio') }}">
                 {{ config('app.name', 'Shopio') }}
             </a>
@@ -1501,7 +1501,7 @@ a.cpg-btn:hover { border-color: var(--brand); color: var(--brand-dk); background
         </div>
         <div class="w-footer-col">
             <h4>Plateforme</h4>
-            <a href="{{ url('/') }}">Accueil</a>
+            <a href="{{ route('welcome') }}">Accueil</a>
             <a href="{{ route('shops.index') }}">Boutiques</a>
             <a href="{{ route('delivery.companies.index') }}">Entreprises livraison</a>
         </div>

@@ -126,7 +126,7 @@ class WelcomeController extends Controller
                 'image' => $p->image ? asset('storage/' . $p->image) : null,
                 'url'   => route('client.orders.createFromProduct', $p),
             ]),
-            'more_url' => url('/') . '?' . http_build_query(['cat' => $catName]) . '#catalogue',
+            'more_url' => route('welcome') . '?' . http_build_query(['cat' => $catName]) . '#catalogue',
         ]);
     }
 
