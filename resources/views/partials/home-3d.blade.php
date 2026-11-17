@@ -27,7 +27,7 @@ prefers-reduced-motion = scènes fixes et simples fondus.
 
     $flashEnds = ($flashProducts ?? collect())->isNotEmpty() ? (int) $flashProducts->min('flash_seconds_remaining') : 0;
     $hasBest = ($bestSellers ?? collect())->isNotEmpty();
-    $catUrl = fn ($c) => url('/') . '?' . http_build_query(['cat' => $c]) . '#catalogue';
+    $catUrl = fn ($c) => route('welcome') . '?' . http_build_query(['cat' => $c]) . '#catalogue';
 
     /* Immeubles de la carte de livraison : x, y, largeur, profondeur, hauteur */
     $blds = [[30,20,60,50,40],[175,10,40,40,56],[250,20,50,32,34],[20,110,60,50,48],[380,110,50,40,44],[340,210,60,56,64],[180,250,50,46,30],[420,240,46,50,38],[60,200,40,36,26]];
@@ -44,7 +44,7 @@ prefers-reduced-motion = scènes fixes et simples fondus.
                 <span class="b3 b3-g in3" style="height:34px;padding:0 14px;font-size:14px">{!! $I('shield', 16) !!} Boutiques vérifiées · Paiement à la livraison</span>
                 <h1 class="h3-title in3-mask d3-1" id="h3Title">Achetez en confiance. <span class="ext3">Payez à la livraison.</span></h1>
                 <p class="h3-sub in3 d3-2">La marketplace tout-en-un : boutiques, produits et livraison partout en Guinée. Vous ne payez qu'à la réception.</p>
-                <form class="in3 d3-3" role="search" action="{{ url('/') }}" method="GET" style="max-width:540px">
+                <form class="in3 d3-3" role="search" action="{{ route('welcome') }}" method="GET" style="max-width:540px">
                     <label for="q3" class="sr3">Rechercher un produit</label>
                     <div class="search3">
                         {!! $I('search', 22) !!}

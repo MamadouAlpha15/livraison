@@ -46,7 +46,7 @@
     $offerUrl  = auth()->check() ? $chatUrl . '?offre=1' : route('register', ['redirect' => $chatUrl . '?offre=1', 'role' => 'client']);
     $writeUrl  = auth()->check() ? $chatUrl : route('register', ['redirect' => $chatUrl, 'role' => 'client']);
     $shopUrl   = route('public.shops.products', $shop);
-    $catUrl    = $product->category ? url('/') . '?category=' . urlencode($product->category) : null;
+    $catUrl    = $product->category ? route('welcome') . '?category=' . urlencode($product->category) : null;
     $initials  = collect(preg_split('/\s+/', trim($shop->name)))->filter()->take(2)->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))->implode('');
 
     // Communes et villes proposées à la livraison (boutiques en Guinée) ; sinon, champ libre
@@ -451,16 +451,16 @@ select.ck-input { appearance: auto; }
 {{-- ═══ EN-TÊTE ═══ --}}
 <header class="pp-head">
     <div class="pp-wrap pp-head-in">
-        <a href="{{ url('/') }}" class="pp-logo">
+        <a href="{{ route('welcome') }}" class="pp-logo">
             <img src="/images/shopio-logo-192.png" alt="" width="38" height="38">
             Shopio
         </a>
-        <form class="pp-head-search" action="{{ url('/') }}" method="GET" role="search">
+        <form class="pp-head-search" action="{{ route('welcome') }}" method="GET" role="search">
             <label for="ppSearch" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Rechercher un produit</label>
             <input type="search" id="ppSearch" name="s" placeholder="Que cherchez-vous ?" autocomplete="off">
             <button type="submit">{!! Ico::svg('search', '', 16) !!} Rechercher</button>
         </form>
-        <a href="{{ url('/') }}" class="pp-icon-btn pp-head-search-m" aria-label="Rechercher sur Shopio">{!! Ico::svg('search', '', 19) !!}</a>
+        <a href="{{ route('welcome') }}" class="pp-icon-btn pp-head-search-m" aria-label="Rechercher sur Shopio">{!! Ico::svg('search', '', 19) !!}</a>
         @auth
         <a href="{{ route('client.cart.index') }}" class="pp-icon-btn" aria-label="Panier ({{ $cartCount }} articles)" id="ppCartLink">
             {!! Ico::svg('bag', '', 19) !!}
@@ -477,7 +477,7 @@ select.ck-input { appearance: auto; }
 <div class="pp-wrap">
 
     <nav class="pp-crumbs" aria-label="Fil d'Ariane">
-        <a href="{{ url('/') }}">Accueil</a> /
+        <a href="{{ route('welcome') }}">Accueil</a> /
         @if($catUrl)<a href="{{ $catUrl }}">{{ $product->category }}</a> /@endif
         <span aria-current="page">{{ Str::limit($product->name, 60) }}</span>
     </nav>
