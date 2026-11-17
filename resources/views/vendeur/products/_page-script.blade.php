@@ -61,12 +61,12 @@
     function photoPro() {
         if (!G.urls.photoAi) return '';
         const styles = { studio: 'Fond blanc studio', scene: 'Mise en scène' };
-        return '<div class="pe-card sx-aimg" style="margin-top:12px"><h3 style="margin:0">✨ Photos pro avec Shopio IA</h3>' +
+        return '<div class="pe-card sx-aimg" style="margin-top:12px"><h3 style="margin:0;display:flex;align-items:center;gap:7px">' + svg('M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 3v4M17 5h4', 16) + ' Photos pro avec Shopio IA</h3>' +
             '<p class="sx-hint" style="margin:0">À partir de la vraie photo principale : le produit reste le même, Shopio IA soigne le fond et la lumière. Vous choisissez ensuite de l’ajouter ou non.</p>' +
             (!G.photos.length ? '<p class="sx-hint">Ajoutez d’abord une vraie photo du produit.</p>' :
             '<div class="sx-seg" role="group" aria-label="Style de la photo">' + Object.entries(styles).map(([k, l]) => '<button type="button" data-pstyle="' + k + '" aria-pressed="' + (ph.style === k) + '">' + l + '</button>').join('') + '</div>' +
             '<input class="sx-input" id="pePhWish" maxlength="300" value="' + esc(ph.wish) + '" placeholder="' + (ph.style === 'studio' ? 'Précision (facultatif) : ex. vue de face, ombre très légère' : 'Décor souhaité (facultatif) : ex. salon moderne, tissu wax, plage') + '" aria-label="Précision pour la photo">' +
-            '<button type="button" class="sx-btn sx-btn-sm sx-ai-btn' + (ph.busy ? ' is-busy' : '') + '" id="pePhGo" style="justify-self:start"' + (ph.busy ? ' disabled' : '') + '>' + (ph.busy ? 'Création en cours…' : '✨ Créer la photo') + '</button>' +
+            '<button type="button" class="sx-btn sx-btn-sm sx-ai-btn' + (ph.busy ? ' is-busy' : '') + '" id="pePhGo" style="justify-self:start"' + (ph.busy ? ' disabled' : '') + '>' + (ph.busy ? 'Création en cours…' : svg('M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 3v4M17 5h4', 16) + ' Créer la photo') + '</button>' +
             (ph.result ? '<div style="display:grid;gap:8px"><img src="' + esc(ph.result.url) + '" alt="Photo créée par Shopio IA" style="width:100%;max-width:320px;aspect-ratio:1;object-fit:cover;border-radius:14px;box-shadow:0 0 0 1px var(--sx-line)">' +
                 '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="sx-btn sx-btn-sm" data-ph-add="1">★ Mettre en photo principale</button><button type="button" class="sx-btn sx-btn-sm" data-ph-add="0">+ Ajouter à la galerie</button><button type="button" class="sx-btn sx-btn-sm sx-btn-danger" data-ph-drop>Ne pas garder</button></div></div>' : '')) +
             '<span class="sx-msg ' + ph.cls + '" aria-live="polite">' + esc(ph.msg || (G.aiPro ? 'Environ 30 secondes à 1 minute. Vérifiez toujours que le produit est fidèle à l’original.' : 'Réservé au plan Pro.')) + '</span></div>';

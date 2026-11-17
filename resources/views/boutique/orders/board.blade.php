@@ -525,6 +525,12 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
     $('obNewBtn').addEventListener('click', () => { if (!lines.length) lines.push({ id: '', qty: 1 }); renderLines(); $('nnMsg').textContent = ''; openModal('obNew'); });
     // Lien « Nouvelle commande » du tableau de bord : ?nouvelle=1 ouvre directement la fenêtre
     if (new URLSearchParams(location.search).has('nouvelle')) setTimeout(() => $('obNewBtn').click(), 0);
+    // Lien depuis la fiche d'un client : ?commande=ID ouvre directement la fiche de cette commande
+    (function () {
+        const id = new URLSearchParams(location.search).get('commande');
+        const card = id && /^\d+$/.test(id) ? document.querySelector('.ob-card[data-id="' + id + '"]') : null;
+        if (card) setTimeout(() => openOrder(cardData(card)), 0);
+    })();
     $('nnAdd').addEventListener('click', () => { if (lines.length < 20) { lines.push({ id: '', qty: 1 }); renderLines(); } });
     $('nnLines').addEventListener('change', e => { const el = e.target; if (el.dataset.l === undefined) return; lines[+el.dataset.l][el.dataset.f] = el.dataset.f === 'qty' ? Math.max(1, Math.min(99, +el.value || 1)) : el.value; renderLines(); });
     $('nnLines').addEventListener('click', e => { const d = e.target.closest('[data-ldel]'); if (d) { lines.splice(+d.dataset.ldel, 1); renderLines(); } });

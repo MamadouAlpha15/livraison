@@ -28,17 +28,21 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #EEF2F8; }
 .sxe { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 /* ── Barre du haut ── */
 .sxe-top { position: relative; z-index: 60; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px max(14px, env(safe-area-inset-left, 0px)); background: var(--sx-surf); box-shadow: 0 1px 0 var(--sx-line); }
-.sxe-back { display: inline-flex; align-items: center; gap: 6px; padding: 0 10px; min-height: 38px; border: 0; border-radius: 10px; background: transparent; color: var(--sx-ink); font: 700 13.5px var(--sx-font); cursor: pointer; }
+.sxe-back { display: inline-flex; align-items: center; gap: 4px; padding: 0 12px 0 8px; min-height: 38px; border: 0; border-radius: 10px; background: transparent; color: var(--sx-ink); font: 700 13.5px var(--sx-font); cursor: pointer; }
 .sxe-back:hover { background: var(--sx-bg); }
 .sxe-pagebox { position: relative; margin: 0 auto; }
 .sxe-pagebtn { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 12px 0 8px; border: 1px solid var(--sx-line); border-radius: 12px; background: var(--sx-surf); color: var(--sx-ink); font: 700 14px var(--sx-font); cursor: pointer; }
 .sxe-pagebtn i { width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: var(--sx-b50); color: var(--sx-blue); font-style: normal; }
+.sxe-caret { display: flex; color: var(--sx-ink3); }
+.sxe-acts .sx-btn svg, .sxe-view svg { color: var(--sx-ink2); flex-shrink: 0; }
+.sxe-acts .sx-btn-main svg { color: #fff; }
 .sxe-menu { position: absolute; left: 50%; top: calc(100% + 6px); transform: translateX(-50%); width: 300px; max-width: calc(100vw - 20px); padding: 8px; border-radius: 14px; background: var(--sx-surf); box-shadow: 0 0 0 1px var(--sx-line), 0 24px 50px -20px rgba(11,30,61,.4); z-index: 70; }
 .sxe-menu[hidden] { display: none; }
 .sxe-menu input { margin-bottom: 6px; }
 .sxe-mi { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px; border: 0; border-radius: 10px; background: transparent; color: var(--sx-ink); font: 600 14px var(--sx-font); text-align: left; cursor: pointer; text-decoration: none; }
 .sxe-mi:hover, .sxe-mi[aria-current="page"] { background: var(--sx-b50); }
-.sxe-mi i { width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--sx-bg); box-shadow: inset 0 0 0 1px var(--sx-line); font-style: normal; overflow: hidden; }
+.sxe-mi i { width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--sx-bg); box-shadow: inset 0 0 0 1px var(--sx-line); color: var(--sx-ink2); font-style: normal; overflow: hidden; }
+.sxe-mi b { display: flex; }
 .sxe-mi i img { width: 100%; height: 100%; object-fit: cover; }
 .sxe-mi span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sxe-mi small { color: var(--sx-ink3); font-weight: 700; }
@@ -47,9 +51,14 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #EEF2F8; }
 .sxe-seg { display: inline-flex; padding: 3px; gap: 2px; border-radius: 999px; background: var(--sx-bg); box-shadow: inset 0 0 0 1px var(--sx-line); }
 .sxe-seg button { min-height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: var(--sx-ink2); font: 700 12.5px var(--sx-font); cursor: pointer; white-space: nowrap; }
 .sxe-seg button[aria-pressed="true"] { background: var(--sx-surf); color: var(--sx-blue); box-shadow: 0 1px 4px rgba(11,30,61,.15); }
-.sxe-seg button i { font-style: normal; font-size: 10px; margin-left: 4px; padding: 1px 6px; border-radius: 999px; background: #E7F6EC; color: #15803D; }
-.sxe-state { font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 999px; white-space: nowrap; background: var(--sx-bg); color: var(--sx-ink2); }
-.sxe-state.is-dirty { background: #FEF3E0; color: #92400E; } .sxe-state.is-draft { background: #EAF2FF; color: #1260C9; } .sxe-state.is-err { background: #FDECEC; color: #B91C1C; } .sxe-state.is-ok { background: #E7F6EC; color: #15803D; }
+.sxe-seg button { display: inline-flex; align-items: center; gap: 6px; }
+.sxe-seg button i { font-style: normal; font-size: 10.5px; font-weight: 700; padding: 1px 7px; border-radius: 999px; background: var(--sx-b50); color: var(--sx-blue); }
+/* État : pastille neutre, seul le petit point change de couleur */
+.sxe-state { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 700; padding: 5px 11px; border-radius: 999px; white-space: nowrap; background: var(--sx-surf); color: var(--sx-ink2); box-shadow: inset 0 0 0 1px var(--sx-line); }
+.sxe-state::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #9DAAC2; flex-shrink: 0; }
+.sxe-state.is-dirty::before { background: #F59E0B; } .sxe-state.is-draft::before { background: #1F7CF6; } .sxe-state.is-ok::before { background: #16A34A; }
+.sxe-state.is-err { color: #B91C1C; } .sxe-state.is-err::before { background: #DC2626; }
+.sxe-state:empty { display: none; }
 .sxe-acts { display: flex; gap: 6px; flex-wrap: wrap; }
 .sxe-acts .sx-btn { min-height: 38px; font-size: 13px; }
 /* ── Corps : colonne de gauche + aperçu ── */
@@ -57,7 +66,9 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #EEF2F8; }
 .sxe-side { width: 400px; flex-shrink: 0; display: flex; flex-direction: column; min-height: 0; background: var(--sx-surf); box-shadow: 1px 0 0 var(--sx-line); }
 .sxe-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 10px 12px 0; }
 .sxe-tabs button { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; border: 0; border-radius: 10px; background: transparent; color: var(--sx-ink2); font: 700 14px var(--sx-font); cursor: pointer; }
+.sxe-tabs button svg { color: var(--sx-ink3); }
 .sxe-tabs button[aria-selected="true"] { background: var(--sx-bg); color: var(--sx-ink); box-shadow: inset 0 0 0 1px var(--sx-line); }
+.sxe-tabs button[aria-selected="true"] svg { color: var(--sx-blue); }
 .sxe-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; align-content: start; }
 .sxe-scroll > *, .sxe-body-in > * { min-width: 0; }
 .sxe-body-in { grid-template-columns: minmax(0, 1fr); }
@@ -65,13 +76,15 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #EEF2F8; }
 .sxe-hd { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; margin-top: 6px; }
 .sxe-hd b { display: block; font-size: 14.5px; } .sxe-hd small { display: block; color: var(--sx-ink3); font-size: 12px; }
 /* Une ligne de la liste (section, logo, réglages, pied de page) */
-.sxe-it { border-radius: 14px; background: var(--sx-surf); box-shadow: inset 0 0 0 1px var(--sx-line); }
+.sxe-it { border-radius: 14px; background: var(--sx-surf); box-shadow: inset 0 0 0 1px var(--sx-line); transition: box-shadow 160ms; }
+.sxe-it:hover { box-shadow: inset 0 0 0 1px #B9C7DD; }
 .sxe-it.is-open { box-shadow: inset 0 0 0 1.5px var(--sx-blue); }
 .sxe-it.is-off .sxe-name { color: var(--sx-ink3); }
 .sxe-it.is-drag { opacity: .4; } .sxe-it.is-over { box-shadow: inset 0 2px 0 var(--sx-blue), inset 0 0 0 1px var(--sx-line); }
 .sxe-row { display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 4px 6px 4px 10px; }
 .sxe-grip { color: var(--sx-ink3); cursor: grab; display: flex; }
-.sxe-ico { width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--sx-b50); color: var(--sx-blue); }
+.sxe-ico { width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--sx-bg); color: var(--sx-ink2); box-shadow: inset 0 0 0 1px var(--sx-line); }
+.sxe-it.is-open .sxe-ico { background: var(--sx-b50); color: var(--sx-blue); box-shadow: none; }
 .sxe-name { flex: 1; min-width: 0; border: 0; background: transparent; padding: 6px 0; text-align: left; cursor: pointer; color: var(--sx-ink); font: 700 14px var(--sx-font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sxe-name small { display: block; font-weight: 500; font-size: 12px; color: var(--sx-ink3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sxe-sw { position: relative; flex-shrink: 0; width: 44px; height: 26px; border-radius: 999px; border: 0; cursor: pointer; padding: 0; background: #C3CBDA; }
@@ -84,11 +97,12 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #EEF2F8; }
 .sxe-more { position: relative; }
 .sxe-pop { position: absolute; right: 0; top: calc(100% + 4px); z-index: 20; width: 180px; padding: 6px; border-radius: 12px; background: var(--sx-surf); box-shadow: 0 0 0 1px var(--sx-line), 0 18px 40px -18px rgba(11,30,61,.45); }
 .sxe-pop button { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--sx-ink); font: 600 13.5px var(--sx-font); cursor: pointer; text-align: left; }
+.sxe-pop button svg { color: var(--sx-ink3); flex-shrink: 0; } .sxe-pop .is-del svg { color: inherit; }
 .sxe-pop button:hover:not(:disabled) { background: var(--sx-bg); } .sxe-pop button:disabled { opacity: .4; cursor: default; } .sxe-pop .is-del { color: #B91C1C; }
 .sxe-body-in { display: grid; gap: 12px; padding: 4px 12px 14px; border-top: 1px solid var(--sx-line); padding-top: 12px; }
-.sxe-add { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; border: 1.5px dashed #B9C7DD; border-radius: 14px; background: transparent; color: var(--sx-blue); font: 700 13.5px var(--sx-font); cursor: pointer; }
+.sxe-add { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 46px; border: 1.5px dashed #C3CBDA; border-radius: 14px; background: transparent; color: var(--sx-blue); font: 700 13.5px var(--sx-font); cursor: pointer; }
 .sxe-add:hover { background: var(--sx-b50); }
-.sxe-note { margin: 0; padding: 10px 12px; border-radius: 12px; background: #EAF2FF; color: #0B1E3D; font-size: 13px; line-height: 1.45; }
+.sxe-note { margin: 0; padding: 10px 12px; border-radius: 12px; background: var(--sx-bg); color: var(--sx-ink2); font-size: 13px; line-height: 1.45; box-shadow: inset 0 0 0 1px var(--sx-line); }
 .sxe-r { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; background: var(--sx-bg); }
 .sxe-r > div { flex: 1; min-width: 0; } .sxe-r b { display: block; font-size: 13.5px; } .sxe-r span { display: block; font-size: 12px; color: var(--sx-ink3); }
 .sxe-pill { display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 999px; font-size: 11.5px; font-weight: 800; background: var(--sx-surf); color: var(--sx-ink2); box-shadow: inset 0 0 0 1px var(--sx-line); white-space: nowrap; }
@@ -153,11 +167,24 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #EEF2F8; }
 </style>
 </head>
 <body>
+@php
+    /* Icônes au trait, toutes du même style (gris ou bleu Shopio selon le bouton) */
+    $EI = [
+        'back' => 'M15 6l-6 6 6 6', 'home' => 'M3 10.5 12 4l9 6.5V20H3zM9 20v-6h6v6', 'caret' => 'm6 9 6 6 6-6',
+        'undo' => 'M9 14 4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3', 'save' => 'M5 3h11l3 3v15H5zM8 3v5h7V3M8 21v-7h8v7',
+        'link' => 'M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1',
+        'eye' => 'M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+        'mobile' => 'M7 2h10v20H7zM11 18h2', 'desk' => 'M3 4h18v12H3zM8 20h8M12 16v4',
+        'sections' => 'M4 5h16v6H4zM4 15h16v4H4z',
+        'palette' => 'M12 3a9 9 0 1 0 0 18c.9 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1.1-.3-.3-.4-.6-.4-1 0-.8.7-1.4 1.5-1.4H16a5 5 0 0 0 5-5c0-4.4-4-8-9-8zM7.5 11h.01M10 7.5h.01M14.5 7.5h.01',
+    ];
+    $ei = fn (string $k, int $s = 17) => '<svg width="' . $s . '" height="' . $s . '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' . $EI[$k] . '"/></svg>';
+@endphp
 <div class="sx sxe" id="sxe">
     <header class="sxe-top">
-        <button type="button" class="sxe-back" id="sxeQuit" title="Quitter l’éditeur">← <span>Retour</span></button>
+        <button type="button" class="sxe-back" id="sxeQuit" title="Quitter l’éditeur">{!! $ei('back') !!}<span>Retour</span></button>
         <div class="sxe-pagebox">
-            <button type="button" class="sxe-pagebtn" id="sxePageBtn" aria-haspopup="true" aria-expanded="false"><i id="sxePageIco">⌂</i><span id="sxePageLbl">Page d’accueil</span> ▾</button>
+            <button type="button" class="sxe-pagebtn" id="sxePageBtn" aria-haspopup="true" aria-expanded="false"><i id="sxePageIco">{!! $ei('home', 15) !!}</i><span id="sxePageLbl">Page d’accueil</span><span class="sxe-caret">{!! $ei('caret', 15) !!}</span></button>
             <div class="sxe-menu" id="sxePageMenu" role="menu" hidden>
                 <input class="sx-input" type="search" id="sxePageQ" placeholder="Rechercher une page ou un produit" aria-label="Rechercher une page ou un produit">
                 <div id="sxePageList"></div>
@@ -170,16 +197,16 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #EEF2F8; }
         </div>
         <span class="sxe-state" id="sxeState" role="status" aria-live="polite"></span>
         <nav class="sxe-acts" id="sxeActs" aria-label="Actions">
-            <button type="button" class="sx-btn" id="sxeUndo" title="Annuler">↺<span> Annuler</span></button>
-            <button type="button" class="sx-btn" id="sxeSave" title="Enregistrer le brouillon">💾<span> Enregistrer le brouillon</span></button>
-            <button type="button" class="sx-btn" id="sxeShare" title="Partager un aperçu">🔗<span> Partager un aperçu</span></button>
+            <button type="button" class="sx-btn" id="sxeUndo" title="Annuler">{!! $ei('undo', 16) !!}<span>Annuler</span></button>
+            <button type="button" class="sx-btn" id="sxeSave" title="Enregistrer le brouillon">{!! $ei('save', 16) !!}<span>Enregistrer le brouillon</span></button>
+            <button type="button" class="sx-btn" id="sxeShare" title="Partager un aperçu">{!! $ei('link', 16) !!}<span>Partager un aperçu</span></button>
             <button type="button" class="sx-btn sx-btn-main" id="sxePublish" title="Publier">Publier</button>
         </nav>
         {{-- Page d'un produit : la barre pilote l'éditeur de la page de vente (intégré ci-dessous) --}}
         <nav class="sxe-acts" id="sxePActs" aria-label="Actions du produit" hidden>
             <span class="sxe-pill" id="sxePStatus"></span>
-            <a class="sx-btn" id="sxePView" target="_blank" rel="noopener" title="Voir la page du produit">👁<span> Voir</span></a>
-            <button type="button" class="sx-btn" id="sxePSave" title="Sauvegarder la page du produit">💾<span> Sauvegarder</span></button>
+            <a class="sx-btn" id="sxePView" target="_blank" rel="noopener" title="Voir la page du produit">{!! $ei('eye', 16) !!}<span>Voir</span></a>
+            <button type="button" class="sx-btn" id="sxePSave" title="Sauvegarder la page du produit">{!! $ei('save', 16) !!}<span>Sauvegarder</span></button>
             <button type="button" class="sx-btn sx-btn-main" id="sxePPub" title="Publier le produit">Publier</button>
         </nav>
     </header>
@@ -187,15 +214,15 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #EEF2F8; }
         <aside class="sxe-side" id="sxeSide" aria-label="Modifier la page">
             <button type="button" class="sxe-sheetbtn" id="sxeSheet" aria-expanded="true">Réduire le panneau</button>
             <div class="sxe-tabs" role="tablist" aria-label="Réglages">
-                <button type="button" role="tab" data-tab="sections" aria-selected="true">▤ Sections</button>
-                <button type="button" role="tab" data-tab="colors" aria-selected="false">🎨 Couleurs</button>
+                <button type="button" role="tab" data-tab="sections" aria-selected="true">{!! $ei('sections', 16) !!} Sections</button>
+                <button type="button" role="tab" data-tab="colors" aria-selected="false">{!! $ei('palette', 16) !!} Couleurs</button>
             </div>
             <div class="sxe-scroll" id="sxeSideB"></div>
         </aside>
         <div class="sxe-stage">
             <div class="sxe-stagebar">
-                <div class="sxe-seg" role="group" aria-label="Appareil"><button type="button" data-dev="phone" aria-pressed="false" title="Téléphone">📱 Téléphone</button><button type="button" data-dev="desk" aria-pressed="true" title="Ordinateur">🖥 Ordinateur</button></div>
-                <a class="sxe-view" id="sxeView" href="{{ $ed['urls']['public'] }}" target="_blank" rel="noopener">👁 Voir</a>
+                <div class="sxe-seg" role="group" aria-label="Appareil"><button type="button" data-dev="phone" aria-pressed="false" title="Téléphone">{!! $ei('mobile', 15) !!} Téléphone</button><button type="button" data-dev="desk" aria-pressed="true" title="Ordinateur">{!! $ei('desk', 15) !!} Ordinateur</button></div>
+                <a class="sxe-view" id="sxeView" href="{{ $ed['urls']['public'] }}" target="_blank" rel="noopener">{!! $ei('eye', 15) !!} Voir</a>
             </div>
             <div class="sxe-frames" id="sxeFrames">
                 <iframe id="sxeF0" title="Votre vitrine" src="{{ $ed['urls']['frame'] }}&modele={{ $theme }}"></iframe>
@@ -223,8 +250,9 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #EEF2F8; }
     let S = JSON.parse(JSON.stringify(G.state));
     let saved = JSON.stringify(S), hasDraft = G.hasDraft;
     let tab = 'sections', open = null, view = 'list', viewArg = null, menuFor = null, page = 'home';
-    const PAGES = { home: ['⌂', 'Page d’accueil'], catalogue: ['▦', 'Page catalogue'], panier: ['🛒', 'Panier'] };
-    const ICO = { grip: 'M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01', more: 'M12 5h.01M12 12h.01M12 19h.01', chev: 'm6 9 6 6 6-6', sec: 'M4 5h16v6H4zM4 15h16v4H4z', logo: 'M3 10l9-6 9 6v10H3zM9 20v-6h6v6', set: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z', foot: 'M4 4h16v16H4zM4 15h16', plus: 'M12 5v14M5 12h14' };
+    const PI = { home: 'M3 10.5 12 4l9 6.5V20H3zM9 20v-6h6v6', catalogue: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z', panier: 'M3 4h2l2.4 11h10.2L20 7H6.2M9 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2M17 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2', tag: 'M3 12V4h8l10 10-8 8zM7.5 8.5h.01', back: 'M15 6l-6 6 6 6', check: 'M20 6 9 17l-5-5' };
+    const PAGES = { home: [svg(PI.home, 16), 'Page d’accueil'], catalogue: [svg(PI.catalogue, 16), 'Page catalogue'], panier: [svg(PI.panier, 16), 'Panier'] };
+    const ICO = { up: 'M12 19V5M5 12l7-7 7 7', down: 'M12 5v14M19 12l-7 7-7-7', dup: 'M8 8h12v12H8zM4 16V4h12', del: 'M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3', back: 'M15 6l-6 6 6 6', grip: 'M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01', more: 'M12 5h.01M12 12h.01M12 19h.01', chev: 'm6 9 6 6 6-6', sec: 'M4 5h16v6H4zM4 15h16v4H4z', logo: 'M3 10l9-6 9 6v10H3zM9 20v-6h6v6', set: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z', foot: 'M4 4h16v16H4zM4 15h16', plus: 'M12 5v14M5 12h14' };
 
     /* ───────── État : non enregistré, brouillon, publié ───────── */
     const dirty = () => JSON.stringify(S) !== saved;
@@ -322,8 +350,8 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #EEF2F8; }
     function sectionItem(s, i) {
         const t = G.types[s.type], isOpen = open === s.id, builtin = X.isBuiltin(s.type), n = list().length;
         const pop = menuFor === s.id ? '<div class="sxe-pop" role="menu">' +
-            '<button type="button" data-act="up" ' + (i === 0 ? 'disabled' : '') + '>↑ Monter</button><button type="button" data-act="down" ' + (i === n - 1 ? 'disabled' : '') + '>↓ Descendre</button>' +
-            (builtin ? '' : '<button type="button" data-act="dup">⧉ Dupliquer</button><button type="button" class="is-del" data-act="del">🗑 Supprimer</button>') +
+            '<button type="button" data-act="up" ' + (i === 0 ? 'disabled' : '') + '>' + svg(ICO.up, 15) + ' Monter</button><button type="button" data-act="down" ' + (i === n - 1 ? 'disabled' : '') + '>' + svg(ICO.down, 15) + ' Descendre</button>' +
+            (builtin ? '' : '<button type="button" data-act="dup">' + svg(ICO.dup, 15) + ' Dupliquer</button><button type="button" class="is-del" data-act="del">' + svg(ICO.del, 15) + ' Supprimer</button>') +
             (builtin ? '<button type="button" disabled title="Section du thème">Section du thème : pas supprimable</button>' : '') + '</div>' : '';
         return '<div class="sxe-it' + (isOpen ? ' is-open' : '') + (s.on ? '' : ' is-off') + '" data-item="' + s.id + '" data-sid="' + s.id + '" draggable="true">' +
             '<div class="sxe-row"><span class="sxe-grip" aria-hidden="true" title="Glisser pour déplacer">' + svg(ICO.grip, 16) + '</span>' +
@@ -363,7 +391,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #EEF2F8; }
 
     /* ───────── Bibliothèque : ajouter une section ───────── */
     function libraryView() {
-        return '<div class="sxe-sub"><button type="button" class="sxe-ib" data-back aria-label="Retour">←</button><b>Ajouter une section</b></div>' +
+        return '<div class="sxe-sub"><button type="button" class="sxe-ib" data-back aria-label="Retour">' + svg(ICO.back, 18) + '</button><b>Ajouter une section</b></div>' +
             (customCount() >= G.limits.custom ? '<p class="sx-hint">Maximum ' + G.limits.custom + ' sections ajoutées.</p>' :
             '<input class="sx-input" type="search" id="sxeLibQ" placeholder="Rechercher une section…" aria-label="Rechercher une section">' +
             Object.entries(G.library).map(([k, [label, types]]) => '<div><b class="sx-lbl" style="margin:4px 0 6px">' + esc(label) + '</b><div class="sxe-lib">' + types.map(ty => '<button type="button" data-addtype="' + ty + '" data-q="' + esc((G.types[ty][0] + ' ' + G.types[ty][1]).toLowerCase()) + '"><b>+ ' + esc(G.types[ty][0]) + '</b><span>' + esc(G.types[ty][1]) + '</span></button>').join('') + '</div></div>').join(''));
@@ -431,7 +459,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #EEF2F8; }
     /* ───────── Partager un aperçu (48 h) : le brouillon, pour avoir un avis avant de publier ───────── */
     function shareView() {
         const p = G.preview;
-        return '<div class="sxe-sub"><button type="button" class="sxe-ib" data-back aria-label="Retour">←</button><b>Partager un aperçu</b></div>' +
+        return '<div class="sxe-sub"><button type="button" class="sxe-ib" data-back aria-label="Retour">' + svg(ICO.back, 18) + '</button><b>Partager un aperçu</b></div>' +
             '<p class="sx-hint" style="margin:0">Faites relire votre vitrine avant de la publier : le lien montre votre <b>brouillon</b> pendant 48 h à qui le reçoit, avec un formulaire pour vous laisser un avis.</p>' +
             (p ? '<div class="sxe-link"><input class="sx-input" id="sxePvLink" value="' + esc(p.url) + '" readonly aria-label="Lien d’aperçu"><button type="button" class="sx-btn sx-btn-sm sx-btn-main" data-pv="copy">Copier</button></div>' +
                 '<p class="sx-hint" style="margin:0">Valable jusqu’au ' + esc(p.expires) + '. ' + (p.feedback ? p.feedback + ' avis reçu' + (p.feedback > 1 ? 's' : '') + ' : <a href="' + esc(G.urls.quality) + '">les lire</a>.' : 'Aucun avis pour l’instant.') + '</p>' +
@@ -590,15 +618,15 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #EEF2F8; }
         const q = $('sxePageQ').value.trim().toLowerCase();
         const match = t => !q || t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q.normalize('NFD').replace(/[̀-ͯ]/g, ''));
         const prods = G.products.filter(p => match(p.name));
-        const item = (k, [ico, label]) => '<button type="button" class="sxe-mi" role="menuitem" data-page="' + k + '"' + (page === k ? ' aria-current="page"' : '') + '><i>' + ico + '</i><span>' + esc(label) + '</span>' + (page === k ? '<b>✓</b>' : '') + '</button>';
-        const prodItem = p => '<button type="button" class="sxe-mi" role="menuitem" data-pid="' + p.id + '"' + (prod && prod.id === p.id ? ' aria-current="page"' : '') + '><i>' + (p.thumb ? '<img src="' + esc(p.thumb) + '" alt="">' : '🏷') + '</i><span>' + esc(p.name) + (p.draft ? ' (brouillon)' : '') + '</span>' + (prod && prod.id === p.id ? '<b>✓</b>' : '') + '</button>';
+        const item = (k, [ico, label]) => '<button type="button" class="sxe-mi" role="menuitem" data-page="' + k + '"' + (page === k ? ' aria-current="page"' : '') + '><i>' + ico + '</i><span>' + esc(label) + '</span>' + (page === k ? '<b>' + svg(PI.check, 16) + '</b>' : '') + '</button>';
+        const prodItem = p => '<button type="button" class="sxe-mi" role="menuitem" data-pid="' + p.id + '"' + (prod && prod.id === p.id ? ' aria-current="page"' : '') + '><i>' + (p.thumb ? '<img src="' + esc(p.thumb) + '" alt="">' : svg(PI.tag, 16)) + '</i><span>' + esc(p.name) + (p.draft ? ' (brouillon)' : '') + '</span>' + (prod && prod.id === p.id ? '<b>' + svg(PI.check, 16) + '</b>' : '') + '</button>';
         if (pageSub === 'products' && !q) {
-            $('sxePageList').innerHTML = '<button type="button" class="sxe-mi" data-psub=""><i>←</i><span>Produits</span></button><div class="sxe-plist">' + (G.products.length ? G.products.map(prodItem).join('') : '<p class="sx-hint" style="padding:8px">Aucun produit pour l’instant.</p>') + '</div>';
+            $('sxePageList').innerHTML = '<button type="button" class="sxe-mi" data-psub=""><i>' + svg(PI.back, 16) + '</i><span>Produits</span></button><div class="sxe-plist">' + (G.products.length ? G.products.map(prodItem).join('') : '<p class="sx-hint" style="padding:8px">Aucun produit pour l’instant.</p>') + '</div>';
             return;
         }
         $('sxePageList').innerHTML = Object.entries(PAGES).filter(([k, v]) => match(v[1])).map(([k, v]) => item(k, v)).join('') +
             (q ? (prods.length ? '<div class="sxe-plist">' + prods.slice(0, 30).map(prodItem).join('') + '</div>' : '') :
-                '<button type="button" class="sxe-mi" data-psub="products"><i>🏷</i><span>Produits</span><small>' + G.products.length + ' ›</small></button>') +
+                '<button type="button" class="sxe-mi" data-psub="products"><i>' + svg(PI.tag, 16) + '</i><span>Produits</span><small>' + G.products.length + ' ›</small></button>') +
             (q && !prods.length && !Object.values(PAGES).some(v => match(v[1])) ? '<p class="sx-hint" style="padding:8px">Aucune page ni aucun produit pour « ' + esc(q) + ' ».</p>' : '');
     }
     function toggleMenu(show) { const m = $('sxePageMenu'); m.hidden = !show; $('sxePageBtn').setAttribute('aria-expanded', show ? 'true' : 'false'); if (show) { pageSub = null; $('sxePageQ').value = ''; drawPageMenu(); $('sxePageQ').focus(); } }
@@ -611,7 +639,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #EEF2F8; }
         const p = e.target.closest('[data-page]'); if (!p) return;
         if (!leaveProduct()) return;
         page = p.dataset.page;
-        $('sxePageIco').textContent = PAGES[page][0]; $('sxePageLbl').textContent = PAGES[page][1];
+        $('sxePageIco').innerHTML = PAGES[page][0]; $('sxePageLbl').textContent = PAGES[page][1];
         $('sxeView').href = viewUrl();
         toggleMenu(false); open = null; view = 'list'; draw(); clearTimeout(renderT); render();
     });
@@ -646,7 +674,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #EEF2F8; }
         if (prod && prod.id === p.id) return;
         if (!leaveProduct()) return;
         prod = p; page = 'product';
-        $('sxePageIco').textContent = '🏷'; $('sxePageLbl').textContent = p.name;
+        $('sxePageIco').innerHTML = svg(PI.tag, 15); $('sxePageLbl').textContent = p.name;
         $('sxePView').href = p.public;
         setMode(p); syncUrl();
         $('sxePStatus').textContent = 'Chargement…'; $('sxePStatus').className = 'sxe-pill';

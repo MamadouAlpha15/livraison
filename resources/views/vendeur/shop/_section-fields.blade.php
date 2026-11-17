@@ -104,7 +104,7 @@ window.SXFields = function (G, theme) {
     };
     /* ───────── Shopio IA : rédiger les textes d'une section (App\Services\SectionAi) ───────── */
     const aiWritable = t => (G.aiTypes || []).includes(t);
-    const aiRow = () => '<div class="sx-ai"><button type="button" class="sx-btn sx-btn-sm sx-ai-btn" data-sai>✨ Rédiger avec Shopio IA</button><span class="sx-msg" data-sai-msg aria-live="polite">' +
+    const aiRow = () => '<div class="sx-ai"><button type="button" class="sx-btn sx-btn-sm sx-ai-btn" data-sai>' + svg('M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 3v4M17 5h4', 15) + ' Rédiger avec Shopio IA</button><span class="sx-msg" data-sai-msg aria-live="polite">' +
         (G.aiPro ? 'L’IA écrit les textes de cette section. Photos, liens et réglages restent les vôtres.' : 'Réservé au plan Pro.') + '</span></div>';
     /** Envoie des sections à rédiger ; renvoie { id: contenu } ou lève une erreur avec un message pour le vendeur. */
     async function aiWrite(url, sections, extra) {
@@ -122,12 +122,12 @@ window.SXFields = function (G, theme) {
     function aimgRow(type, mode, k) {
         if (!G.urls || !G.urls.aiImage || !(G.aiImageTypes || []).includes(type)) return '';
         const shots = G.aiShots || [];
-        return '<div class="sx-aimg" data-aimg-box><b>✨ Ou créez la photo avec Shopio IA</b>' +
+        return '<div class="sx-aimg" data-aimg-box><b>' + svg('M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 3v4M17 5h4', 15) + ' Ou créez la photo avec Shopio IA</b>' +
             '<select class="sx-select" data-aimg-product aria-label="Ce que montre la photo">' +
             shots.map((p, n) => '<option value="' + p.id + '"' + (n === 0 ? ' selected' : '') + '>Mettre en scène : ' + esc(p.name) + '</option>').join('') +
             '<option value=""' + (shots.length ? '' : ' selected') + '>Décor seul, sans produit</option></select>' +
             '<input class="sx-input" data-aimg-wish maxlength="300" placeholder="Décor souhaité (facultatif) : ex. table en bois, lumière du matin, ambiance de fête…" aria-label="Décor souhaité">' +
-            '<button type="button" class="sx-btn sx-btn-sm sx-ai-btn" data-aimg="' + mode + '" data-lk="' + k + '" style="justify-self:start">✨ Créer la photo</button>' +
+            '<button type="button" class="sx-btn sx-btn-sm sx-ai-btn" data-aimg="' + mode + '" data-lk="' + k + '" style="justify-self:start">' + svg('M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 3v4M17 5h4', 15) + ' Créer la photo</button>' +
             '<span class="sx-msg" data-aimg-msg aria-live="polite">' + (G.aiPro ? 'Votre vraie photo est gardée : l’IA change seulement le décor. Vérifiez que le produit est fidèle avant d’enregistrer.' : 'Réservé au plan Pro.') + '</span></div>';
     }
     /** Crée la photo puis la pose dans la section (comme une photo importée) ; done() redessine l'éditeur. */

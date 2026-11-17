@@ -176,6 +176,10 @@ class ClientController extends Controller
             ')
             ->first();
 
+        // Seulement les personnes qui ont commandé dans cette boutique (sinon on verrait le nom et l'e-mail
+        // de n'importe quel compte en changeant le numéro dans l'adresse)
+        abort_unless((int) ($stats->nb_commandes ?? 0) > 0, 404);
+
         // Est-il dans le top 5 ce mois ?
         $now = Carbon::now();
         $topClientIds = $shop->orders()

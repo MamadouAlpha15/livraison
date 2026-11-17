@@ -34,7 +34,8 @@
 .ex-hero .ex-lead { margin: 16px 0 0; max-width: 54ch; color: var(--ink-2); font-size: 16.5px; line-height: 1.6; }
 .ex-points { display: grid; gap: 10px; margin: 20px 0 0; padding: 0; list-style: none; }
 .ex-points li { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; }
-.ex-points i { width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center; color: #fff; font-style: normal; }
+.ex-points i { width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #fff; color: var(--ink); box-shadow: inset 0 0 0 1px rgba(0,0,0,.1); font-style: normal; }
+.ex-pills svg { flex-shrink: 0; }
 .ex-hero .ex-btn { margin-top: 26px; }
 .ex-proof { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 16px; font-size: 13px; color: var(--ink-2); }
 .ex-proof b { color: var(--ink); }
@@ -50,7 +51,8 @@
 @keyframes exTwinkle { 50% { opacity: .2; transform: scale(.6); } }
 .ex-wave { position: absolute; left: 0; right: 0; bottom: -1px; width: 100%; height: clamp(50px, 7vw, 90px); display: block; }
 .ex-feats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; max-width: 760px; margin: 0 auto; text-align: center; }
-.ex-feat i { width: 64px; height: 64px; margin: 0 auto 12px; border-radius: 18px; display: flex; align-items: center; justify-content: center; color: #fff; font-style: normal; box-shadow: 0 14px 24px -14px rgba(0,0,0,.55), inset 0 -6px 10px rgba(0,0,0,.12), inset 0 6px 10px rgba(255,255,255,.3); transition: transform 300ms var(--out); }
+/* Engagements : même tuile pour les trois, icône fine dans la couleur de la boutique */
+.ex-feat i { width: 64px; height: 64px; margin: 0 auto 12px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-style: normal; background: #F4F4F4; background: color-mix(in srgb, var(--acc) 9%, #fff); color: var(--acc); box-shadow: inset 0 0 0 1px rgba(0,0,0,.06); transition: transform 300ms var(--out); }
 .ex-feat:hover i { transform: translateY(-4px) rotate(-4deg); }
 .ex-feat b { display: block; font: 700 15px var(--m-title); }
 .ex-feat span { display: block; margin-top: 3px; color: var(--ink-3); font-size: 12.5px; }
@@ -114,13 +116,14 @@
     <section class="ex-hero" aria-labelledby="exTitle">
         <div class="ex-wrap">
             <div>
-                <div class="ex-pills" data-rv><span>💵 Paiement à la livraison</span><span>⚡ Commande en 1 minute</span></div>
+                @php $exI = fn ($k, $sz = 16) => '<svg width="' . $sz . '" height="' . $sz . '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' . HS::ICONS[$k][1] . '"/></svg>'; @endphp
+                <div class="ex-pills" data-rv><span>{!! $exI('cash', 14) !!} Paiement à la livraison</span><span>{!! $exI('clock', 14) !!} Commande en 1 minute</span></div>
                 <h1 id="exTitle" data-rv style="--d:80ms">{{ $sec['d']['title'] !== '' ? $sec['d']['title'] : ($s['slogan'] !== '' ? $s['slogan'] : HS::txt('express', $sec, 'title')) }}</h1>
                 <p class="ex-lead" data-rv style="--d:140ms">{{ $sec['d']['text'] !== '' ? $sec['d']['text'] : 'Découvrez ' . $s['name'] . ' : ' . lcfirst(HS::txt('express', $sec, 'text')) }}</p>
                 <ul class="ex-points" data-rv style="--d:200ms">
-                    <li><i style="background:#16A34A" aria-hidden="true">✓</i>Paiement à la livraison</li>
-                    <li><i style="background:#2563EB" aria-hidden="true">☎</i>Appel de confirmation avant l’envoi</li>
-                    <li><i style="background:#F59E0B" aria-hidden="true">★</i>{{ $s['verified'] ? 'Boutique vérifiée par Shopio' : 'Suivi de commande sur Shopio' }}</li>
+                    <li><i aria-hidden="true">{!! $exI('cash') !!}</i>Paiement à la livraison</li>
+                    <li><i aria-hidden="true">{!! $exI('phone') !!}</i>Appel de confirmation avant l’envoi</li>
+                    <li><i aria-hidden="true">{!! $exI($s['verified'] ? 'shield' : 'truck') !!}</i>{{ $s['verified'] ? 'Boutique vérifiée par Shopio' : 'Suivi de commande sur Shopio' }}</li>
                 </ul>
                 <a class="ex-btn" href="{{ $s['url'] }}?vue=produits" data-rv style="--d:260ms">{{ HS::txt('express', $sec, 'button') }} <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
                 @if($pm['rating'] || $pm['delivered'])
@@ -150,7 +153,7 @@
             <div class="ex-feats">
                 @foreach($pIcons as $i => [$bg, $path])
                 @php $it = HS::item('express', $sec, $i); @endphp
-                <div class="ex-feat" data-rv style="--d:{{ $i * 80 }}ms"><i style="background:{{ $bg }}"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $path !!}</svg></i><b>{{ $it['title'] }}</b><span>{{ $it['text'] }}</span></div>
+                <div class="ex-feat" data-rv style="--d:{{ $i * 80 }}ms"><i><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $path !!}</svg></i><b>{{ $it['title'] }}</b><span>{{ $it['text'] }}</span></div>
                 @endforeach
             </div>
         </div>

@@ -8,19 +8,21 @@
 .sxe-sec { position: relative; min-height: 40px; }
 .sxe-sec:hover, .sxe-sec.is-sel, [data-sx="header"]:hover, [data-sx="header"].is-sel { outline: 2px solid #1F7CF6; outline-offset: -2px; }
 .sxe-sec.is-off { opacity: 1; }
-.sxe-bar { position: absolute; top: 8px; right: 8px; z-index: 900; display: none; align-items: center; gap: 2px; padding: 4px; border-radius: 12px; background: #0B1E3D; box-shadow: 0 10px 24px -10px rgba(11,30,61,.6); font: 700 12.5px 'Plus Jakarta Sans', system-ui, sans-serif; }
-.sxe-bar b { padding: 0 8px 0 6px; color: #C9D6EA; font-weight: 700; white-space: nowrap; max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
-.sxe-bar button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-width: 32px; height: 32px; padding: 0 8px; border: 0; border-radius: 9px; background: transparent; color: #fff; font: inherit; cursor: pointer; }
-.sxe-bar button:hover:not(:disabled) { background: #1B3563; }
+/* Petite barre d'une section : blanche et discrète, un seul bouton bleu (Modifier) */
+.sxe-bar { position: absolute; top: 10px; right: 10px; z-index: 900; display: none; align-items: center; gap: 2px; padding: 4px; border-radius: 12px; background: #fff; box-shadow: 0 0 0 1px #E3E8F2, 0 12px 28px -12px rgba(11,30,61,.35); font: 700 12.5px 'Plus Jakarta Sans', system-ui, sans-serif; color: #16162A; }
+.sxe-bar b { padding: 0 8px 0 8px; color: #62627C; font-weight: 700; white-space: nowrap; max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
+.sxe-bar button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-width: 32px; height: 32px; padding: 0 8px; border: 0; border-radius: 9px; background: transparent; color: #45455E; font: inherit; cursor: pointer; }
+.sxe-bar button:hover:not(:disabled) { background: #F1F4F9; color: #16162A; }
 .sxe-bar button:disabled { opacity: .35; cursor: default; }
-.sxe-bar button.is-main { background: #1F7CF6; }
-.sxe-bar button.is-del:hover { background: #B91C1C; }
+.sxe-bar button.is-main { background: #1668D8; color: #fff; padding: 0 10px; }
+.sxe-bar button.is-main:hover { background: #1260C9; color: #fff; }
+.sxe-bar button.is-del:hover { background: #FDECEC; color: #B91C1C; }
 .sxe-sec:hover > .sxe-bar, .sxe-sec.is-sel > .sxe-bar, [data-sx="header"]:hover > .sxe-bar, [data-sx="header"].is-sel > .sxe-bar { display: flex; }
 .sxe-add { position: relative; height: 0; z-index: 800; }
-.sxe-add button { position: absolute; left: 50%; top: 0; transform: translate(-50%, -50%); display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px; border: 0; border-radius: 999px; background: #1F7CF6; color: #fff; font: 700 13px 'Plus Jakarta Sans', system-ui, sans-serif; cursor: pointer; box-shadow: 0 8px 18px -8px rgba(31,124,246,.8); opacity: 0; transition: opacity 160ms; }
+.sxe-add button { position: absolute; left: 50%; top: 0; transform: translate(-50%, -50%); display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px; border: 0; border-radius: 999px; background: #1668D8; color: #fff; font: 700 13px 'Plus Jakarta Sans', system-ui, sans-serif; cursor: pointer; box-shadow: 0 8px 18px -8px rgba(31,124,246,.8); opacity: 0; transition: opacity 160ms; }
 .sxe-add:hover button, .sxe-add button:focus-visible, main:hover .sxe-add button { opacity: .92; }
 .sxe-ph { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 76px; margin: 6px 12px; padding: 14px; border-radius: 14px; border: 2px dashed #C3CBDA; background: #F6F9FF; color: #45455E; font: 600 13.5px 'Plus Jakarta Sans', system-ui, sans-serif; text-align: center; }
-.sxe-toast { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 2000; padding: 10px 16px; border-radius: 999px; background: #0B1E3D; color: #fff; font: 700 13px 'Plus Jakarta Sans', system-ui, sans-serif; box-shadow: 0 12px 30px rgba(11,30,61,.35); }
+.sxe-toast { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 2000; padding: 10px 16px; border-radius: 999px; background: #16162A; color: #fff; font: 700 13px 'Plus Jakarta Sans', system-ui, sans-serif; box-shadow: 0 12px 30px rgba(11,30,61,.35); }
 /* Téléphone (pas de survol) : barres toujours visibles, plus compactes */
 @media (hover: none) {
     .sxe-bar { display: flex; top: 6px; right: 6px; }
