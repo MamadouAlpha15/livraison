@@ -49,6 +49,8 @@ class User extends Authenticatable
             'notif_state'          => 'array',
             'referral_rewarded_at' => 'datetime',
             'otp_expires_at'       => 'datetime',
+            'last_active_at'       => 'datetime', // dernière visite (site ou appli), pour les relances des inactifs
+            'reminders_opt_out_at' => 'datetime', // désinscrit des relances « Tu nous manques »
         ];
     }
 
@@ -150,6 +152,12 @@ class User extends Authenticatable
     public function referrals()
     {
         return $this->hasMany(User::class, 'referred_by');
+    }
+
+    // Rappels « Tu nous manques » reçus (App\Services\InactivityReminderService)
+    public function inactivityReminders()
+    {
+        return $this->hasMany(InactivityReminder::class);
     }
 
     // Compte affilié du programme de parrainage des boutiques (≠ parrainage client ci-dessus)

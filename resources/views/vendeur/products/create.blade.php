@@ -527,6 +527,11 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                     <span class="form-card-sub">Max 20 Mo par image</span>
                 </div>
                 <div class="form-card-body">
+                    @if(!empty($imported))
+                    <p class="field-hint" style="margin:0 0 14px;padding:10px 12px;border-radius:10px;background:var(--bg);box-shadow:inset 0 0 0 1px var(--border);color:var(--text-2)">
+                        {{ count($imported) }} photo{{ count($imported) > 1 ? 's' : '' }} importée{{ count($imported) > 1 ? 's' : '' }} depuis le lien. Écrivez le nom, le prix et la description, puis enregistrez.
+                    </p>
+                    @endif
 
                     <div class="field-row" style="align-items:start">
                         {{-- Image principale --}}
@@ -1486,3 +1491,33 @@ document.addEventListener('DOMContentLoaded', function () {
 @push('styles')
 @include('boutique._partials.sv-theme')
 @endpush
+
+@if(!empty($imported))
+{{-- Photos choisies dans « Importer les photos d'un produit » : la première devient la photo principale, les autres la galerie --}}
+@push('scripts')
+<script>
+(function () {
+    const P = @json($imported);
+    if (!P.length) return;
+    document.getElementById('mainImageUploaded').value = P[0].path;
+    showMainPreview(P[0].url);
+    const form = document.getElementById('productForm'), addBtn = document.getElementById('galleryAddBtn');
+    P.slice(1, 21).forEach(p => {
+        const hidden = document.createElement('input');
+        hidden.type = 'hidden'; hidden.name = 'gallery_uploaded[]'; hidden.value = p.path;
+        form.appendChild(hidden);
+        const slot = document.createElement('div');
+        slot.className = 'gallery-slot has-image';
+        const img = document.createElement('img');
+        img.src = p.url; img.alt = ''; img.style.cssText = 'width:100%;height:100%;object-fit:cover;position:absolute;inset:0';
+        const del = document.createElement('button');
+        del.type = 'button'; del.className = 'gallery-slot-remove'; del.title = 'Supprimer'; del.textContent = '✕';
+        del.addEventListener('click', () => { hidden.remove(); slot.remove(); updateGalleryAddBtn(); });
+        slot.append(img, del);
+        addBtn.parentNode.insertBefore(slot, addBtn);
+    });
+    updateGalleryAddBtn();
+})();
+</script>
+@endpush
+@endif

@@ -25,12 +25,15 @@ class ShopMessage extends Model
         'sender_id', 'receiver_id',
         'body', 'note', 'images', 'image_status', 'read_at',
         'type', 'proposed_price', 'proposal_status', 'negotiated_order_id',
+        'follow_up_id', // relance automatique qui a posté ce message (App\Services\FollowUpService)
+        'is_ai',        // écrit par Shopio IA (badge « Shopio IA » dans la conversation)
     ];
 
     protected $casts = [
         'read_at'        => 'datetime',
         'proposed_price' => 'decimal:2',
         'images'         => 'array',
+        'is_ai'          => 'boolean',
     ];
 
     protected static function booted(): void

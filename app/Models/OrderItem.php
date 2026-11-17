@@ -9,7 +9,11 @@ class OrderItem extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['order_id','product_id','product_variant_id','variant_name','quantity','price'];
+    protected $fillable = ['order_id','product_id','product_variant_id','variant_name','quantity','price',
+        'options', // choix faits sur la page produit : palier, lot, cadeau, champs personnalisés (constructeur de page)
+    ];
+
+    protected $casts = ['options' => 'array'];
 
     public function order() {
         return $this->belongsTo(Order::class); //une commande peut avoir un seul OrderItems

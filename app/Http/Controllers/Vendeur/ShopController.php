@@ -45,11 +45,12 @@ class ShopController extends Controller
      */
     public function create(Request $request, AffiliateService $affiliates)
     {
-        // Lien de parrainage suivi avant l'inscription : code pré-rempli ; appareil reconnu pour l'anti-fraude
-        $referralCode = $affiliates->codeFromCookie($request);
+        // Appareil reconnu pour l'anti-fraude du parrainage (le code du lien ?ref= est rattaché à la création,
+        // dans ShopOnboardingController::store)
         $affiliates->ensureDeviceCookie($request);
 
-        return view('vendeur.shop.create', compact('referralCode'));
+        // Parcours en 8 étapes, une question par écran (l'ancien formulaire vendeur/shop/create reste pour store())
+        return app(ShopOnboardingController::class)->create();
     }
 
     /**
@@ -57,7 +58,9 @@ class ShopController extends Controller
      */
     public function store(StoreShopRequest $request, AffiliateService $affiliates)
     {
-        $validated = $request->safe()->except(['referral_code', 'source']);
+        $validated = $request->safe()->except(['referral_code', 'source', 'page_model']);
+        // Thème choisi à la création (Express ou Signature), modifiable ensuite dans « Ma vitrine »
+        $validated['storefront'] = \App\Support\Storefront::normalize(['page_model' => $request->validated('page_model')]);
         $userEmail = Auth::user()->email;
 
                 // Si email vide → utilise l'email d'inscription automatiquement
@@ -257,6 +260,7 @@ $clientMessages = ShopMessage::where('shop_id', $shop->id)
         $recentPayment = \App\Models\Subscription::where('subscriber_type', \App\Models\Shop::class)
             ->where('subscriber_id', $shop->id)
             ->where('status', 'active')
+            ->where('payment_method', '!=', 'essai_gratuit') // l'essai offert à la création n'est pas un paiement
             ->where('updated_at', '>=', now()->subMinutes(10))
             ->exists();
 

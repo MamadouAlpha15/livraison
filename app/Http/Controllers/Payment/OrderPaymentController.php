@@ -87,17 +87,17 @@ class OrderPaymentController extends Controller
             }
         }
 
-        $routeName = auth()->check() ? 'client.orders.index' : 'suivi.show';
-        $routeArg  = auth()->check() ? [] : $order;
+        // Client connecté : ses commandes ; sinon le lien de suivi de la commande (/suivi/{tracking_token})
+        $to = auth()->check() ? route('client.orders.index') : \App\Support\OrderAccess::trackingUrl($order);
 
         if ($payment && $payment->status === 'payé') {
             // Pixel Meta du vendeur : achat payé en ligne (une seule fois par commande et par session)
             \App\Support\MetaPixel::queuePurchase($order);
-            return redirect()->route($routeName, $routeArg)
+            return redirect()->to($to)
                 ->with('success', 'Paiement reçu ! Votre commande est confirmée. 🎉');
         }
 
-        return redirect()->route($routeName, $routeArg)
+        return redirect()->to($to)
             ->with('info', "Le paiement n'a pas encore été confirmé. Ça peut prendre quelques instants.");
     }
 
@@ -105,10 +105,9 @@ class OrderPaymentController extends Controller
     public function failed(Request $request)
     {
         $order = Order::find($request->query('order'));
-        $routeName = auth()->check() ? 'client.orders.index' : 'suivi.show';
-        $routeArg  = auth()->check() ? [] : $order;
+        $to = auth()->check() || !$order ? route('client.orders.index') : \App\Support\OrderAccess::trackingUrl($order);
 
-        return redirect()->route($routeName, $routeArg)
+        return redirect()->to($to)
             ->with('danger', "Le paiement en ligne a été annulé ou a échoué. Votre commande reste enregistrée, vous pouvez réessayer ou payer en espèces à la livraison.");
     }
 

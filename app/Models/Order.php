@@ -20,6 +20,13 @@ class Order extends Model
             $order->delivery_code ??= \App\Support\DeliveryCode::forNewOrder();
         });
 
+        // Numéro normalisé : doublons et historique de livraison du client (App\Support\CustomerRisk)
+        static::saving(function (Order $order) {
+            if ($order->isDirty('client_phone') || ($order->client_phone && !$order->client_phone_key)) {
+                $order->client_phone_key = \App\Support\PhoneKey::of($order->client_phone);
+            }
+        });
+
         static::updated(function (Order $order) {
             if (!$order->wasChanged('status')) {
                 return;

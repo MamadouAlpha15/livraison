@@ -3,9 +3,8 @@
 namespace App\Support\Sms;
 
 /**
- * Envoi de SMS. Aucun fournisseur n'est branché pour l'instant : LogSmsSender écrit les messages
- * dans le journal. Pour un vrai fournisseur, créer une classe qui implémente cette interface
- * (identifiants dans .env) et la déclarer dans AppServiceProvider.
+ * Envoi de SMS : NimbaSmsSender si NIMBA_SERVICE_ID, NIMBA_SECRET_TOKEN et NIMBA_SENDER_NAME sont dans .env,
+ * sinon LogSmsSender écrit les messages dans le journal (voir AppServiceProvider).
  */
 interface SmsSender
 {

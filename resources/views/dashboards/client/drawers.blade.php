@@ -27,7 +27,7 @@
                 'prodName' => $product?->name ?? '',
                 'prodImg'  => $product?->image ? asset('storage/'.$product->image) : null,
                 'prodPrice'=> $product ? number_format($product->price,0,',',' ').' GNF' : '',
-                'prodUrl'  => $product ? route('client.products.show', $product) : '#',
+                'prodUrl'  => $product ? $product->publicUrl() : '#',
                 'productId'=> $product?->id,
                 'msgs'     => $msgs->map(fn($m) => [
                     'id'   => $m->id,

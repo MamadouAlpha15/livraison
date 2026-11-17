@@ -18,8 +18,20 @@ class AppServiceProvider extends ServiceProvider
                 : $app->make(\App\Support\Campaigns\Payment\ChapChapCampaignGateway::class);
         });
 
-        // SMS : aucun fournisseur branché, les messages vont dans le journal (voir App\Support\Sms\SmsSender)
-        $this->app->bind(\App\Support\Sms\SmsSender::class, \App\Support\Sms\LogSmsSender::class);
+        // IA de Shopio (réponses du support…) : Claude si la clé est configurée, sinon une erreur claire
+        $this->app->bind(\App\Support\Ai\TextModel::class, fn () => blank(config('services.anthropic.key'))
+            ? new \App\Support\Ai\UnconfiguredTextModel()
+            : new \App\Support\Ai\ClaudeTextModel((string) config('services.anthropic.key')));
+
+        // Shopio IA dans la messagerie (outils) : Claude si la clé est configurée, sinon message de secours
+        $this->app->bind(\App\Services\ShopioAI\ChatModel::class, fn () => blank(config('services.anthropic.key'))
+            ? new \App\Services\ShopioAI\UnconfiguredChatModel()
+            : new \App\Services\ShopioAI\ClaudeChatModel((string) config('services.anthropic.key')));
+
+        // SMS : Nimba SMS si ses identifiants sont dans .env, sinon les messages vont dans le journal
+        $this->app->bind(\App\Support\Sms\SmsSender::class, fn () => \App\Support\Sms\NimbaSmsSender::configured()
+            ? new \App\Support\Sms\NimbaSmsSender((string) config('services.nimba.service_id'), (string) config('services.nimba.secret'), (string) config('services.nimba.sender'))
+            : new \App\Support\Sms\LogSmsSender());
     }
 
     public function boot(): void
@@ -33,6 +45,22 @@ class AppServiceProvider extends ServiceProvider
         // Programme d'affiliation : un produit ou une commande peut rendre « Active » une boutique parrainée
         \App\Models\Product::observe(\App\Observers\ReferralActivityObserver::class);
         \App\Models\Order::observe(\App\Observers\ReferralActivityObserver::class);
+
+        // Lien de suivi : chaque nouvelle commande reçoit son jeton (/suivi/{tracking_token}), sans toucher à Order.php
+        \App\Models\Order::creating(function (\App\Models\Order $order) {
+            if (empty($order->tracking_token)) $order->tracking_token = \App\Support\OrderAccess::newToken();
+        });
+
+        // Shopio IA : permission de chaque outil (App\Policies\ShopioAiToolPolicy)
+        \Illuminate\Support\Facades\Gate::define('shopio-ai.view-product', [\App\Policies\ShopioAiToolPolicy::class, 'viewProduct']);
+        \Illuminate\Support\Facades\Gate::define('shopio-ai.view-order', [\App\Policies\ShopioAiToolPolicy::class, 'viewOrder']);
+        \Illuminate\Support\Facades\Gate::define('shopio-ai.create-offer', [\App\Policies\ShopioAiToolPolicy::class, 'createOffer']);
+        // Shopio IA répond aux messages des clients ; le vendeur qui écrit lui-même la met en pause
+        \App\Models\ShopMessage::observe(\App\Observers\ShopioAiObserver::class);
+
+        // Relances : un message du client ou une commande arrête les relances en cours
+        \App\Models\ShopMessage::observe(\App\Observers\FollowUpActivityObserver::class);
+        \App\Models\Order::observe(\App\Observers\FollowUpActivityObserver::class);
 
         /* Le CSS compilé par Vite (app.css, boutique-dashboard.css, ...) ne doit pas
            bloquer le premier affichage sur réseau lent : même astuce media="print" que

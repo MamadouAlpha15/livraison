@@ -206,7 +206,7 @@ Route::get('/shops/{shop}/products/c/{categorie}', [PublicShopController::class,
     ->where('categorie', '[a-z0-9]+(?:-[a-z0-9]+)*')
     ->name('public.shops.category');
 
-/* Adresse courte d'une boutique (choisie dans l'éditeur de boutique → Réglages), et de ses catégories */
+/* Adresse courte d'une boutique (choisie dans « Ma vitrine »), et de ses catégories */
 Route::get('/s/{slug}', [PublicShopController::class, 'bySlug'])
     ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
     ->name('public.shops.slug');
@@ -214,13 +214,21 @@ Route::get('/s/{slug}/{categorie}', [PublicShopController::class, 'bySlugCategor
     ->where(['slug' => '[a-z0-9]+(?:-[a-z0-9]+)*', 'categorie' => '[a-z0-9]+(?:-[a-z0-9]+)*'])
     ->name('public.shops.slug.category');
 
-/* Collections d'une boutique (Faire grandir ma vitrine → Personnalisation) */
+/* Anciens liens de collections (outil retiré) : redirigés vers la boutique */
 Route::get('/shops/{shop}/products/collection/{collection}', [PublicShopController::class, 'collection'])
     ->where('collection', 'c[a-z0-9]{3,16}')
     ->name('public.shops.collection');
 Route::get('/s/{slug}/collection/{collection}', [PublicShopController::class, 'bySlugCollection'])
     ->where(['slug' => '[a-z0-9]+(?:-[a-z0-9]+)*', 'collection' => 'c[a-z0-9]{3,16}'])
     ->name('public.shops.slug.collection');
+
+/* Page produit publique (modèle Express) : /shops/{id}/p/12-nom-du-produit et /s/{slug}/p/12-nom-du-produit */
+Route::get('/shops/{shop}/p/{produit}', [PublicShopController::class, 'product'])
+    ->where('produit', '[0-9]+(?:-[a-z0-9]+)*')
+    ->name('public.shops.product');
+Route::get('/s/{slug}/p/{produit}', [PublicShopController::class, 'bySlugProduct'])
+    ->where(['slug' => '[a-z0-9]+(?:-[a-z0-9]+)*', 'produit' => '[0-9]+(?:-[a-z0-9]+)*'])
+    ->name('public.shops.slug.product');
 
 /* Lien d'aperçu de la vitrine, valable 48 h, et avis laissés dessus (Faire grandir ma vitrine → Qualité) */
 Route::get('/apercu/{token}', [PublicShopController::class, 'previewLink'])
@@ -236,36 +244,52 @@ Route::post('/shops/{shop}/commande', [\App\Http\Controllers\StorefrontOrderCont
     ->middleware('throttle:10,1')
     ->name('public.shops.order');
 
+/* Paniers abandonnés : ce que le client a déjà rempli dans le formulaire de commande */
+Route::post('/shops/{shop}/panier-abandonne', [\App\Http\Controllers\StorefrontCartController::class, 'capture'])
+    ->middleware('throttle:30,1')
+    ->name('public.shops.cart');
+
+/* Vue en direct : signal « je suis sur la boutique » envoyé par la vitrine toutes les 20 s (aucune IP enregistrée) */
+Route::post('/shops/{shop}/en-direct', [\App\Http\Controllers\StorefrontLiveController::class, 'ping'])
+    ->middleware('throttle:120,1')
+    ->name('public.shops.live');
+
 /* Vue d'un produit en fiche rapide (modèles de page boutique) : comptée comme une vue de sa fiche */
 Route::post('/shops/{shop}/vue/{product}', [PublicShopController::class, 'productView'])
     ->middleware('throttle:60,1')
     ->name('public.shops.view');
 
-/* Clic dans une section de la vitrine (statistiques « clics par section ») */
-Route::post('/shops/{shop}/clic', [PublicShopController::class, 'click'])
-    ->middleware('throttle:120,1')
-    ->name('public.shops.click');
 
 /* Catalogue produits d'une boutique pour Facebook / Instagram (lu par Meta Commerce Manager) */
 Route::get('/shops/{shop}/catalogue-meta.csv', [\App\Http\Controllers\CatalogFeedController::class, 'meta'])
     ->name('public.shops.catalog');
 
-/* Suivi de commande : client, personnel concerné, ou lien signé partagé (voir App\Support\OrderAccess) */
-Route::get('/suivi/{order}', [SuiviController::class, 'show'])
+/* Suivi de commande : /suivi/{tracking_token}, lien court de 20 lettres et chiffres, impossible à deviner et sans
+   le numéro de la commande (App\Support\OrderAccess). Les anciens liens /suivi/{numéro}?signature=… déjà envoyés
+   restent valables : le numéro seul ne suffit pas (signature, client ou personnel concerné), et la page mène au lien court. */
+Route::bind('suivi', fn (string $v) => ctype_digit($v) && strlen($v) <= 12
+    ? \App\Models\Order::findOrFail((int) $v)
+    : \App\Models\Order::where('tracking_token', $v)->firstOrFail());
+
+Route::get('/suivi/{suivi}', [SuiviController::class, 'show'])
+    ->where('suivi', '[0-9]{1,12}|[a-z0-9]{20}')
     ->name('suivi.show');
 
 /* Position GPS pour le suivi */
-Route::get('/suivi/{order}/position', [SuiviController::class, 'position'])
+Route::get('/suivi/{suivi}/position', [SuiviController::class, 'position'])
+    ->where('suivi', '[0-9]{1,12}|[a-z0-9]{20}')
     ->middleware('throttle:60,1')
     ->name('suivi.position');
 
 /* Données complètes pour le rafraîchissement auto (statut + GPS + livreur) */
-Route::get('/suivi/{order}/data', [SuiviController::class, 'data'])
+Route::get('/suivi/{suivi}/data', [SuiviController::class, 'data'])
+    ->where('suivi', '[0-9]{1,12}|[a-z0-9]{20}')
     ->middleware('throttle:60,1')
     ->name('suivi.data');
 
 /* Position GPS du client, envoyée depuis la page de suivi */
-Route::post('/suivi/{order}/client-location', [SuiviController::class, 'updateClientLocation'])
+Route::post('/suivi/{suivi}/client-location', [SuiviController::class, 'updateClientLocation'])
+    ->where('suivi', '[0-9]{1,12}|[a-z0-9]{20}')
     ->middleware('throttle:30,1')
     ->name('suivi.client-location');
 
@@ -545,6 +569,43 @@ Route::middleware(['auth', 'role:superadmin,staff,marketing'])
 
 
 /* ══════════════════════════════════════════════════════════════════════════
+|  Relances des inactifs (clients et entreprises de livraison)
+|  /relances/desinscription/{user} : lien signé des e-mails, sans connexion
+|  /admin/relances                 : équipe Shopio (role:superadmin,staff)
+══════════════════════════════════════════════════════════════════════════ */
+
+Route::get('relances/desinscription/{user}', \App\Http\Controllers\ReminderUnsubscribeController::class)
+    ->middleware('signed')->whereNumber('user')->name('reminders.unsubscribe');
+
+/* Relances des boutiques : lien « Ne plus recevoir ces rappels » (signé, ?shop= facultatif) */
+Route::get('relances/stop/{user}', \App\Http\Controllers\FollowUpStopController::class)
+    ->middleware('signed')->whereNumber('user')->name('followups.stop');
+
+Route::middleware(['auth', 'role:superadmin,staff'])
+    ->prefix('admin/shopio-ia')
+    ->name('admin.shopio-ai.')
+    ->controller(\App\Http\Controllers\Admin\ShopioAiController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::put('reglages', 'updateSettings')->name('settings');
+        Route::post('faq', 'storeFaq')->name('faq.store');
+        Route::put('faq/{entry}', 'updateFaq')->whereNumber('entry')->name('faq.update');
+        Route::delete('faq/{entry}', 'destroyFaq')->whereNumber('entry')->name('faq.destroy');
+    });
+
+Route::middleware(['auth', 'role:superadmin,staff'])
+    ->prefix('admin/relances')
+    ->name('admin.reminders.')
+    ->controller(\App\Http\Controllers\Admin\ReminderController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::put('reglages', 'update')->name('update');
+        Route::put('vendeurs-inactifs', 'updateVendorRule')->name('vendor-rule');
+        Route::post('envoyer', 'sendNow')->middleware('throttle:3,1')->name('send');
+    });
+
+
+/* ══════════════════════════════════════════════════════════════════════════
 |  Programme d'affiliation (parrainage des boutiques)
 |  /vendeur/parrainage      : propriétaire de boutique (role:admin)
 |  /affilie/tableau-de-bord : affilié externe (role:affilie)
@@ -691,6 +752,9 @@ Route::middleware(['auth', 'role:superadmin,staff'])
 
         /* Tickets support (vue SuperAdmin) */
         Route::get('/support', [\App\Http\Controllers\Support\SupportTicketController::class, 'index'])->name('support.index');
+        /* IA de Shopio : réponse proposée à l'admin (jamais envoyée sans lui) */
+        Route::post('/support/{ticket}/ia', \App\Http\Controllers\Admin\SupportAiController::class)
+            ->whereNumber('ticket')->middleware('throttle:20,1')->name('support.ai');
 
         /* Validation d'une entreprise de livraison (dashboard) */
         Route::post('/companies/{company}/approve', [DashboardController::class, 'approveCompany'])
@@ -731,38 +795,67 @@ Route::middleware(['auth', 'role:admin'])
         /* Tableau de bord boutique */
         Route::get('/dashboard', [ShopController::class, 'admin'])->name('dashboard');
 
+        /* Vue en direct : visiteurs présents, ventes du jour, carte (mise à jour toutes les 10 s) */
+        Route::get('en-direct', [\App\Http\Controllers\Boutique\LiveController::class, 'index'])->name('live');
+        Route::get('en-direct/donnees', [\App\Http\Controllers\Boutique\LiveController::class, 'data'])->middleware('throttle:60,1')->name('live.data');
+
         /* Gestion de la boutique */
         Route::resource('shops', ShopController::class)->only(['create', 'store', 'index']);
 
-        /* Personnaliser la vitrine publique (sections, affichage des produits, bannière, couleur) */
-        Route::get('vitrine',               [\App\Http\Controllers\Vendeur\StorefrontController::class, 'edit'])  ->name('storefront.edit');
-        Route::put('vitrine',               [\App\Http\Controllers\Vendeur\StorefrontController::class, 'update'])->name('storefront.update');
-        Route::post('vitrine/reinitialiser', [\App\Http\Controllers\Vendeur\StorefrontController::class, 'reset']) ->name('storefront.reset');
-        Route::get('vitrine/qr-code',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'qr'])    ->name('storefront.qr');
-        Route::post('vitrine/apercu',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'draft'])       ->name('storefront.draft');
-        Route::post('vitrine/image',        [\App\Http\Controllers\Vendeur\StorefrontController::class, 'uploadImage']) ->name('storefront.image');
-        Route::get('vitrine/adresse',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'slugCheck'])   ->name('storefront.slug');
 
-        /* Faire grandir ma vitrine : couverture et logo, partage, personnalisation, conversion, qualité */
-        Route::prefix('vitrine/grandir')->name('grow')->controller(\App\Http\Controllers\Vendeur\GrowController::class)->group(function () {
-            Route::get('/', 'index');
-            Route::post('couverture/photo', 'uploadCover')->name('.cover-upload');
-            Route::post('logo', 'uploadLogo')->name('.logo-upload');
-            Route::put('identite', 'saveIdentity')->name('.identity');
-            Route::post('campagne', 'createCampaign')->name('.campaign');
-            Route::post('campagne/{campaign}/arreter', 'stopCampaign')->name('.campaign.stop');
-            Route::get('qr-code', 'qr')->name('.qr');
-            Route::get('affiche', 'poster')->name('.poster');
-            Route::put('personnalisation', 'savePersonalize')->name('.personalize');
-            Route::delete('brouillon', 'discardDraft')->name('.draft.discard');
-            Route::put('conversion', 'saveConversion')->name('.conversion');
-            Route::post('modele', 'useModel')->name('.model');
-            Route::post('apercu', 'createPreview')->name('.preview');
-            Route::delete('apercu', 'disablePreview')->name('.preview.disable');
+        /* Shopio IA dans la messagerie (App\Services\ShopioAI) */
+        Route::prefix('shopio-ia')->name('shopio-ai.')->controller(\App\Http\Controllers\Boutique\ShopioAiController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::put('reglages', 'update')->name('update');
+            Route::post('suggestions/{suggestion}/envoyer', 'sendSuggestion')->whereNumber('suggestion')->name('suggestions.send');
+            Route::post('suggestions/{suggestion}/ignorer', 'dismissSuggestion')->whereNumber('suggestion')->name('suggestions.dismiss');
+            Route::post('conversations/{client}/reprendre', 'takeOver')->whereNumber('client')->name('take-over');
+            Route::post('conversations/{client}/rendre', 'handBack')->whereNumber('client')->name('hand-back');
         });
 
-        /* Marketing : provenance des visites et commandes, liens de suivi, catalogue Facebook, test du pixel */
+        /* Relances automatiques (App\Services\FollowUpService) */
+        Route::prefix('relances')->name('followups.')->controller(\App\Http\Controllers\Boutique\FollowUpController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('{type}', 'edit')->name('edit');
+            Route::put('{type}', 'update')->name('update');
+            Route::post('{type}/activer', 'toggle')->name('toggle');
+            Route::post('{type}/apercu', 'preview')->middleware('throttle:60,1')->name('preview');
+            Route::post('{type}/ia', 'generate')->middleware('throttle:10,1')->name('generate');
+        });
+
+        /* Ma vitrine : thème (Express ou Signature), couleur, adresse, fiches produit, mode vacances */
+        Route::get('vitrine',               [\App\Http\Controllers\Vendeur\StorefrontController::class, 'edit'])  ->name('storefront.edit');
+        Route::put('vitrine',               [\App\Http\Controllers\Vendeur\StorefrontController::class, 'update'])->name('storefront.update');
+        Route::get('vitrine/sections',      [\App\Http\Controllers\Vendeur\StorefrontController::class, 'sections'])     ->name('storefront.sections');
+        Route::put('vitrine/sections',      [\App\Http\Controllers\Vendeur\StorefrontController::class, 'saveSections']) ->name('storefront.sections.update');
+        Route::post('vitrine/sections/ia',  [\App\Http\Controllers\Vendeur\StorefrontController::class, 'sectionsAi'])   ->middleware('throttle:10,1')->name('storefront.sections.ai');
+        Route::post('vitrine/sections/photo-ia', [\App\Http\Controllers\Vendeur\StorefrontController::class, 'sectionImage']) ->middleware('throttle:6,1')->name('storefront.sections.image');
+        Route::get('vitrine/qr-code',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'qr'])    ->name('storefront.qr');
+        Route::get('vitrine/adresse',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'slugCheck'])   ->name('storefront.slug');
+
+        /* Modifier la page, directement sur la vitrine en ligne (/s/{slug}?edition=1, propriétaire seulement) */
+        Route::controller(\App\Http\Controllers\Vendeur\StorefrontController::class)->group(function () {
+            Route::get('vitrine/en-direct', 'live')->name('storefront.live');
+            Route::post('vitrine/edition/rendu', 'renderDraft')->middleware('throttle:120,1')->name('storefront.edit.render');
+            Route::put('vitrine/edition/brouillon', 'saveDraft')->name('storefront.edit.draft');
+            Route::delete('vitrine/edition/brouillon', 'discardDraft')->name('storefront.edit.discard');
+            Route::post('vitrine/edition/publier', 'publishDraft')->name('storefront.edit.publish');
+            Route::post('vitrine/photo', 'uploadCover')->name('storefront.cover-upload');
+            Route::post('vitrine/logo', 'uploadLogo')->name('storefront.logo-upload');
+            Route::post('vitrine/theme', 'useModel')->name('storefront.use-model');
+            Route::post('vitrine/apercu', 'createPreview')->name('storefront.preview');
+            Route::delete('vitrine/apercu', 'disablePreview')->name('storefront.preview.disable');
+            // Ancienne page « Boutique » (supprimée) : ses adresses mènent à la bonne nouvelle place
+            Route::get('vitrine/grandir', 'legacyGrow');
+        });
+
+        /* Marketing : provenance des visites et commandes, liens de suivi, catalogue Facebook, test du pixel,
+           Partage (lien produit, QR code, affiche, lien de campagne) et Qualité de la vitrine */
         Route::get('marketing',                     [\App\Http\Controllers\Vendeur\MarketingController::class, 'index'])         ->name('marketing');
+        Route::get('marketing/qr-code',             [\App\Http\Controllers\Vendeur\MarketingController::class, 'qr'])            ->name('marketing.qr');
+        Route::get('marketing/affiche',             [\App\Http\Controllers\Vendeur\MarketingController::class, 'poster'])        ->name('marketing.poster');
+        Route::post('marketing/lien-campagne',      [\App\Http\Controllers\Vendeur\MarketingController::class, 'createPromoLink'])->name('marketing.promo-link');
+        Route::post('marketing/lien-campagne/{campaign}/arreter', [\App\Http\Controllers\Vendeur\MarketingController::class, 'stopPromoLink'])->name('marketing.promo-link.stop');
         Route::post('marketing/test-pixel',         [\App\Http\Controllers\Vendeur\MarketingController::class, 'startPixelTest'])->name('marketing.pixel-test');
         Route::post('marketing/test-pixel/arreter', [\App\Http\Controllers\Vendeur\MarketingController::class, 'stopPixelTest']) ->name('marketing.pixel-test.stop');
         Route::post('marketing/campagnes',          [\App\Http\Controllers\Vendeur\MarketingController::class, 'storeCampaign']) ->name('marketing.campaigns.store');
@@ -794,9 +887,23 @@ Route::middleware(['auth', 'role:admin'])
         
         /* ── Routes accessibles en Plan Gratuit ────────────────────────── */
 
-        /* Commandes */
-        Route::get('orders', [EmployeOrderController::class, 'index'])                 ->name('orders.index');
+        /* Commandes (façon Sellio) : étapes, fiche, notes, nouvelle commande ; l'ancienne page (livreurs,
+           entreprises de livraison) reste à « Livraisons » */
+        Route::get('orders', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'index'])->name('orders.index');
+        // Ancienne page « Livraisons » : renvoie vers Commandes (la livraison se règle dans la fiche de la commande)
+        Route::get('orders/livraisons', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'livraisons'])->name('orders.livraisons');
+        Route::post('orders/{order}/livraison', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'delivery'])->middleware('throttle:30,1')->name('orders.delivery');
+        Route::post('orders/nouvelle', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'store'])->middleware('throttle:30,1')->name('orders.store');
+        Route::put('orders/reglages', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'settings'])->name('orders.settings');
+        Route::post('orders/{order}/etape', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'stage'])->name('orders.stage');
+        Route::post('orders/{order}/note', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'note'])->name('orders.note');
         Route::put('orders/{order}/assign', [EmployeOrderController::class, 'assign']) ->name('orders.assign');
+
+        /* Paniers abandonnés */
+        Route::get('paniers-abandonnes', [\App\Http\Controllers\Boutique\AbandonedCartController::class, 'index'])->name('carts.index');
+        Route::get('paniers-abandonnes/reglages', [\App\Http\Controllers\Boutique\AbandonedCartController::class, 'editSettings'])->name('carts.settings');
+        Route::put('paniers-abandonnes/reglages', [\App\Http\Controllers\Boutique\AbandonedCartController::class, 'updateSettings'])->name('carts.settings.update');
+        Route::post('paniers-abandonnes/{cart}/etat', [\App\Http\Controllers\Boutique\AbandonedCartController::class, 'state'])->name('carts.state');
 
         /* Paiements */
         Route::get('payments', [VendeurPaymentController::class, 'index'])->name('payments.index');
@@ -924,6 +1031,9 @@ Route::middleware(['auth', 'role:vendeur,admin'])->group(function () {
     Route::get('/vendeur/dashboard', [VendeurDashboard::class, 'index'])->name('vendeur.dashboard');
 
     /* ── Boutique / Shop ── */
+    /* Création de la boutique en 8 étapes (le formulaire est servi par shop.create / boutique.shops.create) */
+    Route::post('shop/demarrer', [\App\Http\Controllers\Vendeur\ShopOnboardingController::class, 'store'])
+        ->middleware('throttle:10,1')->name('shop.onboard');
     Route::resource('shop', ShopController::class);
 
     /* ── Produits ── */
@@ -933,7 +1043,25 @@ Route::middleware(['auth', 'role:vendeur,admin'])->group(function () {
     Route::get('products/ajout-rapide',  [ProductController::class, 'quickAdd'])     ->name('products.quick-add');
     Route::post('products/ajout-rapide', [ProductController::class, 'quickAddStore'])->name('products.quick-add.store');
 
+    /* Créer un produit avec Shopio IA : photos → prix et détails → création (brouillon) → page de vente */
+    Route::get('products/creer-avec-ia', [\App\Http\Controllers\Vendeur\ProductWizardController::class, 'create'])->name('products.wizard');
+    Route::post('products/creer-avec-ia', [\App\Http\Controllers\Vendeur\ProductWizardController::class, 'store'])->middleware('throttle:10,1')->name('products.wizard.store');
+    // Importateur Produit Shopio : un produit à partir d'un lien (Alibaba, AliExpress, Shopify…)
+    Route::get('products/importer', [\App\Http\Controllers\Vendeur\ProductImportController::class, 'show'])->name('products.import');
+    Route::post('products/importer/photos', [\App\Http\Controllers\Vendeur\ProductImportController::class, 'photos'])->middleware('throttle:10,1')->name('products.import.photos');
+    Route::post('products/importer/utiliser', [\App\Http\Controllers\Vendeur\ProductImportController::class, 'use'])->middleware('throttle:10,1')->name('products.import.use');
+    Route::post('products/creer-avec-ia/photo-ia', [\App\Http\Controllers\Vendeur\ProductWizardController::class, 'photo'])->middleware('throttle:6,1')->name('products.wizard.photo');
+
     Route::resource('products', ProductController::class)->except(['show']);
+
+    /* Page de vente d'un produit (page produit longue du modèle Express : packs, sections, questions) */
+    Route::get('products/{product}/page-de-vente', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'edit'])->name('products.page.edit');
+    Route::put('products/{product}/page-de-vente', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'update'])->name('products.page.update');
+    Route::post('products/{product}/page-de-vente/ia', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'generate'])->middleware('throttle:6,1')->name('products.page.ai');
+    Route::post('products/{product}/page-de-vente/sections-ia', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'sectionsAi'])->middleware('throttle:10,1')->name('products.page.sections-ai');
+    Route::post('products/{product}/page-de-vente/photo-ia', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'sectionImage'])->middleware('throttle:6,1')->name('products.page.section-image');
+    Route::post('products/{product}/photos-ia', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'photoAi'])->middleware('throttle:6,1')->name('products.photos.ai');
+    Route::post('products/{product}/photos-ia/ajouter', [\App\Http\Controllers\Vendeur\ProductPageController::class, 'photoAttach'])->name('products.photos.attach');
 
     /* Actions supplémentaires produits */
     Route::post('products/{product}/toggle',    [ProductController::class, 'toggleActive'])->name('products.toggle');
@@ -992,6 +1120,10 @@ Route::middleware(['auth', 'role:employe,superadmin,admin,vendeur', 'orders.only
         Route::post('orders/{order}/rate-company',        [EmployeOrderController::class, 'rateCompany'])   ->name('orders.rate-company');
         Route::post('orders/{order}/vendor-location',     [EmployeOrderController::class, 'shareVendorLocation'])->name('orders.vendor-location');
         Route::get('orders/{order}/invoice',              [EmployeOrderController::class, 'downloadInvoice'])->name('orders.invoice');
+
+        /* Paniers abandonnés (si la boutique ouvre la page à ses closers) */
+        Route::get('paniers-abandonnes',              [\App\Http\Controllers\Boutique\AbandonedCartController::class, 'index'])->name('carts.index');
+        Route::post('paniers-abandonnes/{cart}/etat', [\App\Http\Controllers\Boutique\AbandonedCartController::class, 'state'])->name('carts.state');
 
         /* Chat boutique ↔ entreprise de livraison */
         Route::post('companies/{company}/chat/send',     [\App\Http\Controllers\DeliveryChatController::class, 'send'])    ->name('delivery.chat.send');
@@ -1127,7 +1259,7 @@ Route::middleware(['auth', 'role:client'])
 |  Seule la messagerie avec le vendeur nécessite une inscription.
 ══════════════════════════════════════════════════════════════════════════ */
 Route::prefix('client')->name('client.')->group(function () {
-    /* Fiche produit (accessible sans compte — lien partagé par le vendeur) */
+    /* Ancienne adresse d'une fiche produit : redirige vers la page produit du thème (/s/{slug}/p/{id-nom}) */
     Route::get('/produit/{product}', [ClientProductController::class, 'show'])->name('products.show');
 
     /* Commander depuis un produit spécifique — invité ou client connecté */

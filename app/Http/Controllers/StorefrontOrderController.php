@@ -11,6 +11,7 @@ use App\Rules\RealisticFullName;
 use App\Rules\RealisticGuineaPhone;
 use App\Services\PushService;
 use App\Support\PageModels;
+use App\Support\ProductPage;
 use App\Support\Storefront;
 use App\Support\TrafficSource;
 use Illuminate\Http\JsonResponse;
@@ -44,6 +45,7 @@ class StorefrontOrderController extends Controller
             'phone'         => ['required', 'string', 'max:30', new RealisticGuineaPhone],
             'commune'       => ['required', Rule::in(PageModels::COMMUNES)],
             'landmark'      => ['nullable', 'string', 'max:120'],
+            'visitor'       => ['nullable', 'string', 'regex:/^[a-z0-9]{12,40}$/'],
         ], [
             'items.required'   => 'Votre panier est vide.',
             'name.required'    => 'Indiquez votre prénom et votre nom.',
@@ -57,10 +59,19 @@ class StorefrontOrderController extends Controller
         $qty = [];
         foreach ($data['items'] as $it) $qty[(int) $it['id']] = ($qty[(int) $it['id']] ?? 0) + (int) $it['qty'];
 
+        // Adresse obligatoire si le formulaire d'un des produits l'exige (éditeur produit → Formulaire)
+        if (trim((string) ($data['landmark'] ?? '')) === '') {
+            $sf = Storefront::forShop($shop);
+            $needs = Product::where('shop_id', $shop->id)->whereIn('id', array_keys($qty))->get()
+                ->contains(fn ($p) => \App\Support\ProductDesign::for($p, $sf)['form']['address_req']);
+            if ($needs) return response()->json(['message' => 'Indiquez votre adresse (quartier, rue, repère).', 'errors' => ['landmark' => ['Indiquez votre adresse (quartier, rue, repère).']]], 422);
+        }
+
         try {
-            $order = DB::transaction(function () use ($shop, $qty, $data, $guest) {
+            $order = DB::transaction(function () use ($shop, $qty, $data, $guest, $request) {
                 $products = Product::where('shop_id', $shop->id)->where('is_active', true)->whereIn('id', array_keys($qty))->lockForUpdate()->get()->keyBy('id');
                 $total = 0;
+                $lineTotals = [];
                 foreach ($qty as $id => $n) {
                     $p = $products->get($id);
                     if (!$p) throw new \RuntimeException('Un produit de votre panier n’est plus en vente. Retirez-le puis réessayez.');
@@ -68,7 +79,9 @@ class StorefrontOrderController extends Controller
                     if ($p->stock !== null && $p->stock < $n) {
                         throw new \RuntimeException($p->stock > 0 ? 'Il ne reste que ' . $p->stock . ' « ' . $p->name . ' » en stock.' : '« ' . $p->name . ' » est en rupture de stock.');
                     }
-                    $total += $p->current_price * $n;
+                    // Packs du produit (2, 3… à prix réduit) appliqués ici, pas seulement à l'affichage
+                    $lineTotals[$id] = ProductPage::lineTotal($p, $n);
+                    $total += $lineTotals[$id];
                 }
 
                 $order = Order::create([
@@ -85,7 +98,7 @@ class StorefrontOrderController extends Controller
                 ]);
                 foreach ($qty as $id => $n) {
                     $p = $products[$id];
-                    OrderItem::create(['order_id' => $order->id, 'product_id' => $p->id, 'quantity' => $n, 'price' => $p->current_price]);
+                    OrderItem::create(['order_id' => $order->id, 'product_id' => $p->id, 'quantity' => $n, 'price' => round($lineTotals[$id] / $n, 2)]);
                     if ($p->stock !== null) $p->decrement('stock', $n);
                 }
                 Payment::create(['order_id' => $order->id, 'method' => Payment::METHOD_CASH, 'amount' => $total, 'status' => 'en_attente']);
@@ -99,6 +112,14 @@ class StorefrontOrderController extends Controller
         if ($guest) {
             \App\Support\DeliveryCode::rememberGuestOrder($order);
         }
+
+        // Panier abandonné de ce client (même navigateur ou même numéro) : récupéré par cette commande
+        $digits = preg_replace('/\D/', '', (string) $data['phone']);
+        if (strlen($digits) === 12 && str_starts_with($digits, '224')) $digits = substr($digits, 3);
+        \App\Models\AbandonedCart::where('shop_id', $shop->id)->where('state', '!=', 'recupere')
+            ->where('last_activity_at', '>=', now()->subDays(7))
+            ->where(fn ($w) => $w->where('phone', $digits)->when(!empty($data['visitor']), fn ($v) => $v->orWhere('visitor', $data['visitor'])))
+            ->update(['state' => 'recupere', 'order_id' => $order->id, 'updated_at' => now()]);
 
         // Prévenir la boutique (propriétaire et équipe)
         $lines = $order->items()->with('product:id,name')->get();

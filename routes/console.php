@@ -50,6 +50,14 @@ Schedule::call(function () {
 Schedule::command('shops:daily-summary')->dailyAt('20:00')->name('shop-daily-summary')->withoutOverlapping();
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Vue en direct : les visiteurs vus il y a plus d'un jour sont effacés chaque nuit ;
+// la base des pays (DB-IP Lite, nouvelle version chaque mois) est mise à jour le 3 du mois.
+// ─────────────────────────────────────────────────────────────────────────────
+Schedule::call(fn () => \App\Models\LiveVisitor::where('last_seen_at', '<', now()->subDay())->delete())
+    ->dailyAt('04:00')->name('prune-live-visitors')->withoutOverlapping();
+Schedule::command('shopio:geoip-update')->monthlyOn(3, '05:00')->name('geoip-update')->withoutOverlapping();
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Campagnes sponsorisées : compteurs d'affichages, clics et messages (tenus en cache)
 // recopiés dans les statistiques par jour, que le vendeur voit sur sa page Campagnes.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -67,3 +75,16 @@ Schedule::command('campaigns:tick')->hourly()->name('campaigns-tick')->withoutOv
 // deviennent disponibles au retrait (App\Services\AffiliateService::approveDueCommissions).
 // ─────────────────────────────────────────────────────────────────────────────
 Schedule::command('affiliates:approve-commissions')->dailyAt('02:30')->name('affiliates-approve-commissions')->withoutOverlapping();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Relances, chaque jour à 10h (heure de Conakry = UTC) : rappel « Tu nous manques » aux clients
+// et entreprises de livraison inactifs (App\Services\InactivityReminderService, Admin → Relances).
+// ─────────────────────────────────────────────────────────────────────────────
+Schedule::command('reminders:inactive')->dailyAt('10:00')->name('remind-inactive-users')->withoutOverlapping();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Relances des boutiques, toutes les 10 minutes : offres et contre-offres sans réponse,
+// conversations abandonnées, commandes à confirmer, fidélité, retour en stock, vendeurs
+// inactifs (App\Services\FollowUpService). Les envois partent en file d'attente.
+// ─────────────────────────────────────────────────────────────────────────────
+Schedule::command('followups:run')->everyTenMinutes()->name('follow-ups')->withoutOverlapping();

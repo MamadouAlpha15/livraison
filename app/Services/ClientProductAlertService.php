@@ -22,6 +22,9 @@ class ClientProductAlertService
             $product = Product::with('shop')->find($productId);
             if (! $product || ! $product->is_active) return;
 
+            // Relance « de nouveau en stock » activée par la boutique : son message personnalisé remplace celui-ci
+            if (app(FollowUpService::class)->productRestocked($product)) return;
+
             StockAlert::with('user')->where('product_id', $productId)->get()->each(function (StockAlert $alert) use ($product) {
                 if ($alert->user) {
                     try {

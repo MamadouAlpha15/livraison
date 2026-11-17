@@ -195,7 +195,8 @@ class TrafficSource
         return $user && ((int) $user->id === (int) $shop->user_id || (int) $user->shop_id === (int) $shop->id);
     }
 
-    private static function isBot(Request $request): bool
+    /** Robots (moteurs de recherche, aperçus de liens) : jamais comptés, ni dans les visites ni dans la vue en direct. */
+    public static function isBot(Request $request): bool
     {
         return (bool) preg_match('/bot|crawl|spider|slurp|facebookexternalhit|facebookcatalog|preview|headless/i', (string) $request->userAgent());
     }

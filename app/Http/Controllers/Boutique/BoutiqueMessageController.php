@@ -507,6 +507,7 @@ class BoutiqueMessageController extends Controller
             'proposed_price'      => $m->proposed_price ? (float)$m->proposed_price : null,
             'proposal_status'     => $m->proposal_status,
             'negotiated_order_id' => $m->negotiated_order_id,
+            'is_ai'               => (bool) $m->is_ai, // badge « Shopio IA »
             'images'              => ($m->image_status === 'ready' && $m->images)
                                         ? array_map(fn($p) => ImageOptimizer::url($p, 'medium') ?? asset('storage/'.$p), $m->images)
                                         : [],
@@ -686,7 +687,7 @@ class BoutiqueMessageController extends Controller
                     'x-api-key'         => config('services.anthropic.key'),
                     'anthropic-version' => '2023-06-01',
                     'content-type'      => 'application/json',
-                ])
+                ] + \App\Support\Ai\Anthropic::workspaceHeader())
                 ->post('https://api.anthropic.com/v1/messages', [
                     'model'       => 'claude-haiku-4-5-20251001',
                     'max_tokens'  => 200,
@@ -785,7 +786,7 @@ class BoutiqueMessageController extends Controller
                     'x-api-key'         => config('services.anthropic.key'),
                     'anthropic-version' => '2023-06-01',
                     'content-type'      => 'application/json',
-                ])
+                ] + \App\Support\Ai\Anthropic::workspaceHeader())
                 ->post('https://api.anthropic.com/v1/messages', [
                     'model'       => 'claude-haiku-4-5-20251001',
                     'max_tokens'  => 200,

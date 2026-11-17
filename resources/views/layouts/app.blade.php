@@ -210,6 +210,9 @@
         .lang-btn.active { color: #fff; background: rgba(255,255,255,.22); }
 
         /* ── Sur les pages "dashboard" : on cache navbar + footer + on neutralise le main ── */
+        /* Badge des messages écrits par Shopio IA (messagerie vendeur et client) */
+        .ai-badge { display: block; width: fit-content; margin-bottom: 4px; padding: 1px 8px; border-radius: 999px; background: #EAF2FF; color: #1668D8; font-size: 11px; font-weight: 800; letter-spacing: .02em; }
+        [data-theme="dark"] .ai-badge { background: #13284B; color: #7DB4FF; }
         body.is-dashboard .app-navbar  { display: none !important; }
         body.is-dashboard .app-footer  { display: none !important; }
         body.is-dashboard .app-flash   { display: none !important; }

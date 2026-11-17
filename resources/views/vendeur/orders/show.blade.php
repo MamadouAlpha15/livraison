@@ -357,6 +357,7 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
         <a href="{{ route('boutique.promo-codes.index') }}" class="sb-item"><span class="ico">🎟️</span> Codes promo</a>
         <a href="{{ route('boutique.clients.index') }}" class="sb-item"><span class="ico">👥</span> Clients</a>
         @if(auth()->user()->role === 'admin')<a href="{{ route('boutique.marketing') }}" class="sb-item"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h3l6 4V6l-6 4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></span> Marketing</a>@endif
+        @if(auth()->user()->role === 'admin' && (int) optional(auth()->user()->shop)->user_id === (int) auth()->id())<a href="{{ route('boutique.storefront.live') }}" class="sb-item {{ request()->routeIs('boutique.storefront.live') ? 'active' : '' }}"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1 13H7zM9 7a3 3 0 0 1 6 0"/></svg></span> Ma vitrine en direct</a>@endif
         <a href="{{ route('boutique.employees.index') }}" class="sb-item"><span class="ico">🧑‍💼</span> Équipe</a>
         <div class="sb-section">Livraison</div>
         <a href="{{ route('boutique.livreurs.index') }}" class="sb-item"><span class="ico">🚴</span> Livreurs</a>
@@ -528,6 +529,7 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
                                         <div>
                                             <div class="prod-name">{{ $prod?->name ?? 'Produit supprimé' }}</div>
                                             @if($item->variant_name)<div class="prod-ref" style="color:#1668D8;font-weight:700">🎨 {{ $item->variant_name }}</div>@endif
+                                            @include('vendeur.orders._item-options')
                                             @if($prod?->sku)<div class="prod-ref">REF: {{ $prod->sku }}</div>@endif
                                         </div>
                                     </div>
@@ -639,6 +641,18 @@ table.items-tbl tbody tr:hover td { background: #fafbff; }
                             <div class="info-row">
                                 <span class="lbl">Téléphone</span>
                                 <a href="tel:{{ $order->client_phone }}" class="val">📞 {{ $order->client_phone }}</a>
+                            </div>
+                            {{-- Historique de livraison de ce numéro sur Shopio (totaux seulement) --}}
+                            @php
+                                $risk = \App\Support\CustomerRisk::forPhone($order->client_phone, $order->id);
+                                $riskColor = ['new' => '#45455E', 'good' => '#15803D', 'watch' => '#B45309', 'risky' => '#C2410C'][$risk['level']];
+                            @endphp
+                            <div class="info-row" data-customer-risk="{{ $risk['level'] }}">
+                                <span class="lbl">Client</span>
+                                <span class="val" style="text-align:right">
+                                    <strong style="color:{{ $riskColor }}">{{ $risk['label'] }}</strong><br>
+                                    <span style="font-size:12px;color:var(--muted)">{{ $risk['summary'] }}</span>
+                                </span>
                             </div>
                             @endif
                             @if($order->delivery_destination)
@@ -865,7 +879,7 @@ function toggleGroup(btn) {
 
 /* ── Auto-refresh unifié ── */
 (function(){
-    const DATA_URL     = '{{ route('suivi.data', $order) }}';
+    const DATA_URL     = '{{ \App\Support\OrderAccess::trackingUrl($order, 'suivi.data') }}';
     const CONFIRM_URL  = '{{ route('orders.confirm', $order) }}';
     const ASSIGN_URL   = '{{ route('orders.assign.show', $order) }}';
     const CANCEL_URL   = '{{ route('orders.cancel', $order) }}';

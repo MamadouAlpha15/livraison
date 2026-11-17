@@ -91,14 +91,16 @@ test('code inconnu ou affilié suspendu : ni cookie ni clic', function () {
     $this->get('/register?ref=INCONNU1')->assertCookieMissing(AffiliateService::COOKIE);
 });
 
-test('attribution par cookie : le code est pré-rempli et la boutique est rattachée au parrain', function () {
+test('attribution par cookie : l’appareil est marqué et la boutique est rattachée au parrain', function () {
     $affiliate = Affiliate::factory()->vendor()->create(['code' => 'AMINA47']);
     $owner = newOwner();
 
+    // La création en 8 étapes s'ouvre ; l'appareil est reconnu pour l'anti-fraude
     $this->actingAs($owner)->withCookie(AffiliateService::COOKIE, 'AMINA47')
         ->get(route('shop.create'))
         ->assertOk()
-        ->assertSee('value="AMINA47"', false);
+        ->assertSee('Bienvenue sur Shopio')
+        ->assertCookie(AffiliateService::DEVICE_COOKIE);
 
     $this->actingAs($owner)->withCookie(AffiliateService::COOKIE, 'AMINA47')
         ->post(route('shop.store'), shopForm(['referral_code' => 'AMINA47', 'source' => 'whatsapp']))

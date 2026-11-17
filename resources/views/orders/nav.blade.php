@@ -365,7 +365,7 @@ button { font-family: inherit; }
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
 <script>
 const ORDER_ID   = {{ $order->id }};
-const DATA_URL   = '{{ route('suivi.data', $order) }}';
+const DATA_URL   = '{{ \App\Support\OrderAccess::trackingUrl($order, 'suivi.data') }}';
 const POS_URL    = '{{ route('orders.position.update', $order) }}';
 const STATUS_URL = '{{ route('orders.driver.status', $order) }}';
 const CSRF       = '{{ csrf_token() }}';

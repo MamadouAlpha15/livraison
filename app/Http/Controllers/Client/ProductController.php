@@ -8,23 +8,19 @@ use App\Models\Product;
 
 class ProductController extends Controller
 {
+    /**
+     * Ancienne adresse d'une fiche produit (/client/produit/{id}) : liens déjà partagés, SMS, notifications.
+     * Elle mène à la page produit du thème de la boutique (/s/{slug}/p/{id-nom}), qui compte elle-même
+     * la visite. Les paramètres de suivi (utm_source…) sont gardés.
+     */
     public function show(Product $product, Request $request)
     {
         $shop = $product->shop;
+        abort_unless($shop, 404);
 
-        // Visite et vue du produit, une fois par jour, hors vendeur et robots
-        if ($shop) {
-            \App\Support\TrafficSource::recordLanding($shop, $request);
-            \App\Support\TrafficSource::recordProductView($product, $request);
-        }
-
-        $isFavorited = auth()->check()
-            ? auth()->user()->favoriteProducts()->where('product_id', $product->id)->exists()
-            : false;
-
-        $variants = $product->activeVariants()->get();
-
-        return view('client.show', compact('product', 'shop', 'isFavorited', 'variants'));
+        $url = \App\Support\ProductPage::url($shop, $product);
+        $query = $request->query();
+        return redirect()->to($query ? $url . '?' . http_build_query($query) : $url, 301);
     }
 
     public function index(Request $request)
@@ -38,7 +34,7 @@ class ProductController extends Controller
                     $q->where('country', $user->country);
                 }
             })
-            ->with(['shop:id,name,image,country,type']);
+            ->with(['shop:id,slug,name,image,country,type']);
 
         if ($s = $request->get('s')) {
             $query->where(function ($q) use ($s) {

@@ -1,7 +1,7 @@
 {{--
     Menu latéral de l'espace vendeur (maquette Main.dc.html), réutilisable.
     @include('boutique._partials.vendor-sidebar', ['shop' => $shop, 'active' => 'settings'])
-    Clés de $active : dash, messages, orders, products, campaigns, referral, promos, clients, marketing, grow, team, riders, partners, finances, commissions, reports, settings, support.
+    Clés de $active : dash, messages, orders, products, campaigns, referral, followups, shopio-ai, promos, clients, marketing, grow, team, riders, partners, finances, commissions, reports, settings, support.
     À utiliser dans une page qui inclut aussi boutique._partials.sv-theme (couleurs).
     Structure attendue : <div class="vs-wrap"> [ce menu] <main class="main vs-main"> … </main> </div>
 --}}
@@ -15,15 +15,18 @@
     $vsIni    = mb_strtoupper(mb_substr($vsParts[0], 0, 1) . mb_substr($vsParts[1] ?? $vsParts[0], isset($vsParts[1]) ? 0 : 1, 1));
     $vsIco = [
         'dash'     => 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+        'live'     => 'M3 12h4l3-8 4 16 3-8h4',
         'messages' => 'M4 5h16v11H9l-5 4zM8 9h8M8 12h5',
         'orders'   => 'M12 3 4 7v10l8 4 8-4V7zM4 7l8 4 8-4M12 11v10',
         'products' => 'M3 12 12 3h8v8l-9 9zM15.5 8.5h.01',
         'campaigns'=> 'M12 3l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6L3.3 9.2l6.1-.6z',
+        'shopio-ai'=> 'm12 3 1.2 3.6L17 8l-3.8 1.4L12 13l-1.2-3.6L7 8l3.8-1.4zM19 14l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z',
+        'followups'=> 'M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0M20 3l-2 2M4 3l2 2',
         'referral' => 'M4 11h16v9H4zM3 7h18v4H3zM12 7v13M12 7c-1.6-3.2-5-3.4-5-1.2C7 7 9.5 7 12 7zm0 0c1.6-3.2 5-3.4 5-1.2C17 7 14.5 7 12 7z',
         'promos'   => 'M19 5 5 19M7.5 7.5h.01M16.5 16.5h.01',
         'clients'  => 'M9 11.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM3 20c.8-3.4 3.2-5.5 6-5.5s5.2 2.1 6 5.5M16 4.5a3.5 3.5 0 0 1 0 7M21 20c-.5-2.4-1.8-4.1-3.6-4.9',
         'marketing'=> 'M4 10v4h3l6 4V6l-6 4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11',
-        'grow'     => 'M4 19h16M6 15l4-4 3 3 6-7M15 7h4v4',
+        'grow'     => 'M6 7h12l-1 13H7zM9 7a3 3 0 0 1 6 0',
         'team'     => 'M4 7h16v12H4zM9 7V5h6v2M12 11v4M10 13h4',
         'riders'   => 'M6 19.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM18 19.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM8.5 17h7M15 7h2.5l2.5 6.5M6 14.5 9 9h5l1 5',
         'partners' => 'M4 10.5 12 4l8 6.5V20H4zM10 20v-5h4v5',
@@ -39,6 +42,7 @@
     $vsNav = [
         'Boutique' => [
             ['dash', 'Tableau de bord', route('boutique.dashboard'), false],
+            ['live', 'En direct', route('boutique.live'), false],
             ['messages', 'Messages', route('boutique.messages.hub'), false],
             ['orders', 'Commandes', route('boutique.orders.index'), false],
             ['products', 'Produits', route('products.index'), false],
@@ -46,10 +50,14 @@
             ...($vsUser->role === 'admin' ? [['campaigns', 'Campagnes', route('boutique.campaigns.index'), false]] : []),
             // Parrainage (programme d'affiliation) : réservé au propriétaire
             ...($vsUser->role === 'admin' ? [['referral', 'Parrainage', route('vendeur.parrainage'), false]] : []),
+            // Relances automatiques : réglées par le propriétaire
+            ...($vsUser->role === 'admin' ? [['followups', 'Relances', route('boutique.followups.index'), false]] : []),
+            ...($vsUser->role === 'admin' ? [['shopio-ai', 'Shopio IA', route('boutique.shopio-ai.index'), false]] : []),
             ['promos', 'Codes promo', route('boutique.promo-codes.index'), true],
             ['clients', 'Clients', route('boutique.clients.index'), false],
             ['marketing', 'Marketing', route('boutique.marketing'), false],
-            ['grow', 'Faire grandir ma vitrine', route('boutique.grow'), false],
+            // Modifier la vitrine directement sur la vitrine en ligne : réservé au propriétaire
+            ...((int) ($shop->user_id ?? 0) === (int) $vsUser->id ? [['grow', 'Ma vitrine en direct', route('boutique.storefront.live'), false]] : []),
             ['team', 'Équipe', route('boutique.employees.index'), true],
         ],
         'Livraison' => [

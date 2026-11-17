@@ -1,7 +1,12 @@
 {{--
-    Marketing du vendeur : provenance des visites et des commandes (Facebook, Instagram, WhatsApp, QR…),
-    liens de suivi à partager, catalogue produits pour Facebook / Instagram et test du pixel Meta.
-    Données : Vendeur\MarketingController@index — sources : App\Support\TrafficSource.
+    Marketing du vendeur, 3 onglets (?onglet=…) :
+      - Statistiques : provenance des visites et des commandes (Facebook, Instagram, WhatsApp, QR…), liens nommés,
+        produits, catalogue Facebook / Instagram, test du pixel Meta ;
+      - Partage (marketing/_partage) : lien d'un produit, QR code et affiche A5, liens par réseau avec leurs visites
+        et commandes sur 30 jours, liens de campagne avec remise ;
+      - Qualité de la vitrine (marketing/_qualite) : visites, classement des catégories, vus jamais commandés,
+        score de vitrine, avis reçus sur le lien d'aperçu.
+    Données : Vendeur\MarketingController@index — sources : App\Support\TrafficSource, App\Support\Growth.
 --}}
 @extends('layouts.app')
 
@@ -24,6 +29,11 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 .mk-period a { min-height: 36px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 999px; font-weight: 700; font-size: 13px; color: var(--text-2); text-decoration: none; }
 .mk-period a[aria-current="true"] { background: var(--sv-btn); color: #fff; }
 .mk-period a:not([aria-current="true"]):hover { color: var(--sv-btn); }
+.mk-tabs { flex-basis: 100%; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+.mk-tabs::-webkit-scrollbar { display: none; }
+.mk-tabs a { min-height: 38px; display: inline-flex; align-items: center; padding: 0 16px; border-radius: 999px; font-weight: 700; font-size: 13.5px; color: var(--text-2); text-decoration: none; white-space: nowrap; box-shadow: inset 0 0 0 1.5px var(--border); background: var(--surface); }
+.mk-tabs a[aria-current="page"] { background: var(--sv-night); color: #fff; box-shadow: none; }
+.mk-tabs a:not([aria-current="page"]):hover { color: var(--sv-btn); }
 
 .mk-content { padding: 24px 28px 56px; display: flex; flex-direction: column; gap: 20px; max-width: 1180px; min-width: 0; width: 100%; }
 .mk-content > * { min-width: 0; }
@@ -180,9 +190,11 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
     $cur = $shop->currency ?: 'GNF';
     $money = fn ($v) => number_format((float) $v, 0, ',', ' ') . ' ' . $cur;
     $srcColors = ['facebook' => '#1F7CF6', 'instagram' => '#D6336C', 'tiktok' => '#0B1E3D', 'whatsapp' => '#16A34A', 'qr' => '#F59E0B', 'google' => '#7C3AED', 'shopio' => '#7DB4FF', 'app' => '#0EA5E9', 'autre' => '#94A3B8', 'direct' => '#64748B'];
-    $maxVisits = max(1, $rows->max('visits') ?? 0);
-    $maxDay = max(1, $series->max('visits'));
-    $conv = $totals['visits'] > 0 ? round($totals['orders'] / $totals['visits'] * 100, 1) : null;
+    if ($tab === 'statistiques') {
+        $maxVisits = max(1, $rows->max('visits') ?? 0);
+        $maxDay = max(1, $series->max('visits'));
+        $conv = $totals['visits'] > 0 ? round($totals['orders'] / $totals['visits'] * 100, 1) : null;
+    }
     $channels = [
         'facebook'  => ['Facebook', 'Publications, pages, groupes'],
         'instagram' => ['Instagram', 'Bio et stories'],
@@ -205,9 +217,16 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                 <h1 class="mk-title">{!! $ico('M4 10v4h3l6 4V6l-6 4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11') !!} Marketing</h1>
                 <div class="tb-sub">{{ $shop->name }} · d'où viennent vos clients</div>
             </div>
+            @if($tab === 'statistiques')
             <nav class="mk-period" aria-label="Période">
                 @foreach(\App\Http\Controllers\Vendeur\MarketingController::PERIODS as $p)
                     <a href="{{ route('boutique.marketing', ['jours' => $p]) }}" @if($p === $days) aria-current="true" @endif>{{ $p }} jours</a>
+                @endforeach
+            </nav>
+            @endif
+            <nav class="mk-tabs" aria-label="Onglets Marketing">
+                @foreach(\App\Http\Controllers\Vendeur\MarketingController::TABS as $k => $label)
+                    <a href="{{ route('boutique.marketing', $k === 'statistiques' ? [] : ['onglet' => $k]) }}" @if($k === $tab) aria-current="page" @endif>{{ $label }}</a>
                 @endforeach
             </nav>
         </div>
@@ -215,6 +234,12 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
         <div class="mk-content">
             @if(session('success'))<div class="mk-flash mk-flash-ok" role="status">{{ session('success') }}</div>@endif
             @if(session('error'))<div class="mk-flash mk-flash-err" role="alert">{{ session('error') }}</div>@endif
+
+            @if($tab === 'partage')
+                @include('vendeur.shop.marketing._partage')
+            @elseif($tab === 'qualite')
+                @include('vendeur.shop.marketing._qualite')
+            @else
 
             {{-- ══ Résumé de la période ══ --}}
             <section class="mk-hero" aria-label="Résumé des {{ $days }} derniers jours">
@@ -397,61 +422,10 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                 @endif
             </section>
 
+            <p class="mk-note">Liens à partager sur chaque réseau, QR code, affiche et liens de campagne : onglet <a href="{{ route('boutique.marketing', ['onglet' => 'partage']) }}" style="color:var(--sv-btn);font-weight:700">Partage</a>.</p>
+
             <div class="mk-grid">
-                {{-- ══ Liens de suivi ══ --}}
-                <section class="mk-card" id="liens" aria-labelledby="mkLinksTitle">
-                    <div class="mk-card-head">
-                        <span class="mk-card-ico">{!! $ico('M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1') !!}</span>
-                        <div>
-                            <h2 class="mk-card-title" id="mkLinksTitle">Liens de suivi</h2>
-                            <p class="mk-card-sub">Utilisez un lien différent sur chaque réseau. Ils mènent tous à la même page, mais vous saurez lequel vous amène des clients.</p>
-                        </div>
-                    </div>
-
-                    <label class="mk-field-lbl" for="mkTarget">Page à partager</label>
-                    <select class="mk-select" id="mkTarget">
-                        <option value="{{ $publicUrl }}">Ma vitrine (tous les produits)</option>
-                        @if($products->isNotEmpty())
-                        @if(count($categoryLinks))
-                        <optgroup label="Une catégorie">
-                            @foreach($categoryLinks as $c)<option value="{{ $c['url'] }}">{{ $c['name'] }} ({{ $c['count'] }})</option>@endforeach
-                        </optgroup>
-                        @endif
-                        @endif
-                        @if($products->isNotEmpty())
-                        <optgroup label="Un produit">
-                            @foreach($products as $p)<option value="{{ $p['url'] }}">{{ $p['name'] }}</option>@endforeach
-                        </optgroup>
-                        @endif
-                    </select>
-
-                    <ul class="mk-links">
-                        @foreach($channels as $key => [$name, $hint])
-                            <li class="mk-link">
-                                <span class="mk-link-name"><b><span class="mk-dot" style="--c:{{ $srcColors[$key] }}"></span>{{ $name }}</b><small>{{ $hint }}</small></span>
-                                <input type="text" class="mk-url" id="mkLink-{{ $key }}" data-channel="{{ $key }}" data-medium="{{ $key === 'qr' ? 'print' : 'social' }}" value="{{ $links[$key] }}" readonly aria-label="Lien de suivi {{ $name }}">
-                                <span class="mk-link-actions">
-                                    <button type="button" class="mk-btn mk-btn-line mk-btn-sm" data-copy="#mkLink-{{ $key }}">Copier</button>
-                                    @if($key === 'whatsapp')
-                                        <a class="mk-btn mk-btn-blue mk-btn-sm" id="mkWa" target="_blank" rel="noopener" href="https://wa.me/?text={{ rawurlencode('Découvrez ma boutique ' . $shop->name . ' sur Shopio : ' . $links['whatsapp']) }}">Envoyer</a>
-                                    @endif
-                                </span>
-                            </li>
-                        @endforeach
-                    </ul>
-
-                    @if($qrSvg)
-                    <div class="mk-qr">
-                        <div class="mk-qr-img" role="img" aria-label="QR code menant à votre vitrine">{!! $qrSvg !!}</div>
-                        <div>
-                            <p>Ce QR code mène à votre vitrine. Les visites qui en viennent apparaissent sous « QR code ». Imprimez-le sur vos affiches, sacs ou cartes de visite.</p>
-                            <a href="{{ route('boutique.storefront.qr') }}" class="mk-btn mk-btn-line mk-btn-sm">Télécharger le QR code</a>
-                        </div>
-                    </div>
-                    @endif
-                </section>
-
-                <div style="display:flex;flex-direction:column;gap:20px;min-width:0">
+                <div style="display:contents">
                     {{-- ══ Catalogue Facebook / Instagram ══ --}}
                     <section class="mk-card" id="catalogue" aria-labelledby="mkCatTitle">
                         <div class="mk-card-head">
@@ -532,6 +506,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                     </section>
                 </div>
             </div>
+            @endif
         </div>
     </main>
 </div>
@@ -564,7 +539,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
     /* Changer la page à partager met à jour tous les liens (le QR code reste celui de la vitrine) */
     var target = document.getElementById('mkTarget'), wa = document.getElementById('mkWa');
     var shopName = @json($shop->name);
-    target.addEventListener('change', function () {
+    if (target) target.addEventListener('change', function () {
         var base = target.value, isShop = target.selectedIndex === 0;
         document.querySelectorAll('.mk-url[data-channel]').forEach(function (input) {
             var sep = base.indexOf('?') === -1 ? '?' : '&';

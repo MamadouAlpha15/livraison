@@ -98,7 +98,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
         <div class="grid" id="wishGrid">
             @foreach($products as $product)
             <div class="pcard" data-product-id="{{ $product->id }}">
-                <a href="{{ route('client.products.show', $product) }}" class="pcard-link">
+                <a href="{{ $product->publicUrl() }}" class="pcard-link">
                     <div class="pcard-img-wrap">
                         @if($product->out_of_stock)
                             <span class="pcard-out">Rupture de stock</span>
@@ -113,7 +113,7 @@ body { background: var(--grey); margin: 0; color: var(--text); -webkit-font-smoo
                 <button class="pcard-rm" onclick="removeWish({{ $product->id }}, this)" title="Retirer de la liste">✕</button>
                 <div class="pcard-body">
                     <div class="pcard-shop">{{ $product->shop->name ?? '' }}</div>
-                    <a href="{{ route('client.products.show', $product) }}" class="pcard-link">
+                    <a href="{{ $product->publicUrl() }}" class="pcard-link">
                         <div class="pcard-name">{{ $product->name }}</div>
                     </a>
                     <div class="pcard-price">{{ number_format($product->price, 0, ',', ' ') }} {{ $product->shop->currency ?? 'GNF' }}</div>

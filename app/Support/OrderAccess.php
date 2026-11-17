@@ -11,14 +11,47 @@ use Illuminate\Support\Facades\URL;
 /**
  * Qui peut suivre une commande. Les numéros de commande se suivent : la page de suivi
  * ne peut donc pas être ouverte par simple numéro. Elle l'est par le client, le personnel
- * concerné, ou toute personne qui a reçu le lien signé (partage WhatsApp, lien copié).
+ * concerné, ou toute personne qui a reçu le lien de suivi (/suivi/{tracking_token} ; ou un
+ * ancien lien signé /suivi/{id}?signature=…, toujours valable).
  */
 class OrderAccess
 {
-    /** Lien de suivi partageable, impossible à deviner à partir du numéro de commande. */
+    /** Jeton du lien de suivi : 20 lettres et chiffres au hasard (ni le numéro de commande ni la clé du serveur). */
+    public static function newToken(): string
+    {
+        return \Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(20));
+    }
+
+    /** Jeton de la commande, créé s'il manque (commande enregistrée sans passer par Eloquent). */
+    public static function token(Order $order): string
+    {
+        if (empty($order->tracking_token)) {
+            $order->forceFill(['tracking_token' => self::newToken()])->saveQuietly();
+        }
+        return $order->tracking_token;
+    }
+
+    /**
+     * Lien de suivi partageable, court et impossible à deviner : /suivi/{tracking_token} (et ses données :
+     * suivi.data, suivi.position, suivi.client-location). Les anciens liens signés /suivi/{id}?signature=…
+     * restent valables (routes suivi.legacy.*).
+     */
     public static function trackingUrl(Order $order, string $route = 'suivi.show'): string
     {
-        return url(URL::signedRoute($route, $order, null, false));
+        return route($route, ['suivi' => self::token($order)]);
+    }
+
+    /** La page est ouverte avec le bon jeton de suivi (lien partagé). */
+    public static function viaToken(Order $order, Request $request): bool
+    {
+        $given = (string) optional($request->route())->originalParameter('suivi');
+        return $order->tracking_token !== null && $given !== '' && hash_equals((string) $order->tracking_token, $given);
+    }
+
+    /** Ancienne adresse par numéro (/suivi/123?signature=…) : à remplacer par le lien court. */
+    public static function viaNumber(Request $request): bool
+    {
+        return ctype_digit((string) optional($request->route())->originalParameter('suivi'));
     }
 
     /** Client qui a passé la commande (compte connecté, ou navigateur qui l'a passée sans compte). */
@@ -79,7 +112,8 @@ class OrderAccess
     /** Accès à la page de suivi publique et à ses données. */
     public static function canTrack(Order $order, Request $request): bool
     {
-        return $request->hasValidRelativeSignature()
+        return self::viaToken($order, $request)
+            || $request->hasValidRelativeSignature()
             || self::isOwner($order)
             || self::isStaff($request->user(), $order);
     }

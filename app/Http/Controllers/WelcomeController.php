@@ -75,7 +75,7 @@ class WelcomeController extends Controller
         $products = Product::where('is_active', true)
             ->whereHas('shop', $approvedShopFilter)
             ->where('name', 'like', "%{$q}%")
-            ->with('shop:id,name')
+            ->with('shop:id,slug,name')
             ->latest()
             ->limit(6)
             ->get();
@@ -114,7 +114,7 @@ class WelcomeController extends Controller
         $products = Product::where('is_active', true)
             ->whereHas('shop', $approvedShopFilter)
             ->where('category', $catName)
-            ->with('shop:id,name')
+            ->with('shop:id,slug,name')
             ->latest()
             ->limit(4)
             ->get();
@@ -158,7 +158,7 @@ class WelcomeController extends Controller
             ->where(function ($q) {
                 $q->whereNull('flash_starts_at')->orWhere('flash_starts_at', '<=', now());
             })
-            ->with('shop:id,name,image,user_id')
+            ->with('shop:id,slug,name,image,user_id')
             ->latest()
             ->limit(10)
             ->get();
@@ -167,7 +167,7 @@ class WelcomeController extends Controller
         $recommendedProducts = Product::where('is_active', true)
             ->whereHas('shop', $approvedShopFilter)
             ->where('is_featured', true)
-            ->with('shop:id,name,image,user_id')
+            ->with('shop:id,slug,name,image,user_id')
             ->latest()
             ->limit(10)
             ->get();
@@ -182,7 +182,7 @@ class WelcomeController extends Controller
         /* ── Catalogue complet (recherche / catégorie / pagination) ── */
         $query = Product::where('is_active', true)
             ->whereHas('shop', $approvedShopFilter)
-            ->with(['shop:id,name,image,country,type,user_id']);
+            ->with(['shop:id,slug,name,image,country,type,user_id']);
 
         if ($s = $request->get('s')) {
             $query->where(function ($q) use ($s) {
@@ -280,7 +280,7 @@ class WelcomeController extends Controller
                 $catProducts = Product::where('is_active', true)
                     ->whereHas('shop', $approvedShopFilter)
                     ->where('category', $catName)
-                    ->with('shop:id,name,image,user_id')
+                    ->with('shop:id,slug,name,image,user_id')
                     ->latest()
                     ->limit(6)
                     ->get();
@@ -309,7 +309,7 @@ class WelcomeController extends Controller
             if ($soldByProduct->isNotEmpty()) {
                 $bestSellers = Product::whereIn('id', $soldByProduct->keys())
                     ->whereHas('shop', $approvedShopFilter)
-                    ->with('shop:id,name,image,user_id')
+                    ->with('shop:id,slug,name,image,user_id')
                     ->get()
                     ->sortByDesc(fn ($p) => $soldByProduct[$p->id])
                     ->values();

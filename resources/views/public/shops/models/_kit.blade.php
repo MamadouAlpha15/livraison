@@ -7,7 +7,7 @@
       4. Commande : nom, téléphone (9 chiffres commençant par 6), commune, repère ; erreurs sous chaque champ.
       5. Confirmation : vraie commande enregistrée, « Commande #… envoyée ».
     API pour les modèles (window.SM) : products, byId(id), money(n), fav(id), favs(), recent(), cartCount(),
-    cartTotal(), add(id, el), open(id), openCart(), canBuy(p), buyLabel(p), suggest(p), subscribe(fn).
+    cartTotal(), lineTotal(p, qty) (packs compris), add(id, el, qty), open(id), openCart(), canBuy(p), buyLabel(p), suggest(p), subscribe(fn).
     Attributs reconnus partout : data-sm-quick="id", data-sm-add="id", data-sm-fav="id", data-sm-cart,
     data-sm-count (nombre d'articles), data-sm-total (total du panier).
     Variables : $shop, $pm, $previewLink
@@ -47,7 +47,7 @@
     <form class="sm-cart-body sm-form" id="smStepForm" hidden novalidate>
         <div class="sm-general" id="smGeneral" role="alert"></div>
         <div class="sm-field"><label for="smName">Nom complet @if($pm['user'])<small>(facultatif)</small>@endif</label><input id="smName" name="name" autocomplete="name" maxlength="80" value="{{ $pm['user']['name'] ?? '' }}" aria-describedby="smNameErr"><p class="sm-err" id="smNameErr"></p></div>
-        <div class="sm-field"><label for="smPhone">Téléphone</label><input id="smPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="16" placeholder="622 00 00 00" value="{{ $pm['user']['phone'] ?? '' }}" aria-describedby="smPhoneErr"><p class="sm-err" id="smPhoneErr"></p></div>
+        <div class="sm-field"><label for="smPhone">Téléphone</label><input id="smPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="16" placeholder="622 00 00 00" value="{{ $pm['user']['phone'] ?? '' }}" aria-describedby="smPhoneErr"><p class="sm-err" id="smPhoneErr"></p>@if($pm['settings']['carts'] ?? false)<small style="display:block;margin-top:4px;color:var(--m-ink2);font-size:12px">Votre numéro sert seulement à la boutique pour finaliser votre commande.</small>@endif</div>
         <div class="sm-field"><label for="smCommune">Commune</label><select id="smCommune" name="commune" aria-describedby="smCommuneErr"><option value="">Choisir…</option>@foreach($pm['communes'] as $c)<option>{{ $c }}</option>@endforeach</select><p class="sm-err" id="smCommuneErr"></p></div>
         <div class="sm-field"><label for="smLandmark">Repère <small>(facultatif)</small></label><input id="smLandmark" name="landmark" maxlength="120" placeholder="Ex. près de la pharmacie, 2e rue à gauche"></div>
         <div class="sm-cod"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 7h20v10H2zM12 9.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5"/></svg><span><strong>Paiement à la livraison</strong>, en espèces, au livreur. Rien à payer avant.</span></div>
@@ -87,6 +87,21 @@ window.SM = (function () {
     const K = k => 'shopio_pm_' + k + '_' + PM.shop.id;
     const load = (k, d) => { try { return JSON.parse(localStorage.getItem(K(k))) || d; } catch (e) { return d; } };
     const save = (k, v) => { try { localStorage.setItem(K(k), JSON.stringify(v)); } catch (e) {} };
+    /* Paniers abandonnés : identifiant aléatoire du navigateur (aucune donnée personnelle), envoi 1,5 s après la saisie */
+    const VISITOR = (() => {
+        let v = load('visitor', '');
+        if (!/^[a-z0-9]{12,40}$/.test(v)) { v = ''; const a = new Uint8Array(16); (window.crypto || window.msCrypto).getRandomValues(a); a.forEach(b => { v += (b % 36).toString(36); }); save('visitor', v); }
+        return v;
+    })();
+    let capT = null;
+    function capture(get) {
+        if (!PM.settings.carts || !PM.urls.cart) return;
+        clearTimeout(capT);
+        capT = setTimeout(() => {
+            const d = get(); if (!d || !d.items || !d.items.length) return;
+            fetch(PM.urls.cart, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }, body: JSON.stringify(Object.assign({ visitor: VISITOR }, d)) }).catch(() => {});
+        }, 1500);
+    }
     // Panier, favoris et vus récemment : seulement des produits encore en vente
     let cart = load('cart', []).filter(l => byId(l.id) && !byId(l.id).variants);
     let favs = load('fav', []).filter(id => byId(id));
@@ -101,7 +116,16 @@ window.SM = (function () {
         subs.forEach(fn => { try { fn(); } catch (e) {} });
     }
     const cartCount = () => cart.reduce((a, l) => a + l.qty, 0);
-    const cartTotal = () => cart.reduce((a, l) => a + l.qty * (byId(l.id) || { price: 0 }).price, 0);
+    /* Prix d'une ligne : combinaison la moins chère de packs et d'unités (même calcul que le serveur, ProductPage::lineTotal) */
+    function lineTotal(p, q) {
+        if (!p) return 0;
+        const packs = p.packs || [];
+        if (!packs.length || q < 2) return p.price * q;
+        const best = [0];
+        for (let i = 1; i <= q; i++) { best[i] = best[i - 1] + p.price; packs.forEach(k => { if (k.qty <= i) best[i] = Math.min(best[i], best[i - k.qty] + k.price); }); }
+        return best[q];
+    }
+    const cartTotal = () => cart.reduce((a, l) => a + lineTotal(byId(l.id), l.qty), 0);
     const out = p => p.stock !== null && p.stock !== undefined && p.stock <= 0;
     const canBuy = p => !PM.settings.vacation && !out(p);
     const buyLabel = p => PM.settings.vacation ? 'Indisponible' : out(p) ? 'Rupture' : p.variants ? 'Choisir les options' : 'Ajouter au panier';
@@ -112,18 +136,18 @@ window.SM = (function () {
         document.querySelectorAll('[data-sm-cart]').forEach(el => { el.classList.remove('sm-bounce'); void el.offsetWidth; el.classList.add('sm-bounce'); });
     }
 
-    function add(id, from) {
+    function add(id, from, n) {
         const p = byId(id);
+        n = Math.max(1, Math.min(99, parseInt(n, 10) || 1));
         if (!p) return;
         if (PM.settings.vacation) return toast('La boutique est en pause : les commandes reprendront à son retour.');
         if (out(p)) return toast('« ' + p.name + ' » est en rupture de stock.');
         if (p.variants) { window.location.href = p.url; return; }
         const line = cart.find(l => l.id === p.id);
-        if (line) {
-            if (p.stock !== null && line.qty >= p.stock) return toast('Il ne reste que ' + p.stock + ' « ' + p.name + ' » en stock.');
-            line.qty++;
-        } else cart.push({ id: p.id, qty: 1 });
-        changed(); bounce(); toast('« ' + p.name + ' » ajouté au panier');
+        const have = line ? line.qty : 0;
+        if (p.stock !== null && have + n > p.stock) return toast('Il ne reste que ' + p.stock + ' « ' + p.name + ' » en stock.');
+        if (line) line.qty += n; else cart.push({ id: p.id, qty: n });
+        changed(); bounce(); toast((n > 1 ? n + ' × ' : '') + '« ' + p.name + ' » ajouté au panier');
         if (from) { from.classList.remove('sm-added'); void from.offsetWidth; from.classList.add('sm-added'); }
     }
     function toggleFav(id, el) {
@@ -215,7 +239,7 @@ window.SM = (function () {
             return;
         }
         $('smCartFt').hidden = false;
-        $('smStepCart').innerHTML = cart.map(l => { const p = byId(l.id); return '<div class="sm-line"><i' + (p.thumb ? ' style="background-image:url(\'' + esc(p.thumb) + '\')"' : '') + '></i><div style="min-width:0"><b>' + esc(p.name) + '</b><small>' + esc(money(p.price)) + ' l’unité</small><div><span class="sm-qty"><button type="button" data-q="' + p.id + '" data-d="-1" aria-label="Retirer un ' + esc(p.name) + '"' + (l.qty <= 1 ? ' disabled' : '') + '>−</button><span aria-live="polite">' + l.qty + '</span><button type="button" data-q="' + p.id + '" data-d="1" aria-label="Ajouter un ' + esc(p.name) + '"' + (p.stock !== null && l.qty >= p.stock ? ' disabled' : '') + '>+</button></span></div><button type="button" class="sm-rm" data-rm="' + p.id + '">Retirer</button></div><span class="sm-line-total">' + esc(money(p.price * l.qty)) + '</span></div>'; }).join('');
+        $('smStepCart').innerHTML = cart.map(l => { const p = byId(l.id); return '<div class="sm-line"><i' + (p.thumb ? ' style="background-image:url(\'' + esc(p.thumb) + '\')"' : '') + '></i><div style="min-width:0"><b>' + esc(p.name) + '</b><small>' + esc(money(p.price)) + ' l’unité</small><div><span class="sm-qty"><button type="button" data-q="' + p.id + '" data-d="-1" aria-label="Retirer un ' + esc(p.name) + '"' + (l.qty <= 1 ? ' disabled' : '') + '>−</button><span aria-live="polite">' + l.qty + '</span><button type="button" data-q="' + p.id + '" data-d="1" aria-label="Ajouter un ' + esc(p.name) + '"' + (p.stock !== null && l.qty >= p.stock ? ' disabled' : '') + '>+</button></span></div><button type="button" class="sm-rm" data-rm="' + p.id + '">Retirer</button></div><span class="sm-line-total">' + esc(money(lineTotal(p, l.qty))) + (lineTotal(p, l.qty) < p.price * l.qty ? '<small style="display:block;color:#15803D;font-weight:800">Prix pack</small>' : '') + '</span></div>'; }).join('');
     }
     $('smStepCart').addEventListener('click', e => {
         const q = e.target.closest('[data-q]'), rm = e.target.closest('[data-rm]'), browse = e.target.closest('[data-sm-browse]');
@@ -246,13 +270,15 @@ window.SM = (function () {
         if (!$('smCommune').value) { setErr('commune', 'Choisissez votre commune.'); ok = false; }
         return ok;
     }
+    // Ce que le client remplit est gardé pour la boutique (paniers abandonnés), jusqu'à sa commande
+    $('smStepForm').addEventListener('input', () => capture(() => ({ items: cart.map(l => ({ id: l.id, qty: l.qty })), name: $('smName').value.trim(), phone: $('smPhone').value, commune: $('smCommune').value, landmark: $('smLandmark').value.trim() })));
     $('smStepForm').addEventListener('submit', async e => {
         e.preventDefault();
         $('smGeneral').textContent = '';
         if (!check()) { const bad = $('smStepForm').querySelector('[aria-invalid="true"]'); if (bad) bad.focus(); return; }
         const btn = $('smSend'); btn.disabled = true; btn.textContent = 'Envoi…';
         try {
-            const r = await fetch(PM.urls.order, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }, body: JSON.stringify({ items: cart.map(l => ({ id: l.id, qty: l.qty })), name: $('smName').value.trim(), phone: $('smPhone').value.trim(), commune: $('smCommune').value, landmark: $('smLandmark').value.trim() }) });
+            const r = await fetch(PM.urls.order, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }, body: JSON.stringify({ visitor: VISITOR, items: cart.map(l => ({ id: l.id, qty: l.qty })), name: $('smName').value.trim(), phone: $('smPhone').value.trim(), commune: $('smCommune').value, landmark: $('smLandmark').value.trim() }) });
             const j = await r.json().catch(() => ({}));
             if (r.status === 201) return done(j);
             if (j.errors) { Object.entries(j.errors).forEach(([k, v]) => { if (fields[k]) setErr(k, v[0]); else $('smGeneral').textContent = v[0]; }); }
@@ -284,11 +310,39 @@ window.SM = (function () {
     window.addEventListener('storage', e => { if (e.key && e.key.indexOf('shopio_pm_') === 0) { cart = load('cart', []).filter(l => byId(l.id)); favs = load('fav', []).filter(id => byId(id)); recent = load('recent', []).filter(id => byId(id)); changed(); } });
     setTimeout(changed, 0);
 
+    /* ── Vue en direct du vendeur : signal toutes les 20 s tant que la page est visible ──
+       Envoie l'identifiant aléatoire du navigateur, l'étape (parcourt, regarde un produit, panier, formulaire),
+       le produit regardé et le nombre d'articles du panier. Jamais sur un lien d'aperçu. */
+    let liveProduct = null, formAt = 0;
+    const ORDER_FORMS = '#smStepForm, #exCheckout, [data-sm-order]';
+    ['focusin', 'input'].forEach(t => document.addEventListener(t, e => { if (e.target.closest && e.target.closest(ORDER_FORMS)) formAt = Date.now(); }));
+    function liveStage() {
+        if (Date.now() - formAt < 90000 || (openEl === $('smCart') && !$('smStepForm').hidden)) return 'form';
+        if (liveProduct || (openEl === $('smQuick') && quickId)) return 'product';
+        if (cart.length) return 'cart';
+        return 'browse';
+    }
+    let liveT = null;
+    function ping() {
+        if (!COUNT_VIEWS || !PM.urls.live || document.hidden) return;
+        const stage = liveStage();
+        try {
+            fetch(PM.urls.live, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF },
+                body: JSON.stringify({ visitor: VISITOR, stage: stage, product_id: stage === 'product' || stage === 'form' ? (liveProduct || (openEl === $('smQuick') ? quickId : null)) : null, cart_items: cartCount() }) }).catch(() => {});
+        } catch (e) {}
+    }
+    function liveStart() { clearInterval(liveT); ping(); liveT = setInterval(ping, 20000); }
+    document.addEventListener('visibilitychange', () => { if (document.hidden) clearInterval(liveT); else liveStart(); });
+    subs.push(() => { clearTimeout(ping.t); ping.t = setTimeout(ping, 800); }); // panier ou fiche changés : signal rapide
+    setTimeout(liveStart, 600);
+
     return {
         data: PM, products: PM.products, byId: byId, money: money, esc: esc, reduce: reduce,
         fav: id => favs.includes(+id), favs: () => favs.slice(), recent: () => recent.map(byId).filter(Boolean),
-        cartCount: cartCount, cartTotal: cartTotal, cartLines: () => cart.map(l => ({ p: byId(l.id), qty: l.qty })),
+        cartCount: cartCount, cartTotal: cartTotal, lineTotal: lineTotal, cartLines: () => cart.map(l => ({ p: byId(l.id), qty: l.qty })),
         add: add, open: open, openCart: openCart, toggleFav: toggleFav, canBuy: canBuy, buyLabel: buyLabel, suggest: suggest, toast: toast,
+        capture: capture, visitor: VISITOR,
+        liveProduct: id => { liveProduct = id ? +id : null; ping(); }, // page produit : le produit regardé
         subscribe: fn => { subs.push(fn); },
     };
 })();

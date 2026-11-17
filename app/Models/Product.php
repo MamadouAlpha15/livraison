@@ -43,6 +43,7 @@ class Product extends Model
         'description',
         'price',
         'original_price',    // prix barré (promo)
+        'min_price',         // prix minimum PRIVÉ (négociation dans le chat), jamais montré aux clients
         'category',          // catégorie du produit
         'stock',             // quantité en stock
         'unit',              // unité : pièce, kg, litre…
@@ -54,6 +55,7 @@ class Product extends Model
         'tags',              // mots-clés
         'image',             // photo principale
         'gallery',           // JSON : photos supplémentaires
+        'landing',           // JSON : contenu de la page produit longue (voir App\Support\ProductPage)
         'low_stock_threshold', // seuil d'alerte stock faible
         'flash_price',         // prix pendant une vente flash
         'flash_starts_at',     // début de la vente flash
@@ -65,9 +67,13 @@ class Product extends Model
     | Casts automatiques
     |------------------------------------------------------------------
     */
+    /** Jamais envoyé dans une réponse JSON (API, application, pages publiques) : prix minimum privé du vendeur. */
+    protected $hidden = ['min_price'];
+
     protected $casts = [
         'price'            => 'decimal:2',
         'original_price'   => 'decimal:2',
+        'min_price'        => 'decimal:2',
         'flash_price'      => 'decimal:2',
         'flash_starts_at'  => 'datetime',
         'flash_ends_at'    => 'datetime',
@@ -76,6 +82,7 @@ class Product extends Model
         'is_active'        => 'boolean',
         'is_featured'      => 'boolean',
         'is_available'     => 'boolean',
+        'landing'          => 'array',
         // gallery est décodé manuellement dans les vues avec json_decode()
         // pour garder la flexibilité
     ];
@@ -96,6 +103,12 @@ class Product extends Model
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /** Page produit publique (thème Express ou Signature) : /s/{slug}/p/{id-nom} */
+    public function publicUrl(): string
+    {
+        return $this->shop ? \App\Support\ProductPage::url($this->shop, $this) : route('client.products.show', $this);
     }
 
     /** Variantes du produit (taille/couleur/etc.), triées par ordre défini par le vendeur */

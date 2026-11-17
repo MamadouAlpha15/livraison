@@ -737,7 +737,7 @@ function buildNegoCard(msg, conv) {
             </div>`;
     }
 
-    return `<div class="msg-bubble">${escHtml(msg.body)}</div>`;
+    return `<div class="msg-bubble">${msg.is_ai ? '<span class="ai-badge">Shopio IA</span>' : ''}${escHtml(msg.body)}</div>`;
 }
 
 /* ── Afficher le formulaire d'offre ── */

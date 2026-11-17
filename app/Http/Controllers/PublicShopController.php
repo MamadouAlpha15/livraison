@@ -7,10 +7,13 @@ use App\Models\Review;
 use App\Models\Shop;
 use App\Support\Growth;
 use App\Support\PageModels;
+use App\Support\ProductPage;
 use App\Support\Storefront;
+use App\Support\StorefrontEditor;
 use App\Support\TrafficSource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class PublicShopController extends Controller
 {
@@ -88,6 +91,60 @@ class PublicShopController extends Controller
         return $this->products($shop, $request, null, $collection);
     }
 
+    /** Page produit via l'adresse courte : /s/{slug}/p/{12-nom-du-produit}. */
+    public function bySlugProduct(string $slug, string $produit, Request $request)
+    {
+        $shop = Shop::where('slug', $slug)->firstOrFail();
+        return $this->product($shop, $produit, $request);
+    }
+
+    /**
+     * Page produit publique longue (modèle Express) : galerie, packs, commande en 1 minute sur la page,
+     * sections de vente (contenu products.landing), avis réels, barre « Commander » fixe.
+     * Même parcours d'achat que les modèles de page (panier partagé, commande payée à la livraison).
+     */
+    public function product(Shop $shop, string $produit, Request $request)
+    {
+        abort_unless($shop->is_approved, 404);
+        if (Growth::applyScheduled($shop)) $shop->refresh();
+        $isOwner = Auth::check() && ((int) Auth::id() === (int) $shop->user_id || (int) Auth::user()->shop_id === (int) $shop->id);
+        // Un brouillon n'est visible que de sa boutique (aperçu de l'écran « Page de vente »)
+        $product = $shop->products()->when(!$isOwner, fn ($q) => $q->where('is_active', true))->findOrFail(ProductPage::idFrom($produit));
+        // Adresse canonique (nom du produit changé, lien ancien) : une seule adresse par produit
+        if ($produit !== ProductPage::param($product)) return redirect()->to(ProductPage::url($shop, $product), 301);
+
+        $sf = Storefront::forShop($shop);
+        if ($product->is_active) {
+            TrafficSource::recordLanding($shop, $request, false);
+            TrafficSource::recordProductView($product, $request);
+        }
+
+        $reviewStats = Review::where('vendeur_id', $shop->user_id)->selectRaw('COUNT(*) as cnt, AVG(rating) as avg_rating, SUM(CASE WHEN rating >= 4 THEN 1 ELSE 0 END) as happy')->first();
+        $reviewCount = (int) ($reviewStats->cnt ?? 0);
+        $reviewAvg = $reviewCount > 0 ? round((float) $reviewStats->avg_rating, 1) : null;
+        $deliveredCount = Order::where('shop_id', $shop->id)->where('status', Order::STATUS_LIVREE)->count();
+        $proofs = Growth::proofs($shop, $sf['settings'], $deliveredCount, $reviewCount);
+        $pm = PageModels::data($shop, $sf, $deliveredCount, $reviewAvg, $reviewCount, $proofs);
+        $photos = ProductPage::photos($product);
+        $productData = collect($pm['products'])->firstWhere('id', $product->id);
+        if (!$productData) { // brouillon : absent de la liste des produits en ligne
+            $productData = PageModels::product($product, $shop, $sf['settings']);
+            $pm['products'] = collect($pm['products'])->push($productData)->values();
+        }
+
+        return view('public.shops.express.product', [
+            'shop' => $shop, 'pm' => $pm, 'model' => 'express', 'isOwner' => false, 'publishedModel' => $sf['page_model'],
+            'activeCategory' => null, 'previewLink' => null, 'shareImage' => $photos[0] ?? null,
+            'pageTitle' => $product->name . ' · ' . $shop->name,
+            'product' => $productData, 'draft' => !$product->is_active,
+            // Réglages du produit (éditeur produit : sections, couleurs, formulaire, offres)
+            'design' => \App\Support\ProductDesign::for($product, $sf),
+            'photos' => $photos, 'content' => ProductPage::content($product), 'ownerEdit' => $isOwner,
+            // Chiffres réels (jamais saisis) : part d'avis à 4 ou 5 étoiles, seulement à partir de 5 avis
+            'happy' => $reviewCount >= 5 ? (int) round(100 * (int) $reviewStats->happy / $reviewCount) : null,
+        ]);
+    }
+
     /** Lien d'aperçu partageable (48 h) : la vitrine en cours de préparation, avec un formulaire d'avis. */
     public function previewLink(string $token, Request $request)
     {
@@ -95,8 +152,10 @@ class PublicShopController extends Controller
         if (!$shop || !Growth::previewActive($shop)) {
             return response()->view('public.shops.preview-expired', [], 410);
         }
-        [$config, $accent] = Growth::working($shop);
-        return $this->products($shop, $request, null, null, ['config' => $config, 'accent' => $accent, 'token' => $token, 'expires' => $shop->preview_expires_at]);
+        // Le brouillon : sa vitrine, et son nom et son logo (posés en mémoire, rien n'est enregistré)
+        $state = StorefrontEditor::working($shop);
+        StorefrontEditor::dress($shop, $state);
+        return $this->products($shop, $request, null, null, ['config' => $state['config'], 'accent' => $state['accent'], 'token' => $token, 'expires' => $shop->preview_expires_at]);
     }
 
     /** Avis laissé sur un lien d'aperçu (visible du vendeur dans l'onglet Qualité). */
@@ -134,20 +193,19 @@ class PublicShopController extends Controller
         return response()->noContent();
     }
 
-    /** Clic dans une section de la vitrine (onglet Qualité, « clics par section »). */
-    public function click(Shop $shop, Request $request)
-    {
-        $id = (string) $request->input('block');
-        $type = $id === '__banner' ? '__banner' : (Storefront::block(Storefront::forShop($shop), $id)['type'] ?? null);
-        if ($type) \App\Models\StorefrontClick::record($shop->id, $type);
-        return response()->noContent();
-    }
-
+    /**
+     * Vitrine publique : toujours un thème (Express par défaut, ou Signature). Le vendeur peut essayer
+     * l'autre thème sur sa vitrine (?modele=…) sans rien publier. Lien d'aperçu (48 h) : la version
+     * en préparation, avec un formulaire d'avis.
+     */
     public function products(Shop $shop, Request $request, ?string $categorySlug = null, ?string $collectionId = null, ?array $previewLink = null)
     {
         abort_unless($shop->is_approved, 404);
-        // Publication programmée arrivée à son heure (onglet Personnalisation)
+        // Publication programmée arrivée à son heure
         if (Growth::applyScheduled($shop)) $shop->refresh();
+
+        // Les collections n'existent plus : un ancien lien partagé mène à la boutique entière
+        if ($collectionId !== null) return redirect()->to(Storefront::publicUrl($shop));
 
         // Lien d'une catégorie : on retrouve son nom parmi celles des produits en ligne.
         // Catégorie inconnue (lien ancien, produits retirés) → la boutique entière, sans erreur.
@@ -157,128 +215,45 @@ class PublicShopController extends Controller
             if (!$activeCategory) return redirect()->to(Storefront::publicUrl($shop));
         }
 
-        // Réglages de la vitrine. En aperçu (éditeur de boutique, ?apercu=1), le brouillon
-        // gardé en session est affiché au seul propriétaire, jamais aux visiteurs.
-        // Lien d'aperçu (48 h) : la version en préparation, pour qui a le lien.
-        $sf = Storefront::forShop($shop);
-        $sfAccent = Storefront::isHex($shop->accent_color) ? strtoupper($shop->accent_color) : '#1F7CF6';
+        $sf = $previewLink ? $previewLink['config'] : Storefront::forShop($shop);
         $isOwner = Auth::check() && ((int) Auth::id() === (int) $shop->user_id || (int) Auth::user()->shop_id === (int) $shop->id);
-        $isPreview = $isOwner && $request->boolean('apercu') && !$previewLink;
-        if ($isPreview && ($draft = $request->session()->get('storefront_draft.' . $shop->id))) {
-            $sf = Storefront::normalize($draft['config'] ?? null);
-            if (Storefront::isHex($draft['accent'] ?? null)) $sfAccent = $draft['accent'];
-        }
-        if ($previewLink) [$sf, $sfAccent] = [$previewLink['config'], $previewLink['accent']];
 
-        // Collection (lien partagé) : inconnue ou masquée → la boutique entière
-        $activeCollection = null;
-        if ($collectionId !== null) {
-            $c = Growth::collection($sf, $collectionId);
-            if (!$c || !$c['on']) return redirect()->to(Storefront::publicUrl($shop));
-            $activeCollection = $c + ['url' => Growth::collectionUrl($shop, $c)];
+        // Mode « Modifier la page » (?edition=1) : réservé au propriétaire, vérifié ici (jamais un employé,
+        // un client ni un visiteur, même avec ?edition=1 dans l'adresse). La page est l'éditeur ; la vitrine
+        // s'y affiche dans un cadre (?cadre=1), rendue avec le brouillon ou la version en cours de saisie.
+        $editFrame = false;
+        if ($request->boolean('edition') && !$previewLink && $categorySlug === null && StorefrontEditor::isOwner($shop, Auth::user())) {
+            if (!$request->boolean('cadre')) {
+                return app(\App\Http\Controllers\Vendeur\StorefrontController::class)->editor($shop, $request);
+            }
+            $token = (string) $request->query('rendu', '');
+            $state = preg_match('/^[A-Za-z0-9]{20}$/', $token) ? Cache::get('sxe:' . $shop->id . ':' . $token) : null;
+            $state ??= StorefrontEditor::working($shop);
+            StorefrontEditor::dress($shop, $state);
+            $sf = $state['config'];
+            $editFrame = true;
         }
 
         // Visite (une par visiteur et par jour, hors vendeur et robots) et sa provenance
         // (Facebook, Instagram, WhatsApp…) : tableau de bord + page Marketing
-        TrafficSource::recordLanding($shop, $request, $isPreview || (bool) $previewLink);
+        if (!$editFrame) TrafficSource::recordLanding($shop, $request, (bool) $previewLink);
 
-        if ($activeCollection) {
-            $all = Growth::collectionProducts($shop, $activeCollection, null);
-            $activeCollection['count'] = $all->count();
-            $page = max(1, $request->integer('page', 1));
-            $products = (new \Illuminate\Pagination\LengthAwarePaginator($all->forPage($page, 20)->values(), $all->count(), 20, $page, ['path' => $request->url()]))->withQueryString();
-        } else {
-            $query = $shop->products()->where('is_active', true)
-                ->when($activeCategory, fn ($q) => $q->where('category', $activeCategory['name']));
-            match ($sf['sort']) {
-                'price_asc'  => $query->orderBy('price'),
-                'price_desc' => $query->orderByDesc('price'),
-                'recent'     => $query->latest(),
-                default      => $query->orderByDesc('is_featured')->latest(),
-            };
-            $products = $query->paginate(20)->withQueryString();
-        }
-
-        // Produit(s) à la une : choisis dans l'éditeur de vitrine, sinon le dernier « mis en avant »
-        $featuredProducts = Storefront::featuredProducts($shop, $sf);
-
-        // Derniers avis écrits par de vrais clients (aucun avis inventé)
-        $latestReviews = Review::where('vendeur_id', $shop->user_id)
-            ->whereNotNull('comment')->where('comment', '!=', '')
-            ->with('client:id,name')
-            ->latest()->take(3)->get();
-
-        $categories = $shop->products()
-            ->where('is_active', true)
-            ->whereNotNull('category')
-            ->where('category', '!=', '')
-            ->distinct()
-            ->pluck('category')
-            ->toArray();
-
-        // Avis réels du vendeur (remplace les faux "(rand(10,200))" affichés avant sur chaque carte produit).
-        $reviewStats  = Review::where('vendeur_id', $shop->user_id)
-            ->selectRaw('COUNT(*) as cnt, AVG(rating) as avg_rating')
-            ->first();
-        $reviewCount  = (int) ($reviewStats->cnt ?? 0);
-        $reviewAvg    = $reviewCount > 0 ? round((float) $reviewStats->avg_rating, 1) : null;
-
-        // Commandes livrées : signal de confiance ("X commandes livrées") pour rassurer un nouveau client.
-        $deliveredCount = Order::where('shop_id', $shop->id)
-            ->where('status', Order::STATUS_LIVREE)
-            ->count();
-
-        // Blocs « Sélection de produits » : une catégorie (ou toute la boutique), 4 ou 8 produits
-        $selections = [];
-        foreach ($sf['blocks'] as $b) {
-            if ($b['type'] !== 'selection' || !$b['on']) continue;
-            $selections[$b['id']] = $shop->products()->where('is_active', true)
-                ->when($b['d']['category'] !== '', fn ($q) => $q->where('category', $b['d']['category']))
-                ->orderByDesc('is_featured')->latest()->take($b['d']['limit'])->get();
-        }
-
-        // Collections affichées (bloc « Collections »), sections automatiques, preuves de confiance
-        $collectionRows = collect($sf['collections'])->where('on', true)
-            ->map(fn ($c) => ['c' => $c, 'url' => Growth::collectionUrl($shop, $c), 'items' => Growth::collectionProducts($shop, $c, 4)])
-            ->filter(fn ($r) => $r['items']->isNotEmpty())->values();
-        $hasBlock = fn ($t) => collect($sf['blocks'])->contains(fn ($b) => $b['type'] === $t && $b['on']);
-        $trending = $hasBlock('trending') ? Growth::trending($shop) : collect();
-        $lowStock = $hasBlock('lowstock') ? Growth::lowStock($shop) : collect();
+        // Avis réels, commandes livrées et preuves de confiance (jamais inventés)
+        $reviewStats = Review::where('vendeur_id', $shop->user_id)->selectRaw('COUNT(*) as cnt, AVG(rating) as avg_rating')->first();
+        $reviewCount = (int) ($reviewStats->cnt ?? 0);
+        $reviewAvg = $reviewCount > 0 ? round((float) $reviewStats->avg_rating, 1) : null;
+        $deliveredCount = Order::where('shop_id', $shop->id)->where('status', Order::STATUS_LIVREE)->count();
         $proofs = Growth::proofs($shop, $sf['settings'], $deliveredCount, $reviewCount);
-        $coverSlides = $sf['cover']['on'] ? Growth::slides($shop, $sf) : [];
-        $shareImage = Growth::shareImage($shop, $sf);
 
-        // Message de bienvenue : seulement avec un vrai code promo encore utilisable
-        $welcomePromo = null;
-        $set = $sf['settings'];
-        if ($set['welcome'] && $set['welcome_promo_id'] && !$set['vacation'] && !$previewLink) {
-            $welcomePromo = \App\Models\PromoCode::where('shop_id', $shop->id)->whereKey($set['welcome_promo_id'])->active()
-                ->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))
-                ->where(fn ($q) => $q->whereNull('max_uses')->orWhereColumn('uses_count', '<', 'max_uses'))
-                ->first();
-        }
-
-        // Modèle de page (Prestige, Pop, Épuré, Éditorial, Fil). Le vendeur peut essayer un autre modèle
-        // sur sa vitrine (?modele=…) sans rien publier ; l'aperçu de l'éditeur et les collections restent en Standard.
-        $tryModel = $isOwner && !$isPreview && !$previewLink && isset(PageModels::MODELS[$request->query('modele')]) ? $request->query('modele') : null;
+        $tryModel = $isOwner && !$previewLink && PageModels::isModel($request->query('modele')) ? $request->query('modele') : null;
         $pageModel = $tryModel ?? $sf['page_model'];
-        if (PageModels::isModel($pageModel) && !$isPreview && !$activeCollection) {
-            return view('public.shops.models.' . $pageModel, [
-                'shop' => $shop, 'pm' => PageModels::data($shop, $sf, $deliveredCount, $reviewAvg, $reviewCount, $proofs),
-                'model' => $pageModel, 'isOwner' => $isOwner, 'publishedModel' => $sf['page_model'],
-                'activeCategory' => $activeCategory, 'previewLink' => $previewLink, 'shareImage' => $shareImage,
-                'pageTitle' => $activeCategory ? $activeCategory['name'] . ' · ' . $shop->name : $shop->name . ' — Boutique en ligne',
-            ]);
-        }
-        $isOwnerBar = $isOwner && !$isPreview && !$previewLink;
-        $publishedModel = $sf['page_model'];
 
-        return view('public.shops.products', compact(
-            'isOwnerBar', 'pageModel', 'publishedModel',
-            'shop', 'products', 'categories', 'reviewAvg', 'reviewCount', 'deliveredCount',
-            'sf', 'sfAccent', 'isPreview', 'featuredProducts', 'latestReviews', 'selections', 'welcomePromo',
-            'activeCategory', 'activeCollection', 'collectionRows', 'trending', 'lowStock', 'proofs', 'coverSlides',
-            'shareImage', 'previewLink'
-        ));
+        return view('public.shops.models.' . $pageModel, [
+            'shop' => $shop, 'pm' => PageModels::data($shop, $sf, $deliveredCount, $reviewAvg, $reviewCount, $proofs),
+            'model' => $pageModel, 'isOwner' => $isOwner, 'publishedModel' => $sf['page_model'],
+            'activeCategory' => $activeCategory, 'previewLink' => $previewLink, 'shareImage' => Growth::shareImage($shop, $sf),
+            'pageTitle' => $activeCategory ? $activeCategory['name'] . ' · ' . $shop->name : $shop->name . ' — Boutique en ligne',
+            'editFrame' => $editFrame,
+        ]);
     }
 }
