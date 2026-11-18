@@ -1374,6 +1374,8 @@ body { font-variant-numeric: tabular-nums; }
 .db-act.is-main { background: var(--sv-btn, #1F7CF6); color: #fff; box-shadow: none; }
 .db-act.is-main svg { color: #fff; }
 .db-act.is-main:hover { background: var(--sv-btn-h, #1667D6); color: #fff; }
+.db-tm { align-self: flex-start; color: var(--text-2); font-size: 12.5px; font-weight: 700; text-decoration: none; }
+.db-tm:hover { color: var(--text); text-decoration: underline; }
 .db-act b { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: rgba(255,255,255,.22); font-size: 11.5px; }
 .sv-hello { background: var(--surface) !important; color: var(--text) !important; box-shadow: inset 0 0 0 1px var(--border) !important; grid-template-columns: 1fr !important; padding: 24px !important; border-radius: 18px !important; }
 .sv-hello::before, .sv-hello::after, .sv-scene { display: none !important; }
@@ -2070,6 +2072,8 @@ $I = [
                             <a href="{{ route('boutique.storefront.edit') }}" class="db-act"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Personnaliser ma boutique</a>
                             <button type="button" class="db-act" data-share-shop="{{ $shopPublicUrl }}" data-share-name="{{ $shop->name }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13"/></svg>Partager ma boutique</button>
                         </div>
+                        {{-- Témoignage du vendeur sur Shopio (page d'accueil, après validation) --}}
+                        <a href="{{ route('boutique.testimonial.edit') }}" class="db-tm">★ Donne ton avis sur Shopio</a>
                     </div>
                     {{-- Scène 3D décorative : sphère bleue, carte « Visites ce mois », pièce GNF --}}
                     <div class="sv-scene" aria-hidden="true">
