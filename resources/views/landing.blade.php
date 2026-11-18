@@ -19,13 +19,13 @@
 <meta property="og:description" content="Crée ta boutique en quelques minutes et vends partout, paiement à la livraison.">
 <meta property="og:image" content="{{ asset('images/shopio-logo-512.png') }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
 :root {
     --ink: #0F172A; --ink-2: #475569; --ink-3: #94A3B8; --line: #E2E8F0; --soft: #F8FAFC; --soft-2: #F1F5F9;
     --accent: #1F7CF6; --accent-dk: #1667D6; --accent-50: #EFF6FF; --accent-100: #DBEAFE;
     --ok: #16A34A; --ok-50: #F0FDF4; --warn: #B45309; --warn-50: #FFFBEB; --err: #DC2626;
-    --r: 18px; --font: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --r: 18px; --font: 'Geist', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif; --mono: 'Geist Mono', ui-monospace, monospace;
     --shadow: 0 1px 2px rgba(15,23,42,.04), 0 12px 32px -12px rgba(15,23,42,.18);
 }
 *, *::before, *::after { box-sizing: border-box; }
@@ -48,7 +48,12 @@ a { color: inherit; }
 
 /* ── En-tête ── */
 .nav { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,.86); backdrop-filter: saturate(1.4) blur(12px); -webkit-backdrop-filter: saturate(1.4) blur(12px); border-bottom: 1px solid transparent; transition: border-color .2s; }
-.nav.is-scrolled { border-bottom-color: var(--line); }
+.nav.is-scrolled { border-bottom-color: transparent; background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.nav .wrap { transition: max-width .45s cubic-bezier(.22,1,.36,1), height .35s, margin .35s, padding .35s, border-radius .35s, background-color .35s, box-shadow .35s; }
+@media (min-width: 861px) {
+    .nav.is-scrolled .wrap { max-width: 980px; height: 58px; margin-top: 10px; padding: 0 10px 0 18px; border-radius: 16px; background: rgba(255,255,255,.88); backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px); box-shadow: 0 10px 30px -14px rgba(15,23,42,.28), inset 0 0 0 1px var(--line); }
+}
+@media (max-width: 860px) { .nav.is-scrolled { background: rgba(255,255,255,.92); backdrop-filter: saturate(1.4) blur(12px); -webkit-backdrop-filter: saturate(1.4) blur(12px); border-bottom-color: var(--line); } }
 .nav .wrap { display: flex; align-items: center; gap: 20px; height: 68px; }
 .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 19px; text-decoration: none; letter-spacing: -.02em; }
 .logo img { width: 34px; height: 34px; border-radius: 9px; }
@@ -76,7 +81,7 @@ a { color: inherit; }
 .hero .wrap { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 48px; align-items: center; }
 .pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); font-size: 13px; font-weight: 700; color: var(--ink-2); }
 .pill b { padding: 3px 9px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 11.5px; }
-.hero h1 { margin: 18px 0 16px; font-size: clamp(36px, 5.4vw, 60px); line-height: 1.04; font-weight: 800; letter-spacing: -.035em; text-wrap: balance; }
+.hero h1 { margin: 20px 0 18px; font-size: clamp(38px, 5.6vw, 66px); line-height: 1.06; font-weight: 600; letter-spacing: -.045em; text-wrap: balance; }
 .hero h1 em { font-style: normal; color: var(--accent); }
 .hero-sub { margin: 0 0 26px; max-width: 540px; font-size: clamp(16px, 1.6vw, 18.5px); color: var(--ink-2); }
 .hero-cta { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -337,6 +342,35 @@ a { color: inherit; }
     .wa-fab i { width: 52px; height: 52px; }
 }
 
+/* ── Titre « machine à écrire » : le mot clé dans une boîte bleue, curseur qui clignote ── */
+.tw { min-height: 2.2em; }
+@media (max-width: 640px) { .hero h1.tw { font-size: 34px; min-height: 3.25em; } }
+.tw-vis { display: inline; }
+.tw mark { display: inline; padding: 0 .12em; margin: 0 .02em; border-radius: .12em; background: #3B82F6; color: #fff; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.tw mark:empty { padding: 0; margin: 0; }
+.tw-caret { display: inline-block; width: .06em; min-width: 3px; height: .95em; margin-left: .06em; vertical-align: -.1em; background: var(--ink); animation: twBlink 1s steps(1) infinite; }
+@keyframes twBlink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .tw-caret { display: none; } }
+
+/* ── Fini le bricolage : chaque case alterne entre l'outil et ce qu'il te coûte ── */
+.tools { padding: 34px 0 40px; background: var(--soft); border-block: 1px solid var(--soft-2); }
+.tools .tag { display: block; width: max-content; margin: 0 auto 8px; padding: 3px 10px; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-2); font-size: 11.5px; font-weight: 700; letter-spacing: .1em; }
+.tools h2 { margin: 0 0 22px; text-align: center; font-size: clamp(24px, 3vw, 34px); font-weight: 600; letter-spacing: -.035em; }
+.tools-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 880px; margin: 0 auto; border-radius: 16px; background: #fff; box-shadow: 0 1px 2px rgba(15,23,42,.04), inset 0 0 0 1px var(--line); overflow: hidden; }
+.tool { position: relative; height: 84px; border-left: 1px solid var(--soft-2); }
+.tool:first-child { border-left: 0; }
+.tool > span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 0 10px; text-align: center; transition: opacity .5s, transform .6s cubic-bezier(.22,1,.36,1), filter .5s; }
+.tool .a { font-weight: 700; font-size: 15px; color: var(--ink); }
+.tool .a svg { color: var(--ink-2); flex-shrink: 0; }
+.tool .b { flex-direction: column; gap: 0; opacity: 0; transform: translateY(10px); filter: blur(4px); }
+.tool .b b { font-size: 21px; letter-spacing: -.03em; color: var(--accent); line-height: 1.1; }
+.tool .b small { color: var(--ink-3); font-size: 12px; font-weight: 600; }
+.tool.is-b .a { opacity: 0; transform: translateY(-10px); filter: blur(4px); }
+.tool.is-b .b { opacity: 1; transform: none; filter: none; }
+.tools-sub { margin: 16px auto 0; max-width: 560px; text-align: center; color: var(--ink-2); font-size: 15px; }
+.tools-sub b { color: var(--ink); }
+@media (max-width: 700px) { .tools-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tool:nth-child(3) { border-left: 0; } .tool:nth-child(n+3) { border-top: 1px solid var(--soft-2); } }
+
 /* ── Bandeau ── */
 .band { padding: 22px 0; border-block: 1px solid var(--soft-2); background: var(--soft); }
 .band ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 34px; margin: 0; padding: 0; list-style: none; color: var(--ink-2); font-weight: 700; font-size: 14.5px; }
@@ -347,7 +381,7 @@ a { color: inherit; }
 .sec { padding: 88px 0; }
 .sec-hd { max-width: 680px; margin: 0 auto 40px; text-align: center; }
 .kicker { display: inline-block; margin-bottom: 10px; color: var(--accent); font-weight: 800; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
-.sec h2 { margin: 0 0 12px; font-size: clamp(28px, 3.6vw, 42px); line-height: 1.1; letter-spacing: -.03em; font-weight: 800; text-wrap: balance; }
+.sec h2 { margin: 0 0 12px; font-size: clamp(30px, 3.8vw, 46px); line-height: 1.08; letter-spacing: -.04em; font-weight: 600; text-wrap: balance; }
 .sec-hd p { margin: 0; color: var(--ink-2); font-size: 17px; }
 
 /* ── Démos ── */
@@ -600,6 +634,9 @@ a { color: inherit; }
     $ico = [
         'check' => 'M5 12.5 10 17 19 7',
         'x'     => 'M6 6l12 12M18 6 6 18',
+        'note'  => 'M6 3h11a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6zM6 3v18M9 8h6M9 12h6M9 16h4',
+        'grid'  => 'M4 4h16v16H4zM4 9.5h16M4 14.5h16M9.5 4v16',
+        'calc'  => 'M6 3h12a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM8 7h8v3H8zM8.5 14h.01M12 14h.01M15.5 14h.01M8.5 17.5h.01M12 17.5h.01M15.5 17.5h.01',
         'store' => 'M4 9l1.5-5h13L20 9M4 9v11h16V9M4 9c0 1.7 1.3 3 3 3s3-1.3 3-3c0 1.7 1.3 3 3 3s3-1.3 3-3c0 1.7 1.3 3 3 3M10 20v-5h4v5',
         'spark' => 'M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z',
         'layers'=> 'M12 3 3 8l9 5 9-5zM3 13l9 5 9-5M3 17.5l9 5 9-5',
@@ -660,8 +697,9 @@ a { color: inherit; }
         <div class="wrap hero-in">
             <div class="hero-txt">
                 <span class="pill"><b>Nouveau</b> Commandes, paniers abandonnés et Shopio IA</span>
-                <h1>Ta boutique en ligne qui <em>vend</em>, payée à la livraison.</h1>
-                <p class="hero-sub">Crée ta boutique en quelques minutes, publie des pages produit qui donnent envie, reçois les commandes au même endroit et relance les clients partis sans commander.</p>
+                {{-- Titre « Arrête de… » : tapé, mot clé surligné, effacé, puis la phrase suivante (texte complet pour les lecteurs d'écran) --}}
+                <h1 class="tw"><span class="sr">Arrête de perdre des commandes : Shopio réunit ta boutique, tes commandes, tes relances et tes livraisons.</span><span class="tw-vis" aria-hidden="true"><span id="twA">Arrête de perdre des commandes dans </span><mark id="twB">WhatsApp</mark><span class="tw-caret"></span></span></h1>
+                <p class="hero-sub">Shopio remplace tout ça. Ta boutique, tes commandes, tes relances et tes livraisons au même endroit, pensé pour la vente payée à la livraison.</p>
                 <div class="hero-cta">
                     <a class="btn btn-main" href="{{ $cta }}">{{ $ctaLabel }} <span aria-hidden="true">→</span></a>
                     <a class="btn btn-line" href="#demos">{!! $i('play', 16) !!} Voir les démos</a>
@@ -741,17 +779,27 @@ a { color: inherit; }
         </div>
     </section>
 
-<div class="band">
+{{-- ═══ Fini le bricolage : les outils du quotidien et ce qu'ils te coûtent (sans chiffre inventé) ═══ --}}
+    <section class="tools" aria-labelledby="toolsH">
         <div class="wrap">
-            <ul>
-                <li>{!! $i('cash', 18) !!} Paiement à la livraison</li>
-                <li>{!! $i('globe', 18) !!} Ton adresse /s/ta-boutique</li>
-                <li>{!! $i('whats', 18) !!} Commandes et relances WhatsApp</li>
-                <li>{!! $i('bike', 18) !!} Livreurs et entreprises de livraison</li>
-                <li>{!! $i('phone', 18) !!} Pensé pour le téléphone</li>
-            </ul>
+            <span class="tag">TOUT-EN-UN</span>
+            <h2 id="toolsH">Fini le bricolage entre ces outils</h2>
+            <div class="tools-row">
+                @foreach([
+                    ['note', 'Le cahier', 'À la main', 'chaque commande notée'],
+                    ['whats', 'WhatsApp', 'Perdues', 'commandes noyées'],
+                    ['grid', 'Excel', 'Des heures', 'à tout recopier'],
+                    ['calc', 'La calculette', 'Au hasard', 'l’argent encaissé'],
+                ] as $k => [$ic, $tool, $pain, $what])
+                <div class="tool" data-tool="{{ $k }}">
+                    <span class="a">{!! $i($ic, 20) !!} {{ $tool }}</span>
+                    <span class="b" aria-hidden="true"><b>{{ $pain }}</b><small>{{ $what }}</small></span>
+                </div>
+                @endforeach
+            </div>
+            <p class="tools-sub">Avec Shopio, <b>tout est au même endroit</b> : boutique, commandes, relances, livreurs et argent encaissé.</p>
         </div>
-    </div>
+    </section>
 
     {{-- ═══ Pays et devises : la boutique prend la devise et l'indicatif du pays choisi à la création ═══ --}}
     @php
@@ -1255,7 +1303,52 @@ a { color: inherit; }
 
     /* En-tête : bordure au défilement, menu mobile */
     const nav = $('nav');
-    const onScroll = () => nav.classList.toggle('is-scrolled', window.scrollY > 8);
+    const onScroll = () => nav.classList.toggle('is-scrolled', window.scrollY > 24);
+
+    /* Titre « Arrête de… » : tape la phrase, surligne le mot clé, efface jusqu'à « Arrête d », puis la suivante */
+    (function () {
+        const A = $('twA'), B = $('twB');
+        if (!A || !B || REDUCE) return;
+        const P = [
+            ['Arrête de perdre des commandes dans ', 'WhatsApp'],
+            ['Arrête de noter tes commandes dans ', 'un cahier'],
+            ['Arrête d’oublier de ', 'rappeler tes clients'],
+            ['Arrête de jongler entre ', '5 applications'],
+            ['Arrête de passer des heures sur ', 'tes pages produit'],
+            ['Arrête de courir après ', 'tes livreurs'],
+        ];
+        const KEEP = 'Arrête d';
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
+        let k = 0;
+        (async function loop() {
+            await sleep(2600);
+            for (;;) {
+                // Effacer : d'abord le mot clé, puis la phrase jusqu'à « Arrête d »
+                while (B.textContent.length) { B.textContent = B.textContent.slice(0, -1); await sleep(26); }
+                while (A.textContent.length > KEEP.length) { A.textContent = A.textContent.slice(0, -1); await sleep(22); }
+                await sleep(260);
+                k = (k + 1) % P.length;
+                const [pre, hl] = P[k];
+                for (let n = KEEP.length + 1; n <= pre.length; n++) { A.textContent = pre.slice(0, n); await sleep(48 + Math.random() * 40); }
+                for (let n = 1; n <= hl.length; n++) { B.textContent = hl.slice(0, n); await sleep(60 + Math.random() * 40); }
+                await sleep(2400);
+            }
+        })();
+    })();
+
+    /* « Fini le bricolage » : chaque case montre à tour de rôle ce que l'outil te coûte */
+    (function () {
+        const T = [...document.querySelectorAll('.tool')];
+        if (!T.length || REDUCE) return;
+        // Cases 1 et 3, puis toutes les outils, puis cases 2 et 4, puis tous les outils…
+        const phases = [[0, 2], [], [1, 3], []];
+        let n = 0;
+        setInterval(() => {
+            const ph = phases[n % phases.length];
+            T.forEach((t, k) => t.classList.toggle('is-b', ph.includes(k)));
+            n++;
+        }, 1900);
+    })();
     window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
     $('navBurger').addEventListener('click', () => {
         const open = $('navMenu').classList.toggle('is-open');
