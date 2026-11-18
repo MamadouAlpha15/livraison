@@ -61,7 +61,7 @@ a { color: inherit; }
 .nav-links a { padding: 8px 12px; border-radius: 9px; color: var(--ink-2); font-weight: 600; font-size: 14.5px; text-decoration: none; }
 .nav-links a:hover { background: var(--soft-2); color: var(--ink); }
 .nav-end { display: flex; align-items: center; gap: 8px; margin-left: auto; }
-.nav-login { padding: 8px 12px; color: var(--ink-2); font-weight: 700; font-size: 14.5px; text-decoration: none; }
+.nav-login { white-space: nowrap; padding: 8px 12px; color: var(--ink-2); font-weight: 700; font-size: 14.5px; text-decoration: none; }
 .nav-login:hover { color: var(--ink); }
 .nav-burger { display: none; width: 42px; height: 42px; border: 0; border-radius: 10px; background: var(--soft-2); cursor: pointer; place-items: center; }
 .nav-menu { display: none; }
