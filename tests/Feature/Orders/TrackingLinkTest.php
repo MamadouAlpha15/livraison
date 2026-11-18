@@ -25,7 +25,8 @@ test('chaque nouvelle commande reçoit un jeton de 20 lettres et chiffres, diff�
 });
 
 test('le lien court ouvre le suivi pour quiconque l’a reçu ; un numéro seul ou un faux jeton donnent 404', function () {
-    $this->get(OrderAccess::trackingUrl($this->order))->assertOk();
+    // Sans compte, « Retour » mène au marché (pas à la page d'accueil des vendeurs)
+    $this->get(OrderAccess::trackingUrl($this->order))->assertOk()->assertSee('href="' . route('welcome') . '"', false)->assertSee('Le marché');
     $this->getJson(OrderAccess::trackingUrl($this->order, 'suivi.data'))->assertOk();
     $this->get('/suivi/' . $this->order->id)->assertNotFound();
     $this->getJson('/suivi/' . $this->order->id . '/data')->assertNotFound();
