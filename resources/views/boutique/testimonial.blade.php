@@ -46,7 +46,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
 .tm-flash { padding: 12px 14px; border-radius: 12px; font-weight: 700; font-size: 13.5px; margin-bottom: 12px; }
 .tm-flash.is-ok { background: var(--sv-ok50, #F0FDF4); color: var(--sv-ok, #15803D); } .tm-flash.is-err { background: var(--sv-err50, #FEF2F2); color: var(--sv-err, #DC2626); }
 .tm-status { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; background: var(--bg); box-shadow: inset 0 0 0 1px var(--border); font-size: 13.5px; }
-.tm-pill { padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 800; }
+.tm-pill { white-space: nowrap; flex-shrink: 0; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 800; }
 .tm-pill.pending { background: #FFFBEB; color: #B45309; } .tm-pill.approved { background: #F0FDF4; color: #15803D; } .tm-pill.rejected { background: #FEF2F2; color: #DC2626; }
 .tm-prev { padding: 18px; border-radius: 16px; background: #fff; box-shadow: inset 0 0 0 1px var(--border); }
 .tm-prev q { display: block; margin: 8px 0 12px; font-size: 15px; line-height: 1.55; quotes: '« ' ' »'; color: #0F172A; }

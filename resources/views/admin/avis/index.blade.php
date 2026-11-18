@@ -104,6 +104,13 @@ tr:hover td{background:var(--bg)}
     .mn{margin-left:0}.ham{display:block}
     .hero{flex-direction:column;align-items:flex-start;padding:20px}
     .hero-stats{margin-left:0;width:100%}.hs{flex:1;min-width:70px}
+    /* Téléphone : barre du haut serrée (nom caché), onglets qui défilent de côté au lieu d'élargir la page */
+    .tb{padding:0 12px;gap:10px}
+    .tb-bc{min-width:0;overflow:hidden;white-space:nowrap}
+    .tb-ua > div:last-child{display:none}
+    .tabs{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+    .tabs::-webkit-scrollbar{display:none}
+    .tab-btn{flex:0 0 auto;white-space:nowrap}
 }
 </style>
 @include('admin._partials.shopio-theme')

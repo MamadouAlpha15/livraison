@@ -60,13 +60,16 @@ a { color: inherit; }
 .nav-login:hover { color: var(--ink); }
 .nav-burger { display: none; width: 42px; height: 42px; border: 0; border-radius: 10px; background: var(--soft-2); cursor: pointer; place-items: center; }
 .nav-menu { display: none; }
-@media (max-width: 860px) {
+@media (max-width: 1020px) {
     .nav-links, .nav-login { display: none; }
     .nav-burger { display: grid; }
     .nav-menu.is-open { display: grid; gap: 2px; padding: 8px 20px 16px; border-bottom: 1px solid var(--line); background: #fff; }
     .nav-menu a { padding: 12px 4px; font-weight: 700; text-decoration: none; border-bottom: 1px solid var(--soft-2); }
 }
 @media (max-width: 420px) { .nav-end .btn { padding: 0 12px; font-size: 13.5px; } }
+/* Petits téléphones (320–380 px) : barre du haut plus serrée, logo sans le nom sous 360 px */
+@media (max-width: 380px) { .nav .wrap { gap: 10px; padding: 0 14px; } .nav-end { gap: 6px; } .nav-end .btn { padding: 0 10px; font-size: 12.5px; } .nav-burger { width: 38px; height: 38px; } }
+@media (max-width: 360px) { .logo { font-size: 0; gap: 0; } }
 
 /* ── Héros ── */
 .hero { padding: 56px 0 40px; background: radial-gradient(1200px 500px at 70% -10%, var(--accent-50), transparent 70%); }
@@ -371,7 +374,8 @@ a { color: inherit; }
 .dcap b { color: var(--ink); }
 .replay { position: absolute; right: 12px; bottom: 12px; z-index: 4; display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 0; border-radius: 999px; background: rgba(255,255,255,.92); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-2); font: 700 12px var(--font); cursor: pointer; }
 @media (max-width: 960px) {
-    .demos { grid-template-columns: 1fr; }
+    .demos { grid-template-columns: minmax(0, 1fr); }
+    .demos > * { min-width: 0; }
     .dtabs { position: static; grid-auto-flow: column; grid-auto-columns: minmax(210px, 1fr); overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 2px 10px; margin: 0 -20px; padding-inline: 20px; scrollbar-width: none; }
     .dtabs::-webkit-scrollbar { display: none; }
     .dtab { scroll-snap-align: start; }
