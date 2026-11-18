@@ -753,6 +753,10 @@ Route::middleware(['auth', 'role:superadmin,staff'])
         Route::get('/avis', [\App\Http\Controllers\Admin\AvisController::class, 'index'])->name('avis.index');
         Route::delete('/avis/boutique/{review}', [\App\Http\Controllers\Admin\AvisController::class, 'destroyShop'])->name('avis.destroy-shop');
         Route::delete('/avis/entreprise/{review}', [\App\Http\Controllers\Admin\AvisController::class, 'destroyCompany'])->name('avis.destroy-company');
+        /* Témoignages des vendeurs sur Shopio : publiés sur la page d'accueil après validation */
+        Route::post('/avis/temoignages/{testimonial}/publier', [\App\Http\Controllers\Admin\AvisController::class, 'approveTestimonial'])->name('avis.testimonials.approve');
+        Route::post('/avis/temoignages/{testimonial}/refuser', [\App\Http\Controllers\Admin\AvisController::class, 'rejectTestimonial'])->name('avis.testimonials.reject');
+        Route::delete('/avis/temoignages/{testimonial}', [\App\Http\Controllers\Admin\AvisController::class, 'destroyTestimonial'])->name('avis.testimonials.destroy');
 
         /* Tickets support (vue SuperAdmin) */
         Route::get('/support', [\App\Http\Controllers\Support\SupportTicketController::class, 'index'])->name('support.index');
@@ -902,6 +906,11 @@ Route::middleware(['auth', 'role:admin'])
         Route::post('orders/{order}/etape', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'stage'])->name('orders.stage');
         Route::post('orders/{order}/note', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'note'])->name('orders.note');
         Route::put('orders/{order}/assign', [EmployeOrderController::class, 'assign']) ->name('orders.assign');
+
+        /* Ton avis sur Shopio (témoignage affiché sur la page d'accueil après validation) */
+        Route::get('avis-shopio',    [\App\Http\Controllers\Boutique\TestimonialController::class, 'edit'])   ->name('testimonial.edit');
+        Route::put('avis-shopio',    [\App\Http\Controllers\Boutique\TestimonialController::class, 'update']) ->middleware('throttle:10,1')->name('testimonial.update');
+        Route::delete('avis-shopio', [\App\Http\Controllers\Boutique\TestimonialController::class, 'destroy'])->name('testimonial.destroy');
 
         /* Paniers abandonnés */
         Route::get('paniers-abandonnes', [\App\Http\Controllers\Boutique\AbandonedCartController::class, 'index'])->name('carts.index');

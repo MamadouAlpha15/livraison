@@ -306,6 +306,34 @@ a { color: inherit; }
     .mq-vp { -webkit-mask-image: none; mask-image: none; }
 }
 
+/* ── Témoignages (validés par l'équipe Shopio) ── */
+.tms { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.tms.is-1 { grid-template-columns: minmax(0, 620px); justify-content: center; }
+.tms.is-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 900px; margin: 0 auto; }
+.tm { display: flex; flex-direction: column; gap: 14px; padding: 24px; border-radius: 20px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); }
+.tm .st { color: #F59E0B; letter-spacing: 2px; font-size: 15px; height: auto; padding: 0; background: none; }
+.tm q { margin: 0; font-size: 16px; line-height: 1.6; quotes: '« ' ' »'; flex: 1; }
+.tm-who { display: flex; align-items: center; gap: 12px; padding-top: 14px; border-top: 1px solid var(--soft-2); }
+.tm-av { width: 42px; height: 42px; border-radius: 12px; background: var(--ink); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 14px; flex-shrink: 0; overflow: hidden; }
+.tm-av img { width: 100%; height: 100%; object-fit: cover; }
+.tm-who b { display: block; font-size: 14.5px; }
+.tm-who small { display: block; color: var(--ink-2); font-size: 12.5px; font-weight: 600; }
+.tm-who a { color: var(--accent-dk); font-weight: 700; text-decoration: none; }
+.tm-who a:hover { text-decoration: underline; }
+@media (max-width: 960px) { .tms, .tms.is-2 { grid-template-columns: 1fr; max-width: 620px; margin: 0 auto; } }
+
+/* ── WhatsApp du support ── */
+.wa-fab { position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 70; display: inline-flex; align-items: center; gap: 8px; height: 52px; padding: 0 18px 0 14px; border-radius: 999px; background: #fff; color: var(--ink); box-shadow: 0 14px 34px -12px rgba(15,23,42,.45), inset 0 0 0 1px var(--line); font-weight: 800; font-size: 14px; text-decoration: none; transition: transform .2s, box-shadow .2s; }
+.wa-fab:hover { transform: translateY(-2px); }
+.wa-fab i { width: 32px; height: 32px; border-radius: 999px; background: #16A34A; color: #fff; display: grid; place-items: center; }
+.faq-more { margin: 18px auto 0; text-align: center; color: var(--ink-2); font-weight: 600; }
+.faq-more a { color: var(--accent-dk); font-weight: 800; }
+@media (max-width: 640px) {
+    .wa-fab { padding: 0; width: 52px; justify-content: center; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); right: 14px; }
+    .wa-fab span { display: none; }
+    .wa-fab i { width: 52px; height: 52px; }
+}
+
 /* ── Bandeau ── */
 .band { padding: 22px 0; border-block: 1px solid var(--soft-2); background: var(--soft); }
 .band ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 34px; margin: 0; padding: 0; list-style: none; color: var(--ink-2); font-weight: 700; font-size: 14.5px; }
@@ -514,6 +542,21 @@ a { color: inherit; }
 .plan ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 9px; }
 .plan li { display: flex; gap: 10px; font-size: 14.5px; font-weight: 600; }
 .plan li svg { color: var(--ok); flex-shrink: 0; margin-top: 3px; }
+.plan { position: relative; }
+.plan .price { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 8px; padding: 6px 0 14px; border-bottom: 1px solid var(--soft-2); }
+.plan .price b { font-size: 40px; line-height: 1; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
+.plan .price span { color: var(--ink-2); font-weight: 700; font-size: 15px; }
+.plan .price small { flex-basis: 100%; color: var(--ink-3); font-size: 13px; font-weight: 600; }
+.plan-flag { position: absolute; top: -13px; left: 24px; padding: 4px 12px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 12px; font-weight: 800; }
+.plan-note { color: var(--ink-3); font-size: 12.5px; font-weight: 600; line-height: 1.45; text-align: center; }
+.ptable { max-width: 860px; margin: 22px auto 0; }
+.ptable summary { width: max-content; margin: 0 auto; padding: 10px 16px; border-radius: 10px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); font-weight: 700; font-size: 14.5px; cursor: pointer; list-style: none; }
+.ptable summary::-webkit-details-marker { display: none; }
+.ptable summary::after { content: ' ▾'; color: var(--ink-3); }
+.ptable[open] summary::after { content: ' ▴'; }
+.ptable .cmp { min-width: 520px; background: #fff; }
+.ptable .cmp .n { color: var(--ink-3); }
+.nav-links a.is-on { color: var(--ink); background: var(--soft-2); }
 @media (max-width: 760px) { .plans { grid-template-columns: 1fr; } }
 
 /* ── FAQ ── */
@@ -622,7 +665,7 @@ a { color: inherit; }
                 <ul class="hero-proof">
                     <li>{!! $i('check', 16) !!} {{ $trialDays }} jours de Plan Pro offerts</li>
                     <li>{!! $i('check', 16) !!} Paiement à la livraison</li>
-                    <li>{!! $i('check', 16) !!} Sans carte bancaire</li>
+                    <li>{!! $i('check', 16) !!} Puis gratuit, ou Pro à {{ number_format($pro['price'], 0, ',', ' ') }} GNF / mois</li>
                 </ul>
             </div>
 
@@ -1053,38 +1096,102 @@ a { color: inherit; }
         </div>
     </section>
 
-    {{-- ═══ Tarifs ═══ --}}
+    {{-- ═══ Témoignages : seulement ceux validés par l'équipe Shopio, avec les vraies commandes livrées ═══ --}}
+    @if($testimonials->isNotEmpty())
+    <section class="sec" id="avis" style="padding-bottom:0">
+        <div class="wrap">
+            <div class="sec-hd rv">
+                <span class="kicker">Ils vendent avec Shopio</span>
+                <h2>Ce qu’en disent les vendeurs</h2>
+                <p>Des avis de vraies boutiques Shopio, avec le nombre de commandes qu’elles ont livrées.</p>
+            </div>
+            <div class="tms {{ $testimonials->count() === 1 ? 'is-1' : ($testimonials->count() === 2 ? 'is-2' : '') }}">
+                @foreach($testimonials as $tm)
+                <figure class="tm rv" style="margin:0">
+                    <span class="st" role="img" aria-label="{{ $tm['rating'] }} sur 5">{{ str_repeat('★', $tm['rating']) }}{{ str_repeat('☆', 5 - $tm['rating']) }}</span>
+                    <blockquote style="margin:0;flex:1;display:flex"><q>{{ $tm['text'] }}</q></blockquote>
+                    <figcaption class="tm-who">
+                        <span class="tm-av">@if($tm['logo'])<img src="{{ $tm['logo'] }}" alt="" width="42" height="42" loading="lazy">@else{{ $tm['initials'] }}@endif</span>
+                        <span>
+                            <b>{{ $tm['author'] }}{{ $tm['role'] ? ', ' . $tm['role'] : '' }}</b>
+                            <small><a href="{{ $tm['url'] }}">{{ $tm['shop'] }}</a>@if($tm['delivered'] > 0) · {{ number_format($tm['delivered'], 0, ',', ' ') }} commande{{ $tm['delivered'] > 1 ? 's' : '' }} livrée{{ $tm['delivered'] > 1 ? 's' : '' }}@endif</small>
+                        </span>
+                    </figcaption>
+                </figure>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
+    {{-- ═══ Tarifs (prix réels : config chapchappay.plans.pro, limites de SubscriptionService) ═══ --}}
+    @php
+        $gnf = fn ($n) => number_format($n, 0, ',', ' ');
+        $perDay = (int) round($pro['price'] / max(1, $pro['days']));
+        // [libellé, gratuit (true / false / texte), pro (true / texte)]
+        $planRows = [
+            ['Vitrine, adresse /s/ta-boutique et thèmes', true, true],
+            ['Paiement à la livraison', true, true],
+            ['Produits', $pro['products'] . ' au maximum', 'Sans limite'],
+            ['Commandes traitées', $pro['orders'] . ' par mois', 'Sans limite'],
+            ['Page Commandes et paniers abandonnés', true, true],
+            ['Shopio IA et assistant de ventes IA', false, true],
+            ['Équipe et closers', false, true],
+            ['Livreurs, entreprises partenaires et carte GPS', false, true],
+            ['Codes promo', false, true],
+            ['Statistiques et rapports', false, true],
+        ];
+        $planCell = fn ($v) => $v === true ? $i('check', 16) . '<span class="sr">Inclus</span>' : ($v === false ? '<span class="n" aria-label="Non inclus">—</span>' : e($v));
+    @endphp
     <section class="sec" id="tarifs" style="background:var(--soft)">
         <div class="wrap">
             <div class="sec-hd rv">
                 <span class="kicker">Tarifs</span>
-                <h2>Commence gratuitement</h2>
-                <p>Chaque nouvelle boutique reçoit {{ $trialDays }} jours de Plan Pro offerts. Ensuite, tu choisis.</p>
+                <h2>Un prix simple, sans surprise</h2>
+                <p>Commence gratuitement. Chaque nouvelle boutique reçoit {{ $trialDays }} jours de Plan Pro offerts, sans carte bancaire.</p>
             </div>
             <div class="plans">
                 <div class="plan rv">
                     <h3>Gratuit</h3>
                     <p>Pour démarrer et faire tes premières ventes.</p>
+                    <div class="price"><b>0</b><span>GNF</span><small>pour toujours</small></div>
                     <ul>
                         <li>{!! $i('check', 16) !!} Ta vitrine et ton adresse /s/…</li>
-                        <li>{!! $i('check', 16) !!} Jusqu’à 5 produits</li>
-                        <li>{!! $i('check', 16) !!} 10 commandes traitées par mois</li>
-                        <li>{!! $i('check', 16) !!} Paiement à la livraison</li>
+                        <li>{!! $i('check', 16) !!} Jusqu’à {{ $pro['products'] }} produits</li>
+                        <li>{!! $i('check', 16) !!} {{ $pro['orders'] }} commandes traitées par mois</li>
+                        <li>{!! $i('check', 16) !!} Commandes et paniers abandonnés</li>
                     </ul>
                     <a class="btn btn-line" href="{{ $cta }}">{{ $ctaLabel }}</a>
                 </div>
                 <div class="plan is-pro rv">
+                    <span class="plan-flag">Recommandé pour vendre plus</span>
                     <h3>Pro <span>{{ $trialDays }} jours offerts</span></h3>
                     <p>Pour vendre plus et travailler en équipe.</p>
+                    <div class="price"><b>{{ $gnf($pro['price']) }}</b><span>GNF / mois</span><small>soit environ {{ $gnf($perDay) }} GNF par jour</small></div>
                     <ul>
                         <li>{!! $i('check', 16) !!} Produits et commandes sans limite</li>
-                        <li>{!! $i('check', 16) !!} Shopio IA pour tes pages produit</li>
-                        <li>{!! $i('check', 16) !!} Équipe, livreurs et entreprises partenaires</li>
-                        <li>{!! $i('check', 16) !!} Codes promo et rapports</li>
+                        <li>{!! $i('check', 16) !!} Shopio IA et assistant de ventes IA</li>
+                        <li>{!! $i('check', 16) !!} Équipe, livreurs, partenaires et carte GPS</li>
+                        <li>{!! $i('check', 16) !!} Codes promo, statistiques et rapports</li>
                     </ul>
-                    <a class="btn btn-main" href="{{ $cta }}">Essayer le Pro gratuitement</a>
+                    <a class="btn btn-main" href="{{ $cta }}">Essayer {{ $trialDays }} jours gratuits</a>
+                    <small class="plan-note">Sans engagement · renouvellement manuel · paiement par Orange Money, MTN, PayCard ou carte Visa</small>
                 </div>
             </div>
+
+            <details class="ptable rv">
+                <summary>Comparer les plans en détail</summary>
+                <div class="cmp-wrap" style="margin-top:14px">
+                    <table class="cmp">
+                        <thead><tr><th scope="col"><span class="sr">Fonction</span></th><th scope="col">Gratuit</th><th scope="col" class="is-us">Pro · {{ $gnf($pro['price']) }} GNF / mois</th></tr></thead>
+                        <tbody>
+                            @foreach($planRows as [$label, $free, $paid])
+                            <tr><th scope="row" style="font-weight:600">{{ $label }}</th><td class="{{ $free === true ? 'y' : ($free === false ? 'n' : 's') }}">{!! $planCell($free) !!}</td><td class="{{ $paid === true ? 'y' : 's' }} is-us">{!! $planCell($paid) !!}</td></tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </details>
         </div>
     </section>
 
@@ -1096,15 +1203,19 @@ a { color: inherit; }
                 <details><summary>Mes clients doivent-ils payer en ligne ?</summary><p>Non. Ton client commande en laissant son nom, son téléphone et sa commune, puis il paie à la livraison.</p></details>
                 <details><summary>Faut-il un site internet ou un nom de domaine ?</summary><p>Non. Ta boutique a tout de suite son adresse Shopio, du type /s/ta-boutique, que tu partages où tu veux.</p></details>
                 <details><summary>C’est quoi un panier abandonné ?</summary><p>Un client qui a rempli le formulaire de commande sans valider. Shopio te le montre avec son numéro, pour que tu puisses l’appeler ou lui écrire sur WhatsApp. Le formulaire le prévient que son numéro sert à la boutique.</p></details>
+                <details><summary>Combien coûte le Plan Pro ?</summary><p>{{ number_format($pro['price'], 0, ',', ' ') }} GNF pour {{ $pro['days'] }} jours, soit environ {{ number_format((int) round($pro['price'] / max(1, $pro['days'])), 0, ',', ' ') }} GNF par jour. Les {{ $trialDays }} premiers jours sont offerts à chaque nouvelle boutique.</p></details>
+                <details><summary>Comment je paie l’abonnement ?</summary><p>Depuis ton tableau de bord, par Orange Money, MTN, PayCard ou carte Visa. Le renouvellement est manuel : rien n’est prélevé sans toi.</p></details>
+                <details><summary>Que se passe-t-il à la fin de l’essai ?</summary><p>Ta boutique repasse automatiquement sur le plan Gratuit ({{ $pro['products'] }} produits, {{ $pro['orders'] }} commandes traitées par mois). Tu ne perds ni tes produits ni tes commandes, et tu peux passer au Pro quand tu veux.</p></details>
                 <details><summary>Shopio IA est-il inclus ?</summary><p>Shopio IA est réservé au Plan Pro, offert pendant {{ $trialDays }} jours à chaque nouvelle boutique.</p></details>
                 <details><summary>Je peux travailler avec mon équipe ?</summary><p>Oui. Avec le Plan Pro, tu ajoutes tes employés et tes livreurs. Tu choisis si tes closers voient les paniers abandonnés.</p></details>
             </div>
+            @if($whatsapp)<p class="faq-more rv">Une autre question ? <a href="{{ $whatsapp }}" target="_blank" rel="noopener">Écris-nous sur WhatsApp</a>, on te répond.</p>@endif
         </div>
     </section>
 
     <section class="final rv">
         <h2>Prêt à vendre en ligne ?</h2>
-        <p>Crée ta boutique en quelques minutes. {{ $trialDays }} jours de Plan Pro offerts, sans carte bancaire.</p>
+        <p>Crée ta boutique en quelques minutes. {{ $trialDays }} jours de Plan Pro offerts, sans carte bancaire. Ensuite : gratuit, ou {{ number_format($pro['price'], 0, ',', ' ') }} GNF par mois pour le Pro.</p>
         <div class="hero-cta">
             <a class="btn btn-main" href="{{ $cta }}">{{ $ctaLabel }} <span aria-hidden="true">→</span></a>
             <a class="btn btn-line" href="{{ route('welcome') }}">Voir le marché Shopio</a>
@@ -1112,6 +1223,9 @@ a { color: inherit; }
     </section>
 </main>
 
+@if($whatsapp)
+<a class="wa-fab" href="{{ $whatsapp }}" target="_blank" rel="noopener" aria-label="Écrire au support Shopio sur WhatsApp"><i>{!! $i('whats', 18) !!}</i><span>Une question ?</span></a>
+@endif
 <div class="mcta" id="mcta"><a class="btn btn-main" href="{{ $cta }}">{{ $ctaLabel }} <span aria-hidden="true">→</span></a></div>
 
 
@@ -1122,6 +1236,7 @@ a { color: inherit; }
         <nav aria-label="Liens">
             <a href="{{ route('welcome') }}">Marché</a>
             @guest<a href="{{ route('login') }}">Se connecter</a><a href="{{ $register }}">Créer ma boutique</a>@endguest
+            @if($whatsapp)<a href="{{ $whatsapp }}" target="_blank" rel="noopener">Support WhatsApp</a>@endif
             <a href="{{ route('legal.terms') }}">Conditions d’utilisation</a>
         </nav>
     </div>
@@ -1241,6 +1356,14 @@ a { color: inherit; }
         });
         shot.addEventListener('mouseleave', () => { dash.style.transform = ''; });
     }
+
+    /* ─────────── Menu : section visible mise en avant ─────────── */
+    const navA = [...document.querySelectorAll('.nav-links a[href^="#"]')];
+    const navObs = new IntersectionObserver(es => es.forEach(e => {
+        if (!e.isIntersecting) return;
+        navA.forEach(a => { const on = a.getAttribute('href') === '#' + e.target.id; a.classList.toggle('is-on', on); if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+    }), { rootMargin: '-40% 0px -55% 0px' });
+    navA.forEach(a => { const t = document.querySelector(a.getAttribute('href')); if (t) navObs.observe(t); });
 
     /* ─────────── Démos ─────────── */
     const demo = runner();

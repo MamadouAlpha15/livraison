@@ -284,8 +284,66 @@ $I = [
             {!! $I['truck_tab'] !!} Entreprises livraison
             <span class="tab-cnt">{{ number_format($statsCo['total']) }}</span>
         </a>
+        <a href="{{ route('admin.avis.index', ['tab' => 'temoignages']) }}"
+           class="tab-btn {{ $tab === 'temoignages' ? 'on' : '' }}">
+            ★ Témoignages Shopio
+            <span class="tab-cnt" @if($statsTm['pending'] > 0) style="background:#F59E0B;color:#16162A" title="{{ $statsTm['pending'] }} en attente" @endif>{{ $statsTm['pending'] > 0 ? $statsTm['pending'] : number_format($statsTm['total']) }}</span>
+        </a>
     </div>
 
+    @if($tab === 'temoignages')
+    {{-- TÉMOIGNAGES DES VENDEURS (page d'accueil) : rien n'est affiché avant validation --}}
+    <div class="tcard">
+        <div style="padding:14px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <div style="font-size:14px;font-weight:800">Témoignages des vendeurs</div>
+            <span style="font-size:12px;color:var(--muted)">Publiés sur la page d’accueil après validation · {{ $statsTm['pending'] }} en attente</span>
+        </div>
+        <div class="twrap">
+            <table>
+                <thead><tr><th>Boutique</th><th>Note</th><th>Témoignage</th><th>Statut</th><th>Date</th><th></th></tr></thead>
+                <tbody>
+                @forelse($reviews as $tm)
+                <tr>
+                    <td>
+                        <div style="font-weight:700;font-size:13px">{{ Str::limit($tm->shop?->name ?? '—', 26) }}</div>
+                        <div class="muted">{{ $tm->author }}{{ $tm->author_role ? ', ' . $tm->author_role : '' }}</div>
+                        @if($tm->shop)<a href="{{ \App\Support\Storefront::publicUrl($tm->shop) }}" target="_blank" rel="noopener" style="font-size:12px">Voir la vitrine ↗</a>@endif
+                    </td>
+                    <td><div class="stars">{!! $starsHtml($tm->rating) !!}</div></td>
+                    <td style="max-width:380px"><div class="comment-txt">{{ $tm->text }}</div></td>
+                    <td>
+                        @php $tc = ['pending' => ['#B45309', '#FFFBEB'], 'approved' => ['#15803D', '#F0FDF4'], 'rejected' => ['#DC2626', '#FEF2F2']][$tm->status] ?? ['#64748b', '#f1f5f9']; @endphp
+                        <span style="display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:800;color:{{ $tc[0] }};background:{{ $tc[1] }}">{{ \App\Models\ShopTestimonial::STATUSES[$tm->status] ?? $tm->status }}</span>
+                    </td>
+                    <td><div style="font-size:12px">{{ $tm->updated_at->diffForHumans() }}</div></td>
+                    <td>
+                        <div style="display:flex;gap:6px;flex-wrap:wrap">
+                            @if($tm->status !== 'approved')
+                            <form method="POST" action="{{ route('admin.avis.testimonials.approve', $tm) }}">@csrf<button type="submit" class="btn-del" style="color:#15803D;border-color:rgba(21,128,61,.3);background:#F0FDF4">Publier</button></form>
+                            @endif
+                            @if($tm->status !== 'rejected')
+                            <form method="POST" action="{{ route('admin.avis.testimonials.reject', $tm) }}">@csrf<button type="submit" class="btn-del" style="color:#B45309;border-color:rgba(180,83,9,.3);background:#FFFBEB">{{ $tm->status === 'approved' ? 'Retirer' : 'Refuser' }}</button></form>
+                            @endif
+                            <form method="POST" action="{{ route('admin.avis.testimonials.destroy', $tm) }}" onsubmit="return confirm('Supprimer ce témoignage ?')">@csrf @method('DELETE')<button type="submit" class="btn-del">{!! $I['trash'] !!} Supprimer</button></form>
+                        </div>
+                    </td>
+                </tr>
+                @empty
+                <tr><td colspan="6">
+                    <div class="empty-state">
+                        <div class="empty-title">Aucun témoignage pour l’instant</div>
+                        <div class="empty-sub">Les vendeurs donnent leur avis depuis leur tableau de bord (« Ton avis sur Shopio »).</div>
+                    </div>
+                </td></tr>
+                @endforelse
+                </tbody>
+            </table>
+        </div>
+        @if($reviews->hasPages())
+        <div style="padding:16px 20px;border-top:1px solid var(--bd)">{{ $reviews->links() }}</div>
+        @endif
+    </div>
+    @else
     {{-- FILTRES --}}
     <div class="filter-bar">
         <div class="chips">
@@ -439,6 +497,7 @@ $I = [
         <div style="padding:16px 20px;border-top:1px solid var(--bd)">{{ $reviews->links() }}</div>
         @endif
     </div>
+    @endif
 
 </div>
 </div>
