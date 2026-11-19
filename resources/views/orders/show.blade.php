@@ -485,9 +485,10 @@ $init = fn(string $n): string =>
 
     {{-- ── Topbar ── --}}
     <div class="topbar">
-        <a href="{{ auth()->check() ? route('client.orders.index') : url('/') }}" class="btn-back">
+        {{-- Client sans compte : retour au marché (/ présente Shopio aux vendeurs) --}}
+        <a href="{{ auth()->check() ? route('client.orders.index') : route('welcome') }}" class="btn-back">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-            {{ auth()->check() ? 'Mes commandes' : 'Accueil' }}
+            {{ auth()->check() ? 'Mes commandes' : 'Le marché' }}
         </a>
         <div class="topbar-info">
             @if($isGroup)

@@ -27,6 +27,8 @@
                             <a href="{{ route('boutique.storefront.edit') }}" class="db-act"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Personnaliser ma boutique</a>
                             <button type="button" class="db-act" data-share-shop="{{ $shopPublicUrl }}" data-share-name="{{ $shop->name }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13"/></svg>Partager ma boutique</button>
                         </div>
+                        {{-- Témoignage du vendeur sur Shopio (page d'accueil, après validation) --}}
+                        <a href="{{ route('boutique.testimonial.edit') }}" class="db-tm">★ Donne ton avis sur Shopio</a>
                     </div>
                     {{-- Scène 3D décorative : sphère bleue, carte « Visites ce mois », pièce GNF --}}
                     <div class="sv-scene" aria-hidden="true">

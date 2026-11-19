@@ -1346,6 +1346,8 @@ body { font-variant-numeric: tabular-nums; }
 .db-act.is-main { background: var(--sv-btn, #1F7CF6); color: #fff; box-shadow: none; }
 .db-act.is-main svg { color: #fff; }
 .db-act.is-main:hover { background: var(--sv-btn-h, #1667D6); color: #fff; }
+.db-tm { align-self: flex-start; color: var(--text-2); font-size: 12.5px; font-weight: 700; text-decoration: none; }
+.db-tm:hover { color: var(--text); text-decoration: underline; }
 .db-act b { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: rgba(255,255,255,.22); font-size: 11.5px; }
 .sv-hello { background: var(--surface) !important; color: var(--text) !important; box-shadow: inset 0 0 0 1px var(--border) !important; grid-template-columns: 1fr !important; padding: 24px !important; border-radius: 18px !important; }
 .sv-hello::before, .sv-hello::after, .sv-scene { display: none !important; }

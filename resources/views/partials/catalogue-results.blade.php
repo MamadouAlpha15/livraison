@@ -120,7 +120,7 @@ fragment soit inclus dans welcome.blade.php ou rendu seul.
 @foreach($categoryGroups as $group)
 <div class="sec-hd reveal">
     <div class="sec-title">{!! \App\Support\IconLibrary::categorySvg($group['name']) !!} Populaire en <strong>{{ $group['name'] }}</strong></div>
-    <a href="{{ url('/') }}?cat={{ urlencode($group['name']) }}#catalogue" class="sec-link">Tout voir →</a>
+    <a href="{{ route('welcome') }}?cat={{ urlencode($group['name']) }}#catalogue" class="sec-link">Tout voir →</a>
 </div>
 <div class="reco-row-outer">
     <div class="cat-group-row">
@@ -145,7 +145,7 @@ fragment soit inclus dans welcome.blade.php ou rendu seul.
 <div class="search-banner reveal" id="catalogue" style="scroll-margin-top:calc(var(--nav-h) + 12px)">
     {!! \App\Support\IconLibrary::svg('search', '', 17) !!}
     <span>Résultats pour <strong>&laquo;&nbsp;{{ request('s') }}&nbsp;&raquo;</strong> — {{ number_format($products->total()) }} produit{{ $products->total() > 1 ? 's' : '' }} trouvé{{ $products->total() > 1 ? 's' : '' }}</span>
-    <a href="{{ url('/') }}" class="search-banner-clear" data-live-clear data-noprogress>{!! \App\Support\IconLibrary::svg('x', '', 12) !!} Effacer</a>
+    <a href="{{ route('welcome') }}" class="search-banner-clear" data-live-clear data-noprogress>{!! \App\Support\IconLibrary::svg('x', '', 12) !!} Effacer</a>
 </div>
 @else
 <div class="sec-hd reveal" id="catalogue" style="scroll-margin-top:calc(var(--nav-h) + 12px)">
@@ -166,7 +166,7 @@ fragment soit inclus dans welcome.blade.php ou rendu seul.
     /* Base commune des filtres actifs à préserver d'un contrôle à l'autre (catégorie,
        tri, prix min/max) — ex: changer le tri ne doit pas faire perdre le filtre prix. */
     $baseParams = ['s' => request('s'), 'cat' => request('cat'), 'min_price' => $minPrice, 'max_price' => $maxPrice, 'sort' => $sort !== 'newest' ? $sort : null];
-    $catalogueUrl = fn (array $overrides) => url('/') . '?' . http_build_query(array_filter(array_merge($baseParams, $overrides))) . '#catalogue';
+    $catalogueUrl = fn (array $overrides) => route('welcome') . '?' . http_build_query(array_filter(array_merge($baseParams, $overrides))) . '#catalogue';
     $sortLabels = ['newest' => 'Plus récents', 'price_asc' => 'Prix croissant', 'price_desc' => 'Prix décroissant', 'popular' => 'Plus vendus'];
     $sortUrl = fn ($v) => $catalogueUrl(['sort' => $v !== 'newest' ? $v : null]);
     $gnf = fn ($v) => number_format((float) $v, 0, ',', ' ') . ' GNF';
@@ -206,7 +206,7 @@ fragment soit inclus dans welcome.blade.php ou rendu seul.
         </select>
     </div>
 
-    <form method="GET" action="{{ url('/') }}#catalogue" class="price-filter-form" data-live-form data-ajax>
+    <form method="GET" action="{{ route('welcome') }}#catalogue" class="price-filter-form" data-live-form data-ajax>
         <input type="hidden" name="s" value="{{ request('s') }}">
         <input type="hidden" name="cat" value="{{ request('cat') }}">
         @if($sort !== 'newest')<input type="hidden" name="sort" value="{{ $sort }}">@endif
@@ -230,7 +230,7 @@ fragment soit inclus dans welcome.blade.php ou rendu seul.
     </a>
     @endforeach
     @if(count($activeChips) > 1)
-    <a href="{{ url('/') }}?{{ http_build_query(array_filter(['s' => request('s')])) }}#catalogue" class="active-chips-reset" data-live-link>Tout effacer</a>
+    <a href="{{ route('welcome') }}?{{ http_build_query(array_filter(['s' => request('s')])) }}#catalogue" class="active-chips-reset" data-live-link>Tout effacer</a>
     @endif
 </div>
 @endif
@@ -248,7 +248,7 @@ fragment soit inclus dans welcome.blade.php ou rendu seul.
         </div>
         @if($isSearching || $isFiltering || $minPrice !== null || $maxPrice !== null)
             <div class="c-empty-sub">Essayez un autre mot-clé, une autre catégorie ou une autre fourchette de prix.</div>
-            <a href="{{ url('/') }}#catalogue" class="c-empty-cta" data-live-clear data-noprogress>{!! \App\Support\IconLibrary::svg('eye', '', 15) !!} Voir tous les produits</a>
+            <a href="{{ route('welcome') }}#catalogue" class="c-empty-cta" data-live-clear data-noprogress>{!! \App\Support\IconLibrary::svg('eye', '', 15) !!} Voir tous les produits</a>
         @else
             <div class="c-empty-sub">Les boutiques ajoutent de nouveaux produits chaque jour. Revenez bientôt !</div>
             <a href="{{ route('shops.index') }}" class="c-empty-cta">{!! \App\Support\IconLibrary::svg('store', '', 15) !!} Parcourir les boutiques</a>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Review;
 use App\Models\DeliveryCompanyReview;
+use App\Models\ShopTestimonial;
 use Illuminate\Http\Request;
 
 class AvisController extends Controller
@@ -26,7 +27,17 @@ class AvisController extends Controller
             'bad'   => DeliveryCompanyReview::where('rating', '<=', 2)->count(),
         ];
 
-        if ($tab === 'entreprises') {
+        // Témoignages des vendeurs sur Shopio (page d'accueil)
+        $statsTm = [
+            'total'   => ShopTestimonial::count(),
+            'pending' => ShopTestimonial::where('status', 'pending')->count(),
+        ];
+
+        if ($tab === 'temoignages') {
+            $reviews = ShopTestimonial::with(['shop', 'user'])
+                ->orderByRaw("CASE status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 ELSE 2 END")
+                ->latest('updated_at')->paginate(25)->withQueryString();
+        } elseif ($tab === 'entreprises') {
             $query = DeliveryCompanyReview::with(['company', 'user'])->latest();
 
             if ($rating) {
@@ -57,7 +68,7 @@ class AvisController extends Controller
         }
 
         return view('admin.avis.index', compact(
-            'reviews', 'tab', 'search', 'rating', 'statsShop', 'statsCo'
+            'reviews', 'tab', 'search', 'rating', 'statsShop', 'statsCo', 'statsTm'
         ));
     }
 
@@ -65,6 +76,26 @@ class AvisController extends Controller
     {
         $review->delete();
         return back()->with('deleted', 'Avis boutique supprimé.');
+    }
+
+    /** Témoignage d'un vendeur : publié sur la page d'accueil. */
+    public function approveTestimonial(ShopTestimonial $testimonial)
+    {
+        $testimonial->update(['status' => 'approved', 'approved_at' => now()]);
+        return back()->with('deleted', 'Témoignage publié sur la page d’accueil.');
+    }
+
+    /** Témoignage refusé (ou retiré de la page d'accueil). */
+    public function rejectTestimonial(ShopTestimonial $testimonial)
+    {
+        $testimonial->update(['status' => 'rejected', 'approved_at' => null]);
+        return back()->with('deleted', 'Témoignage retiré de la page d’accueil.');
+    }
+
+    public function destroyTestimonial(ShopTestimonial $testimonial)
+    {
+        $testimonial->delete();
+        return back()->with('deleted', 'Témoignage supprimé.');
     }
 
     public function destroyCompany(DeliveryCompanyReview $review)

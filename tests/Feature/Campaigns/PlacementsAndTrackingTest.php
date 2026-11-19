@@ -90,7 +90,8 @@ test('le site affiche le badge Sponsorisé et le lien de clic', function () {
     $product = F::product($shop, ['name' => 'Parfum boisé sponsorisé']);
     $campaign = F::campaign($shop, 'boost_produit', [$product->id], ['status' => C::STATUS_EN_COURS]);
 
-    $this->get('/?cat=' . urlencode('Beauté & Cosmétiques'))
+    // Le marché des clients est sur /marche (la page d'accueil / présente Shopio aux vendeurs)
+    $this->get(route('welcome', ['cat' => 'Beauté & Cosmétiques']))
         ->assertOk()
         ->assertSee('Parfum boisé sponsorisé')
         ->assertSee('Sponsorisé')

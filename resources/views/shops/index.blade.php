@@ -548,12 +548,12 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 
 {{-- ══════════ NAVBAR ══════════ --}}
 <nav class="top-nav">
-    <a href="{{ url('/') }}" class="nav-brand">
+    <a href="{{ route('welcome') }}" class="nav-brand">
         <div class="sb-logo-icon"><img src="/images/shopio3.jpeg" alt="Shopio" style="width:40px;height:40px;object-fit:cover;border-radius:9px"></div>
         {{ config('app.name', 'ShopManager') }}
     </a>
     <div class="nav-links">
-        <a href="{{ url('/') }}" class="nav-link-item">← Accueil</a>
+        <a href="{{ route('welcome') }}" class="nav-link-item">← Accueil</a>
         @guest
         <a href="{{ route('login') }}"    class="nav-link-item nav-btn nav-btn-outline" style="padding:7px 14px">Connexion</a>
         <a href="{{ route('register') }}" class="nav-btn">S'inscrire</a>
@@ -574,7 +574,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 
 {{-- Menu mobile --}}
 <div class="nav-mobile-menu" id="shopsMobileMenu">
-    <a href="{{ url('/') }}" class="nav-mobile-link">← Accueil</a>
+    <a href="{{ route('welcome') }}" class="nav-mobile-link">← Accueil</a>
     <div class="nav-mobile-divider"></div>
     @guest
     <a href="{{ route('login') }}"    class="nav-mobile-btn nav-mobile-btn-outline">Se connecter</a>
@@ -632,7 +632,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 <div class="shops-main">
 
     {{-- Retour --}}
-    <a href="{{ url('/') }}" class="back-top">← Retour à l'accueil</a>
+    <a href="{{ route('welcome') }}" class="back-top">← Retour à l'accueil</a>
 
     {{-- Filtres par type --}}
     @if($types->count() > 0)
@@ -761,7 +761,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--txt); margi
 {{-- ══════════ FOOTER MINI ══════════ --}}
 <footer class="mini-footer">
     <span>&copy; {{ date('Y') }} {{ config('app.name') }} ·
-    <a href="{{ url('/') }}">Accueil</a> ·
+    <a href="{{ route('welcome') }}">Accueil</a> ·
     <a href="{{ route('login') }}">Connexion</a> ·
     <a href="{{ route('register') }}">S'inscrire</a></span>
 </footer>

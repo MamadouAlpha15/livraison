@@ -419,8 +419,8 @@ test('l\'équipe crée un affilié externe avec accès ; il voit son tableau de 
     $this->actingAs($affiliate->user)->get(route('vendeur.parrainage'))->assertForbidden();
 });
 
-test('accueil : bouton « Devenir affilié » vers la page publique du programme', function () {
-    $this->get('/')->assertOk()
+test('marché : bouton « Devenir affilié » vers la page publique du programme', function () {
+    $this->get(route('welcome'))->assertOk()
         ->assertSee(route('affiliation.join'), false)
         ->assertSee('Devenir affilié');
 
