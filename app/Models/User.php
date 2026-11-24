@@ -51,6 +51,7 @@ class User extends Authenticatable
             'otp_expires_at'       => 'datetime',
             'last_active_at'       => 'datetime', // dernière visite (site ou appli), pour les relances des inactifs
             'reminders_opt_out_at' => 'datetime', // désinscrit des relances « Tu nous manques »
+            'welcome_sent_at'      => 'datetime', // message de bienvenue WhatsApp envoyé par l'équipe Shopio
         ];
     }
 
