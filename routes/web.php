@@ -727,6 +727,11 @@ Route::middleware(['auth', 'role:superadmin,staff'])
         /* Tous les utilisateurs (vue globale superadmin) */
         Route::get('/users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');
 
+        /* Bienvenue WhatsApp : écrire à chaque nouvel inscrit (envoi manuel par lien wa.me, aucun envoi automatique) */
+        Route::get('/bienvenue',          [\App\Http\Controllers\Admin\WelcomeController::class, 'index'])->name('welcome.index');
+        Route::put('/bienvenue/messages', [\App\Http\Controllers\Admin\WelcomeController::class, 'texts'])->name('welcome.texts');
+        Route::post('/bienvenue/{user}',  [\App\Http\Controllers\Admin\WelcomeController::class, 'mark']) ->name('welcome.mark');
+
         /* Annonces par email (diffusion ciblée : clients / vendeurs / entreprises) */
         Route::get('/broadcasts',          [\App\Http\Controllers\Admin\BroadcastController::class, 'index'])   ->name('broadcasts.index');
         Route::post('/broadcasts',         [\App\Http\Controllers\Admin\BroadcastController::class, 'store'])   ->name('broadcasts.store');

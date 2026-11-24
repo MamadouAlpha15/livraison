@@ -591,6 +591,7 @@ $I = [
         <a href="{{ route('admin.broadcasts.index') }}" class="sb-a">
             <span class="sb-i">{!! $I['megaphone'] !!}</span><span>Annonces par email</span>
         </a>
+        @include('admin.welcome._menu-link')
         <a href="{{ route('admin.plans.index') }}" class="sb-a"><span class="sb-i">{!! $I['cog'] !!}</span><span>Paramètres système</span></a>
     </nav>
     <div class="sb-ft">
