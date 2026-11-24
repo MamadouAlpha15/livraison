@@ -43,8 +43,26 @@ class WelcomeController extends Controller
         }
     }
 
+    /** La migration 2026_11_24_100000_add_welcome_whatsapp_to_users est-elle passée ? */
+    private static function ready(): bool
+    {
+        try {
+            return \Illuminate\Support\Facades\Schema::hasColumn('users', 'welcome_sent_at');
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
     public function index(Request $request): View
     {
+        // Base pas encore à jour : message clair au lieu d'une erreur 500
+        if (!self::ready()) {
+            return view('admin.welcome.index', [
+                'users' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 30), 'rows' => collect(),
+                'vue' => 'todo', 'qui' => 'all', 'texts' => WelcomeWhatsapp::texts(), 'vars' => WelcomeWhatsapp::VARS,
+                'stats' => ['todo' => 0, 'done' => 0, 'week' => 0], 'senders' => collect(), 'needsMigration' => true,
+            ]);
+        }
         $vue = in_array($request->query('vue'), ['todo', 'done', 'all'], true) ? $request->query('vue') : 'todo';
         $qui = in_array($request->query('qui'), ['all', 'vendor', 'client'], true) ? $request->query('qui') : 'all';
 
@@ -83,6 +101,7 @@ class WelcomeController extends Controller
     public function mark(Request $request, User $user): JsonResponse
     {
         abort_unless(in_array($user->role, ['admin', 'client'], true), 404);
+        if (!self::ready()) return response()->json(['error' => 'Lancez d’abord la migration : php artisan migrate'], 503);
         $done = $request->boolean('done');
         $user->forceFill([
             'welcome_sent_at' => $done ? now() : null,

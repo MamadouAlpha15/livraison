@@ -266,6 +266,9 @@ $meInit = strtoupper(substr($meName,0,1));
         </div>
     </div>
 
+    @if(!empty($needsMigration))
+    <div class="flash err">La base de données n’est pas encore à jour pour cette page. Lancez dans le terminal du projet : <code>php artisan migrate</code>, puis rechargez la page.</div>
+    @endif
     @if(session('success'))<div class="flash ok">{{ session('success') }}</div>@endif
     @if($errors->any())<div class="flash err">{{ $errors->first() }}</div>@endif
 
