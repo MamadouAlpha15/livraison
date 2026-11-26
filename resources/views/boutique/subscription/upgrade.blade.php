@@ -232,6 +232,12 @@ $proGnf   = number_format(150000, 0, ',', ' ');
                        class="plan-btn pro">
                         Passer au Plan Pro →
                     </a>
+                    @if(($proAnnual = (int) config('chapchappay.plans.pro_annual', 0)) > 0)
+                    <a href="{{ route('payment.checkout', ['type'=>'shop','id'=>$shop->id,'periode'=>'annee']) }}"
+                       style="display:block;margin-top:10px;text-align:center;font-weight:700;font-size:13px;color:inherit">
+                        ou à l’année : {{ number_format($proAnnual, 0, ',', ' ') }} GNF (−{{ round((1 - $proAnnual / max(1, 12 * (int) config('chapchappay.plans.pro', 150000))) * 100) }} %)
+                    </a>
+                    @endif
                 @endif
             </div>
         </div>

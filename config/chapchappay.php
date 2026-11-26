@@ -31,7 +31,8 @@ return [
 
     // Tarifs des abonnements en GNF (devise unique — ChapChap Pay opère en Guinée)
     'plans' => [
-        'pro'      => 150000, // Plan Pro — boutiques
+        'pro'      => 150000, // Plan Pro — boutiques (30 jours)
+        'pro_annual' => 1530000, // Plan Pro payé à l'année (365 jours) : 12 mois − 15 %
         'business' => 100000, // Plan Business — entreprises de livraison
     ],
 ];

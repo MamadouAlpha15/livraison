@@ -29,7 +29,12 @@
     @if($current !== $publishedModel)
     <form method="POST" action="{{ route('boutique.grow.model') }}">@csrf<input type="hidden" name="model" value="{{ $current }}"><button type="submit" class="pmb-use">Utiliser ce thème</button></form>
     @endif
+    @if($current === 'lookbook')
+    <a href="{{ route('boutique.looks.index') }}">Looks</a>
+    @else
     <a href="{{ route('boutique.storefront.sections', ['theme' => $current]) }}">Sections</a>
+    @if($current === 'cabine')<a href="{{ route('boutique.looks.index') }}#detourage">Photos sans fond</a>@endif
+    @endif
     <a href="{{ route('boutique.storefront.edit') }}">Ma vitrine</a>
     <a href="{{ route('boutique.grow') }}">Boutique</a>
 </div>

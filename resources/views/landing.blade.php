@@ -12,10 +12,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+@if($geo)
+<title>Vendre en ligne {{ $geo['in'] }} · boutique payée à la livraison | Shopio</title>
+<meta name="description" content="Crée ta boutique en ligne {{ $geo['in'] }} en quelques minutes : prix en {{ $geo['currency'] }}, commandes payées à la livraison à {{ $geo['city'] }} et partout dans le pays, relance des clients et livreurs.">
+@else
 <title>Shopio · Ta boutique en ligne, payée à la livraison</title>
 <meta name="description" content="Crée ta boutique en ligne en quelques minutes : pages produit qui vendent, commandes payées à la livraison, relance des paniers abandonnés et livreurs. Fait pour la Guinée et l'Afrique.">
+@endif
+<link rel="canonical" href="{{ url()->current() }}">
 <link rel="icon" href="{{ \App\Support\Assets::v('images/shopio-logo-192.png') }}">
-<meta property="og:title" content="Shopio · Ta boutique en ligne, payée à la livraison">
+<meta property="og:title" content="{{ $geo ? 'Vendre en ligne ' . $geo['in'] . ' avec Shopio' : 'Shopio · Ta boutique en ligne, payée à la livraison' }}">
 <meta property="og:description" content="Crée ta boutique en quelques minutes et vends partout, paiement à la livraison.">
 <meta property="og:image" content="{{ asset('images/shopio-logo-512.png') }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -61,7 +67,10 @@ a { color: inherit; }
 .nav-links a { padding: 8px 12px; border-radius: 9px; color: var(--ink-2); font-weight: 600; font-size: 14.5px; text-decoration: none; }
 .nav-links a:hover { background: var(--soft-2); color: var(--ink); }
 .nav-end { display: flex; align-items: center; gap: 8px; margin-left: auto; }
-.nav-login { padding: 8px 12px; color: var(--ink-2); font-weight: 700; font-size: 14.5px; text-decoration: none; }
+/* Menu : moins de liens quand la largeur manque (ils restent dans le menu mobile et la page) */
+@media (max-width: 1240px) { .nav-links a[href="#comparer"], .nav-links a[href="#faq"] { display: none; } }
+@media (max-width: 1040px) { .nav-links a[href="#fonctionnalites"] { display: none; } }
+.nav-login { white-space: nowrap; padding: 8px 12px; color: var(--ink-2); font-weight: 700; font-size: 14.5px; text-decoration: none; }
 .nav-login:hover { color: var(--ink); }
 .nav-burger { display: none; width: 42px; height: 42px; border: 0; border-radius: 10px; background: var(--soft-2); cursor: pointer; place-items: center; }
 .nav-menu { display: none; }
@@ -317,6 +326,7 @@ a { color: inherit; }
 .tms.is-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 900px; margin: 0 auto; }
 .tm { display: flex; flex-direction: column; gap: 14px; padding: 24px; border-radius: 20px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); }
 .tm .st { color: #F59E0B; letter-spacing: 2px; font-size: 15px; height: auto; padding: 0; background: none; }
+.tm-video { width: 100%; aspect-ratio: 9 / 12; object-fit: cover; border-radius: 14px; background: #0F172A; }
 .tm q { margin: 0; font-size: 16px; line-height: 1.6; quotes: '« ' ' »'; flex: 1; }
 .tm-who { display: flex; align-items: center; gap: 12px; padding-top: 14px; border-top: 1px solid var(--soft-2); }
 .tm-av { width: 42px; height: 42px; border-radius: 12px; background: var(--ink); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 14px; flex-shrink: 0; overflow: hidden; }
@@ -367,6 +377,39 @@ a { color: inherit; }
 .tools-sub { margin: 16px auto 0; max-width: 560px; text-align: center; color: var(--ink-2); font-size: 15px; }
 .tools-sub b { color: var(--ink); }
 @media (max-width: 700px) { .tools-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tool:nth-child(3) { border-left: 0; } .tool:nth-child(n+3) { border-top: 1px solid var(--soft-2); } }
+
+/* ── Prix au mois / à l'année ── */
+.bill { display: inline-flex; padding: 4px; border-radius: 12px; background: var(--soft-2); gap: 2px; margin: 0 auto 22px; }
+.bill button { min-height: 38px; padding: 0 16px; border: 0; border-radius: 9px; background: transparent; color: var(--ink-2); font: 700 14px var(--font); cursor: pointer; }
+.bill button[aria-pressed="true"] { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(15,23,42,.12); }
+.bill button em { font-style: normal; margin-left: 6px; padding: 2px 7px; border-radius: 999px; background: #DCFCE7; color: #15803D; font-size: 11.5px; }
+.bill-wrap { text-align: center; }
+#plans[data-bill="an"] .price.p-mois, #plans[data-bill="mois"] .price.p-an { display: none; }
+
+/* ── Invitation (lien de parrainage) ── */
+.invite { background: var(--ink); color: #fff; font-size: 14px; font-weight: 600; text-align: center; padding: 10px 16px; }
+.invite b { color: #93C5FD; }
+.invite a { color: #fff; font-weight: 800; margin-left: 6px; }
+
+/* ── Parrainage ── */
+.refer { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 34px; align-items: center; padding: 34px; border-radius: 26px; background: var(--soft); }
+.refer h2 { text-align: left; }
+.refer p { color: var(--ink-2); font-size: 16.5px; margin: 0 0 18px; }
+.refer-steps { display: grid; gap: 10px; }
+.refer-steps div { display: flex; gap: 14px; align-items: flex-start; padding: 16px; border-radius: 16px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); }
+.refer-steps b { display: grid; place-items: center; width: 30px; height: 30px; flex-shrink: 0; border-radius: 999px; background: var(--ink); color: #fff; font-size: 13px; }
+.refer-steps strong { display: block; font-size: 15px; } .refer-steps span { color: var(--ink-2); font-size: 14px; }
+@media (max-width: 860px) { .refer { grid-template-columns: 1fr; padding: 22px; } }
+
+/* ── Académie ── */
+.acad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.acad a { display: flex; flex-direction: column; gap: 8px; padding: 22px; border-radius: 18px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); text-decoration: none; transition: transform .2s, box-shadow .2s; }
+.acad a:hover { transform: translateY(-2px); box-shadow: var(--shadow), inset 0 0 0 1px var(--line); }
+.acad h3 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -.02em; }
+.acad p { margin: 0; color: var(--ink-2); font-size: 14.5px; flex: 1; }
+.acad small { color: var(--ink-3); font-weight: 700; font-size: 12.5px; }
+.acad-more { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+@media (max-width: 860px) { .acad { grid-template-columns: 1fr; } }
 
 /* ── Bandeau ── */
 .band { padding: 22px 0; border-block: 1px solid var(--soft-2); background: var(--soft); }
@@ -616,6 +659,9 @@ a { color: inherit; }
 .foot a { text-decoration: none; font-weight: 600; } .foot a:hover { color: var(--ink); }
 
 /* Apparition au défilement */
+.foot-geo { flex-basis: 100%; order: 9; display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0 !important; padding-top: 14px; border-top: 1px solid var(--soft-2); font-size: 13px; }
+.foot-geo span { color: var(--ink-3); font-weight: 700; }
+.foot-geo a[aria-current] { color: var(--ink); text-decoration: underline; }
 .rv { opacity: 0; transform: translateY(18px); transition: opacity .6s cubic-bezier(.22,1,.36,1), transform .6s cubic-bezier(.22,1,.36,1); }
 .rv.is-in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
@@ -664,6 +710,9 @@ a { color: inherit; }
     $bag = '<svg width="120" height="120" viewBox="0 0 120 120" aria-hidden="true"><defs><linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3F3A35"/><stop offset="1" stop-color="#1F1B18"/></linearGradient></defs><path d="M38 44c0-14 10-24 22-24s22 10 22 24" fill="none" stroke="#2A2622" stroke-width="6" stroke-linecap="round"/><rect x="22" y="42" width="76" height="62" rx="14" fill="url(#bg1)"/><rect x="50" y="58" width="20" height="8" rx="3" fill="#C9A86A"/></svg>';
 @endphp
 
+@if($referrer)
+<div class="invite" role="status">🎁 <b>{{ $referrer->name }}</b> t’invite sur Shopio : {{ $referralDays }} jours de Pro en plus de ton essai.<a href="{{ $cta }}">Créer ma boutique →</a></div>
+@endif
 <header class="nav" id="nav">
     <div class="wrap">
         <a class="logo" href="{{ route('landing') }}"><img src="{{ $logo }}" alt="" width="34" height="34">Shopio</a>
@@ -672,6 +721,7 @@ a { color: inherit; }
             <a href="#fonctionnalites">Fonctionnalités</a>
             <a href="#comparer">Comparer</a>
             <a href="#tarifs">Tarifs</a>
+            <a href="{{ route('academy.index') }}">Académie</a>
             <a href="#faq">Questions</a>
             <a href="{{ route('welcome') }}">Marché</a>
         </nav>
@@ -682,7 +732,7 @@ a { color: inherit; }
         </div>
     </div>
     <nav class="nav-menu" id="navMenu" aria-label="Menu">
-        <a href="#demos">Démos</a><a href="#fonctionnalites">Fonctionnalités</a><a href="#comparer">Comparer</a><a href="#tarifs">Tarifs</a><a href="#faq">Questions</a><a href="{{ route('welcome') }}">Marché Shopio</a>
+        <a href="#demos">Démos</a><a href="#fonctionnalites">Fonctionnalités</a><a href="#comparer">Comparer</a><a href="#tarifs">Tarifs</a><a href="{{ route('academy.index') }}">Académie</a><a href="#faq">Questions</a><a href="{{ route('welcome') }}">Marché Shopio</a>
         @guest<a href="{{ route('login') }}">Se connecter</a>@endguest
     </nav>
 </header>
@@ -692,10 +742,18 @@ a { color: inherit; }
     <section class="hero">
         <div class="wrap hero-in">
             <div class="hero-txt">
+                @if($geo)
+                <span class="pill"><b>{{ $geo['code'] }}</b> Shopio {{ $geo['in'] }} · prix en {{ $geo['currency'] }} · indicatif +{{ $geo['dial'] }}</span>
+                @else
                 <span class="pill"><b>Nouveau</b> Commandes, paniers abandonnés et Shopio IA</span>
+                @endif
                 {{-- Titre « Arrête de… » : tapé, mot clé surligné, effacé, puis la phrase suivante (texte complet pour les lecteurs d'écran) --}}
                 <h1 class="tw"><span class="sr">Arrête de perdre des commandes : Shopio réunit ta boutique, tes commandes, tes relances et tes livraisons.</span><span class="tw-vis" aria-hidden="true"><span id="twA">Arrête de perdre des commandes dans </span><mark id="twB">WhatsApp</mark><span class="tw-caret"></span></span></h1>
+                @if($geo)
+                <p class="hero-sub">À {{ $geo['city'] }} comme partout {{ $geo['in'] }}, Shopio remplace tout ça : ta boutique, tes commandes, tes relances et tes livraisons au même endroit, avec tes prix en {{ $geo['currency'] }}.</p>
+                @else
                 <p class="hero-sub">Shopio remplace tout ça. Ta boutique, tes commandes, tes relances et tes livraisons au même endroit, pensé pour la vente payée à la livraison.</p>
+                @endif
                 <div class="hero-cta">
                     <a class="btn btn-main" href="{{ $cta }}">{{ $ctaLabel }} <span aria-hidden="true">→</span></a>
                     <a class="btn btn-line" href="#demos">{!! $i('play', 16) !!} Voir les démos</a>
@@ -809,7 +867,11 @@ a { color: inherit; }
             <div class="mq-track">
                 @foreach([false, true] as $dup)
                     @foreach($mqList as [$code, $cname, $cur])
+                    @if(isset($countryPages[$code]))
+                    <a class="mq-c" href="{{ $countryPages[$code][1] }}" @if($dup) aria-hidden="true" tabindex="-1" @endif style="text-decoration:none;color:inherit"><b>{{ $code }}</b>{{ $cname }} <small>{{ $cur }}</small></a>
+                    @else
                     <span class="mq-c" @if($dup) aria-hidden="true" @endif><b>{{ $code }}</b>{{ $cname }} <small>{{ $cur }}</small></span>
+                    @endif
                     @endforeach
                 @endforeach
             </div>
@@ -1156,6 +1218,7 @@ a { color: inherit; }
             <div class="tms {{ $testimonials->count() === 1 ? 'is-1' : ($testimonials->count() === 2 ? 'is-2' : '') }}">
                 @foreach($testimonials as $tm)
                 <figure class="tm rv" style="margin:0">
+                    @if($tm['video'])<video src="{{ $tm['video'] }}#t=0.5" controls preload="metadata" playsinline class="tm-video" aria-label="Vidéo de {{ $tm['author'] }}, {{ $tm['shop'] }}"></video>@endif
                     <span class="st" role="img" aria-label="{{ $tm['rating'] }} sur 5">{{ str_repeat('★', $tm['rating']) }}{{ str_repeat('☆', 5 - $tm['rating']) }}</span>
                     <blockquote style="margin:0;flex:1;display:flex"><q>{{ $tm['text'] }}</q></blockquote>
                     <figcaption class="tm-who">
@@ -1198,7 +1261,13 @@ a { color: inherit; }
                 <h2>Un prix simple, sans surprise</h2>
                 <p>Commence gratuitement. Chaque nouvelle boutique reçoit {{ $trialDays }} jours de Plan Pro offerts, sans carte bancaire.</p>
             </div>
-            <div class="plans">
+            @if($annual > 0)
+            <div class="bill-wrap rv"><div class="bill" role="group" aria-label="Payer le Pro">
+                <button type="button" data-bill-set="mois" aria-pressed="true">Au mois</button>
+                <button type="button" data-bill-set="an" aria-pressed="false">À l’année <em>−{{ round((1 - $annual / max(1, $pro['price'] * 12)) * 100) }} %</em></button>
+            </div></div>
+            @endif
+            <div class="plans" id="plans" data-bill="mois">
                 <div class="plan rv">
                     <h3>Gratuit</h3>
                     <p>Pour démarrer et faire tes premières ventes.</p>
@@ -1215,7 +1284,10 @@ a { color: inherit; }
                     <span class="plan-flag">Recommandé pour vendre plus</span>
                     <h3>Pro <span>{{ $trialDays }} jours offerts</span></h3>
                     <p>Pour vendre plus et travailler en équipe.</p>
-                    <div class="price"><b>{{ $gnf($pro['price']) }}</b><span>GNF / mois</span><small>soit environ {{ $gnf($perDay) }} GNF par jour</small></div>
+                    <div class="price p-mois"><b>{{ $gnf($pro['price']) }}</b><span>GNF / mois</span><small>soit environ {{ $gnf($perDay) }} GNF par jour</small></div>
+                    @if($annual > 0)
+                    <div class="price p-an"><b>{{ $gnf($annual) }}</b><span>GNF / an</span><small>soit {{ $gnf((int) round($annual / 12)) }} GNF par mois · {{ $gnf($pro['price'] * 12 - $annual) }} GNF économisés</small></div>
+                    @endif
                     <ul>
                         <li>{!! $i('check', 16) !!} Produits et commandes sans limite</li>
                         <li>{!! $i('check', 16) !!} Shopio IA et assistant de ventes IA</li>
@@ -1243,6 +1315,51 @@ a { color: inherit; }
         </div>
     </section>
 
+    {{-- ═══ Parrainage : 1 mois de Pro chacun (le parrain au 1er paiement du filleul) ═══ --}}
+    <section class="sec" id="parrainage" style="padding-top:0">
+        <div class="wrap">
+            <div class="refer rv">
+                <div>
+                    <span class="kicker">Parrainage</span>
+                    <h2>Invite un vendeur, gagnez chacun {{ $referralDays }} jours de Pro</h2>
+                    <p>Chaque boutique Shopio a son lien d’invitation. Partage-le à tes amis qui vendent en ligne.</p>
+                    @auth
+                        @if(auth()->user()->role === 'admin' && auth()->user()->shop_id)
+                        <a class="btn btn-main" href="{{ route('boutique.referral') }}">Mon lien d’invitation</a>
+                        @endif
+                    @else
+                        <a class="btn btn-main" href="{{ $cta }}">Créer ma boutique et mon lien</a>
+                    @endauth
+                </div>
+                <div class="refer-steps">
+                    <div><b>1</b><span><strong>Ton ami crée sa boutique avec ton lien</strong>Dans les 30 jours après l’avoir ouvert.</span></div>
+                    <div><b>2</b><span><strong>Il reçoit {{ $referralDays }} jours de Pro en plus</strong>En plus des {{ $trialDays }} jours d’essai offerts à tous.</span></div>
+                    <div><b>3</b><span><strong>Tu reçois {{ $referralDays }} jours de Pro</strong>Quand sa boutique paie son premier abonnement.</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- ═══ Académie Shopio : guides pratiques ═══ --}}
+    <section class="sec" id="academie" style="padding-top:20px">
+        <div class="wrap">
+            <div class="sec-hd rv">
+                <span class="kicker">Académie Shopio</span>
+                <h2>Apprends à vendre en ligne, pas à pas</h2>
+                <p>Des guides courts et gratuits : trouver un produit, photographier, écrire une page qui vend, faire de la pub, réduire les refus.</p>
+            </div>
+            <div class="acad">
+                @foreach($guides as $gSlug => $g)
+                <a class="rv" href="{{ route('academy.show', $gSlug) }}"><h3>{{ $g['title'] }}</h3><p>{{ $g['summary'] }}</p><small>{{ $g['minutes'] }} min de lecture</small></a>
+                @endforeach
+            </div>
+            <div class="acad-more">
+                <a class="btn btn-line" href="{{ route('academy.index') }}">Voir les {{ $guideCount }} guides</a>
+                @if($community)<a class="btn btn-line" href="{{ $community }}" target="_blank" rel="noopener">{!! $i('whats', 16) !!} Rejoindre les vendeurs sur WhatsApp</a>@endif
+            </div>
+        </div>
+    </section>
+
     {{-- ═══ Questions ═══ --}}
     <section class="sec" id="faq">
         <div class="wrap">
@@ -1251,7 +1368,7 @@ a { color: inherit; }
                 <details><summary>Mes clients doivent-ils payer en ligne ?</summary><p>Non. Ton client commande en laissant son nom, son téléphone et sa commune, puis il paie à la livraison.</p></details>
                 <details><summary>Faut-il un site internet ou un nom de domaine ?</summary><p>Non. Ta boutique a tout de suite son adresse Shopio, du type /s/ta-boutique, que tu partages où tu veux.</p></details>
                 <details><summary>C’est quoi un panier abandonné ?</summary><p>Un client qui a rempli le formulaire de commande sans valider. Shopio te le montre avec son numéro, pour que tu puisses l’appeler ou lui écrire sur WhatsApp. Le formulaire le prévient que son numéro sert à la boutique.</p></details>
-                <details><summary>Combien coûte le Plan Pro ?</summary><p>{{ number_format($pro['price'], 0, ',', ' ') }} GNF pour {{ $pro['days'] }} jours, soit environ {{ number_format((int) round($pro['price'] / max(1, $pro['days'])), 0, ',', ' ') }} GNF par jour. Les {{ $trialDays }} premiers jours sont offerts à chaque nouvelle boutique.</p></details>
+                <details><summary>Combien coûte le Plan Pro ?</summary><p>@if($annual > 0)Au mois, @endif{{ number_format($pro['price'], 0, ',', ' ') }} GNF pour {{ $pro['days'] }} jours, soit environ {{ number_format((int) round($pro['price'] / max(1, $pro['days'])), 0, ',', ' ') }} GNF par jour. Les {{ $trialDays }} premiers jours sont offerts à chaque nouvelle boutique.@if($annual > 0) À l’année : {{ number_format($annual, 0, ',', ' ') }} GNF pour 365 jours.@endif</p></details>
                 <details><summary>Comment je paie l’abonnement ?</summary><p>Depuis ton tableau de bord, par Orange Money, MTN, PayCard ou carte Visa. Le renouvellement est manuel : rien n’est prélevé sans toi.</p></details>
                 <details><summary>Que se passe-t-il à la fin de l’essai ?</summary><p>Ta boutique repasse automatiquement sur le plan Gratuit ({{ $pro['products'] }} produits, {{ $pro['orders'] }} commandes traitées par mois). Tu ne perds ni tes produits ni tes commandes, et tu peux passer au Pro quand tu veux.</p></details>
                 <details><summary>Shopio IA est-il inclus ?</summary><p>Shopio IA est réservé au Plan Pro, offert pendant {{ $trialDays }} jours à chaque nouvelle boutique.</p></details>
@@ -1281,6 +1398,10 @@ a { color: inherit; }
     <div class="wrap">
         <a class="logo" href="{{ route('landing') }}"><img src="{{ $logo }}" alt="" width="28" height="28">Shopio</a>
         <span>© {{ now()->year }} Shopio</span>
+        <nav aria-label="Vendre en ligne par pays" class="foot-geo">
+            <span>Vendre en ligne :</span>
+            @foreach($countryPages as $cp => [$cpName, $cpUrl])<a href="{{ $cpUrl }}" @if($geo && $geo['code'] === $cp) aria-current="page" @endif>{{ $cpName }}</a>@endforeach
+        </nav>
         <nav aria-label="Liens">
             <a href="{{ route('welcome') }}">Marché</a>
             @guest<a href="{{ route('login') }}">Se connecter</a><a href="{{ $register }}">Créer ma boutique</a>@endguest
@@ -1457,6 +1578,12 @@ a { color: inherit; }
         navA.forEach(a => { const on = a.getAttribute('href') === '#' + e.target.id; a.classList.toggle('is-on', on); if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
     }), { rootMargin: '-40% 0px -55% 0px' });
     navA.forEach(a => { const t = document.querySelector(a.getAttribute('href')); if (t) navObs.observe(t); });
+
+    /* ─────────── Tarifs : au mois ou à l'année ─────────── */
+    document.querySelectorAll('[data-bill-set]').forEach(b => b.addEventListener('click', () => {
+        const v = b.dataset.billSet; $('plans').dataset.bill = v;
+        document.querySelectorAll('[data-bill-set]').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+    }));
 
     /* ─────────── Démos ─────────── */
     const demo = runner();

@@ -4,13 +4,15 @@
     Preuve sociale : avis clients, témoignages Facebook, témoignages en photos, résultats (vrais chiffres),
     tableau de comparaison. Média : diaporama, grille vidéos, vitrine vidéo. Commerce : bannière,
     bannière code promo, paiement en confiance, produits d'une catégorie.
-    Une section vide (rien de rempli) n'affiche rien. Variables : $sec, $theme (express | signature), $pm
+    Une section vide (rien de rempli) n'affiche rien. Variables : $sec, $theme (express | signature | cabine), $pm
 --}}
 @php
     use App\Support\HomeSections as HS;
-    $c = $theme === 'signature'
-        ? ['wrap' => 'sg-wrap', 'h2' => 'sg-h2', 'sub' => 'sg-lead', 'btn' => 'sg-btn', 'sec' => 'sg-sec', 'faq' => 'sg-wrap sg-faq']
-        : ['wrap' => 'ex-wrap', 'h2' => 'ex-h2', 'sub' => 'ex-sub', 'btn' => 'ex-btn is-acc', 'sec' => 'ex-sec', 'faq' => 'ex-wrap ex-faq'];
+    $c = match ($theme) {
+        'signature' => ['wrap' => 'sg-wrap', 'h2' => 'sg-h2', 'sub' => 'sg-lead', 'btn' => 'sg-btn', 'sec' => 'sg-sec', 'faq' => 'sg-wrap sg-faq'],
+        'cabine'    => ['wrap' => 'cb-wrap', 'h2' => 'cb-h2', 'sub' => 'cb-sub', 'btn' => 'cb-btn', 'sec' => 'cb-sec', 'faq' => 'cb-wrap cb-faq'],
+        default     => ['wrap' => 'ex-wrap', 'h2' => 'ex-h2', 'sub' => 'ex-sub', 'btn' => 'ex-btn is-acc', 'sec' => 'ex-sec', 'faq' => 'ex-wrap ex-faq'],
+    };
     $d = $sec['d'];
     $t = fn ($k) => HS::txt($theme, $sec, $k);
     $catalog = $pm['shop']['url'] . '?vue=produits';

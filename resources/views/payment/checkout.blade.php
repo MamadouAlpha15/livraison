@@ -114,9 +114,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
                         <span class="order-amount-v">{{ number_format($amount, 0, ',', ' ') }}</span>
                         <span class="order-amount-c">GNF</span>
                     </div>
-                    <div class="order-amount-note">Valable 30 jours · Renouvellement manuel</div>
+                    <div class="order-amount-note">{{ $plan === 'pro_annual' ? 'Valable 1 an (365 jours)' : 'Valable 30 jours' }} · Renouvellement manuel</div>
                 </div>
-                <div class="order-plan-badge">⚡ Plan {{ ucfirst($plan) }}</div>
+                <div class="order-plan-badge">⚡ {{ $plan === 'pro_annual' ? 'Plan Pro · 1 an' : 'Plan ' . ucfirst($plan) }}</div>
             </div>
         </div>
 
@@ -141,9 +141,17 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
                 </div>
             </div>
 
+            @if($type === 'shop' && ($annual ?? 0) > 0)
+            {{-- Plan Pro : au mois ou à l'année (−15 %) --}}
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px" role="group" aria-label="Durée de l'abonnement">
+                <a href="{{ route('payment.checkout', ['type' => 'shop', 'id' => $subscriber->id]) }}" style="padding:12px;border-radius:12px;text-decoration:none;text-align:center;font-weight:800;font-size:13px;{{ $period === 'mois' ? 'background:#EFF6FF;color:#1667D6;box-shadow:inset 0 0 0 2px #1F7CF6' : 'background:#fff;color:#0F172A;box-shadow:inset 0 0 0 1px #E2E8F0' }}" @if($period === 'mois') aria-current="true" @endif>Au mois<br><span style="font-weight:600;font-size:12px">{{ number_format($monthly, 0, ',', ' ') }} GNF / mois</span></a>
+                <a href="{{ route('payment.checkout', ['type' => 'shop', 'id' => $subscriber->id, 'periode' => 'annee']) }}" style="padding:12px;border-radius:12px;text-decoration:none;text-align:center;font-weight:800;font-size:13px;{{ $period === 'annee' ? 'background:#EFF6FF;color:#1667D6;box-shadow:inset 0 0 0 2px #1F7CF6' : 'background:#fff;color:#0F172A;box-shadow:inset 0 0 0 1px #E2E8F0' }}" @if($period === 'annee') aria-current="true" @endif>À l’année · −{{ round((1 - $annual / max(1, $monthly * 12)) * 100) }} %<br><span style="font-weight:600;font-size:12px">{{ number_format($annual, 0, ',', ' ') }} GNF / an</span></a>
+            </div>
+            @endif
             <form method="POST" action="{{ route('payment.initiate') }}" id="payForm">
                 @csrf
                 <input type="hidden" name="type" value="{{ $type }}">
+                <input type="hidden" name="periode" value="{{ $period ?? 'mois' }}">
                 <input type="hidden" name="id" value="{{ $subscriber->id }}">
 
                 <button type="submit" class="pay-btn" id="payBtn">

@@ -70,6 +70,17 @@ html, body { background: var(--sx-bg); }
 .sx-pair { display: grid; gap: 6px; padding: 10px; border-radius: 12px; background: var(--sx-soft); }
 .sx-pair-hd { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 800; color: var(--sx-ink3); }
 .sx-msg { font-size: 12.5px; font-weight: 600; color: var(--sx-ink3); }
+.sx-msg:empty { display: none; }
+.sx-ai { display: grid; gap: 8px; padding: 12px; margin-bottom: 12px; border-radius: 12px; background: linear-gradient(135deg, #F3EEFF, #EAF2FF); }
+.sx-ai-hd { display: flex; justify-content: space-between; align-items: center; }
+.sx-ai-hd b { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: #4C1D95; }
+.sx-ai-hd a { font-size: 12px; font-weight: 700; color: #4C1D95; }
+.sx-btn-ai { background: #4C1D95; border-color: #4C1D95; color: #fff; justify-self: start; }
+.sx-btn-ai:hover:not(:disabled) { background: #3B1578; }
+.sx-btn-ai:disabled { opacity: .55; cursor: not-allowed; }
+.sx-btn-ai.is-busy { opacity: .8; cursor: progress; }
+.sx-item.is-ai { animation: sxAiGlow 1.6s ease-out; }
+@keyframes sxAiGlow { from { box-shadow: 0 0 0 3px #A78BFA; } }
 .sx-msg.is-err { color: var(--sx-err); } .sx-msg.is-ok { color: var(--sx-ok); }
 
 .sx-add { border: 2px dashed #B9C7DD; border-radius: 14px; padding: 14px; display: grid; gap: 10px; background: transparent; }

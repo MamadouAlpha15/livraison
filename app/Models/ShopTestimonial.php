@@ -18,7 +18,7 @@ class ShopTestimonial extends Model
         'rejected' => 'Refusé',
     ];
 
-    protected $fillable = ['shop_id', 'user_id', 'rating', 'text', 'author', 'author_role', 'status', 'approved_at'];
+    protected $fillable = ['shop_id', 'user_id', 'rating', 'text', 'author', 'author_role', 'video', 'status', 'approved_at'];
 
     protected $casts = [
         'rating'      => 'integer',

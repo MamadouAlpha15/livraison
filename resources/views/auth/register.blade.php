@@ -236,7 +236,7 @@ $countries = [
                         onchange="updateFlag(this)">
                     <option value="">-- Sélectionner votre pays --</option>
                     @foreach($countries as $code => $info)
-                    <option value="{{ $code }}" data-flag="{{ $info[0] }}" {{ old('country') === $code ? 'selected':'' }}>
+                    <option value="{{ $code }}" data-flag="{{ $info[0] }}" {{ old('country', strtoupper((string) request('country'))) === $code ? 'selected':'' }}>
                         {{ $info[0] }} {{ $info[1] }}
                     </option>
                     @endforeach

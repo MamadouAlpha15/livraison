@@ -260,7 +260,7 @@ $clientMessages = ShopMessage::where('shop_id', $shop->id)
         $recentPayment = \App\Models\Subscription::where('subscriber_type', \App\Models\Shop::class)
             ->where('subscriber_id', $shop->id)
             ->where('status', 'active')
-            ->where('payment_method', '!=', 'essai_gratuit') // l'essai offert à la création n'est pas un paiement
+            ->whereNotIn('payment_method', ['essai_gratuit', 'parrainage']) // essai et mois offerts : pas des paiements
             ->where('updated_at', '>=', now()->subMinutes(10))
             ->exists();
 

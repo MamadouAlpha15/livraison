@@ -182,6 +182,7 @@ $meInit = strtoupper(substr($meName,0,1));
         <a href="{{ route('admin.avis.index') }}" class="sb-a"><span class="sb-i">{!! $I['star'] !!}</span><span>Avis &amp; Notation</span></a>
         <a href="{{ route('admin.support.index') }}" class="sb-a"><span class="sb-i">{!! $I['ticket'] !!}</span><span>Support conversations</span></a>
         <a href="{{ route('admin.broadcasts.index') }}" class="sb-a on"><span class="sb-i">{!! $I['megaphone'] !!}</span><span>Annonces par email</span></a>
+        <a href="{{ route('admin.welcome.index') }}" class="sb-a"><span class="sb-i"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"/></svg></span><span>Bienvenue WhatsApp</span>@php $wlPending = \App\Http\Controllers\Admin\WelcomeController::pending(); @endphp<span data-wl-badge style="margin-left:auto;min-width:20px;padding:1px 7px;border-radius:999px;background:#10b981;color:#fff;font-size:11px;font-weight:800;text-align:center" @if(!$wlPending) hidden @endif>{{ $wlPending }}</span></a>
         <a href="{{ route('admin.plans.index') }}" class="sb-a"><span class="sb-i">{!! $I['cog'] !!}</span><span>Paramètres système</span></a>
     </nav>
     <div class="sb-ft">

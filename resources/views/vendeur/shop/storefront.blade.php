@@ -20,13 +20,17 @@
                         'points' => ['Packs à prix réduit (2, 3 pièces…)', 'Commande en 1 minute sur la page produit', 'Page produit longue, rédigée par Shopio IA'], 'tag' => 'Pour vendre vite'],
         'signature' => ['bg' => '#F6F2EA', 'band' => '#1F3B2D', 'card' => '#EDE6D8', 'ink' => '#1A1A17', 'btn' => '#1F3B2D', 'font' => "'Instrument Serif', Georgia, serif",
                         'points' => ['Grandes photos, look magazine', 'Ivoire, encre et vert profond', 'Idéal pour les belles pièces'], 'tag' => 'Pour une image premium'],
+        'lookbook'  => ['bg' => '#FFFFFF', 'band' => '#151413', 'card' => '#FFFFFF', 'ink' => '#151413', 'btn' => '#151413', 'font' => "Helvetica, Arial, sans-serif",
+                        'points' => ['Défilé : tes looks tournent sur un carrousel 3D', 'Points sur la photo : le client touche la pièce', 'Look complet en 1 clic, tailles et motifs au choix'], 'tag' => 'Mode, pagne, parfums'],
+        'cabine'    => ['bg' => '#EFEDE9', 'band' => '#2B2B2B', 'card' => '#F7F6F3', 'ink' => '#151515', 'btn' => '#2B2B2B', 'font' => "'Bodoni Moda', Georgia, serif",
+                        'points' => ['Cabine d’essayage : la tenue change en direct', 'Haut, bas, chaussures, sac… ou coffret de parfums', 'Sections modifiables, améliorées par Shopio IA'], 'tag' => 'Essayage en direct'],
     ];
 @endphp
 
 @push('styles')
 <link href="{{ \App\Support\Assets::v('fonts/dashboard-fonts.css') }}" rel="stylesheet">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Instrument+Serif&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Instrument+Serif&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
 <style>
 :root {
     --mv-blue: #1668D8; --mv-blue-h: #1260C9; --mv-b50: #EAF2FF; --mv-night: #0B1E3D;
@@ -193,7 +197,7 @@ html, body { background: var(--mv-bg); }
             <section class="mv-card" aria-labelledby="mvThemeH">
                 <div class="mv-card-hd">
                     <h2 id="mvThemeH">Thème de la boutique</h2>
-                    <span class="mv-hint">Même commande payée à la livraison, deux styles</span>
+                    <span class="mv-hint">Même commande payée à la livraison, trois styles</span>
                 </div>
                 <div class="mv-themes" role="radiogroup" aria-labelledby="mvThemeH">
                     @foreach($models as $k => [$label, $desc])
@@ -205,7 +209,7 @@ html, body { background: var(--mv-bg); }
                             <span class="mv-shot-band" style="background:{{ $l['band'] }}"><i></i>{{ \Illuminate\Support\Str::limit($shop->name, 18) }}</span>
                             <span class="mv-shot-body">
                                 <span>
-                                    <span class="mv-shot-title" style="display:block;font-family:{{ $l['font'] }}">{{ $k === 'express' ? 'Commandez en 1 minute' : 'L’élégance au quotidien' }}</span>
+                                    <span class="mv-shot-title" style="display:block;font-family:{{ $l['font'] }}">{{ ['express' => 'Commandez en 1 minute', 'signature' => 'L’élégance au quotidien', 'lookbook' => 'Jour de marché'][$k] ?? $label }}</span>
                                     <span class="mv-shot-lines"><span></span><span></span></span>
                                     <span class="mv-shot-btn" style="display:block;background:{{ $l['btn'] }}"></span>
                                 </span>

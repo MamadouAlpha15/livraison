@@ -22,6 +22,8 @@ class PageModels
     public const MODELS = [
         'express'   => ['Express', 'Qui vend : packs, commande en 1 minute, page produit longue'],
         'signature' => ['Signature', 'Premium clair : ivoire, encre et vert profond'],
+        'lookbook'  => ['Lookbook', 'Mode, pagne, parfums : défilé de looks en 3D, points sur la photo, look complet en 1 clic'],
+        'cabine'    => ['Cabine', 'Cabine d’essayage : le client compose sa tenue ou son coffret et l’essaie en direct'],
     ];
 
     /** Thème d'une boutique qui n'en a pas choisi (ou dont l'ancien modèle a été retiré). */

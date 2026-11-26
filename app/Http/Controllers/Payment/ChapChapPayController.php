@@ -26,8 +26,9 @@ class ChapChapPayController extends Controller
     {
         $type = $request->query('type');
         $id   = $request->query('id');
+        $period = $request->query('periode') === 'annee' ? 'annee' : 'mois'; // Plan Pro : au mois ou à l'année
 
-        [$subscriber, $plan, $amount] = $this->resolveSubscriber($type, $id);
+        [$subscriber, $plan, $amount] = $this->resolveSubscriber($type, $id, $period);
 
         abort_unless($subscriber, 404);
         $this->authorizeSubscriber($subscriber);
@@ -38,7 +39,9 @@ class ChapChapPayController extends Controller
             return redirect($dash)->with('info', 'Vous avez déjà un abonnement actif.');
         }
 
-        return view('payment.checkout', compact('subscriber', 'type', 'plan', 'amount'));
+        $monthly = (int) config('chapchappay.plans.pro', 150000);
+        $annual  = (int) config('chapchappay.plans.pro_annual', 0);
+        return view('payment.checkout', compact('subscriber', 'type', 'plan', 'amount', 'period', 'monthly', 'annual'));
     }
 
     // ─── Initie le paiement ───────────────────────────────────────────────────
@@ -46,11 +49,12 @@ class ChapChapPayController extends Controller
     public function initiate(Request $request)
     {
         $request->validate([
-            'type' => 'required|in:shop,company',
-            'id'   => 'required|integer',
+            'type'    => 'required|in:shop,company',
+            'id'      => 'required|integer',
+            'periode' => 'nullable|in:mois,annee',
         ]);
 
-        [$subscriber, $plan, $amount] = $this->resolveSubscriber($request->type, $request->id);
+        [$subscriber, $plan, $amount] = $this->resolveSubscriber($request->type, $request->id, $request->input('periode', 'mois'));
 
         abort_unless($subscriber, 404);
         $this->authorizeSubscriber($subscriber);
@@ -83,7 +87,7 @@ class ChapChapPayController extends Controller
         $result = $this->chapChapPay->createOperation(
             amountGnf:   $amount,
             orderId:     $internalRef,
-            description: "Abonnement Plan {$plan} — {$subscriber->name}",
+            description: ($plan === 'pro_annual' ? 'Abonnement Plan Pro (1 an)' : "Abonnement Plan {$plan}") . " — {$subscriber->name}",
             notifyUrl:   route('payment.callback'),
             returnUrl:   route('payment.success'),
             cancelUrl:   route('payment.failed'),
@@ -219,13 +223,17 @@ class ChapChapPayController extends Controller
     }
 
     // ─── Privé ───────────────────────────────────────────────────────────────
-    private function resolveSubscriber(string $type, int|string $id): array
+    private function resolveSubscriber(string $type, int|string $id, string $period = 'mois'): array
     {
         $pro = config('chapchappay.plans.pro', 150000);
         $biz = config('chapchappay.plans.business', 100000);
+        $annual = (int) config('chapchappay.plans.pro_annual', 0);
 
         return match ($type) {
-            'shop'    => [Shop::find($id),            'pro',      $pro],
+            // Boutique : Pro au mois (30 jours) ou à l'année (365 jours, prix de config chapchappay.plans.pro_annual)
+            'shop'    => $period === 'annee' && $annual > 0
+                ? [Shop::find($id), 'pro_annual', $annual]
+                : [Shop::find($id), 'pro', $pro],
             'company' => [DeliveryCompany::find($id), 'business', $biz],
             default   => [null, null, null],
         };

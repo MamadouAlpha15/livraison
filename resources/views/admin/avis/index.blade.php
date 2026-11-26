@@ -303,7 +303,7 @@ $I = [
                         @if($tm->shop)<a href="{{ \App\Support\Storefront::publicUrl($tm->shop) }}" target="_blank" rel="noopener" style="font-size:12px">Voir la vitrine ↗</a>@endif
                     </td>
                     <td><div class="stars">{!! $starsHtml($tm->rating) !!}</div></td>
-                    <td style="max-width:380px"><div class="comment-txt">{{ $tm->text }}</div></td>
+                    <td style="max-width:380px"><div class="comment-txt">{{ $tm->text }}</div>@if($tm->video)<a href="{{ asset('storage/' . $tm->video) }}" target="_blank" rel="noopener" style="display:inline-block;margin-top:6px;font-size:12px;font-weight:700">▶ Voir la vidéo</a>@endif</td>
                     <td>
                         @php $tc = ['pending' => ['#B45309', '#FFFBEB'], 'approved' => ['#15803D', '#F0FDF4'], 'rejected' => ['#DC2626', '#FEF2F2']][$tm->status] ?? ['#64748b', '#f1f5f9']; @endphp
                         <span style="display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:800;color:{{ $tc[0] }};background:{{ $tc[1] }}">{{ \App\Models\ShopTestimonial::STATUSES[$tm->status] ?? $tm->status }}</span>

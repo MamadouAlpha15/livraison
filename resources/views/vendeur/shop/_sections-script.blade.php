@@ -31,7 +31,9 @@
                 (o ? '<div class="sx-body">' + (fields.length ? fields.map(f => field(s, i, f)).join('') : '<p class="sx-hint">' + esc(t[1]) + (G.isProduct ? '.' : '. Rien à écrire : elle se remplit avec vos produits.') + '</p>') +
                     (s.type === 'stats' ? '<p class="sx-hint">Les chiffres viennent de votre boutique (avis, commandes livrées, produits) : ils ne peuvent pas être modifiés.</p>' : '') +
                     (isBuiltin(s.type) && G.isProduct ? '<p class="sx-hint">Le contenu de cette section vient de la « Page de vente » de chaque produit.</p>' : '') +
-                    (isBuiltin(s.type) && !G.isProduct ? '<p class="sx-hint">Un champ laissé vide garde le texte prévu par le thème (affiché en gris).</p>' : isBuiltin(s.type) ? '' : '<button type="button" class="sx-btn sx-btn-sm sx-btn-danger" data-del style="justify-self:start">' + svg(IC.trash, 15) + ' Supprimer la section</button>') + '</div>' : '') + '</li>';
+                    (isBuiltin(s.type) && !G.isProduct ? '<p class="sx-hint">Un champ laissé vide garde le texte prévu par le thème (affiché en gris).</p>' : '') +
+                    (!G.isProduct && G.ai.writable.includes(s.type) ? '<button type="button" class="sx-btn sx-btn-sm sx-btn-ai" data-ai style="justify-self:start"' + (G.ai.ready ? '' : ' disabled title="' + (G.ai.pro ? 'Shopio IA n’est pas configuré' : 'Réservé au plan Pro') + '"') + '>✦ Améliorer avec Shopio IA</button>' + (G.testimonial.includes(s.type) ? '<p class="sx-hint">Shopio IA réécrit seulement le titre : les avis restent ceux de vos vrais clients.</p>' : '') : '') +
+                    (isBuiltin(s.type) ? '' : '<button type="button" class="sx-btn sx-btn-sm sx-btn-danger" data-del style="justify-self:start">' + svg(IC.trash, 15) + ' Supprimer la section</button>') + '</div>' : '') + '</li>';
         }).join('');
         renderLibrary(custom);
     }
@@ -58,6 +60,7 @@
         const mv = e.target.closest('[data-move]');
         if (mv && !mv.disabled) { const j = i + +mv.dataset.move; [list[i], list[j]] = [list[j], list[i]]; touch(); render(); $('sxList').querySelector('[data-i="' + j + '"] [data-move="' + mv.dataset.move + '"]')?.focus(); return; }
         if (e.target.closest('[data-toggle]')) { s.on = !s.on; touch(); render(); return; }
+        if (e.target.closest('[data-ai]')) { improve([s], e.target.closest('[data-ai]')); return; }
         if (e.target.closest('[data-del]')) { if (confirm('Supprimer la section « ' + G.types[s.type][0] + ' » ?')) { list.splice(i, 1); open = null; touch(); render(); } return; }
         const sg = e.target.closest('[data-seg]');
         if (sg) { d[sg.dataset.seg] = sg.dataset.seg === 'limit' ? +sg.dataset.v : sg.dataset.v; sg.parentNode.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b === sg ? 'true' : 'false')); touch(); refreshSummary(li); return; }
@@ -90,6 +93,42 @@
         else return;
         touch(); refreshSummary(li);
     });
+
+    /* ───────── Shopio IA : textes améliorés, à relire avant de publier ───────── */
+    let aiBusy = false;
+    async function improve(sections, btn) {
+        if (aiBusy || !G.ai.ready) return;
+        const todo = sections.filter(s => G.ai.writable.includes(s.type));
+        const msg = $('sxAiMsg');
+        if (!todo.length) { if (msg) { msg.textContent = 'Aucune section avec du texte à améliorer.'; msg.className = 'sx-msg is-err'; } return; }
+        aiBusy = true;
+        const label = btn ? btn.textContent : '';
+        document.querySelectorAll('.sx-btn-ai').forEach(b => { b.disabled = true; });
+        if (btn) { btn.classList.add('is-busy'); btn.textContent = 'Shopio IA écrit…'; }
+        if (msg) { msg.textContent = todo.length > 1 ? 'Shopio IA réécrit ' + todo.length + ' sections…' : ''; msg.className = 'sx-msg'; }
+        try {
+            const r = await fetch(G.urls.ai, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF },
+                body: JSON.stringify({ theme: theme, sections: todo.map(s => ({ id: s.id, type: s.type, d: s.d })), hint: $('sxAiHint') ? $('sxAiHint').value : '' }) });
+            const j = await r.json().catch(() => ({}));
+            if (!r.ok) { const t = j.error || (j.errors && Object.values(j.errors)[0][0]) || j.message || 'Shopio IA n’a pas répondu.'; if (msg) { msg.textContent = t; msg.className = 'sx-msg is-err'; } setState(t, 'is-err'); return; }
+            let n = 0;
+            list.forEach(s => { if (j.sections && j.sections[s.id]) { s.d = j.sections[s.id]; n++; } });
+            if (todo.length === 1) open = todo[0].id;
+            touch(); render();
+            Object.keys(j.sections || {}).forEach(id => { const i = list.findIndex(s => s.id === id); const li = $('sxList').querySelector('[data-i="' + i + '"]'); if (li) li.classList.add('is-ai'); });
+            const done = n > 1 ? n + ' sections réécrites par Shopio IA : relisez-les, puis « Enregistrer et publier ».' : 'Textes réécrits par Shopio IA : relisez-les, puis « Enregistrer et publier ».';
+            setState(done, 'is-dirty');
+            if (msg) { msg.textContent = done; msg.className = 'sx-msg is-ok'; }
+        } catch (x) {
+            setState('Shopio IA ne répond pas : vérifiez la connexion.', 'is-err');
+        } finally {
+            aiBusy = false;
+            document.querySelectorAll('.sx-btn-ai').forEach(b => { b.disabled = !G.ai.ready; });
+            if (btn && btn.isConnected) { btn.classList.remove('is-busy'); btn.textContent = label; }
+            if ($('sxAiAll')) $('sxAiAll').textContent = '✦ Améliorer toute la page';
+        }
+    }
+    if ($('sxAiAll')) $('sxAiAll').addEventListener('click', () => improve(list.filter(s => s.on), $('sxAiAll')));
 
     /* Glisser-déposer */
     let dragI = null;

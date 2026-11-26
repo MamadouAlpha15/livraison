@@ -1837,6 +1837,7 @@ $I = [
                 </button>
                 <div class="sb-sub">
                     <a href="{{ route('boutique.payments.index') }}" class="sb-item"><span class="ico">{!! $I['card'] !!}</span> Paiements</a>
+                    <a href="{{ route('boutique.profit.index') }}" class="sb-item"><span class="ico">{!! $I['coin'] !!}</span> Bénéfices</a>
                     <a href="{{ route('boutique.commissions.index') }}" class="sb-item"><span class="ico">{!! $I['chart'] !!}</span> Commissions</a>
                     @if($isPro)
                     <a href="{{ route('boutique.reports.index') }}" class="sb-item"><span class="ico">{!! $I['clip'] !!}</span> Rapports</a>
@@ -2073,7 +2074,7 @@ $I = [
                             <button type="button" class="db-act" data-share-shop="{{ $shopPublicUrl }}" data-share-name="{{ $shop->name }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13"/></svg>Partager ma boutique</button>
                         </div>
                         {{-- Témoignage du vendeur sur Shopio (page d'accueil, après validation) --}}
-                        <a href="{{ route('boutique.testimonial.edit') }}" class="db-tm">★ Donne ton avis sur Shopio</a>
+                        <span style="display:flex;gap:14px;flex-wrap:wrap"><a href="{{ route('boutique.testimonial.edit') }}" class="db-tm">★ Donne ton avis sur Shopio</a><a href="{{ route('boutique.referral') }}" class="db-tm">🎁 Invite un vendeur : 1 mois de Pro chacun</a></span>
                     </div>
                     {{-- Scène 3D décorative : sphère bleue, carte « Visites ce mois », pièce GNF --}}
                     <div class="sv-scene" aria-hidden="true">

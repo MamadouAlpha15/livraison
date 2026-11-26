@@ -82,7 +82,7 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
             </div>
             @endif
 
-            <form class="tm-card" method="POST" action="{{ route('boutique.testimonial.update') }}">
+            <form class="tm-card" method="POST" action="{{ route('boutique.testimonial.update') }}" enctype="multipart/form-data">
                 @csrf @method('PUT')
                 <div>
                     <span class="tm-lbl" id="tmRateL">Ta note</span>
@@ -100,6 +100,15 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
                 <div class="tm-row">
                     <div><label class="tm-lbl" for="tmAuthor">Nom affiché</label><input class="tm-in" id="tmAuthor" name="author" maxlength="60" required value="{{ old('author', $t->author ?? $firstName) }}"><span class="tm-hint">Ton prénom suffit.</span></div>
                     <div><label class="tm-lbl" for="tmRole">Ton rôle (facultatif)</label><input class="tm-in" id="tmRole" name="author_role" maxlength="60" placeholder="Ex. : Fondatrice" value="{{ old('author_role', $t->author_role ?? '') }}"></div>
+                </div>
+                <div>
+                    <label class="tm-lbl" for="tmVideo">Une courte vidéo (facultatif)</label>
+                    @if($t && $t->video)
+                        <video src="{{ asset('storage/' . $t->video) }}" controls preload="metadata" playsinline style="width:100%;max-width:360px;border-radius:12px;background:#000;display:block;margin-bottom:8px"></video>
+                        <label class="tm-check" style="margin-bottom:8px"><input type="checkbox" name="remove_video" value="1"> <span>Retirer cette vidéo</span></label>
+                    @endif
+                    <input class="tm-in" id="tmVideo" name="video" type="file" accept="video/mp4,video/webm,video/quicktime" style="padding:8px">
+                    <span class="tm-hint" id="tmVideoHint">Filme-toi 30 secondes à 1 min 30 au téléphone : qui tu es, ce que tu vends, ce que Shopio a changé. MP4, WebM ou MOV, 50 Mo au maximum.</span>
                 </div>
                 <label class="tm-check"><input type="checkbox" name="consent" value="1" required @checked(old('consent', $t ? true : false))>
                     <span>J’accepte que cet avis, mon nom affiché, le nom de ma boutique avec un lien vers sa vitrine{{ $delivered > 0 ? ' et son nombre de commandes livrées (' . $delivered . ' aujourd’hui)' : '' }} soient montrés sur la page d’accueil de Shopio.</span></label>
@@ -136,6 +145,16 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
         $('tmPRole').textContent = $('tmRole').value.trim() ? ', ' + $('tmRole').value.trim() : '';
         $('tmCount').textContent = $('tmText').value.length;
     };
+    // Vidéo : 1 min 30 au plus et 50 Mo au plus, vérifiés avant l'envoi
+    const vIn = $('tmVideo'), vHint = $('tmVideoHint'), vDefault = vHint.textContent;
+    vIn.addEventListener('change', () => {
+        const f = vIn.files[0]; vHint.style.color = ''; vHint.textContent = vDefault;
+        if (!f) return;
+        if (f.size > 50 * 1024 * 1024) { vIn.value = ''; vHint.style.color = '#DC2626'; vHint.textContent = 'Vidéo trop lourde : 50 Mo au maximum.'; return; }
+        const v = document.createElement('video'); v.preload = 'metadata';
+        v.onloadedmetadata = () => { URL.revokeObjectURL(v.src); if (v.duration > 95) { vIn.value = ''; vHint.style.color = '#DC2626'; vHint.textContent = 'Vidéo trop longue : 1 min 30 au maximum.'; } };
+        v.src = URL.createObjectURL(f);
+    });
     document.querySelector('.tm-card').addEventListener('input', sync);
     document.querySelector('.tm-card').addEventListener('change', sync);
     sync();

@@ -66,7 +66,7 @@ class StorefrontController extends Controller
             'vacation'     => ['nullable', 'boolean'],
             'vacation_msg' => ['nullable', 'string', 'max:120'],
         ], [
-            'page_model.in' => 'Choisissez le thème Express ou Signature.',
+            'page_model.in' => 'Choisissez un des thèmes proposés.',
             'accent.regex'  => 'Couleur invalide.',
             'vacation_msg.max' => 'Le message de vacances ne peut pas dépasser 120 caractères.',
         ]);
@@ -99,7 +99,8 @@ class StorefrontController extends Controller
         $shop = $this->shop();
         $config = Storefront::forShop($shop);
         // Page modifiée : l'accueil d'un thème (Express, Signature) ou la page produit
-        $theme = isset(HomeSections::PAGES[$request->query('theme')]) ? $request->query('theme') : $config['page_model'];
+        // (thème en ligne sans sections, comme Lookbook : on ouvre l'accueil Express)
+        $theme = isset(HomeSections::PAGES[$request->query('theme')]) ? $request->query('theme') : (isset(HomeSections::PAGES[$config['page_model']]) ? $config['page_model'] : 'express');
         $defaults = HomeSections::DEFAULTS;
         // Titre d'accueil prévu : le slogan de la boutique, sinon son nom (Signature) ou la phrase du thème
         $slogan = (string) $config['cover']['slogan'];
@@ -124,6 +125,7 @@ class StorefrontController extends Controller
             'images'     => $images,
             'categories' => collect(Storefront::categoryLinks($shop))->pluck('name')->values(),
             'publicUrl'  => Storefront::publicUrl($shop),
+            'ai'         => self::aiState($shop),
         ]);
     }
 
@@ -141,6 +143,41 @@ class StorefrontController extends Controller
         $shop->update(['storefront' => Storefront::normalize($config)]);
 
         return response()->json(['ok' => true, 'sections' => Storefront::forShop($shop->fresh())['home'][$data['theme']]]);
+    }
+
+    /** Shopio IA est-il proposé à cette boutique ? (plan Pro en cours, clé configurée) */
+    public static function aiState(Shop $shop): array
+    {
+        $pro = $shop->plan === 'pro' && $shop->plan_expires_at?->isFuture();
+        return ['pro' => (bool) $pro, 'ready' => $pro && (string) config('services.anthropic.key') !== ''];
+    }
+
+    /**
+     * « Améliorer avec Shopio IA » : réécrit les textes d'une section (ou de toute la page) et les renvoie à
+     * l'éditeur, sans rien enregistrer : le vendeur relit, corrige, puis publie. Plan Pro, 20 demandes par heure.
+     */
+    public function sectionsAi(Request $request, \App\Services\SectionsAi $ai): JsonResponse
+    {
+        $shop = $this->shop();
+        $data = $request->validate([
+            'theme'    => ['required', Rule::in(array_keys(HomeSections::PAGES))],
+            'sections' => ['required', 'array', 'min:1', 'max:' . (count(HomeSections::BUILTIN['signature']) + HomeSections::CUSTOM_MAX)],
+            'hint'     => ['nullable', 'string', 'max:300'],
+        ]);
+        if (!self::aiState($shop)['pro']) {
+            return response()->json(['error' => 'Shopio IA est réservé au plan Pro. Passez au plan Pro pour améliorer vos sections en un clic.'], 403);
+        }
+        $key = 'ai-sections:' . Auth::id();
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 20)) {
+            return response()->json(['error' => 'Limite atteinte (20 demandes par heure). Réessayez plus tard.'], 429);
+        }
+        \Illuminate\Support\Facades\RateLimiter::hit($key, 3600);
+
+        try {
+            return response()->json(['sections' => $ai->improve($shop, $data['theme'], $data['sections'], (string) ($data['hint'] ?? ''))]);
+        } catch (\RuntimeException $e) {
+            return response()->json(['error' => $e->getMessage()], 502);
+        }
     }
 
     /** Disponibilité d'une adresse de boutique (/s/…). */

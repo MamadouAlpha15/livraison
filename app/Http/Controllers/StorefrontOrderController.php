@@ -41,6 +41,9 @@ class StorefrontOrderController extends Controller
             'items'         => ['required', 'array', 'min:1', 'max:30'],
             'items.*.id'    => ['required', 'integer'],
             'items.*.qty'   => ['required', 'integer', 'min:1', 'max:99'],
+            // Thème Lookbook : motif (variante du produit) et taille choisis pour chaque pièce
+            'items.*.variant' => ['nullable', 'integer'],
+            'items.*.size'    => ['nullable', 'string', 'max:12'],
             'name'          => $guest ? ['required', 'string', 'max:255', new RealisticFullName] : ['nullable', 'string', 'max:255'],
             'phone'         => ['required', 'string', 'max:30', new RealisticGuineaPhone],
             'commune'       => ['required', Rule::in(PageModels::COMMUNES)],
@@ -55,9 +58,18 @@ class StorefrontOrderController extends Controller
             'landmark.max'     => 'Le repère ne peut pas dépasser 120 caractères.',
         ]);
 
-        // Quantités regroupées par produit (un même produit ajouté deux fois = une ligne)
+        // Lignes regroupées par produit, motif et taille (un même produit ajouté deux fois = une ligne)
+        $lines = [];
+        foreach ($data['items'] as $it) {
+            $vid = !empty($it['variant']) ? (int) $it['variant'] : null;
+            $size = isset($it['size']) ? mb_strtoupper(trim(strip_tags((string) $it['size']))) : '';
+            $key = (int) $it['id'] . ':' . ($vid ?? 0) . ':' . $size;
+            $lines[$key] ??= ['id' => (int) $it['id'], 'variant' => $vid, 'size' => $size !== '' ? $size : null, 'qty' => 0];
+            $lines[$key]['qty'] += (int) $it['qty'];
+        }
+        // Quantités par produit (adresse obligatoire, stock et packs des produits sans motif)
         $qty = [];
-        foreach ($data['items'] as $it) $qty[(int) $it['id']] = ($qty[(int) $it['id']] ?? 0) + (int) $it['qty'];
+        foreach ($lines as $l) $qty[$l['id']] = ($qty[$l['id']] ?? 0) + $l['qty'];
 
         // Adresse obligatoire si le formulaire d'un des produits l'exige (éditeur produit → Formulaire)
         if (trim((string) ($data['landmark'] ?? '')) === '') {
@@ -68,20 +80,51 @@ class StorefrontOrderController extends Controller
         }
 
         try {
-            $order = DB::transaction(function () use ($shop, $qty, $data, $guest) {
+            $order = DB::transaction(function () use ($shop, $qty, $lines, $data, $guest) {
                 $products = Product::where('shop_id', $shop->id)->where('is_active', true)->whereIn('id', array_keys($qty))->lockForUpdate()->get()->keyBy('id');
+                $variantIds = array_values(array_filter(array_column($lines, 'variant')));
+                $variants = $variantIds
+                    ? \App\Models\ProductVariant::whereIn('id', $variantIds)->whereIn('product_id', array_keys($qty))->where('is_active', true)->lockForUpdate()->get()->keyBy('id')
+                    : collect();
                 $total = 0;
-                $lineTotals = [];
-                foreach ($qty as $id => $n) {
-                    $p = $products->get($id);
+                $plainQty = [];  // produit sans motif => quantité (packs et stock du produit)
+                $variantQty = []; // motif => quantité (stock du motif)
+                foreach ($lines as $l) {
+                    $p = $products->get($l['id']);
                     if (!$p) throw new \RuntimeException('Un produit de votre panier n’est plus en vente. Retirez-le puis réessayez.');
-                    if ($p->has_variants) throw new \RuntimeException('« ' . $p->name . ' » a des options (taille, couleur…) : commandez-le depuis sa fiche.');
+                    if ($l['variant']) {
+                        $v = $variants->get($l['variant']);
+                        if (!$v || (int) $v->product_id !== (int) $p->id) throw new \RuntimeException('Le motif choisi pour « ' . $p->name . ' » n’est plus disponible. Choisissez-en un autre.');
+                        $variantQty[$v->id] = ($variantQty[$v->id] ?? 0) + $l['qty'];
+                    } else {
+                        if ($p->has_variants) throw new \RuntimeException('« ' . $p->name . ' » a des options (taille, couleur…) : commandez-le depuis sa fiche.');
+                        $plainQty[$p->id] = ($plainQty[$p->id] ?? 0) + $l['qty'];
+                    }
+                }
+                foreach ($variantQty as $vid => $n) {
+                    $v = $variants[$vid];
+                    if ($v->stock !== null && $v->stock < $n) {
+                        $pn = $products[$v->product_id]->name . ' · ' . $v->name;
+                        throw new \RuntimeException($v->stock > 0 ? 'Il ne reste que ' . $v->stock . ' « ' . $pn . ' » en stock.' : '« ' . $pn . ' » est en rupture de stock.');
+                    }
+                }
+                $unitPlain = [];
+                foreach ($plainQty as $id => $n) {
+                    $p = $products[$id];
                     if ($p->stock !== null && $p->stock < $n) {
                         throw new \RuntimeException($p->stock > 0 ? 'Il ne reste que ' . $p->stock . ' « ' . $p->name . ' » en stock.' : '« ' . $p->name . ' » est en rupture de stock.');
                     }
                     // Packs du produit (2, 3… à prix réduit) appliqués ici, pas seulement à l'affichage
-                    $lineTotals[$id] = ProductPage::lineTotal($p, $n);
-                    $total += $lineTotals[$id];
+                    $sum = ProductPage::lineTotal($p, $n);
+                    $unitPlain[$id] = $sum / $n;
+                    $total += $sum;
+                }
+                foreach ($lines as $k => $l) {
+                    if (!$l['variant']) continue;
+                    $v = $variants[$l['variant']];
+                    $unit = (float) $v->price > 0 ? (float) $v->price : (float) $products[$l['id']]->current_price;
+                    $lines[$k]['unit'] = $unit;
+                    $total += (int) round($unit * $l['qty']);
                 }
 
                 $order = Order::create([
@@ -95,11 +138,19 @@ class StorefrontOrderController extends Controller
                     'source'               => TrafficSource::forOrder($shop->id),
                     'campaign_id'          => TrafficSource::campaignForOrder($shop->id),
                 ]);
-                foreach ($qty as $id => $n) {
-                    $p = $products[$id];
-                    OrderItem::create(['order_id' => $order->id, 'product_id' => $p->id, 'quantity' => $n, 'price' => round($lineTotals[$id] / $n, 2)]);
-                    if ($p->stock !== null) $p->decrement('stock', $n);
+                foreach ($lines as $l) {
+                    $p = $products[$l['id']];
+                    $v = $l['variant'] ? $variants[$l['variant']] : null;
+                    // Nom affiché au vendeur : « Soleils · Taille M », « Taille L », ou rien
+                    $label = trim(($v ? $v->name : '') . ($l['size'] ? ($v ? ' · ' : '') . 'Taille ' . $l['size'] : ''));
+                    OrderItem::create([
+                        'order_id' => $order->id, 'product_id' => $p->id, 'quantity' => $l['qty'],
+                        'product_variant_id' => $v?->id, 'variant_name' => $label !== '' ? $label : null,
+                        'price' => round($v ? $l['unit'] : $unitPlain[$p->id], 2),
+                    ]);
                 }
+                foreach ($variantQty as $vid => $n) if ($variants[$vid]->stock !== null) $variants[$vid]->decrement('stock', $n);
+                foreach ($plainQty as $id => $n) if ($products[$id]->stock !== null) $products[$id]->decrement('stock', $n);
                 Payment::create(['order_id' => $order->id, 'method' => Payment::METHOD_CASH, 'amount' => $total, 'status' => 'en_attente']);
                 return $order;
             });

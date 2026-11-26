@@ -182,6 +182,16 @@ Route::get('/.well-known/assetlinks.json', function () {
 /* Accueil Shopio : présentation des fonctionnalités avec démos animées (pour les vendeurs) */
 Route::get('/', [\App\Http\Controllers\LandingController::class, 'index'])->name('landing');
 
+/* Lien de parrainage d'une boutique : garde le code 30 jours puis ouvre la page d'accueil */
+Route::get('/r/{code}', [\App\Http\Controllers\ReferralController::class, 'visit'])->middleware('throttle:60,1')->name('referral.visit');
+
+/* Académie Shopio : guides pratiques pour vendre en ligne */
+Route::get('/academie', [\App\Http\Controllers\AcademyController::class, 'index'])->name('academy.index');
+Route::get('/academie/{slug}', [\App\Http\Controllers\AcademyController::class, 'show'])->name('academy.show');
+
+/* Pages par pays : « Vendre en ligne en Guinée, au Sénégal… » (page d'accueil adaptée au pays) */
+Route::get('/vendre-en-ligne/{pays}', [\App\Http\Controllers\LandingController::class, 'country'])->name('landing.country');
+
 /* Marché Shopio : produits et boutiques pour les clients (ancien accueil, même nom de route « welcome ») */
 Route::get('/marche', [WelcomeController::class, 'index'])->name('welcome');
 
@@ -583,6 +593,10 @@ Route::middleware(['auth', 'role:superadmin,staff'])
         Route::get('/users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');
 
         /* Annonces par email (diffusion ciblée : clients / vendeurs / entreprises) */
+        /* Bienvenue WhatsApp : écrire à chaque nouvel inscrit (vendeur ou client), en un clic */
+        Route::get('/bienvenue',           [\App\Http\Controllers\Admin\WelcomeController::class, 'index'])->name('welcome.index');
+        Route::put('/bienvenue/messages',  [\App\Http\Controllers\Admin\WelcomeController::class, 'texts'])->name('welcome.texts');
+        Route::post('/bienvenue/{user}',   [\App\Http\Controllers\Admin\WelcomeController::class, 'mark']) ->name('welcome.mark');
         Route::get('/broadcasts',          [\App\Http\Controllers\Admin\BroadcastController::class, 'index'])   ->name('broadcasts.index');
         Route::post('/broadcasts',         [\App\Http\Controllers\Admin\BroadcastController::class, 'store'])   ->name('broadcasts.store');
         Route::get('/broadcasts/progress', [\App\Http\Controllers\Admin\BroadcastController::class, 'progress'])->name('broadcasts.progress');
@@ -663,6 +677,7 @@ Route::middleware(['auth', 'role:admin'])
         Route::put('vitrine',               [\App\Http\Controllers\Vendeur\StorefrontController::class, 'update'])->name('storefront.update');
         Route::get('vitrine/sections',      [\App\Http\Controllers\Vendeur\StorefrontController::class, 'sections'])     ->name('storefront.sections');
         Route::put('vitrine/sections',      [\App\Http\Controllers\Vendeur\StorefrontController::class, 'saveSections']) ->name('storefront.sections.update');
+        Route::post('vitrine/sections/ia',  [\App\Http\Controllers\Vendeur\StorefrontController::class, 'sectionsAi'])   ->name('storefront.sections.ai');
         Route::get('vitrine/qr-code',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'qr'])    ->name('storefront.qr');
         Route::get('vitrine/adresse',       [\App\Http\Controllers\Vendeur\StorefrontController::class, 'slugCheck'])   ->name('storefront.slug');
 
@@ -704,6 +719,23 @@ Route::middleware(['auth', 'role:admin'])
         Route::post('orders/{order}/etape', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'stage'])->name('orders.stage');
         Route::post('orders/{order}/note', [\App\Http\Controllers\Boutique\OrderBoardController::class, 'note'])->name('orders.note');
         Route::put('orders/{order}/assign', [EmployeOrderController::class, 'assign']) ->name('orders.assign');
+
+        /* Looks (thème Lookbook) : tenues mises en scène avec les produits de la boutique */
+        Route::get('looks',                 [\App\Http\Controllers\Boutique\LookController::class, 'index'])  ->name('looks.index');
+        Route::get('looks/nouveau',         [\App\Http\Controllers\Boutique\LookController::class, 'create']) ->name('looks.create');
+        Route::post('looks',                [\App\Http\Controllers\Boutique\LookController::class, 'store'])  ->name('looks.store');
+        Route::get('looks/{look}/modifier', [\App\Http\Controllers\Boutique\LookController::class, 'edit'])   ->name('looks.edit');
+        Route::put('looks/{look}',          [\App\Http\Controllers\Boutique\LookController::class, 'update']) ->name('looks.update');
+        Route::delete('looks/{look}',       [\App\Http\Controllers\Boutique\LookController::class, 'destroy'])->name('looks.destroy');
+        Route::post('looks/{look}/deplacer',[\App\Http\Controllers\Boutique\LookController::class, 'move'])   ->name('looks.move');
+        Route::post('looks/detourage',      [\App\Http\Controllers\Boutique\LookController::class, 'cutout']) ->middleware('throttle:20,1')->name('looks.cutout');
+
+        /* Parrainage : lien d'invitation, filleuls, mois de Pro gagnés */
+        Route::get('parrainage', [\App\Http\Controllers\ReferralController::class, 'index'])->name('referral');
+
+        /* Bénéfices : bénéfice réel par produit (prix d'achat, livraison, retours, pub) */
+        Route::get('benefices', [\App\Http\Controllers\Boutique\ProfitController::class, 'index'])->name('profit.index');
+        Route::put('benefices', [\App\Http\Controllers\Boutique\ProfitController::class, 'update'])->middleware('throttle:30,1')->name('profit.update');
 
         /* Ton avis sur Shopio (témoignage affiché sur la page d'accueil après validation) */
         Route::get('avis-shopio',    [\App\Http\Controllers\Boutique\TestimonialController::class, 'edit'])   ->name('testimonial.edit');

@@ -32,6 +32,8 @@ class SubscriptionService
 
     // ── Durée d'un abonnement ────────────────────────────────────────────────
     const SUBSCRIPTION_DAYS = 30;         // 30 jours = 1 mois
+    const ANNUAL_DAYS = 365;              // Plan Pro payé à l'année (abonnement « pro_annual »)
+    const REFERRAL_DAYS = 30;             // Parrainage : 1 mois de Pro offert au parrain et au filleul
 
     // ── Durée de l'essai gratuit offert à l'inscription ───────────────────────
     const TRIAL_DAYS = 30;                // 1 mois d'essai Pro / Business offert
@@ -166,7 +168,7 @@ class SubscriptionService
     public function activate(Subscription $subscription, array $gatewayResponse = []): void
     {
         $startedAt  = now();
-        $expiresAt  = now()->addDays(self::SUBSCRIPTION_DAYS);
+        $expiresAt  = now()->addDays($subscription->plan === 'pro_annual' ? self::ANNUAL_DAYS : self::SUBSCRIPTION_DAYS);
 
         // Met à jour l'enregistrement d'abonnement
         $subscription->update([
@@ -186,7 +188,9 @@ class SubscriptionService
             ]);
             Log::info("[Subscription] Boutique #{$subscriber->id} activée en Pro jusqu'au {$expiresAt->toDateString()}");
             $this->sendConfirmationEmail($subscription, $subscriber->name, route('boutique.dashboard'));
-            $this->notifySuperadminsOfPayment($subscriber->name, 'Pro', (float) $subscription->amount);
+            $this->notifySuperadminsOfPayment($subscriber->name, $subscription->plan === 'pro_annual' ? 'Pro annuel' : 'Pro', (float) $subscription->amount);
+            // Parrainage : le premier vrai paiement d'une boutique invitée offre 1 mois de Pro à son parrain
+            $this->rewardReferrer($subscriber);
         }
 
         if ($subscriber instanceof DeliveryCompany) {
@@ -198,6 +202,40 @@ class SubscriptionService
             $this->sendConfirmationEmail($subscription, $subscriber->name, route('company.dashboard'));
             $this->notifySuperadminsOfPayment($subscriber->name, 'Business', (float) $subscription->amount);
         }
+    }
+
+    /**
+     * Parrainage : ajoute REFERRAL_DAYS jours de Pro à la boutique qui a invité celle-ci, une seule fois,
+     * au premier paiement réel de la boutique invitée (jamais pour un essai gratuit).
+     */
+    public function rewardReferrer(Shop $shop): void
+    {
+        if (!$shop->referred_by_shop_id || $shop->referral_rewarded_at) return;
+        $referrer = Shop::find($shop->referred_by_shop_id);
+        $shop->forceFill(['referral_rewarded_at' => now()])->saveQuietly();
+        if (!$referrer) return;
+        $this->addProDays($referrer, self::REFERRAL_DAYS, 'parrainage', 'ref-' . $shop->id);
+        Log::info("[Parrainage] Boutique #{$referrer->id} : +" . self::REFERRAL_DAYS . " jours de Pro (filleul #{$shop->id})");
+    }
+
+    /** Ajoute des jours de Pro (à la suite de l'abonnement en cours s'il y en a un), avec une trace à 0 GNF. */
+    public function addProDays(Shop $shop, int $days, string $method, string $ref): void
+    {
+        $base = ($shop->plan === 'pro' && $shop->plan_expires_at?->isFuture()) ? $shop->plan_expires_at->copy() : now();
+        $expiresAt = $base->addDays($days);
+        $shop->update(['plan' => 'pro', 'plan_expires_at' => $expiresAt]);
+        Subscription::create([
+            'subscriber_type'   => Shop::class,
+            'subscriber_id'     => $shop->id,
+            'plan'              => 'pro',
+            'amount'            => 0,
+            'currency'          => $shop->currency ?? 'GNF',
+            'payment_method'    => $method,
+            'payment_reference' => $method . '-' . $ref . '-' . now()->timestamp,
+            'status'            => 'active',
+            'started_at'        => now(),
+            'expires_at'        => $expiresAt,
+        ]);
     }
 
     private function notifySuperadminsOfPayment(string $subscriberName, string $planLabel, float $amount): void

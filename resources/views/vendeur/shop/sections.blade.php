@@ -19,8 +19,11 @@
         'defaults' => $defaults, 'tones' => HS::TONES, 'styles' => HS::STYLES, 'formats' => HS::FORMATS, 'images' => (object) $images, 'categories' => $categories,
         'library' => HS::CATEGORIES, 'icons' => HS::ICONS, 'testimonial' => HS::TESTIMONIAL_TYPES,
         'limits' => ['custom' => HS::CUSTOM_MAX, 'list' => HS::LIST_MAX],
+        // Shopio IA : textes réécrits pour les sections qui en ont (jamais les témoignages ni les chiffres)
+        'ai' => $ai + ['writable' => collect(array_keys(HS::TYPES))->filter(fn ($t) => \App\Services\SectionsAi::writable($t))->values()],
         'urls' => [
             'save' => route('boutique.storefront.sections.update'), 'upload' => route('boutique.grow.cover-upload'),
+            'ai' => route('boutique.storefront.sections.ai'), 'upgrade' => route('boutique.subscription.upgrade'),
             'preview' => $publicUrl, 'self' => route('boutique.storefront.sections'),
         ],
     ];
@@ -57,6 +60,15 @@
             @elseif($theme !== $published)
             <p class="sx-hint" style="padding:10px 12px;border-radius:12px;background:#FEF3E0;color:#92400E">Vous modifiez le thème {{ $models[$theme][0] }}, qui n’est pas en ligne. Vos clients verront ces sections quand vous choisirez ce thème dans <a href="{{ route('boutique.storefront.edit') }}" style="color:inherit">Ma vitrine</a>.</p>
             @endif
+            @unless($isProduct)
+            <div class="sx-ai" id="sxAi">
+                <div class="sx-ai-hd"><b><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg> Shopio IA</b>@unless($ai['pro'])<a href="{{ route('boutique.subscription.upgrade') }}">Plan Pro</a>@endunless</div>
+                <p class="sx-hint">Réécrit les textes de vos sections : plus clairs, plus vendeurs, toujours vrais. Vous relisez avant de publier.</p>
+                <input class="sx-input" id="sxAiHint" maxlength="300" placeholder="Ton souhaité (facultatif) : chic, chaleureux, jeune…" aria-label="Ton souhaité pour Shopio IA" @unless($ai['ready']) disabled @endunless>
+                <button type="button" class="sx-btn sx-btn-sm sx-btn-ai" id="sxAiAll" @unless($ai['ready']) disabled @endunless>✦ Améliorer toute la page</button>
+                <p class="sx-msg" id="sxAiMsg" aria-live="polite">@if(!$ai['pro'])Réservé au plan Pro.@elseif(!$ai['ready'])Shopio IA n’est pas configuré sur ce serveur.@endif</p>
+            </div>
+            @endunless
             <ol class="sx-list" id="sxList" aria-label="Sections, dans l’ordre de la page"></ol>
             <div class="sx-add" id="sxAdd">
                 <b style="font-size:14px">Ajouter une section</b>

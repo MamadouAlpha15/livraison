@@ -145,6 +145,8 @@ class ShopOnboardingController extends Controller
 
             // Essai gratuit du Plan Pro, comme pour toute nouvelle boutique
             app(\App\Services\SubscriptionService::class)->startShopTrial($shop);
+            // Invitée par un lien de parrainage : 1 mois de Pro en plus (le parrain sera récompensé au 1er paiement)
+            \App\Support\Referral::attach($shop->fresh(), request());
 
             // Le vendeur devient admin de sa boutique
             $user->update(['shop_id' => $shop->id, 'role_in_shop' => 'admin']);

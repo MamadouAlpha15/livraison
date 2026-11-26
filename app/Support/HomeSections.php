@@ -35,6 +35,7 @@ class HomeSections
         'results'      => ['Chiffres réels', 'Note moyenne et commandes livrées (s’il y en a)'],
         'reviews'      => ['Avis vérifiés', 'Les avis laissés sur Shopio par vos clients livrés'],
         'faq'          => ['Questions fréquentes', 'Questions et réponses'],
+        'studio'       => ['Cabine d’essayage', 'Le client compose sa tenue (ou son coffret) et l’essaie en direct'],
         // Sections de la page produit (contenu de chaque produit : écran « Page de vente »)
         'p_info'       => ['Informations', 'Volets « Comment l’utiliser ? », « Description détaillée », « Livraison et garantie »'],
         'p_highlight'  => ['Garantie avec photos', 'Titre, texte et bouton « Je le veux », avec vos photos inclinées'],
@@ -84,13 +85,14 @@ class HomeSections
     public const BUILTIN = [
         'express'   => ['hero', 'promise', 'products', 'results', 'reviews', 'faq'],
         'signature' => ['hero', 'promise', 'categories', 'products', 'spotlight', 'how', 'reviews', 'faq'],
+        'cabine'    => ['studio', 'promise', 'how', 'reviews', 'faq'],
         // Page produit (une seule mise en page pour tous les produits) : sous le haut de page fixe
         // (photos, prix, packs, commande), qui reste toujours en premier
         'product'   => ['p_info', 'p_highlight', 'p_reviews', 'p_band', 'p_story', 'p_audience', 'p_results', 'p_love', 'p_compare', 'p_faq', 'p_related'],
     ];
 
     /** Pages modifiables dans l'éditeur : [libellé, thème de rendu]. */
-    public const PAGES = ['express' => ['Accueil · Express', 'express'], 'signature' => ['Accueil · Signature', 'signature'], 'product' => ['Page produit', 'express']];
+    public const PAGES = ['express' => ['Accueil · Express', 'express'], 'signature' => ['Accueil · Signature', 'signature'], 'cabine' => ['Accueil · Cabine', 'cabine'], 'product' => ['Page produit', 'express']];
 
     /** Sections que le vendeur peut ajouter (dans les deux thèmes). */
     public const ADDABLE = ['icons', 'text', 'imgtext', 'qa', 'faq2', 'marquee', 'divider', 'quotes', 'fbposts', 'testimonials', 'stats', 'compare', 'slideshow', 'videos', 'reel', 'banner', 'promo', 'trust', 'category'];
@@ -127,6 +129,10 @@ class HomeSections
         'results'      => [['title', 'line', 'Titre', 60]],
         'reviews'      => [['title', 'line', 'Titre', 60]],
         'faq'          => [['title', 'line', 'Titre', 80], ['items', 'faq', 'Questions (vide = questions prévues par Shopio)', 0]],
+        'studio'       => [['title', 'line', 'Titre (vide = nom de la boutique)', 60], ['text', 'line', 'Phrase d’accroche', 160], ['button', 'line', 'Texte du bouton de commande', 30],
+                           ['img', 'img', 'Photo d’ambiance (bouton « Pièce » de la cabine, facultatif)', 0],
+                           ['z1', 'cat', 'Rayon 1 (vide = choisi automatiquement)', 100], ['z2', 'cat', 'Rayon 2 (vide = automatique)', 100],
+                           ['z3', 'cat', 'Rayon 3 (vide = automatique)', 100], ['z4', 'cat', 'Rayon 4 (vide = automatique)', 100]],
         'p_info'       => [],
         'p_highlight'  => [],
         'p_audience'   => [],
@@ -177,6 +183,13 @@ class HomeSections
             'how'        => ['title' => 'Commander en une minute', 'text' => 'Pas de carte bancaire, pas de compte obligatoire. Vous payez seulement quand vous avez le produit en main.'],
             'reviews'    => ['title' => 'Ce qu’en disent nos clients'],
             'faq'        => ['title' => 'Les réponses à vos questions'],
+        ],
+        'cabine' => [
+            'studio'  => ['title' => '', 'text' => 'Composez votre tenue, essayez-la en direct, payez à la livraison.', 'button' => 'Commander le look'],
+            'promise' => ['items' => [['title' => 'Paiement à la livraison', 'text' => 'En espèces, au livreur'], ['title' => 'Appel de confirmation', 'text' => 'La boutique vous appelle avant l’envoi'], ['title' => 'Suivi de commande', 'text' => 'Chaque étape sur Shopio']]],
+            'how'     => ['title' => 'Essayer, puis commander', 'text' => 'Touchez une pièce pour l’essayer, changez-la autant que vous voulez, puis commandez le look entier ou une seule pièce. Vous payez à la livraison.'],
+            'reviews' => ['title' => 'Ce qu’en disent nos clients'],
+            'faq'     => ['title' => 'Les réponses à vos questions'],
         ],
         'product' => [
             'p_reviews' => ['title' => 'Testé et approuvé par des clients de la boutique'],
